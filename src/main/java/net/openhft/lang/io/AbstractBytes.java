@@ -54,23 +54,6 @@ public abstract class AbstractBytes implements Bytes {
         this.bytesMarshallerFactory = bytesMarshallerFactory;
     }
 
-    /*
-        @Override
-        public int position() {
-            return (int) (position - start);
-        }
-
-        @Override
-        public int capacity() {
-            return (int) (limit - start);
-        }
-
-        @Override
-        public int remaining() {
-            return (int) (limit - position);
-        }
-
-    */
     @Override
     public void readFully(byte[] b) {
         readFully(b, 0, b.length);
@@ -1697,6 +1680,8 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void finish() {
+        if (remaining() < 0)
+            throw new IllegalStateException("Buffer overflow, capacity: " + capacity() + " position: " + position());
         finished = true;
     }
 
