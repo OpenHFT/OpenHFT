@@ -66,4 +66,27 @@ public class Maths {
         if (n < 0 || n >= TENS.length) return -1;
         return TENS[n];
     }
+
+    public static int nextPower2(int n, int min) {
+        if (n < min) return min;
+        if ((n & (n - 1)) == 0) return n;
+        int i = min;
+        while (i < n) {
+            i *= 2;
+            if (i <= 0) return 1 << 30;
+        }
+        return i;
+    }
+
+    public static int hash(int n) {
+        n ^= (n >> 21) ^ (n >> 11);
+        n ^= (n >> 7) ^ (n >> 4);
+        return n;
+    }
+
+    public static int hash(long n) {
+        n ^= (n >> 43) ^ (n >> 21);
+        n ^= (n >> 15) ^ (n >> 7);
+        return (int) n;
+    }
 }

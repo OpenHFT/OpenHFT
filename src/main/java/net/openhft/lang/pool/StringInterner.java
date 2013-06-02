@@ -16,8 +16,61 @@
 
 package net.openhft.lang.pool;
 
+import net.openhft.lang.Maths;
+import net.openhft.lang.io.IOTools;
+
 /**
  * @author peter.lawrey
  */
 public class StringInterner {
+    private final String[] interner;
+    private final int mask;
+
+    public StringInterner(int capacity) {
+        int n = Maths.nextPower2(capacity, 128);
+        interner = new String[n];
+        mask = n;
+    }
+
+    public String intern(byte[] bytes, int off, int len) {
+        long hash = 0;
+        for (int i = 0; i < len; i++)
+            hash = 57 * hash + bytes[i + off];
+        int h = Maths.hash(hash) & mask;
+        String s = interner[h];
+        if (isEqual(s, bytes, off, len))
+            return s;
+        String s2 = new String(bytes, off, len, IOTools.ISO_8859_1);
+        return interner[h] = s2;
+    }
+
+    public String intern(CharSequence cs) {
+        long hash = 0;
+        for (int i = 0; i < cs.length(); i++)
+            hash = 57 * hash + cs.charAt(i);
+        int h = Maths.hash(hash) & mask;
+        String s = interner[h];
+        if (isEqual(s, cs))
+            return s;
+        String s2 = cs.toString();
+        return interner[h] = s2;
+    }
+
+    private static boolean isEqual(String s, CharSequence cs) {
+        if (s == null) return false;
+        if (s.length() != cs.length()) return false;
+        for (int i = 0; i < cs.length(); i++)
+            if (s.charAt(i) != cs.charAt(i))
+                return false;
+        return true;
+    }
+
+    private static boolean isEqual(String s, byte[] bytes, int off, int len) {
+        if (s == null) return false;
+        if (s.length() != len) return false;
+        for (int i = 0; i < len; i++)
+            if (s.charAt(i) != (bytes[off + i] & 0xFF))
+                return false;
+        return true;
+    }
 }

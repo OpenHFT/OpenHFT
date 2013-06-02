@@ -19,18 +19,17 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
+import net.openhft.lang.pool.StringInterner;
 
 /**
  * @author peter.lawrey
  */
 public class StringMarshaller implements BytesMarshaller<String> {
-    private final int size1;
-    private String[] interner;
+    private final int size;
+    private StringInterner interner;
 
     public StringMarshaller(int size) {
-        int size2 = 128;
-        while (size2 < size && size2 < (1 << 20)) size2 <<= 1;
-        this.size1 = size2 - 1;
+        this.size = size;
     }
 
     @Override
@@ -65,30 +64,8 @@ public class StringMarshaller implements BytesMarshaller<String> {
     }
 
     private String builderToString() {
-        int idx = hashFor(reader);
         if (interner == null)
-            interner = new String[size1 + 1];
-
-        String s2 = interner[idx];
-        if (s2 != null && s2.length() == reader.length())
-            NOT_FOUND:{
-                for (int i = 0, len = s2.length(); i < len; i++) {
-                    if (s2.charAt(i) != reader.charAt(i))
-                        break NOT_FOUND;
-                }
-                return s2;
-            }
-        return interner[idx] = reader.toString();
-    }
-
-    private int hashFor(CharSequence cs) {
-        long h = 0;
-
-        for (int i = 0, length = cs.length(); i < length; i++)
-            h = 57 * h + cs.charAt(i);
-
-        h ^= (h >>> 43) ^ (h >>> 21);
-        h ^= (h >>> 15) ^ (h >>> 7);
-        return (int) (h & size1);
+            interner = new StringInterner(size);
+        return interner.intern(reader);
     }
 }
