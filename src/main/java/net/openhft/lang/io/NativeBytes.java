@@ -25,21 +25,21 @@ import java.nio.ByteOrder;
  * @author peter.lawrey
  */
 public class NativeBytes extends AbstractBytes {
-    protected long start;
-    protected long position;
-    protected long limit;
+    protected long startAddr;
+    protected long positionAddr;
+    protected long limitAddr;
 
-    public NativeBytes(long start, long position, long limit) {
-        this.start = start;
-        this.position = position;
-        this.limit = limit;
+    public NativeBytes(long startAddr, long positionAddr, long limitAddr) {
+        this.startAddr = startAddr;
+        this.positionAddr = positionAddr;
+        this.limitAddr = limitAddr;
     }
 
-    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long start, long position, long limit) {
+    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long startAddr, long positionAddr, long limitAddr) {
         super(bytesMarshallerFactory);
-        this.start = start;
-        this.position = position;
-        this.limit = limit;
+        this.startAddr = startAddr;
+        this.positionAddr = positionAddr;
+        this.limitAddr = limitAddr;
     }
 
     @Override
@@ -49,206 +49,206 @@ public class NativeBytes extends AbstractBytes {
         int left = remaining();
         if (left <= 0) return -1;
         int len2 = Math.min(len, left);
-        UNSAFE.copyMemory(null, position, b, BYTES_OFFSET + off, len2);
-        position += len2;
+        UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len2);
+        positionAddr += len2;
         return len2;
     }
 
 
     @Override
     public byte readByte() {
-        return UNSAFE.getByte(position++);
+        return UNSAFE.getByte(positionAddr++);
     }
 
     @Override
     public byte readByte(int offset) {
-        return UNSAFE.getByte(start + offset);
+        return UNSAFE.getByte(startAddr + offset);
     }
 
     @Override
     public void readFully(byte[] b, int off, int len) {
-        UNSAFE.copyMemory(null, position, b, BYTES_OFFSET + off, len);
-        position += len;
+        UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len);
+        positionAddr += len;
     }
 
     @Override
     public short readShort() {
-        short s = UNSAFE.getShort(position);
-        position += 2;
+        short s = UNSAFE.getShort(positionAddr);
+        positionAddr += 2;
         return s;
     }
 
     @Override
     public short readShort(int offset) {
-        return UNSAFE.getShort(start + offset);
+        return UNSAFE.getShort(startAddr + offset);
     }
 
     @Override
     public char readChar() {
-        char ch = UNSAFE.getChar(position);
-        position += 2;
+        char ch = UNSAFE.getChar(positionAddr);
+        positionAddr += 2;
         return ch;
     }
 
     @Override
     public char readChar(int offset) {
-        return UNSAFE.getChar(start + offset);
+        return UNSAFE.getChar(startAddr + offset);
     }
 
     @Override
     public int readInt() {
-        int i = UNSAFE.getInt(position);
-        position += 4;
+        int i = UNSAFE.getInt(positionAddr);
+        positionAddr += 4;
         return i;
     }
 
     @Override
     public int readInt(int offset) {
-        return UNSAFE.getInt(start + offset);
+        return UNSAFE.getInt(startAddr + offset);
     }
 
     @Override
     public long readLong() {
-        long l = UNSAFE.getLong(position);
-        position += 8;
+        long l = UNSAFE.getLong(positionAddr);
+        positionAddr += 8;
         return l;
     }
 
     @Override
     public long readLong(int offset) {
-        return UNSAFE.getLong(start + offset);
+        return UNSAFE.getLong(startAddr + offset);
     }
 
     @Override
     public float readFloat() {
-        float f = UNSAFE.getFloat(position);
-        position += 4;
+        float f = UNSAFE.getFloat(positionAddr);
+        positionAddr += 4;
         return f;
     }
 
     @Override
     public float readFloat(int offset) {
-        return UNSAFE.getFloat(start + offset);
+        return UNSAFE.getFloat(startAddr + offset);
     }
 
     @Override
     public double readDouble() {
-        double d = UNSAFE.getDouble(position);
-        position += 8;
+        double d = UNSAFE.getDouble(positionAddr);
+        positionAddr += 8;
         return d;
     }
 
     @Override
     public double readDouble(int offset) {
-        return UNSAFE.getDouble(start + offset);
+        return UNSAFE.getDouble(startAddr + offset);
     }
 
     @Override
     public void write(int b) {
-        UNSAFE.putByte(position++, (byte) b);
+        UNSAFE.putByte(positionAddr++, (byte) b);
     }
 
     @Override
     public void write(int offset, int b) {
-        UNSAFE.putByte(start + offset, (byte) b);
+        UNSAFE.putByte(startAddr + offset, (byte) b);
     }
 
     @Override
     public void write(int offset, byte[] b) {
-        UNSAFE.copyMemory(b, BYTES_OFFSET, null, position, b.length);
-        position += b.length;
+        UNSAFE.copyMemory(b, BYTES_OFFSET, null, positionAddr, b.length);
+        positionAddr += b.length;
     }
 
     @Override
     public void write(byte[] b, int off, int len) {
-        UNSAFE.copyMemory(b, BYTES_OFFSET + off, null, position, len);
-        position += len;
+        UNSAFE.copyMemory(b, BYTES_OFFSET + off, null, positionAddr, len);
+        positionAddr += len;
     }
 
     @Override
     public void writeShort(int v) {
-        UNSAFE.putShort(position, (short) v);
-        position += 2;
+        UNSAFE.putShort(positionAddr, (short) v);
+        positionAddr += 2;
     }
 
     @Override
     public void writeShort(int offset, int v) {
-        UNSAFE.putShort(start + offset, (short) v);
+        UNSAFE.putShort(startAddr + offset, (short) v);
     }
 
     @Override
     public void writeChar(int v) {
-        UNSAFE.putChar(position, (char) v);
-        position += 2;
+        UNSAFE.putChar(positionAddr, (char) v);
+        positionAddr += 2;
     }
 
     @Override
     public void writeChar(int offset, int v) {
-        UNSAFE.putChar(start + offset, (char) v);
+        UNSAFE.putChar(startAddr + offset, (char) v);
     }
 
     @Override
     public void writeInt(int v) {
-        UNSAFE.putInt(position, v);
-        position += 4;
+        UNSAFE.putInt(positionAddr, v);
+        positionAddr += 4;
     }
 
     @Override
     public void writeInt(int offset, int v) {
-        UNSAFE.putInt(start + offset, v);
+        UNSAFE.putInt(startAddr + offset, v);
     }
 
     @Override
     public void writeLong(long v) {
-        UNSAFE.putLong(position, v);
-        position += 8;
+        UNSAFE.putLong(positionAddr, v);
+        positionAddr += 8;
     }
 
     @Override
     public void writeLong(int offset, long v) {
-        UNSAFE.putLong(start + offset, v);
+        UNSAFE.putLong(startAddr + offset, v);
     }
 
     @Override
     public void writeFloat(float v) {
-        UNSAFE.putFloat(position, v);
-        position += 4;
+        UNSAFE.putFloat(positionAddr, v);
+        positionAddr += 4;
     }
 
     @Override
     public void writeFloat(int offset, float v) {
-        UNSAFE.putFloat(start + offset, v);
+        UNSAFE.putFloat(startAddr + offset, v);
     }
 
     @Override
     public void writeDouble(double v) {
-        UNSAFE.putDouble(position, v);
-        position += 8;
+        UNSAFE.putDouble(positionAddr, v);
+        positionAddr += 8;
     }
 
     @Override
     public void writeDouble(int offset, double v) {
-        UNSAFE.putDouble(start + offset, v);
+        UNSAFE.putDouble(startAddr + offset, v);
     }
 
     @Override
     public int position() {
-        return (int) (position - start);
+        return (int) (positionAddr - startAddr);
     }
 
     @Override
     public void position(int position) {
-        this.position = start + position;
+        this.positionAddr = startAddr + position;
     }
 
     @Override
     public int capacity() {
-        return (int) (limit - start);
+        return (int) (limitAddr - startAddr);
     }
 
     @Override
     public int remaining() {
-        return (int) (limit - position);
+        return (int) (limitAddr - positionAddr);
     }
 
     @Override

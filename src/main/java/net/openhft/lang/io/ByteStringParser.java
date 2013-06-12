@@ -41,7 +41,7 @@ public interface ByteStringParser extends BytesCommon {
     public boolean stepBackAndSkipTo(StopCharTester tester);
 
     /**
-     * Wind from this position to the end of the field
+     * Wind from this positionAddr to the end of the field
      *
      * @param tester to stop at
      * @return true if we stopped at a stop character, false if we ran out of data.

@@ -16,6 +16,8 @@
 
 package net.openhft.lang.io;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -25,4 +27,18 @@ public enum IOTools {
     ;
     public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     public static final Charset UTF_8 = Charset.forName("UTF-8");
+
+    public static void close(Closeable closeable) {
+        if (closeable == null) return;
+        try {
+            closeable.close();
+        } catch (IOException ignored) {
+        }
+    }
+
+    public static void close(Iterable<? extends Closeable> closeables) {
+        for (Closeable closeable : closeables) {
+            close(closeable);
+        }
+    }
 }

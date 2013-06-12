@@ -1681,8 +1681,12 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void finish() {
         if (remaining() < 0)
-            throw new IllegalStateException("Buffer overflow, capacity: " + capacity() + " position: " + position());
+            throwOverflow();
         finished = true;
+    }
+
+    private void throwOverflow() {
+        throw new IllegalStateException("Buffer overflow, capacity: " + capacity() + " position: " + position());
     }
 
     @Override
