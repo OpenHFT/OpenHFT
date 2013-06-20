@@ -18,6 +18,7 @@ package net.openhft.lang.io;
 
 import sun.misc.Unsafe;
 
+import java.io.EOFException;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 
@@ -54,7 +55,6 @@ public class NativeBytes extends AbstractBytes {
         return len2;
     }
 
-
     @Override
     public byte readByte() {
         return UNSAFE.getByte(positionAddr++);
@@ -67,6 +67,11 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void readFully(byte[] b, int off, int len) {
+        if (len < 0 || off < 0 || off + len > b.length)
+            throw new IllegalArgumentException();
+        int left = remaining();
+        if (left <= len)
+            throw new IllegalStateException(new EOFException());
         UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len);
         positionAddr += len;
     }
@@ -274,6 +279,7 @@ public class NativeBytes extends AbstractBytes {
             theUnsafe.setAccessible(true);
             UNSAFE = (Unsafe) theUnsafe.get(null);
             BYTES_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);
+
         } catch (Exception e) {
             throw new AssertionError(e);
         }
