@@ -1,8 +1,11 @@
 package net.openhft.lang.io;
 
+import sun.nio.ch.DirectBuffer;
+
 import java.io.EOFException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author peter.lawrey
@@ -10,6 +13,17 @@ import java.nio.ByteOrder;
 public class ByteBufferBytes extends AbstractBytes {
     protected ByteBuffer buffer;
     protected int start, position, limit;
+    protected AtomicBoolean barrier;
+
+    protected void readBarrier() {
+        if (barrier == null) barrier = new AtomicBoolean();
+        barrier.get();
+    }
+
+    protected void writeBarrier() {
+        if (barrier == null) barrier = new AtomicBoolean();
+        barrier.lazySet(false);
+    }
 
     @Override
     public int read(byte[] b, int off, int len) {
@@ -101,6 +115,18 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
+    public int readVolatileInt() {
+        readBarrier();
+        return readInt();
+    }
+
+    @Override
+    public int readVolatileInt(int offset) {
+        readBarrier();
+        return readInt(offset);
+    }
+
+    @Override
     public long readLong() {
         if (position + 8 <= limit) {
             long l = buffer.getLong(position);
@@ -115,6 +141,18 @@ public class ByteBufferBytes extends AbstractBytes {
         if (start + offset + 8 <= limit)
             return buffer.getLong(start + offset);
         throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public long readVolatileLong() {
+        readBarrier();
+        return readLong();
+    }
+
+    @Override
+    public long readVolatileLong(int offset) {
+        readBarrier();
+        return readLong(offset);
     }
 
     @Override
@@ -222,6 +260,25 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
+    public void writeOrderedInt(int v) {
+        writeInt(v);
+        writeBarrier();
+    }
+
+    @Override
+    public void writeOrderedInt(int offset, int v) {
+        writeInt(offset, v);
+        writeBarrier();
+    }
+
+    @Override
+    public boolean compareAndSetInt(int offset, int expected, int x) {
+        if (buffer instanceof DirectBuffer)
+            return NativeBytes.UNSAFE.compareAndSwapInt(null, ((DirectBuffer) buffer).address(), expected, x);
+        return NativeBytes.UNSAFE.compareAndSwapInt(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);
+    }
+
+    @Override
     public void writeLong(long v) {
         if (position + 8 <= limit) {
             buffer.putLong(position, v);
@@ -237,6 +294,25 @@ public class ByteBufferBytes extends AbstractBytes {
             buffer.putLong(start + offset, v);
         else
             throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    public void writeOrderedLong(long v) {
+        writeLong(v);
+        writeBarrier();
+    }
+
+    @Override
+    public void writeOrderedLong(int offset, long v) {
+        writeLong(offset, v);
+        writeBarrier();
+    }
+
+    @Override
+    public boolean compareAndSetLong(int offset, long expected, long x) {
+        if (buffer instanceof DirectBuffer)
+            return NativeBytes.UNSAFE.compareAndSwapLong(null, ((DirectBuffer) buffer).address(), expected, x);
+        return NativeBytes.UNSAFE.compareAndSwapLong(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);
     }
 
     @Override

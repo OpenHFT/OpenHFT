@@ -70,7 +70,7 @@ public class NativeBytes extends AbstractBytes {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
         int left = remaining();
-        if (left <= len)
+        if (left < len)
             throw new IllegalStateException(new EOFException());
         UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len);
         positionAddr += len;
@@ -113,6 +113,18 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
+    public int readVolatileInt() {
+        int i = UNSAFE.getIntVolatile(null, positionAddr);
+        positionAddr += 4;
+        return i;
+    }
+
+    @Override
+    public int readVolatileInt(int offset) {
+        return UNSAFE.getIntVolatile(null, startAddr + offset);
+    }
+
+    @Override
     public long readLong() {
         long l = UNSAFE.getLong(positionAddr);
         positionAddr += 8;
@@ -122,6 +134,18 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public long readLong(int offset) {
         return UNSAFE.getLong(startAddr + offset);
+    }
+
+    @Override
+    public long readVolatileLong() {
+        long l = UNSAFE.getLongVolatile(null, positionAddr);
+        positionAddr += 8;
+        return l;
+    }
+
+    @Override
+    public long readVolatileLong(int offset) {
+        return UNSAFE.getLongVolatile(null, startAddr + offset);
     }
 
     @Override
@@ -204,6 +228,22 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
+    public void writeOrderedInt(int v) {
+        UNSAFE.putOrderedInt(null, positionAddr, v);
+        positionAddr += 4;
+    }
+
+    @Override
+    public void writeOrderedInt(int offset, int v) {
+        UNSAFE.putOrderedInt(null, startAddr + offset, v);
+    }
+
+    @Override
+    public boolean compareAndSetInt(int offset, int expected, int x) {
+        return UNSAFE.compareAndSwapInt(null, startAddr + offset, expected, x);
+    }
+
+    @Override
     public void writeLong(long v) {
         UNSAFE.putLong(positionAddr, v);
         positionAddr += 8;
@@ -212,6 +252,22 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeLong(int offset, long v) {
         UNSAFE.putLong(startAddr + offset, v);
+    }
+
+    @Override
+    public void writeOrderedLong(long v) {
+        UNSAFE.putOrderedLong(null, positionAddr, v);
+        positionAddr += 8;
+    }
+
+    @Override
+    public void writeOrderedLong(int offset, long v) {
+        UNSAFE.putOrderedLong(null, startAddr + offset, v);
+    }
+
+    @Override
+    public boolean compareAndSetLong(int offset, long expected, long x) {
+        return UNSAFE.compareAndSwapLong(null, startAddr + offset, expected, x);
     }
 
     @Override
@@ -270,7 +326,7 @@ public class NativeBytes extends AbstractBytes {
      */
     @SuppressWarnings("ALL")
     protected static final Unsafe UNSAFE;
-    private static final int BYTES_OFFSET;
+    static final int BYTES_OFFSET;
 
     static {
         try {

@@ -34,7 +34,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     public void writeUnsignedByte(int v);
 
-    void write(int offset, int b);
+    public void write(int offset, int b);
 
     public void writeUnsignedByte(int offset, int v);
 
@@ -89,6 +89,12 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     void writeCompactUnsignedInt(long v);
 
+    void writeOrderedInt(int v);
+
+    void writeOrderedInt(int offset, int v);
+
+    boolean compareAndSetInt(int offset, int expected, int x);
+
     /**
      * @param v 48-bit long to write
      */
@@ -102,6 +108,12 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeLong(int offset, long v);
 
     void writeCompactLong(long v);
+
+    void writeOrderedLong(long v);
+
+    void writeOrderedLong(int offset, long v);
+
+    boolean compareAndSetLong(int offset, long expected, long x);
 
     /**
      * Stop bit encoding numbers.

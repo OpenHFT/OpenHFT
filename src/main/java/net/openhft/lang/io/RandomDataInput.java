@@ -85,6 +85,10 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     int readInt(int offset);
 
+    int readVolatileInt();
+
+    int readVolatileInt(int offset);
+
     long readUnsignedInt();
 
     long readUnsignedInt(int offset);
@@ -97,6 +101,10 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     long readLong();
 
     long readLong(int offset);
+
+    long readVolatileLong();
+
+    long readVolatileLong(int offset);
 
     /**
      * @return read a 48 bit long value.
