@@ -25,11 +25,17 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
  */
 public abstract class AbstractBytes implements Bytes {
+    private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
+    public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
+    public static final int INT_LOCK_MASK = 0xFFFFFF;
+
     protected boolean finished;
     protected BytesMarshallerFactory bytesMarshallerFactory;
 
@@ -1695,5 +1701,103 @@ public abstract class AbstractBytes implements Bytes {
             throw new IllegalStateException(e);
         }
         checkEndOfBuffer();
+    }
+
+    static boolean ID_LIMIT_WARNED = false;
+
+    @Override
+    public boolean tryLockNanosInt(long offset) {
+        long id = Thread.currentThread().getId();
+        if (!ID_LIMIT_WARNED && id > 1 << 24) {
+            warnIdLimit(id);
+        }
+        return tryLockNanos4a(offset, (int) id);
+    }
+
+    @Override
+    public boolean tryLockNanosInt(long offset, long nanos) {
+        long id = Thread.currentThread().getId();
+        if (!ID_LIMIT_WARNED && id > 1 << 24) {
+            warnIdLimit(id);
+        }
+        int limit = nanos <= 10000 ? (int) nanos / 10 : 1000;
+        for (int i = 0; i < limit; i++)
+            if (tryLockNanos4a(offset, (int) id))
+                return true;
+        if (nanos <= 10000)
+            return false;
+        long end = System.nanoTime() + nanos - 10000;
+        do {
+            if (tryLockNanos4a(offset, (int) id))
+                return true;
+        } while (end > System.nanoTime() && !Thread.currentThread().isInterrupted());
+        return false;
+    }
+
+    private void warnIdLimit(long id) {
+        LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
+        ID_LIMIT_WARNED = true;
+    }
+
+    private boolean tryLockNanos4a(long offset, int id) {
+        int lowId = id & INT_LOCK_MASK;
+        int firstValue = ((1 << 24) | lowId);
+        if (compareAndSetInt(offset, 0, firstValue))
+            return true;
+        long currentValue = readUnsignedInt(offset);
+        if ((currentValue & INT_LOCK_MASK) == lowId) {
+            if (currentValue >= (255L << 24))
+                throw new IllegalStateException("Reentred 255 times without an unlock");
+            currentValue += 1 << 24;
+            writeOrderedInt(offset, (int) currentValue);
+        }
+        return false;
+    }
+
+    @Override
+    public void busyLockInt(long offset) throws InterruptedException, IllegalStateException {
+        boolean success = tryLockNanosInt(offset, BUSY_LOCK_LIMIT);
+        if (Thread.currentThread().isInterrupted())
+            throw new InterruptedException();
+        if (!success)
+            throw new IllegalStateException("Failed to acquire lock after " + BUSY_LOCK_LIMIT / 1e9 + " seconds.");
+    }
+
+    @Override
+    public void unlockInt(long offset) throws IllegalStateException {
+        int lowId = (int) Thread.currentThread().getId() & INT_LOCK_MASK;
+        int firstValue = ((1 << 24) | lowId);
+        if (compareAndSetInt(offset, firstValue, 0))
+            return;
+        long currentValue = readUnsignedInt(offset);
+        long holderId = currentValue & INT_LOCK_MASK;
+        if (holderId == lowId) {
+            currentValue -= 1 << 24;
+            writeOrderedInt(offset, (int) currentValue);
+        } else if (currentValue == 0) {
+            throw new IllegalStateException("No thread holds this lock");
+        } else {
+            throw new IllegalStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
+        }
+    }
+
+    @Override
+    public boolean tryLockNanosLong(long offset) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean tryLockNanosLong(long offset, long nanos) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void busyLockLong(long offset) throws InterruptedException, IllegalStateException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void unlockLong(long offset) throws IllegalStateException {
+        throw new UnsupportedOperationException();
     }
 }
