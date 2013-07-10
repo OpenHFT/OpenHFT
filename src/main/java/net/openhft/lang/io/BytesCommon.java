@@ -117,42 +117,4 @@ public interface BytesCommon {
      * @throws IllegalStateException if this thread doesn't hold the lock
      */
     void unlockInt(long offset) throws IllegalStateException;
-
-    /**
-     * Lock which uses 8 bytes.  It store the lower 48 bits of the Thread Id and
-     * the re-entrant count as 16 bit.
-     *
-     * @param offset
-     * @return did it lock or not.
-     */
-    boolean tryLockNanosLong(long offset);
-
-    /**
-     * Lock which uses 8 bytes.  It store the lower 48 bits of the Thread Id and
-     * the re-entrant count as 16 bit.
-     *
-     * @param offset
-     * @param nanos  to try to lock for
-     * @return did it lock or not.
-     */
-    boolean tryLockNanosLong(long offset, long nanos);
-
-    /**
-     * Lock which uses 8 bytes.  It store the lower 48 bits of the Thread Id and
-     * the re-entrant count as 16 bit.
-     *
-     * @param offset
-     * @throws InterruptedException  if interrupted
-     * @throws IllegalStateException if the thread tries to lock it 65535 nested time (without an unlock)
-     */
-    void busyLockLong(long offset) throws InterruptedException, IllegalStateException;
-
-    /**
-     * Lock which uses 4 bytes.  Unlock this It store the lower 48 bits of the Thread Id and
-     * the re-entrant count as 16 bit.
-     *
-     * @param offset
-     * @throws IllegalStateException if this thread doesn't hold the lock
-     */
-    void unlockLong(long offset) throws IllegalStateException;
 }

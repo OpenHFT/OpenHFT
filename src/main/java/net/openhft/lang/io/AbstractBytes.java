@@ -1780,24 +1780,4 @@ public abstract class AbstractBytes implements Bytes {
             throw new IllegalStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
     }
-
-    @Override
-    public boolean tryLockNanosLong(long offset) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean tryLockNanosLong(long offset, long nanos) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void busyLockLong(long offset) throws InterruptedException, IllegalStateException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void unlockLong(long offset) throws IllegalStateException {
-        throw new UnsupportedOperationException();
-    }
 }
