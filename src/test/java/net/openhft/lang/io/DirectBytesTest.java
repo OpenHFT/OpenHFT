@@ -64,7 +64,7 @@ public class DirectBytesTest {
 
         for (int i = 0; i < lockCount; i++) {
             assertTrue(
-                    slice1.tryLockNanosInt(0L, 10 * 1000 * 1000));
+                    slice1.tryLockNanosInt(0L, 2 * 1000 * 1000));
             int toggle1 = slice1.readInt(4);
             if (toggle1 == from) {
                 slice1.writeInt(4L, to);
@@ -72,6 +72,7 @@ public class DirectBytesTest {
                 i--;
             }
             slice1.unlockInt(0L);
+            System.nanoTime(); // do something small between locks
         }
     }
 
