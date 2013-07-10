@@ -27,22 +27,22 @@ public interface BytesCommon {
     /**
      * @return the offset read/written so far
      */
-    int position();
+    long position();
 
     /**
      * @param position to skip to
      */
-    void position(int position);
+    void position(long position);
 
     /**
      * @return space available
      */
-    int capacity();
+    long capacity();
 
     /**
      * @return space remaining in bytes
      */
-    int remaining();
+    long remaining();
 
     /**
      * Mark the end of the message if writing and check we are at the end of the message if reading.

@@ -47,9 +47,9 @@ public class NativeBytes extends AbstractBytes {
     public int read(byte[] b, int off, int len) {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
-        int left = remaining();
+        long left = remaining();
         if (left <= 0) return -1;
-        int len2 = Math.min(len, left);
+        int len2 = (int) Math.min(len, left);
         UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len2);
         positionAddr += len2;
         return len2;
@@ -69,7 +69,7 @@ public class NativeBytes extends AbstractBytes {
     public void readFully(byte[] b, int off, int len) {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
-        int left = remaining();
+        long left = remaining();
         if (left < len)
             throw new IllegalStateException(new EOFException());
         UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len);
@@ -293,23 +293,23 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public int position() {
-        return (int) (positionAddr - startAddr);
+    public long position() {
+        return (positionAddr - startAddr);
     }
 
     @Override
-    public void position(int position) {
+    public void position(long position) {
         this.positionAddr = startAddr + position;
     }
 
     @Override
-    public int capacity() {
-        return (int) (limitAddr - startAddr);
+    public long capacity() {
+        return (limitAddr - startAddr);
     }
 
     @Override
-    public int remaining() {
-        return (int) (limitAddr - positionAddr);
+    public long remaining() {
+        return (limitAddr - positionAddr);
     }
 
     @Override

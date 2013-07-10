@@ -42,10 +42,10 @@ public class DateMarshaller implements BytesMarshaller<Date> {
 
     @Override
     public void write(Bytes bytes, Date date) {
-        int pos = bytes.position();
+        long pos = bytes.position();
         bytes.writeUnsignedByte(0);
         bytes.append(date.getTime());
-        bytes.writeUnsignedByte(pos, bytes.position() - 1 - pos);
+        bytes.writeUnsignedByte(pos, (int) (bytes.position() - 1 - pos));
     }
 
     @Override

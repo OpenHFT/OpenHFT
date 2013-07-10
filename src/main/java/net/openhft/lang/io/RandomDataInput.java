@@ -184,6 +184,9 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     @Override
     long skip(long n);
 
+    /**
+     * @return remaining() or Integer.MAX_VALUE if larger.
+     */
     @Override
     int available();
 

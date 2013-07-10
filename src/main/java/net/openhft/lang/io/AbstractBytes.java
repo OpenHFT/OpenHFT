@@ -63,8 +63,8 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int skipBytes(int n) {
-        int position = position();
-        int n2 = Math.min(n, capacity() - position);
+        long position = position();
+        int n2 = (int) Math.min(n, capacity() - position);
         position(position + n2);
         return n2;
     }
@@ -115,7 +115,7 @@ public abstract class AbstractBytes implements Bytes {
                 case '\n':
                     break EOL;
                 case '\r':
-                    int cur = position();
+                    long cur = position();
                     if (cur < capacity() && readByte(cur) == '\n')
                         position(cur + 1);
                     break EOL;
@@ -343,7 +343,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public String readUTF(int offset) {
-        int oldPosition = position();
+        long oldPosition = position();
         position(offset);
         try {
             return readUTF();
@@ -514,7 +514,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void read(ByteBuffer bb) {
-        int len = Math.min(bb.remaining(), remaining());
+        int len = (int) Math.min(bb.remaining(), remaining());
         if (bb.order() == byteOrder()) {
             while (len >= 8) {
                 bb.putLong(readLong());
@@ -1450,11 +1450,12 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     protected class BytesInputStream extends InputStream {
-        private int mark = 0;
+        private long mark = 0;
 
         @Override
         public int available() throws IOException {
-            return remaining();
+            long remaining = remaining();
+            return (int) Math.min(Integer.MAX_VALUE, remaining);
         }
 
         @Override
@@ -1589,7 +1590,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int available() {
-        return remaining();
+        return (int) Math.min(Integer.MAX_VALUE, remaining());
     }
 
     @Override

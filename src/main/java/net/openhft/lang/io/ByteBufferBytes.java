@@ -29,9 +29,9 @@ public class ByteBufferBytes extends AbstractBytes {
     public int read(byte[] b, int off, int len) {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
-        int left = remaining();
+        long left = remaining();
         if (left <= 0) return -1;
-        int len2 = Math.min(left, len);
+        int len2 = (int) Math.min(left, len);
         for (int i = 0; i < len2; i++)
             b[off + i] = readByte();
         return len2;
@@ -57,7 +57,7 @@ public class ByteBufferBytes extends AbstractBytes {
     public void readFully(byte[] b, int off, int len) {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
-        int left = remaining();
+        long left = remaining();
         if (left <= len)
             throw new IllegalStateException(new EOFException());
         for (int i = 0; i < len; i++)
@@ -365,22 +365,24 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public int position() {
+    public long position() {
         return position - start;
     }
 
     @Override
-    public void position(int position) {
-        this.position = start + position;
+    public void position(long position) {
+        if (start + position > Integer.MAX_VALUE)
+            throw new IndexOutOfBoundsException("Position to large");
+        this.position = (int) (start + position);
     }
 
     @Override
-    public int capacity() {
+    public long capacity() {
         return limit - start;
     }
 
     @Override
-    public int remaining() {
+    public long remaining() {
         return limit - position;
     }
 
