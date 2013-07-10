@@ -250,7 +250,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeLong(int offset, long v) {
+    public void writeLong(long offset, long v) {
         UNSAFE.putLong(startAddr + offset, v);
     }
 

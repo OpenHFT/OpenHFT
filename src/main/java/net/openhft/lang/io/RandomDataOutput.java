@@ -105,7 +105,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     @Override
     void writeLong(long v);
 
-    void writeLong(int offset, long v);
+    void writeLong(long offset, long v);
 
     void writeCompactLong(long v);
 

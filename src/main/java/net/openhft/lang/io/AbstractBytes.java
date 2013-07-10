@@ -342,7 +342,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public String readUTF(int offset) {
+    public String readUTF(long offset) {
         long oldPosition = position();
         position(offset);
         try {

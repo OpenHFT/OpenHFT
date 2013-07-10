@@ -158,7 +158,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     boolean appendUTF(Appendable appendable);
 
-    String readUTF(int offset);
+    String readUTF(long offset);
 
     void read(ByteBuffer bb);
 

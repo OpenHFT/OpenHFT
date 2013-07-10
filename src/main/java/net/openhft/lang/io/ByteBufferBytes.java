@@ -316,9 +316,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeLong(int offset, long v) {
-        if (start + offset + 8 <= limit)
-            buffer.putLong(start + offset, v);
+    public void writeLong(long offset, long v) {
+        int pos = (int) (start + offset);
+        if (pos + 8 <= limit)
+            buffer.putLong(pos, v);
         else
             throw new IndexOutOfBoundsException();
     }
