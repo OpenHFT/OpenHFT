@@ -34,7 +34,7 @@ public class DirectStore {
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
         this.bytesMarshallerFactory = bytesMarshallerFactory;
         address = NativeBytes.UNSAFE.allocateMemory(size);
-        System.out.println("old value " + Integer.toHexString(NativeBytes.UNSAFE.getInt(null, address)));
+//        System.out.println("old value " + Integer.toHexString(NativeBytes.UNSAFE.getInt(null, address)));
         NativeBytes.UNSAFE.setMemory(address, size, (byte) 0);
         NativeBytes.UNSAFE.putLongVolatile(null, address, 0L);
 
