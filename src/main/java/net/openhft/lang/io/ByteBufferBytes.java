@@ -45,9 +45,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public byte readByte(int offset) {
-        if (start + offset < limit)
-            return buffer.get(start + offset);
+    public byte readByte(long offset) {
+        int pos = (int) (start + offset);
+        if (pos < limit)
+            return buffer.get(pos);
         throw new IndexOutOfBoundsException();
     }
 
@@ -74,9 +75,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public short readShort(int offset) {
-        if (start + offset + 2 <= limit)
-            return buffer.getShort(start + offset);
+    public short readShort(long offset) {
+        int pos = (int) (start + offset);
+        if (pos + 2 <= limit)
+            return buffer.getShort(pos);
         throw new IndexOutOfBoundsException();
     }
 
@@ -91,9 +93,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public char readChar(int offset) {
-        if (start + offset + 2 <= limit)
-            return buffer.getChar(start + offset);
+    public char readChar(long offset) {
+        int pos = (int) (start + offset);
+        if (pos + 2 <= limit)
+            return buffer.getChar(pos);
         throw new IndexOutOfBoundsException();
     }
 
@@ -108,9 +111,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public int readInt(int offset) {
-        if (start + offset + 4 <= limit)
-            return buffer.getInt(start + offset);
+    public int readInt(long offset) {
+        int pos = (int) (start + offset);
+        if (pos + 4 <= limit)
+            return buffer.getInt(pos);
         throw new IndexOutOfBoundsException();
     }
 
@@ -121,7 +125,7 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public int readVolatileInt(int offset) {
+    public int readVolatileInt(long offset) {
         readBarrier();
         return readInt(offset);
     }
@@ -137,9 +141,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public long readLong(int offset) {
-        if (start + offset + 8 <= limit)
-            return buffer.getLong(start + offset);
+    public long readLong(long offset) {
+        int pos = (int) (start + offset);
+        if (pos + 8 <= limit)
+            return buffer.getLong(pos);
         throw new IndexOutOfBoundsException();
     }
 
@@ -150,7 +155,7 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public long readVolatileLong(int offset) {
+    public long readVolatileLong(long offset) {
         readBarrier();
         return readLong(offset);
     }
@@ -166,9 +171,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public float readFloat(int offset) {
-        if (start + offset + 4 <= limit)
-            return buffer.getFloat(start + offset);
+    public float readFloat(long offset) {
+        int pos = (int) (start + offset);
+        if (pos + 4 <= limit)
+            return buffer.getFloat(pos);
         throw new IndexOutOfBoundsException();
     }
 
@@ -183,9 +189,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public double readDouble(int offset) {
-        if (start + offset + 8 <= limit)
-            return buffer.getDouble(start + offset);
+    public double readDouble(long offset) {
+        int pos = (int) (start + offset);
+        if (pos + 8 <= limit)
+            return buffer.getDouble(pos);
         throw new IndexOutOfBoundsException();
     }
 
@@ -198,9 +205,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void write(int offset, int b) {
-        if (start + offset < limit)
-            buffer.put(start + offset, (byte) b);
+    public void writeByte(long offset, int b) {
+        int pos = (int) (start + offset);
+        if (pos < limit)
+            buffer.put(pos, (byte) b);
         else
             throw new IndexOutOfBoundsException();
     }
@@ -216,9 +224,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeShort(int offset, int v) {
-        if (start + offset + 2 <= limit)
-            buffer.putShort(start + offset, (short) v);
+    public void writeShort(long offset, int v) {
+        int pos = (int) (start + offset);
+        if (pos + 2 <= limit)
+            buffer.putShort(pos, (short) v);
         else
             throw new IndexOutOfBoundsException();
     }
@@ -234,9 +243,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeChar(int offset, int v) {
-        if (start + offset + 2 <= limit)
-            buffer.putChar(start + offset, (char) v);
+    public void writeChar(long offset, int v) {
+        int pos = (int) (start + offset);
+        if (pos + 2 <= limit)
+            buffer.putChar(pos, (char) v);
         else
             throw new IndexOutOfBoundsException();
     }
@@ -252,9 +262,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeInt(int offset, int v) {
-        if (start + offset + 4 <= limit)
-            buffer.putInt(start + offset, v);
+    public void writeInt(long offset, int v) {
+        int pos = (int) (start + offset);
+        if (pos + 4 <= limit)
+            buffer.putInt(pos, v);
         else
             throw new IndexOutOfBoundsException();
     }
@@ -266,13 +277,13 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeOrderedInt(int offset, int v) {
+    public void writeOrderedInt(long offset, int v) {
         writeInt(offset, v);
         writeBarrier();
     }
 
     @Override
-    public boolean compareAndSetInt(int offset, int expected, int x) {
+    public boolean compareAndSetInt(long offset, int expected, int x) {
         if (buffer instanceof DirectBuffer)
             return NativeBytes.UNSAFE.compareAndSwapInt(null, ((DirectBuffer) buffer).address(), expected, x);
         return NativeBytes.UNSAFE.compareAndSwapInt(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);
@@ -303,13 +314,13 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeOrderedLong(int offset, long v) {
-        writeLong(offset, v);
+    public void writeOrderedLong(long offset, long v) {
+        writeLong((int) offset, v);
         writeBarrier();
     }
 
     @Override
-    public boolean compareAndSetLong(int offset, long expected, long x) {
+    public boolean compareAndSetLong(long offset, long expected, long x) {
         if (buffer instanceof DirectBuffer)
             return NativeBytes.UNSAFE.compareAndSwapLong(null, ((DirectBuffer) buffer).address(), expected, x);
         return NativeBytes.UNSAFE.compareAndSwapLong(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);
@@ -326,9 +337,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeFloat(int offset, float v) {
-        if (start + offset + 4 <= limit)
-            buffer.putFloat(start + offset, v);
+    public void writeFloat(long offset, float v) {
+        int pos = (int) (start + offset);
+        if (pos + 4 <= limit)
+            buffer.putFloat(pos, v);
         else
             throw new IndexOutOfBoundsException();
     }
@@ -344,9 +356,10 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeDouble(int offset, double v) {
-        if (start + offset + 8 <= limit)
-            buffer.putDouble(start + offset, v);
+    public void writeDouble(long offset, double v) {
+        int pos = (int) (start + offset);
+        if (pos + 8 <= limit)
+            buffer.putDouble(pos, v);
         else
             throw new IndexOutOfBoundsException();
     }

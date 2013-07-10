@@ -38,27 +38,27 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     @Override
     boolean readBoolean();
 
-    boolean readBoolean(int offset);
+    boolean readBoolean(long offset);
 
     @Override
     byte readByte();
 
-    byte readByte(int offset);
+    byte readByte(long offset);
 
     @Override
     int readUnsignedByte();
 
-    int readUnsignedByte(int offset);
+    int readUnsignedByte(long offset);
 
     @Override
     short readShort();
 
-    short readShort(int offset);
+    short readShort(long offset);
 
     @Override
     int readUnsignedShort();
 
-    int readUnsignedShort(int offset);
+    int readUnsignedShort(long offset);
 
     short readCompactShort();
 
@@ -67,7 +67,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     @Override
     char readChar();
 
-    char readChar(int offset);
+    char readChar(long offset);
 
     /**
      * @return a 24-bit integer value.
@@ -78,20 +78,20 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @param offset of start.
      * @return a 24-bit integer value.
      */
-    int readInt24(int offset);
+    int readInt24(long offset);
 
     @Override
     int readInt();
 
-    int readInt(int offset);
+    int readInt(long offset);
 
     int readVolatileInt();
 
-    int readVolatileInt(int offset);
+    int readVolatileInt(long offset);
 
     long readUnsignedInt();
 
-    long readUnsignedInt(int offset);
+    long readUnsignedInt(long offset);
 
     int readCompactInt();
 
@@ -100,11 +100,11 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     @Override
     long readLong();
 
-    long readLong(int offset);
+    long readLong(long offset);
 
     long readVolatileLong();
 
-    long readVolatileLong(int offset);
+    long readVolatileLong(long offset);
 
     /**
      * @return read a 48 bit long value.
@@ -112,9 +112,10 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     long readInt48();
 
     /**
+     * @param offset
      * @return read a 48 bit long value.
      */
-    long readInt48(int offset);
+    long readInt48(long offset);
 
     long readCompactLong();
 
@@ -126,12 +127,12 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     @Override
     float readFloat();
 
-    float readFloat(int offset);
+    float readFloat(long offset);
 
     @Override
     double readDouble();
 
-    double readDouble(int offset);
+    double readDouble(long offset);
 
     double readCompactDouble();
 
@@ -140,13 +141,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     void readByteString(StringBuilder sb);
 
-    int readByteString(int offset, StringBuilder sb);
-
-    String readByteString();
-
     void readChars(StringBuilder sb);
-
-    String readChars();
 
     @Override
     String readUTF();

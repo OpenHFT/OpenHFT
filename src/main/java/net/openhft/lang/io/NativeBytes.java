@@ -61,7 +61,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public byte readByte(int offset) {
+    public byte readByte(long offset) {
         return UNSAFE.getByte(startAddr + offset);
     }
 
@@ -84,7 +84,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public short readShort(int offset) {
+    public short readShort(long offset) {
         return UNSAFE.getShort(startAddr + offset);
     }
 
@@ -96,7 +96,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public char readChar(int offset) {
+    public char readChar(long offset) {
         return UNSAFE.getChar(startAddr + offset);
     }
 
@@ -108,7 +108,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public int readInt(int offset) {
+    public int readInt(long offset) {
         return UNSAFE.getInt(startAddr + offset);
     }
 
@@ -120,7 +120,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public int readVolatileInt(int offset) {
+    public int readVolatileInt(long offset) {
         return UNSAFE.getIntVolatile(null, startAddr + offset);
     }
 
@@ -132,7 +132,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public long readLong(int offset) {
+    public long readLong(long offset) {
         return UNSAFE.getLong(startAddr + offset);
     }
 
@@ -144,7 +144,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public long readVolatileLong(int offset) {
+    public long readVolatileLong(long offset) {
         return UNSAFE.getLongVolatile(null, startAddr + offset);
     }
 
@@ -156,7 +156,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public float readFloat(int offset) {
+    public float readFloat(long offset) {
         return UNSAFE.getFloat(startAddr + offset);
     }
 
@@ -168,7 +168,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public double readDouble(int offset) {
+    public double readDouble(long offset) {
         return UNSAFE.getDouble(startAddr + offset);
     }
 
@@ -178,12 +178,12 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void write(int offset, int b) {
+    public void writeByte(long offset, int b) {
         UNSAFE.putByte(startAddr + offset, (byte) b);
     }
 
     @Override
-    public void write(int offset, byte[] b) {
+    public void write(long offset, byte[] b) {
         UNSAFE.copyMemory(b, BYTES_OFFSET, null, positionAddr, b.length);
         positionAddr += b.length;
     }
@@ -201,7 +201,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeShort(int offset, int v) {
+    public void writeShort(long offset, int v) {
         UNSAFE.putShort(startAddr + offset, (short) v);
     }
 
@@ -212,7 +212,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeChar(int offset, int v) {
+    public void writeChar(long offset, int v) {
         UNSAFE.putChar(startAddr + offset, (char) v);
     }
 
@@ -223,7 +223,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeInt(int offset, int v) {
+    public void writeInt(long offset, int v) {
         UNSAFE.putInt(startAddr + offset, v);
     }
 
@@ -234,12 +234,12 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeOrderedInt(int offset, int v) {
+    public void writeOrderedInt(long offset, int v) {
         UNSAFE.putOrderedInt(null, startAddr + offset, v);
     }
 
     @Override
-    public boolean compareAndSetInt(int offset, int expected, int x) {
+    public boolean compareAndSetInt(long offset, int expected, int x) {
         return UNSAFE.compareAndSwapInt(null, startAddr + offset, expected, x);
     }
 
@@ -261,12 +261,12 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeOrderedLong(int offset, long v) {
+    public void writeOrderedLong(long offset, long v) {
         UNSAFE.putOrderedLong(null, startAddr + offset, v);
     }
 
     @Override
-    public boolean compareAndSetLong(int offset, long expected, long x) {
+    public boolean compareAndSetLong(long offset, long expected, long x) {
         return UNSAFE.compareAndSwapLong(null, startAddr + offset, expected, x);
     }
 
@@ -277,7 +277,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeFloat(int offset, float v) {
+    public void writeFloat(long offset, float v) {
         UNSAFE.putFloat(startAddr + offset, v);
     }
 
@@ -288,7 +288,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void writeDouble(int offset, double v) {
+    public void writeDouble(long offset, double v) {
         UNSAFE.putDouble(startAddr + offset, v);
     }
 

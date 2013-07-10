@@ -81,7 +81,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public boolean readBoolean(int offset) {
+    public boolean readBoolean(long offset) {
         return readByte(offset) != 0;
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public int readUnsignedByte(int offset) {
+    public int readUnsignedByte(long offset) {
         return readByte(offset) & 0xFF;
     }
 
@@ -101,7 +101,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public int readUnsignedShort(int offset) {
+    public int readUnsignedShort(long offset) {
         return readShort(offset) & 0xFFFF;
     }
 
@@ -391,7 +391,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public int readInt24(int offset) {
+    public int readInt24(long offset) {
         if (byteOrder() == ByteOrder.BIG_ENDIAN)
             return (readUnsignedByte(offset) << 24 + readUnsignedShort(offset + 1) << 8) >> 8;
         // extra shifting to get sign extension.
@@ -404,7 +404,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public long readUnsignedInt(int offset) {
+    public long readUnsignedInt(long offset) {
         return readInt(offset) & 0xFFFFFFFFL;
     }
 
@@ -447,7 +447,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public long readInt48(int offset) {
+    public long readInt48(long offset) {
         if (byteOrder() == ByteOrder.BIG_ENDIAN)
             return ((long) readUnsignedShort(offset) << 48 + readUnsignedInt(offset + 2) << 16) >> 16;
         // extra shifting to get sign extension.
@@ -499,47 +499,17 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void readByteString(StringBuilder sb) {
         sb.setLength(0);
-        int len = readByte() & 0xFF;
+        int len = (int) readStopBit();
         for (int i = 0; i < len; i++)
             sb.append(readByte());
     }
 
     @Override
-    public int readByteString(int offset, StringBuilder sb) {
-        sb.setLength(0);
-        int len = readByte(offset) & 0xFF;
-        for (int i = 1; i <= len; i++)
-            sb.append(readByte(offset + i));
-        return offset + len + 1;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public String readByteString() {
-        int len = readByte() & 0xFF;
-        if (len == 0) return "";
-        byte[] bytes = new byte[len];
-        for (int i = 0; i < len; i++)
-            bytes[i] = readByte();
-        return new String(bytes, 0);
-    }
-
-    @Override
     public void readChars(StringBuilder sb) {
-        int len = readChar();
+        int len = (int) readStopBit();
         sb.setLength(0);
         for (int i = 0; i < len; i++)
             sb.append(readChar());
-    }
-
-    @Override
-    public String readChars() {
-        int len = readChar();
-        if (len == 0) return "";
-        char[] chars = new char[len];
-        for (int i = 0; i < len; i++)
-            chars[i] = readChar();
-        return new String(chars);
     }
 
     @Override
@@ -569,8 +539,8 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeBoolean(int offset, boolean v) {
-        write(offset, v ? -1 : 0);
+    public void writeBoolean(long offset, boolean v) {
+        writeByte(offset, v ? -1 : 0);
     }
 
     @Override
@@ -581,44 +551,17 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeBytes(CharSequence s) {
         int len = s.length();
-        if (len > 255) throw new IllegalArgumentException("Len cannot be " + len + " > 255");
-        write(len);
+        writeStopBit(len);
         for (int i = 0; i < len; i++)
             write(s.charAt(i));
-    }
-
-    @Override
-    public void writeBytes(int offset, CharSequence s) {
-        int len = s.length();
-        if (len > 255) throw new IllegalArgumentException("Len cannot be " + len + " > 255");
-        write(offset, len);
-        for (int i = 0; i < len; i++)
-            write(s.charAt(i));
-        for (int i = 0; i < len; i++)
-            write(offset + 1 + i, s.charAt(i));
     }
 
     @Override
     public void writeChars(String s) {
-        writeChars((CharSequence) s);
-    }
-
-    @Override
-    public void writeChars(CharSequence s) {
         int len = s.length();
-        if (len > 65535) throw new IllegalArgumentException("Len cannot be " + len + " > 65535");
-        writeChar(len);
+        writeStopBit(len);
         for (int i = 0; i < len; i++)
             writeChar(s.charAt(i));
-    }
-
-    @Override
-    public void writeChars(int offset, CharSequence s) {
-        int len = s.length();
-        if (len > 65535) throw new IllegalArgumentException("Len cannot be " + len + " > 65535");
-        writeChar(offset + len);
-        for (int i = 0; i < len; i++)
-            writeChar(offset + 2 + i, s.charAt(i));
     }
 
     @Override
@@ -701,14 +644,14 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUnsignedByte(int offset, int v) {
-        write(offset, v);
+    public void writeUnsignedByte(long offset, int v) {
+        writeByte(offset, v);
     }
 
     @Override
-    public void write(int offset, byte[] b) {
+    public void write(long offset, byte[] b) {
         for (int i = 0; i < b.length; i++)
-            write(offset + i, b[i]);
+            writeByte(offset + i, b[i]);
     }
 
     @Override
@@ -723,7 +666,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUnsignedShort(int offset, int v) {
+    public void writeUnsignedShort(long offset, int v) {
         writeShort(offset, v);
     }
 
@@ -767,7 +710,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeInt24(int offset, int v) {
+    public void writeInt24(long offset, int v) {
         if (byteOrder() == ByteOrder.BIG_ENDIAN) {
             writeUnsignedByte(offset, v >>> 16);
             writeUnsignedShort(offset + 1, v);
@@ -783,7 +726,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUnsignedInt(int offset, long v) {
+    public void writeUnsignedInt(long offset, long v) {
         writeInt(offset, (int) v);
     }
 
@@ -828,7 +771,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeInt48(int offset, long v) {
+    public void writeInt48(long offset, long v) {
         if (byteOrder() == ByteOrder.BIG_ENDIAN) {
             writeUnsignedShort(offset, (int) (v >>> 32));
             writeUnsignedInt(offset + 2, v);
