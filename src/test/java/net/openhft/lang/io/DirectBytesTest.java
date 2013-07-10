@@ -19,6 +19,7 @@ package net.openhft.lang.io;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author peter.lawrey
@@ -36,8 +37,8 @@ public class DirectBytesTest {
 
     @Test
     public void testLocking() {
-        // a page
         long start = System.nanoTime();
+        // a page
         final DirectStore store1 = DirectStore.allocate(1 << 12);
         final int lockCount = 20 * 1000 * 1000;
         new Thread(new Runnable() {
@@ -62,14 +63,15 @@ public class DirectBytesTest {
         DirectBytes slice1 = store1.createSlice();
 
         for (int i = 0; i < lockCount; i++) {
-            slice1.tryLockNanosInt(0, 1000 * 1000 * 1000);
+            assertTrue(
+                    slice1.tryLockNanosInt(0L, 10 * 1000 * 1000));
             int toggle1 = slice1.readInt(4);
             if (toggle1 == from) {
-                slice1.writeInt(4, to);
+                slice1.writeInt(4L, to);
             } else {
                 i--;
             }
-            slice1.unlockInt(0);
+            slice1.unlockInt(0L);
         }
     }
 
