@@ -84,7 +84,7 @@ public interface BytesCommon {
      * @param offset
      * @return did it lock or not.
      */
-    boolean tryLockNanosInt(long offset);
+    boolean tryLockInt(long offset);
 
     /**
      * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and

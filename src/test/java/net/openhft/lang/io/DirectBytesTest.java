@@ -35,37 +35,26 @@ public class DirectBytesTest {
     }
 
     @Test
-    public void testLocking() throws Exception {
+    public void testLocking() {
         // a page
         long start = System.nanoTime();
         final DirectStore store1 = DirectStore.allocate(1 << 12);
-        final int lockCount = 20 * 1000000;
-
-        Thread t = new Thread(new Runnable() {
+        final int lockCount = 20 * 1000 * 1000;
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                long id = Thread.currentThread().getId();
-                System.out.println("Thread " + id);
-                assertEquals(0, id >>> 24);
-                try {
-                    DirectBytes slice1 = store1.createSlice();
-                    for (int i = 0; i < lockCount; i++) {
-                        slice1.busyLockInt(0);
-                        int toggle1 = slice1.readInt(4);
-                        if (toggle1 == 1) {
-                            slice1.writeInt(4, 0);
-                        } else {
-                            i--;
-                        }
-                        slice1.unlockInt(0);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                manyToggles(store1, lockCount, 1, 0);
             }
-        });
-        t.start();
+        }).start();
 
+        manyToggles(store1, lockCount, 0, 1);
+
+        store1.free();
+        long time = System.nanoTime() - start;
+        System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
+    }
+
+    private void manyToggles(DirectStore store1, int lockCount, int from, int to) {
         long id = Thread.currentThread().getId();
         assertEquals(0, id >>> 24);
         System.out.println("Thread " + id);
@@ -73,19 +62,15 @@ public class DirectBytesTest {
         DirectBytes slice1 = store1.createSlice();
 
         for (int i = 0; i < lockCount; i++) {
-            slice1.busyLockInt(0);
+            slice1.tryLockNanosInt(0, 1000 * 1000 * 1000);
             int toggle1 = slice1.readInt(4);
-            if (toggle1 == 0) {
-                slice1.writeInt(4, 1);
+            if (toggle1 == from) {
+                slice1.writeInt(4, to);
             } else {
                 i--;
             }
             slice1.unlockInt(0);
         }
-
-        store1.free();
-        long time = System.nanoTime() - start;
-        System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
     }
 
     @Test

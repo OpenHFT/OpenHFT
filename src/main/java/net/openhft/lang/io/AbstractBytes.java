@@ -1706,7 +1706,7 @@ public abstract class AbstractBytes implements Bytes {
     static boolean ID_LIMIT_WARNED = false;
 
     @Override
-    public boolean tryLockNanosInt(long offset) {
+    public boolean tryLockInt(long offset) {
         long id = Thread.currentThread().getId();
         if (!ID_LIMIT_WARNED && id > 1 << 24) {
             warnIdLimit(id);
