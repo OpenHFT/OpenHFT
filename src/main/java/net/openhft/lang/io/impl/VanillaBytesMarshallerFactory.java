@@ -31,7 +31,7 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
 
     private final Map<Class, BytesMarshaller> marshallerMap = new LinkedHashMap<Class, BytesMarshaller>();
 
-    private final Map<Class, BytesMarshaller> marshallerTextMap = new LinkedHashMap<Class, BytesMarshaller>();
+//    private final Map<Class, BytesMarshaller> marshallerTextMap = new LinkedHashMap<Class, BytesMarshaller>();
 
     {
         StringMarshaller stringMarshaller = new StringMarshaller(16 * 1024);
