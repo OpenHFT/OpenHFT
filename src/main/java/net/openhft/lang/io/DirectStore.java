@@ -63,4 +63,9 @@ public class DirectStore {
     public void free() {
         cleaner.clean();
     }
+
+    public long size() {
+        return size;
+    }
+
 }
