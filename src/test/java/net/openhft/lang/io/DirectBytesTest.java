@@ -57,7 +57,7 @@ public class DirectBytesTest {
         long start = System.nanoTime();
         // a page
         final DirectStore store1 = DirectStore.allocate(1 << 12);
-        final int lockCount = 40 * 1000 * 1000;
+        final int lockCount = 200 * 1000 * 1000;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -81,17 +81,20 @@ public class DirectBytesTest {
 
         DirectBytes slice1 = store1.createSlice();
 
-        for (int i = 0; i < lockCount; i++) {
-            assertTrue(
-                    slice1.tryLockNanosInt(0L, 5 * 1000 * 1000));
-            int toggle1 = slice1.readInt(4);
-            if (toggle1 == from) {
-                slice1.writeInt(4L, to);
-            } else {
-                i--;
+        int records = 8;
+        for (int i = 0; i < lockCount; i += records) {
+            for (long j = 0; j < records * 64; j += 64) {
+                slice1.positionAndSize(j, 64);
+                assertTrue(
+                        slice1.tryLockNanosInt(0L, 5 * 1000 * 1000));
+                int toggle1 = slice1.readInt(4);
+                if (toggle1 == from) {
+                    slice1.writeInt(4L, to);
+                } else {
+                    i--;
+                }
+                slice1.unlockInt(0L);
             }
-            slice1.unlockInt(0L);
-            System.nanoTime(); // do something small between locks
         }
     }
 
