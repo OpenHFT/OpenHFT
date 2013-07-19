@@ -218,7 +218,7 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void writeInt(int v) {
-        UNSAFE.putInt(positionAddr, v);
+        UNSAFE.putInt(null, positionAddr, v);
         positionAddr += 4;
     }
 
