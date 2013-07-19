@@ -96,6 +96,24 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     boolean compareAndSetInt(long offset, int expected, int x);
 
     /**
+     * Atomically adds the given value to the current value.
+     *
+     * @param offset of the int value to use.
+     * @param delta  the value to add
+     * @return the previous value
+     */
+    public int getAndAdd(long offset, int delta);
+
+    /**
+     * Atomically adds the given value to the current value.
+     *
+     * @param offset of the int value to use.
+     * @param delta  the value to add
+     * @return the updated value
+     */
+    int addAndGetInt(long offset, int delta);
+
+    /**
      * @param v 48-bit long to write
      */
     void writeInt48(long v);

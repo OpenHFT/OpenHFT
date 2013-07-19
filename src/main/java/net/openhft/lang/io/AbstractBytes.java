@@ -1780,4 +1780,24 @@ public abstract class AbstractBytes implements Bytes {
             throw new IllegalStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
     }
+
+    @Override
+    public int getAndAdd(long offset, int delta) {
+        for (; ; ) {
+            int current = readVolatileInt(offset);
+            int next = current + delta;
+            if (compareAndSetInt(offset, current, next))
+                return current;
+        }
+    }
+
+    @Override
+    public int addAndGetInt(long offset, int delta) {
+        for (; ; ) {
+            int current = readVolatileInt(offset);
+            int next = current + delta;
+            if (compareAndSetInt(offset, current, next))
+                return next;
+        }
+    }
 }
