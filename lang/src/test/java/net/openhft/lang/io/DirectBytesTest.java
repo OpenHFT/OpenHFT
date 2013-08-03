@@ -85,8 +85,15 @@ public class DirectBytesTest {
         for (int i = 0; i < lockCount; i += records) {
             for (long j = 0; j < records * 64; j += 64) {
                 slice1.positionAndSize(j, 64);
-                assertTrue(
-                        slice1.tryLockNanosInt(0L, 5 * 1000 * 1000));
+                boolean condition = false;
+                for (int k = 0; k < 20; k++) {
+                    if (condition = slice1.tryLockNanosInt(0L, 5 * 1000 * 1000))
+                        break;
+                    if (k > 0)
+                        System.out.println("k: " + (5 + k * 5));
+                }
+                if (!condition)
+                    assertTrue("i= " + i, condition);
                 int toggle1 = slice1.readInt(4);
                 if (toggle1 == from) {
                     slice1.writeInt(4L, to);
@@ -94,6 +101,7 @@ public class DirectBytesTest {
                     i--;
                 }
                 slice1.unlockInt(0L);
+                System.currentTimeMillis(); // small delay
             }
         }
     }

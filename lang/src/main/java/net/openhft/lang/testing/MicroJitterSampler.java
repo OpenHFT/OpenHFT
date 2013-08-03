@@ -76,11 +76,16 @@ public class MicroJitterSampler {
     static final int CPU = Integer.getInteger("cpu", 0);
 
     public static void main(String... ignored) throws InterruptedException {
-        if (CPU > 0) {
-            PosixJNAAffinity.INSTANCE.setAffinity(1L << CPU);
-        } else {
-            // anything but cpu 0
-            PosixJNAAffinity.INSTANCE.setAffinity(PosixJNAAffinity.INSTANCE.getAffinity() & ~1);
+        boolean binding = false;
+        try {
+            if (CPU > 0) {
+                PosixJNAAffinity.INSTANCE.setAffinity(1L << CPU);
+            } else {
+                // anything but cpu 0
+                PosixJNAAffinity.INSTANCE.setAffinity(PosixJNAAffinity.INSTANCE.getAffinity() & ~1);
+            }
+            binding = true;
+        } catch (UnsatisfiedLinkError ignore) {
         }
         // warmup.
         new MicroJitterSampler().sample(1000 * 1000 * 1000);
@@ -96,7 +101,8 @@ public class MicroJitterSampler {
                     Thread.sleep(1);
                 }
             }
-            System.out.println("On cpu " + PosixJNAAffinity.INSTANCE.getcpu());
+            if (binding)
+                System.out.println("On cpu " + PosixJNAAffinity.INSTANCE.getcpu());
             microJitterSampler.print(System.out);
         }
     }
