@@ -29,7 +29,7 @@ public class StringInterner {
     public StringInterner(int capacity) {
         int n = Maths.nextPower2(capacity, 128);
         interner = new String[n];
-        mask = n;
+        mask = n - 1;
     }
 
     public String intern(byte[] bytes, int off, int len) {

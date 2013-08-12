@@ -26,6 +26,20 @@ import java.io.PrintStream;
  * Time: 13:13
  */
 public class MicroJitterSampler {
+    static final boolean BINDING;
+
+    static {
+        boolean binding = false;
+        try {
+            PosixJNAAffinity.INSTANCE.getcpu();
+            binding = true;
+        } catch (Throwable ignored) {
+        }
+        System.out.println("Binding: " + binding);
+        BINDING = binding;
+
+    }
+
     static final long[] DELAY = {
             2 * 1000, 3 * 1000, 4 * 1000, 6 * 1000, 8 * 1000, 10 * 1000, 14 * 1000,
             20 * 1000, 30 * 1000, 40 * 1000, 60 * 1000, 80 * 1000, 100 * 1000, 140 * 1000,
@@ -76,17 +90,13 @@ public class MicroJitterSampler {
     static final int CPU = Integer.getInteger("cpu", 0);
 
     public static void main(String... ignored) throws InterruptedException {
-        boolean binding = false;
-        try {
+        if (BINDING)
             if (CPU > 0) {
                 PosixJNAAffinity.INSTANCE.setAffinity(1L << CPU);
             } else {
                 // anything but cpu 0
                 PosixJNAAffinity.INSTANCE.setAffinity(PosixJNAAffinity.INSTANCE.getAffinity() & ~1);
             }
-            binding = true;
-        } catch (UnsatisfiedLinkError ignore) {
-        }
         // warmup.
         new MicroJitterSampler().sample(1000 * 1000 * 1000);
 
@@ -101,7 +111,7 @@ public class MicroJitterSampler {
                     Thread.sleep(1);
                 }
             }
-            if (binding)
+            if (BINDING)
                 System.out.println("On cpu " + PosixJNAAffinity.INSTANCE.getcpu());
             microJitterSampler.print(System.out);
         }
