@@ -35,40 +35,9 @@ import java.util.logging.Logger;
  */
 public enum PosixJNAAffinity implements IAffinity {
     INSTANCE;
-    private static final Logger LOGGER = Logger.getLogger(PosixJNAAffinity.class.getName());
-
     public static final boolean LOADED;
-
+    private static final Logger LOGGER = Logger.getLogger(PosixJNAAffinity.class.getName());
     private static final String LIBRARY_NAME = Platform.isWindows() ? "msvcrt" : "c";
-
-    /**
-     * @author BegemoT
-     */
-    private interface CLibrary extends Library {
-        public static final CLibrary INSTANCE = (CLibrary)
-                Native.loadLibrary(LIBRARY_NAME, CLibrary.class);
-
-        public int sched_setaffinity(final int pid,
-                                     final int cpusetsize,
-                                     final PointerType cpuset) throws LastErrorException;
-
-        public int sched_getaffinity(final int pid,
-                                     final int cpusetsize,
-                                     final PointerType cpuset) throws LastErrorException;
-
-        public int sched_getcpu() throws LastErrorException;
-    }
-
-    static {
-        boolean loaded = false;
-        try {
-            INSTANCE.getAffinity();
-            loaded = true;
-        } catch (UnsatisfiedLinkError e) {
-            LOGGER.log(Level.FINE, "Unable to load jna library " + e);
-        }
-        LOADED = loaded;
-    }
 
     @Override
     public long getAffinity() {
@@ -107,5 +76,34 @@ public enum PosixJNAAffinity implements IAffinity {
         } catch (LastErrorException e) {
             throw new IllegalStateException("sched_getcpu() errorNo=" + e.getErrorCode(), e);
         }
+    }
+
+    /**
+     * @author BegemoT
+     */
+    private interface CLibrary extends Library {
+        public static final CLibrary INSTANCE = (CLibrary)
+                Native.loadLibrary(LIBRARY_NAME, CLibrary.class);
+
+        public int sched_setaffinity(final int pid,
+                                     final int cpusetsize,
+                                     final PointerType cpuset) throws LastErrorException;
+
+        public int sched_getaffinity(final int pid,
+                                     final int cpusetsize,
+                                     final PointerType cpuset) throws LastErrorException;
+
+        public int sched_getcpu() throws LastErrorException;
+    }
+
+    static {
+        boolean loaded = false;
+        try {
+            INSTANCE.getAffinity();
+            loaded = true;
+        } catch (UnsatisfiedLinkError e) {
+            LOGGER.log(Level.FINE, "Unable to load jna library " + e);
+        }
+        LOADED = loaded;
     }
 }
