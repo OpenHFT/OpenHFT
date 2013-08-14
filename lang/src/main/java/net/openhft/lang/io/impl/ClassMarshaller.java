@@ -45,13 +45,13 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         }
     }
 
+    private final ClassLoader classLoader;
+    @SuppressWarnings("unchecked")
+    private WeakReference<Class>[] classWeakReference = null;
+
     public ClassMarshaller(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
-
-    @SuppressWarnings("unchecked")
-    private WeakReference<Class>[] classWeakReference = null;
-    private final ClassLoader classLoader;
 
     @Override
     public Class<Class> classMarshaled() {

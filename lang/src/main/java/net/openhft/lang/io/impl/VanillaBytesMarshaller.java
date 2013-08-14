@@ -35,6 +35,7 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
     private final Map<String, E> map = new LinkedHashMap<String, E>();
     private final E defaultValue;
     private final int mask;
+    private final StringBuilder reader = new StringBuilder();
 
     public VanillaBytesMarshaller(Class<E> classMarshaled, E defaultValue) {
         this.classMarshaled = classMarshaled;
@@ -80,8 +81,6 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
         h ^= (h >>> 7) ^ (h >>> 4);
         return h & mask;
     }
-
-    private final StringBuilder reader = new StringBuilder();
 
     @Override
     public E read(Bytes bytes) {

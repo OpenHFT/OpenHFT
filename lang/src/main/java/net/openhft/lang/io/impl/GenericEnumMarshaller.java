@@ -32,6 +32,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
     private final Class<E> classMarshaled;
     private final Constructor<E> constructor;
     private final Method valueOf;
+    private final Map<String, E> map;
 
     public GenericEnumMarshaller(Class<E> classMarshaled, final int capacity) {
         this.classMarshaled = classMarshaled;
@@ -70,8 +71,6 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
     public void append(Bytes bytes, E e) {
         bytes.append(e == null ? null : e.toString());
     }
-
-    private final Map<String, E> map;
 
     @Override
     public E read(Bytes bytes) {

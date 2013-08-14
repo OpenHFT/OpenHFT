@@ -27,12 +27,29 @@ import java.util.Date;
  */
 public class DateMarshaller implements BytesMarshaller<Date> {
     final int size1;
+    private final StringBuilder sb = new StringBuilder();
     private Date[] interner = null;
 
     public DateMarshaller(int size) {
         int size2 = 128;
         while (size2 < size && size2 < (1 << 20)) size2 <<= 1;
         this.size1 = size2 - 1;
+    }
+
+    private static long parseLong(CharSequence sb) {
+        long num = 0;
+        boolean negative = false;
+        for (int i = 0; i < sb.length(); i++) {
+            char b = sb.charAt(i);
+//            if (b >= '0' && b <= '9')
+            if ((b - ('0' + Integer.MIN_VALUE)) <= 9 + Integer.MIN_VALUE)
+                num = num * 10 + b - '0';
+            else if (b == '-')
+                negative = true;
+            else
+                break;
+        }
+        return negative ? -num : num;
     }
 
     @Override
@@ -53,29 +70,11 @@ public class DateMarshaller implements BytesMarshaller<Date> {
         bytes.append(date.getTime());
     }
 
-    private final StringBuilder sb = new StringBuilder();
-
     @Override
     public Date read(Bytes bytes) {
         bytes.readUTF(sb);
         long time = parseLong(sb);
         return lookupDate(time);
-    }
-
-    private static long parseLong(CharSequence sb) {
-        long num = 0;
-        boolean negative = false;
-        for (int i = 0; i < sb.length(); i++) {
-            char b = sb.charAt(i);
-//            if (b >= '0' && b <= '9')
-            if ((b - ('0' + Integer.MIN_VALUE)) <= 9 + Integer.MIN_VALUE)
-                num = num * 10 + b - '0';
-            else if (b == '-')
-                negative = true;
-            else
-                break;
-        }
-        return negative ? -num : num;
     }
 
     @Override

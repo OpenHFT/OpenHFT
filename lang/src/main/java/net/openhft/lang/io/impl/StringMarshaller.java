@@ -26,6 +26,7 @@ import net.openhft.lang.pool.StringInterner;
  */
 public class StringMarshaller implements BytesMarshaller<String> {
     private final int size;
+    private final StringBuilder reader = new StringBuilder();
     private StringInterner interner;
 
     public StringMarshaller(int size) {
@@ -46,8 +47,6 @@ public class StringMarshaller implements BytesMarshaller<String> {
     public void append(Bytes bytes, String s) {
         bytes.append(s);
     }
-
-    private final StringBuilder reader = new StringBuilder();
 
     @Override
     public String read(Bytes bytes) {
