@@ -8,7 +8,6 @@ package net.openhft.lang.testing;
 public class RunningMinimum implements Differencer {
     private final long actualMinimum;
     private final int drift;
-
     private long lastStartTime = Long.MIN_VALUE;
     private long minimum = Long.MAX_VALUE;
 

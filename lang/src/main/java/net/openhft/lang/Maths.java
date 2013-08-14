@@ -24,6 +24,13 @@ public class Maths {
      * Numbers larger than this are whole numbers due to representation error.
      */
     public static final double WHOLE_NUMBER = 1L << 53;
+    private static final long[] TENS = new long[19];
+
+    static {
+        TENS[0] = 1;
+        for (int i = 1; i < TENS.length; i++)
+            TENS[i] = TENS[i - 1] * 10;
+    }
 
     /**
      * Performs a round which is accurate to within 1 ulp.
@@ -52,14 +59,6 @@ public class Maths {
         final double factor = 1e8;
         return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ?
                 (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor : d;
-    }
-
-    private static final long[] TENS = new long[19];
-
-    static {
-        TENS[0] = 1;
-        for (int i = 1; i < TENS.length; i++)
-            TENS[i] = TENS[i - 1] * 10;
     }
 
     public static long power10(int n) {

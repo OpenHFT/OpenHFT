@@ -68,7 +68,6 @@ public class ByteBufferBytes extends AbstractBytes {
         throw new IndexOutOfBoundsException();
     }
 
-
     @Override
     public void readFully(byte[] b, int off, int len) {
         if (len < 0 || off < 0 || off + len > b.length)

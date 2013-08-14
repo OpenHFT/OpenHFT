@@ -47,8 +47,38 @@ public class MicroJitterSampler {
             2 * 1000 * 1000, 5 * 1000 * 1000, 10 * 1000 * 10000,
             20 * 1000 * 1000, 50 * 1000 * 1000, 100 * 1000 * 1000
     };
+    static final double UTIL = Double.parseDouble(System.getProperty("util", "50"));
+    static final int CPU = Integer.getInteger("cpu", 0);
     final int[] count = new int[DELAY.length];
     long totalTime = 0;
+
+    public static void main(String... ignored) throws InterruptedException {
+        if (BINDING)
+            if (CPU > 0) {
+                PosixJNAAffinity.INSTANCE.setAffinity(1L << CPU);
+            } else {
+                // anything but cpu 0
+                PosixJNAAffinity.INSTANCE.setAffinity(PosixJNAAffinity.INSTANCE.getAffinity() & ~1);
+            }
+        // warmup.
+        new MicroJitterSampler().sample(1000 * 1000 * 1000);
+
+        MicroJitterSampler microJitterSampler = new MicroJitterSampler();
+        while (!Thread.currentThread().isInterrupted()) {
+            if (UTIL >= 100) {
+                microJitterSampler.sample(30L * 1000 * 1000 * 1000);
+            } else {
+                long sampleLength = (long) ((1 / (1 - UTIL / 100) - 1) * 1000 * 1000);
+                for (int i = 0; i < 30 * 1000; i += 2) {
+                    microJitterSampler.sample(sampleLength);
+                    Thread.sleep(1);
+                }
+            }
+            if (BINDING)
+                System.out.println("On cpu " + PosixJNAAffinity.INSTANCE.getcpu());
+            microJitterSampler.print(System.out);
+        }
+    }
 
     public void sample(long intervalNS) {
         long prev = System.nanoTime();
@@ -84,36 +114,5 @@ public class MicroJitterSampler {
                 timeNS < 1000000 ? timeNS / 1000 + "us" :
                         timeNS < 1000000000 ? timeNS / 1000000 + "ms" :
                                 timeNS / 1000000000 + "sec";
-    }
-
-    static final double UTIL = Double.parseDouble(System.getProperty("util", "50"));
-    static final int CPU = Integer.getInteger("cpu", 0);
-
-    public static void main(String... ignored) throws InterruptedException {
-        if (BINDING)
-            if (CPU > 0) {
-                PosixJNAAffinity.INSTANCE.setAffinity(1L << CPU);
-            } else {
-                // anything but cpu 0
-                PosixJNAAffinity.INSTANCE.setAffinity(PosixJNAAffinity.INSTANCE.getAffinity() & ~1);
-            }
-        // warmup.
-        new MicroJitterSampler().sample(1000 * 1000 * 1000);
-
-        MicroJitterSampler microJitterSampler = new MicroJitterSampler();
-        while (!Thread.currentThread().isInterrupted()) {
-            if (UTIL >= 100) {
-                microJitterSampler.sample(30L * 1000 * 1000 * 1000);
-            } else {
-                long sampleLength = (long) ((1 / (1 - UTIL / 100) - 1) * 1000 * 1000);
-                for (int i = 0; i < 30 * 1000; i += 2) {
-                    microJitterSampler.sample(sampleLength);
-                    Thread.sleep(1);
-                }
-            }
-            if (BINDING)
-                System.out.println("On cpu " + PosixJNAAffinity.INSTANCE.getcpu());
-            microJitterSampler.print(System.out);
-        }
     }
 }

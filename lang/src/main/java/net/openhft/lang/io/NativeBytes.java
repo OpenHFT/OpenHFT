@@ -26,6 +26,26 @@ import java.nio.ByteOrder;
  * @author peter.lawrey
  */
 public class NativeBytes extends AbstractBytes {
+    /**
+     * *** Access the Unsafe class *****
+     */
+    @SuppressWarnings("ALL")
+    protected static final Unsafe UNSAFE;
+    static final int BYTES_OFFSET;
+
+    static {
+        try {
+            @SuppressWarnings("ALL")
+            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            UNSAFE = (Unsafe) theUnsafe.get(null);
+            BYTES_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);
+
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    }
+
     protected long startAddr;
     protected long positionAddr;
     protected long limitAddr;
@@ -41,6 +61,16 @@ public class NativeBytes extends AbstractBytes {
         this.startAddr = startAddr;
         this.positionAddr = positionAddr;
         this.limitAddr = limitAddr;
+    }
+
+    public static long longHash(byte[] bytes, int off, int len) {
+        long hash = 0;
+        int pos = 0;
+        for (; pos < len - 7; pos += 8)
+            hash = hash * 10191 + UNSAFE.getLong(bytes, (long) BYTES_OFFSET + off + pos);
+        for (; pos < len; pos++)
+            hash = hash * 57 + bytes[off + pos];
+        return hash;
     }
 
     @Override
@@ -319,25 +349,5 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
-    }
-
-    /**
-     * *** Access the Unsafe class *****
-     */
-    @SuppressWarnings("ALL")
-    protected static final Unsafe UNSAFE;
-    static final int BYTES_OFFSET;
-
-    static {
-        try {
-            @SuppressWarnings("ALL")
-            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            UNSAFE = (Unsafe) theUnsafe.get(null);
-            BYTES_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);
-
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
     }
 }

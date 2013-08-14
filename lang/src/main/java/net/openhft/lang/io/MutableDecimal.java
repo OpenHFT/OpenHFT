@@ -23,6 +23,14 @@ import java.math.RoundingMode;
  * @author peter.lawrey
  */
 public class MutableDecimal extends Number implements Comparable<MutableDecimal> {
+    static final double[] TENS = new double[16];
+
+    static {
+        TENS[0] = 1;
+        for (int i = 1; i < TENS.length; i++)
+            TENS[i] = 10 * TENS[i - 1];
+    }
+
     private long value;
     private int scale;
 
@@ -165,14 +173,6 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
         if (scale == 0)
             return value;
         return scale <= 0 ? value * tens(-scale) : value / tens(scale);
-    }
-
-    static final double[] TENS = new double[16];
-
-    static {
-        TENS[0] = 1;
-        for (int i = 1; i < TENS.length; i++)
-            TENS[i] = 10 * TENS[i - 1];
     }
 
     private double tens(int scale) {

@@ -22,7 +22,6 @@ package net.openhft.lang;
 public enum Jvm {
     ;
     public static final String TMP = System.getProperty("java.io.tmpdir");
-
     private static final boolean IS64BIT = is64Bit0();
 
     public static boolean is64Bit() {

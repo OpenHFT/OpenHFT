@@ -22,14 +22,10 @@ import sun.misc.Cleaner;
  * @author peter.lawrey
  */
 public class DirectStore {
-    private final Cleaner cleaner;
     protected final BytesMarshallerFactory bytesMarshallerFactory;
+    private final Cleaner cleaner;
     protected long address;
     protected long size;
-
-    public static DirectStore allocate(long size) {
-        return new DirectStore(null, size);
-    }
 
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
         this.bytesMarshallerFactory = bytesMarshallerFactory;
@@ -48,6 +44,10 @@ public class DirectStore {
                 address = DirectStore.this.size = 0;
             }
         });
+    }
+
+    public static DirectStore allocate(long size) {
+        return new DirectStore(null, size);
     }
 
     public void resize(long newSize) {

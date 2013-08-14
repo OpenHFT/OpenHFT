@@ -18,6 +18,7 @@ package net.openhft.lang.pool;
 
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.IOTools;
+import net.openhft.lang.io.NativeBytes;
 
 /**
  * @author peter.lawrey
@@ -30,30 +31,6 @@ public class StringInterner {
         int n = Maths.nextPower2(capacity, 128);
         interner = new String[n];
         mask = n - 1;
-    }
-
-    public String intern(byte[] bytes, int off, int len) {
-        long hash = 0;
-        for (int i = 0; i < len; i++)
-            hash = 57 * hash + bytes[i + off];
-        int h = Maths.hash(hash) & mask;
-        String s = interner[h];
-        if (isEqual(s, bytes, off, len))
-            return s;
-        String s2 = new String(bytes, off, len, IOTools.ISO_8859_1);
-        return interner[h] = s2;
-    }
-
-    public String intern(CharSequence cs) {
-        long hash = 0;
-        for (int i = 0; i < cs.length(); i++)
-            hash = 57 * hash + cs.charAt(i);
-        int h = Maths.hash(hash) & mask;
-        String s = interner[h];
-        if (isEqual(s, cs))
-            return s;
-        String s2 = cs.toString();
-        return interner[h] = s2;
     }
 
     private static boolean isEqual(String s, CharSequence cs) {
@@ -72,5 +49,27 @@ public class StringInterner {
             if (s.charAt(i) != (bytes[off + i] & 0xFF))
                 return false;
         return true;
+    }
+
+    public String intern(byte[] bytes, int off, int len) {
+        long hash = NativeBytes.longHash(bytes, off, len);
+        int h = Maths.hash(hash) & mask;
+        String s = interner[h];
+        if (isEqual(s, bytes, off, len))
+            return s;
+        String s2 = new String(bytes, off, len, IOTools.ISO_8859_1);
+        return interner[h] = s2;
+    }
+
+    public String intern(CharSequence cs) {
+        long hash = 0;
+        for (int i = 0; i < cs.length(); i++)
+            hash = 57 * hash + cs.charAt(i);
+        int h = Maths.hash(hash) & mask;
+        String s = interner[h];
+        if (isEqual(s, cs))
+            return s;
+        String s2 = cs.toString();
+        return interner[h] = s2;
     }
 }
