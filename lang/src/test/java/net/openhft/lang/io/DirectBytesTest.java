@@ -44,7 +44,7 @@ public class DirectBytesTest {
 
     @Test
     public void testAllocate() throws Exception {
-        long size = 1L << 24; // 31;
+        long size = 1L << 24; // 31; don't overload cloud-bees
         DirectStore store = DirectStore.allocate(size);
         DirectBytes slice = store.createSlice();
         slice.writeLong(0, size);
