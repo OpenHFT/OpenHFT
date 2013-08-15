@@ -16,7 +16,7 @@ public class RunningMinimumTest {
             for (long delta : new long[]{0, Integer.MIN_VALUE, Integer.MAX_VALUE}) {
                 RunningMinimum rm = new RunningMinimum(50 * 1000);
                 int j;
-                for (j = 0; j < 40 * 1000000; j += 1000000) {
+                for (j = 0; j < 50 * 1000000; j += 1000000) {
                     long startTime = System.nanoTime() + j;
                     long endTime = System.nanoTime() + j + delta + (long) (Math.pow(10 * 1000, Math.random()) * 1000);
                     rm.sample(startTime, endTime);
