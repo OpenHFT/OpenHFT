@@ -54,6 +54,17 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         this.classLoader = classLoader;
     }
 
+    private static int hashOf(CharSequence name) {
+        if (name instanceof String)
+            return name.hashCode();
+        int h = 0;
+
+        for (int i = 0; i < name.length(); i++) {
+            h = 31 * h + name.charAt(i);
+        }
+        return h;
+    }
+
     @Override
     public Class<Class> classMarshaled() {
         return Class.class;
@@ -83,7 +94,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
     }
 
     private Class load(CharSequence name) {
-        int hash = (name.hashCode() & 0x7fffffff) % CACHE_SIZE;
+        int hash = hashOf(name) % CACHE_SIZE;
         if (classWeakReference == null)
             classWeakReference = new WeakReference[CACHE_SIZE];
         WeakReference<Class> ref = classWeakReference[hash];
@@ -94,7 +105,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         }
         try {
 
-            Class<?> clazz = SC_SHORT_NAME.get(name);
+            Class<?> clazz = SC_SHORT_NAME.get(name.toString());
             if (clazz != null)
                 return clazz;
             clazz = classLoader.loadClass(name.toString());
