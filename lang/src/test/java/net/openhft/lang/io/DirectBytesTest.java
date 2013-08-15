@@ -44,7 +44,7 @@ public class DirectBytesTest {
 
     @Test
     public void testAllocate() throws Exception {
-        long size = 1L << 31;
+        long size = 1L << 24; // 31;
         DirectStore store = DirectStore.allocate(size);
         DirectBytes slice = store.createSlice();
         slice.writeLong(0, size);
