@@ -57,7 +57,7 @@ public class DirectBytesTest {
         long start = System.nanoTime();
         // a page
         final DirectStore store1 = DirectStore.allocate(1 << 12);
-        final int lockCount = 200 * 1000 * 1000;
+        final int lockCount = 50 * 1000 * 1000;
         new Thread(new Runnable() {
             @Override
             public void run() {
