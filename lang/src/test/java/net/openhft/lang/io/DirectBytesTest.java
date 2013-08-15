@@ -54,7 +54,10 @@ public class DirectBytesTest {
 
     @Test
     public void testLocking() {
-        assertTrue(Runtime.getRuntime().availableProcessors() > 1);
+        if(Runtime.getRuntime().availableProcessors() < 2) {
+            System.err.println("Test requires 2 CPUs, skipping");
+            return;
+        }
         long start = System.nanoTime();
         // a page
         final DirectStore store1 = DirectStore.allocate(1 << 12);
@@ -109,7 +112,10 @@ public class DirectBytesTest {
 
     @Test
     public void testLocking2() throws Exception {
-        assertTrue(Runtime.getRuntime().availableProcessors() > 1);
+        if(Runtime.getRuntime().availableProcessors() < 2) {
+            System.err.println("Test requires 2 CPUs, skipping");
+            return;
+        }
         // a page
         final DirectStore store1 = DirectStore.allocate(1 << 12);
         final DirectStore store2 = DirectStore.allocate(1 << 12);
