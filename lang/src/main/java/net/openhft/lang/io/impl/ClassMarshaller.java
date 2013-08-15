@@ -46,6 +46,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
     }
 
     private final ClassLoader classLoader;
+    private final StringBuilder className = new StringBuilder(40);
     @SuppressWarnings("unchecked")
     private WeakReference<Class>[] classWeakReference = null;
 
@@ -76,11 +77,12 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
 
     @Override
     public Class read(Bytes bytes) {
-        String name = bytes.readUTF();
-        return load(name);
+        className.setLength(0);
+        bytes.readUTF(className);
+        return load(className);
     }
 
-    private Class load(String name) {
+    private Class load(CharSequence name) {
         int hash = (name.hashCode() & 0x7fffffff) % CACHE_SIZE;
         if (classWeakReference == null)
             classWeakReference = new WeakReference[CACHE_SIZE];
@@ -95,7 +97,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
             Class<?> clazz = SC_SHORT_NAME.get(name);
             if (clazz != null)
                 return clazz;
-            clazz = classLoader.loadClass(name);
+            clazz = classLoader.loadClass(name.toString());
             classWeakReference[hash] = new WeakReference<Class>(clazz);
             return clazz;
         } catch (ClassNotFoundException e) {
@@ -105,7 +107,8 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
 
     @Override
     public Class parse(Bytes bytes, StopCharTester tester) {
-        String name = bytes.parseUTF(tester);
-        return load(name);
+        className.setLength(0);
+        bytes.parseUTF(className, tester);
+        return load(className);
     }
 }
