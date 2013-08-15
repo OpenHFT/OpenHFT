@@ -54,7 +54,7 @@ public class DirectBytesTest {
 
     @Test
     public void testLocking() {
-        if(Runtime.getRuntime().availableProcessors() < 2) {
+        if (Runtime.getRuntime().availableProcessors() < 2) {
             System.err.println("Test requires 2 CPUs, skipping");
             return;
         }
@@ -112,7 +112,7 @@ public class DirectBytesTest {
 
     @Test
     public void testLocking2() throws Exception {
-        if(Runtime.getRuntime().availableProcessors() < 2) {
+        if (Runtime.getRuntime().availableProcessors() < 2) {
             System.err.println("Test requires 2 CPUs, skipping");
             return;
         }
