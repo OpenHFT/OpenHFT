@@ -96,6 +96,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
     private Class load(CharSequence name) {
         int hash = hashOf(name) % CACHE_SIZE;
         if (classWeakReference == null)
+            //noinspection unchecked
             classWeakReference = new WeakReference[CACHE_SIZE];
         WeakReference<Class> ref = classWeakReference[hash];
         if (ref != null) {

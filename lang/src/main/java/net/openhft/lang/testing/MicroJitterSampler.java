@@ -71,6 +71,7 @@ public class MicroJitterSampler {
                 long sampleLength = (long) ((1 / (1 - UTIL / 100) - 1) * 1000 * 1000);
                 for (int i = 0; i < 30 * 1000; i += 2) {
                     microJitterSampler.sample(sampleLength);
+                    //noinspection BusyWait
                     Thread.sleep(1);
                 }
             }
@@ -104,12 +105,12 @@ public class MicroJitterSampler {
         for (int i = 0; i < DELAY.length; i++) {
             if (count[i] < 1) continue;
             long countPerHour = (long) Math.ceil(count[i] * 3600e9 / totalTime);
-            ps.println(asString(DELAY[i]) + "\t" + countPerHour);
+            ps.println(asString(DELAY[i]) + '\t' + countPerHour);
         }
         ps.println();
     }
 
-    private String asString(long timeNS) {
+    private static String asString(long timeNS) {
         return timeNS < 1000 ? timeNS + "ns" :
                 timeNS < 1000000 ? timeNS / 1000 + "us" :
                         timeNS < 1000000000 ? timeNS / 1000000 + "ms" :

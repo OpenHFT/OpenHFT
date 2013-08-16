@@ -33,13 +33,14 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
 
     //    private final Map<Class, BytesMarshaller> marshallerTextMap = new LinkedHashMap<Class, BytesMarshaller>();
     {
-        StringMarshaller stringMarshaller = new StringMarshaller(16 * 1024);
+        BytesMarshaller stringMarshaller = new StringMarshaller(16 * 1024);
         marshallerMap.put(String.class, stringMarshaller);
         marshallerMap.put(CharSequence.class, stringMarshaller);
         marshallerMap.put(Class.class, new ClassMarshaller(Thread.currentThread().getContextClassLoader()));
         marshallerMap.put(Date.class, new DateMarshaller(10191));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <E> BytesMarshaller<E> acquireMarshaller(Class<E> eClass, boolean create) {
         BytesMarshaller<E> em = marshallerMap.get(eClass);

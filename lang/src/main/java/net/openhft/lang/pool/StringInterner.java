@@ -33,7 +33,7 @@ public class StringInterner {
         mask = n - 1;
     }
 
-    private static boolean isEqual(String s, CharSequence cs) {
+    private static boolean isEqual(CharSequence s, CharSequence cs) {
         if (s == null) return false;
         if (s.length() != cs.length()) return false;
         for (int i = 0; i < cs.length(); i++)
@@ -42,7 +42,7 @@ public class StringInterner {
         return true;
     }
 
-    private static boolean isEqual(String s, byte[] bytes, int off, int len) {
+    private static boolean isEqual(CharSequence s, byte[] bytes, int off, int len) {
         if (s == null) return false;
         if (s.length() != len) return false;
         for (int i = 0; i < len; i++)

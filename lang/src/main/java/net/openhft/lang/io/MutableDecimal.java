@@ -22,6 +22,7 @@ import java.math.RoundingMode;
 /**
  * @author peter.lawrey
  */
+@SuppressWarnings({"CompareToUsesNonFinalVariable", "NonFinalFieldReferenceInEquals", "NonFinalFieldReferencedInHashCode"})
 public class MutableDecimal extends Number implements Comparable<MutableDecimal> {
     static final double[] TENS = new double[16];
 
@@ -175,7 +176,7 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
         return scale <= 0 ? value * tens(-scale) : value / tens(scale);
     }
 
-    private double tens(int scale) {
+    private static double tens(int scale) {
         return scale < TENS.length ? TENS[scale] : Math.pow(10, scale);
     }
 
@@ -194,7 +195,7 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
         return BigDecimal.valueOf(value, scale).compareTo(BigDecimal.valueOf(ovalue, o.scale()));
     }
 
-    private int longCompareTo(long value, long ovalue) {
+    private static int longCompareTo(long value, long ovalue) {
         return value < ovalue ? -1 : value > ovalue ? +1 : 0;
     }
 }

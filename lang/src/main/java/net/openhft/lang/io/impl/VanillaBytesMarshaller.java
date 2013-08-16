@@ -47,6 +47,7 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
             int idx = hashFor(e.name());
             if (!internerDup.get(idx)) {
                 if (interner[idx] != null) {
+                    //noinspection UnqualifiedFieldAccess,AssignmentToNull
                     interner[idx] = null;
                     internerDup.set(idx);
                 } else {

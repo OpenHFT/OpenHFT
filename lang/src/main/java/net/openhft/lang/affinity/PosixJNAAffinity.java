@@ -82,18 +82,18 @@ public enum PosixJNAAffinity implements IAffinity {
      * @author BegemoT
      */
     private interface CLibrary extends Library {
-        public static final CLibrary INSTANCE = (CLibrary)
+        CLibrary INSTANCE = (CLibrary)
                 Native.loadLibrary(LIBRARY_NAME, CLibrary.class);
 
-        public int sched_setaffinity(final int pid,
-                                     final int cpusetsize,
-                                     final PointerType cpuset) throws LastErrorException;
+        int sched_setaffinity(final int pid,
+                              final int cpusetsize,
+                              final PointerType cpuset) throws LastErrorException;
 
-        public int sched_getaffinity(final int pid,
-                                     final int cpusetsize,
-                                     final PointerType cpuset) throws LastErrorException;
+        int sched_getaffinity(final int pid,
+                              final int cpusetsize,
+                              final PointerType cpuset) throws LastErrorException;
 
-        public int sched_getcpu() throws LastErrorException;
+        int sched_getcpu() throws LastErrorException;
     }
 
     static {

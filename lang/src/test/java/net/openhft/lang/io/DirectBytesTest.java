@@ -78,7 +78,7 @@ public class DirectBytesTest {
         System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
     }
 
-    private void manyToggles(DirectStore store1, int lockCount, int from, int to) {
+    private static void manyToggles(DirectStore store1, int lockCount, int from, int to) {
         long id = Thread.currentThread().getId();
         assertEquals(0, id >>> 24);
         System.out.println("Thread " + id);
@@ -91,7 +91,8 @@ public class DirectBytesTest {
                 slice1.positionAndSize(j, 64);
                 boolean condition = false;
                 for (int k = 0; k < 20; k++) {
-                    if (condition = slice1.tryLockNanosInt(0L, 5 * 1000 * 1000))
+                    condition = slice1.tryLockNanosInt(0L, 5 * 1000 * 1000);
+                    if (condition)
                         break;
                     if (k > 0)
                         System.out.println("k: " + (5 + k * 5));
@@ -102,6 +103,7 @@ public class DirectBytesTest {
                 if (toggle1 == from) {
                     slice1.writeInt(4L, to);
                 } else {
+                    //noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
                     i--;
                 }
                 slice1.unlockInt(0L);
@@ -147,6 +149,7 @@ public class DirectBytesTest {
 //                            if (i % 10000== 0)
 //                            System.out.println("t: " + i);
                         } else {
+                            //noinspection AssignmentToForLoopParameter
                             i--;
                         }
                         int toggle2 = slice2.readInt(4);
@@ -155,6 +158,7 @@ public class DirectBytesTest {
 //                            if (i % 10000== 0)
 //                            System.out.println("t: " + i);
                         } else {
+                            //noinspection AssignmentToForLoopParameter
                             i--;
                         }
                         int lockValue1A = slice1.readInt(0);
@@ -200,6 +204,7 @@ public class DirectBytesTest {
 //                            if (i % 10000== 0)
 //                            System.out.println("t: " + i);
             } else {
+                //noinspection AssignmentToForLoopParameter
                 i--;
             }
             int toggle2 = slice2.readInt(4);
@@ -208,6 +213,7 @@ public class DirectBytesTest {
 //                            if (i % 10000== 0)
 //                            System.out.println("t: " + i);
             } else {
+                //noinspection AssignmentToForLoopParameter
                 i--;
             }
             int lockValue1A = slice1.readInt(0);

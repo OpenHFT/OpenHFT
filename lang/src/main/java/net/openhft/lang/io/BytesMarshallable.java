@@ -29,12 +29,12 @@ public interface BytesMarshallable {
      * @param in to read from
      * @throws IllegalStateException if the object could not be read.
      */
-    public void readMarshallable(Bytes in) throws IllegalStateException;
+    void readMarshallable(Bytes in) throws IllegalStateException;
 
     /**
      * write an object to bytes
      *
      * @param out to write to
      */
-    public void writeMarshallable(Bytes out);
+    void writeMarshallable(Bytes out);
 }

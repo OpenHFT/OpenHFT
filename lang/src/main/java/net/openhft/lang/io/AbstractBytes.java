@@ -31,10 +31,14 @@ import java.util.logging.Logger;
 /**
  * @author peter.lawrey
  */
+@SuppressWarnings("MagicNumber")
 public abstract class AbstractBytes implements Bytes {
     private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     public static final int INT_LOCK_MASK = 0xFFFFFF;
+    public static final int UNSIGNED_BYTE_MASK = 0xFF;
+    public static final int UNSIGNED_SHORT_MASK = 0xFFFF;
+    public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
 
     protected boolean finished;
     protected BytesMarshallerFactory bytesMarshallerFactory;
@@ -93,22 +97,22 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int readUnsignedByte() {
-        return readByte() & 0xFF;
+        return readByte() & UNSIGNED_BYTE_MASK;
     }
 
     @Override
     public int readUnsignedByte(long offset) {
-        return readByte(offset) & 0xFF;
+        return readByte(offset) & UNSIGNED_BYTE_MASK;
     }
 
     @Override
     public int readUnsignedShort() {
-        return readShort() & 0xFFFF;
+        return readShort() & UNSIGNED_SHORT_MASK;
     }
 
     @Override
     public int readUnsignedShort(long offset) {
-        return readShort(offset) & 0xFFFF;
+        return readShort(offset) & UNSIGNED_SHORT_MASK;
     }
 
     @Override
@@ -172,6 +176,7 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
+    @SuppressWarnings("MagicNumber")
     private boolean appendUTF0(Appendable appendable) throws IOException {
         long len = readStopBit();
         if (len < -1 || len > Integer.MAX_VALUE)
@@ -406,19 +411,19 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public long readUnsignedInt() {
-        return readInt() & 0xFFFFFFFFL;
+        return readInt() & UNSIGNED_INT_MASK;
     }
 
     @Override
     public long readUnsignedInt(long offset) {
-        return readInt(offset) & 0xFFFFFFFFL;
+        return readInt(offset) & UNSIGNED_INT_MASK;
     }
 
     private static final short SHORT_MIN_VALUE = Short.MIN_VALUE;
     private static final short SHORT_EXTENDED = Short.MIN_VALUE + 1;
     private static final short SHORT_MAX_VALUE = Short.MIN_VALUE + 2;
 
-    private static final int USHORT_EXTENDED = 0xFFFF;
+    private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
 
     @Override
     public int readCompactInt() {
@@ -1469,6 +1474,7 @@ public abstract class AbstractBytes implements Bytes {
             finish();
         }
 
+        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
         @Override
         public void mark(int readlimit) {
             mark = position();
@@ -1485,6 +1491,7 @@ public abstract class AbstractBytes implements Bytes {
             return len;
         }
 
+        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
         @Override
         public void reset() throws IOException {
             position(mark);
@@ -1734,8 +1741,9 @@ public abstract class AbstractBytes implements Bytes {
         return false;
     }
 
-    private void warnIdLimit(long id) {
+    private static void warnIdLimit(long id) {
         LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
+
         ID_LIMIT_WARNED = true;
     }
 

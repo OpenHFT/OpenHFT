@@ -81,7 +81,7 @@ public interface BytesCommon {
      * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
      * you can get a collision, and if you try to re-enter 255 times you will get an ISE
      *
-     * @param offset
+     * @param offset of the start of the 4-byte lock
      * @return did it lock or not.
      */
     boolean tryLockInt(long offset);
@@ -91,7 +91,7 @@ public interface BytesCommon {
      * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
      * you can get a collision, and if you try to re-enter 255 times you will get an ISE
      *
-     * @param offset
+     * @param offset of the start of the 4-byte lock
      * @param nanos  to try to lock for
      * @return did it lock or not.
      */
@@ -102,7 +102,7 @@ public interface BytesCommon {
      * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
      * you can get a collision, and if you try to re-enter 255 times you will get an ISE
      *
-     * @param offset
+     * @param offset of the start of the 4-byte lock
      * @throws InterruptedException  if interrupted
      * @throws IllegalStateException if the thread tries to lock it 255 nested time (without an unlock)
      */
@@ -113,7 +113,7 @@ public interface BytesCommon {
      * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
      * you can get a collision, and if you try to re-enter 255 times you will get an ISE
      *
-     * @param offset
+     * @param offset of the start of the 4-byte lock
      * @throws IllegalStateException if this thread doesn't hold the lock
      */
     void unlockInt(long offset) throws IllegalStateException;

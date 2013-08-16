@@ -6,5 +6,5 @@ package net.openhft.lang.testing;
  * Time: 19:06
  */
 public interface Differencer {
-    public long sample(long startTime, long endTime);
+    long sample(long startTime, long endTime);
 }

@@ -26,15 +26,15 @@ public interface IAffinity {
     /**
      * @return returns affinity mask for current thread
      */
-    public long getAffinity();
+    long getAffinity();
 
     /**
      * @param affinity sets affinity mask of current thread to specified value
      */
-    public void setAffinity(final long affinity);
+    void setAffinity(final long affinity);
 
     /**
      * @return the cpu id currently used.
      */
-    public int getcpu();
+    int getcpu();
 }

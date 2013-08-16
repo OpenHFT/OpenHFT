@@ -30,13 +30,13 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void write(int b);
 
     @Override
-    public void writeByte(int v);
+    void writeByte(int v);
 
-    public void writeUnsignedByte(int v);
+    void writeUnsignedByte(int v);
 
-    public void writeByte(long offset, int b);
+    void writeByte(long offset, int b);
 
-    public void writeUnsignedByte(long offset, int v);
+    void writeUnsignedByte(long offset, int v);
 
     @Override
     void write(byte[] b);
@@ -102,7 +102,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param delta  the value to add
      * @return the previous value
      */
-    public int getAndAdd(long offset, int delta);
+    int getAndAdd(long offset, int delta);
 
     /**
      * Atomically adds the given value to the current value.

@@ -32,11 +32,11 @@ public enum Jvm {
         String systemProp;
         systemProp = System.getProperty("com.ibm.vm.bitmode");
         if (systemProp != null) {
-            return systemProp.equals("64");
+            return "64".equals(systemProp);
         }
         systemProp = System.getProperty("sun.arch.data.model");
         if (systemProp != null) {
-            return systemProp.equals("64");
+            return "64".equals(systemProp);
         }
         systemProp = System.getProperty("java.vm.version");
         return systemProp != null && systemProp.contains("_64");

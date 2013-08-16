@@ -112,7 +112,6 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     long readInt48();
 
     /**
-     * @param offset
      * @return read a 48 bit long value.
      */
     long readInt48(long offset);

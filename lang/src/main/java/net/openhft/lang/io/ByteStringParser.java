@@ -20,17 +20,17 @@ package net.openhft.lang.io;
  * @author peter.lawrey
  */
 public interface ByteStringParser extends BytesCommon {
-    public void parseUTF(Appendable builder, StopCharTester tester);
+    void parseUTF(Appendable builder, StopCharTester tester);
 
-    public String parseUTF(StopCharTester tester);
+    String parseUTF(StopCharTester tester);
 
-    public <E> E parseEnum(Class<E> eClass, StopCharTester tester);
+    <E> E parseEnum(Class<E> eClass, StopCharTester tester);
 
-    public MutableDecimal parseDecimal(MutableDecimal decimal);
+    MutableDecimal parseDecimal(MutableDecimal decimal);
 
-    public long parseLong();
+    long parseLong();
 
-    public double parseDouble();
+    double parseDouble();
 
     /**
      * Make sure we just read a stop character
@@ -38,7 +38,7 @@ public interface ByteStringParser extends BytesCommon {
      * @param tester to stop at
      * @return true if we stopped at a stop character, false if we ran out of data.
      */
-    public boolean stepBackAndSkipTo(StopCharTester tester);
+    boolean stepBackAndSkipTo(StopCharTester tester);
 
     /**
      * Wind from this positionAddr to the end of the field
@@ -46,5 +46,5 @@ public interface ByteStringParser extends BytesCommon {
      * @param tester to stop at
      * @return true if we stopped at a stop character, false if we ran out of data.
      */
-    public boolean skipTo(StopCharTester tester);
+    boolean skipTo(StopCharTester tester);
 }
