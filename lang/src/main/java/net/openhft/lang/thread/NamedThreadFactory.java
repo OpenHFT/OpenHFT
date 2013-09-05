@@ -8,16 +8,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date: 18/08/13
  * Time: 11:37
  */
-public class NamedThreadPool implements ThreadFactory {
+public class NamedThreadFactory implements ThreadFactory {
     private final AtomicInteger id = new AtomicInteger();
     private final String name;
     private final Boolean daemon;
 
-    public NamedThreadPool(String name) {
+    public NamedThreadFactory(String name) {
         this(name, null);
     }
 
-    public NamedThreadPool(String name, Boolean daemon) {
+    public NamedThreadFactory(String name, Boolean daemon) {
         this.name = name;
         this.daemon = daemon;
     }
