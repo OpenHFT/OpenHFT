@@ -33,43 +33,120 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("MagicNumber")
 public abstract class AbstractBytes implements Bytes {
-    private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     public static final int INT_LOCK_MASK = 0xFFFFFF;
     public static final int UNSIGNED_BYTE_MASK = 0xFF;
     public static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
-
-    protected boolean finished;
-    protected BytesMarshallerFactory bytesMarshallerFactory;
-
+    // extra 1 for decimal place.
+    static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
+    private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
     private static final byte[] Infinity = "Infinity".getBytes();
     private static final byte[] NaN = "NaN".getBytes();
     private static final long MAX_VALUE_DIVIDE_5 = Long.MAX_VALUE / 5;
-    // extra 1 for decimal place.
-    static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
+    private static final byte BYTE_MIN_VALUE = Byte.MIN_VALUE;
+    private static final byte BYTE_EXTENDED = Byte.MIN_VALUE + 1;
+    private static final byte BYTE_MAX_VALUE = Byte.MIN_VALUE + 2;
+    private static final short UBYTE_EXTENDED = 0xff;
+    private static final short SHORT_MIN_VALUE = Short.MIN_VALUE;
+    private static final short SHORT_EXTENDED = Short.MIN_VALUE + 1;
+    private static final short SHORT_MAX_VALUE = Short.MIN_VALUE + 2;
+    private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
 
+    // RandomDataInput
+    private static final int INT_MIN_VALUE = Integer.MIN_VALUE;
+    private static final int INT_EXTENDED = Integer.MIN_VALUE + 1;
+    private static final int INT_MAX_VALUE = Integer.MIN_VALUE + 2;
+    private static final long MAX_VALUE_DIVIDE_10 = Long.MAX_VALUE / 10;
+    private static final byte NULL = 'N';
+    private static final byte ENUMED = 'E';
+    private static final byte SERIALIZED = 'S';
+    static boolean ID_LIMIT_WARNED = false;
     private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
+    protected boolean finished;
+    protected BytesMarshallerFactory bytesMarshallerFactory;
     private BytesInputStream inputStream = null;
     private BytesOutputStream outputStream = null;
+    private StringBuilder utfReader = null;
+    private SimpleDateFormat dateFormat = null;
+    private long lastDay = Long.MIN_VALUE;
+    private byte[] lastDateStr = null;
 
     protected AbstractBytes() {
         this(new VanillaBytesMarshallerFactory());
     }
+
 
     protected AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory) {
         this.finished = false;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
     }
 
-    @Override
-    public void readFully(byte[] b) {
-        readFully(b, 0, b.length);
+    private static double asDouble(long value, int exp, boolean negative, int decimalPlaces) {
+        if (decimalPlaces > 0 && value < Long.MAX_VALUE / 2) {
+            if (value < Long.MAX_VALUE / (1L << 32)) {
+                exp -= 32;
+                value <<= 32;
+            }
+            if (value < Long.MAX_VALUE / (1L << 16)) {
+                exp -= 16;
+                value <<= 16;
+            }
+            if (value < Long.MAX_VALUE / (1L << 8)) {
+                exp -= 8;
+                value <<= 8;
+            }
+            if (value < Long.MAX_VALUE / (1L << 4)) {
+                exp -= 4;
+                value <<= 4;
+            }
+            if (value < Long.MAX_VALUE / (1L << 2)) {
+                exp -= 2;
+                value <<= 2;
+            }
+            if (value < Long.MAX_VALUE / (1L << 1)) {
+                exp -= 1;
+                value <<= 1;
+            }
+        }
+        for (; decimalPlaces > 0; decimalPlaces--) {
+            exp--;
+            long mod = value % 5;
+            value /= 5;
+            int modDiv = 1;
+            if (value < Long.MAX_VALUE / (1L << 4)) {
+                exp -= 4;
+                value <<= 4;
+                modDiv <<= 4;
+            }
+            if (value < Long.MAX_VALUE / (1L << 2)) {
+                exp -= 2;
+                value <<= 2;
+                modDiv <<= 2;
+            }
+            if (value < Long.MAX_VALUE / (1L << 1)) {
+                exp -= 1;
+                value <<= 1;
+                modDiv <<= 1;
+            }
+            value += modDiv * mod / 5;
+        }
+        final double d = Math.scalb((double) value, exp);
+        return negative ? -d : d;
     }
 
-    // RandomDataInput
+    private static void warnIdLimit(long id) {
+        LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
+
+        ID_LIMIT_WARNED = true;
+    }
+
+    @Override
+    public void readFully(byte[] bytes) {
+        readFully(bytes, 0, bytes.length);
+    }
 
     @Override
     public int skipBytes(int n) {
@@ -137,11 +214,9 @@ public abstract class AbstractBytes implements Bytes {
         return input.toString();
     }
 
-    private StringBuilder utfReader = null;
-
     @Override
-    public String readUTF() {
-        if (readUTF(acquireUtfReader()))
+    public String readUTFΔ() {
+        if (readUTFΔ(acquireUtfReader()))
             return utfReader.toString();
         return null;
     }
@@ -153,24 +228,10 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public boolean readUTF(Appendable appendable) {
-        return appendUTF(appendable);
-    }
-
-    @Override
-    public boolean readUTF(StringBuilder stringBuilder) {
+    public boolean readUTFΔ(StringBuilder stringBuilder) {
         try {
             stringBuilder.setLength(0);
             return appendUTF0(stringBuilder);
-        } catch (IOException unexpected) {
-            throw new AssertionError(unexpected);
-        }
-    }
-
-    @Override
-    public boolean appendUTF(Appendable appendable) {
-        try {
-            return appendUTF0(appendable);
         } catch (IOException unexpected) {
             throw new AssertionError(unexpected);
         }
@@ -184,6 +245,13 @@ public abstract class AbstractBytes implements Bytes {
         if (len == -1)
             return false;
         int utflen = (int) len;
+        readUTF0(appendable, utflen);
+        return true;
+    }
+
+    // RandomDataOutput
+
+    private void readUTF0(Appendable appendable, int utflen) throws IOException {
         int count = 0;
         while (count < utflen) {
             int c = readByte();
@@ -250,7 +318,6 @@ public abstract class AbstractBytes implements Bytes {
                             "malformed input around byte " + count);
             }
         }
-        return true;
     }
 
     @Override
@@ -353,21 +420,26 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public String readUTF(long offset) {
+    public String readUTF() {
+        try {
+            int len = readUnsignedShort();
+            readUTF0(acquireUtfReader(), len);
+            return utfReader.toString();
+        } catch (IOException unexpected) {
+            throw new AssertionError(unexpected);
+        }
+    }
+
+    @Override
+    public String readUTFΔ(long offset) {
         long oldPosition = position();
         position(offset);
         try {
-            return readUTF();
+            return readUTFΔ();
         } finally {
             position(oldPosition);
         }
     }
-
-    private static final byte BYTE_MIN_VALUE = Byte.MIN_VALUE;
-    private static final byte BYTE_EXTENDED = Byte.MIN_VALUE + 1;
-    private static final byte BYTE_MAX_VALUE = Byte.MIN_VALUE + 2;
-
-    private static final short UBYTE_EXTENDED = 0xff;
 
     @Override
     public short readCompactShort() {
@@ -391,7 +463,6 @@ public abstract class AbstractBytes implements Bytes {
             return readUnsignedShort();
         return b;
     }
-
 
     @Override
     public int readInt24() {
@@ -419,12 +490,6 @@ public abstract class AbstractBytes implements Bytes {
         return readInt(offset) & UNSIGNED_INT_MASK;
     }
 
-    private static final short SHORT_MIN_VALUE = Short.MIN_VALUE;
-    private static final short SHORT_EXTENDED = Short.MIN_VALUE + 1;
-    private static final short SHORT_MAX_VALUE = Short.MIN_VALUE + 2;
-
-    private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
-
     @Override
     public int readCompactInt() {
         short b = readShort();
@@ -439,7 +504,6 @@ public abstract class AbstractBytes implements Bytes {
                 return b;
         }
     }
-
 
     @Override
     public long readCompactUnsignedInt() {
@@ -464,10 +528,6 @@ public abstract class AbstractBytes implements Bytes {
         // extra shifting to get sign extension.
         return (readUnsignedShort(offset) << 16 + readUnsignedInt(offset + 2) << 32) >> 16;
     }
-
-    private static final int INT_MIN_VALUE = Integer.MIN_VALUE;
-    private static final int INT_EXTENDED = Integer.MIN_VALUE + 1;
-    private static final int INT_MAX_VALUE = Integer.MIN_VALUE + 2;
 
     @Override
     public long readCompactLong() {
@@ -497,8 +557,6 @@ public abstract class AbstractBytes implements Bytes {
         return l | (b << count);
     }
 
-    // RandomDataOutput
-
     @Override
     public double readCompactDouble() {
         float f = readFloat();
@@ -508,7 +566,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readByteString(StringBuilder sb) {
+    public void readBytesΔ(StringBuilder sb) {
         sb.setLength(0);
         int len = (int) readStopBit();
         for (int i = 0; i < len; i++)
@@ -556,11 +614,13 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeBytes(String s) {
-        writeBytes((CharSequence) s);
+        int len = s.length();
+        for (int i = 0; i < len; i++)
+            write(s.charAt(i));
     }
 
     @Override
-    public void writeBytes(CharSequence s) {
+    public void writeBytesΔ(CharSequence s) {
         int len = s.length();
         writeStopBit(len);
         for (int i = 0; i < len; i++)
@@ -576,12 +636,15 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUTF(String s) {
-        writeUTF((CharSequence) s);
+    public void writeUTF(String str) {
+        writeUnsignedShort(str.length());
+        long strlen = str.length();
+        int utflen = findUTFLength(str, strlen);
+        writeUTF0(str, utflen);
     }
 
     @Override
-    public void writeUTF(CharSequence str) {
+    public void writeUTFΔ(CharSequence str) {
         if (str == null) {
             writeStopBit(-1);
             return;
@@ -759,7 +822,6 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-
     @Override
     public void writeCompactUnsignedInt(long v) {
         if (v >= 0 && v < USHORT_EXTENDED) {
@@ -914,10 +976,6 @@ public abstract class AbstractBytes implements Bytes {
         }
         return this;
     }
-
-    private SimpleDateFormat dateFormat = null;
-    private long lastDay = Long.MIN_VALUE;
-    private byte[] lastDateStr = null;
 
     @Override
     public ByteStringAppender appendDateMillis(long timeInMS) {
@@ -1087,61 +1145,6 @@ public abstract class AbstractBytes implements Bytes {
 
         return this;
     }
-
-    private static double asDouble(long value, int exp, boolean negative, int decimalPlaces) {
-        if (decimalPlaces > 0 && value < Long.MAX_VALUE / 2) {
-            if (value < Long.MAX_VALUE / (1L << 32)) {
-                exp -= 32;
-                value <<= 32;
-            }
-            if (value < Long.MAX_VALUE / (1L << 16)) {
-                exp -= 16;
-                value <<= 16;
-            }
-            if (value < Long.MAX_VALUE / (1L << 8)) {
-                exp -= 8;
-                value <<= 8;
-            }
-            if (value < Long.MAX_VALUE / (1L << 4)) {
-                exp -= 4;
-                value <<= 4;
-            }
-            if (value < Long.MAX_VALUE / (1L << 2)) {
-                exp -= 2;
-                value <<= 2;
-            }
-            if (value < Long.MAX_VALUE / (1L << 1)) {
-                exp -= 1;
-                value <<= 1;
-            }
-        }
-        for (; decimalPlaces > 0; decimalPlaces--) {
-            exp--;
-            long mod = value % 5;
-            value /= 5;
-            int modDiv = 1;
-            if (value < Long.MAX_VALUE / (1L << 4)) {
-                exp -= 4;
-                value <<= 4;
-                modDiv <<= 4;
-            }
-            if (value < Long.MAX_VALUE / (1L << 2)) {
-                exp -= 2;
-                value <<= 2;
-                modDiv <<= 2;
-            }
-            if (value < Long.MAX_VALUE / (1L << 1)) {
-                exp -= 1;
-                value <<= 1;
-                modDiv <<= 1;
-            }
-            value += modDiv * mod / 5;
-        }
-        final double d = Math.scalb((double) value, exp);
-        return negative ? -d : d;
-    }
-
-    private static final long MAX_VALUE_DIVIDE_10 = Long.MAX_VALUE / 10;
 
     @Override
     public double parseDouble() {
@@ -1460,79 +1463,6 @@ public abstract class AbstractBytes implements Bytes {
         return outputStream;
     }
 
-    protected class BytesInputStream extends InputStream {
-        private long mark = 0;
-
-        @Override
-        public int available() throws IOException {
-            long remaining = remaining();
-            return (int) Math.min(Integer.MAX_VALUE, remaining);
-        }
-
-        @Override
-        public void close() throws IOException {
-            finish();
-        }
-
-        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
-        @Override
-        public void mark(int readlimit) {
-            mark = position();
-        }
-
-        @Override
-        public boolean markSupported() {
-            return true;
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            AbstractBytes.this.readFully(b, off, len);
-            return len;
-        }
-
-        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
-        @Override
-        public void reset() throws IOException {
-            position(mark);
-        }
-
-        @Override
-        public long skip(long n) throws IOException {
-            if (n > Integer.MAX_VALUE) throw new IOException("Skip too large");
-            return skipBytes((int) n);
-        }
-
-        @Override
-        public int read() throws IOException {
-            if (remaining() > 0)
-                return readUnsignedByte();
-            return -1;
-        }
-    }
-
-    protected class BytesOutputStream extends OutputStream {
-        @Override
-        public void close() throws IOException {
-            finish();
-        }
-
-        @Override
-        public void write(byte[] b) throws IOException {
-            AbstractBytes.this.write(b);
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            AbstractBytes.this.write(b, off, len);
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            writeUnsignedByte(b);
-        }
-    }
-
     @Override
     public BytesMarshallerFactory bytesMarshallerFactory() {
         return bytesMarshallerFactory;
@@ -1678,10 +1608,6 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    private static final byte NULL = 'N';
-    private static final byte ENUMED = 'E';
-    private static final byte SERIALIZED = 'S';
-
     @SuppressWarnings("unchecked")
     @Override
     public void writeObject(Object obj) {
@@ -1710,8 +1636,6 @@ public abstract class AbstractBytes implements Bytes {
         checkEndOfBuffer();
     }
 
-    static boolean ID_LIMIT_WARNED = false;
-
     @Override
     public boolean tryLockInt(long offset) {
         long id = Thread.currentThread().getId();
@@ -1739,12 +1663,6 @@ public abstract class AbstractBytes implements Bytes {
                 return true;
         } while (end > System.nanoTime() && !Thread.currentThread().isInterrupted());
         return false;
-    }
-
-    private static void warnIdLimit(long id) {
-        LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
-
-        ID_LIMIT_WARNED = true;
     }
 
     private boolean tryLockNanos4a(long offset, int id) {
@@ -1806,6 +1724,79 @@ public abstract class AbstractBytes implements Bytes {
             int next = current + delta;
             if (compareAndSetInt(offset, current, next))
                 return next;
+        }
+    }
+
+    protected class BytesInputStream extends InputStream {
+        private long mark = 0;
+
+        @Override
+        public int available() throws IOException {
+            long remaining = remaining();
+            return (int) Math.min(Integer.MAX_VALUE, remaining);
+        }
+
+        @Override
+        public void close() throws IOException {
+            finish();
+        }
+
+        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
+        @Override
+        public void mark(int readlimit) {
+            mark = position();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return true;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            AbstractBytes.this.readFully(b, off, len);
+            return len;
+        }
+
+        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
+        @Override
+        public void reset() throws IOException {
+            position(mark);
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            if (n > Integer.MAX_VALUE) throw new IOException("Skip too large");
+            return skipBytes((int) n);
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (remaining() > 0)
+                return readUnsignedByte();
+            return -1;
+        }
+    }
+
+    protected class BytesOutputStream extends OutputStream {
+        @Override
+        public void close() throws IOException {
+            finish();
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            AbstractBytes.this.write(b);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            AbstractBytes.this.write(b, off, len);
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            writeUnsignedByte(b);
         }
     }
 }

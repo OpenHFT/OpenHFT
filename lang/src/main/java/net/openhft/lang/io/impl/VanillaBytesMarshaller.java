@@ -64,7 +64,7 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
 
     @Override
     public void write(Bytes bytes, E e) {
-        bytes.writeUTF(e == null ? "" : e.name());
+        bytes.writeUTFΔ(e == null ? "" : e.name());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
 
     @Override
     public E read(Bytes bytes) {
-        bytes.readUTF(reader);
+        bytes.readUTFΔ(reader);
         return builderToEnum();
     }
 

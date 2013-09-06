@@ -75,7 +75,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         String s = CS_SHORT_NAME.get(aClass);
         if (s == null)
             s = aClass.getName();
-        bytes.writeUTF(s);
+        bytes.writeUTFΔ(s);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
     @Override
     public Class read(Bytes bytes) {
         className.setLength(0);
-        bytes.readUTF(className);
+        bytes.readUTFΔ(className);
         return load(className);
     }
 

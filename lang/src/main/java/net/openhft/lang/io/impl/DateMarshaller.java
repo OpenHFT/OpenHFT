@@ -72,7 +72,7 @@ public class DateMarshaller implements BytesMarshaller<Date> {
 
     @Override
     public Date read(Bytes bytes) {
-        bytes.readUTF(sb);
+        bytes.readUTFΔ(sb);
         long time = parseLong(sb);
         return lookupDate(time);
     }

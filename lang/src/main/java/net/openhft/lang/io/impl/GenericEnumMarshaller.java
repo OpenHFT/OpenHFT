@@ -64,7 +64,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
 
     @Override
     public void write(Bytes bytes, E e) {
-        bytes.writeUTF(e == null ? null : e.toString());
+        bytes.writeUTFΔ(e == null ? null : e.toString());
     }
 
     @Override
@@ -74,7 +74,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
 
     @Override
     public E read(Bytes bytes) {
-        String s = bytes.readUTF();
+        String s = bytes.readUTFΔ();
         return s == null ? null : valueOf(s);
     }
 

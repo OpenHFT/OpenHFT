@@ -40,7 +40,7 @@ public class StringMarshaller implements BytesMarshaller<String> {
 
     @Override
     public void write(Bytes bytes, String s) {
-        bytes.writeUTF(s);
+        bytes.writeUTFΔ(s);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class StringMarshaller implements BytesMarshaller<String> {
 
     @Override
     public String read(Bytes bytes) {
-        if (bytes.readUTF(reader))
+        if (bytes.readUTFΔ(reader))
             return builderToString();
         return null;
     }

@@ -134,8 +134,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     boolean compareAndSetLong(long offset, long expected, long x);
 
     /**
-     * Stop bit encoding numbers.
-     * This will write the same number of bytes whether you used a byte, short or int.
+     * Stop bit encoding numbers. This will write the same number of bytes whether you used a byte, short or int.
      */
     void writeStopBit(long n);
 
@@ -154,7 +153,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     @Override
     void writeBytes(String s);
 
-    void writeBytes(CharSequence s);
+    void writeBytesΔ(CharSequence s);
 
     @Override
     void writeChars(String s);
@@ -162,7 +161,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     @Override
     void writeUTF(String s);
 
-    void writeUTF(CharSequence s);
+    void writeUTFΔ(CharSequence s);
 
     void write(ByteBuffer bb);
 
