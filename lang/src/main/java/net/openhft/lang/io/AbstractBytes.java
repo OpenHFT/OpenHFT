@@ -233,7 +233,7 @@ public abstract class AbstractBytes implements Bytes {
             stringBuilder.setLength(0);
             return appendUTF0(stringBuilder);
         } catch (IOException unexpected) {
-            throw new AssertionError(unexpected);
+            throw new IllegalStateException(unexpected);
         }
     }
 
@@ -431,17 +431,6 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public String readUTFΔ(long offset) {
-        long oldPosition = position();
-        position(offset);
-        try {
-            return readUTFΔ();
-        } finally {
-            position(oldPosition);
-        }
-    }
-
-    @Override
     public short readCompactShort() {
         byte b = readByte();
         switch (b) {
@@ -574,7 +563,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readChars(StringBuilder sb) {
+    public void readCharsΔ(StringBuilder sb) {
         int len = (int) readStopBit();
         sb.setLength(0);
         for (int i = 0; i < len; i++)
@@ -1496,14 +1485,14 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public <E> void writeList(Collection<E> list) {
-        writeInt(list.size());
+        writeStopBit(list.size());
         for (E e : list)
-            writeObject(e);
+            writeEnum(e);
     }
 
     @Override
     public <K, V> void writeMap(Map<K, V> map) {
-        writeInt(map.size());
+        writeStopBit(map.size());
         for (Map.Entry<K, V> entry : map.entrySet()) {
             writeEnum(entry.getKey());
             writeEnum(entry.getValue());
@@ -1511,24 +1500,22 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public <E> void readList(Collection<E> list) {
+    public <E> void readList(Collection<E> list, Class<E> eClass) {
         int len = (int) readStopBit();
         list.clear();
         for (int i = 0; i < len; i++) {
             @SuppressWarnings("unchecked")
-            E e = (E) readObject();
+            E e = (E) readEnum(eClass);
             list.add(e);
         }
     }
 
     @Override
-    public <K, V> Map<K, V> readMap(Class<K> kClass, Class<V> vClass) {
+    public <K, V> void readMap(Map<K, V> map, Class<K> kClass, Class<V> vClass) {
         int len = (int) readStopBit();
-        if (len == 0) return Collections.emptyMap();
-        Map<K, V> map = new LinkedHashMap<K, V>(len * 10 / 7);
+        map.clear();
         for (int i = 0; i < len; i++)
             map.put(readEnum(kClass), readEnum(vClass));
-        return map;
     }
 
     @Override
@@ -1542,12 +1529,12 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public int read(byte[] b) {
-        return read(b, 0, b.length);
+    public int read(byte[] bytes) {
+        return read(bytes, 0, bytes.length);
     }
 
     @Override
-    public abstract int read(byte[] b, int off, int len);
+    public abstract int read(byte[] bytes, int off, int len);
 
     @Override
     public long skip(long n) {

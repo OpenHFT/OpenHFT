@@ -42,14 +42,14 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public int read(byte[] b, int off, int len) {
-        if (len < 0 || off < 0 || off + len > b.length)
+    public int read(byte[] bytes, int off, int len) {
+        if (len < 0 || off < 0 || off + len > bytes.length)
             throw new IllegalArgumentException();
         long left = remaining();
         if (left <= 0) return -1;
         int len2 = (int) Math.min(left, len);
         for (int i = 0; i < len2; i++)
-            b[off + i] = readByte();
+            bytes[off + i] = readByte();
         return len2;
     }
 

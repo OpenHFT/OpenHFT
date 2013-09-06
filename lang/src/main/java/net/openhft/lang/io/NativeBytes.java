@@ -74,13 +74,13 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public int read(byte[] b, int off, int len) {
-        if (len < 0 || off < 0 || off + len > b.length)
+    public int read(byte[] bytes, int off, int len) {
+        if (len < 0 || off < 0 || off + len > bytes.length)
             throw new IllegalArgumentException();
         long left = remaining();
         if (left <= 0) return -1;
         int len2 = (int) Math.min(len, left);
-        UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len2);
+        UNSAFE.copyMemory(null, positionAddr, bytes, BYTES_OFFSET + off, len2);
         positionAddr += len2;
         return len2;
     }
