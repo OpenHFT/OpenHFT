@@ -358,7 +358,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * The bytes written by this method may be read by the <code>readCompactInt</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>int</code> equal to <code>v</code>.
      *
-     * @param v the <code>short</code> value to be written.
+     * @param v the <code>int</code> value to be written.
      */
     void writeCompactInt(int v);
 
@@ -515,7 +515,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * The bytes written by this method may be read by the <code>readCompactLong</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>long</code> equal to <code>v</code>.
      *
-     * @param v the <code>short</code> value to be written.
+     * @param v the <code>long</code> value to be written.
      */
     void writeCompactLong(long v);
 
@@ -558,54 +558,220 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Stop bit encoding numbers. This will write the same number of bytes whether you used a byte, short or int.
-     * <p/>
-     * <code>
-     * <p/>
-     * </code>
      */
     void writeStopBit(long n);
 
+    /**
+     * Writes a <code>float</code> value, which is comprised of four bytes, to the output stream. It does this as if it
+     * first converts this <code>float</code> value to an <code>int</code> in exactly the manner of the
+     * <code>Float.floatToIntBits</code> method  and then writes the <code>int</code> value in exactly the manner of the
+     * <code>writeInt</code> method.  The bytes written by this method may be read by the <code>readFloat</code> method
+     * of interface <code>DataInput</code>, which will then return a <code>float</code> equal to <code>v</code>.
+     *
+     * @param v the <code>float</code> value to be written.
+     */
     @Override
     void writeFloat(float v);
 
+    /**
+     * Writes a <code>float</code> value, which is comprised of four bytes, to the output stream. It does this as if it
+     * first converts this <code>float</code> value to an <code>int</code> in exactly the manner of the
+     * <code>Float.floatToIntBits</code> method  and then writes the <code>int</code> value in exactly the manner of the
+     * <code>writeInt</code> method.  The bytes written by this method may be read by the <code>readFloat</code> method
+     * of interface <code>DataInput</code>, which will then return a <code>float</code> equal to <code>v</code>.
+     *
+     * @param offset to write to
+     * @param v      the <code>float</code> value to be written.
+     */
     void writeFloat(long offset, float v);
 
+    /**
+     * Writes a <code>double</code> value, which is comprised of eight bytes, to the output stream. It does this as if
+     * it first converts this <code>double</code> value to a <code>long</code> in exactly the manner of the
+     * <code>Double.doubleToLongBits</code> method  and then writes the <code>long</code> value in exactly the manner of
+     * the  <code>writeLong</code> method. The bytes written by this method may be read by the <code>readDouble</code>
+     * method of interface <code>DataInput</code>, which will then return a <code>double</code> equal to
+     * <code>v</code>.
+     *
+     * @param v the <code>double</code> value to be written.
+     */
     @Override
     void writeDouble(double v);
 
+
+    /**
+     * Writes a <code>double</code> value, which is comprised of eight bytes, to the output stream. It does this as if
+     * it first converts this <code>double</code> value to a <code>long</code> in exactly the manner of the
+     * <code>Double.doubleToLongBits</code> method  and then writes the <code>long</code> value in exactly the manner of
+     * the  <code>writeLong</code> method. The bytes written by this method may be read by the <code>readDouble</code>
+     * method of interface <code>DataInput</code>, which will then return a <code>double</code> equal to
+     * <code>v</code>.
+     *
+     * @param offset to write to
+     * @param v      the <code>double</code> value to be written.
+     */
     void writeDouble(long offset, double v);
 
+    /**
+     * Writes four or twelve bytes as follow;
+     * <p/><pre><code>
+     * if ((float) d == d) {
+     *     writeFloat((float) d);
+     * } else {
+     *     writeFloat(Float.NaN);
+     *     writeDouble(d);
+     * }
+     * <p/>
+     * The bytes written by this method may be read by the <code>readCompactDouble</code> method of interface
+     * <code>RandomDataInput</code> , which will then return a <code>double</code> equal to <code>v</code>.
+     *
+     * @param v the <code>double</code> value to be written.
+     */
     void writeCompactDouble(double v);
 
+    /**
+     * Writes a string to the output stream. For every character in the string <code>s</code>,  taken in order, one byte
+     * is written to the output stream.  If <code>s</code> is <code>null</code>, a <code>NullPointerException</code> is
+     * thrown.<p>  If <code>s.length</code> is zero, then no bytes are written. Otherwise, the character
+     * <code>s[0]</code> is written first, then <code>s[1]</code>, and so on; the last character written is
+     * <code>s[s.length-1]</code>. For each character, one byte is written, the low-order byte, in exactly the manner of
+     * the <code>writeByte</code> method . The high-order eight bits of each character in the string are ignored.
+     *
+     * @param s the string of bytes to be written. Cannot be null.
+     */
     @Override
     void writeBytes(String s);
 
+    /**
+     * Writes a string to the output stream. First a stop bit encoded length is written followed by the lower bytes of
+     * each of the characters.
+     * <p/>
+     * For every character in the string <code>s</code>,  taken in order, one byte is written to the output stream.  If
+     * <code>s</code> is <code>null</code>, a <code>NullPointerException</code> is thrown.<p>  If <code>s.length</code>
+     * is zero, then no bytes are written. Otherwise, the character <code>s[0]</code> is written first, then
+     * <code>s[1]</code>, and so on; the last character written is <code>s[s.length-1]</code>. For each character, one
+     * byte is written, the low-order byte, in exactly the manner of the <code>writeByte</code> method . The high-order
+     * eight bits of each character in the string are ignored.
+     * <p/>
+     * The bytes written by this method may be read by the <code>readBytesΔ</code> method of interface
+     * <code>RandomDataInput</code> , which will populate a StringBuilder with the ISO-8859-1 characters.
+     *
+     * @param s the string of bytes to be written. Can be null.
+     */
     void writeBytesΔ(CharSequence s);
 
+    /**
+     * Writes every character in the string <code>s</code>, to the output stream, in order, two bytes per character. If
+     * <code>s</code> is <code>null</code>, a <code>NullPointerException</code> is thrown.  If <code>s.length</code> is
+     * zero, then no characters are written. Otherwise, the character <code>s[0]</code> is written first, then
+     * <code>s[1]</code>, and so on; the last character written is <code>s[s.length-1]</code>. For each character, two
+     * bytes are actually written, high-order byte first, in exactly the manner of the <code>writeChar</code> method.
+     *
+     * @param s the string value to be written. Cannot be null.
+     */
     @Override
     void writeChars(String s);
 
+    /**
+     * Writes two bytes of length information to the output stream, followed by the <a
+     * href="DataInput.html#modified-utf-8">modified UTF-8</a> representation of  every character in the string
+     * <code>s</code>. If <code>s</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. Each
+     * character in the string <code>s</code> is converted to a group of one, two, or three bytes, depending on the
+     * value of the character.<p> If a character <code>c</code> is in the range <code>&#92;u0001</code> through
+     * <code>&#92;u007f</code>, it is represented by one byte:<p>
+     * <pre>(byte)c </pre>  <p>
+     * If a character <code>c</code> is <code>&#92;u0000</code> or is in the range <code>&#92;u0080</code> through
+     * <code>&#92;u07ff</code>, then it is represented by two bytes, to be written
+     * in the order shown:<p> <pre><code>
+     * (byte)(0xc0 | (0x1f &amp; (c &gt;&gt; 6)))
+     * (byte)(0x80 | (0x3f &amp; c))
+     *  </code></pre>  <p> If a character
+     * <code>c</code> is in the range <code>&#92;u0800</code> through <code>uffff</code>, then it is represented by
+     * three bytes, to be written
+     * in the order shown:<p> <pre><code>
+     * (byte)(0xe0 | (0x0f &amp; (c &gt;&gt; 12)))
+     * (byte)(0x80 | (0x3f &amp; (c &gt;&gt;  6)))
+     * (byte)(0x80 | (0x3f &amp; c))
+     *  </code></pre>  <p> First,
+     * the total number of bytes needed to represent all the characters of <code>s</code> is calculated. If this number
+     * is larger than <code>65535</code>, then a <code>UTFDataFormatException</code> is thrown. Otherwise, this length
+     * is written to the output stream in exactly the manner of the <code>writeShort</code> method; after this, the
+     * one-, two-, or three-byte representation of each character in the string <code>s</code> is written.<p>  The bytes
+     * written by this method may be read by the <code>readUTF</code> method of interface <code>DataInput</code> , which
+     * will then return a <code>String</code> equal to <code>s</code>.
+     *
+     * @param s the string value to be written. Cannot be null
+     */
     @Override
     void writeUTF(String s);
 
+    /**
+     * Write the same encoding as <code>writeUTF</code> with the following changes.  1) The length is stop bit encoded
+     * i.e. one byte longer for short strings, but is not limited in length. 2) The string can be null.
+     *
+     * @param s the string value to be written. Can be null.
+     */
     void writeUTFΔ(CharSequence s);
 
+    /**
+     * Copies the contents of a ByteBuffer from the potision ot the limit.
+     *
+     * @param bb to copy.
+     */
     void write(ByteBuffer bb);
 
+    /**
+     * Write the object in a form which can be uniquely recreated by readEnum.  This type of "enumerable objects" has
+     * the following constraints; 1) each object must have a one to one mapping with a toString() representation, 2) be
+     * immutable, 3) ideally appears more than once, 4) Must have a constructor which takes a single String or a
+     * <code>valueOf(String)</code> method.
+     *
+     * @param e to enumerate
+     */
     <E> void writeEnum(E e);
 
+    /**
+     * Write an ordered collection of "enumerable objects" (See writeEnum).  This writes the stop bit encoded length,
+     * followed by multiple calls to <code>writeEnum</code>  All the elements must be of the same type.
+     * <p/>
+     * This can be read by the <code>readList</code> method of <code>RandomInputStream</code> and the reader must know
+     * the type of each element.  You can send the class first by using <code>writeEnum</code> of the element class
+     *
+     * @param list to be written
+     */
     <E> void writeList(Collection<E> list);
+
+    /**
+     * Write the keys and values of a Map of "enumerable objects" (See writeEnum). This writes the stop bit encoded
+     * length, followed by multiple calls to <code>writeEnum</code> for each key and value.  All the keys must be of the
+     * same type. All values must be of the same type.
+     *
+     * @param map to write out
+     */
 
     <K, V> void writeMap(Map<K, V> map);
 
     // ObjectOutput
 
+    /**
+     * Write an object as either an "enumerable object" or a Serializable/Externalizable object using Java
+     * Serialization. Java Serialization is <i>much</i> slower but sometimes more convenient than using
+     * BytesMarshallable.
+     *
+     * @param obj
+     */
     @Override
     void writeObject(Object obj);
 
+    /**
+     * Check the end of the stream has not overflowed.  Otherwise this doesn't do anything.
+     */
     @Override
     void flush();
 
+    /**
+     * The same as calling finish();
+     */
     @Override
     void close();
 }

@@ -16,7 +16,6 @@
 
 package net.openhft.lang.io;
 
-import net.openhft.lang.affinity.PosixJNAAffinity;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,22 +25,6 @@ import static org.junit.Assert.assertTrue;
  * @author peter.lawrey
  */
 public class DirectBytesTest {
-    static final boolean WITH_BINDING;
-
-    static {
-        boolean binding = false;
-
-        if (Runtime.getRuntime().availableProcessors() >= 12) {
-            try {
-                PosixJNAAffinity.INSTANCE.getcpu();
-                binding = true;
-                System.out.println("binding: true");
-            } catch (Throwable ignored) {
-            }
-        }
-        WITH_BINDING = binding;
-    }
-
     @Test
     public void testAllocate() throws Exception {
         long size = 1L << 24; // 31; don't overload cloud-bees
@@ -65,12 +48,10 @@ public class DirectBytesTest {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (WITH_BINDING) PosixJNAAffinity.INSTANCE.setAffinity(1L << 11);
                 manyToggles(store1, lockCount, 1, 0);
             }
         }).start();
 
-        if (WITH_BINDING) PosixJNAAffinity.INSTANCE.setAffinity(1L << 5);
         manyToggles(store1, lockCount, 0, 1);
 
         store1.free();
