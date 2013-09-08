@@ -16,49 +16,69 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
  * @author peter.lawrey
  */
 public interface ByteStringAppender extends Appendable, BytesCommon {
-    ByteStringAppender append(CharSequence s);
+    @NotNull
+    ByteStringAppender append(@NotNull CharSequence s);
 
-    ByteStringAppender append(CharSequence s, int start, int end);
+    @NotNull
+    ByteStringAppender append(@NotNull CharSequence s, int start, int end);
 
-    ByteStringAppender append(byte[] str);
+    @NotNull
+    ByteStringAppender append(@NotNull byte[] str);
 
-    ByteStringAppender append(byte[] str, int offset, int len);
+    @NotNull
+    ByteStringAppender append(@NotNull byte[] str, int offset, int len);
 
+    @NotNull
     ByteStringAppender append(boolean b);
 
+    @NotNull
     ByteStringAppender append(char c);
 
-    ByteStringAppender append(Enum value);
+    @NotNull
+    ByteStringAppender append(@NotNull Enum value);
 
+    @NotNull
     ByteStringAppender append(int i);
 
+    @NotNull
     ByteStringAppender append(long l);
 
+    @NotNull
     ByteStringAppender appendTimeMillis(long timeInMS);
 
+    @NotNull
     ByteStringAppender appendDateMillis(long timeInMS);
 
+    @NotNull
     ByteStringAppender appendDateTimeMillis(long timeInMS);
 
 //    ByteStringAppender append(float f);
 
 //    ByteStringAppender append(float f, int precision);
 
+    @NotNull
     ByteStringAppender append(double d);
 
+    @NotNull
     ByteStringAppender append(double d, int precision);
 
-    ByteStringAppender append(MutableDecimal md);
+    @NotNull
+    ByteStringAppender append(@NotNull MutableDecimal md);
 
-    <E> ByteStringAppender append(E object);
+    @NotNull
+    <E> ByteStringAppender append(@NotNull E object);
 
-    <E> ByteStringAppender append(Iterable<E> list, CharSequence seperator);
+    @NotNull
+    <E> ByteStringAppender append(@NotNull Iterable<E> list, @NotNull CharSequence separator);
 
-    <E> ByteStringAppender append(List<E> list, CharSequence seperator);
+    @NotNull
+    <E> ByteStringAppender append(@NotNull List<E> list, @NotNull CharSequence separator);
 }

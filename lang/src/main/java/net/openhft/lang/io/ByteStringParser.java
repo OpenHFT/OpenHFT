@@ -16,17 +16,23 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @author peter.lawrey
  */
 public interface ByteStringParser extends BytesCommon {
-    void parseUTF(Appendable builder, StopCharTester tester);
+    void parseUTF(@NotNull Appendable builder, @NotNull StopCharTester tester);
 
-    String parseUTF(StopCharTester tester);
+    @NotNull
+    String parseUTF(@NotNull StopCharTester tester);
 
-    <E> E parseEnum(Class<E> eClass, StopCharTester tester);
+    @Nullable
+    <E> E parseEnum(@NotNull Class<E> eClass, @NotNull StopCharTester tester);
 
-    MutableDecimal parseDecimal(MutableDecimal decimal);
+    @NotNull
+    MutableDecimal parseDecimal(@NotNull MutableDecimal decimal);
 
     long parseLong();
 
@@ -38,7 +44,7 @@ public interface ByteStringParser extends BytesCommon {
      * @param tester to stop at
      * @return true if we stopped at a stop character, false if we ran out of data.
      */
-    boolean stepBackAndSkipTo(StopCharTester tester);
+    boolean stepBackAndSkipTo(@NotNull StopCharTester tester);
 
     /**
      * Wind from this positionAddr to the end of the field
@@ -46,5 +52,5 @@ public interface ByteStringParser extends BytesCommon {
      * @param tester to stop at
      * @return true if we stopped at a stop character, false if we ran out of data.
      */
-    boolean skipTo(StopCharTester tester);
+    boolean skipTo(@NotNull StopCharTester tester);
 }

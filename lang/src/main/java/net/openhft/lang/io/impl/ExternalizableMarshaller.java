@@ -19,6 +19,7 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -28,10 +29,11 @@ import java.lang.reflect.Constructor;
  * @author peter.lawrey
  */
 public class ExternalizableMarshaller<E extends Externalizable> implements BytesMarshaller<E> {
+    @NotNull
     private final Class<E> classMarshaled;
     private final Constructor<E> constructor;
 
-    public ExternalizableMarshaller(Class<E> classMarshaled) {
+    public ExternalizableMarshaller(@NotNull Class<E> classMarshaled) {
         this.classMarshaled = classMarshaled;
         try {
             constructor = classMarshaled.getConstructor();
@@ -41,13 +43,14 @@ public class ExternalizableMarshaller<E extends Externalizable> implements Bytes
         }
     }
 
+    @NotNull
     @Override
     public Class<E> classMarshaled() {
         return classMarshaled;
     }
 
     @Override
-    public void write(Bytes bytes, E e) {
+    public void write(Bytes bytes, @NotNull E e) {
         try {
             e.writeExternal(bytes);
         } catch (IOException e2) {
@@ -56,7 +59,7 @@ public class ExternalizableMarshaller<E extends Externalizable> implements Bytes
     }
 
     @Override
-    public void append(Bytes bytes, E e) {
+    public void append(Bytes bytes, @NotNull E e) {
         write(bytes, e);
     }
 

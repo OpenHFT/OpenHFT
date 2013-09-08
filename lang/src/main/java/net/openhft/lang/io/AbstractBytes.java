@@ -18,6 +18,8 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.impl.VanillaBytesMarshallerFactory;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -72,6 +74,7 @@ public abstract class AbstractBytes implements Bytes {
     private StringBuilder utfReader = null;
     private SimpleDateFormat dateFormat = null;
     private long lastDay = Long.MIN_VALUE;
+    @Nullable
     private byte[] lastDateStr = null;
 
     protected AbstractBytes() {
@@ -143,7 +146,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readFully(byte[] bytes) {
+    public void readFully(@NotNull byte[] bytes) {
         readFully(bytes, 0, bytes.length);
     }
 
@@ -156,7 +159,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readFully(byte[] b, int off, int len) {
+    public void readFully(@NotNull byte[] b, int off, int len) {
         while (len-- > 0)
             b[off++] = readByte();
     }
@@ -191,6 +194,7 @@ public abstract class AbstractBytes implements Bytes {
         return readShort(offset) & UNSIGNED_SHORT_MASK;
     }
 
+    @NotNull
     @Override
     public String readLine() {
         StringBuilder input = new StringBuilder();
@@ -213,6 +217,7 @@ public abstract class AbstractBytes implements Bytes {
         return input.toString();
     }
 
+    @Nullable
     @Override
     public String readUTFΔ() {
         if (readUTFΔ(acquireUtfReader()))
@@ -220,6 +225,7 @@ public abstract class AbstractBytes implements Bytes {
         return null;
     }
 
+    @NotNull
     private StringBuilder acquireUtfReader() {
         if (utfReader == null)
             utfReader = new StringBuilder();
@@ -229,7 +235,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public boolean readUTFΔ(StringBuilder stringBuilder) {
+    public boolean readUTFΔ(@NotNull StringBuilder stringBuilder) {
         try {
             stringBuilder.setLength(0);
             return appendUTF0(stringBuilder);
@@ -239,7 +245,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @SuppressWarnings("MagicNumber")
-    private boolean appendUTF0(Appendable appendable) throws IOException {
+    private boolean appendUTF0(@NotNull Appendable appendable) throws IOException {
         long len = readStopBit();
         if (len < -1 || len > Integer.MAX_VALUE)
             throw new StreamCorruptedException("UTF length invalid " + len);
@@ -252,7 +258,7 @@ public abstract class AbstractBytes implements Bytes {
 
     // RandomDataOutput
 
-    private void readUTF0(Appendable appendable, int utflen) throws IOException {
+    private void readUTF0(@NotNull Appendable appendable, int utflen) throws IOException {
         int count = 0;
         while (count < utflen) {
             int c = readByte();
@@ -281,7 +287,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 case 12:
                 case 13: {
-				/* 110x xxxx 10xx xxxx */
+                /* 110x xxxx 10xx xxxx */
                     count += 2;
                     if (count > utflen)
                         throw new UTFDataFormatException(
@@ -321,14 +327,15 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
+    @NotNull
     @Override
-    public String parseUTF(StopCharTester tester) {
+    public String parseUTF(@NotNull StopCharTester tester) {
         parseUTF(acquireUtfReader(), tester);
         return utfReader.toString();
     }
 
     @Override
-    public void parseUTF(Appendable builder, StopCharTester tester) {
+    public void parseUTF(@NotNull Appendable builder, @NotNull StopCharTester tester) {
         try {
             readUTF0(builder, tester);
         } catch (IOException e) {
@@ -336,7 +343,7 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    private void readUTF0(Appendable appendable, StopCharTester tester) throws IOException {
+    private void readUTF0(@NotNull Appendable appendable, @NotNull StopCharTester tester) throws IOException {
         while (remaining() > 0) {
             int c = readByte();
             if (c < 0) {
@@ -404,14 +411,14 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public boolean stepBackAndSkipTo(StopCharTester tester) {
+    public boolean stepBackAndSkipTo(@NotNull StopCharTester tester) {
         if (position() > 0)
             position(position() - 1);
         return skipTo(tester);
     }
 
     @Override
-    public boolean skipTo(StopCharTester tester) {
+    public boolean skipTo(@NotNull StopCharTester tester) {
         while (remaining() > 0) {
             int ch = readByte();
             if (tester.isStopChar(ch))
@@ -420,6 +427,7 @@ public abstract class AbstractBytes implements Bytes {
         return false;
     }
 
+    @NotNull
     @Override
     public String readUTF() {
         try {
@@ -556,7 +564,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readBytesΔ(StringBuilder sb) {
+    public void readBytesΔ(@NotNull StringBuilder sb) {
         sb.setLength(0);
         int len = (int) readStopBit();
         for (int i = 0; i < len; i++)
@@ -564,7 +572,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readCharsΔ(StringBuilder sb) {
+    public void readCharsΔ(@NotNull StringBuilder sb) {
         int len = (int) readStopBit();
         sb.setLength(0);
         for (int i = 0; i < len; i++)
@@ -572,7 +580,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void read(ByteBuffer bb) {
+    public void read(@NotNull ByteBuffer bb) {
         int len = (int) Math.min(bb.remaining(), remaining());
         if (bb.order() == byteOrder()) {
             while (len >= 8) {
@@ -588,7 +596,7 @@ public abstract class AbstractBytes implements Bytes {
 
     // // RandomOutputStream
     @Override
-    public void write(byte[] bytes) {
+    public void write(@NotNull byte[] bytes) {
         write(bytes, 0, bytes.length);
     }
 
@@ -603,14 +611,14 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeBytes(String s) {
+    public void writeBytes(@NotNull String s) {
         int len = s.length();
         for (int i = 0; i < len; i++)
             write(s.charAt(i));
     }
 
     @Override
-    public void writeBytesΔ(CharSequence s) {
+    public void writeBytesΔ(@NotNull CharSequence s) {
         int len = s.length();
         writeStopBit(len);
         for (int i = 0; i < len; i++)
@@ -618,7 +626,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeChars(String s) {
+    public void writeChars(@NotNull String s) {
         int len = s.length();
         writeStopBit(len);
         for (int i = 0; i < len; i++)
@@ -626,7 +634,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUTF(String str) {
+    public void writeUTF(@NotNull String str) {
         writeUnsignedShort(str.length());
         long strlen = str.length();
         int utflen = findUTFLength(str, strlen);
@@ -634,7 +642,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUTFΔ(CharSequence str) {
+    public void writeUTFΔ(@Nullable CharSequence str) {
         if (str == null) {
             writeStopBit(-1);
             return;
@@ -645,7 +653,8 @@ public abstract class AbstractBytes implements Bytes {
         writeUTF0(str, strlen);
     }
 
-    public ByteStringAppender append(CharSequence str) {
+    @NotNull
+    public ByteStringAppender append(@Nullable CharSequence str) {
         if (str == null)
             return this;
         long strlen = str.length();
@@ -653,7 +662,7 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
-    private int findUTFLength(CharSequence str, long strlen) {
+    private int findUTFLength(@NotNull CharSequence str, long strlen) {
         int utflen = 0, c;/* use charAt instead of copying String to char array */
         for (int i = 0; i < strlen; i++) {
             c = str.charAt(i);
@@ -672,7 +681,7 @@ public abstract class AbstractBytes implements Bytes {
         return utflen;
     }
 
-    private void writeUTF0(CharSequence str, long strlen) {
+    private void writeUTF0(@NotNull CharSequence str, long strlen) {
         int c;
         int i;
         for (i = 0; i < strlen; i++) {
@@ -714,7 +723,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void write(long offset, byte[] bytes) {
+    public void write(long offset, @NotNull byte[] bytes) {
         for (int i = 0; i < bytes.length; i++)
             writeByte(offset + i, bytes[i]);
     }
@@ -901,7 +910,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void write(ByteBuffer bb) {
+    public void write(@NotNull ByteBuffer bb) {
         if (bb.order() == byteOrder())
             while (bb.remaining() >= 8)
                 writeLong(bb.getLong());
@@ -910,47 +919,55 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     // // ByteStringAppender
+    @NotNull
     @Override
-    public ByteStringAppender append(CharSequence s, int start, int end) {
+    public ByteStringAppender append(@NotNull CharSequence s, int start, int end) {
         for (int i = start, len = Math.min(end, s.length()); i < len; i++)
             writeByte(s.charAt(i));
         return this;
     }
 
+    @NotNull
     @Override
-    public ByteStringAppender append(Enum value) {
+    public ByteStringAppender append(@NotNull Enum value) {
         return append(value.toString());
     }
 
+    @NotNull
     @Override
-    public ByteStringAppender append(byte[] str) {
+    public ByteStringAppender append(@NotNull byte[] str) {
         write(str);
         return this;
     }
 
+    @NotNull
     @Override
-    public ByteStringAppender append(byte[] str, int offset, int len) {
+    public ByteStringAppender append(@NotNull byte[] str, int offset, int len) {
         write(str, offset, len);
         return this;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender append(boolean b) {
         append(b ? "true" : "false");
         return this;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender append(char c) {
         writeByte(c);
         return this;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender append(int num) {
         return append((long) num);
     }
 
+    @NotNull
     @Override
     public ByteStringAppender append(long num) {
         if (num < 0) {
@@ -970,6 +987,7 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender appendDateMillis(long timeInMS) {
         if (dateFormat == null) {
@@ -985,6 +1003,7 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender appendDateTimeMillis(long timeInMS) {
         appendDateMillis(timeInMS);
@@ -993,6 +1012,7 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender appendTimeMillis(long timeInMS) {
         int hours = (int) (timeInMS / (60 * 60 * 1000));
@@ -1018,6 +1038,7 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender append(double d) {
         long val = Double.doubleToRawLongBits(d);
@@ -1166,37 +1187,41 @@ public abstract class AbstractBytes implements Bytes {
         return asDouble(value, exp, negative, decimalPlaces);
     }
 
+    @NotNull
     @Override
-    public <E> ByteStringAppender append(E object) {
+    public <E> ByteStringAppender append(@NotNull E object) {
         return null;
     }
 
+    @NotNull
     @Override
-    public <E> ByteStringAppender append(Iterable<E> list, CharSequence seperator) {
+    public <E> ByteStringAppender append(@NotNull Iterable<E> list, @NotNull CharSequence separator) {
         if (list instanceof List) {
-            return append((List) list, seperator);
+            return append((List) list, separator);
         }
         int i = 0;
         for (E e : list) {
             if (i++ > 0)
-                append(seperator);
+                append(separator);
             append(e);
         }
         return this;
     }
 
+    @NotNull
     @Override
-    public <E> ByteStringAppender append(List<E> list, CharSequence seperator) {
+    public <E> ByteStringAppender append(@NotNull List<E> list, @NotNull CharSequence separator) {
         for (int i = 0; i < list.size(); i++) {
             if (i > 0)
-                append(seperator);
+                append(separator);
             append(list.get(i));
         }
         return this;
     }
 
+    @NotNull
     @Override
-    public MutableDecimal parseDecimal(MutableDecimal decimal) {
+    public MutableDecimal parseDecimal(@NotNull MutableDecimal decimal) {
         long num = 0, scale = Long.MIN_VALUE;
         boolean negative = false;
         while (true) {
@@ -1318,6 +1343,7 @@ public abstract class AbstractBytes implements Bytes {
         return 2;
     }
 
+    @NotNull
     @Override
     public ByteStringAppender append(double d, int precision) {
         if (precision < 0)
@@ -1470,14 +1496,16 @@ public abstract class AbstractBytes implements Bytes {
         return endIndex;
     }
 
+    @NotNull
     @Override
-    public ByteStringAppender append(MutableDecimal md) {
+    public ByteStringAppender append(@NotNull MutableDecimal md) {
         StringBuilder sb = acquireUtfReader();
         md.toString(sb);
         append(sb);
         return this;
     }
 
+    @NotNull
     @Override
     public InputStream inputStream() {
         if (inputStream == null)
@@ -1485,6 +1513,7 @@ public abstract class AbstractBytes implements Bytes {
         return inputStream;
     }
 
+    @NotNull
     @Override
     public OutputStream outputStream() {
         if (outputStream == null)
@@ -1492,6 +1521,7 @@ public abstract class AbstractBytes implements Bytes {
         return outputStream;
     }
 
+    @NotNull
     @Override
     public BytesMarshallerFactory bytesMarshallerFactory() {
         return bytesMarshallerFactory;
@@ -1499,7 +1529,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E> void writeEnum(E e) {
+    public <E> void writeEnum(@Nullable E e) {
         Class aClass;
         if (e == null)
             aClass = String.class;
@@ -1511,27 +1541,27 @@ public abstract class AbstractBytes implements Bytes {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E> E readEnum(Class<E> eClass) {
+    public <E> E readEnum(@NotNull Class<E> eClass) {
         BytesMarshaller<E> em = bytesMarshallerFactory().acquireMarshaller(eClass, true);
         return em.read(this);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E> E parseEnum(Class<E> eClass, StopCharTester tester) {
+    public <E> E parseEnum(@NotNull Class<E> eClass, @NotNull StopCharTester tester) {
         BytesMarshaller<E> em = bytesMarshallerFactory().acquireMarshaller(eClass, true);
         return em.parse(this, tester);
     }
 
     @Override
-    public <E> void writeList(Collection<E> list) {
+    public <E> void writeList(@NotNull Collection<E> list) {
         writeStopBit(list.size());
         for (E e : list)
             writeEnum(e);
     }
 
     @Override
-    public <K, V> void writeMap(Map<K, V> map) {
+    public <K, V> void writeMap(@NotNull Map<K, V> map) {
         writeStopBit(map.size());
         for (Map.Entry<K, V> entry : map.entrySet()) {
             writeEnum(entry.getKey());
@@ -1540,7 +1570,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public <E> void readList(Collection<E> list, Class<E> eClass) {
+    public <E> void readList(@NotNull Collection<E> list, @NotNull Class<E> eClass) {
         int len = (int) readStopBit();
         list.clear();
         for (int i = 0; i < len; i++) {
@@ -1551,7 +1581,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public <K, V> void readMap(Map<K, V> map, Class<K> kClass, Class<V> vClass) {
+    public <K, V> void readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass) {
         int len = (int) readStopBit();
         map.clear();
         for (int i = 0; i < len; i++)
@@ -1569,12 +1599,12 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public int read(byte[] bytes) {
+    public int read(@NotNull byte[] bytes) {
         return read(bytes, 0, bytes.length);
     }
 
     @Override
-    public abstract int read(byte[] bytes, int off, int len);
+    public abstract int read(@NotNull byte[] bytes, int off, int len);
 
     @Override
     public long skip(long n) {
@@ -1613,6 +1643,7 @@ public abstract class AbstractBytes implements Bytes {
         checkEndOfBuffer();
     }
 
+    @Nullable
     @Override
     public Object readObject() {
         int type = readByte();
@@ -1637,7 +1668,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void writeObject(Object obj) {
+    public void writeObject(@Nullable Object obj) {
         if (obj == null) {
             writeByte(NULL);
             return;
@@ -1813,7 +1844,7 @@ public abstract class AbstractBytes implements Bytes {
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
+        public void write(@NotNull byte[] b) throws IOException {
             AbstractBytes.this.write(b);
         }
 

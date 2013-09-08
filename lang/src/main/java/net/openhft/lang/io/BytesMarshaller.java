@@ -16,6 +16,9 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * External marshaller for classes.
  *
@@ -26,6 +29,7 @@ public interface BytesMarshaller<E> {
     /**
      * @return super class of classes marshalled/
      */
+    @NotNull
     Class<E> classMarshaled();
 
     /**
@@ -42,6 +46,7 @@ public interface BytesMarshaller<E> {
      * @param bytes to read
      * @return the object
      */
+    @Nullable
     E read(Bytes bytes);
 
     /**
@@ -59,5 +64,6 @@ public interface BytesMarshaller<E> {
      * @param tester to know when to stop.
      * @return the object.
      */
+    @Nullable
     E parse(Bytes bytes, StopCharTester tester);
 }

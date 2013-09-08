@@ -20,6 +20,8 @@ import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
 import net.openhft.lang.pool.StringInterner;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author peter.lawrey
@@ -33,30 +35,32 @@ public class StringMarshaller implements BytesMarshaller<String> {
         this.size = size;
     }
 
+    @NotNull
     @Override
     public Class<String> classMarshaled() {
         return String.class;
     }
 
     @Override
-    public void write(Bytes bytes, String s) {
+    public void write(@NotNull Bytes bytes, String s) {
         bytes.writeUTFΔ(s);
     }
 
     @Override
-    public void append(Bytes bytes, String s) {
+    public void append(@NotNull Bytes bytes, @NotNull String s) {
         bytes.append(s);
     }
 
+    @Nullable
     @Override
-    public String read(Bytes bytes) {
+    public String read(@NotNull Bytes bytes) {
         if (bytes.readUTFΔ(reader))
             return builderToString();
         return null;
     }
 
     @Override
-    public String parse(Bytes bytes, StopCharTester tester) {
+    public String parse(@NotNull Bytes bytes, @NotNull StopCharTester tester) {
         reader.setLength(0);
         bytes.parseUTF(reader, tester);
         return builderToString();

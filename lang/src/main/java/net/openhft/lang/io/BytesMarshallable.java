@@ -16,6 +16,8 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Integrated marshaller for objects.
  *
@@ -29,12 +31,12 @@ public interface BytesMarshallable {
      * @param in to read from
      * @throws IllegalStateException if the object could not be read.
      */
-    void readMarshallable(Bytes in) throws IllegalStateException;
+    void readMarshallable(@NotNull Bytes in) throws IllegalStateException;
 
     /**
      * write an object to bytes
      *
      * @param out to write to
      */
-    void writeMarshallable(Bytes out);
+    void writeMarshallable(@NotNull Bytes out);
 }

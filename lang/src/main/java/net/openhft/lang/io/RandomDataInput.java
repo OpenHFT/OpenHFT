@@ -16,6 +16,9 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.ObjectInput;
 import java.nio.ByteBuffer;
 import java.util.Collection;
@@ -46,7 +49,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @param bytes the buffer into which the data is read.
      */
     @Override
-    void readFully(byte[] bytes);
+    void readFully(@NotNull byte[] bytes);
 
     /**
      * Reads <code>len</code> bytes from an input stream.
@@ -70,7 +73,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @param len   an int specifying the number of bytes to read.
      */
     @Override
-    void readFully(byte[] bytes, int off, int len);
+    void readFully(@NotNull byte[] bytes, int off, int len);
 
     /**
      * Makes an attempt to skip over <code>n</code> bytes of data from the input stream, discarding the skipped bytes.
@@ -589,7 +592,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads eight input bytes and returns a <code>double</code> value. It does this by first constructing a
-     * <code>long</code> value in exactly the manner of the <code>readlong</code> method, then converting this
+     * <code>long</code> value in exactly the manner of the <code>readLong</code> method, then converting this
      * <code>long</code> value to a <code>double</code> in exactly the manner of the method
      * <code>Double.longBitsToDouble</code>. This method is suitable for reading bytes written by the
      * <code>writeDouble</code> method of interface <code>DataOutput</code>.
@@ -601,7 +604,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads eight input bytes and returns a <code>double</code> value. It does this by first constructing a
-     * <code>long</code> value in exactly the manner of the <code>readlong</code> method, then converting this
+     * <code>long</code> value in exactly the manner of the <code>readLong</code> method, then converting this
      * <code>long</code> value to a <code>double</code> in exactly the manner of the method
      * <code>Double.longBitsToDouble</code>. This method is suitable for reading bytes written by the
      * <code>writeDouble</code> method of interface <code>DataOutput</code>.
@@ -638,6 +641,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *         before a byte can be read.
      */
     @Override
+    @Nullable
     String readLine();
 
     /**
@@ -648,7 +652,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *
      * @param sb to populate
      */
-    void readBytesΔ(StringBuilder sb);
+    void readBytesΔ(@NotNull StringBuilder sb);
 
     /**
      * Read a length as readStopBits() and the following chars.
@@ -657,7 +661,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *
      * @param sb to populate
      */
-    void readCharsΔ(StringBuilder sb);
+    void readCharsΔ(@NotNull StringBuilder sb);
 
     /**
      * Reads in a string that has been encoded using a <a href="#modified-utf-8">modified UTF-8</a> format. The general
@@ -706,6 +710,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @throws IllegalStateException if the bytes do not represent a valid modified UTF-8 encoding of a string.
      */
     @Override
+    @NotNull
     String readUTF();
 
     /**
@@ -714,6 +719,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *
      * @return a Unicode string or <code>null</code> if <code>writeUTFΔ(null)</code> was called
      */
+    @Nullable
     String readUTFΔ();
 
     /**
@@ -721,7 +727,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *
      * @return <code>true</code> if there was a String, or <code>false</code> if it was <code>null</code>
      */
-    boolean readUTFΔ(StringBuilder stringBuilder);
+    boolean readUTFΔ(@NotNull StringBuilder stringBuilder);
 
     /**
      * Copy bytes into a ByteBuffer to the minimum of the length <code>remaining()</code> in the ByteBuffer or the
@@ -729,7 +735,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *
      * @param bb to copy into
      */
-    void read(ByteBuffer bb);
+    void read(@NotNull ByteBuffer bb);
 
     /**
      * Read a String with <code>readUTFΔ</code> which is converted to an enumerable type. i.e. where there is a one to
@@ -741,7 +747,8 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @param eClass to decode the String as
      * @return the decoded value.  <code>null</code> with be return if null was written.
      */
-    <E> E readEnum(Class<E> eClass);
+    @Nullable
+    <E> E readEnum(@NotNull Class<E> eClass);
 
     /**
      * Read a stop bit encoded length and populates this Collection after clear()ing it.
@@ -751,7 +758,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *
      * @param list to populate
      */
-    <E> void readList(Collection<E> list, Class<E> eClass);
+    <E> void readList(@NotNull Collection<E> list, @NotNull Class<E> eClass);
 
     /**
      * Read a stop bit encoded length and populates this Map after clear()ing it.
@@ -761,7 +768,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *
      * @param map to populate
      */
-    <K, V> void readMap(Map<K, V> map, Class<K> kClass, Class<V> vClass);
+    <K, V> void readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass);
 
     // ObjectInput
 
@@ -772,6 +779,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @throws IllegalStateException the class of a serialized object cannot be found or any of the usual Input/Output
      *                               related exceptions occur.
      */
+    @Nullable
     @Override
     Object readObject() throws IllegalStateException;
 
@@ -790,7 +798,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @return the actual number of bytes read, -1 is returned when the end of the stream is reached.
      */
     @Override
-    int read(byte[] bytes);
+    int read(@NotNull byte[] bytes);
 
     /**
      * Reads into an array of bytes.  This method will block until some input is available.
@@ -801,7 +809,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @return the actual number of bytes read, -1 is returned when the end of the stream is reached.
      */
     @Override
-    int read(byte[] bytes, int off, int len);
+    int read(@NotNull byte[] bytes, int off, int len);
 
     /**
      * Skips n bytes of input.

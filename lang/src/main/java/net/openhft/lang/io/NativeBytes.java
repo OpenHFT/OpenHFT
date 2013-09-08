@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import java.io.EOFException;
@@ -29,6 +30,7 @@ public class NativeBytes extends AbstractBytes {
     /**
      * *** Access the Unsafe class *****
      */
+    @NotNull
     @SuppressWarnings("ALL")
     protected static final Unsafe UNSAFE;
     static final int BYTES_OFFSET;
@@ -74,7 +76,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public int read(byte[] bytes, int off, int len) {
+    public int read(@NotNull byte[] bytes, int off, int len) {
         if (len < 0 || off < 0 || off + len > bytes.length)
             throw new IllegalArgumentException();
         long left = remaining();
@@ -96,7 +98,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void readFully(byte[] b, int off, int len) {
+    public void readFully(@NotNull byte[] b, int off, int len) {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
         long left = remaining();
@@ -213,7 +215,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void write(long offset, byte[] bytes) {
+    public void write(long offset, @NotNull byte[] bytes) {
         UNSAFE.copyMemory(bytes, BYTES_OFFSET, null, positionAddr, bytes.length);
         positionAddr += bytes.length;
     }
@@ -342,6 +344,7 @@ public class NativeBytes extends AbstractBytes {
         return (limitAddr - positionAddr);
     }
 
+    @NotNull
     @Override
     public ByteOrder byteOrder() {
         return ByteOrder.nativeOrder();

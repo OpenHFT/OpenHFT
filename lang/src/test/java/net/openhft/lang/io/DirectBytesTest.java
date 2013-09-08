@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -59,7 +60,7 @@ public class DirectBytesTest {
         System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
     }
 
-    private static void manyToggles(DirectStore store1, int lockCount, int from, int to) {
+    private static void manyToggles(@NotNull DirectStore store1, int lockCount, int from, int to) {
         long id = Thread.currentThread().getId();
         assertEquals(0, id >>> 24);
         System.out.println("Thread " + id);

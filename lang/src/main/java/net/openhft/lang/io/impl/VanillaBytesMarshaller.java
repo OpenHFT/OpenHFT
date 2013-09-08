@@ -19,6 +19,8 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.BitSet;
 import java.util.LinkedHashMap;
@@ -28,6 +30,7 @@ import java.util.Map;
  * @author peter.lawrey
  */
 public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshaller<E> {
+    @NotNull
     private final Class<E> classMarshaled;
     @SuppressWarnings("unchecked")
     private final E[] interner = (E[]) new Enum[1024];
@@ -37,7 +40,7 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
     private final int mask;
     private final StringBuilder reader = new StringBuilder();
 
-    public VanillaBytesMarshaller(Class<E> classMarshaled, E defaultValue) {
+    public VanillaBytesMarshaller(@NotNull Class<E> classMarshaled, E defaultValue) {
         this.classMarshaled = classMarshaled;
         this.defaultValue = defaultValue;
 
@@ -57,22 +60,23 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
         }
     }
 
+    @NotNull
     @Override
     public Class<E> classMarshaled() {
         return classMarshaled;
     }
 
     @Override
-    public void write(Bytes bytes, E e) {
+    public void write(@NotNull Bytes bytes, @Nullable E e) {
         bytes.writeUTFΔ(e == null ? "" : e.name());
     }
 
     @Override
-    public void append(Bytes bytes, E e) {
+    public void append(@NotNull Bytes bytes, @Nullable E e) {
         bytes.append(e == null ? "" : e.name());
     }
 
-    private int hashFor(CharSequence cs) {
+    private int hashFor(@NotNull CharSequence cs) {
         int h = 0;
 
         for (int i = 0, length = cs.length(); i < length; i++)
@@ -84,13 +88,13 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
     }
 
     @Override
-    public E read(Bytes bytes) {
+    public E read(@NotNull Bytes bytes) {
         bytes.readUTFΔ(reader);
         return builderToEnum();
     }
 
     @Override
-    public E parse(Bytes bytes, StopCharTester tester) {
+    public E parse(@NotNull Bytes bytes, @NotNull StopCharTester tester) {
         reader.setLength(0);
         bytes.parseUTF(reader, tester);
         return builderToEnum();

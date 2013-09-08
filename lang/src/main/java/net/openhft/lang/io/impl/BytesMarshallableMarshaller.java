@@ -20,6 +20,7 @@ import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshallable;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 
@@ -27,10 +28,11 @@ import java.lang.reflect.Constructor;
  * @author peter.lawrey
  */
 public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements BytesMarshaller<E> {
+    @NotNull
     private final Class<E> classMarshaled;
     private final Constructor<E> constructor;
 
-    public BytesMarshallableMarshaller(Class<E> classMarshaled) {
+    public BytesMarshallableMarshaller(@NotNull Class<E> classMarshaled) {
         this.classMarshaled = classMarshaled;
         try {
             constructor = classMarshaled.getConstructor();
@@ -40,23 +42,24 @@ public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements
         }
     }
 
+    @NotNull
     @Override
     public Class<E> classMarshaled() {
         return classMarshaled;
     }
 
     @Override
-    public void write(Bytes bytes, E e) {
+    public void write(@NotNull Bytes bytes, @NotNull E e) {
         e.writeMarshallable(bytes);
     }
 
     @Override
-    public void append(Bytes bytes, E e) {
+    public void append(@NotNull Bytes bytes, @NotNull E e) {
         e.writeMarshallable(bytes);
     }
 
     @Override
-    public E read(Bytes bytes) {
+    public E read(@NotNull Bytes bytes) {
         E e;
         try {
             e = constructor.newInstance();
@@ -68,7 +71,7 @@ public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements
     }
 
     @Override
-    public E parse(Bytes bytes, StopCharTester tester) {
+    public E parse(@NotNull Bytes bytes, StopCharTester tester) {
         return read(bytes);
     }
 }

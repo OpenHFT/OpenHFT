@@ -19,6 +19,8 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 
@@ -28,6 +30,7 @@ import java.util.Date;
 public class DateMarshaller implements BytesMarshaller<Date> {
     final int size1;
     private final StringBuilder sb = new StringBuilder();
+    @Nullable
     private Date[] interner = null;
 
     public DateMarshaller(int size) {
@@ -36,7 +39,7 @@ public class DateMarshaller implements BytesMarshaller<Date> {
         this.size1 = size2 - 1;
     }
 
-    private static long parseLong(CharSequence sb) {
+    private static long parseLong(@NotNull CharSequence sb) {
         long num = 0;
         boolean negative = false;
         for (int i = 0; i < sb.length(); i++) {
@@ -52,13 +55,14 @@ public class DateMarshaller implements BytesMarshaller<Date> {
         return negative ? -num : num;
     }
 
+    @NotNull
     @Override
     public Class<Date> classMarshaled() {
         return Date.class;
     }
 
     @Override
-    public void write(Bytes bytes, Date date) {
+    public void write(@NotNull Bytes bytes, @NotNull Date date) {
         long pos = bytes.position();
         bytes.writeUnsignedByte(0);
         bytes.append(date.getTime());
@@ -66,22 +70,25 @@ public class DateMarshaller implements BytesMarshaller<Date> {
     }
 
     @Override
-    public void append(Bytes bytes, Date date) {
+    public void append(@NotNull Bytes bytes, @NotNull Date date) {
         bytes.append(date.getTime());
     }
 
+    @Nullable
     @Override
-    public Date read(Bytes bytes) {
+    public Date read(@NotNull Bytes bytes) {
         bytes.readUTFΔ(sb);
         long time = parseLong(sb);
         return lookupDate(time);
     }
 
+    @Nullable
     @Override
-    public Date parse(Bytes bytes, StopCharTester tester) {
+    public Date parse(@NotNull Bytes bytes, StopCharTester tester) {
         return lookupDate(bytes.readLong());
     }
 
+    @Nullable
     private Date lookupDate(long time) {
         int idx = hashFor(time);
         if (interner == null)

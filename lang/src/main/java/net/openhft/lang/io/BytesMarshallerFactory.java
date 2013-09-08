@@ -16,9 +16,12 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author peter.lawrey
  */
 public interface BytesMarshallerFactory {
-    <E> BytesMarshaller<E> acquireMarshaller(Class<E> eClass, boolean create);
+    @NotNull
+    <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create);
 }

@@ -1,29 +1,46 @@
+/*
+ * Copyright 2013 Peter Lawrey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.openhft.lang.thread;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * User: peter
- * Date: 18/08/13
- * Time: 11:37
+ * User: peter Date: 18/08/13 Time: 11:37
  */
 public class NamedThreadFactory implements ThreadFactory {
     private final AtomicInteger id = new AtomicInteger();
     private final String name;
     private final Boolean daemon;
 
-    public NamedThreadFactory(String name) {
+    public NamedThreadFactory(@NotNull String name) {
         this(name, null);
     }
 
-    public NamedThreadFactory(String name, Boolean daemon) {
+    public NamedThreadFactory(@NotNull String name, Boolean daemon) {
         this.name = name;
         this.daemon = daemon;
     }
 
+    @NotNull
     @Override
-    public Thread newThread(Runnable r) {
+    public Thread newThread(@NotNull Runnable r) {
         int id = this.id.getAndIncrement();
         String nameN = id == 0 ? name : (name + '-' + id);
         Thread t = new Thread(r, nameN);

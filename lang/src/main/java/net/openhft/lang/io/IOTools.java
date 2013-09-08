@@ -16,6 +16,9 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,7 +31,7 @@ public enum IOTools {
     public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     public static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    public static void close(Closeable closeable) {
+    public static void close(@Nullable Closeable closeable) {
         if (closeable == null) return;
         try {
             closeable.close();
@@ -36,7 +39,7 @@ public enum IOTools {
         }
     }
 
-    public static void close(Iterable<? extends Closeable> closeables) {
+    public static void close(@NotNull Iterable<? extends Closeable> closeables) {
         for (Closeable closeable : closeables) {
             close(closeable);
         }

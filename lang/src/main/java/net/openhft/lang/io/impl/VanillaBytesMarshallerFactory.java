@@ -18,6 +18,7 @@ package net.openhft.lang.io.impl;
 
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.BytesMarshallerFactory;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Externalizable;
 import java.util.Date;
@@ -40,9 +41,10 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
         marshallerMap.put(Date.class, new DateMarshaller(10191));
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     @Override
-    public <E> BytesMarshaller<E> acquireMarshaller(Class<E> eClass, boolean create) {
+    public <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create) {
         BytesMarshaller<E> em = marshallerMap.get(eClass);
         if (em == null)
             if (eClass.isEnum())

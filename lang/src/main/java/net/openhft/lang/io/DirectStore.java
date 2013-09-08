@@ -16,6 +16,8 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import sun.misc.Cleaner;
 
 /**
@@ -46,6 +48,7 @@ public class DirectStore {
         });
     }
 
+    @Nullable
     public static DirectStore allocate(long size) {
         return new DirectStore(null, size);
     }
@@ -57,6 +60,7 @@ public class DirectStore {
         size = newSize;
     }
 
+    @NotNull
     public DirectBytes createSlice() {
         return new DirectBytes(this);
     }

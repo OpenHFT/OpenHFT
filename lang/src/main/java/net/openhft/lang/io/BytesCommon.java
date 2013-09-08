@@ -16,6 +16,8 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
@@ -54,21 +56,25 @@ public interface BytesCommon {
     /**
      * @return Byte order for reading binary
      */
+    @NotNull
     ByteOrder byteOrder();
 
     /**
      * @return these Bytes as an InputStream
      */
+    @NotNull
     InputStream inputStream();
 
     /**
      * @return these Bytes as an OutputStream
      */
+    @NotNull
     OutputStream outputStream();
 
     /**
      * @return the factory for marshallers.
      */
+    @NotNull
     BytesMarshallerFactory bytesMarshallerFactory();
 
     /**
@@ -77,9 +83,9 @@ public interface BytesCommon {
     void checkEndOfBuffer() throws IndexOutOfBoundsException;
 
     /**
-     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and
-     * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
-     * you can get a collision, and if you try to re-enter 255 times you will get an ISE
+     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and the re-entrant count as 8 bit.  This
+     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 255 times
+     * you will get an ISE
      *
      * @param offset of the start of the 4-byte lock
      * @return did it lock or not.
@@ -87,9 +93,9 @@ public interface BytesCommon {
     boolean tryLockInt(long offset);
 
     /**
-     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and
-     * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
-     * you can get a collision, and if you try to re-enter 255 times you will get an ISE
+     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and the re-entrant count as 8 bit.  This
+     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 255 times
+     * you will get an ISE
      *
      * @param offset of the start of the 4-byte lock
      * @param nanos  to try to lock for
@@ -98,9 +104,9 @@ public interface BytesCommon {
     boolean tryLockNanosInt(long offset, long nanos);
 
     /**
-     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and
-     * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
-     * you can get a collision, and if you try to re-enter 255 times you will get an ISE
+     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and the re-entrant count as 8 bit.  This
+     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 255 times
+     * you will get an ISE
      *
      * @param offset of the start of the 4-byte lock
      * @throws InterruptedException  if interrupted
@@ -109,9 +115,9 @@ public interface BytesCommon {
     void busyLockInt(long offset) throws InterruptedException, IllegalStateException;
 
     /**
-     * Lock which uses 4 bytes.  Unlock this It store the lower 24 bits of the Thread Id and
-     * the re-entrant count as 8 bit.  This means if you create more than 16 million threads
-     * you can get a collision, and if you try to re-enter 255 times you will get an ISE
+     * Lock which uses 4 bytes.  Unlock this It store the lower 24 bits of the Thread Id and the re-entrant count as 8
+     * bit.  This means if you create more than 16 million threads you can get a collision, and if you try to re-enter
+     * 255 times you will get an ISE
      *
      * @param offset of the start of the 4-byte lock
      * @throws IllegalStateException if this thread doesn't hold the lock

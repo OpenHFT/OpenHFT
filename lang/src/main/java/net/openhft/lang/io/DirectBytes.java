@@ -16,13 +16,16 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author peter.lawrey
  */
 public class DirectBytes extends NativeBytes {
+    @NotNull
     private final DirectStore store;
 
-    DirectBytes(DirectStore store) {
+    DirectBytes(@NotNull DirectStore store) {
         super(store.bytesMarshallerFactory, store.address, store.address, store.address + store.size);
         this.store = store;
     }
@@ -34,7 +37,7 @@ public class DirectBytes extends NativeBytes {
         limitAddr = startAddr + size;
     }
 
-    public void positionAndSize(DirectBytes bytes, long size) {
+    public void positionAndSize(@NotNull DirectBytes bytes, long size) {
         long start2 = bytes.positionAddr;
         long end2 = start2 + size;
         if (end2 > limitAddr)
@@ -43,7 +46,7 @@ public class DirectBytes extends NativeBytes {
         limitAddr = end2;
     }
 
-    public void positionAndSize(DirectBytes bytes, long offset, long size) {
+    public void positionAndSize(@NotNull DirectBytes bytes, long offset, long size) {
         long start2 = bytes.startAddr + offset;
         long end2 = start2 + size;
         if (end2 > limitAddr)

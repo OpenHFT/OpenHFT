@@ -16,6 +16,9 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.util.Collection;
@@ -640,7 +643,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param s the string of bytes to be written. Cannot be null.
      */
     @Override
-    void writeBytes(String s);
+    void writeBytes(@NotNull String s);
 
     /**
      * Writes a string to the output stream. First a stop bit encoded length is written followed by the lower bytes of
@@ -658,7 +661,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      *
      * @param s the string of bytes to be written. Can be null.
      */
-    void writeBytesΔ(CharSequence s);
+    void writeBytesΔ(@NotNull CharSequence s);
 
     /**
      * Writes every character in the string <code>s</code>, to the output stream, in order, two bytes per character. If
@@ -670,7 +673,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param s the string value to be written. Cannot be null.
      */
     @Override
-    void writeChars(String s);
+    void writeChars(@NotNull String s);
 
     /**
      * Writes two bytes of length information to the output stream, followed by the <a
@@ -703,7 +706,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param s the string value to be written. Cannot be null
      */
     @Override
-    void writeUTF(String s);
+    void writeUTF(@NotNull String s);
 
     /**
      * Write the same encoding as <code>writeUTF</code> with the following changes.  1) The length is stop bit encoded
@@ -711,14 +714,14 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      *
      * @param s the string value to be written. Can be null.
      */
-    void writeUTFΔ(CharSequence s);
+    void writeUTFΔ(@Nullable CharSequence s);
 
     /**
      * Copies the contents of a ByteBuffer from the potision ot the limit.
      *
      * @param bb to copy.
      */
-    void write(ByteBuffer bb);
+    void write(@NotNull ByteBuffer bb);
 
     /**
      * Write the object in a form which can be uniquely recreated by readEnum.  This type of "enumerable objects" has
@@ -728,7 +731,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      *
      * @param e to enumerate
      */
-    <E> void writeEnum(E e);
+    <E> void writeEnum(@Nullable E e);
 
     /**
      * Write an ordered collection of "enumerable objects" (See writeEnum).  This writes the stop bit encoded length,
@@ -739,7 +742,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      *
      * @param list to be written
      */
-    <E> void writeList(Collection<E> list);
+    <E> void writeList(@NotNull Collection<E> list);
 
     /**
      * Write the keys and values of a Map of "enumerable objects" (See writeEnum). This writes the stop bit encoded
@@ -749,7 +752,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param map to write out
      */
 
-    <K, V> void writeMap(Map<K, V> map);
+    <K, V> void writeMap(@NotNull Map<K, V> map);
 
     // ObjectOutput
 
@@ -758,10 +761,10 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Serialization. Java Serialization is <i>much</i> slower but sometimes more convenient than using
      * BytesMarshallable.
      *
-     * @param obj
+     * @param object to write
      */
     @Override
-    void writeObject(Object obj);
+    void writeObject(@Nullable Object object);
 
     /**
      * Check the end of the stream has not overflowed.  Otherwise this doesn't do anything.

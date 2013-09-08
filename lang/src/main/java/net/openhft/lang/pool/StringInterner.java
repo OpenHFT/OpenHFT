@@ -19,11 +19,14 @@ package net.openhft.lang.pool;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.IOTools;
 import net.openhft.lang.io.NativeBytes;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author peter.lawrey
  */
 public class StringInterner {
+    @NotNull
     private final String[] interner;
     private final int mask;
 
@@ -33,7 +36,7 @@ public class StringInterner {
         mask = n - 1;
     }
 
-    private static boolean isEqual(CharSequence s, CharSequence cs) {
+    private static boolean isEqual(@Nullable CharSequence s, @NotNull CharSequence cs) {
         if (s == null) return false;
         if (s.length() != cs.length()) return false;
         for (int i = 0; i < cs.length(); i++)
@@ -42,7 +45,7 @@ public class StringInterner {
         return true;
     }
 
-    private static boolean isEqual(CharSequence s, byte[] bytes, int off, int len) {
+    private static boolean isEqual(@Nullable CharSequence s, @NotNull byte[] bytes, int off, int len) {
         if (s == null) return false;
         if (s.length() != len) return false;
         for (int i = 0; i < len; i++)
@@ -51,7 +54,8 @@ public class StringInterner {
         return true;
     }
 
-    public String intern(byte[] bytes, int off, int len) {
+    @NotNull
+    public String intern(@NotNull byte[] bytes, int off, int len) {
         long hash = NativeBytes.longHash(bytes, off, len);
         int h = Maths.hash(hash) & mask;
         String s = interner[h];
@@ -61,7 +65,8 @@ public class StringInterner {
         return interner[h] = s2;
     }
 
-    public String intern(CharSequence cs) {
+    @NotNull
+    public String intern(@NotNull CharSequence cs) {
         long hash = 0;
         for (int i = 0; i < cs.length(); i++)
             hash = 57 * hash + cs.charAt(i);

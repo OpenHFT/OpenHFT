@@ -19,6 +19,8 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
@@ -47,6 +49,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
 
     private final ClassLoader classLoader;
     private final StringBuilder className = new StringBuilder(40);
+    @Nullable
     @SuppressWarnings("unchecked")
     private WeakReference<Class>[] classWeakReference = null;
 
@@ -65,13 +68,14 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         return h;
     }
 
+    @NotNull
     @Override
     public Class<Class> classMarshaled() {
         return Class.class;
     }
 
     @Override
-    public void write(Bytes bytes, Class aClass) {
+    public void write(@NotNull Bytes bytes, @NotNull Class aClass) {
         String s = CS_SHORT_NAME.get(aClass);
         if (s == null)
             s = aClass.getName();
@@ -79,21 +83,23 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
     }
 
     @Override
-    public void append(Bytes bytes, Class aClass) {
+    public void append(@NotNull Bytes bytes, @NotNull Class aClass) {
         String s = CS_SHORT_NAME.get(aClass);
         if (s == null)
             s = aClass.getName();
         bytes.append(s);
     }
 
+    @Nullable
     @Override
-    public Class read(Bytes bytes) {
+    public Class read(@NotNull Bytes bytes) {
         className.setLength(0);
         bytes.readUTFΔ(className);
         return load(className);
     }
 
-    private Class load(CharSequence name) {
+    @Nullable
+    private Class load(@NotNull CharSequence name) {
         int hash = hashOf(name) % CACHE_SIZE;
         if (classWeakReference == null)
             //noinspection unchecked
@@ -117,8 +123,9 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         }
     }
 
+    @Nullable
     @Override
-    public Class parse(Bytes bytes, StopCharTester tester) {
+    public Class parse(@NotNull Bytes bytes, @NotNull StopCharTester tester) {
         className.setLength(0);
         bytes.parseUTF(className, tester);
         return load(className);

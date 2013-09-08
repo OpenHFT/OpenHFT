@@ -19,6 +19,8 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -29,12 +31,16 @@ import java.util.Map;
  * @author peter.lawrey
  */
 public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
+    @NotNull
     private final Class<E> classMarshaled;
+    @Nullable
     private final Constructor<E> constructor;
+    @Nullable
     private final Method valueOf;
+    @NotNull
     private final Map<String, E> map;
 
-    public GenericEnumMarshaller(Class<E> classMarshaled, final int capacity) {
+    public GenericEnumMarshaller(@NotNull Class<E> classMarshaled, final int capacity) {
         this.classMarshaled = classMarshaled;
         Constructor<E> constructor = null;
         Method valueOf = null;
@@ -57,29 +63,31 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
         };
     }
 
+    @NotNull
     @Override
     public Class<E> classMarshaled() {
         return classMarshaled;
     }
 
     @Override
-    public void write(Bytes bytes, E e) {
+    public void write(@NotNull Bytes bytes, @Nullable E e) {
         bytes.writeUTFΔ(e == null ? null : e.toString());
     }
 
     @Override
-    public void append(Bytes bytes, E e) {
+    public void append(@NotNull Bytes bytes, @Nullable E e) {
         bytes.append(e == null ? null : e.toString());
     }
 
+    @Nullable
     @Override
-    public E read(Bytes bytes) {
+    public E read(@NotNull Bytes bytes) {
         String s = bytes.readUTFΔ();
         return s == null ? null : valueOf(s);
     }
 
     @Override
-    public E parse(Bytes bytes, StopCharTester tester) {
+    public E parse(@NotNull Bytes bytes, @NotNull StopCharTester tester) {
         String s = bytes.parseUTF(tester);
         return valueOf(s);
     }

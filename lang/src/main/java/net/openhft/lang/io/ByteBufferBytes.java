@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io;
 
+import org.jetbrains.annotations.NotNull;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.EOFException;
@@ -42,7 +43,7 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public int read(byte[] bytes, int off, int len) {
+    public int read(@NotNull byte[] bytes, int off, int len) {
         if (len < 0 || off < 0 || off + len > bytes.length)
             throw new IllegalArgumentException();
         long left = remaining();
@@ -69,7 +70,7 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void readFully(byte[] b, int off, int len) {
+    public void readFully(@NotNull byte[] b, int off, int len) {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
         long left = remaining();
@@ -402,6 +403,7 @@ public class ByteBufferBytes extends AbstractBytes {
         return limit - position;
     }
 
+    @NotNull
     @Override
     public ByteOrder byteOrder() {
         return buffer.order();
