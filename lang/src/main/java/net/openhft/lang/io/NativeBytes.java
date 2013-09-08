@@ -213,14 +213,14 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void write(long offset, byte[] b) {
-        UNSAFE.copyMemory(b, BYTES_OFFSET, null, positionAddr, b.length);
-        positionAddr += b.length;
+    public void write(long offset, byte[] bytes) {
+        UNSAFE.copyMemory(bytes, BYTES_OFFSET, null, positionAddr, bytes.length);
+        positionAddr += bytes.length;
     }
 
     @Override
-    public void write(byte[] b, int off, int len) {
-        UNSAFE.copyMemory(b, BYTES_OFFSET + off, null, positionAddr, len);
+    public void write(byte[] bytes, int off, int len) {
+        UNSAFE.copyMemory(bytes, BYTES_OFFSET + off, null, positionAddr, len);
         positionAddr += len;
     }
 
