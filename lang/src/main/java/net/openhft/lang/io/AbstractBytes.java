@@ -302,7 +302,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 case 14: {
-				/* 1110 xxxx 10xx xxxx 10xx xxxx */
+                /* 1110 xxxx 10xx xxxx 10xx xxxx */
                     count += 3;
                     if (count > utflen)
                         throw new UTFDataFormatException(
@@ -1389,109 +1389,109 @@ public abstract class AbstractBytes implements Bytes {
         if (num <= 0)
             return endIndex;
         if (precision == 1)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 2)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 3)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 4)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 5)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 6)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 7)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 8)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 9)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 10)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 11)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 12)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 13)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 14)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 15)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 16)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 17)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
         if (num <= 0)
             return endIndex;
         if (precision == 18)
-            numberBuffer[--endIndex] = (byte) (num % 10L + '0');
+            numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         return endIndex;
     }
@@ -1531,7 +1531,7 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public <E> void writeEnum(@Nullable E e) {
         Class aClass;
-        if (e == null)
+        if (e == null || e instanceof CharSequence)
             aClass = String.class;
         else
             aClass = (Class) e.getClass();
@@ -1675,8 +1675,10 @@ public abstract class AbstractBytes implements Bytes {
         }
 
         Class<?> clazz = obj.getClass();
-        boolean create = obj instanceof Comparable || obj instanceof Externalizable;
-        BytesMarshaller em = bytesMarshallerFactory.acquireMarshaller(clazz, create);
+        BytesMarshaller em = bytesMarshallerFactory.acquireMarshaller(clazz, false);
+        if (em == null && autoGenerateMarshaller(obj))
+            em = bytesMarshallerFactory.acquireMarshaller(clazz, true);
+
         if (em != null) {
             writeByte(ENUMED);
             writeEnum(clazz);
@@ -1692,6 +1694,10 @@ public abstract class AbstractBytes implements Bytes {
             throw new IllegalStateException(e);
         }
         checkEndOfBuffer();
+    }
+
+    private boolean autoGenerateMarshaller(Object obj) {
+        return (obj instanceof Comparable && obj.getClass().getPackage().getName().startsWith("java")) || obj instanceof Externalizable;
     }
 
     @Override
