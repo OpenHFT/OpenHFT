@@ -56,7 +56,6 @@ public abstract class AbstractBytes implements Bytes {
     private static final short SHORT_EXTENDED = Short.MIN_VALUE + 1;
     private static final short SHORT_MAX_VALUE = Short.MIN_VALUE + 2;
     private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
-
     // RandomDataInput
     private static final int INT_MIN_VALUE = Integer.MIN_VALUE;
     private static final int INT_EXTENDED = Integer.MIN_VALUE + 1;
@@ -320,7 +319,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 default:
-				/* 10xx xxxx, 1111 xxxx */
+                /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
                             "malformed input around byte " + count);
             }
@@ -1664,6 +1663,15 @@ public abstract class AbstractBytes implements Bytes {
             default:
                 throw new IllegalStateException("Unknown type " + (char) type);
         }
+    }
+
+    @Nullable
+    @Override
+    public <T> T readObject(Class<T> tClass) throws IllegalStateException {
+        Object o = readObject();
+        if (o == null || tClass.isInstance(o))
+            return (T) o;
+        throw new ClassCastException("Cannot convert " + o.getClass().getName() + " to " + tClass.getName() + " was " + o);
     }
 
     @SuppressWarnings("unchecked")

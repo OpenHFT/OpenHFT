@@ -784,6 +784,17 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     Object readObject() throws IllegalStateException;
 
     /**
+     * Read and return an object. The class that implements this interface defines where the object is "read" from.
+     *
+     * @return the object read from the stream
+     * @throws IllegalStateException the class of a serialized object cannot be found or any of the usual Input/Output
+     *                               related exceptions occur.
+     * @throws ClassCastException    The class cannot be cast or converted to the type given.
+     */
+    @Nullable
+    <T> T readObject(Class<T> tClass) throws IllegalStateException;
+
+    /**
      * Reads a byte of data. This method will block if no input is available.
      *
      * @return the byte read, or -1 if the end of the stream is reached.
