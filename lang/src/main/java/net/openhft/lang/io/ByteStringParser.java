@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * @author peter.lawrey
  */
 public interface ByteStringParser extends BytesCommon {
-    void parseUTF(@NotNull Appendable builder, @NotNull StopCharTester tester);
+    void parseUTF(@NotNull StringBuilder builder, @NotNull StopCharTester tester);
 
     @NotNull
     String parseUTF(@NotNull StopCharTester tester);

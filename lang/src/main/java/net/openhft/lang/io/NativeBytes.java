@@ -216,7 +216,9 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void write(long offset, @NotNull byte[] bytes) {
-        UNSAFE.copyMemory(bytes, BYTES_OFFSET, null, positionAddr, bytes.length);
+        if (offset < 0 || offset + bytes.length > capacity())
+            throw new IllegalArgumentException();
+        UNSAFE.copyMemory(bytes, BYTES_OFFSET, null, startAddr + offset, bytes.length);
         positionAddr += bytes.length;
     }
 
@@ -352,5 +354,7 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
+        if (position() > capacity())
+            throw new IndexOutOfBoundsException("position is beyond the end of the buffer " + position() + " > " + capacity());
     }
 }

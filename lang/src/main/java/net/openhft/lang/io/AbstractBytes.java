@@ -158,12 +158,6 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readFully(@NotNull byte[] b, int off, int len) {
-        while (len-- > 0)
-            b[off++] = readByte();
-    }
-
-    @Override
     public boolean readBoolean() {
         return readByte() != 0;
     }
@@ -334,7 +328,8 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void parseUTF(@NotNull Appendable builder, @NotNull StopCharTester tester) {
+    public void parseUTF(@NotNull StringBuilder builder, @NotNull StopCharTester tester) {
+        builder.setLength(0);
         try {
             readUTF0(builder, tester);
         } catch (IOException e) {
@@ -365,7 +360,7 @@ public abstract class AbstractBytes implements Bytes {
                 case 5:
                 case 6:
                 case 7:
-				/* 0xxxxxxx */
+                /* 0xxxxxxx */
                     if (tester.isStopChar(c))
                         return;
                     appendable.append((char) c);
@@ -634,10 +629,10 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeUTF(@NotNull String str) {
-        writeUnsignedShort(str.length());
         long strlen = str.length();
         int utflen = findUTFLength(str, strlen);
-        writeUTF0(str, utflen);
+        writeUnsignedShort(utflen);
+        writeUTF0(str, strlen);
     }
 
     @Override
@@ -817,7 +812,7 @@ public abstract class AbstractBytes implements Bytes {
                     writeShort(SHORT_MAX_VALUE);
                     break;
                 default:
-                    writeShort(BYTE_EXTENDED);
+                    writeShort(SHORT_EXTENDED);
                     writeInt(v);
                     break;
             }
@@ -861,13 +856,13 @@ public abstract class AbstractBytes implements Bytes {
             writeInt((int) v);
 
         } else if (v == Long.MIN_VALUE) {
-            writeInt(BYTE_MIN_VALUE);
+            writeInt(INT_MIN_VALUE);
 
         } else if (v == Long.MAX_VALUE) {
-            writeInt(BYTE_MAX_VALUE);
+            writeInt(INT_MAX_VALUE);
 
         } else {
-            writeInt(BYTE_EXTENDED);
+            writeInt(INT_EXTENDED);
             writeLong(v);
 
         }

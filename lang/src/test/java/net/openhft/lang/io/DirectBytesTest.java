@@ -31,6 +31,7 @@ public class DirectBytesTest {
         long size = 1L << 24; // 31; don't overload cloud-bees
         DirectStore store = DirectStore.allocate(size);
         DirectBytes slice = store.createSlice();
+        slice.positionAndSize(0, size);
         slice.writeLong(0, size);
         slice.writeLong(size - 8, size);
         store.free();
@@ -45,7 +46,7 @@ public class DirectBytesTest {
         long start = System.nanoTime();
         // a page
         final DirectStore store1 = DirectStore.allocate(1 << 12);
-        final int lockCount = 50 * 1000 * 1000;
+        final int lockCount = 10 * 1000 * 1000;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -85,7 +86,7 @@ public class DirectBytesTest {
                 if (toggle1 == from) {
                     slice1.writeInt(4L, to);
                 } else {
-                    //noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
+                    // noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
                     i--;
                 }
                 slice1.unlockInt(0L);
@@ -103,7 +104,7 @@ public class DirectBytesTest {
         // a page
         final DirectStore store1 = DirectStore.allocate(1 << 12);
         final DirectStore store2 = DirectStore.allocate(1 << 12);
-        final int lockCount = 10 * 1000000;
+        final int lockCount = 1000000;
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -128,19 +129,19 @@ public class DirectBytesTest {
                         int toggle1 = slice1.readInt(4);
                         if (toggle1 == 1) {
                             slice1.writeInt(4, 0);
-//                            if (i % 10000== 0)
-//                            System.out.println("t: " + i);
+                            // if (i % 10000== 0)
+                            // System.out.println("t: " + i);
                         } else {
-                            //noinspection AssignmentToForLoopParameter
+                            // noinspection AssignmentToForLoopParameter
                             i--;
                         }
                         int toggle2 = slice2.readInt(4);
                         if (toggle2 == 1) {
                             slice2.writeInt(4, 0);
-//                            if (i % 10000== 0)
-//                            System.out.println("t: " + i);
+                            // if (i % 10000== 0)
+                            // System.out.println("t: " + i);
                         } else {
-                            //noinspection AssignmentToForLoopParameter
+                            // noinspection AssignmentToForLoopParameter
                             i--;
                         }
                         int lockValue1A = slice1.readInt(0);
@@ -183,19 +184,19 @@ public class DirectBytesTest {
             int toggle1 = slice1.readInt(4);
             if (toggle1 == 0) {
                 slice1.writeInt(4, 1);
-//                            if (i % 10000== 0)
-//                            System.out.println("t: " + i);
+                // if (i % 10000== 0)
+                // System.out.println("t: " + i);
             } else {
-                //noinspection AssignmentToForLoopParameter
+                // noinspection AssignmentToForLoopParameter
                 i--;
             }
             int toggle2 = slice2.readInt(4);
             if (toggle2 == 0) {
                 slice2.writeInt(4, 1);
-//                            if (i % 10000== 0)
-//                            System.out.println("t: " + i);
+                // if (i % 10000== 0)
+                // System.out.println("t: " + i);
             } else {
-                //noinspection AssignmentToForLoopParameter
+                // noinspection AssignmentToForLoopParameter
                 i--;
             }
             int lockValue1A = slice1.readInt(0);
