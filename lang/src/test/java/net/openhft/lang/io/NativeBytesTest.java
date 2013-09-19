@@ -9,6 +9,8 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Random;
 
+import static net.openhft.lang.io.StopCharTesters.CONTROL_STOP;
+import static net.openhft.lang.io.StopCharTesters.SPACE_STOP;
 import static org.junit.Assert.*;
 
 /**
@@ -192,36 +194,36 @@ public class NativeBytesTest {
         nativeBytes.append('\t');
         nativeBytes.position(0);
         for (String word : words) {
-            assertEquals(word, nativeBytes.parseUTF(StopCharTesters.CONTROL_STOP));
+            assertEquals(word, nativeBytes.parseUTF(CONTROL_STOP));
         }
-        assertEquals("", nativeBytes.parseUTF(StopCharTesters.CONTROL_STOP));
+        assertEquals("", nativeBytes.parseUTF(CONTROL_STOP));
 
         nativeBytes.position(0);
         StringBuilder sb = new StringBuilder();
         for (String word : words) {
-            nativeBytes.parseUTF(sb, StopCharTesters.CONTROL_STOP);
+            nativeBytes.parseUTF(sb, CONTROL_STOP);
             assertEquals(word, sb.toString());
         }
-        nativeBytes.parseUTF(sb, StopCharTesters.CONTROL_STOP);
+        nativeBytes.parseUTF(sb, CONTROL_STOP);
         assertEquals("", sb.toString());
 
         nativeBytes.position(0);
-        nativeBytes.skipTo(StopCharTesters.CONTROL_STOP);
+        nativeBytes.skipTo(CONTROL_STOP);
         assertEquals(6, nativeBytes.position());
-        nativeBytes.skipTo(StopCharTesters.CONTROL_STOP);
+        nativeBytes.skipTo(CONTROL_STOP);
         assertEquals(13, nativeBytes.position());
-        nativeBytes.skipTo(StopCharTesters.CONTROL_STOP);
+        nativeBytes.skipTo(CONTROL_STOP);
         assertEquals(17, nativeBytes.position());
-        nativeBytes.skipTo(StopCharTesters.CONTROL_STOP);
+        nativeBytes.skipTo(CONTROL_STOP);
         assertEquals(18, nativeBytes.position());
 
         nativeBytes.position(0);
-        nativeBytes.stepBackAndSkipTo(StopCharTesters.CONTROL_STOP);
+        nativeBytes.stepBackAndSkipTo(CONTROL_STOP);
         assertEquals(6, nativeBytes.position());
-        nativeBytes.stepBackAndSkipTo(StopCharTesters.CONTROL_STOP);
+        nativeBytes.stepBackAndSkipTo(CONTROL_STOP);
         assertEquals(6, nativeBytes.position());
         nativeBytes.position(10);
-        nativeBytes.stepBackAndSkipTo(StopCharTesters.CONTROL_STOP);
+        nativeBytes.stepBackAndSkipTo(CONTROL_STOP);
         assertEquals(13, nativeBytes.position());
 
     }
@@ -473,4 +475,50 @@ public class NativeBytesTest {
         for (long i = 32; i < 64; i += 8)
             assertEquals(i, nativeBytes.readDouble(i), 0);
     }
+
+    @Test
+    public void testAppendSubstring() {
+        nativeBytes.append("Hello World", 2, 7).append("\n");
+        nativeBytes.position(0);
+        assertEquals("Hello World".substring(2, 7), nativeBytes.parseUTF(CONTROL_STOP));
+    }
+
+    @Test
+    public void testWriteReadEnum() {
+        nativeBytes.append(BuySell.Buy).append("\t").append(BuySell.Sell);
+        nativeBytes.position(0);
+        assertEquals(BuySell.Buy, nativeBytes.parseEnum(BuySell.class, CONTROL_STOP));
+        assertEquals(BuySell.Sell, nativeBytes.parseEnum(BuySell.class, CONTROL_STOP));
+        assertEquals(null, nativeBytes.parseEnum(BuySell.class, CONTROL_STOP));
+    }
+
+    enum BuySell {
+        Buy, Sell
+    }
+
+    @Test
+    public void testAppendParse() {
+        nativeBytes.append(false).append(' ');
+        nativeBytes.append(true).append(' ');
+        nativeBytes.append("what?").append(' ');
+        nativeBytes.append("word£€").append(' ');
+        nativeBytes.append(BuySell.Buy).append(' ');
+        nativeBytes.append(1234).append(' ');
+        nativeBytes.append(123456L).append(' ');
+        nativeBytes.append(1.2345).append(' ');
+        nativeBytes.append(1.5555, 3).append(' ');
+        nativeBytes.position(0);
+        assertEquals(false, nativeBytes.parseBoolean(SPACE_STOP));
+        assertEquals(true, nativeBytes.parseBoolean(SPACE_STOP));
+        assertEquals(null, nativeBytes.parseBoolean(SPACE_STOP));
+        assertEquals("word£€", nativeBytes.parseUTF(SPACE_STOP));
+        assertEquals(BuySell.Buy, nativeBytes.parseEnum(BuySell.class, SPACE_STOP));
+        assertEquals(1234, nativeBytes.parseLong());
+        assertEquals(123456L, nativeBytes.parseLong());
+        assertEquals(1.2345, nativeBytes.parseDouble(), 0);
+        assertEquals(1.556, nativeBytes.parseDouble(), 0);
+
+    }
+
+
 }

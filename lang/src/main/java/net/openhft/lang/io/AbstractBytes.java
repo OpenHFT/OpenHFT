@@ -85,6 +85,40 @@ public abstract class AbstractBytes implements Bytes {
         this.bytesMarshallerFactory = bytesMarshallerFactory;
     }
 
+    @Override
+    public Boolean parseBoolean(@NotNull StopCharTester tester) {
+        StringBuilder sb = acquireUtfReader();
+        parseUTF(sb, tester);
+        if (sb.length() == 0) return null;
+        switch (sb.charAt(0)) {
+            case 't':
+            case 'T':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "true") ? true : null;
+            case 'y':
+            case 'Y':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "yes") ? true : null;
+            case '0':
+                return sb.length() == 1 ? false : null;
+            case '1':
+                return sb.length() == 1 ? true : null;
+            case 'f':
+            case 'F':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "false") ? false : null;
+            case 'n':
+            case 'N':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "no") ? false : null;
+        }
+        return null;
+    }
+
+    static boolean equalsCaseIgnore(StringBuilder sb, String s) {
+        if (sb.length() != s.length()) return false;
+        for (int i = 0; i < s.length(); i++)
+            if (Character.toLowerCase(sb.charAt(i)) != s.charAt(i))
+                return false;
+        return true;
+    }
+
     private static double asDouble(long value, int exp, boolean negative, int decimalPlaces) {
         if (decimalPlaces > 0 && value < Long.MAX_VALUE / 2) {
             if (value < Long.MAX_VALUE / (1L << 32)) {
@@ -274,13 +308,13 @@ public abstract class AbstractBytes implements Bytes {
                 case 5:
                 case 6:
                 case 7:
-                /* 0xxxxxxx */
+                    /* 0xxxxxxx */
                     count++;
                     appendable.append((char) c);
                     break;
                 case 12:
                 case 13: {
-                /* 110x xxxx 10xx xxxx */
+                    /* 110x xxxx 10xx xxxx */
                     count += 2;
                     if (count > utflen)
                         throw new UTFDataFormatException(
@@ -295,7 +329,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 case 14: {
-                /* 1110 xxxx 10xx xxxx 10xx xxxx */
+                    /* 1110 xxxx 10xx xxxx 10xx xxxx */
                     count += 3;
                     if (count > utflen)
                         throw new UTFDataFormatException(
@@ -313,7 +347,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 default:
-                /* 10xx xxxx, 1111 xxxx */
+                    /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
                             "malformed input around byte " + count);
             }
@@ -360,14 +394,14 @@ public abstract class AbstractBytes implements Bytes {
                 case 5:
                 case 6:
                 case 7:
-                /* 0xxxxxxx */
+                    /* 0xxxxxxx */
                     if (tester.isStopChar(c))
                         return;
                     appendable.append((char) c);
                     break;
                 case 12:
                 case 13: {
-				/* 110x xxxx 10xx xxxx */
+                    /* 110x xxxx 10xx xxxx */
                     int char2 = readUnsignedByte();
                     if ((char2 & 0xC0) != 0x80)
                         throw new UTFDataFormatException(
@@ -380,7 +414,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 case 14: {
-				/* 1110 xxxx 10xx xxxx 10xx xxxx */
+                    /* 1110 xxxx 10xx xxxx 10xx xxxx */
 
                     int char2 = readUnsignedByte();
                     int char3 = readUnsignedByte();
@@ -397,7 +431,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 default:
-				/* 10xx xxxx, 1111 xxxx */
+                    /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
                             "malformed input around byte ");
             }
@@ -648,7 +682,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @NotNull
-    public ByteStringAppender append(@Nullable CharSequence str) {
+    public ByteStringAppender append(@NotNull CharSequence str) {
         if (str == null)
             return this;
         long strlen = str.length();
@@ -923,22 +957,8 @@ public abstract class AbstractBytes implements Bytes {
 
     @NotNull
     @Override
-    public ByteStringAppender append(@NotNull Enum value) {
-        return append(value.toString());
-    }
-
-    @NotNull
-    @Override
-    public ByteStringAppender append(@NotNull byte[] str) {
-        write(str);
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public ByteStringAppender append(@NotNull byte[] str, int offset, int len) {
-        write(str, offset, len);
-        return this;
+    public ByteStringAppender append(@Nullable Enum value) {
+        return value == null ? this : append(value.toString());
     }
 
     @NotNull
@@ -1793,6 +1813,7 @@ public abstract class AbstractBytes implements Bytes {
                 return next;
         }
     }
+
 
     protected class BytesInputStream extends InputStream {
         private long mark = 0;

@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -30,12 +31,12 @@ public interface ByteStringAppender extends Appendable, BytesCommon {
     @NotNull
     ByteStringAppender append(@NotNull CharSequence s, int start, int end);
 
-    @NotNull
-    ByteStringAppender append(@NotNull byte[] str);
-
-    @NotNull
-    ByteStringAppender append(@NotNull byte[] str, int offset, int len);
-
+    /**
+     * Writes "true" or "false".
+     *
+     * @param b to write.
+     * @return this.
+     */
     @NotNull
     ByteStringAppender append(boolean b);
 
@@ -43,7 +44,7 @@ public interface ByteStringAppender extends Appendable, BytesCommon {
     ByteStringAppender append(char c);
 
     @NotNull
-    ByteStringAppender append(@NotNull Enum value);
+    ByteStringAppender append(@Nullable Enum value);
 
     @NotNull
     ByteStringAppender append(int i);
