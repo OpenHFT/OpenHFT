@@ -1,13 +1,18 @@
 package net.openhft.lang.io;
 
+import net.openhft.lang.Maths;
 import org.junit.Before;
 import org.junit.Test;
 import sun.nio.ch.DirectBuffer;
 
+import java.io.*;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static net.openhft.lang.io.StopCharTesters.CONTROL_STOP;
 import static net.openhft.lang.io.StopCharTesters.SPACE_STOP;
@@ -18,14 +23,15 @@ import static org.junit.Assert.*;
  * Templates.
  */
 public class NativeBytesTest {
+    public static final int SIZE = 128;
     private NativeBytes nativeBytes;
     private ByteBuffer byteBuffer;
 
     @Before
     public void beforeTest() {
-        byteBuffer = ByteBuffer.allocateDirect(64);
+        byteBuffer = ByteBuffer.allocateDirect(SIZE);
         long addr = ((DirectBuffer) byteBuffer).address();
-        nativeBytes = new NativeBytes(addr, addr, addr + 64);
+        nativeBytes = new NativeBytes(addr, addr, addr + SIZE);
     }
 
     @Test
@@ -84,15 +90,15 @@ public class NativeBytesTest {
 
     @Test
     public void testCapacity() throws Exception {
-        assertEquals(64, nativeBytes.capacity());
+        assertEquals(SIZE, nativeBytes.capacity());
         assertEquals(10, new NativeBytes(0, 0, 10).capacity());
     }
 
     @Test
     public void testRemaining() throws Exception {
-        assertEquals(64, nativeBytes.remaining());
+        assertEquals(SIZE, nativeBytes.remaining());
         nativeBytes.position(10);
-        assertEquals(64 - 10, nativeBytes.remaining());
+        assertEquals(SIZE - 10, nativeBytes.remaining());
     }
 
     @Test
@@ -104,7 +110,7 @@ public class NativeBytesTest {
     public void testCheckEndOfBuffer() throws Exception {
         nativeBytes.checkEndOfBuffer();
 
-        nativeBytes.position(66);
+        nativeBytes.position(SIZE + 2);
         try {
             nativeBytes.checkEndOfBuffer();
             fail();
@@ -113,17 +119,56 @@ public class NativeBytesTest {
     }
 
     @Test
-    public void appendDouble() {
+    public void testAppendDouble() {
+        testAppendDouble0(-6.895305375646115E24);
         Random random = new Random(1);
         for (int i = 0; i < 100000; i++) {
-            double d = Math.pow(1e12, random.nextDouble());
+            double d = Math.pow(1e32, random.nextDouble()) / 1e6;
             if (i % 3 == 0) d = -d;
-            nativeBytes.position(0);
-            nativeBytes.append(d).append(' ');
-            nativeBytes.position(0);
-            double d2 = nativeBytes.parseDouble();
-            assertEquals(d2, d, 0);
+            testAppendDouble0(d);
         }
+    }
+
+    private void testAppendDouble0(double d) {
+        nativeBytes.position(0);
+        nativeBytes.append(d).append(' ');
+        nativeBytes.position(0);
+        double d2 = nativeBytes.parseDouble();
+        assertEquals(d, d2, 0);
+    }
+
+    @Test
+    public void testAppendDouble2() {
+//        testAppendDouble0(-0.93879148954440506, 14);
+//        testAppendDouble0(-0.214980202661, 12);
+//        testAppendDouble0(-0.937082148896, 12);
+        testAppendDouble0(0.17805, 5);
+        Random random = new Random(1);
+
+        for (int j = 0; j < 20000; j++) {
+            double d = random.nextDouble();
+            if (j % 3 == 0) d = -d;
+//            if (j % 5 == 0) d *= 1e6;
+            for (int i = 0; i < 4; i++) {
+                testAppendDouble0(d, i);
+            }
+        }
+    }
+
+    private void testAppendDouble0(double d, int precision) {
+        nativeBytes.position(0);
+        nativeBytes.append(d, precision).append(' ');
+        Thread.yield();
+        nativeBytes.position(0);
+        String text = nativeBytes.parseUTF(SPACE_STOP);
+        nativeBytes.position(0);
+        assertEquals(0, nativeBytes.position());
+        double d2 = nativeBytes.parseDouble();
+        double d3 = (double) Math.round(d * Maths.power10(precision)) / Maths.power10(precision);
+//        if (precision >= 14)
+//            assertEquals("'" + text + "' p: " + precision + " v: " + new BigDecimal(d), d3, d2, 5e-29 * Maths.power10(precision));
+//        else
+        assertEquals("'" + text + "' p: " + precision, d3, d2, 0);
     }
 
     @Test
@@ -250,7 +295,6 @@ public class NativeBytesTest {
         assertEquals(bytes2.length, bb2.position());
         assertTrue(Arrays.equals(bytes, Arrays.copyOf(bytes2, bytes.length)));
     }
-
 
     @Test
     public void testReadWriteBoolean() {
@@ -435,6 +479,103 @@ public class NativeBytesTest {
     }
 
     @Test
+    public void testReadWriteInt24() {
+        for (int i = 0; i < 30; i += 3)
+            nativeBytes.writeInt24(i, ~i & 0x7FFFFF);
+        nativeBytes.position(30);
+        for (int i = 30; i < 63; i += 3)
+            nativeBytes.writeInt24(~i & 0x7FFFFF);
+        assertEquals(63, nativeBytes.position());
+        nativeBytes.position(0);
+        for (int i = 0; i < 30; i += 3)
+            assertEquals("i: " + i, ~i & 0x7FFFFFL, nativeBytes.readInt24());
+        for (int i = 30; i < 63; i += 3)
+            assertEquals("i: " + i, ~i & 0x7FFFFFL, nativeBytes.readInt24(i));
+        // now negative
+        nativeBytes.position(0);
+        for (int i = 0; i < 30; i += 3)
+            nativeBytes.writeInt24(i, ~i);
+        nativeBytes.position(30);
+        for (int i = 30; i < 63; i += 3)
+            nativeBytes.writeInt24(~i);
+        assertEquals(63, nativeBytes.position());
+        nativeBytes.position(0);
+        for (int i = 0; i < 30; i += 3)
+            assertEquals("i: " + i, ~i << 8 >> 8, nativeBytes.readInt24());
+        for (int i = 30; i < 63; i += 3)
+            assertEquals("i: " + i, ~i << 8 >> 8, nativeBytes.readInt24(i));
+    }
+
+    @Test
+    public void testReadWriteInt48() {
+        for (long i = 0; i < 30; i += 6)
+            nativeBytes.writeInt48(i, ~i & 0x7FFFFFFFFFFFL);
+        nativeBytes.position(30);
+        for (long i = 30; i < 60; i += 6)
+            nativeBytes.writeInt48(~i & 0x7FFFFFFFFFFFL);
+        assertEquals(60, nativeBytes.position());
+        nativeBytes.position(0);
+        for (long i = 0; i < 30; i += 6)
+            assertEquals("i: " + i, ~i & 0x7FFFFFFFFFFFL, nativeBytes.readInt48());
+        for (long i = 30; i < 60; i += 6)
+            assertEquals("i: " + i, ~i & 0x7FFFFFFFFFFFL, nativeBytes.readInt48(i));
+        // now negative
+        nativeBytes.position(0);
+        for (long i = 0; i < 30; i += 6)
+            nativeBytes.writeInt48(i, ~i);
+        nativeBytes.position(30);
+        for (long i = 30; i < 60; i += 6)
+            nativeBytes.writeInt48(~i);
+        assertEquals(60, nativeBytes.position());
+        nativeBytes.position(0);
+        for (long i = 0; i < 30; i += 6)
+            assertEquals("i: " + i, ~i << 16 >> 16, nativeBytes.readInt48());
+        for (long i = 30; i < 60; i += 6)
+            assertEquals("i: " + i, ~i << 16 >> 16, nativeBytes.readInt48(i));
+    }
+
+    @Test
+    public void testDateTimes() {
+        long now = System.currentTimeMillis();
+        nativeBytes.appendDateTimeMillis(now);
+        nativeBytes.append(' ');
+        nativeBytes.appendDateMillis(now);
+        nativeBytes.append('T');
+        nativeBytes.appendTimeMillis(now % 86400000L);
+        assertEquals(23 * 2 + 1, nativeBytes.position());
+        nativeBytes.position(0);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd'T'HH:mm:ss.SSS");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String asStr = sdf.format(new Date(now));
+        assertEquals(asStr, nativeBytes.parseUTF(SPACE_STOP));
+        assertEquals(asStr, nativeBytes.parseUTF(SPACE_STOP));
+    }
+
+    @Test
+    public void testReadWriteCompactUnsignedShort() {
+        for (int i = 0; i < 64; i += 4)
+            nativeBytes.writeCompactUnsignedShort(i);
+        assertEquals(64 / 4, nativeBytes.position());
+        nativeBytes.position(0);
+        for (int i = 0; i < 64; i += 4)
+            assertEquals(i, nativeBytes.readByte(i / 4));
+        for (int i = 0; i < 64; i += 4)
+            assertEquals(i, nativeBytes.readCompactUnsignedShort());
+    }
+
+    @Test
+    public void testReadWriteCompactUnsignedInt() {
+        for (int i = 0; i < 64; i += 4)
+            nativeBytes.writeCompactUnsignedInt(i);
+        assertEquals(64 / 2, nativeBytes.position());
+        nativeBytes.position(0);
+        for (int i = 0; i < 64; i += 4)
+            assertEquals(i, nativeBytes.readShort(i / 2));
+        for (int i = 0; i < 64; i += 4)
+            assertEquals(i, nativeBytes.readCompactUnsignedInt());
+    }
+
+    @Test
     public void testReadWriteLong() {
         for (long i = 0; i < 32; i += 8)
             nativeBytes.writeLong(i, i);
@@ -492,10 +633,6 @@ public class NativeBytesTest {
         assertEquals(null, nativeBytes.parseEnum(BuySell.class, CONTROL_STOP));
     }
 
-    enum BuySell {
-        Buy, Sell
-    }
-
     @Test
     public void testAppendParse() {
         nativeBytes.append(false).append(' ');
@@ -520,5 +657,162 @@ public class NativeBytesTest {
 
     }
 
+    @Test
+    public void testWriteByteChar() throws UnsupportedEncodingException {
+        nativeBytes.writeBytes("Hello \u00ff\u01fe\u02fc\n");
+        nativeBytes.writeChars("Hello \u00ff\u01fe\u02fc\n");
+        byte[] bytes = new byte[(int) nativeBytes.position()];
+        nativeBytes.position(0);
+        nativeBytes.readFully(bytes);
+        assertEquals("Hello \u00ff\u00fe\u00fc\n" +
+                "H\u0000e\u0000l\u0000l\u0000o\u0000 \u0000ÿ\u0000þ\u0001ü\u0002\n" +
+                "\u0000", new String(bytes, "ISO-8859-1"));
+    }
 
+    @Test
+    public void testWriteBytes() {
+        nativeBytes.write("Hello World\n".getBytes(), 0, 10);
+        nativeBytes.write("good bye\n".getBytes(), 4, 4);
+        nativeBytes.write(4, "0 w".getBytes());
+        nativeBytes.position(0);
+        assertEquals("Hell0 worl bye", nativeBytes.parseUTF(CONTROL_STOP));
+    }
+
+    @Test
+    public void testAppendIterable() {
+        nativeBytes.append(Arrays.asList(1, 2, 3, 4, 5), ";").append(' ');
+        nativeBytes.append(new TreeSet<Integer>(Arrays.asList(21, 2, 13, 4, 5)), ";");
+        nativeBytes.position(0);
+        assertEquals("1;2;3;4;5 2;4;5;13;21", nativeBytes.parseUTF(CONTROL_STOP));
+    }
+
+    @Test
+    public void readWriteMutableDecimal() {
+        Random rand = new Random(2);
+        MutableDecimal md = new MutableDecimal();
+        MutableDecimal md2 = new MutableDecimal();
+//        md.set(1260042744, 0);
+
+        for (int i = 0; i < 20000; i++) {
+            int n = rand.nextInt();
+            for (int j = 0; j < 6; j++) {
+                testDecimal0(md, md2, n, j);
+            }
+        }
+    }
+
+    private void testDecimal0(MutableDecimal md, MutableDecimal md2, int n, int j) {
+        md.set(n, j);
+        nativeBytes.position(0);
+        nativeBytes.append(md).append('\n');
+        nativeBytes.position(0);
+        nativeBytes.parseDecimal(md2);
+        nativeBytes.position(0);
+        String text = nativeBytes.parseUTF(CONTROL_STOP);
+        if (!md.equals(md2))
+            assertEquals("n: " + n + ", s: " + j + " t: " + text, md, md2);
+    }
+
+    @Test
+    public void testStream() throws IOException {
+        GZIPOutputStream out = new GZIPOutputStream(nativeBytes.outputStream());
+        out.write("Hello world\n".getBytes());
+        out.close();
+        nativeBytes.position(0);
+        GZIPInputStream in = new GZIPInputStream(nativeBytes.inputStream());
+        byte[] bytes = new byte[12];
+        for (int i = 0; i < 12; i++)
+            bytes[i] = (byte) in.read();
+        assertEquals(-1, in.read());
+        assertEquals("Hello world\n", new String(bytes));
+        in.close();
+    }
+
+    @Test
+    public void testStream2() throws IOException {
+        OutputStream out = nativeBytes.outputStream();
+        out.write(11);
+        out.write(22);
+        out.write(33);
+        out.write(44);
+        out.write(55);
+
+        nativeBytes.position(0);
+        InputStream in = nativeBytes.inputStream();
+        assertTrue(in.markSupported());
+        assertEquals(11, in.read());
+        in.mark(1);
+        assertEquals(1, nativeBytes.position());
+        assertEquals(22, in.read());
+        assertEquals(2, nativeBytes.position());
+
+        assertEquals(33, in.read());
+        in.reset();
+
+        assertEquals(1, nativeBytes.position());
+        assertEquals(22, in.read());
+
+        assertEquals(2, in.skip(2));
+        assertEquals(4, nativeBytes.position());
+        assertEquals(SIZE - 4, nativeBytes.available());
+        assertEquals(55, in.read());
+        in.close();
+    }
+
+    @Test
+    public void testWriteObject() {
+        for (Object o : new Object[]{10, 9.9, "string", new Date(), BigDecimal.valueOf(1.1)}) {
+            nativeBytes.position(0);
+            nativeBytes.writeObject(o);
+//            System.out.println(o +" size: "+nativeBytes.position());
+            assertTrue(nativeBytes.position() < 21);
+            nativeBytes.position(0);
+            Object o2 = nativeBytes.readObject();
+            nativeBytes.position(0);
+            Object o3 = nativeBytes.readObject(o.getClass());
+            assertEquals(o, o2);
+            assertEquals(o, o3);
+        }
+    }
+
+    @Test
+    public void testWriteSerializable() {
+        int capacity = 16 * 1024;
+        byteBuffer = ByteBuffer.allocateDirect(capacity);
+        long addr = ((DirectBuffer) byteBuffer).address();
+        nativeBytes = new NativeBytes(addr, addr, addr + capacity);
+        Calendar cal = Calendar.getInstance();
+        nativeBytes.writeObject(cal);
+        Dummy d = new Dummy();
+        nativeBytes.writeObject(d);
+        nativeBytes.position(0);
+        Calendar cal2 = nativeBytes.readObject(Calendar.class);
+        Dummy d2 = nativeBytes.readObject(Dummy.class);
+        assertEquals(cal, cal2);
+        assertEquals(d, d2);
+    }
+
+    @Test
+    public void testAddAndGet() {
+        for (int i = 0; i < 10; i++)
+            nativeBytes.addAndGetInt(0L, 10);
+        assertEquals(100, nativeBytes.readInt(0L));
+        assertEquals(0, nativeBytes.readInt(4L));
+
+        for (int i = 0; i < 11; i++)
+            nativeBytes.getAndAdd(4L, 11);
+        assertEquals(100, nativeBytes.readInt(0L));
+        assertEquals(11 * 11, nativeBytes.readInt(4L));
+    }
+
+    enum BuySell {
+        Buy, Sell
+    }
+
+    static class Dummy implements Serializable {
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Dummy;
+        }
+    }
 }

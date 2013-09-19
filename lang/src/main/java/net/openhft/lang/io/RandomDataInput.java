@@ -645,25 +645,6 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     String readLine();
 
     /**
-     * Read a length as readStopBits() and the following bytes as a char each. Let <code>b</code> be the byte, the
-     * resulting character is <code>(char) (b & 0xFF)</code>
-     * <p/>
-     * The StringBuilder is cleared first.
-     *
-     * @param sb to populate
-     */
-    void readBytesΔ(@NotNull StringBuilder sb);
-
-    /**
-     * Read a length as readStopBits() and the following chars.
-     * <p/>
-     * The StringBuilder is cleared first.
-     *
-     * @param sb to populate
-     */
-    void readCharsΔ(@NotNull StringBuilder sb);
-
-    /**
      * Reads in a string that has been encoded using a <a href="#modified-utf-8">modified UTF-8</a> format. The general
      * contract of <code>readUTF</code> is that it reads a representation of a Unicode character string encoded in
      * modified UTF-8 format; this string of characters is then returned as a <code>String</code>.

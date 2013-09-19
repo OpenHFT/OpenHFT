@@ -37,7 +37,7 @@ public class RunningMinimumTest {
                     long endTime = System.nanoTime() + j + delta + (long) (Math.pow(10 * 1000, Math.random()) * 1000);
                     rm.sample(startTime, endTime);
                 }
-                assertEquals("delta=" + delta, delta, rm.minimum(), 10 * 1000);
+                assertEquals("delta=" + delta, delta, rm.minimum(), 40 * 1000);
             }
         }
     }

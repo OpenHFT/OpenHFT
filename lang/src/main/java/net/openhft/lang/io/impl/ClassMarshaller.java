@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io.impl;
 
+import net.openhft.lang.Maths;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.StopCharTester;
@@ -100,7 +101,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
 
     @Nullable
     private Class load(@NotNull CharSequence name) {
-        int hash = hashOf(name) % CACHE_SIZE;
+        int hash = (int) (Maths.hashOf(name) & 0x7ffffff) % CACHE_SIZE;
         if (classWeakReference == null)
             //noinspection unchecked
             classWeakReference = new WeakReference[CACHE_SIZE];

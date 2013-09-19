@@ -33,9 +33,9 @@ public class Maths {
     }
 
     /**
-     * Performs a round which is accurate to within 1 ulp.
-     * i.e. for values very close to 0.5 it might be rounded up or down.
-     * This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the precision of double.
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
      */
     public static double round2(double d) {
         final double factor = 1e2;
@@ -87,5 +87,13 @@ public class Maths {
         n ^= (n >> 43) ^ (n >> 21);
         n ^= (n >> 15) ^ (n >> 7);
         return (int) n;
+    }
+
+    public static long hashOf(CharSequence s) {
+        long hash = 0;
+        for (int i = 0, len = s.length(); i < len; i++) {
+            hash = 57 * hash + s.charAt(i);
+        }
+        return hash;
     }
 }

@@ -45,7 +45,7 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
     @SuppressWarnings("unchecked")
     @Override
     public <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create) {
-        BytesMarshaller<E> em = marshallerMap.get(eClass);
+        BytesMarshaller em = marshallerMap.get(eClass);
         if (em == null)
             if (eClass.isEnum())
                 marshallerMap.put(eClass, em = new VanillaBytesMarshaller(eClass, null));
@@ -53,8 +53,13 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
                 marshallerMap.put(eClass, em = new BytesMarshallableMarshaller((Class) eClass));
             else if (Externalizable.class.isAssignableFrom(eClass))
                 marshallerMap.put(eClass, em = new ExternalizableMarshaller((Class) eClass));
-            else
-                marshallerMap.put(eClass, em = new GenericEnumMarshaller<E>(eClass, 1000));
+            else {
+                try {
+                    marshallerMap.put(eClass, em = new GenericEnumMarshaller<E>(eClass, 1000));
+                } catch (Exception e) {
+                    marshallerMap.put(eClass, em = NoMarshaller.INSTANCE);
+                }
+            }
         return em;
     }
 }

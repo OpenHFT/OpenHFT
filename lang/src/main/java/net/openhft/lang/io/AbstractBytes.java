@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.Maths;
+import net.openhft.lang.io.impl.NoMarshaller;
 import net.openhft.lang.io.impl.VanillaBytesMarshallerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -166,7 +167,10 @@ public abstract class AbstractBytes implements Bytes {
                 value <<= 1;
                 modDiv <<= 1;
             }
-            value += modDiv * mod / 5;
+            if (decimalPlaces > 1)
+                value += modDiv * mod / 5;
+            else
+                value += (modDiv * mod + 4) / 5;
         }
         final double d = Math.scalb((double) value, exp);
         return negative ? -d : d;
@@ -492,18 +496,22 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int readInt24() {
+        int b = readUnsignedByte();
+        int s = readUnsignedShort();
         if (byteOrder() == ByteOrder.BIG_ENDIAN)
-            return (readUnsignedByte() << 24 + readUnsignedShort() << 8) >> 8;
+            return ((b << 24) + (s << 8)) >> 8;
         // extra shifting to get sign extension.
-        return (readUnsignedByte() << 8 + readUnsignedShort() << 16) >> 8;
+        return ((b << 8) + (s << 16)) >> 8;
     }
 
     @Override
     public int readInt24(long offset) {
+        int b = readUnsignedByte(offset);
+        int s = readUnsignedShort(offset + 1);
         if (byteOrder() == ByteOrder.BIG_ENDIAN)
-            return (readUnsignedByte(offset) << 24 + readUnsignedShort(offset + 1) << 8) >> 8;
+            return ((b << 24) + (s << 8)) >> 8;
         // extra shifting to get sign extension.
-        return (readUnsignedByte(offset) << 8 + readUnsignedShort(offset + 1) << 16) >> 8;
+        return ((b << 8) + (s << 16)) >> 8;
     }
 
     @Override
@@ -533,7 +541,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public long readCompactUnsignedInt() {
-        int b = readUnsignedByte();
+        int b = readUnsignedShort();
         if (b == USHORT_EXTENDED)
             return readUnsignedInt();
         return b;
@@ -541,18 +549,22 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public long readInt48() {
+        long s = readUnsignedShort();
+        long l = readUnsignedInt();
         if (byteOrder() == ByteOrder.BIG_ENDIAN)
-            return ((long) readUnsignedShort() << 48 + readUnsignedInt() << 16) >> 16;
+            return ((s << 48) + (l << 16)) >> 16;
         // extra shifting to get sign extension.
-        return (readUnsignedShort() << 16 + readUnsignedInt() << 32) >> 8;
+        return ((s << 16) + (l << 32)) >> 16;
     }
 
     @Override
     public long readInt48(long offset) {
+        long s = readUnsignedShort(offset);
+        long l = readUnsignedInt(offset + 2);
         if (byteOrder() == ByteOrder.BIG_ENDIAN)
-            return ((long) readUnsignedShort(offset) << 48 + readUnsignedInt(offset + 2) << 16) >> 16;
+            return ((s << 48) + (l << 16)) >> 16;
         // extra shifting to get sign extension.
-        return (readUnsignedShort(offset) << 16 + readUnsignedInt(offset + 2) << 32) >> 16;
+        return ((s << 16) + (l << 32)) >> 16;
     }
 
     @Override
@@ -592,22 +604,6 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void readBytesΔ(@NotNull StringBuilder sb) {
-        sb.setLength(0);
-        int len = (int) readStopBit();
-        for (int i = 0; i < len; i++)
-            sb.append(readByte());
-    }
-
-    @Override
-    public void readCharsΔ(@NotNull StringBuilder sb) {
-        int len = (int) readStopBit();
-        sb.setLength(0);
-        for (int i = 0; i < len; i++)
-            sb.append(readChar());
-    }
-
-    @Override
     public void read(@NotNull ByteBuffer bb) {
         int len = (int) Math.min(bb.remaining(), remaining());
         if (bb.order() == byteOrder()) {
@@ -625,7 +621,14 @@ public abstract class AbstractBytes implements Bytes {
     // // RandomOutputStream
     @Override
     public void write(@NotNull byte[] bytes) {
-        write(bytes, 0, bytes.length);
+        int length = bytes.length;
+        checkWrite(length);
+        write(bytes, 0, length);
+    }
+
+    private void checkWrite(int length) {
+        if (length > remaining())
+            throw new IllegalStateException("Cannot write " + length + " only " + remaining() + " remaining");
     }
 
     @Override
@@ -646,17 +649,8 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeBytesΔ(@NotNull CharSequence s) {
-        int len = s.length();
-        writeStopBit(len);
-        for (int i = 0; i < len; i++)
-            write(s.charAt(i));
-    }
-
-    @Override
     public void writeChars(@NotNull String s) {
         int len = s.length();
-        writeStopBit(len);
         for (int i = 0; i < len; i++)
             writeChar(s.charAt(i));
     }
@@ -752,12 +746,15 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(long offset, @NotNull byte[] bytes) {
+        checkWrite(bytes.length);
         for (int i = 0; i < bytes.length; i++)
             writeByte(offset + i, bytes[i]);
     }
 
     @Override
     public void write(byte[] bytes, int off, int len) {
+        checkWrite(bytes.length);
+
         for (int i = 0; i < len; i++)
             write(bytes[off + i]);
     }
@@ -986,7 +983,7 @@ public abstract class AbstractBytes implements Bytes {
     public ByteStringAppender append(long num) {
         if (num < 0) {
             if (num == Long.MIN_VALUE) {
-                append(MIN_VALUE_TEXT);
+                write(MIN_VALUE_TEXT);
                 return this;
             }
             writeByte('-');
@@ -1012,8 +1009,10 @@ public abstract class AbstractBytes implements Bytes {
         if (lastDay != date) {
             lastDateStr = dateFormat.format(new Date(timeInMS)).getBytes(ISO_8859_1);
             lastDay = date;
+        } else {
+            assert lastDateStr != null;
         }
-        append(lastDateStr);
+        write(lastDateStr);
         return this;
     }
 
@@ -1022,7 +1021,7 @@ public abstract class AbstractBytes implements Bytes {
     public ByteStringAppender appendDateTimeMillis(long timeInMS) {
         appendDateMillis(timeInMS);
         writeByte('T');
-        appendTimeMillis(timeInMS);
+        appendTimeMillis(timeInMS % 86400000L);
         return this;
     }
 
@@ -1203,32 +1202,28 @@ public abstract class AbstractBytes implements Bytes {
 
     @NotNull
     @Override
-    public <E> ByteStringAppender append(@NotNull E object) {
-        return null;
-    }
-
-    @NotNull
-    @Override
     public <E> ByteStringAppender append(@NotNull Iterable<E> list, @NotNull CharSequence separator) {
-        if (list instanceof List) {
-            return append((List) list, separator);
+        if (list instanceof RandomAccess && list instanceof List) {
+            return append((List<E>) list, separator);
         }
         int i = 0;
         for (E e : list) {
             if (i++ > 0)
                 append(separator);
-            append(e);
+            if (e != null)
+                append(e.toString());
         }
         return this;
     }
 
     @NotNull
-    @Override
     public <E> ByteStringAppender append(@NotNull List<E> list, @NotNull CharSequence separator) {
         for (int i = 0; i < list.size(); i++) {
             if (i > 0)
                 append(separator);
-            append(list.get(i));
+            E e = list.get(i);
+            if (e != null)
+                append(e.toString());
         }
         return this;
     }
@@ -1354,7 +1349,11 @@ public abstract class AbstractBytes implements Bytes {
             return 3;
         numberBuffer[2] = (byte) (num % 10L + '0');
         num /= 10;
-        return 2;
+        if (num <= 0)
+            return 2;
+        numberBuffer[1] = (byte) (num % 10L + '0');
+        num /= 10;
+        return 1;
     }
 
     @NotNull
@@ -1373,8 +1372,12 @@ public abstract class AbstractBytes implements Bytes {
         if (d2 > Long.MAX_VALUE || d2 < Long.MIN_VALUE + 1)
             return append(d);
         long val = (long) (d2 + 0.5);
-        while (precision > 0 && val % 10 == 0) {
+        while (precision > 1 && val % 10 == 0) {
             val /= 10;
+            precision--;
+        }
+        if (precision > 0 && val % 10 == 0) {
+            val = (val + 5) / 10;
             precision--;
         }
         if (precision > 0)
@@ -1396,113 +1399,114 @@ public abstract class AbstractBytes implements Bytes {
         write(numberBuffer, endIndex, MAX_NUMBER_LENGTH - endIndex);
     }
 
-    private int appendDouble1(long num, final int precision) {
+    private int appendDouble1(long num, int precision) {
         int endIndex = MAX_NUMBER_LENGTH;
+        int maxEnd = MAX_NUMBER_LENGTH - precision - 2;
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 1)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 2)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 3)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 4)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 5)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 6)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 7)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 8)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 9)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 10)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 11)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 12)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 13)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 14)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 15)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 16)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 17)
             numberBuffer[--endIndex] = (byte) '.';
         numberBuffer[--endIndex] = (byte) (num % 10L + '0');
         num /= 10;
-        if (num <= 0)
+        if (num <= 0 && endIndex <= maxEnd)
             return endIndex;
         if (precision == 18)
             numberBuffer[--endIndex] = (byte) '.';
@@ -1699,10 +1703,10 @@ public abstract class AbstractBytes implements Bytes {
 
         Class<?> clazz = obj.getClass();
         BytesMarshaller em = bytesMarshallerFactory.acquireMarshaller(clazz, false);
-        if (em == null && autoGenerateMarshaller(obj))
+        if (em == NoMarshaller.INSTANCE && autoGenerateMarshaller(obj))
             em = bytesMarshallerFactory.acquireMarshaller(clazz, true);
 
-        if (em != null) {
+        if (em != NoMarshaller.INSTANCE) {
             writeByte(ENUMED);
             writeEnum(clazz);
             em.write(this, obj);
@@ -1782,6 +1786,10 @@ public abstract class AbstractBytes implements Bytes {
         int firstValue = ((1 << 24) | lowId);
         if (compareAndSetInt(offset, firstValue, 0))
             return;
+        unlockFailed(offset, lowId);
+    }
+
+    private void unlockFailed(long offset, int lowId) {
         long currentValue = readUnsignedInt(offset);
         long holderId = currentValue & INT_LOCK_MASK;
         if (holderId == lowId) {
@@ -1842,8 +1850,7 @@ public abstract class AbstractBytes implements Bytes {
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            AbstractBytes.this.readFully(b, off, len);
-            return len;
+            return AbstractBytes.this.read(b, off, len);
         }
 
         @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
@@ -1885,6 +1892,7 @@ public abstract class AbstractBytes implements Bytes {
 
         @Override
         public void write(int b) throws IOException {
+            checkWrite(1);
             writeUnsignedByte(b);
         }
     }

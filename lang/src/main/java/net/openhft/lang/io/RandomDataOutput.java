@@ -646,24 +646,6 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeBytes(@NotNull String s);
 
     /**
-     * Writes a string to the output stream. First a stop bit encoded length is written followed by the lower bytes of
-     * each of the characters.
-     * <p/>
-     * For every character in the string <code>s</code>,  taken in order, one byte is written to the output stream.  If
-     * <code>s</code> is <code>null</code>, a <code>NullPointerException</code> is thrown.<p>  If <code>s.length</code>
-     * is zero, then no bytes are written. Otherwise, the character <code>s[0]</code> is written first, then
-     * <code>s[1]</code>, and so on; the last character written is <code>s[s.length-1]</code>. For each character, one
-     * byte is written, the low-order byte, in exactly the manner of the <code>writeByte</code> method . The high-order
-     * eight bits of each character in the string are ignored.
-     * <p/>
-     * The bytes written by this method may be read by the <code>readBytesΔ</code> method of interface
-     * <code>RandomDataInput</code> , which will populate a StringBuilder with the ISO-8859-1 characters.
-     *
-     * @param s the string of bytes to be written. Can be null.
-     */
-    void writeBytesΔ(@NotNull CharSequence s);
-
-    /**
      * Writes every character in the string <code>s</code>, to the output stream, in order, two bytes per character. If
      * <code>s</code> is <code>null</code>, a <code>NullPointerException</code> is thrown.  If <code>s.length</code> is
      * zero, then no characters are written. Otherwise, the character <code>s[0]</code> is written first, then

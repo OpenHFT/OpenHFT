@@ -19,8 +19,6 @@ package net.openhft.lang.io;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 /**
  * @author peter.lawrey
  */
@@ -75,11 +73,5 @@ public interface ByteStringAppender extends Appendable, BytesCommon {
     ByteStringAppender append(@NotNull MutableDecimal md);
 
     @NotNull
-    <E> ByteStringAppender append(@NotNull E object);
-
-    @NotNull
     <E> ByteStringAppender append(@NotNull Iterable<E> list, @NotNull CharSequence separator);
-
-    @NotNull
-    <E> ByteStringAppender append(@NotNull List<E> list, @NotNull CharSequence separator);
 }

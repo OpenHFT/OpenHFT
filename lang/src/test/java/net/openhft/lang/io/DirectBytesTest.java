@@ -26,6 +26,40 @@ import static org.junit.Assert.assertTrue;
  * @author peter.lawrey
  */
 public class DirectBytesTest {
+    private static void manyToggles(@NotNull DirectStore store1, int lockCount, int from, int to) {
+        long id = Thread.currentThread().getId();
+        assertEquals(0, id >>> 24);
+        System.out.println("Thread " + id);
+
+        DirectBytes slice1 = store1.createSlice();
+
+        int records = 8;
+        for (int i = 0; i < lockCount; i += records) {
+            for (long j = 0; j < records * 64; j += 64) {
+                slice1.positionAndSize(j, 64);
+                boolean condition = false;
+                for (int k = 0; k < 20; k++) {
+                    condition = slice1.tryLockInt(0L) || slice1.tryLockNanosInt(0L, 5 * 1000 * 1000);
+                    if (condition)
+                        break;
+                    if (k > 0)
+                        System.out.println("k: " + (5 + k * 5));
+                }
+                if (!condition)
+                    assertTrue("i= " + i, condition);
+                int toggle1 = slice1.readInt(4);
+                if (toggle1 == from) {
+                    slice1.writeInt(4L, to);
+                } else {
+                    // noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
+                    i--;
+                }
+                slice1.unlockInt(0L);
+                System.currentTimeMillis(); // small delay
+            }
+        }
+    }
+
     @Test
     public void testAllocate() throws Exception {
         long size = 1L << 24; // 31; don't overload cloud-bees
@@ -59,40 +93,6 @@ public class DirectBytesTest {
         store1.free();
         long time = System.nanoTime() - start;
         System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
-    }
-
-    private static void manyToggles(@NotNull DirectStore store1, int lockCount, int from, int to) {
-        long id = Thread.currentThread().getId();
-        assertEquals(0, id >>> 24);
-        System.out.println("Thread " + id);
-
-        DirectBytes slice1 = store1.createSlice();
-
-        int records = 8;
-        for (int i = 0; i < lockCount; i += records) {
-            for (long j = 0; j < records * 64; j += 64) {
-                slice1.positionAndSize(j, 64);
-                boolean condition = false;
-                for (int k = 0; k < 20; k++) {
-                    condition = slice1.tryLockNanosInt(0L, 5 * 1000 * 1000);
-                    if (condition)
-                        break;
-                    if (k > 0)
-                        System.out.println("k: " + (5 + k * 5));
-                }
-                if (!condition)
-                    assertTrue("i= " + i, condition);
-                int toggle1 = slice1.readInt(4);
-                if (toggle1 == from) {
-                    slice1.writeInt(4L, to);
-                } else {
-                    // noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
-                    i--;
-                }
-                slice1.unlockInt(0L);
-                System.currentTimeMillis(); // small delay
-            }
-        }
     }
 
     @Test
