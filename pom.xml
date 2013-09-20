@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>Java-Lang</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>6.0.1</version>
     <packaging>pom</packaging>
 
     <name>Java Lang Parent</name>
