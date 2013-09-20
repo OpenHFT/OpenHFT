@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io.impl;
 
+import net.openhft.lang.io.BytesMarshallable;
 import net.openhft.lang.io.BytesMarshaller;
 import net.openhft.lang.io.BytesMarshallerFactory;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +50,7 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
         if (em == null)
             if (eClass.isEnum())
                 marshallerMap.put(eClass, em = new VanillaBytesMarshaller(eClass, null));
-            else if (BytesMarshaller.class.isAssignableFrom(eClass))
+            else if (BytesMarshallable.class.isAssignableFrom(eClass))
                 marshallerMap.put(eClass, em = new BytesMarshallableMarshaller((Class) eClass));
             else if (Externalizable.class.isAssignableFrom(eClass))
                 marshallerMap.put(eClass, em = new ExternalizableMarshaller((Class) eClass));

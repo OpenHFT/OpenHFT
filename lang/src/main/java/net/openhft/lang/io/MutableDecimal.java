@@ -58,7 +58,7 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
         double d2 = precision > 0 ? d * tens(precision) : d / tens(-precision);
         scale = precision;
         if (Math.abs(d2) < 1e16) {
-            value = Math.round(d);
+            value = Math.round(d2);
         } else {
             BigDecimal bd = BigDecimal.valueOf(d).setScale(precision, RoundingMode.HALF_UP);
             value = bd.unscaledValue().longValue();
@@ -155,7 +155,7 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
 
     @Override
     public int intValue() {
-        return (int) doubleValue();
+        return (int) longValue();
     }
 
     @Override

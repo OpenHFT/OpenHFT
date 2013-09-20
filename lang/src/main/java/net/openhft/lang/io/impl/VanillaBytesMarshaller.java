@@ -18,7 +18,6 @@ package net.openhft.lang.io.impl;
 
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
-import net.openhft.lang.io.StopCharTester;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,20 +59,9 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
         }
     }
 
-    @NotNull
-    @Override
-    public Class<E> classMarshaled() {
-        return classMarshaled;
-    }
-
     @Override
     public void write(@NotNull Bytes bytes, @Nullable E e) {
         bytes.writeUTFΔ(e == null ? "" : e.name());
-    }
-
-    @Override
-    public void append(@NotNull Bytes bytes, @Nullable E e) {
-        bytes.append(e == null ? "" : e.name());
     }
 
     private int hashFor(@NotNull CharSequence cs) {
@@ -90,13 +78,6 @@ public class VanillaBytesMarshaller<E extends Enum<E>> implements BytesMarshalle
     @Override
     public E read(@NotNull Bytes bytes) {
         bytes.readUTFΔ(reader);
-        return builderToEnum();
-    }
-
-    @Override
-    public E parse(@NotNull Bytes bytes, @NotNull StopCharTester tester) {
-        reader.setLength(0);
-        bytes.parseUTF(reader, tester);
         return builderToEnum();
     }
 

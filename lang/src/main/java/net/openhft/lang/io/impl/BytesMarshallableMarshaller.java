@@ -19,10 +19,8 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshallable;
 import net.openhft.lang.io.BytesMarshaller;
-import net.openhft.lang.io.StopCharTester;
+import net.openhft.lang.io.NativeBytes;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Constructor;
 
 /**
  * @author peter.lawrey
@@ -30,22 +28,9 @@ import java.lang.reflect.Constructor;
 public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements BytesMarshaller<E> {
     @NotNull
     private final Class<E> classMarshaled;
-    private final Constructor<E> constructor;
 
     public BytesMarshallableMarshaller(@NotNull Class<E> classMarshaled) {
         this.classMarshaled = classMarshaled;
-        try {
-            constructor = classMarshaled.getConstructor();
-            constructor.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError(e);
-        }
-    }
-
-    @NotNull
-    @Override
-    public Class<E> classMarshaled() {
-        return classMarshaled;
     }
 
     @Override
@@ -54,24 +39,14 @@ public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements
     }
 
     @Override
-    public void append(@NotNull Bytes bytes, @NotNull E e) {
-        e.writeMarshallable(bytes);
-    }
-
-    @Override
     public E read(@NotNull Bytes bytes) {
         E e;
         try {
-            e = constructor.newInstance();
+            e = (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
         } catch (Exception e2) {
             throw new IllegalStateException(e2);
         }
         e.readMarshallable(bytes);
         return e;
-    }
-
-    @Override
-    public E parse(@NotNull Bytes bytes, StopCharTester tester) {
-        return read(bytes);
     }
 }

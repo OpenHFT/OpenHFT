@@ -1566,9 +1566,11 @@ public abstract class AbstractBytes implements Bytes {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E> E parseEnum(@NotNull Class<E> eClass, @NotNull StopCharTester tester) {
-        BytesMarshaller<E> em = bytesMarshallerFactory().acquireMarshaller(eClass, true);
-        return em.parse(this, tester);
+    public <E extends Enum<E>> E parseEnum(@NotNull Class<E> eClass, @NotNull StopCharTester tester) {
+        String text = parseUTF(tester);
+        if (text.isEmpty())
+            return null;
+        return Enum.valueOf(eClass, text);
     }
 
     @Override
@@ -1641,19 +1643,25 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void finish() {
+    public void finish() throws IndexOutOfBoundsException {
         if (remaining() < 0)
             throwOverflow();
         finished = true;
     }
 
-    private void throwOverflow() {
-        throw new IllegalStateException("Buffer overflow, capacity: " + capacity() + " position: " + position());
+    private void throwOverflow() throws IndexOutOfBoundsException {
+        throw new IndexOutOfBoundsException("Buffer overflow, capacity: " + capacity() + " position: " + position());
     }
 
     @Override
     public boolean isFinished() {
         return finished;
+    }
+
+    @Override
+    public void reset() {
+        finished = false;
+        position(0L);
     }
 
     @Override
@@ -1724,7 +1732,9 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private boolean autoGenerateMarshaller(Object obj) {
-        return (obj instanceof Comparable && obj.getClass().getPackage().getName().startsWith("java")) || obj instanceof Externalizable;
+        return (obj instanceof Comparable && obj.getClass().getPackage().getName().startsWith("java"))
+                || obj instanceof Externalizable
+                || obj instanceof BytesMarshallable;
     }
 
     @Override
@@ -1781,7 +1791,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void unlockInt(long offset) throws IllegalStateException {
+    public void unlockInt(long offset) throws IllegalMonitorStateException {
         int lowId = (int) Thread.currentThread().getId() & INT_LOCK_MASK;
         int firstValue = ((1 << 24) | lowId);
         if (compareAndSetInt(offset, firstValue, 0))
@@ -1789,16 +1799,16 @@ public abstract class AbstractBytes implements Bytes {
         unlockFailed(offset, lowId);
     }
 
-    private void unlockFailed(long offset, int lowId) {
+    private void unlockFailed(long offset, int lowId) throws IllegalMonitorStateException {
         long currentValue = readUnsignedInt(offset);
         long holderId = currentValue & INT_LOCK_MASK;
         if (holderId == lowId) {
             currentValue -= 1 << 24;
             writeOrderedInt(offset, (int) currentValue);
         } else if (currentValue == 0) {
-            throw new IllegalStateException("No thread holds this lock");
+            throw new IllegalMonitorStateException("No thread holds this lock");
         } else {
-            throw new IllegalStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
+            throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
     }
 

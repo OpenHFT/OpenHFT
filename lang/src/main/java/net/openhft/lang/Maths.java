@@ -39,26 +39,26 @@ public class Maths {
      */
     public static double round2(double d) {
         final double factor = 1e2;
-        return d > WHOLE_NUMBER || d < -WHOLE_NUMBER ?
-                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor : d;
+        return d > WHOLE_NUMBER || d < -WHOLE_NUMBER ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
     }
 
     public static double round4(double d) {
         final double factor = 1e4;
-        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ?
-                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor : d;
+        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
     }
 
     public static double round6(double d) {
         final double factor = 1e6;
-        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ?
-                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor : d;
+        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
     }
 
     public static double round8(double d) {
         final double factor = 1e8;
-        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ?
-                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor : d;
+        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
     }
 
     public static long power10(int n) {

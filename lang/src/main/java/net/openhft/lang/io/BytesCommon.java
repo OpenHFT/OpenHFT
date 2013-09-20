@@ -48,10 +48,20 @@ public interface BytesCommon {
 
     /**
      * Mark the end of the message if writing and check we are at the end of the message if reading.
+     *
+     * @throws IndexOutOfBoundsException if too much data was written.
      */
-    void finish();
+    void finish() throws IndexOutOfBoundsException;
 
+    /**
+     * @return has finish been called.
+     */
     boolean isFinished();
+
+    /**
+     * Start again, unfinished, position() == 0
+     */
+    void reset();
 
     /**
      * @return Byte order for reading binary
@@ -120,7 +130,7 @@ public interface BytesCommon {
      * 255 times you will get an ISE
      *
      * @param offset of the start of the 4-byte lock
-     * @throws IllegalStateException if this thread doesn't hold the lock
+     * @throws IllegalMonitorStateException if this thread doesn't hold the lock
      */
-    void unlockInt(long offset) throws IllegalStateException;
+    void unlockInt(long offset) throws IllegalMonitorStateException;
 }

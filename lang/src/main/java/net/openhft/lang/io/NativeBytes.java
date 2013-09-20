@@ -32,7 +32,7 @@ public class NativeBytes extends AbstractBytes {
      */
     @NotNull
     @SuppressWarnings("ALL")
-    protected static final Unsafe UNSAFE;
+    public static final Unsafe UNSAFE;
     static final int BYTES_OFFSET;
 
     static {

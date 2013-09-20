@@ -18,7 +18,6 @@ package net.openhft.lang.io.impl;
 
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
-import net.openhft.lang.io.StopCharTester;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,12 +54,6 @@ public class DateMarshaller implements BytesMarshaller<Date> {
         return negative ? -num : num;
     }
 
-    @NotNull
-    @Override
-    public Class<Date> classMarshaled() {
-        return Date.class;
-    }
-
     @Override
     public void write(@NotNull Bytes bytes, @NotNull Date date) {
         long pos = bytes.position();
@@ -69,23 +62,12 @@ public class DateMarshaller implements BytesMarshaller<Date> {
         bytes.writeUnsignedByte(pos, (int) (bytes.position() - 1 - pos));
     }
 
-    @Override
-    public void append(@NotNull Bytes bytes, @NotNull Date date) {
-        bytes.append(date.getTime());
-    }
-
     @Nullable
     @Override
     public Date read(@NotNull Bytes bytes) {
         bytes.readUTFΔ(sb);
         long time = parseLong(sb);
         return lookupDate(time);
-    }
-
-    @Nullable
-    @Override
-    public Date parse(@NotNull Bytes bytes, StopCharTester tester) {
-        return lookupDate(bytes.readLong());
     }
 
     @Nullable

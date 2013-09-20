@@ -47,7 +47,7 @@ public interface ByteStringParser extends BytesCommon {
     String parseUTF(@NotNull StopCharTester tester);
 
     @Nullable
-    <E> E parseEnum(@NotNull Class<E> eClass, @NotNull StopCharTester tester);
+    <E extends Enum<E>> E parseEnum(@NotNull Class<E> eClass, @NotNull StopCharTester tester);
 
     @NotNull
     MutableDecimal parseDecimal(@NotNull MutableDecimal decimal);

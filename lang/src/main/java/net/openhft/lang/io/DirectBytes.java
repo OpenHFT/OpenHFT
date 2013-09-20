@@ -36,22 +36,4 @@ public class DirectBytes extends NativeBytes {
         startAddr = positionAddr = store.address + offset;
         limitAddr = startAddr + size;
     }
-
-    public void positionAndSize(@NotNull DirectBytes bytes, long size) {
-        long start2 = bytes.positionAddr;
-        long end2 = start2 + size;
-        if (end2 > limitAddr)
-            throw new IllegalArgumentException("Slice offset and size too large");
-        startAddr = positionAddr = start2;
-        limitAddr = end2;
-    }
-
-    public void positionAndSize(@NotNull DirectBytes bytes, long offset, long size) {
-        long start2 = bytes.startAddr + offset;
-        long end2 = start2 + size;
-        if (end2 > limitAddr)
-            throw new IllegalArgumentException("Slice offset and size too large");
-        startAddr = positionAddr = start2;
-        limitAddr = end2;
-    }
 }

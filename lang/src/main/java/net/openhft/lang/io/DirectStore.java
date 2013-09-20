@@ -53,12 +53,12 @@ public class DirectStore {
         return new DirectStore(null, size);
     }
 
-    public void resize(long newSize) {
+/*    public void resize(long newSize) {
         if (newSize == size)
             return;
         address = NativeBytes.UNSAFE.reallocateMemory(address, newSize);
         size = newSize;
-    }
+    }*/
 
     @NotNull
     public DirectBytes createSlice() {

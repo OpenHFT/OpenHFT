@@ -16,7 +16,6 @@
 
 package net.openhft.lang.io;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -26,12 +25,6 @@ import org.jetbrains.annotations.Nullable;
  * @see BytesMarshallable
  */
 public interface BytesMarshaller<E> {
-    /**
-     * @return super class of classes marshalled/
-     */
-    @NotNull
-    Class<E> classMarshaled();
-
     /**
      * write the object out as bytes.
      *
@@ -48,22 +41,4 @@ public interface BytesMarshaller<E> {
      */
     @Nullable
     E read(Bytes bytes);
-
-    /**
-     * Write in a form which can be parsed
-     *
-     * @param bytes to write to
-     * @param e     to write
-     */
-    void append(Bytes bytes, E e);
-
-    /**
-     * Parse a stream up to a known stop character
-     *
-     * @param bytes  to read
-     * @param tester to know when to stop.
-     * @return the object.
-     */
-    @Nullable
-    E parse(Bytes bytes, StopCharTester tester);
 }

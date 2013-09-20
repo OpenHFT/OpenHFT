@@ -17,8 +17,6 @@
 package net.openhft.lang.pool;
 
 import net.openhft.lang.Maths;
-import net.openhft.lang.io.IOTools;
-import net.openhft.lang.io.NativeBytes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +43,7 @@ public class StringInterner {
         return true;
     }
 
-    private static boolean isEqual(@Nullable CharSequence s, @NotNull byte[] bytes, int off, int len) {
+/*    private static boolean isEqual(@Nullable CharSequence s, @NotNull byte[] bytes, int off, int len) {
         if (s == null) return false;
         if (s.length() != len) return false;
         for (int i = 0; i < len; i++)
@@ -63,7 +61,7 @@ public class StringInterner {
             return s;
         String s2 = new String(bytes, off, len, IOTools.ISO_8859_1);
         return interner[h] = s2;
-    }
+    }*/
 
     @NotNull
     public String intern(@NotNull CharSequence cs) {

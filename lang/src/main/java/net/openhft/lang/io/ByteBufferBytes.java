@@ -28,9 +28,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author peter.lawrey
  */
 public class ByteBufferBytes extends AbstractBytes {
-    protected ByteBuffer buffer;
+    protected final ByteBuffer buffer;
     protected int start, position, limit;
     protected AtomicBoolean barrier;
+
+    public ByteBufferBytes(ByteBuffer buffer) {
+        this(buffer, 0, buffer.capacity());
+    }
+
+    public ByteBufferBytes(ByteBuffer buffer, int start, int limit) {
+        this.buffer = buffer;
+        this.start = position = start;
+        this.limit = limit;
+    }
 
     protected void readBarrier() {
         if (barrier == null) barrier = new AtomicBoolean();
@@ -74,7 +84,7 @@ public class ByteBufferBytes extends AbstractBytes {
         if (len < 0 || off < 0 || off + len > b.length)
             throw new IllegalArgumentException();
         long left = remaining();
-        if (left <= len)
+        if (left < len)
             throw new IllegalStateException(new EOFException());
         for (int i = 0; i < len; i++)
             b[off + i] = readByte();
@@ -301,7 +311,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public boolean compareAndSetInt(long offset, int expected, int x) {
         if (buffer instanceof DirectBuffer)
-            return NativeBytes.UNSAFE.compareAndSwapInt(null, ((DirectBuffer) buffer).address(), expected, x);
+            return NativeBytes.UNSAFE.compareAndSwapInt(null, ((DirectBuffer) buffer).address() + offset, expected, x);
         return NativeBytes.UNSAFE.compareAndSwapInt(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);
     }
 
@@ -339,7 +349,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public boolean compareAndSetLong(long offset, long expected, long x) {
         if (buffer instanceof DirectBuffer)
-            return NativeBytes.UNSAFE.compareAndSwapLong(null, ((DirectBuffer) buffer).address(), expected, x);
+            return NativeBytes.UNSAFE.compareAndSwapLong(null, ((DirectBuffer) buffer).address() + offset, expected, x);
         return NativeBytes.UNSAFE.compareAndSwapLong(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);
     }
 

@@ -19,7 +19,6 @@ package net.openhft.lang.io.impl;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.BytesMarshaller;
-import net.openhft.lang.io.StopCharTester;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,37 +57,12 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         this.classLoader = classLoader;
     }
 
-    private static int hashOf(CharSequence name) {
-        if (name instanceof String)
-            return name.hashCode();
-        int h = 0;
-
-        for (int i = 0; i < name.length(); i++) {
-            h = 31 * h + name.charAt(i);
-        }
-        return h;
-    }
-
-    @NotNull
-    @Override
-    public Class<Class> classMarshaled() {
-        return Class.class;
-    }
-
     @Override
     public void write(@NotNull Bytes bytes, @NotNull Class aClass) {
         String s = CS_SHORT_NAME.get(aClass);
         if (s == null)
             s = aClass.getName();
         bytes.writeUTFΔ(s);
-    }
-
-    @Override
-    public void append(@NotNull Bytes bytes, @NotNull Class aClass) {
-        String s = CS_SHORT_NAME.get(aClass);
-        if (s == null)
-            s = aClass.getName();
-        bytes.append(s);
     }
 
     @Nullable
@@ -122,13 +96,5 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    @Nullable
-    @Override
-    public Class parse(@NotNull Bytes bytes, @NotNull StopCharTester tester) {
-        className.setLength(0);
-        bytes.parseUTF(className, tester);
-        return load(className);
     }
 }

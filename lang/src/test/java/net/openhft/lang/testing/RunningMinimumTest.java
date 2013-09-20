@@ -41,4 +41,10 @@ public class RunningMinimumTest {
             }
         }
     }
+
+    @Test
+    public void testVanillaDiff() {
+        VanillaDifferencer vd = new VanillaDifferencer();
+        assertEquals(100, vd.sample(123400, 123500));
+    }
 }

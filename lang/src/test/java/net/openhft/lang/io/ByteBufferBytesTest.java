@@ -4,7 +4,6 @@ import net.openhft.lang.Maths;
 import net.openhft.lang.thread.NamedThreadFactory;
 import org.junit.Before;
 import org.junit.Test;
-import sun.nio.ch.DirectBuffer;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -24,16 +23,15 @@ import static org.junit.Assert.*;
  * Created with IntelliJ IDEA. User: peter Date: 17/09/13 Time: 16:09 To change this template use File | Settings | File
  * Templates.
  */
-public class NativeBytesTest {
+public class ByteBufferBytesTest {
     public static final int SIZE = 128;
-    private NativeBytes bytes;
+    private ByteBufferBytes bytes;
     private ByteBuffer byteBuffer;
 
     @Before
     public void beforeTest() {
-        byteBuffer = ByteBuffer.allocateDirect(SIZE);
-        long addr = ((DirectBuffer) byteBuffer).address();
-        bytes = new NativeBytes(addr, addr, addr + SIZE);
+        byteBuffer = ByteBuffer.allocate(SIZE).order(ByteOrder.nativeOrder());
+        bytes = new ByteBufferBytes(byteBuffer);
     }
 
     @Test
@@ -717,6 +715,7 @@ public class NativeBytesTest {
 
     @Test
     public void testStream() throws IOException {
+        bytes = new ByteBufferBytes(ByteBuffer.allocate(1000));
         GZIPOutputStream out = new GZIPOutputStream(bytes.outputStream());
         out.write("Hello world\n".getBytes());
         out.close();
@@ -781,8 +780,7 @@ public class NativeBytesTest {
     public void testWriteSerializable() {
         int capacity = 16 * 1024;
         byteBuffer = ByteBuffer.allocateDirect(capacity);
-        long addr = ((DirectBuffer) byteBuffer).address();
-        bytes = new NativeBytes(addr, addr, addr + capacity);
+        bytes = new ByteBufferBytes(byteBuffer);
         Calendar cal = Calendar.getInstance();
         bytes.writeObject(cal);
         Dummy d = new Dummy();
@@ -821,10 +819,9 @@ public class NativeBytesTest {
     @Test
     public void testErrors() {
         int capacity = 1024;
-        byteBuffer = ByteBuffer.allocateDirect(capacity);
-        long addr = ((DirectBuffer) byteBuffer).address();
+        byteBuffer = ByteBuffer.allocate(capacity);
         // it is actually much bigger than it believes
-        bytes = new NativeBytes(addr, addr, addr + 16);
+        bytes = new ByteBufferBytes(byteBuffer, 0, 16);
         bytes.writeLong(8);
         assertFalse(bytes.isFinished());
         bytes.finish();
@@ -833,17 +830,14 @@ public class NativeBytesTest {
         bytes.writeLong(16);
         bytes.finish();
         bytes.flush();
-        bytes.writeLong(24);
         try {
-            bytes.finish();
+            bytes.writeLong(24);
             fail();
         } catch (IndexOutOfBoundsException expected) {
         }
-        try {
-            bytes.flush();
-            fail();
-        } catch (IndexOutOfBoundsException expected) {
-        }
+        bytes.finish();
+        bytes.flush();
+
         bytes.reset();
         assertEquals(0, bytes.position());
         assertEquals(8, bytes.skip(8));
