@@ -160,7 +160,6 @@ public class NativeBytesTest {
     private void testAppendDouble0(double d, int precision) {
         bytes.position(0);
         bytes.append(d, precision).append(' ');
-        Thread.yield();
         bytes.position(0);
         String text = bytes.parseUTF(SPACE_STOP);
         bytes.position(0);
