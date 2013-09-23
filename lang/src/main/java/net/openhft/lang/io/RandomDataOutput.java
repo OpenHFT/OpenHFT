@@ -522,7 +522,6 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     void writeCompactLong(long v);
 
-
     /**
      * Same as writeLong but include an ordered write barrier.  This means all writes will be visible on a read barrier
      * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
@@ -600,7 +599,6 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     @Override
     void writeDouble(double v);
-
 
     /**
      * Writes a <code>double</code> value, which is comprised of eight bytes, to the output stream. It does this as if
@@ -747,6 +745,15 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     @Override
     void writeObject(@Nullable Object object);
+
+    /**
+     * Copy data from an Object from bytes start to end.
+     *
+     * @param object to copy from
+     * @param start  first byte inclusive
+     * @param end    last byte exclusive.
+     */
+    void writeObject(Object object, int start, int end);
 
     /**
      * Check the end of the stream has not overflowed.  Otherwise this doesn't do anything.

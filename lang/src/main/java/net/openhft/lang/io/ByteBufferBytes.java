@@ -392,6 +392,16 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
+    public void readObject(Object object, int start, int end) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void writeObject(Object object, int start, int end) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public long position() {
         return position - start;
     }

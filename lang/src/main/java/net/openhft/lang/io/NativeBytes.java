@@ -327,6 +327,36 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
+    public void readObject(Object object, int start, int end) {
+        int len = end - start;
+        for (; len >= 8; len -= 8) {
+            UNSAFE.putLong(object, start, UNSAFE.getLong(positionAddr));
+            positionAddr += 8;
+            start += 8;
+        }
+        for (; len > 0; len--) {
+            UNSAFE.putByte(object, start, UNSAFE.getByte(positionAddr));
+            positionAddr++;
+            start++;
+        }
+    }
+
+    @Override
+    public void writeObject(Object object, int start, int end) {
+        int len = end - start;
+        for (; len >= 8; len -= 8) {
+            UNSAFE.putLong(positionAddr, UNSAFE.getLong(object, start));
+            positionAddr += 8;
+            start += 8;
+        }
+        for (; len > 0; len--) {
+            UNSAFE.putByte(positionAddr, UNSAFE.getByte(object, start));
+            positionAddr++;
+            start++;
+        }
+    }
+
+    @Override
     public long position() {
         return (positionAddr - startAddr);
     }

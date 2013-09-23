@@ -804,6 +804,15 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     int read(@NotNull byte[] bytes, int off, int len);
 
     /**
+     * Read the object from start to end bytes
+     *
+     * @param object to read into
+     * @param start  byte inclusive
+     * @param end    byte exclusive
+     */
+    void readObject(Object object, int start, int end);
+
+    /**
      * Skips n bytes of input.
      *
      * @param n the number of bytes to be skipped
