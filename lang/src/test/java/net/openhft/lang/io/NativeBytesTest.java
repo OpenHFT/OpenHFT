@@ -45,6 +45,10 @@ public class NativeBytesTest {
     private NativeBytes bytes;
     private ByteBuffer byteBuffer;
 
+    public static void main(String... args) {
+        new TestRunner().doRun(new JUnit4TestAdapter(NativeBytesTest.class));
+    }
+
     @Before
     public void beforeTest() {
         byteBuffer = ByteBuffer.allocateDirect(SIZE);
