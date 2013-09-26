@@ -709,7 +709,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * immutable, 3) ideally appears more than once, 4) Must have a constructor which takes a single String or a
      * <code>valueOf(String)</code> method.
      *
-     * @param e to enumerate
+     * @param e   to enumerate
+     * @param <E> element class
      */
     <E> void writeEnum(@Nullable E e);
 
