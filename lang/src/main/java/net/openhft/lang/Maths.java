@@ -36,6 +36,8 @@ public class Maths {
      * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
      * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
      * precision of double.
+     *
+     * @param d value to round
      */
     public static double round2(double d) {
         final double factor = 1e2;
@@ -43,18 +45,39 @@ public class Maths {
                 (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
     }
 
+    /**
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
+     *
+     * @param d value to round
+     */
     public static double round4(double d) {
         final double factor = 1e4;
         return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
                 (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
     }
 
+    /**
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
+     *
+     * @param d value to round
+     */
     public static double round6(double d) {
         final double factor = 1e6;
         return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
                 (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
     }
 
+    /**
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
+     *
+     * @param d value to round
+     */
     public static double round8(double d) {
         final double factor = 1e8;
         return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
