@@ -553,11 +553,11 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * <p><pre><code>
      * long l = 0, b;
      * int count = 0;
-     * while ((b = readByte()) < 0) {
+     * while ((b = readByte()) &lt; 0) {
      *     l |= (b & 0x7FL) &lt;&lt; count;
      *     count += 7;
      * }
-     * if (b == 0 && count > 0)
+     * if (b == 0 && count &gt; 0)
      *     return ~l;
      * return l | (b &lt;&lt; count);
      * </code></pre
