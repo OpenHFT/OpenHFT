@@ -615,7 +615,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Writes four or twelve bytes as follow;
-     * <p/><pre><code>
+     * <p><pre><code>
      * if ((float) d == d) {
      *     writeFloat((float) d);
      * } else {

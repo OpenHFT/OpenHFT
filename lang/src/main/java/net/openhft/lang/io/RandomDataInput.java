@@ -212,8 +212,8 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads one or three input bytes and returns a <code>short</code> value. Let <code>a</code> be the first byte read.
-     * This mapped as follows; Byte.MIN_VALUE => Short.MIN_VALUE, Byte.MAX_VALUE => Short.MAX_VALUE, Byte.MIN_VALUE+2 to
-     * Byte.MAX_VALUE-1 => same as short value, Byte.MIN_VALUE+1 => readShort().
+     * This mapped as follows; Byte.MIN_VALUE =&gt; Short.MIN_VALUE, Byte.MAX_VALUE =&gt; Short.MAX_VALUE, Byte.MIN_VALUE+2 to
+     * Byte.MAX_VALUE-1 =&gt; same as short value, Byte.MIN_VALUE+1 =&gt; readShort().
      * <p/>
      * This method is suitable for reading the bytes written by the <code>writeCompactShort</code> method of interface
      * <code>RandomDataOutput</code>.
@@ -224,7 +224,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads one or three input bytes and returns a <code>short</code> value. Let <code>a</code> be the first byte read.
-     * This mapped as follows; -1 => readUnsignedShort(), default => (a &amp; 0xFF)
+     * This mapped as follows; -1 =&gt; readUnsignedShort(), default =&gt; (a &amp; 0xFF)
      * <p/>
      * This method is suitable for reading the bytes written by the <code>writeCompactUnsignedShort</code> method of
      * interface <code>RandomDataOutput</code>.
@@ -266,7 +266,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * third bytes read on big endian machines, and the opposite on little endian machines. The value returned is:
      * <p><pre>
      * <code>
-     * ((((a &amp; 0xff) &lt;&lt; 24) | ((b &amp; 0xff) &lt;&lt; 16) | ((c &amp; 0xff) << 8))) &gt;&gt; 8
+     * ((((a &amp; 0xff) &lt;&lt; 24) | ((b &amp; 0xff) &lt;&lt; 16) | ((c &amp; 0xff) &lt;&lt; 8))) &gt;&gt; 8
      * </code></pre>
      * This method is suitable for reading bytes written by the <code>writeInt24</code> method of interface
      * <code>RandomDataOutput</code>.
@@ -280,7 +280,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * third bytes read on big endian machines, and the opposite on little endian machines. The value returned is:
      * <p><pre>
      * <code>
-     * ((((a &amp; 0xff) &lt;&lt; 24) | ((b &amp; 0xff) &lt;&lt; 16) | ((c &amp; 0xff) << 8))) &gt;&gt; 8
+     * ((((a &amp; 0xff) &lt;&lt; 24) | ((b &amp; 0xff) &lt;&lt; 16) | ((c &amp; 0xff) &lt;&lt; 8))) &gt;&gt; 8
      * </code></pre>
      * This method is suitable for reading bytes written by the <code>writeInt24</code> method of interface
      * <code>RandomDataOutput</code>.
@@ -384,8 +384,8 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads two or six input bytes and returns an <code>int</code> value. Let <code>a</code> be the first short read
-     * with readShort(). This mapped as follows; Short.MIN_VALUE => Integer.MIN_VALUE, Short.MAX_VALUE =>
-     * Integer.MAX_VALUE, Short.MIN_VALUE+2 to Short.MAX_VALUE-1 => same as short value, Short.MIN_VALUE+1 =>
+     * with readShort(). This mapped as follows; Short.MIN_VALUE =&gt; Integer.MIN_VALUE, Short.MAX_VALUE =&gt;
+     * Integer.MAX_VALUE, Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; same as short value, Short.MIN_VALUE+1 =&gt;
      * readInt().
      * <p/>
      * This method is suitable for reading the bytes written by the <code>writeCompactInt</code> method of interface
@@ -397,7 +397,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads two or six input bytes and returns an <code>int</code> value. Let <code>a</code> be the first short read
-     * with readShort(). This mapped as follows; -1 => readUnsignedInt(), default => (a &amp; 0xFFFF)
+     * with readShort(). This mapped as follows; -1 =&gt; readUnsignedInt(), default =&gt; (a &amp; 0xFFFF)
      * <p/>
      * This method is suitable for reading the bytes written by the <code>writeCompactUnsignedInt</code> method of
      * interface <code>RandomDataOutput</code>.
@@ -538,8 +538,8 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads four or twelve input bytes and returns a <code>long</code> value. Let <code>a</code> be the first int read
-     * with readInt(). This mapped as follows; Integer.MIN_VALUE => Long.MIN_VALUE, Integer.MAX_VALUE => Long.MAX_VALUE,
-     * Integer.MIN_VALUE+2 to Integer.MAX_VALUE-1 => same as short value, Integer.MIN_VALUE+1 => readLong().
+     * with readInt(). This mapped as follows; Integer.MIN_VALUE =&gt; Long.MIN_VALUE, Integer.MAX_VALUE =&gt; Long.MAX_VALUE,
+     * Integer.MIN_VALUE+2 to Integer.MAX_VALUE-1 =&gt; same as short value, Integer.MIN_VALUE+1 =&gt; readLong().
      * <p/>
      * This method is suitable for reading the bytes written by the <code>writeCompactLong</code> method of interface
      * <code>RandomDataOutput</code>.
@@ -550,16 +550,16 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Reads between one and ten bytes with are stop encoded with support for negative numbers
-     * <p/><pre><code>
+     * <p><pre><code>
      * long l = 0, b;
      * int count = 0;
      * while ((b = readByte()) < 0) {
-     *     l |= (b & 0x7FL) << count;
+     *     l |= (b & 0x7FL) &lt;&lt; count;
      *     count += 7;
      * }
      * if (b == 0 && count > 0)
      *     return ~l;
-     * return l | (b << count);
+     * return l | (b &lt;&lt; count);
      * </code></pre
      *
      * @return a stop bit encoded number as a long.
