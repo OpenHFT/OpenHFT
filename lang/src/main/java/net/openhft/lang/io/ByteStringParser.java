@@ -25,9 +25,9 @@ import org.jetbrains.annotations.Nullable;
 public interface ByteStringParser extends BytesCommon {
     /**
      * Return true or false, or null if it could not be detected as true or false.  Case is not important
-     * <p>
+     * <p/>
      * false: f, false, n, no, 0
-     * <p>
+     * <p/>
      * true: t, true, y, yes, 1
      *
      * @param tester to detect the end of the text.

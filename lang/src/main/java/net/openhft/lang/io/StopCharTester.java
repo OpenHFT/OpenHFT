@@ -22,9 +22,9 @@ package net.openhft.lang.io;
 public interface StopCharTester {
     /**
      * Detect which byte stops the string to be parsed
-     * <p>
+     * <p/>
      * This should be changed to support char instead.
-     * <p>
+     * <p/>
      * Note: for safety reasons, you should stop on a 0 byte or throw an IllegalStateException.
      *
      * @param ch to test, 0 should return true or throw an exception.
