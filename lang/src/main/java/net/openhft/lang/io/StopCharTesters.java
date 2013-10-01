@@ -22,7 +22,12 @@ import org.jetbrains.annotations.NotNull;
  * @author peter.lawrey
  */
 public enum StopCharTesters implements StopCharTester {
-    CONTROL_STOP {
+    COMMA_STOP {
+        @Override
+        public boolean isStopChar(int ch) {
+            return ch < ' ' || ch == ',';
+        }
+    }, CONTROL_STOP {
         @Override
         public boolean isStopChar(int ch) {
             return ch < ' ';
