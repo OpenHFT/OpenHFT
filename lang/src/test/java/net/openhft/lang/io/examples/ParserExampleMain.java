@@ -34,7 +34,7 @@ public class ParserExampleMain {
         ByteBufferBytes bufferBytes = new ByteBufferBytes(wrap);
         byte[] bytes = "BAC,12.32,12.54,12.56,232443".getBytes();
 
-        int runs = 1000000;
+        int runs = 10000000;
         long start = System.nanoTime();
         for (int i = 0; i < runs; i++) {
             bufferBytes.reset();
