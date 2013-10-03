@@ -14,45 +14,39 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io.impl;
+package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.Bytes;
-import net.openhft.lang.io.BytesMarshaller;
+import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.NativeBytes;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Externalizable;
-import java.io.IOException;
 
 /**
  * @author peter.lawrey
  */
-public class ExternalizableMarshaller<E extends Externalizable> implements BytesMarshaller<E> {
+public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements BytesMarshaller<E> {
     @NotNull
     private final Class<E> classMarshaled;
 
-    public ExternalizableMarshaller(@NotNull Class<E> classMarshaled) {
+    public BytesMarshallableMarshaller(@NotNull Class<E> classMarshaled) {
         this.classMarshaled = classMarshaled;
     }
 
     @Override
-    public void write(Bytes bytes, @NotNull E e) {
-        try {
-            e.writeExternal(bytes);
-        } catch (IOException e2) {
-            throw new IllegalStateException(e2);
-        }
+    public void write(@NotNull Bytes bytes, @NotNull E e) {
+        e.writeMarshallable(bytes);
     }
 
     @Override
-    public E read(Bytes bytes) {
+    public E read(@NotNull Bytes bytes) {
         E e;
         try {
             e = (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
-            e.readExternal(bytes);
         } catch (Exception e2) {
             throw new IllegalStateException(e2);
         }
+        e.readMarshallable(bytes);
         return e;
     }
 }

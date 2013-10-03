@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io.impl;
+package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.Bytes;
-import net.openhft.lang.io.BytesMarshaller;
+import net.openhft.lang.io.serialization.BytesMarshaller;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

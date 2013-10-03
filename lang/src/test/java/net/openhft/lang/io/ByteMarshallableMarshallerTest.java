@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.io.serialization.BytesMarshallable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import sun.nio.ch.DirectBuffer;
