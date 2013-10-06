@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io;
+package net.openhft.lang.io.serialization;
 
+import net.openhft.lang.io.DirectBytes;
+import net.openhft.lang.io.DirectStore;
+import net.openhft.lang.io.NativeBytes;
 import org.junit.Test;
 
 import java.awt.geom.Point2D;
