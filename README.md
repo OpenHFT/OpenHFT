@@ -1,5 +1,16 @@
 #JavaLang
 This module provides marshalling, de-marshalling and handling of thread safe off heap memory through ByteBuffers.
+
+This module is available on maven central as
+
+    <dependency>
+        <groupId>net.openhft</groupId>
+        <artifactId>lang</artifactId>
+        <version>6.0.2</version>
+    </dependency>
+
+The version 6.x signifies that it is build for Java 6+. (It requires Java 6 update 18 or later to build)
+
 ## Working with buffers
 To work with buffers there is a several options:
 * _ByteBufferBytes_ which wraps [java.nio.ByteBuffer](http://docs.oracle.com/javase/7/docs/api/java/nio/ByteBuffer.html)
