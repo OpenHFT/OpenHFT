@@ -17,7 +17,10 @@
 package net.openhft.lang.model;
 
 import net.openhft.compiler.CachedCompiler;
+import net.openhft.lang.io.ByteBufferBytes;
 import org.junit.Test;
+
+import java.nio.ByteBuffer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -66,6 +69,7 @@ public class DataValueGeneratorTest {
         mi.long$(6);
         mi.double$(7);
         mi.flag(true);
+
         assertEquals(1, mi.byte$());
         assertEquals('2', mi.char$());
         assertEquals(3, mi.short$());
@@ -74,5 +78,23 @@ public class DataValueGeneratorTest {
         assertEquals(6, mi.long$());
         assertEquals(7.0, mi.double$(), 0.0);
         assertTrue(mi.flag());
+
+        ByteBufferBytes bbb = new ByteBufferBytes(ByteBuffer.allocate(64));
+        mi.writeExternal(bbb);
+        System.out.println("size: " + bbb.position());
+
+        MinimalInterface mi2 = (MinimalInterface) aClass.newInstance();
+        bbb.position(0);
+        mi2.readExternal(bbb);
+
+
+        assertEquals(1, mi2.byte$());
+        assertEquals('2', mi2.char$());
+        assertEquals(3, mi2.short$());
+        assertEquals(4, mi2.int$());
+        assertEquals(5.0, mi2.float$(), 0);
+        assertEquals(6, mi2.long$());
+        assertEquals(7.0, mi2.double$(), 0.0);
+        assertTrue(mi2.flag());
     }
 }

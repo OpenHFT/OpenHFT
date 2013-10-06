@@ -16,12 +16,14 @@
 
 package net.openhft.lang.model;
 
+import java.io.Externalizable;
+
 /**
  * User: plawrey
  * Date: 06/10/13
  * Time: 16:59
  */
-public interface MinimalInterface {
+public interface MinimalInterface extends Externalizable {
     void flag(boolean flag);
 
     boolean flag();

@@ -16,6 +16,7 @@
 
 package net.openhft.lang.model;
 
+import java.io.Externalizable;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,7 +36,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             throw new IllegalArgumentException("type must be an interface, was " + type);
         Method[] methods = type.getMethods();
         for (Method method : methods) {
-            if (method.getDeclaringClass() == Object.class)
+            Class<?> declaringClass = method.getDeclaringClass();
+            if (declaringClass == Object.class || declaringClass == Externalizable.class)
                 continue;
             String name = method.getName();
             Class<?>[] parameterTypes = method.getParameterTypes();
