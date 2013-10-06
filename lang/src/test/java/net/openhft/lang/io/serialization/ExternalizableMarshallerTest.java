@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io;
+package net.openhft.lang.io.serialization;
 
-import org.jetbrains.annotations.NotNull;
+import net.openhft.lang.io.NativeBytes;
 import org.junit.Test;
 import sun.nio.ch.DirectBuffer;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +33,7 @@ import static org.junit.Assert.assertEquals;
  * Date: 20/09/13
  * Time: 09:28
  */
-public class ByteMarshallableMarshallerTest {
+public class ExternalizableMarshallerTest {
     @Test
     public void testMarshallable() {
         int capacity = 2 * 1024;
@@ -37,29 +41,29 @@ public class ByteMarshallableMarshallerTest {
         long addr = ((DirectBuffer) byteBuffer).address();
         NativeBytes nativeBytes = new NativeBytes(addr, addr, addr + capacity);
 
-        BytesMarshallable bm = new MockBytesMarshallable(12345678);
+        Externalizable bm = new MockExternalizable(12345678);
         nativeBytes.writeObject(bm);
         nativeBytes.finish();
         nativeBytes.reset();
-        BytesMarshallable bm2 = nativeBytes.readObject(MockBytesMarshallable.class);
+        Externalizable bm2 = nativeBytes.readObject(MockExternalizable.class);
         assertEquals(bm, bm2);
     }
 
-    static class MockBytesMarshallable implements BytesMarshallable {
+    static class MockExternalizable implements Externalizable {
         long number;
 
-        MockBytesMarshallable(long number) {
+        MockExternalizable(long number) {
             this.number = number;
         }
 
         @Override
-        public void readMarshallable(@NotNull Bytes in) throws IllegalStateException {
-            number = in.readLong();
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeLong(number);
         }
 
         @Override
-        public void writeMarshallable(@NotNull Bytes out) {
-            out.writeLong(number);
+        public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+            number = in.readLong();
         }
 
         @Override
@@ -67,7 +71,7 @@ public class ByteMarshallableMarshallerTest {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            MockBytesMarshallable that = (MockBytesMarshallable) o;
+            MockExternalizable that = (MockExternalizable) o;
 
             if (number != that.number) return false;
 

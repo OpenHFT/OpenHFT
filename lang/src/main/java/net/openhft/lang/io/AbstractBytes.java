@@ -17,8 +17,11 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.Maths;
-import net.openhft.lang.io.impl.NoMarshaller;
-import net.openhft.lang.io.impl.VanillaBytesMarshallerFactory;
+import net.openhft.lang.io.serialization.impl.NoMarshaller;
+import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
+import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.io.serialization.BytesMarshaller;
+import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.pool.StringInterner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

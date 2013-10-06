@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 

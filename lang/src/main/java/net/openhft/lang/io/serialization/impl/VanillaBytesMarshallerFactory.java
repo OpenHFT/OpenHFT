@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io.impl;
+package net.openhft.lang.io.serialization.impl;
 
-import net.openhft.lang.io.BytesMarshallable;
-import net.openhft.lang.io.BytesMarshaller;
-import net.openhft.lang.io.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.io.serialization.BytesMarshaller;
+import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Externalizable;

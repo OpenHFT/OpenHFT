@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io;
+package net.openhft.lang.io.serialization.impl;
 
-import org.jetbrains.annotations.Nullable;
+import net.openhft.lang.io.Bytes;
+import net.openhft.lang.io.serialization.BytesMarshaller;
 
 /**
- * External marshaller for classes.
- *
- * @author peter.lawrey
- * @see BytesMarshallable
+ * Created with IntelliJ IDEA. User: peter Date: 19/09/13 Time: 18:26 To change this template use File | Settings | File
+ * Templates.
  */
-public interface BytesMarshaller<E> {
-    /**
-     * write the object out as bytes.
-     *
-     * @param bytes to write to
-     * @param e     to write
-     */
-    void write(Bytes bytes, E e);
+public enum NoMarshaller implements BytesMarshaller<Void> {
+    INSTANCE;
 
-    /**
-     * Read bytes and obtain an object
-     *
-     * @param bytes to read
-     * @return the object
-     */
-    @Nullable
-    E read(Bytes bytes);
+    @Override
+    public void write(Bytes bytes, Void aVoid) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Void read(Bytes bytes) {
+        throw new UnsupportedOperationException();
+    }
 }

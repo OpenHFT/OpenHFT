@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io;
+package net.openhft.lang.io.serialization;
 
 import org.jetbrains.annotations.NotNull;
 
