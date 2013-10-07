@@ -38,7 +38,9 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         Method[] methods = type.getMethods();
         for (Method method : methods) {
             Class<?> declaringClass = method.getDeclaringClass();
-            if (declaringClass == Object.class || declaringClass == Externalizable.class)
+            if (declaringClass == Object.class
+                    || declaringClass == Externalizable.class
+                    || declaringClass == Byteable.class)
                 continue;
             String name = method.getName();
             Class<?>[] parameterTypes = method.getParameterTypes();
@@ -109,14 +111,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
 
         static {
-            HEAP_SIZE_MAP.put(boolean.class, 0);
-            HEAP_SIZE_MAP.put(byte.class, 1);
-            HEAP_SIZE_MAP.put(char.class, 2);
-            HEAP_SIZE_MAP.put(short.class, 2);
-            HEAP_SIZE_MAP.put(int.class, 4);
-            HEAP_SIZE_MAP.put(float.class, 4);
-            HEAP_SIZE_MAP.put(long.class, 8);
-            HEAP_SIZE_MAP.put(double.class, 8);
+            HEAP_SIZE_MAP.put(boolean.class, 1);
+            HEAP_SIZE_MAP.put(byte.class, 8);
+            HEAP_SIZE_MAP.put(char.class, 16);
+            HEAP_SIZE_MAP.put(short.class, 16);
+            HEAP_SIZE_MAP.put(int.class, 32);
+            HEAP_SIZE_MAP.put(float.class, 32);
+            HEAP_SIZE_MAP.put(long.class, 64);
+            HEAP_SIZE_MAP.put(double.class, 64);
         }
 
         private final String name;
@@ -155,6 +157,13 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         public int heapSize() {
             Integer size = HEAP_SIZE_MAP.get(type());
             if (size == null) return -1;
+            return size;
+        }
+
+        @Override
+        public int nativeSize() {
+            Integer size = HEAP_SIZE_MAP.get(type());
+            if (size == null) throw new AssertionError(type() + " not supported for native types");
             return size;
         }
 

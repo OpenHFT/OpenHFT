@@ -18,6 +18,7 @@ package net.openhft.lang.model;
 
 import net.openhft.compiler.CachedCompiler;
 import net.openhft.lang.io.ByteBufferBytes;
+import net.openhft.lang.io.Bytes;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -33,11 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class DataValueGeneratorTest {
     @Test
     public void testGenerateJavaCode() throws Exception {
-        String actual = new DataValueGenerator().generateJavaCode(JavaBeanInterface.class);
-//        System.out.println(actual);
-        CachedCompiler cc = new CachedCompiler(null, null);
-        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + '_', actual);
-        JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
+        JavaBeanInterface jbi = new DataValueGenerator().heapInstance(JavaBeanInterface.class);
         jbi.setByte((byte) 1);
         jbi.setChar('2');
         jbi.setShort((short) 3);
@@ -58,10 +55,9 @@ public class DataValueGeneratorTest {
 
     @Test
     public void testGenerateJavaCode2() throws Exception {
-        String actual = new DataValueGenerator().generateJavaCode(MinimalInterface.class);
-        CachedCompiler cc = new CachedCompiler(null, null);
-        Class aClass = cc.loadFromJava(MinimalInterface.class.getName() + '_', actual);
-        MinimalInterface mi = (MinimalInterface) aClass.asSubclass(MinimalInterface.class).newInstance();
+        DataValueGenerator dvg = new DataValueGenerator();
+        MinimalInterface mi = dvg.heapInstance(MinimalInterface.class);
+
         mi.byte$((byte) 1);
         mi.char$('2');
         mi.short$((short) 3);
@@ -84,7 +80,7 @@ public class DataValueGeneratorTest {
         mi.writeExternal(bbb);
         System.out.println("size: " + bbb.position());
 
-        MinimalInterface mi2 = (MinimalInterface) aClass.newInstance();
+        MinimalInterface mi2 = dvg.heapInstance(MinimalInterface.class);
         bbb.position(0);
         mi2.readExternal(bbb);
 
@@ -98,4 +94,33 @@ public class DataValueGeneratorTest {
         assertEquals(7.0, mi2.double$(), 0.0);
         assertTrue(mi2.flag());
     }
+
+    @Test
+    public void testGenerateNative() throws Exception {
+        String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterface.class);
+//        System.out.println(actual);
+        CachedCompiler cc = new CachedCompiler(null, null);
+        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "$native", actual);
+        JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
+        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
+        ((Byteable) jbi).bytes(bytes);
+        jbi.setByte((byte) 1);
+        jbi.setChar('2');
+        jbi.setShort((short) 3);
+        jbi.setInt(4);
+        jbi.setFloat(5);
+        jbi.setLong(6);
+        jbi.setDouble(7);
+        jbi.setFlag(true);
+        assertEquals(1, jbi.getByte());
+        assertEquals('2', jbi.getChar());
+        assertEquals(3, jbi.getShort());
+        assertEquals(4, jbi.getInt());
+        assertEquals(5.0, jbi.getFloat(), 0);
+        assertEquals(6, jbi.getLong());
+        assertEquals(7.0, jbi.getDouble(), 0.0);
+        assertTrue(jbi.getFlag());
+    }
+
+
 }

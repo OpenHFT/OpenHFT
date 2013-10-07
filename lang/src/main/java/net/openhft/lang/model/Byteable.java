@@ -16,23 +16,15 @@
 
 package net.openhft.lang.model;
 
-import java.lang.reflect.Method;
+import net.openhft.lang.io.Bytes;
 
 /**
  * User: plawrey
- * Date: 06/10/13
- * Time: 18:22
+ * Date: 07/10/13
+ * Time: 21:38
  */
-public interface FieldModel<T> {
-    String name();
+public interface Byteable {
+    void bytes(Bytes bytes);
 
-    Method getter();
-
-    Method setter();
-
-    Class<T> type();
-
-    int heapSize();
-
-    int nativeSize();
+    Bytes bytes();
 }
