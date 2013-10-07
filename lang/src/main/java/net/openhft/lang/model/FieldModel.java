@@ -31,4 +31,6 @@ public interface FieldModel<T> {
     Method setter();
 
     Class<T> type();
+
+    int heapSize();
 }

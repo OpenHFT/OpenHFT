@@ -34,6 +34,7 @@ public class DataValueGeneratorTest {
     @Test
     public void testGenerateJavaCode() throws Exception {
         String actual = new DataValueGenerator().generateJavaCode(JavaBeanInterface.class);
+//        System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
         Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + '_', actual);
         JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();

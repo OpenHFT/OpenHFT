@@ -18,6 +18,7 @@ package net.openhft.lang.model;
 
 import java.io.Externalizable;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -105,6 +106,19 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
     }
 
     static class FieldModelImpl<T> implements FieldModel<T> {
+        static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
+
+        static {
+            HEAP_SIZE_MAP.put(boolean.class, 0);
+            HEAP_SIZE_MAP.put(byte.class, 1);
+            HEAP_SIZE_MAP.put(char.class, 2);
+            HEAP_SIZE_MAP.put(short.class, 2);
+            HEAP_SIZE_MAP.put(int.class, 4);
+            HEAP_SIZE_MAP.put(float.class, 4);
+            HEAP_SIZE_MAP.put(long.class, 8);
+            HEAP_SIZE_MAP.put(double.class, 8);
+        }
+
         private final String name;
         Method getter, setter;
 
@@ -135,6 +149,13 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         @Override
         public Class<T> type() {
             return (Class<T>) getter.getReturnType();
+        }
+
+        @Override
+        public int heapSize() {
+            Integer size = HEAP_SIZE_MAP.get(type());
+            if (size == null) return -1;
+            return size;
         }
 
         @Override

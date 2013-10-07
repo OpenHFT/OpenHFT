@@ -20,10 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * User: plawrey
@@ -36,6 +33,14 @@ public class DataValueGenerator {
         @Override
         public int compare(Class o1, Class o2) {
             return o1.getName().compareTo(o2.getName());
+        }
+    };
+    public static final Comparator<Map.Entry<String, FieldModel>> COMPARE_BY_HEAP_SIZE = new Comparator<Map.Entry<String, FieldModel>>() {
+        @Override
+        public int compare(Map.Entry<String, FieldModel> o1, Map.Entry<String, FieldModel> o2) {
+            // descending
+            int cmp = -Integer.compare(o1.getValue().heapSize(), o2.getValue().heapSize());
+            return cmp == 0 ? o1.getKey().compareTo(o2.getKey()) : cmp;
         }
     };
 
@@ -54,7 +59,10 @@ public class DataValueGenerator {
         StringBuilder getterSetters = new StringBuilder();
         StringBuilder writeExtern = new StringBuilder();
         StringBuilder readExtern = new StringBuilder();
-        for (Map.Entry<String, ? extends FieldModel> entry : dvmodel.fieldMap().entrySet()) {
+        Map<String, ? extends FieldModel> fieldMap = dvmodel.fieldMap();
+        Map.Entry<String, FieldModel>[] entries = fieldMap.entrySet().toArray(new Map.Entry[fieldMap.size()]);
+        Arrays.sort(entries, COMPARE_BY_HEAP_SIZE);
+        for (Map.Entry<String, ? extends FieldModel> entry : entries) {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
             Class type = model.type();
