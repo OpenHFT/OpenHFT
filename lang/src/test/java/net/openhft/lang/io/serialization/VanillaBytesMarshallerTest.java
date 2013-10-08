@@ -22,7 +22,7 @@ import sun.nio.ch.DirectBuffer;
 
 import java.nio.ByteBuffer;
 
-import static org.junit.Assert.assertEquals;
+import static net.openhft.lang.Assert.assertEquals;
 
 /**
  * User: peter

@@ -19,7 +19,7 @@ package net.openhft.lang.collection;
 import net.openhft.lang.model.JavaBeanInterface;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static net.openhft.lang.Assert.assertEquals;
 
 /**
  * User: plawrey

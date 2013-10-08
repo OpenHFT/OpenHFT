@@ -18,7 +18,7 @@ package net.openhft.lang.io;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static net.openhft.lang.Assert.*;
 
 /**
  * User: peter

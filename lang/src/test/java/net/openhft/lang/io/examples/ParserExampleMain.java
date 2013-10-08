@@ -21,7 +21,7 @@ import net.openhft.lang.io.StopCharTesters;
 
 import java.nio.ByteBuffer;
 
-import static org.junit.Assert.assertEquals;
+import static net.openhft.lang.Assert.assertEquals;
 
 /**
  * Run with -verbosegc -Xmx32m

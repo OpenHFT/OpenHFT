@@ -18,14 +18,13 @@ package net.openhft.lang.io.serialization;
 
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.NativeBytes;
-import net.openhft.lang.io.serialization.BytesMarshallable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import sun.nio.ch.DirectBuffer;
 
 import java.nio.ByteBuffer;
 
-import static org.junit.Assert.assertEquals;
+import static net.openhft.lang.Assert.assertEquals;
 
 /**
  * User: peter

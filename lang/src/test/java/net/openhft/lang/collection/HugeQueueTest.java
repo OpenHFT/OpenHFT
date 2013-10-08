@@ -19,8 +19,8 @@ package net.openhft.lang.collection;
 import net.openhft.lang.model.JavaBeanInterface;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static net.openhft.lang.Assert.assertEquals;
+import static net.openhft.lang.Assert.assertTrue;
 
 /**
  * User: plawrey
@@ -46,6 +46,7 @@ public class HugeQueueTest {
                 jbi.setLong(i);
                 jbi.setDouble(i);
                 jbi.setFlag((i & 3) == 0);
+                queue.recycle(jbi);
             }
             assertTrue(queue.isFull());
             for (int i = 0; i < length; i++) {

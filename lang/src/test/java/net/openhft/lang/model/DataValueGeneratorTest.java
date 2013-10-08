@@ -23,8 +23,8 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static net.openhft.lang.Assert.assertEquals;
+import static net.openhft.lang.Assert.assertTrue;
 
 /**
  * User: plawrey

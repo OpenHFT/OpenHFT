@@ -31,9 +31,9 @@ import java.util.concurrent.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static net.openhft.lang.Assert.*;
 import static net.openhft.lang.io.StopCharTesters.CONTROL_STOP;
 import static net.openhft.lang.io.StopCharTesters.SPACE_STOP;
-import static org.junit.Assert.*;
 
 /**
  * Created with IntelliJ IDEA. User: peter Date: 17/09/13 Time: 16:09 To change this template use File | Settings | File
