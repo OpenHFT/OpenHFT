@@ -34,7 +34,9 @@ import static org.junit.Assert.assertTrue;
 public class DataValueGeneratorTest {
     @Test
     public void testGenerateJavaCode() throws Exception {
-        JavaBeanInterface jbi = new DataValueGenerator().heapInstance(JavaBeanInterface.class);
+        DataValueGenerator dvg = new DataValueGenerator();
+//        dvg.setDumpCode(true);
+        JavaBeanInterface jbi = dvg.heapInstance(JavaBeanInterface.class);
         jbi.setByte((byte) 1);
         jbi.setChar('2');
         jbi.setShort((short) 3);
@@ -163,5 +165,9 @@ public class DataValueGeneratorTest {
         assertEquals(nestedB1.bid(), nestedA.one().bid(), 0.0);
         assertEquals(nestedB2.ask(), nestedA.two().ask(), 0.0);
         assertEquals(nestedB2.bid(), nestedA.two().bid(), 0.0);
+        assertEquals(nestedB1, nestedA.one());
+        assertEquals(nestedB2, nestedA.two());
+        assertEquals(nestedB1.hashCode(), nestedA.one().hashCode());
+        assertEquals(nestedB2.hashCode(), nestedA.two().hashCode());
     }
 }

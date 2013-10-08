@@ -16,7 +16,7 @@
 
 package net.openhft.lang.io.serialization.impl;
 
-import net.openhft.lang.Maths;
+import net.openhft.lang.Compare;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import org.jetbrains.annotations.NotNull;
@@ -75,7 +75,7 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
 
     @Nullable
     private Class load(@NotNull CharSequence name) {
-        int hash = (int) (Maths.hashOf(name) & 0x7ffffff) % CACHE_SIZE;
+        int hash = (int) (Compare.calcLongHashCode(name) & 0x7ffffff) % CACHE_SIZE;
         if (classWeakReference == null)
             //noinspection unchecked
             classWeakReference = new WeakReference[CACHE_SIZE];

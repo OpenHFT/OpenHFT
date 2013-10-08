@@ -17,6 +17,7 @@
 package net.openhft.lang.model;
 
 import net.openhft.compiler.CachedCompiler;
+import net.openhft.lang.Compare;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 
@@ -114,6 +115,7 @@ public class DataValueGenerator {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(dvmodel.type().getPackage().getName()).append(";\n\n");
+        sb.append("import static ").append(Compare.class.getName()).append(".*;\n");
         for (Class aClass : imported) {
             sb.append("import ").append(aClass.getName()).append(";\n");
         }
@@ -145,9 +147,58 @@ public class DataValueGenerator {
             sb.append("       throw new UnsupportedOperationException();\n");
             sb.append("    }\n");
         }
+        generateObjectMethods(sb, dvmodel, entries);
         sb.append("}\n");
 
         return sb.toString();
+    }
+
+    private void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel, Map.Entry<String, FieldModel>[] entries) {
+        int count = 0;
+        StringBuilder hashCode = new StringBuilder();
+        StringBuilder equals = new StringBuilder();
+        StringBuilder toString = new StringBuilder();
+        for (Map.Entry<String, FieldModel> entry : entries) {
+            String name = entry.getKey();
+            FieldModel model = entry.getValue();
+            Class type = model.type();
+            if (count > 0)
+                hashCode.append(") * 10191 +\n            ");
+            String getterName = model.getter().getName();
+            hashCode.append("calcLongHashCode(").append(getterName).append("())");
+            equals.append("        if(!isEqual(").append(getterName).append("(), that.").append(getterName).append("())) return false;\n");
+            toString.append("            \", ").append(name).append("= \" + ").append(getterName).append("() +\n");
+            count++;
+        }
+        sb.append("    public int hashCode() {\n" +
+                "        long lhc = longHashCode();\n" +
+                "        return (int) ((lhc >>> 32) ^ lhc);\n" +
+                "    }\n" +
+                "\n" +
+                "    public long longHashCode() {\n" +
+                "        return ");
+        for (int i = 1; i < count; i++)
+            sb.append('(');
+        sb.append(hashCode);
+        String simpleName = dvmodel.type().getSimpleName();
+        sb.append(";\n")
+                .append("    }\n")
+                .append("\n")
+                .append("    public boolean equals(Object o) {\n")
+                .append("        if (this == o) return true;\n")
+                .append("        if (!(o instanceof ").append(simpleName).append(")) return false;\n")
+                .append("        ").append(simpleName).append(" that = (").append(simpleName).append(") o;\n")
+                .append("\n")
+                .append(equals)
+                .append("        return true;\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    public String toString() {\n" +
+                        "        return \"").append(simpleName).append(" {\" +\n")
+                .append(toString.substring(0, toString.length() - 3)).append(";\n")
+                .append("    }");
+
+
     }
 
     public <T> T nativeInstance(Class<T> tClass) {
@@ -254,6 +305,7 @@ public class DataValueGenerator {
                 .append("    private long _offset;\n");
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(dvmodel.type().getPackage().getName()).append(";\n\n");
+        sb.append("import static ").append(Compare.class.getName()).append(".*;\n");
         for (Class aClass : imported) {
             sb.append("import ").append(aClass.getName()).append(";\n");
         }
@@ -286,6 +338,7 @@ public class DataValueGenerator {
         sb.append("    public int maxSize() {\n");
         sb.append("       return ").append(offset).append(";\n");
         sb.append("    }\n");
+        generateObjectMethods(sb, dvmodel, entries);
         sb.append("}\n");
 
         return sb.toString();
