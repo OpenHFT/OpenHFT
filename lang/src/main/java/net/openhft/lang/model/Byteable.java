@@ -26,6 +26,8 @@ import net.openhft.lang.io.Bytes;
 public interface Byteable {
     void bytes(Bytes bytes);
 
+    void bytes(Bytes bytes, long offset);
+
     Bytes bytes();
 
     int maxSize();

@@ -26,6 +26,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -36,11 +37,13 @@ import java.util.TreeMap;
 public class DataValueModelImpl<T> implements DataValueModel<T> {
     private final Map<String, FieldModelImpl> fieldModelMap = new TreeMap<String, FieldModelImpl>();
     private final Class<T> type;
+    private final Map<Class, DataValueModel> nestedMap = new HashMap<Class, DataValueModel>();
 
     public DataValueModelImpl(Class<T> type) {
         this.type = type;
         if (!type.isInterface())
             throw new IllegalArgumentException("type must be an interface, was " + type);
+
         Method[] methods = type.getMethods();
         for (Method method : methods) {
             Class<?> declaringClass = method.getDeclaringClass();
@@ -79,6 +82,9 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             FieldModelImpl model = entry.getValue();
             if (model.getter() == null || model.setter() == null)
                 throw new IllegalArgumentException("Field " + entry.getKey() + " must have a getter and setter.");
+            Class ftype = model.type();
+            if (!isScalar(ftype) && !nestedMap.containsKey(ftype))
+                nestedMap.put(ftype, new DataValueModelImpl(ftype));
         }
     }
 
@@ -110,24 +116,41 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         return fieldModelMap;
     }
 
+    public boolean isScalar(Class type) {
+        return type.isPrimitive() || CharSequence.class.isAssignableFrom(type);
+    }
+
+    @Override
+    public Set<Class> nestedModels() {
+        return nestedMap.keySet();
+    }
+
+    @Override
+    public <N> DataValueModel<N> nestedModel(Class<N> nClass) {
+        @SuppressWarnings("unchecked")
+        DataValueModel<N> model = (DataValueModel<N>) (nClass == type ? this : nestedMap.get(nClass));
+        return model;
+    }
+
     @Override
     public Class<T> type() {
         return type;
     }
 
-    static class FieldModelImpl<T> implements FieldModel<T> {
-        static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
+    static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
 
-        static {
-            HEAP_SIZE_MAP.put(boolean.class, 1);
-            HEAP_SIZE_MAP.put(byte.class, 8);
-            HEAP_SIZE_MAP.put(char.class, 16);
-            HEAP_SIZE_MAP.put(short.class, 16);
-            HEAP_SIZE_MAP.put(int.class, 32);
-            HEAP_SIZE_MAP.put(float.class, 32);
-            HEAP_SIZE_MAP.put(long.class, 64);
-            HEAP_SIZE_MAP.put(double.class, 64);
-        }
+    static {
+        HEAP_SIZE_MAP.put(boolean.class, 1);
+        HEAP_SIZE_MAP.put(byte.class, 8);
+        HEAP_SIZE_MAP.put(char.class, 16);
+        HEAP_SIZE_MAP.put(short.class, 16);
+        HEAP_SIZE_MAP.put(int.class, 32);
+        HEAP_SIZE_MAP.put(float.class, 32);
+        HEAP_SIZE_MAP.put(long.class, 64);
+        HEAP_SIZE_MAP.put(double.class, 64);
+    }
+
+    static class FieldModelImpl<T> implements FieldModel<T> {
 
         private final String name;
         private Method getter, setter;

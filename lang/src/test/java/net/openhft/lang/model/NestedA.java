@@ -16,22 +16,24 @@
 
 package net.openhft.lang.model;
 
-import java.util.Map;
-import java.util.Set;
+import net.openhft.lang.constraints.Size;
 
 /**
  * User: plawrey
- * Date: 06/10/13
- * Time: 17:06
+ * Date: 08/10/13
+ * Time: 10:11
  */
-public interface DataValueModel<T> {
-    Map<String, ? extends FieldModel> fieldMap();
+public interface NestedA {
+    void key(@Size String key);
 
-    boolean isScalar(Class<?> nClass);
+    String key();
 
-    Set<Class> nestedModels();
+    void one(NestedB one);
 
-    <N> DataValueModel<N> nestedModel(Class<N> nClass);
+    NestedB one();
 
-    Class<T> type();
+    void two(NestedB one);
+
+    NestedB two();
+
 }

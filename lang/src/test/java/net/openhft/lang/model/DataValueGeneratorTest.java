@@ -141,6 +141,27 @@ public class DataValueGeneratorTest {
         si2.setText("Hello world £€");
         assertEquals("Hello world £€", si2.getString());
         assertEquals("Hello world £€", si2.getText());
+    }
 
+    @Test
+    public void testNested() {
+        DataValueGenerator dvg = new DataValueGenerator();
+        NestedB nestedB1 = dvg.heapInstance(NestedB.class);
+        nestedB1.ask(100);
+        nestedB1.bid(100);
+        NestedB nestedB2 = dvg.heapInstance(NestedB.class);
+        nestedB2.ask(91);
+        nestedB2.bid(92);
+        NestedA nestedA = dvg.nativeInstance(NestedA.class);
+        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
+        ((Byteable) nestedA).bytes(bytes);
+        nestedA.key("key");
+        nestedA.one(nestedB1);
+        nestedA.two(nestedB2);
+        assertEquals("key", nestedA.key());
+        assertEquals(nestedB1.ask(), nestedA.one().ask(), 0.0);
+        assertEquals(nestedB1.bid(), nestedA.one().bid(), 0.0);
+        assertEquals(nestedB2.ask(), nestedA.two().ask(), 0.0);
+        assertEquals(nestedB2.bid(), nestedA.two().bid(), 0.0);
     }
 }

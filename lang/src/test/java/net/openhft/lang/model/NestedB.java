@@ -16,22 +16,19 @@
 
 package net.openhft.lang.model;
 
-import java.util.Map;
-import java.util.Set;
+import net.openhft.lang.constraints.Digits;
 
 /**
  * User: plawrey
- * Date: 06/10/13
- * Time: 17:06
+ * Date: 08/10/13
+ * Time: 10:24
  */
-public interface DataValueModel<T> {
-    Map<String, ? extends FieldModel> fieldMap();
+public interface NestedB {
+    void bid(@Digits double bid);
 
-    boolean isScalar(Class<?> nClass);
+    double bid();
 
-    Set<Class> nestedModels();
+    void ask(@Digits double ask);
 
-    <N> DataValueModel<N> nestedModel(Class<N> nClass);
-
-    Class<T> type();
+    double ask();
 }
