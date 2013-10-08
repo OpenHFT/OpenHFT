@@ -155,7 +155,7 @@ public class DataValueGenerator {
         if (nativeClass != null)
             return nativeClass;
         String actual = new DataValueGenerator().generateNativeObject(tClass);
-        System.out.println(actual);
+//        System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
         nativeClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "$native", actual);
         nativeClassMap.put(tClass, nativeClass);
