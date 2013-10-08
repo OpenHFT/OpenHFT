@@ -46,6 +46,7 @@
             <version>2.0</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>

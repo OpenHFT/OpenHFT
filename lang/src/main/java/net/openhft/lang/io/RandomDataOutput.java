@@ -696,6 +696,18 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     void writeUTFΔ(@Nullable CharSequence s);
 
+
+    /**
+     * Write the same encoding as <code>writeUTF</code> with the following changes.  1) The length is stop bit encoded
+     * i.e. one byte longer for short strings, but is not limited in length. 2) The string can be null.
+     *
+     * @param offset  to write to
+     * @param maxSize maximum number of bytes to use
+     * @param s       the string value to be written. Can be null.
+     * @throws IllegalStateException if the size is too large.
+     */
+    void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException;
+
     /**
      * Copies the contents of a ByteBuffer from the potision ot the limit.
      *

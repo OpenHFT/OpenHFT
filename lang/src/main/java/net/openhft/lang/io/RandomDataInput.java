@@ -704,6 +704,16 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     String readUTFΔ();
 
     /**
+     * The same as readUTFΔ() except an offset and maximum length is given.
+     *
+     * @param offset to read from
+     * @return a Unicode string or <code>null</code> if <code>writeUTFΔ(null)</code> was called
+     * @throws IllegalStateException if the length to be read is out of range.
+     */
+    @Nullable
+    String readUTFΔ(long offset) throws IllegalStateException;
+
+    /**
      * The same as readUTFΔ() except the chars are copied to a truncated StringBuilder.
      *
      * @return <code>true</code> if there was a String, or <code>false</code> if it was <code>null</code>

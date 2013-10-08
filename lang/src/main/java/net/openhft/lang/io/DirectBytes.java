@@ -36,4 +36,8 @@ public class DirectBytes extends NativeBytes {
         startAddr = positionAddr = store.address + offset;
         limitAddr = startAddr + size;
     }
+
+    public DirectStore store() {
+        return store;
+    }
 }

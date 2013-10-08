@@ -16,6 +16,10 @@
 
 package net.openhft.lang.model;
 
+import net.openhft.lang.constraints.Digits;
+import net.openhft.lang.constraints.Range;
+import net.openhft.lang.constraints.Size;
+
 import java.lang.reflect.Method;
 
 /**
@@ -35,4 +39,10 @@ public interface FieldModel<T> {
     int heapSize();
 
     int nativeSize();
+
+    Digits digits();
+
+    Range range();
+
+    Size size();
 }

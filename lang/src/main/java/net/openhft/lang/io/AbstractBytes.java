@@ -17,11 +17,11 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.Maths;
-import net.openhft.lang.io.serialization.impl.NoMarshaller;
-import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.impl.NoMarshaller;
+import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.pool.StringInterner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -269,6 +269,18 @@ public abstract class AbstractBytes implements Bytes {
         return null;
     }
 
+    @Nullable
+    @Override
+    public String readUTFΔ(long offset) throws IllegalStateException {
+        long position = position();
+        try {
+            position(offset);
+            return readUTFΔ();
+        } finally {
+            position(position);
+        }
+    }
+
     @NotNull
     private StringBuilder acquireUtfReader() {
         if (utfReader == null)
@@ -346,7 +358,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 case 14: {
-				/* 1110 xxxx 10xx xxxx 10xx xxxx */
+                /* 1110 xxxx 10xx xxxx 10xx xxxx */
                     count += 3;
                     if (count > utflen)
                         throw new UTFDataFormatException(
@@ -364,7 +376,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 default:
-				/* 10xx xxxx, 1111 xxxx */
+                /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
                             "malformed input around byte " + count);
             }
@@ -411,14 +423,14 @@ public abstract class AbstractBytes implements Bytes {
                 case 5:
                 case 6:
                 case 7:
-				/* 0xxxxxxx */
+                /* 0xxxxxxx */
                     if (tester.isStopChar(c))
                         return;
                     appendable.append((char) c);
                     break;
                 case 12:
                 case 13: {
-				/* 110x xxxx 10xx xxxx */
+                /* 110x xxxx 10xx xxxx */
                     int char2 = readUnsignedByte();
                     if ((char2 & 0xC0) != 0x80)
                         throw new UTFDataFormatException(
@@ -431,7 +443,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 case 14: {
-				/* 1110 xxxx 10xx xxxx 10xx xxxx */
+                /* 1110 xxxx 10xx xxxx 10xx xxxx */
 
                     int char2 = readUnsignedByte();
                     int char3 = readUnsignedByte();
@@ -448,7 +460,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 default:
-				/* 10xx xxxx, 1111 xxxx */
+                /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
                             "malformed input around byte ");
             }
@@ -671,8 +683,10 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeUTF(@NotNull String str) {
         long strlen = str.length();
-        int utflen = findUTFLength(str, strlen);
-        writeUnsignedShort(utflen);
+        long utflen = findUTFLength(str, strlen);
+        if (utflen > 65535)
+            throw new IllegalStateException("String too long " + utflen + " when encoded, max: 65535");
+        writeUnsignedShort((int) utflen);
         writeUTF0(str, strlen);
     }
 
@@ -683,9 +697,31 @@ public abstract class AbstractBytes implements Bytes {
             return;
         }
         long strlen = str.length();
-        int utflen = findUTFLength(str, strlen);
+        long utflen = findUTFLength(str, strlen);
         writeStopBit(utflen);
         writeUTF0(str, strlen);
+    }
+
+    @Override
+    public void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException {
+        assert maxSize > 1;
+        if (s == null) {
+            writeStopBit(-1);
+            return;
+        }
+        long strlen = s.length();
+        long utflen = findUTFLength(s, strlen);
+        long totalSize = IOTools.stopBitLength(utflen) + utflen;
+        if (totalSize > maxSize)
+            throw new IllegalStateException("Attempted to write " + totalSize + " byte String, when only " + maxSize + " allowed");
+        long position = position();
+        try {
+            position(offset);
+            writeStopBit(utflen);
+            writeUTF0(s, strlen);
+        } finally {
+            position(position);
+        }
     }
 
     @NotNull
@@ -697,8 +733,8 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
-    private int findUTFLength(@NotNull CharSequence str, long strlen) {
-        int utflen = 0, c;/* use charAt instead of copying String to char array */
+    private long findUTFLength(@NotNull CharSequence str, long strlen) {
+        long utflen = 0, c;/* use charAt instead of copying String to char array */
         for (int i = 0; i < strlen; i++) {
             c = str.charAt(i);
             if ((c >= 0x0001) && (c <= 0x007F)) {

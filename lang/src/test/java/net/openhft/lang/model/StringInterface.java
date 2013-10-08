@@ -16,43 +16,19 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.constraints.Size;
 
 /**
  * User: plawrey
- * Date: 06/10/13
- * Time: 16:59
+ * Date: 08/10/13
+ * Time: 09:09
  */
-public interface MinimalInterface extends BytesMarshallable, Copyable<MinimalInterface>, Byteable {
-    void flag(boolean flag);
+public interface StringInterface {
+    void setString(@Size(64) String s);
 
-    boolean flag();
+    String getString();
 
-    void byte$(byte b);
+    void setText(@Size String s);
 
-    byte byte$();
-
-    void short$(short s);
-
-    short short$();
-
-    void char$(char ch);
-
-    char char$();
-
-    void int$(int i);
-
-    int int$();
-
-    void float$(float f);
-
-    float float$();
-
-    void long$(long l);
-
-    long long$();
-
-    void double$(double d);
-
-    double double$();
+    String getText();
 }

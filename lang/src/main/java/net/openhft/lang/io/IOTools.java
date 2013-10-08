@@ -44,4 +44,14 @@ public enum IOTools {
             close(closeable);
         }
     }
+
+    public static int stopBitLength(long l) {
+        if (l < 0) return stopBitLength(~l) + 1;
+        int count = 1;
+        while (l >= 128) {
+            l >>>= 7;
+            count++;
+        }
+        return count;
+    }
 }

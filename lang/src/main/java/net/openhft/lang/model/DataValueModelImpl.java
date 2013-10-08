@@ -16,7 +16,13 @@
 
 package net.openhft.lang.model;
 
+import net.openhft.lang.constraints.Digits;
+import net.openhft.lang.constraints.Range;
+import net.openhft.lang.constraints.Size;
+import net.openhft.lang.io.serialization.BytesMarshallable;
+
 import java.io.Externalizable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +46,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             Class<?> declaringClass = method.getDeclaringClass();
             if (declaringClass == Object.class
                     || declaringClass == Externalizable.class
+                    || declaringClass == BytesMarshallable.class
+                    || declaringClass == Copyable.class
                     || declaringClass == Byteable.class)
                 continue;
             String name = method.getName();
@@ -69,7 +77,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
         for (Map.Entry<String, FieldModelImpl> entry : fieldModelMap.entrySet()) {
             FieldModelImpl model = entry.getValue();
-            if (model.getter == null || model.setter == null)
+            if (model.getter() == null || model.setter() == null)
                 throw new IllegalArgumentException("Field " + entry.getKey() + " must have a getter and setter.");
         }
     }
@@ -122,7 +130,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
         private final String name;
-        Method getter, setter;
+        private Method getter, setter;
+        private Digits digits;
+        private Range range;
+        private Size size;
 
         public FieldModelImpl(String name) {
             this.name = name;
@@ -142,6 +153,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         public void setter(Method setter) {
             this.setter = setter;
+            for (Annotation a : setter.getParameterAnnotations()[0]) {
+                if (a instanceof Digits)
+                    digits = (Digits) a;
+                if (a instanceof Range)
+                    range = (Range) a;
+                if (a instanceof Size)
+                    size = (Size) a;
+            }
         }
 
         public Method setter() {
@@ -160,10 +179,30 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             return size;
         }
 
+        // size in bits.
         @Override
         public int nativeSize() {
             Integer size = HEAP_SIZE_MAP.get(type());
-            if (size == null) throw new AssertionError(type() + " not supported for native types");
+            if (size != null)
+                return size;
+            Size size2 = size();
+            if (size2 == null)
+                throw new AssertionError(type() + " without a @Size not supported for native types");
+            return size2.value() << 3;
+        }
+
+        @Override
+        public Digits digits() {
+            return digits;
+        }
+
+        @Override
+        public Range range() {
+            return range;
+        }
+
+        @Override
+        public Size size() {
             return size;
         }
 
@@ -173,6 +212,9 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     "name='" + name + '\'' +
                     ", getter=" + getter +
                     ", setter=" + setter +
+                    (digits == null ? "" : ", digits= " + digits) +
+                    (range == null ? "" : ", range= " + range) +
+                    (size == null ? "" : ", size= " + size) +
                     '}';
         }
     }

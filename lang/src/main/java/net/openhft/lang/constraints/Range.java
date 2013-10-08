@@ -14,45 +14,23 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.model;
+package net.openhft.lang.constraints;
 
-import net.openhft.lang.io.serialization.BytesMarshallable;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * User: plawrey
- * Date: 06/10/13
- * Time: 16:59
+ * The lowest to highest values allowed (inclusive)
  */
-public interface MinimalInterface extends BytesMarshallable, Copyable<MinimalInterface>, Byteable {
-    void flag(boolean flag);
+@Target(PARAMETER)
+@Retention(RUNTIME)
+@Documented
+public @interface Range {
+    long min() default Long.MIN_VALUE;
 
-    boolean flag();
-
-    void byte$(byte b);
-
-    byte byte$();
-
-    void short$(short s);
-
-    short short$();
-
-    void char$(char ch);
-
-    char char$();
-
-    void int$(int i);
-
-    int int$();
-
-    void float$(float f);
-
-    float float$();
-
-    void long$(long l);
-
-    long long$();
-
-    void double$(double d);
-
-    double double$();
+    long max() default Long.MAX_VALUE;
 }

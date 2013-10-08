@@ -16,43 +16,16 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.io.serialization.BytesMarshallable;
-
 /**
  * User: plawrey
- * Date: 06/10/13
- * Time: 16:59
+ * Date: 08/10/13
+ * Time: 07:45
  */
-public interface MinimalInterface extends BytesMarshallable, Copyable<MinimalInterface>, Byteable {
-    void flag(boolean flag);
-
-    boolean flag();
-
-    void byte$(byte b);
-
-    byte byte$();
-
-    void short$(short s);
-
-    short short$();
-
-    void char$(char ch);
-
-    char char$();
-
-    void int$(int i);
-
-    int int$();
-
-    void float$(float f);
-
-    float float$();
-
-    void long$(long l);
-
-    long long$();
-
-    void double$(double d);
-
-    double double$();
+public interface Copyable<T> {
+    /**
+     * Copy from this type.
+     *
+     * @param from to copy from
+     */
+    void copyFrom(T from);
 }

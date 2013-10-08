@@ -16,6 +16,8 @@
 
 package net.openhft.lang.model;
 
+import net.openhft.lang.constraints.Size;
+
 /**
  * User: plawrey
  * Date: 06/10/13
@@ -53,4 +55,8 @@ public interface JavaBeanInterface {
     void setDouble(double d);
 
     double getDouble();
+
+    void setString(@Size(8) String s);
+
+    String getString();
 }

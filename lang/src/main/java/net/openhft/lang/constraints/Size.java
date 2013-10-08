@@ -14,45 +14,21 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.model;
+package net.openhft.lang.constraints;
 
-import net.openhft.lang.io.serialization.BytesMarshallable;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * User: plawrey
- * Date: 06/10/13
- * Time: 16:59
+ * The maximum size <b>in encoded bytes</b> for a variable length data type.
  */
-public interface MinimalInterface extends BytesMarshallable, Copyable<MinimalInterface>, Byteable {
-    void flag(boolean flag);
-
-    boolean flag();
-
-    void byte$(byte b);
-
-    byte byte$();
-
-    void short$(short s);
-
-    short short$();
-
-    void char$(char ch);
-
-    char char$();
-
-    void int$(int i);
-
-    int int$();
-
-    void float$(float f);
-
-    float float$();
-
-    void long$(long l);
-
-    long long$();
-
-    void double$(double d);
-
-    double double$();
+@Target(PARAMETER)
+@Retention(RUNTIME)
+@Documented
+public @interface Size {
+    int value() default 128;
 }

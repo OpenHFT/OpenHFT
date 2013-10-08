@@ -14,45 +14,21 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.model;
+package net.openhft.lang.collection;
 
-import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.model.DataValueGenerator;
 
 /**
  * User: plawrey
- * Date: 06/10/13
- * Time: 16:59
+ * Date: 08/10/13
+ * Time: 08:09
  */
-public interface MinimalInterface extends BytesMarshallable, Copyable<MinimalInterface>, Byteable {
-    void flag(boolean flag);
+public enum HugeArrays {
+    ;
 
-    boolean flag();
+    private static final DataValueGenerator VALUE_GENERATOR = new DataValueGenerator();
 
-    void byte$(byte b);
-
-    byte byte$();
-
-    void short$(short s);
-
-    short short$();
-
-    void char$(char ch);
-
-    char char$();
-
-    void int$(int i);
-
-    int int$();
-
-    void float$(float f);
-
-    float float$();
-
-    void long$(long l);
-
-    long long$();
-
-    void double$(double d);
-
-    double double$();
+    public static <T> HugeArray<T> create(Class<T> tClass, long length) {
+        return new HugeArrayImpl<T>(VALUE_GENERATOR, tClass, length);
+    }
 }

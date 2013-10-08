@@ -77,12 +77,12 @@ public class DataValueGeneratorTest {
         assertTrue(mi.flag());
 
         ByteBufferBytes bbb = new ByteBufferBytes(ByteBuffer.allocate(64));
-        mi.writeExternal(bbb);
+        mi.writeMarshallable(bbb);
         System.out.println("size: " + bbb.position());
 
         MinimalInterface mi2 = dvg.heapInstance(MinimalInterface.class);
         bbb.position(0);
-        mi2.readExternal(bbb);
+        mi2.readMarshallable(bbb);
 
 
         assertEquals(1, mi2.byte$());
@@ -112,6 +112,8 @@ public class DataValueGeneratorTest {
         jbi.setLong(6);
         jbi.setDouble(7);
         jbi.setFlag(true);
+        assertEquals("", jbi.getString());
+        jbi.setString("G'day");
         assertEquals(1, jbi.getByte());
         assertEquals('2', jbi.getChar());
         assertEquals(3, jbi.getShort());
@@ -120,7 +122,25 @@ public class DataValueGeneratorTest {
         assertEquals(6, jbi.getLong());
         assertEquals(7.0, jbi.getDouble(), 0.0);
         assertTrue(jbi.getFlag());
+        assertEquals("G'day", jbi.getString());
+        assertEquals(38, ((Byteable) jbi).maxSize());
     }
 
 
+    @Test
+    public void testStringFields() {
+        DataValueGenerator dvg = new DataValueGenerator();
+        StringInterface si = dvg.heapInstance(StringInterface.class);
+        si.setString("Hello world");
+        assertEquals("Hello world", si.getString());
+
+        StringInterface si2 = dvg.nativeInstance(StringInterface.class);
+        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
+        ((Byteable) si2).bytes(bytes);
+        si2.setString("Hello world £€");
+        si2.setText("Hello world £€");
+        assertEquals("Hello world £€", si2.getString());
+        assertEquals("Hello world £€", si2.getText());
+
+    }
 }

@@ -27,4 +27,6 @@ public interface Byteable {
     void bytes(Bytes bytes);
 
     Bytes bytes();
+
+    int maxSize();
 }
