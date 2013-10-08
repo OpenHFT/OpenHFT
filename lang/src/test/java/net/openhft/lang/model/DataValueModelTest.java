@@ -47,7 +47,7 @@ public class DataValueModelTest {
                 " int=FieldModel{name='int', getter=public abstract int net.openhft.lang.model.JavaBeanInterface.getInt(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setInt(int)}\n" +
                 " long=FieldModel{name='long', getter=public abstract long net.openhft.lang.model.JavaBeanInterface.getLong(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setLong(long)}\n" +
                 " short=FieldModel{name='short', getter=public abstract short net.openhft.lang.model.JavaBeanInterface.getShort(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setShort(short)}\n" +
-                " string=FieldModel{name='string', getter=public abstract java.lang.String net.openhft.lang.model.JavaBeanInterface.getString(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setString(java.lang.String), size= @net.openhft.lang.constraints.MaxSize(value=8)}}"
+                " string=FieldModel{name='string', getter=public abstract java.lang.String net.openhft.lang.model.JavaBeanInterface.getString(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setString(java.lang.String), size= @net.openhft.lang.model.constraints.MaxSize(value=8)}}"
                 , jbdvm.fieldMap().toString().replaceAll("},", "}\n"));
     }
 }

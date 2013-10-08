@@ -16,10 +16,10 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.constraints.Digits;
-import net.openhft.lang.constraints.MaxSize;
-import net.openhft.lang.constraints.Range;
 import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.model.constraints.Digits;
+import net.openhft.lang.model.constraints.MaxSize;
+import net.openhft.lang.model.constraints.Range;
 
 import java.io.Externalizable;
 import java.lang.annotation.Annotation;

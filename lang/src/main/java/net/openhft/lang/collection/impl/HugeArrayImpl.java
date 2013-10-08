@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.collection;
+package net.openhft.lang.collection.impl;
 
+import net.openhft.lang.collection.HugeArray;
 import net.openhft.lang.io.DirectBytes;
 import net.openhft.lang.io.DirectStore;
 import net.openhft.lang.model.Byteable;

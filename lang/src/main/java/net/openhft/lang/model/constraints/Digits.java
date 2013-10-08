@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.constraints;
+package net.openhft.lang.model.constraints;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

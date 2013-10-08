@@ -16,7 +16,7 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.constraints.MaxSize;
+import net.openhft.lang.model.constraints.MaxSize;
 
 /**
  * User: plawrey

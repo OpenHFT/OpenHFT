@@ -16,7 +16,7 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.constraints.Digits;
+import net.openhft.lang.model.constraints.Digits;
 
 /**
  * User: plawrey

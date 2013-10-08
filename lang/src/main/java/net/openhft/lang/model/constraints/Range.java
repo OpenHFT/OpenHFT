@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.constraints;
+package net.openhft.lang.model.constraints;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -24,11 +24,13 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The maximum size <b>in encoded bytes</b> for a variable length data type.
+ * The lowest to highest values allowed (inclusive)
  */
 @Target(PARAMETER)
 @Retention(RUNTIME)
 @Documented
-public @interface MaxSize {
-    int value() default 128;
+public @interface Range {
+    long min() default Long.MIN_VALUE;
+
+    long max() default Long.MAX_VALUE;
 }

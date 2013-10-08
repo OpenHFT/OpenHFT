@@ -16,6 +16,8 @@
 
 package net.openhft.lang.collection;
 
+import net.openhft.lang.collection.impl.HugeArrayImpl;
+import net.openhft.lang.collection.impl.HugeQueueImpl;
 import net.openhft.lang.model.DataValueGenerator;
 
 /**
