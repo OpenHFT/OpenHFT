@@ -16,7 +16,7 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.constraints.Size;
+import net.openhft.lang.constraints.MaxSize;
 
 /**
  * User: plawrey
@@ -24,7 +24,7 @@ import net.openhft.lang.constraints.Size;
  * Time: 10:11
  */
 public interface NestedA {
-    void key(@Size String key);
+    void key(@MaxSize String key);
 
     String key();
 

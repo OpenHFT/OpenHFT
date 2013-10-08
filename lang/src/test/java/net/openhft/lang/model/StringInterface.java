@@ -16,7 +16,7 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.constraints.Size;
+import net.openhft.lang.constraints.MaxSize;
 
 /**
  * User: plawrey
@@ -24,11 +24,11 @@ import net.openhft.lang.constraints.Size;
  * Time: 09:09
  */
 public interface StringInterface {
-    void setString(@Size(64) String s);
+    void setString(@MaxSize(64) String s);
 
     String getString();
 
-    void setText(@Size String s);
+    void setText(@MaxSize String s);
 
     String getText();
 }

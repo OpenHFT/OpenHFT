@@ -32,6 +32,7 @@ public class HugeArrayTest {
         // runs with a maximum heap size of 32 MB.
         int length = 10 * 1000 * 1000;
         HugeArray<JavaBeanInterface> array = HugeArrays.create(JavaBeanInterface.class, length);
+        long start = System.nanoTime();
         for (int i = 0; i < array.length(); i++) {
             JavaBeanInterface jbi = array.get(i);
             jbi.setByte((byte) i);
@@ -41,7 +42,7 @@ public class HugeArrayTest {
             jbi.setFloat(i);
             jbi.setLong(i);
             jbi.setDouble(i);
-            jbi.setFlag(i % 3 == 0);
+            jbi.setFlag((i & 3) == 0);
             array.recycle(jbi);
         }
         for (int i = 0; i < array.length(); i++) {
@@ -53,8 +54,11 @@ public class HugeArrayTest {
             assertEquals(i, jbi.getFloat(), 0);
             assertEquals(i, jbi.getLong());
             assertEquals(i, jbi.getDouble(), 0.0);
-            assertEquals(i % 3 == 0, jbi.getFlag());
+            assertEquals((i & 3) == 0, jbi.getFlag());
             array.recycle(jbi);
         }
+        long time = System.nanoTime() - start;
+        double avg = time / 2.0 / length;
+        System.out.printf("Average time to access a JavaBeanInterface was %.1f ns%n", avg);
     }
 }

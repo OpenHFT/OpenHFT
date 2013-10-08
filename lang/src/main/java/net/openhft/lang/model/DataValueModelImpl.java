@@ -17,8 +17,8 @@
 package net.openhft.lang.model;
 
 import net.openhft.lang.constraints.Digits;
+import net.openhft.lang.constraints.MaxSize;
 import net.openhft.lang.constraints.Range;
-import net.openhft.lang.constraints.Size;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 
 import java.io.Externalizable;
@@ -156,7 +156,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Method getter, setter;
         private Digits digits;
         private Range range;
-        private Size size;
+        private MaxSize maxSize;
 
         public FieldModelImpl(String name) {
             this.name = name;
@@ -181,8 +181,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     digits = (Digits) a;
                 if (a instanceof Range)
                     range = (Range) a;
-                if (a instanceof Size)
-                    size = (Size) a;
+                if (a instanceof MaxSize)
+                    maxSize = (MaxSize) a;
             }
         }
 
@@ -202,16 +202,16 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             return size;
         }
 
-        // size in bits.
+        // maxSize in bits.
         @Override
         public int nativeSize() {
             Integer size = HEAP_SIZE_MAP.get(type());
             if (size != null)
                 return size;
-            Size size2 = size();
-            if (size2 == null)
-                throw new AssertionError(type() + " without a @Size not supported for native types");
-            return size2.value() << 3;
+            MaxSize maxSize2 = size();
+            if (maxSize2 == null)
+                throw new AssertionError(type() + " without a @MaxSize not supported for native types");
+            return maxSize2.value() << 3;
         }
 
         @Override
@@ -225,8 +225,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
         @Override
-        public Size size() {
-            return size;
+        public MaxSize size() {
+            return maxSize;
         }
 
         @Override
@@ -237,7 +237,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     ", setter=" + setter +
                     (digits == null ? "" : ", digits= " + digits) +
                     (range == null ? "" : ", range= " + range) +
-                    (size == null ? "" : ", size= " + size) +
+                    (maxSize == null ? "" : ", size= " + maxSize) +
                     '}';
         }
     }

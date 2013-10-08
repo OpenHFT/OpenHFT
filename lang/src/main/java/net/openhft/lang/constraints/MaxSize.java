@@ -29,6 +29,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(PARAMETER)
 @Retention(RUNTIME)
 @Documented
-public @interface Size {
+public @interface MaxSize {
     int value() default 128;
 }

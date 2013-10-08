@@ -16,7 +16,7 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.constraints.Size;
+import net.openhft.lang.constraints.MaxSize;
 
 /**
  * User: plawrey
@@ -56,7 +56,7 @@ public interface JavaBeanInterface {
 
     double getDouble();
 
-    void setString(@Size(8) String s);
+    void setString(@MaxSize(8) String s);
 
     String getString();
 }

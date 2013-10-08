@@ -17,8 +17,8 @@
 package net.openhft.lang.model;
 
 import net.openhft.lang.constraints.Digits;
+import net.openhft.lang.constraints.MaxSize;
 import net.openhft.lang.constraints.Range;
-import net.openhft.lang.constraints.Size;
 
 import java.lang.reflect.Method;
 
@@ -44,5 +44,5 @@ public interface FieldModel<T> {
 
     Range range();
 
-    Size size();
+    MaxSize size();
 }
