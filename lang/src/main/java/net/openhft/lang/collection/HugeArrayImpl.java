@@ -71,6 +71,15 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
         return t;
     }
 
+    @Override
+    public void get(long index, T element) {
+        T t = acquire();
+        DirectBytes bytes = (DirectBytes) ((Byteable) t).bytes();
+        bytes.positionAndSize(index * size, size);
+        ((Copyable) element).copyFrom(t);
+        recycle(t);
+    }
+
     private T acquire() {
         int size = freeList.size();
         if (size > 0)

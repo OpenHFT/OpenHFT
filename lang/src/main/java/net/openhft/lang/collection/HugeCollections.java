@@ -23,12 +23,16 @@ import net.openhft.lang.model.DataValueGenerator;
  * Date: 08/10/13
  * Time: 08:09
  */
-public enum HugeArrays {
+public enum HugeCollections {
     ;
 
     private static final DataValueGenerator VALUE_GENERATOR = new DataValueGenerator();
 
-    public static <T> HugeArray<T> create(Class<T> tClass, long length) {
+    public static <T> HugeArray<T> newArray(Class<T> tClass, long length) {
         return new HugeArrayImpl<T>(VALUE_GENERATOR, tClass, length);
+    }
+
+    public static <T> HugeQueue<T> newQueue(Class<T> tClass, long length) {
+        return new HugeQueueImpl<T>(new HugeArrayImpl<T>(VALUE_GENERATOR, tClass, length + 1), length + 1);
     }
 }

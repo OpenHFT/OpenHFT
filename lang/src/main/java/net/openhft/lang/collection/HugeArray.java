@@ -36,6 +36,14 @@ public interface HugeArray<T> {
     T get(long index);
 
     /**
+     * Get a copy of the object in the array
+     *
+     * @param index   of element to copy
+     * @param element Copyable element to copy to.
+     */
+    void get(long index, T element);
+
+    /**
      * Copy the contents of an index to another object
      *
      * @param index to copy

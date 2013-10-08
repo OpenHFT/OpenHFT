@@ -31,7 +31,7 @@ public class HugeArrayTest {
     public void testHugeArray() {
         // runs with a maximum heap size of 32 MB.
         int length = 10 * 1000 * 1000;
-        HugeArray<JavaBeanInterface> array = HugeArrays.create(JavaBeanInterface.class, length);
+        HugeArray<JavaBeanInterface> array = HugeCollections.newArray(JavaBeanInterface.class, length);
         long start = System.nanoTime();
         for (int i = 0; i < array.length(); i++) {
             JavaBeanInterface jbi = array.get(i);
