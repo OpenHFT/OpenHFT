@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.model.constraints;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package net.openhft.lang.values;
 
 /**
- * The maximum size <b>in encoded bytes</b> for a variable length data type.  The units is either elements, or bytes.
+ * User: plawrey
+ * Date: 10/10/13
+ * Time: 07:19
  */
-@Target(PARAMETER)
-@Retention(RUNTIME)
-@Documented
-public @interface MaxSize {
-    int value() default 64;
+public interface BooleanValue {
+    boolean getValue();
+
+    void setValue(boolean value);
 }
