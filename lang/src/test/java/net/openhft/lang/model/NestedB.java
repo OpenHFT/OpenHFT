@@ -19,7 +19,7 @@ package net.openhft.lang.model;
 import net.openhft.lang.model.constraints.Digits;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 08/10/13
  * Time: 10:24
  */

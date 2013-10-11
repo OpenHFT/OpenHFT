@@ -19,7 +19,7 @@ package net.openhft.lang.model;
 import net.openhft.lang.model.constraints.MaxSize;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 06/10/13
  * Time: 16:59
  */

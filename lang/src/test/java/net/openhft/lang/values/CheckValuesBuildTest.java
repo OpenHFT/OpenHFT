@@ -20,7 +20,7 @@ import net.openhft.lang.model.DataValueGenerator;
 import org.junit.Test;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 10/10/13
  * Time: 11:38
  */

@@ -19,7 +19,7 @@ package net.openhft.lang.values;
 import net.openhft.lang.model.constraints.Range;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 10/10/13
  * Time: 07:19
  */

@@ -23,7 +23,7 @@ import net.openhft.lang.model.constraints.Range;
 import java.lang.reflect.Method;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 06/10/13
  * Time: 18:22
  */

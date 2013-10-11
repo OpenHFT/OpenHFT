@@ -29,7 +29,7 @@ import java.nio.ByteBuffer;
 import static org.junit.Assert.assertEquals;
 
 /**
- * User: peter
+ * User: peter.lawrey
  * Date: 20/09/13
  * Time: 09:28
  */

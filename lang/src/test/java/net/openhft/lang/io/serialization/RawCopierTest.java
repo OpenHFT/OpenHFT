@@ -27,7 +27,7 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 22/09/13
  * Time: 17:06
  */

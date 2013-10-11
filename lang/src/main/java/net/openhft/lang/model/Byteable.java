@@ -19,7 +19,7 @@ package net.openhft.lang.model;
 import net.openhft.lang.io.Bytes;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 07/10/13
  * Time: 21:38
  */

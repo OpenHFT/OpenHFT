@@ -19,7 +19,7 @@ package net.openhft.lang;
 import org.junit.Test;
 
 /**
- * User: peter
+ * User: peter.lawrey
  * Date: 20/09/13
  * Time: 10:04
  */

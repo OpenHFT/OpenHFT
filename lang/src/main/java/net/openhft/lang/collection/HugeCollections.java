@@ -21,7 +21,7 @@ import net.openhft.lang.collection.impl.HugeQueueImpl;
 import net.openhft.lang.model.DataValueGenerator;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 08/10/13
  * Time: 08:09
  */

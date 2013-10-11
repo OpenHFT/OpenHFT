@@ -20,7 +20,7 @@ import net.openhft.lang.model.constraints.Range;
 
 /**
  * 48-bit signed value
- * User: plawrey
+ * User: peter.lawrey
  * Date: 10/10/13
  * Time: 07:15
  */

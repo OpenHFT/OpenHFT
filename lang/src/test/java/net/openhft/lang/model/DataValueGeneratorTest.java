@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 06/10/13
  * Time: 20:13
  */

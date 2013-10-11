@@ -17,7 +17,7 @@
 package net.openhft.lang.values;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 10/10/13
  * Time: 07:17
  */

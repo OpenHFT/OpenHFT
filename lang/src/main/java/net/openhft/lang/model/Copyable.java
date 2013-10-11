@@ -17,7 +17,7 @@
 package net.openhft.lang.model;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 08/10/13
  * Time: 07:45
  */

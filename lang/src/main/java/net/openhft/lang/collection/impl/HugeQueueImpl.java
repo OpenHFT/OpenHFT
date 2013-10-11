@@ -20,7 +20,7 @@ import net.openhft.lang.collection.HugeArray;
 import net.openhft.lang.collection.HugeQueue;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 08/10/13
  * Time: 13:31
  */
