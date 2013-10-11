@@ -26,7 +26,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
-import static net.openhft.lang.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * User: peter

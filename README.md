@@ -47,7 +47,7 @@ To work with buffers there is a several options:
 Both classes provide functionality:
 * write\read operations for primitives (writeLong(long n), readLong() etc.)
 * locking in native memory, so you can add thread safe constructs to your native record.
-* CAS operations for int and long _boolean compareAndSetInt(long offset, int expected, int x)_, _boolean compareAndSetLong(long offset, long expected, long x)_
+* CAS operations for int and long _boolean compareAndSwapInt(long offset, int expected, int x)_, _boolean compareAndSwapLong(long offset, long expected, long x)_
 * addAndGetInt and getAndAddInt operations
 
 ####Example

@@ -23,8 +23,8 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
-import static net.openhft.lang.Assert.assertEquals;
-import static net.openhft.lang.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: plawrey
@@ -102,7 +102,7 @@ public class DataValueGeneratorTest {
         String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterface.class);
 //        System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
-        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "$native", actual);
+        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "£native", actual);
         JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
         ((Byteable) jbi).bytes(bytes);

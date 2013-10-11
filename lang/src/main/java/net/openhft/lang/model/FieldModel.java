@@ -34,6 +34,20 @@ public interface FieldModel<T> {
 
     Method setter();
 
+    Method adder();
+
+    Method atomicAdder();
+
+    Method cas();
+
+    Method tryLockNanos();
+
+    Method tryLock();
+
+    Method busyLock();
+
+    Method unlock();
+
     Class<T> type();
 
     int heapSize();

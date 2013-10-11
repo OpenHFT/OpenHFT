@@ -18,7 +18,7 @@ package net.openhft.lang.model;
 
 import org.junit.Test;
 
-import static net.openhft.lang.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * User: plawrey

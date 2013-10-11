@@ -24,7 +24,9 @@ import net.openhft.lang.model.constraints.Range;
  * Time: 07:19
  */
 public interface UnsignedShortValue {
+    int getValue();
+
     void setValue(@Range(min = 0, max = 65535) int value);
 
-    int getValue();
+    int addValue(int delta);
 }

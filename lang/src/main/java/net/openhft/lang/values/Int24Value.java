@@ -28,4 +28,6 @@ public interface Int24Value {
     int getValue();
 
     void setValue(@Range(min = -1 << 23, max = (1 << 23) - 1) int value);
+
+    int addValue(int delta);
 }

@@ -19,8 +19,8 @@ package net.openhft.lang.io;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static net.openhft.lang.Assert.assertEquals;
-import static net.openhft.lang.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author peter.lawrey

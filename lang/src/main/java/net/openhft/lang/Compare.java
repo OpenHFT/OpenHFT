@@ -17,12 +17,10 @@
 package net.openhft.lang;
 
 /**
- * User: plawrey
- * Date: 08/10/13
- * Time: 12:29
+ * A generic Compare class for many types.  It can be sub-classed so you can give types a different behaviour.
  */
-public enum Compare {
-    ;
+public abstract class Compare {
+
     private static final long NULL_HASHCODE = Long.MIN_VALUE;
 
     public static boolean isEqual(boolean a, boolean b) {

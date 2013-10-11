@@ -16,28 +16,18 @@
 
 package net.openhft.lang.values;
 
+import net.openhft.lang.model.constraints.Range;
+
 /**
+ * 48-bit signed value
  * User: plawrey
  * Date: 10/10/13
  * Time: 07:15
  */
-public interface IntValue {
-    int getValue();
+public interface Int48Value {
+    long getValue();
 
-    void setValue(int value);
+    void setValue(@Range(min = -1L << 47, max = (1L << 47) - 1) long value);
 
-    int addValue(int delta);
-
-    int addAtomicValue(int delta);
-
-    boolean compareAndSwapValue(int expected, int value);
-
-    boolean tryLockValue();
-
-    boolean tryLockNanosValue(long nanos);
-
-    void busyLockValue() throws InterruptedException, IllegalStateException;
-
-    void unlockValue() throws IllegalMonitorStateException;
-
+    long addValue(long delta);
 }

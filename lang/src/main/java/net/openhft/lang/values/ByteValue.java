@@ -25,4 +25,6 @@ public interface ByteValue {
     byte getValue();
 
     void setValue(byte value);
+
+    byte addValue(byte b);
 }

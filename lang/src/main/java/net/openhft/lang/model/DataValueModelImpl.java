@@ -35,6 +35,19 @@ import java.util.TreeMap;
  * Time: 17:23
  */
 public class DataValueModelImpl<T> implements DataValueModel<T> {
+    static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
+
+    static {
+        HEAP_SIZE_MAP.put(boolean.class, 1);
+        HEAP_SIZE_MAP.put(byte.class, 8);
+        HEAP_SIZE_MAP.put(char.class, 16);
+        HEAP_SIZE_MAP.put(short.class, 16);
+        HEAP_SIZE_MAP.put(int.class, 32);
+        HEAP_SIZE_MAP.put(float.class, 32);
+        HEAP_SIZE_MAP.put(long.class, 64);
+        HEAP_SIZE_MAP.put(double.class, 64);
+    }
+
     private final Map<String, FieldModelImpl> fieldModelMap = new TreeMap<String, FieldModelImpl>();
     private final Class<T> type;
     private final Map<Class, DataValueModel> nestedMap = new HashMap<Class, DataValueModel>();
@@ -55,9 +68,27 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                 continue;
             String name = method.getName();
             Class<?>[] parameterTypes = method.getParameterTypes();
-            Class<?> returnType = method.getReturnType();
+            final Class<?> returnType = method.getReturnType();
             switch (parameterTypes.length) {
                 case 0: {
+                    String name5 = getUnlock(name);
+                    if (name5 != null && returnType == void.class) {
+                        FieldModelImpl fm = acquireField(name5);
+                        fm.unlock(method);
+                        break;
+                    }
+                    String name4 = getBusyLock(name);
+                    if (name4 != null && returnType == void.class) {
+                        FieldModelImpl fm = acquireField(name4);
+                        fm.busyLock(method);
+                        break;
+                    }
+                    String name3 = getTryLock(name);
+                    if (name3 != null && returnType == boolean.class) {
+                        FieldModelImpl fm = acquireField(name3);
+                        fm.tryLock(method);
+                        break;
+                    }
                     if (returnType == void.class)
                         throw new IllegalArgumentException("void () not supported " + method);
                     String name2 = getGetter(name, returnType);
@@ -66,6 +97,27 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     break;
                 }
                 case 1: {
+                    String name5 = getTryLockNanos(name);
+                    if (name5 != null && returnType == boolean.class) {
+                        FieldModelImpl fm = acquireField(name5);
+                        fm.tryLockNanos(method);
+                        break;
+                    }
+
+                    String name4 = getAtomicAdder(name);
+                    if (name4 != null) {
+                        FieldModelImpl fm = acquireField(name4);
+                        fm.atomicAdder(method);
+                        break;
+                    }
+
+                    String name3 = getAdder(name);
+                    if (name3 != null) {
+                        FieldModelImpl fm = acquireField(name3);
+                        fm.adder(method);
+                        break;
+                    }
+
                     if (returnType != void.class)
                         throw new IllegalArgumentException("setter must be void " + method);
                     String name2 = getSetter(name);
@@ -73,6 +125,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     fm.setter(method);
                     break;
                 }
+                case 2:
+                    String name2 = getCAS(name);
+                    if (name2 != null && returnType == boolean.class) {
+                        FieldModelImpl fm = acquireField(name2);
+                        fm.cas(method);
+                        break;
+                    }
+
                 default: {
                     throw new IllegalArgumentException("method not supported " + method);
                 }
@@ -80,7 +140,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
         for (Map.Entry<String, FieldModelImpl> entry : fieldModelMap.entrySet()) {
             FieldModelImpl model = entry.getValue();
-            if (model.getter() == null || model.setter() == null)
+            if (model.getter() == null || (model.setter() == null && model.getter().getReturnType().isPrimitive()))
                 throw new IllegalArgumentException("Field " + entry.getKey() + " must have a getter and setter.");
             Class ftype = model.type();
             if (!isScalar(ftype) && !nestedMap.containsKey(ftype))
@@ -88,17 +148,31 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
     }
 
-    private FieldModelImpl acquireField(String name) {
-        FieldModelImpl fieldModelImpl = fieldModelMap.get(name);
-        if (fieldModelImpl == null)
-            fieldModelMap.put(name, fieldModelImpl = new FieldModelImpl(name));
+    private static String getCAS(String name) {
+        final int len = 14;
+        if (name.length() > len && name.startsWith("compareAndSwap") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
+    }
 
-        return fieldModelImpl;
+    private static String getAtomicAdder(String name) {
+        final int len = 9;
+        if (name.length() > len && name.startsWith("addAtomic") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
+    }
+
+    private static String getAdder(String name) {
+        final int len = 3;
+        if (name.length() > len && name.startsWith("add") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
     }
 
     private static String getSetter(String name) {
-        if (name.length() > 3 && name.startsWith("set") && Character.isUpperCase(name.charAt(3)))
-            return Character.toLowerCase(name.charAt(3)) + name.substring(4);
+        final int len = 3;
+        if (name.length() > len && name.startsWith("set") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return name;
     }
 
@@ -109,6 +183,42 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                 && name.length() > 2 && name.startsWith("is") && Character.isUpperCase(name.charAt(2)))
             return Character.toLowerCase(name.charAt(2)) + name.substring(3);
         return name;
+    }
+
+    private String getBusyLock(String name) {
+        final int len = 8;
+        if (name.length() > len && name.startsWith("busyLock") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
+    }
+
+    private String getUnlock(String name) {
+        final int len = 6;
+        if (name.length() > len && name.startsWith("unlock") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
+    }
+
+    private String getTryLockNanos(String name) {
+        final int len = 12;
+        if (name.length() > len && name.startsWith("tryLockNanos") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
+    }
+
+    private String getTryLock(String name) {
+        final int len = 7;
+        if (name.length() > len && name.startsWith("tryLock") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
+    }
+
+    private FieldModelImpl acquireField(String name) {
+        FieldModelImpl fieldModelImpl = fieldModelMap.get(name);
+        if (fieldModelImpl == null)
+            fieldModelMap.put(name, fieldModelImpl = new FieldModelImpl(name));
+
+        return fieldModelImpl;
     }
 
     @Override
@@ -137,19 +247,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         return type;
     }
 
-    static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
-
-    static {
-        HEAP_SIZE_MAP.put(boolean.class, 1);
-        HEAP_SIZE_MAP.put(byte.class, 8);
-        HEAP_SIZE_MAP.put(char.class, 16);
-        HEAP_SIZE_MAP.put(short.class, 16);
-        HEAP_SIZE_MAP.put(int.class, 32);
-        HEAP_SIZE_MAP.put(float.class, 32);
-        HEAP_SIZE_MAP.put(long.class, 64);
-        HEAP_SIZE_MAP.put(double.class, 64);
-    }
-
     static class FieldModelImpl<T> implements FieldModel<T> {
 
         private final String name;
@@ -157,6 +254,13 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Digits digits;
         private Range range;
         private MaxSize maxSize;
+        private Method adder;
+        private Method atomicAdder;
+        private Method cas;
+        private Method tryLockNanos;
+        private Method tryLock;
+        private Method busyLock;
+        private Method unlock;
 
         public FieldModelImpl(String name) {
             this.name = name;
@@ -193,6 +297,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         @Override
         public Class<T> type() {
             return (Class<T>) getter.getReturnType();
+        }
+
+        public void adder(Method method) {
+            adder = method;
+        }
+
+        public Method adder() {
+            return adder;
         }
 
         @Override
@@ -239,6 +351,54 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     (range == null ? "" : ", range= " + range) +
                     (maxSize == null ? "" : ", size= " + maxSize) +
                     '}';
+        }
+
+        public void atomicAdder(Method method) {
+            atomicAdder = method;
+        }
+
+        public Method atomicAdder() {
+            return atomicAdder;
+        }
+
+        public void cas(Method method) {
+            cas = method;
+        }
+
+        public Method cas() {
+            return cas;
+        }
+
+        public void tryLockNanos(Method method) {
+            tryLockNanos = method;
+        }
+
+        public Method tryLockNanos() {
+            return tryLockNanos;
+        }
+
+        public void tryLock(Method tryLock) {
+            this.tryLock = tryLock;
+        }
+
+        public Method tryLock() {
+            return tryLock;
+        }
+
+        public void busyLock(Method busyLock) {
+            this.busyLock = busyLock;
+        }
+
+        public Method busyLock() {
+            return busyLock;
+        }
+
+        public void unlock(Method unlock) {
+            this.unlock = unlock;
+        }
+
+        public Method unlock() {
+            return unlock;
         }
     }
 }

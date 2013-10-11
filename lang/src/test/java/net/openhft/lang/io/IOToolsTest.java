@@ -22,7 +22,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static net.openhft.lang.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * User: peter

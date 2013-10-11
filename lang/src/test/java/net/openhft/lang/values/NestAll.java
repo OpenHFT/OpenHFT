@@ -18,26 +18,36 @@ package net.openhft.lang.values;
 
 /**
  * User: plawrey
- * Date: 10/10/13
- * Time: 07:15
+ * Date: 11/10/13
+ * Time: 08:59
  */
-public interface IntValue {
-    int getValue();
+public interface NestAll {
+    BooleanValue getBoolean();
 
-    void setValue(int value);
+    ByteValue getByte();
 
-    int addValue(int delta);
+    CharValue getChar();
 
-    int addAtomicValue(int delta);
+    DoubleValue getDouble();
 
-    boolean compareAndSwapValue(int expected, int value);
+    FloatValue getFloat();
 
-    boolean tryLockValue();
+    Int24Value getInt24();
 
-    boolean tryLockNanosValue(long nanos);
+    Int48Value getInt48();
 
-    void busyLockValue() throws InterruptedException, IllegalStateException;
+    IntValue getInt();
 
-    void unlockValue() throws IllegalMonitorStateException;
+    LongValue getLong();
+
+    ShortValue getShort();
+
+    StringValue getString();
+
+    UnsignedByteValue getUB();
+
+    UnsignedIntValue getUI();
+
+    UnsignedShortValue getUS();
 
 }

@@ -25,4 +25,10 @@ public interface LongValue {
     long getValue();
 
     void setValue(long value);
+
+    long addValue(long delta);
+
+    long addAtomicValue(long delta);
+
+    boolean compareAndSwapValue(long expected, long value);
 }

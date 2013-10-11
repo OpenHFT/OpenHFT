@@ -25,4 +25,8 @@ public interface DoubleValue {
     double getValue();
 
     void setValue(double value);
+
+    double addValue(double delta);
+
+    double addAtomicValue(double delta);
 }

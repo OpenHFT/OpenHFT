@@ -24,6 +24,7 @@ import net.openhft.lang.io.serialization.BytesMarshallable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -34,11 +35,6 @@ import java.util.logging.Logger;
  * Time: 19:17
  */
 public class DataValueGenerator {
-    private static final Logger LOGGER = Logger.getLogger(DataValueGenerator.class.getName());
-
-    private boolean dumpCode = false;
-    final CachedCompiler cc = new CachedCompiler(null, null);
-
     public static final Comparator<Class> COMPARATOR = new Comparator<Class>() {
         @Override
         public int compare(Class o1, Class o2) {
@@ -53,6 +49,19 @@ public class DataValueGenerator {
             return cmp == 0 ? o1.getKey().compareTo(o2.getKey()) : cmp;
         }
     };
+    private static final Logger LOGGER = Logger.getLogger(DataValueGenerator.class.getName());
+    final CachedCompiler cc = new CachedCompiler(null, null);
+    private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
+    private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
+    private boolean dumpCode = false;
+
+    private static String bytesType(Class type) {
+        if (type.isPrimitive())
+            return Character.toUpperCase(type.getName().charAt(0)) + type.getName().substring(1);
+        if (CharSequence.class.isAssignableFrom(type))
+            return "UTFΔ";
+        return "Object";
+    }
 
     public <T> T heapInstance(Class<T> tClass) {
         try {
@@ -62,8 +71,6 @@ public class DataValueGenerator {
         }
     }
 
-    private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
-
     public <T> Class acquireHeapClass(Class<T> tClass) throws ClassNotFoundException {
         Class heapClass = heapClassMap.get(tClass);
         if (heapClass != null)
@@ -71,7 +78,7 @@ public class DataValueGenerator {
         String actual = new DataValueGenerator().generateHeapObject(tClass);
         if (dumpCode)
             LOGGER.info(actual);
-        heapClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "$heap", actual);
+        heapClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "£heap", actual);
         heapClassMap.put(tClass, heapClass);
         return heapClass;
     }
@@ -103,15 +110,79 @@ public class DataValueGenerator {
             if (!type.isPrimitive() && !type.getPackage().getName().equals("java.lang"))
                 imported.add(type);
             fieldDeclarations.append("    private ").append(type.getName()).append(" _").append(name).append(";\n");
-            copy.append("        ").append(model.setter().getName()).append("(from.").append(model.getter().getName()).append("());\n");
-            getterSetters.append("    public void ").append(model.setter().getName()).append('(').append(type.getName()).append(" _) {\n");
-            getterSetters.append("        _").append(name).append(" = _;\n");
-            getterSetters.append("    }\n\n");
-            getterSetters.append("    public ").append(type.getName()).append(' ').append(model.getter().getName()).append("() {\n");
+
+            final Method setter = model.setter();
+            final Method getter = model.getter();
+            if (setter == null) {
+                copy.append("        ((Copyable) ").append(getter.getName()).append("()).copyFrom(from.").append(getter.getName()).append("());\n");
+            } else {
+                copy.append("        ").append(setter.getName()).append("(from.").append(getter.getName()).append("());\n");
+                Class<?> setterType = setter.getParameterTypes()[0];
+                getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
+                if (type == String.class && setterType != String.class)
+                    getterSetters.append("        _").append(name).append(" = _.toString();\n");
+                else
+                    getterSetters.append("        _").append(name).append(" = _;\n");
+                getterSetters.append("    }\n\n");
+            }
+            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
             getterSetters.append("        return _").append(name).append(";\n");
             getterSetters.append("    }\n\n");
-            writeMarshal.append("         out.write").append(writerFor(type)).append("(_").append(name).append(");\n");
-            readMarshal.append("         _").append(name).append(" = in.read").append(writerFor(type)).append("();\n");
+            Method adder = model.adder();
+            if (adder != null) {
+                getterSetters.append("    public ").append(type.getName()).append(' ').append(adder.getName())
+                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                        .append("        return _").append(name).append(" += _;\n")
+                        .append("    }");
+            }
+            Method atomicAdder = model.atomicAdder();
+            if (atomicAdder != null) {
+                getterSetters.append("    public synchronized ").append(type.getName()).append(' ').append(atomicAdder.getName())
+                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                        .append("        return _").append(name).append(" += _;\n")
+                        .append("    }");
+            }
+            Method cas = model.cas();
+            if (cas != null) {
+                getterSetters.append("    public synchronized boolean ").append(cas.getName()).append("(")
+                        .append(type.getName()).append(" _1, ")
+                        .append(type.getName()).append(" _2) {\n")
+                        .append("        if (_").append(name).append(" == _1) {\n")
+                        .append("            _").append(name).append(" = _2;\n")
+                        .append("            return true;\n")
+                        .append("        }\n")
+                        .append("        return false;\n")
+                        .append("    }\n");
+            }
+            Method tryLockNanos = model.tryLockNanos();
+            if (tryLockNanos != null) {
+                getterSetters.append("    public boolean ").append(tryLockNanos.getName()).append("(long nanos) {\n")
+                        .append("        throw new UnsupportedOperationException();\n")
+                        .append("    }");
+            }
+            Method tryLock = model.tryLock();
+            if (tryLock != null) {
+                getterSetters.append("    public boolean ").append(tryLock.getName()).append("() {\n")
+                        .append("        throw new UnsupportedOperationException();\n")
+                        .append("    }");
+            }
+            Method unlock = model.unlock();
+            if (unlock != null) {
+                getterSetters.append("    public void ").append(unlock.getName()).append("() {\n")
+                        .append("        throw new UnsupportedOperationException();\n")
+                        .append("    }");
+            }
+            Method busyLock = model.busyLock();
+            if (busyLock != null) {
+                getterSetters.append("    public void ").append(busyLock.getName()).append("() {\n")
+                        .append("        throw new UnsupportedOperationException();\n")
+                        .append("    }");
+            }
+            writeMarshal.append("         out.write").append(bytesType(type)).append("(_").append(name).append(");\n");
+            readMarshal.append("         _").append(name).append(" = in.read").append(bytesType(type)).append("(");
+            if ("Object".equals(bytesType(type)))
+                readMarshal.append(type.getName()).append(".class");
+            readMarshal.append(");\n");
         }
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(dvmodel.type().getPackage().getName()).append(";\n\n");
@@ -120,11 +191,12 @@ public class DataValueGenerator {
             sb.append("import ").append(aClass.getName()).append(";\n");
         }
         sb.append("\npublic class ").append(dvmodel.type().getSimpleName())
-                .append("$heap implements ").append(dvmodel.type().getSimpleName())
+                .append("£heap implements ").append(dvmodel.type().getSimpleName())
                 .append(", BytesMarshallable, Copyable<").append(dvmodel.type().getName()).append(">  {\n");
         sb.append(fieldDeclarations).append('\n');
         sb.append(getterSetters);
-        sb.append("    public void copyFrom(").append(dvmodel.type().getName()).append(" from) {\n");
+        sb.append("        @SuppressWarnings(\"unchecked\")\n" +
+                "        public void copyFrom(").append(dvmodel.type().getName()).append(" from) {\n");
         sb.append(copy);
         sb.append("    }\n\n");
         sb.append("    public void writeMarshallable(Bytes out) {\n");
@@ -149,7 +221,7 @@ public class DataValueGenerator {
         }
         generateObjectMethods(sb, dvmodel, entries);
         sb.append("}\n");
-
+//        System.out.println(sb);
         return sb.toString();
     }
 
@@ -209,8 +281,6 @@ public class DataValueGenerator {
         }
     }
 
-    private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
-
     public <T> Class acquireNativeClass(Class<T> tClass) throws ClassNotFoundException {
         Class nativeClass = nativeClassMap.get(tClass);
         if (nativeClass != null)
@@ -222,7 +292,7 @@ public class DataValueGenerator {
         String actual = new DataValueGenerator().generateNativeObject(dvmodel);
         if (dumpCode)
             LOGGER.info(actual);
-        nativeClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "$native", actual);
+        nativeClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "£native", actual);
         nativeClassMap.put(tClass, nativeClass);
         return nativeClass;
     }
@@ -258,38 +328,101 @@ public class DataValueGenerator {
             Class type = model.type();
             if (!type.isPrimitive() && !type.getPackage().getName().equals("java.lang"))
                 imported.add(type);
+            String NAME = "_offset + " + name.toUpperCase();
+            final Method setter = model.setter();
+            final Method getter = model.getter();
             if (dvmodel.isScalar(type)) {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
-                copy.append("        ").append(model.setter().getName()).append("(from.").append(model.getter().getName()).append("());\n");
-                getterSetters.append("    public void ").append(model.setter().getName()).append('(').append(type.getName()).append(" _) {\n");
-                getterSetters.append("        _bytes.write").append(writerFor(type)).append("(_offset+").append(name.toUpperCase()).append(", ");
+                copy.append("        ").append(setter.getName()).append("(from.").append(getter.getName()).append("());\n");
+                Class<?> setterType = setter.getParameterTypes()[0];
+                getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
+                getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME).append(", ");
                 if (CharSequence.class.isAssignableFrom(type))
                     getterSetters.append(model.size().value()).append(", ");
                 getterSetters.append("_);\n");
                 getterSetters.append("    }\n\n");
-                getterSetters.append("    public ").append(type.getName()).append(' ').append(model.getter().getName()).append("() {\n");
-                getterSetters.append("        return _bytes.read").append(writerFor(type)).append("(_offset+").append(name.toUpperCase()).append(");\n");
+                getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
+                getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME).append(");\n");
                 getterSetters.append("    }\n\n");
-                writeMarshal.append("         out.write").append(writerFor(type)).append("(")
-                        .append(model.getter().getName()).append("());\n");
-                readMarshal.append("         ").append(model.setter().getName()).append("(in.read").append(writerFor(type)).append("());\n");
+                Method adder = model.adder();
+                if (adder != null) {
+                    getterSetters.append("    public ").append(type.getName()).append(' ').append(adder.getName())
+                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                            .append("        return _bytes.add").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
+                            .append("    }");
+                }
+                Method atomicAdder = model.atomicAdder();
+                if (atomicAdder != null) {
+                    getterSetters.append("    public ").append(type.getName()).append(' ').append(atomicAdder.getName())
+                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                            .append("        return _bytes.addAtomic").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
+                            .append("    }");
+                }
+                Method cas = model.cas();
+                if (cas != null) {
+                    getterSetters.append("    public boolean ").append(cas.getName()).append("(")
+                            .append(type.getName()).append(" _1, ")
+                            .append(type.getName()).append(" _2) {\n")
+                            .append("        return _bytes.compareAndSwap").append(bytesType(type)).append('(').append(NAME).append(", _1, _2);\n")
+                            .append("    }");
+                }
+                Method tryLockNanos = model.tryLockNanos();
+                if (tryLockNanos != null) {
+                    getterSetters.append("    public boolean ").append(tryLockNanos.getName()).append("(long nanos) {\n")
+                            .append("        return _bytes.tryLockNanos").append(bytesType(type)).append('(').append(NAME).append(", nanos);\n")
+                            .append("    }");
+                }
+                Method tryLock = model.tryLock();
+                if (tryLock != null) {
+                    getterSetters.append("    public boolean ").append(tryLock.getName()).append("() {\n")
+                            .append("        return _bytes.tryLock").append(bytesType(type)).append('(').append(NAME).append(");\n")
+                            .append("    }");
+                }
+                Method unlock = model.unlock();
+                if (unlock != null) {
+                    getterSetters.append("    public void ").append(unlock.getName()).append("() {\n")
+                            .append("         _bytes.unlock").append(bytesType(type)).append('(').append(NAME).append(");\n")
+                            .append("    }");
+                }
+                Method busyLock = model.busyLock();
+                if (busyLock != null) {
+                    getterSetters.append("    public void ").append(busyLock.getName()).append("() throws InterruptedException {\n")
+                            .append("         _bytes.busyLock").append(bytesType(type)).append('(').append(NAME).append(");\n")
+                            .append("    }");
+                }
+                writeMarshal.append("         out.write").append(bytesType(type)).append("(")
+                        .append(getter.getName()).append("());\n");
+                readMarshal.append("         ").append(setter.getName()).append("(in.read").append(bytesType(type)).append("());\n");
                 offset += (model.nativeSize() + 7) >> 3;
             } else {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
-                fieldDeclarations.append("    private final ").append(type.getName()).append("$native ").append(name).append(" = new ").append(type.getName()).append("$native();\n");
-                copy.append("        ").append(model.setter().getName()).append("(from.").append(model.getter().getName()).append("());\n");
+                fieldDeclarations.append("    private final ").append(type.getName()).append("£native _").append(name).append(" = new ").append(type.getName()).append("£native();\n");
+                if (setter == null) {
+                    copy.append("        _").append(name).append(".copyFrom(from.").append(getter.getName()).append("());\n");
+                } else {
+                    copy.append("        ").append(setter.getName()).append("(from.").append(getter.getName()).append("());\n");
+                    Class<?> setterType = setter.getParameterTypes()[0];
+                    getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
+                    if (type == String.class && setterType != String.class)
+                        getterSetters.append("        _").append(name).append(" = _.toString();\n");
+                    else
+                        getterSetters.append("        _").append(name).append(" = _;\n");
+                    getterSetters.append("    }\n\n");
+                }
 
-                getterSetters.append("    public void ").append(model.setter().getName()).append('(').append(type.getName()).append(" _) {\n");
-                getterSetters.append("        ").append(name).append(".copyFrom(_);\n");
+                if (setter != null) {
+                    getterSetters.append("    public void ").append(setter.getName()).append('(').append(type.getName()).append(" _) {\n");
+                    getterSetters.append("        _").append(name).append(".copyFrom(_);\n");
+                    getterSetters.append("    }\n\n");
+                }
+                getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
+                getterSetters.append("        return _").append(name).append(";\n");
                 getterSetters.append("    }\n\n");
-                getterSetters.append("    public ").append(type.getName()).append(' ').append(model.getter().getName()).append("() {\n");
-                getterSetters.append("        return ").append(name).append(";\n");
-                getterSetters.append("    }\n\n");
 
-                writeMarshal.append("         ").append(model.getter().getName()).append(".writeMarshallable(out);\n");
-                readMarshal.append("         ").append(model.getter().getName()).append(".readMarshallable(in);\n");
+                writeMarshal.append("         _").append(name).append(".writeMarshallable(out);\n");
+                readMarshal.append("         _").append(name).append(".readMarshallable(in);\n");
 
-                nestedBytes.append("        ((Byteable) ").append(name).append(").bytes(bytes, _offset + ").append(name.toUpperCase()).append(");\n");
+                nestedBytes.append("        ((Byteable) _").append(name).append(").bytes(bytes, ").append(NAME).append(");\n");
                 DataValueModel dvmodel2 = dvmodel.nestedModel(type);
                 Map<String, ? extends FieldModel> fieldMap2 = dvmodel2.fieldMap();
                 Map.Entry<String, FieldModel>[] entries2 = fieldMap2.entrySet().toArray(new Map.Entry[fieldMap2.size()]);
@@ -310,7 +443,7 @@ public class DataValueGenerator {
             sb.append("import ").append(aClass.getName()).append(";\n");
         }
         sb.append("\npublic class ").append(dvmodel.type().getSimpleName())
-                .append("$native implements ").append(dvmodel.type().getSimpleName())
+                .append("£native implements ").append(dvmodel.type().getSimpleName())
                 .append(", BytesMarshallable, Byteable, Copyable<").append(dvmodel.type().getName()).append("> {\n");
         sb.append(staticFieldDeclarations).append('\n');
         sb.append(fieldDeclarations).append('\n');
@@ -340,16 +473,8 @@ public class DataValueGenerator {
         sb.append("    }\n");
         generateObjectMethods(sb, dvmodel, entries);
         sb.append("}\n");
-
+//        System.out.println(sb);
         return sb.toString();
-    }
-
-    private static String writerFor(Class type) {
-        if (type.isPrimitive())
-            return Character.toUpperCase(type.getName().charAt(0)) + type.getName().substring(1);
-        if (CharSequence.class.isAssignableFrom(type))
-            return "UTFΔ";
-        return "Object";
     }
 
     public boolean isDumpCode() {

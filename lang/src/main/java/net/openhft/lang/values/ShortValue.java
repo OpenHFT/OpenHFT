@@ -25,4 +25,6 @@ public interface ShortValue {
     short getValue();
 
     void setValue(short value);
+
+    short addValue(short delta);
 }

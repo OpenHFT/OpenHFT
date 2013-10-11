@@ -309,7 +309,7 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public boolean compareAndSetInt(long offset, int expected, int x) {
+    public boolean compareAndSwapInt(long offset, int expected, int x) {
         if (buffer instanceof DirectBuffer)
             return NativeBytes.UNSAFE.compareAndSwapInt(null, ((DirectBuffer) buffer).address() + offset, expected, x);
         return NativeBytes.UNSAFE.compareAndSwapInt(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);
@@ -347,7 +347,7 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public boolean compareAndSetLong(long offset, long expected, long x) {
+    public boolean compareAndSwapLong(long offset, long expected, long x) {
         if (buffer instanceof DirectBuffer)
             return NativeBytes.UNSAFE.compareAndSwapLong(null, ((DirectBuffer) buffer).address() + offset, expected, x);
         return NativeBytes.UNSAFE.compareAndSwapLong(buffer.array(), NativeBytes.BYTES_OFFSET + offset, expected, x);

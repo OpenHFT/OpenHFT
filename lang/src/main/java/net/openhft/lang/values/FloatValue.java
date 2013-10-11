@@ -25,4 +25,8 @@ public interface FloatValue {
     float getValue();
 
     void setValue(float value);
+
+    float addValue(float delta);
+
+    float addAtomicValue(float delta);
 }

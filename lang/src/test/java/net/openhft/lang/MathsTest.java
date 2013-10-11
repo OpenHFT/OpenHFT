@@ -21,7 +21,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.Random;
 
-import static net.openhft.lang.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * User: peter

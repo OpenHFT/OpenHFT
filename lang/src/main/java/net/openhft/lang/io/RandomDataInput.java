@@ -591,6 +591,17 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     float readFloat(long offset);
 
     /**
+     * This is the same as readFloat() except a read barrier is performed first. <p> Reads four input bytes and returns
+     * a <code>float</code> value.
+     * <p/>
+     * This method is suitable for reading bytes written by the <code>writeOrderedFloat</code> method of interface <code>RandomDataOutput</code>.
+     *
+     * @param offset to read from
+     * @return the <code>int</code> value read.
+     */
+    float readVolatileFloat(long offset);
+
+    /**
      * Reads eight input bytes and returns a <code>double</code> value. It does this by first constructing a
      * <code>long</code> value in exactly the manner of the <code>readLong</code> method, then converting this
      * <code>long</code> value to a <code>double</code> in exactly the manner of the method
@@ -620,6 +631,17 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @return the <code>double</code> value read.
      */
     double readCompactDouble();
+
+    /**
+     * This is the same as readDouble() except a read barrier is performed first. <p> Reads four input bytes and returns
+     * a <code>float</code> value.
+     * <p/>
+     * This method is suitable for reading bytes written by the <code>writeOrderedFloat</code> method of interface <code>RandomDataOutput</code>.
+     *
+     * @param offset to read from
+     * @return the <code>int</code> value read.
+     */
+    double readVolatileDouble(long offset);
 
     /**
      * Reads the next line of text from the input stream. It reads successive bytes, converting each byte separately
