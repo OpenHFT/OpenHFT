@@ -148,6 +148,7 @@ public class DataValueGeneratorTest {
     @Test
     public void testNested() {
         DataValueGenerator dvg = new DataValueGenerator();
+//        dvg.setDumpCode(true);
         NestedB nestedB1 = dvg.heapInstance(NestedB.class);
         nestedB1.ask(100);
         nestedB1.bid(100);

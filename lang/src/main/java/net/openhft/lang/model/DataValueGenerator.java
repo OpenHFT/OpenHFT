@@ -406,15 +406,10 @@ public class DataValueGenerator {
                     if (type == String.class && setterType != String.class)
                         getterSetters.append("        _").append(name).append(" = _.toString();\n");
                     else
-                        getterSetters.append("        _").append(name).append(" = _;\n");
+                        getterSetters.append("        _").append(name).append(".copyFrom(_);\n");
                     getterSetters.append("    }\n\n");
                 }
 
-                if (setter != null) {
-                    getterSetters.append("    public void ").append(setter.getName()).append('(').append(type.getName()).append(" _) {\n");
-                    getterSetters.append("        _").append(name).append(".copyFrom(_);\n");
-                    getterSetters.append("    }\n\n");
-                }
                 getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
                 getterSetters.append("        return _").append(name).append(";\n");
                 getterSetters.append("    }\n\n");
