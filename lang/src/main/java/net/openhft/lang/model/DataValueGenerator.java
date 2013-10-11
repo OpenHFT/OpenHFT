@@ -225,7 +225,7 @@ public class DataValueGenerator {
         return sb.toString();
     }
 
-    private void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel, Map.Entry<String, FieldModel>[] entries) {
+    private static void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel, Map.Entry<String, FieldModel>[] entries) {
         int count = 0;
         StringBuilder hashCode = new StringBuilder();
         StringBuilder equals = new StringBuilder();
