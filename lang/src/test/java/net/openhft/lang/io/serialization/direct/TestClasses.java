@@ -1,6 +1,6 @@
 package net.openhft.lang.io.serialization.direct;
 
-import java.util.List;
+import java.util.*;
 
 class TestClasses {
 
@@ -38,21 +38,24 @@ class TestClasses {
         final int levelTwoDerivedIntField = 0;
     }
 
-    public static class DirectSerializationFilterFields {
-        public static int staticIntField;
+    public static class MixedFields {
+        public static int staticIntField ;
         public static double[] staticDoubleArray;
 
-        public static List<String> staticStringList;
-        public static Object[] staticObjectArray;
+        public static List<String> staticStringList = Collections.singletonList("S1");
+        public static Object[] staticObjectArray = {new Object()};
 
         public int intField;
+        public byte byteField;
+        public short shortField;
+        public long longField;
         public double[] doubleArray;
 
         public List<String> stringList;
         public Object[] objectArray;
 
-        protected transient short transientShort;
-        protected transient Object transientObject;
+        transient short transientShort;
+        public transient Object transientObject;
     }
 
     public static class Primitives1 {

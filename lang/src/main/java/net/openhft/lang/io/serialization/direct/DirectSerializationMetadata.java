@@ -3,7 +3,7 @@ package net.openhft.lang.io.serialization.direct;
 import net.openhft.lang.Jvm;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
+import java.util.List;
 
 import static net.openhft.lang.io.NativeBytes.UNSAFE;
 
@@ -25,29 +25,37 @@ public class DirectSerializationMetadata {
             this.start = start;
             this.length = length;
         }
+
+        @Override
+        public String toString() {
+            return String.format("SerializationMetadata: Start %s Length %s", start, length);
+        }
     }
 
-    public static SerializationMetadata extractMetadata(Collection<Field> fields) {
-        long minOffset = Long.MAX_VALUE;
-        long maxOffset = Long.MIN_VALUE;
+    public static SerializationMetadata extractMetadata(List<Field> fields) {
+        if (fields.isEmpty()) return EmptyObjectMetadata;
 
-        for (Field field : fields) {
-            long offset = UNSAFE.objectFieldOffset(field);
+        Offsets offsets = minMaxOffsets(fields);
 
-            if (offset < minOffset) {
-                minOffset = offset;
-                maxOffset = offset;
-            } else if (offset > maxOffset) {
-                maxOffset = offset;
-            }
-        }
+        long totalSize = OBJECT_HEADER_SIZE + offsets.max - offsets.min + 1;
+        return new SerializationMetadata(offsets.min, padToObjectAlignment(totalSize) - OBJECT_HEADER_SIZE);
+    }
 
-        if (maxOffset == Long.MIN_VALUE) {
-            return EmptyObjectMetadata;
-        } else {
-            long totalSize = OBJECT_HEADER_SIZE + maxOffset - minOffset + 1;
-            return new SerializationMetadata(minOffset, padToObjectAlignment(totalSize) - OBJECT_HEADER_SIZE);
-        }
+    public static SerializationMetadata extractMetadataForPartialCopy(List<Field> fields) {
+        if (fields.isEmpty()) return EmptyObjectMetadata;
+
+        Offsets offsets = minMaxOffsets(fields);
+
+        Field lastField = fields.get(fields.size() - 1);
+
+        return new SerializationMetadata(offsets.min, offsets.max + sizeOf(lastField) - OBJECT_HEADER_SIZE);
+    }
+
+    private static Offsets minMaxOffsets(List<Field> fields) {
+        long minOffset = UNSAFE.objectFieldOffset(fields.get(0));
+        long maxOffset = UNSAFE.objectFieldOffset(fields.get(fields.size() - 1));
+
+        return new Offsets(minOffset, maxOffset);
     }
 
     static long padToObjectAlignment(long length) {
@@ -57,5 +65,24 @@ public class DirectSerializationMetadata {
         }
 
         return length;
+    }
+
+    private static long sizeOf(Field field) {
+        if (boolean.class.equals(field.getType())) return 1;
+        else if (byte.class.equals(field.getType())) return 1;
+        else if (short.class.equals(field.getType())) return 2;
+        else if (char.class.equals(field.getType())) return 2;
+        else if (int.class.equals(field.getType())) return 4;
+        else return 8;
+    }
+
+    private static final class Offsets {
+        public final long min;
+        public final long max;
+
+        private Offsets(long min, long max) {
+            this.min = min;
+            this.max = max;
+        }
     }
 }

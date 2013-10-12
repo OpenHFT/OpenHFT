@@ -6,17 +6,19 @@ import java.util.*;
 import static net.openhft.lang.io.serialization.direct.FieldMetadata.*;
 
 public final class DirectSerializationFilter {
-    public static Collection<Field> check(Collection<Field> fields) {
-        ArrayList<Field> ineligibleFields = new ArrayList<Field>();
+    public static List<Field> stopAtFirstIneligibleField(List<Field> fields) {
+        ArrayList<Field> eligibleFields = new ArrayList<Field>();
         for (Field f : fields) {
-            if (!checkEligible(f)) {
-                ineligibleFields.add(f);
+            if (checkEligible(f)) {
+                eligibleFields.add(f);
+            } else {
+                break;
             }
         }
 
-        return ineligibleFields.isEmpty() ?
+        return eligibleFields.isEmpty() ?
                 Collections.<Field>emptyList() :
-                ineligibleFields;
+                eligibleFields;
     }
 
     private static boolean checkEligible(Field f) {

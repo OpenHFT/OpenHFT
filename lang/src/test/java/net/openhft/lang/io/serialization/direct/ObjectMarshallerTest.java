@@ -4,9 +4,11 @@ import net.openhft.lang.io.*;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Collections;
 
 import static net.openhft.lang.io.serialization.direct.TestClasses.*;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ObjectMarshallerTest {
 
@@ -178,6 +180,63 @@ public class ObjectMarshallerTest {
         assertEquals(Short.MAX_VALUE, p.c);
         assertEquals(Long.MAX_VALUE, p.d);
         assertEquals(Double.MAX_VALUE, p.e, 0);
+    }
+
+    @Test
+    public void marshalAndUnmarshalMixedClass() {
+        MixedFields m = new MixedFields();
+        m.intField = Integer.MIN_VALUE + 1;
+        m.byteField = Byte.MAX_VALUE - 1;
+        m.shortField = Short.MIN_VALUE + 1;
+        m.longField = Long.MAX_VALUE - 1;
+
+        m.doubleArray = new double[]{-50.0, 50.0};
+        m.stringList = Collections.singletonList("Foo");
+        m.objectArray = new Object[]{new Primitives1()};
+        m.transientShort = 12;
+        m.transientObject = new Primitives2();
+
+        Bytes b = createByteStore();
+        ObjectMarshaller<MixedFields> marshaller = ObjectMarshallers.forClass(MixedFields.class);
+        marshaller.write(b, m);
+
+        m.intField = 0;
+        m.byteField = 0;
+        m.shortField = 0;
+        m.longField = 0;
+        m.doubleArray = null;
+        m.stringList = null;
+        m.objectArray = null;
+        m.transientShort = 0;
+        m.transientObject = null;
+
+        b.reset();
+        marshaller.read(b, m);
+
+        assertEquals(Integer.MIN_VALUE + 1, m.intField);
+        assertEquals(0, m.byteField); // because of jvm field rearrangement the two shorts are packed into 4 bytes and this eligible field is skipped
+        assertEquals(Short.MIN_VALUE + 1, m.shortField);
+        assertEquals(Long.MAX_VALUE - 1, m.longField);
+        assertNull(m.doubleArray);
+        assertNull(m.stringList);
+        assertNull(m.objectArray);
+        assertNull(m.transientObject);
+        assertEquals(0, m.transientShort);
+
+        b.reset();
+
+        MixedFields newM = new MixedFields();
+        marshaller.read(b, newM);
+
+        assertEquals(Integer.MIN_VALUE + 1, newM.intField);
+        assertEquals(0, newM.byteField);
+        assertEquals(Short.MIN_VALUE + 1, newM.shortField);
+        assertEquals(Long.MAX_VALUE - 1, newM.longField);
+        assertNull(newM.doubleArray);
+        assertNull(newM.stringList);
+        assertNull(newM.objectArray);
+        assertNull(newM.transientObject);
+        assertEquals(0, newM.transientShort);
     }
 
     private ByteBufferBytes createByteStore() {

@@ -5,78 +5,90 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static net.openhft.lang.io.serialization.direct.DirectSerializationFilter.check;
-import static net.openhft.lang.io.serialization.direct.TestClasses.DirectSerializationFilterFields;
+import static net.openhft.lang.io.serialization.direct.DirectSerializationFilter.stopAtFirstIneligibleField;
 import static org.junit.Assert.*;
 
 public class DirectSerializationFilterTest {
 
     @Test
     public void instancePrimitivesAreEligible() {
-        assertTrue(check(fieldNamed("intField")).isEmpty());
+        List<Field> field = fieldsNamed("intField");
+        assertEquals(field, stopAtFirstIneligibleField(field));
     }
 
     @Test
     public void instancePrimitiveArraysAreNotEligible() {
-        Collection<Field> field = fieldNamed("doubleArray");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("doubleArray");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void instanceReferencesAreNotEligible() {
-        Collection<Field> field = fieldNamed("stringList");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("stringList");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void instanceReferenceArraysAreNotEligible() {
-        Collection<Field> field = fieldNamed("objectArray");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("objectArray");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void staticPrimitivesAreNotEligible() {
-        Collection<Field> field = fieldNamed("staticIntField");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("staticIntField");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void staticPrimitiveArraysAreNotEligible() {
-        Collection<Field> field = fieldNamed("staticDoubleArray");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("staticDoubleArray");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void staticReferencesAreNotEligible() {
-        Collection<Field> field = fieldNamed("staticStringList");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("staticStringList");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void staticReferenceArraysAreNotEligible() {
-        Collection<Field> field = fieldNamed("staticObjectArray");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("staticObjectArray");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void transientPrimitivesAreNotEligible() {
-        Collection<Field> field = fieldNamed("transientShort");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("transientShort");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
     @Test
     public void transientReferencsAreNotEligible() {
-        Collection<Field> field = fieldNamed("transientObject");
-        assertEquals(field, check(field));
+        List<Field> field = fieldsNamed("transientObject");
+        assertTrue(stopAtFirstIneligibleField(field).isEmpty());
     }
 
-    private static Collection<Field> fieldNamed(String name) {
-        try {
-            ArrayList<Field> field = new ArrayList<Field>();
-            field.add(DirectSerializationFilterFields.class.getDeclaredField(name));
-            return field;
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Exception retrieving " + name, e);
+    @Test
+    public void includesAllEligibleFields() {
+        List<Field> fields = fieldsNamed("intField", "shortField", "longField", "byteField", "stringList");
+        List<Field> expectedfields = fields.subList(0, 4);
+
+        assertEquals(expectedfields, stopAtFirstIneligibleField(fields));
+    }
+
+    private static List<Field> fieldsNamed(String... names) {
+        ArrayList<Field> fields = new ArrayList<Field>();
+
+        for (String name : names) {
+            try {
+                fields.add(TestClasses.MixedFields.class.getDeclaredField(name));
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException("Exception retrieving " + name, e);
+            }
         }
+
+        return fields;
     }
 }
