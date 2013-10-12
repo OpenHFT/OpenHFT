@@ -50,6 +50,9 @@ class TestClasses {
 
         public List<String> stringList;
         public Object[] objectArray;
+
+        protected transient short transientShort;
+        protected transient Object transientObject;
     }
 
     public static class Primitives1 {

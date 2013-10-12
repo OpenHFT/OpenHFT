@@ -17,8 +17,9 @@ public class DirectSerializationFilterTest {
     }
 
     @Test
-    public void instancePrimitiveArraysAreEligible() {
-        assertTrue(check(fieldNamed("doubleArray")).isEmpty());
+    public void instancePrimitiveArraysAreNotEligible() {
+        Collection<Field> field = fieldNamed("doubleArray");
+        assertEquals(field, check(field));
     }
 
     @Test
@@ -54,6 +55,18 @@ public class DirectSerializationFilterTest {
     @Test
     public void staticReferenceArraysAreNotEligible() {
         Collection<Field> field = fieldNamed("staticObjectArray");
+        assertEquals(field, check(field));
+    }
+
+    @Test
+    public void transientPrimitivesAreNotEligible() {
+        Collection<Field> field = fieldNamed("transientShort");
+        assertEquals(field, check(field));
+    }
+
+    @Test
+    public void transientReferencsAreNotEligible() {
+        Collection<Field> field = fieldNamed("transientObject");
         assertEquals(field, check(field));
     }
 

@@ -1,9 +1,11 @@
 package net.openhft.lang.io.serialization.direct;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 import java.util.*;
 
-public class DirectSerializationFilter {
+import static net.openhft.lang.io.serialization.direct.FieldMetadata.*;
+
+public final class DirectSerializationFilter {
     public static Collection<Field> check(Collection<Field> fields) {
         ArrayList<Field> ineligibleFields = new ArrayList<Field>();
         for (Field f : fields) {
@@ -18,19 +20,8 @@ public class DirectSerializationFilter {
     }
 
     private static boolean checkEligible(Field f) {
-        return (isPrimitive(f) || isPrimitiveArray(f)) && !isStatic(f);
-    }
-
-    private static boolean isPrimitive(Field f) {
-        return f.getType().isPrimitive();
-    }
-
-    private static boolean isPrimitiveArray(Field f) {
-        Class<?> clazz = f.getType();
-        return clazz.isArray() && clazz.getComponentType().isPrimitive();
-    }
-
-    private static boolean isStatic(Field f) {
-        return Modifier.isStatic(f.getModifiers());
+        return isPrimitive(f) &&
+                !isStatic(f) &&
+                !isTransient(f);
     }
 }
