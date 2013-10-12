@@ -16,10 +16,14 @@
 
 package net.openhft.lang.model;
 
+import net.openhft.lang.model.constraints.Digits;
+import net.openhft.lang.model.constraints.MaxSize;
+import net.openhft.lang.model.constraints.Range;
+
 import java.lang.reflect.Method;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 06/10/13
  * Time: 18:22
  */
@@ -30,5 +34,29 @@ public interface FieldModel<T> {
 
     Method setter();
 
+    Method adder();
+
+    Method atomicAdder();
+
+    Method cas();
+
+    Method tryLockNanos();
+
+    Method tryLock();
+
+    Method busyLock();
+
+    Method unlock();
+
     Class<T> type();
+
+    int heapSize();
+
+    int nativeSize();
+
+    Digits digits();
+
+    Range range();
+
+    MaxSize size();
 }

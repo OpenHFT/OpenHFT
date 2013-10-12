@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * User: peter Date: 18/08/13 Time: 11:37
+ * User: peter.lawrey Date: 18/08/13 Time: 11:37
  */
 public class NamedThreadFactory implements ThreadFactory {
     private final AtomicInteger id = new AtomicInteger();

@@ -274,7 +274,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public boolean compareAndSetInt(long offset, int expected, int x) {
+    public boolean compareAndSwapInt(long offset, int expected, int x) {
         return UNSAFE.compareAndSwapInt(null, startAddr + offset, expected, x);
     }
 
@@ -301,7 +301,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public boolean compareAndSetLong(long offset, long expected, long x) {
+    public boolean compareAndSwapLong(long offset, long expected, long x) {
         return UNSAFE.compareAndSwapLong(null, startAddr + offset, expected, x);
     }
 

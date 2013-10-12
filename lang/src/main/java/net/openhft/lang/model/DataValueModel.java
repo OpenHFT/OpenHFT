@@ -17,14 +17,21 @@
 package net.openhft.lang.model;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 06/10/13
  * Time: 17:06
  */
 public interface DataValueModel<T> {
     Map<String, ? extends FieldModel> fieldMap();
+
+    boolean isScalar(Class<?> nClass);
+
+    Set<Class> nestedModels();
+
+    <N> DataValueModel<N> nestedModel(Class<N> nClass);
 
     Class<T> type();
 }

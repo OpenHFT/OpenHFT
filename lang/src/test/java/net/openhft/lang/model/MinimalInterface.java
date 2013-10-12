@@ -16,14 +16,14 @@
 
 package net.openhft.lang.model;
 
-import java.io.Externalizable;
+import net.openhft.lang.io.serialization.BytesMarshallable;
 
 /**
- * User: plawrey
+ * User: peter.lawrey
  * Date: 06/10/13
  * Time: 16:59
  */
-public interface MinimalInterface extends Externalizable {
+public interface MinimalInterface extends BytesMarshallable, Copyable<MinimalInterface>, Byteable {
     void flag(boolean flag);
 
     boolean flag();

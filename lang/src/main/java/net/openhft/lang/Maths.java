@@ -112,11 +112,4 @@ public class Maths {
         return (int) n;
     }
 
-    public static long hashOf(CharSequence s) {
-        long hash = 0;
-        for (int i = 0, len = s.length(); i < len; i++) {
-            hash = 57 * hash + s.charAt(i);
-        }
-        return hash;
-    }
 }

@@ -92,46 +92,4 @@ public interface BytesCommon {
      * @throws IndexOutOfBoundsException if the bounds of the Bytes has been exceeded.
      */
     void checkEndOfBuffer() throws IndexOutOfBoundsException;
-
-    /**
-     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and the re-entrant count as 8 bit.  This
-     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 255 times
-     * you will get an ISE
-     *
-     * @param offset of the start of the 4-byte lock
-     * @return did it lock or not.
-     */
-    boolean tryLockInt(long offset);
-
-    /**
-     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and the re-entrant count as 8 bit.  This
-     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 255 times
-     * you will get an ISE
-     *
-     * @param offset of the start of the 4-byte lock
-     * @param nanos  to try to lock for
-     * @return did it lock or not.
-     */
-    boolean tryLockNanosInt(long offset, long nanos);
-
-    /**
-     * Lock which uses 4 bytes.  It store the lower 24 bits of the Thread Id and the re-entrant count as 8 bit.  This
-     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 255 times
-     * you will get an ISE
-     *
-     * @param offset of the start of the 4-byte lock
-     * @throws InterruptedException  if interrupted
-     * @throws IllegalStateException if the thread tries to lock it 255 nested time (without an unlock)
-     */
-    void busyLockInt(long offset) throws InterruptedException, IllegalStateException;
-
-    /**
-     * Lock which uses 4 bytes.  Unlock this It store the lower 24 bits of the Thread Id and the re-entrant count as 8
-     * bit.  This means if you create more than 16 million threads you can get a collision, and if you try to re-enter
-     * 255 times you will get an ISE
-     *
-     * @param offset of the start of the 4-byte lock
-     * @throws IllegalMonitorStateException if this thread doesn't hold the lock
-     */
-    void unlockInt(long offset) throws IllegalMonitorStateException;
 }

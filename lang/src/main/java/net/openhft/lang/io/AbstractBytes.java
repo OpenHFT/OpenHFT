@@ -17,11 +17,11 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.Maths;
-import net.openhft.lang.io.serialization.impl.NoMarshaller;
-import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.impl.NoMarshaller;
+import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.pool.StringInterner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -89,39 +89,6 @@ public abstract class AbstractBytes implements Bytes {
     protected AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory) {
         this.finished = false;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
-    }
-
-    protected StringInterner stringInterner() {
-        if (stringInterner == null)
-            stringInterner = new StringInterner(8 * 1024);
-        return stringInterner;
-    }
-
-    @Override
-    public Boolean parseBoolean(@NotNull StopCharTester tester) {
-        StringBuilder sb = acquireUtfReader();
-        parseUTF(sb, tester);
-        if (sb.length() == 0)
-            return null;
-        switch (sb.charAt(0)) {
-            case 't':
-            case 'T':
-                return sb.length() == 1 || equalsCaseIgnore(sb, "true") ? true : null;
-            case 'y':
-            case 'Y':
-                return sb.length() == 1 || equalsCaseIgnore(sb, "yes") ? true : null;
-            case '0':
-                return sb.length() == 1 ? false : null;
-            case '1':
-                return sb.length() == 1 ? true : null;
-            case 'f':
-            case 'F':
-                return sb.length() == 1 || equalsCaseIgnore(sb, "false") ? false : null;
-            case 'n':
-            case 'N':
-                return sb.length() == 1 || equalsCaseIgnore(sb, "no") ? false : null;
-        }
-        return null;
     }
 
     static boolean equalsCaseIgnore(StringBuilder sb, String s) {
@@ -193,6 +160,39 @@ public abstract class AbstractBytes implements Bytes {
         LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
 
         ID_LIMIT_WARNED = true;
+    }
+
+    protected StringInterner stringInterner() {
+        if (stringInterner == null)
+            stringInterner = new StringInterner(8 * 1024);
+        return stringInterner;
+    }
+
+    @Override
+    public Boolean parseBoolean(@NotNull StopCharTester tester) {
+        StringBuilder sb = acquireUtfReader();
+        parseUTF(sb, tester);
+        if (sb.length() == 0)
+            return null;
+        switch (sb.charAt(0)) {
+            case 't':
+            case 'T':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "true") ? true : null;
+            case 'y':
+            case 'Y':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "yes") ? true : null;
+            case '0':
+                return sb.length() == 1 ? false : null;
+            case '1':
+                return sb.length() == 1 ? true : null;
+            case 'f':
+            case 'F':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "false") ? false : null;
+            case 'n':
+            case 'N':
+                return sb.length() == 1 || equalsCaseIgnore(sb, "no") ? false : null;
+        }
+        return null;
     }
 
     @Override
@@ -267,6 +267,18 @@ public abstract class AbstractBytes implements Bytes {
         if (readUTFΔ(acquireUtfReader()))
             return utfReader.length() == 0 ? "" : stringInterner().intern(utfReader);
         return null;
+    }
+
+    @Nullable
+    @Override
+    public String readUTFΔ(long offset) throws IllegalStateException {
+        long position = position();
+        try {
+            position(offset);
+            return readUTFΔ();
+        } finally {
+            position(position);
+        }
     }
 
     @NotNull
@@ -346,7 +358,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 case 14: {
-				/* 1110 xxxx 10xx xxxx 10xx xxxx */
+                /* 1110 xxxx 10xx xxxx 10xx xxxx */
                     count += 3;
                     if (count > utflen)
                         throw new UTFDataFormatException(
@@ -364,7 +376,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 default:
-				/* 10xx xxxx, 1111 xxxx */
+                /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
                             "malformed input around byte " + count);
             }
@@ -411,14 +423,14 @@ public abstract class AbstractBytes implements Bytes {
                 case 5:
                 case 6:
                 case 7:
-				/* 0xxxxxxx */
+                /* 0xxxxxxx */
                     if (tester.isStopChar(c))
                         return;
                     appendable.append((char) c);
                     break;
                 case 12:
                 case 13: {
-				/* 110x xxxx 10xx xxxx */
+                /* 110x xxxx 10xx xxxx */
                     int char2 = readUnsignedByte();
                     if ((char2 & 0xC0) != 0x80)
                         throw new UTFDataFormatException(
@@ -431,7 +443,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 case 14: {
-				/* 1110 xxxx 10xx xxxx 10xx xxxx */
+                /* 1110 xxxx 10xx xxxx 10xx xxxx */
 
                     int char2 = readUnsignedByte();
                     int char3 = readUnsignedByte();
@@ -448,7 +460,7 @@ public abstract class AbstractBytes implements Bytes {
                     break;
                 }
                 default:
-				/* 10xx xxxx, 1111 xxxx */
+                /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
                             "malformed input around byte ");
             }
@@ -671,8 +683,10 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeUTF(@NotNull String str) {
         long strlen = str.length();
-        int utflen = findUTFLength(str, strlen);
-        writeUnsignedShort(utflen);
+        long utflen = findUTFLength(str, strlen);
+        if (utflen > 65535)
+            throw new IllegalStateException("String too long " + utflen + " when encoded, max: 65535");
+        writeUnsignedShort((int) utflen);
         writeUTF0(str, strlen);
     }
 
@@ -683,9 +697,31 @@ public abstract class AbstractBytes implements Bytes {
             return;
         }
         long strlen = str.length();
-        int utflen = findUTFLength(str, strlen);
+        long utflen = findUTFLength(str, strlen);
         writeStopBit(utflen);
         writeUTF0(str, strlen);
+    }
+
+    @Override
+    public void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException {
+        assert maxSize > 1;
+        if (s == null) {
+            writeStopBit(-1);
+            return;
+        }
+        long strlen = s.length();
+        long utflen = findUTFLength(s, strlen);
+        long totalSize = IOTools.stopBitLength(utflen) + utflen;
+        if (totalSize > maxSize)
+            throw new IllegalStateException("Attempted to write " + totalSize + " byte String, when only " + maxSize + " allowed");
+        long position = position();
+        try {
+            position(offset);
+            writeStopBit(utflen);
+            writeUTF0(s, strlen);
+        } finally {
+            position(position);
+        }
     }
 
     @NotNull
@@ -697,8 +733,8 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
-    private int findUTFLength(@NotNull CharSequence str, long strlen) {
-        int utflen = 0, c;/* use charAt instead of copying String to char array */
+    private long findUTFLength(@NotNull CharSequence str, long strlen) {
+        long utflen = 0, c;/* use charAt instead of copying String to char array */
         for (int i = 0; i < strlen; i++) {
             c = str.charAt(i);
             if ((c >= 0x0001) && (c <= 0x007F)) {
@@ -1782,7 +1818,7 @@ public abstract class AbstractBytes implements Bytes {
     private boolean tryLockNanos4a(long offset, int id) {
         int lowId = id & INT_LOCK_MASK;
         int firstValue = ((1 << 24) | lowId);
-        if (compareAndSetInt(offset, 0, firstValue))
+        if (compareAndSwapInt(offset, 0, firstValue))
             return true;
         long currentValue = readUnsignedInt(offset);
         if ((currentValue & INT_LOCK_MASK) == lowId) {
@@ -1807,7 +1843,7 @@ public abstract class AbstractBytes implements Bytes {
     public void unlockInt(long offset) throws IllegalMonitorStateException {
         int lowId = (int) Thread.currentThread().getId() & INT_LOCK_MASK;
         int firstValue = ((1 << 24) | lowId);
-        if (compareAndSetInt(offset, firstValue, 0))
+        if (compareAndSwapInt(offset, firstValue, 0))
             return;
         unlockFailed(offset, lowId);
     }
@@ -1830,7 +1866,7 @@ public abstract class AbstractBytes implements Bytes {
         for (; ; ) {
             int current = readVolatileInt(offset);
             int next = current + delta;
-            if (compareAndSetInt(offset, current, next))
+            if (compareAndSwapInt(offset, current, next))
                 return current;
         }
     }
@@ -1840,9 +1876,136 @@ public abstract class AbstractBytes implements Bytes {
         for (; ; ) {
             int current = readVolatileInt(offset);
             int next = current + delta;
-            if (compareAndSetInt(offset, current, next))
+            if (compareAndSwapInt(offset, current, next))
                 return next;
         }
+    }
+
+    @Override
+    public byte addByte(long offset, byte b) {
+        byte b2 = readByte(offset);
+        b2 += b;
+        writeByte(offset, b2);
+        return b2;
+    }
+
+    @Override
+    public int addUnsignedByte(long offset, int i) {
+        int b2 = readUnsignedByte(offset);
+        b2 += i;
+        writeUnsignedByte(offset, b2);
+        return b2 & 0xFF;
+    }
+
+    @Override
+    public short addShort(long offset, short s) {
+        short s2 = readShort(offset);
+        s2 += s;
+        writeByte(offset, s2);
+        return s2;
+    }
+
+    @Override
+    public int addUnsignedShort(long offset, int i) {
+        int b2 = readUnsignedShort(offset);
+        b2 += i;
+        writeUnsignedShort(offset, b2);
+        return b2 & 0xFFFF;
+    }
+
+    @Override
+    public int addInt(long offset, int i) {
+        int b2 = readInt(offset);
+        b2 += i;
+        writeInt(offset, b2);
+        return b2;
+    }
+
+    @Override
+    public long addUnsignedInt(long offset, long i) {
+        long b2 = readUnsignedInt(offset);
+        b2 += i;
+        writeUnsignedInt(offset, b2);
+        return b2 & 0xFFFFFFFFL;
+    }
+
+    @Override
+    public long addLong(long offset, long i) {
+        long b2 = readLong(offset);
+        b2 += i;
+        writeLong(offset, b2);
+        return b2;
+    }
+
+    @Override
+    public float addFloat(long offset, float f) {
+        float b2 = readFloat(offset);
+        b2 += f;
+        writeFloat(offset, b2);
+        return b2;
+    }
+
+    @Override
+    public double addDouble(long offset, double d) {
+        double b2 = readDouble(offset);
+        b2 += d;
+        writeDouble(offset, b2);
+        return b2;
+    }
+
+    @Override
+    public int addAtomicInt(long offset, int i) {
+        return addAndGetInt(offset, i);
+    }
+
+    @Override
+    public long addAtomicLong(long offset, long delta) {
+        for (; ; ) {
+            long current = readVolatileLong(offset);
+            long next = current + delta;
+            if (compareAndSwapLong(offset, current, next))
+                return next;
+        }
+    }
+
+    @Override
+    public float addAtomicFloat(long offset, float delta) {
+        for (; ; ) {
+            int current = readVolatileInt(offset);
+            int next = Float.floatToRawIntBits(Float.intBitsToFloat(current) + delta);
+            if (compareAndSwapInt(offset, current, next))
+                return next;
+        }
+    }
+
+    @Override
+    public double addAtomicDouble(long offset, double delta) {
+        for (; ; ) {
+            long current = readVolatileLong(offset);
+            long next = Double.doubleToRawLongBits(Double.longBitsToDouble(current) + delta);
+            if (compareAndSwapLong(offset, current, next))
+                return next;
+        }
+    }
+
+    @Override
+    public float readVolatileFloat(long offset) {
+        return Float.intBitsToFloat(readVolatileInt(offset));
+    }
+
+    @Override
+    public double readVolatileDouble(long offset) {
+        return Double.longBitsToDouble(readVolatileLong(offset));
+    }
+
+    @Override
+    public void writeOrderedFloat(long offset, float v) {
+        writeOrderedInt(offset, Float.floatToRawIntBits(v));
+    }
+
+    @Override
+    public void writeOrderedDouble(long offset, double v) {
+        writeOrderedLong(offset, Double.doubleToRawLongBits(v));
     }
 
     protected class BytesInputStream extends InputStream {

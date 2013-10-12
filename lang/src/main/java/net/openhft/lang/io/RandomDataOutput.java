@@ -410,7 +410,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param x        to set if expected was found
      * @return true if set, false if the value was not expected
      */
-    boolean compareAndSetInt(long offset, int expected, int x);
+    boolean compareAndSwapInt(long offset, int expected, int x);
 
     /**
      * Atomically adds the given value to the current value.
@@ -556,7 +556,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param x        to set if expected was found
      * @return true if set, false if the value was not expected
      */
-    boolean compareAndSetLong(long offset, long expected, long x);
+    boolean compareAndSwapLong(long offset, long expected, long x);
 
     /**
      * Stop bit encoding numbers. This will write the same number of bytes whether you used a byte, short or int.
@@ -586,6 +586,18 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param v      the <code>float</code> value to be written.
      */
     void writeFloat(long offset, float v);
+
+    /**
+     * Same as writeFloat but include an ordered write barrier.  This means all writes will be visible on a read barrier
+     * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
+     * could see an old value
+     * <p/>
+     * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
+     * same time.
+     *
+     * @param v value to write
+     */
+    void writeOrderedFloat(long offset, float v);
 
     /**
      * Writes a <code>double</code> value, which is comprised of eight bytes, to the output stream. It does this as if
@@ -629,6 +641,18 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param v the <code>double</code> value to be written.
      */
     void writeCompactDouble(double v);
+
+    /**
+     * Same as writeDouble but include an ordered write barrier.  This means all writes will be visible on a read barrier
+     * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
+     * could see an old value
+     * <p/>
+     * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
+     * same time.
+     *
+     * @param v value to write
+     */
+    void writeOrderedDouble(long offset, double v);
 
     /**
      * Writes a string to the output stream. For every character in the string <code>s</code>,  taken in order, one byte
@@ -695,6 +719,18 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param s the string value to be written. Can be null.
      */
     void writeUTFΔ(@Nullable CharSequence s);
+
+
+    /**
+     * Write the same encoding as <code>writeUTF</code> with the following changes.  1) The length is stop bit encoded
+     * i.e. one byte longer for short strings, but is not limited in length. 2) The string can be null.
+     *
+     * @param offset  to write to
+     * @param maxSize maximum number of bytes to use
+     * @param s       the string value to be written. Can be null.
+     * @throws IllegalStateException if the size is too large.
+     */
+    void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException;
 
     /**
      * Copies the contents of a ByteBuffer from the potision ot the limit.

@@ -21,7 +21,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * User: peter
+ * User: peter.lawrey
  * Date: 20/09/13
  * Time: 10:40
  */

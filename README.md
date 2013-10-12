@@ -6,11 +6,39 @@ This module is available on maven central as
     <dependency>
         <groupId>net.openhft</groupId>
         <artifactId>lang</artifactId>
-        <version>6.0.2</version>
+        <version>6.1</version>
     </dependency>
 
 The version 6.x signifies that it is build for Java 6+. (It requires Java 6 update 18 or later to build)
 
+## Working with off heap objects.
+
+Java-Lang 6.1 adds support for basic off heap data structures.  More collections types and more complex data types will be added in future versions.
+
+    public interface DataType {
+         // add getters and setters here
+    }
+    
+    // can create an array of any size (provided you have the memory) off heap.
+    HugeArray<DataType> array = HugeCollections.newArray(DataType.class, 10*1000*1000*1000L);
+    DataType dt = array.get(1111111111);
+    
+    // set data on dt
+    array.recycle(dt); // recycle the reference (or discard it)
+    
+    // create a ring buffer
+    HugeQueue<DataType> queue = HugeCollections.newQueue(DataType.class, 10*1000*1000L);
+    // give me a reference to an object to populate
+    DataType dt2 = queue.offer();
+    // set the values od dt2
+    queue.recycle(dt2);
+    
+    DataType dt3 = queue.take();
+    // get values
+    queue.recycle(dt3);
+    
+This is designed to be largely GC-less and you can queue millions of entries with 32 MB heap and not trigger GCs.
+    
 ## Working with buffers
 To work with buffers there is a several options:
 * _ByteBufferBytes_ which wraps [java.nio.ByteBuffer](http://docs.oracle.com/javase/7/docs/api/java/nio/ByteBuffer.html)
@@ -19,7 +47,7 @@ To work with buffers there is a several options:
 Both classes provide functionality:
 * write\read operations for primitives (writeLong(long n), readLong() etc.)
 * locking in native memory, so you can add thread safe constructs to your native record.
-* CAS operations for int and long _boolean compareAndSetInt(long offset, int expected, int x)_, _boolean compareAndSetLong(long offset, long expected, long x)_
+* CAS operations for int and long _boolean compareAndSwapInt(long offset, int expected, int x)_, _boolean compareAndSwapLong(long offset, long expected, long x)_
 * addAndGetInt and getAndAddInt operations
 
 ####Example

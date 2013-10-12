@@ -17,7 +17,7 @@
 package net.openhft.lang.testing;
 
 /**
- * User: peter
+ * User: peter.lawrey
  * Date: 05/08/13
  * Time: 19:07
  */
