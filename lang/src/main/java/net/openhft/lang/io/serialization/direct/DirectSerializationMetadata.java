@@ -73,6 +73,7 @@ public class DirectSerializationMetadata {
         else if (short.class.equals(field.getType())) return 2;
         else if (char.class.equals(field.getType())) return 2;
         else if (int.class.equals(field.getType())) return 4;
+        else if (float.class.equals(field.getType())) return 4;
         else return 8;
     }
 
