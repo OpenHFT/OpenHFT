@@ -6,7 +6,7 @@ This module is available on maven central as
     <dependency>
         <groupId>net.openhft</groupId>
         <artifactId>lang</artifactId>
-        <version>6.1</version>
+        <version>6.1.1</version>
     </dependency>
 
 The version 6.x signifies that it is build for Java 6+. (It requires Java 6 update 18 or later to build)
