@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>lang</artifactId>
-    <version>6.1.1-SNAPSHOT</version>
+    <version>6.1.1</version>
     <packaging>bundle</packaging>
 
     <name>OpenHFT/Java-Lang</name>
@@ -62,7 +62,6 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-
 
 
         <!-- for OSGi testing -->
@@ -108,7 +107,7 @@
             <version>0.9.6</version>
             <scope>test</scope>
         </dependency>
-        
+
     </dependencies>
 
     <build>
