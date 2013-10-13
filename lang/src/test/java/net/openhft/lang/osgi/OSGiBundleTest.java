@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.openhft.chronicle.osgi;
+package net.openhft.lang.osgi;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -47,15 +47,15 @@ public class OSGiBundleTest {
         root.setLevel(Level.INFO);
 
         return options(
-            systemProperty("org.osgi.framework.storage.clean").value("true"),
-            systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
-            mavenBundle("net.openhft", "compiler", "2.1"),
-            bundle("reference:file:target/classes"),
-            junitBundles(),
-            systemPackage("sun.misc"),
-            systemPackage("sun.nio.ch"),
-            systemPackage("com.sun.tools.javac.api"),
-            cleanCaches()
+                systemProperty("org.osgi.framework.storage.clean").value("true"),
+                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
+                mavenBundle("net.openhft", "compiler", "2.1"),
+                mavenBundle("net.openhft", "lang", "6.1"),
+                junitBundles(),
+                systemPackage("sun.misc"),
+                systemPackage("sun.nio.ch"),
+                systemPackage("com.sun.tools.javac.api"),
+                cleanCaches()
         );
     }
 

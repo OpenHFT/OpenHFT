@@ -30,6 +30,10 @@ public class DirectStore {
     protected long address;
     protected long size;
 
+    public DirectStore(long size) {
+        this(null, size);
+    }
+
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
         this.bytesMarshallerFactory = bytesMarshallerFactory;
         address = NativeBytes.UNSAFE.allocateMemory(size);
@@ -51,7 +55,7 @@ public class DirectStore {
 
     @Nullable
     public static DirectStore allocate(long size) {
-        return new DirectStore(null, size);
+        return new DirectStore(size);
     }
 
 /*    public void resize(long newSize) {
