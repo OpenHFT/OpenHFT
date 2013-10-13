@@ -184,6 +184,17 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                     </instructions>
                 </configuration>
+                <executions>
+                    <!-- 
+                      This execution makes sure that the manifest is available 
+                      when the tests are executed 
+                    -->
+                    <execution>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

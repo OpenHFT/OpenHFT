@@ -54,7 +54,7 @@ public class OSGiCollectionTest {
             systemProperty("org.osgi.framework.storage.clean").value("true"),
             systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
             mavenBundle("net.openhft", "compiler", "2.1"),
-            mavenBundle("net.openhft", "lang", "6.1"),
+            bundle("reference:file:target/classes"),
             junitBundles(),
             systemPackage("sun.misc"),
             systemPackage("sun.nio.ch"),
