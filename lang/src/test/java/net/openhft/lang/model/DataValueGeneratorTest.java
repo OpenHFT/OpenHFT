@@ -155,6 +155,8 @@ public class DataValueGeneratorTest {
         NestedB nestedB2 = dvg.heapInstance(NestedB.class);
         nestedB2.ask(91);
         nestedB2.bid(92);
+
+//        dvg.setDumpCode(true);
         NestedA nestedA = dvg.nativeInstance(NestedA.class);
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
         ((Byteable) nestedA).bytes(bytes);

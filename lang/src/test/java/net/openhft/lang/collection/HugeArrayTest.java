@@ -43,6 +43,7 @@ public class HugeArrayTest {
             jbi.setLong(i);
             jbi.setDouble(i);
             jbi.setFlag((i & 3) == 0);
+            jbi.setString("hello");
             array.recycle(jbi);
         }
         for (int i = 0; i < array.length(); i++) {
@@ -55,6 +56,7 @@ public class HugeArrayTest {
             assertEquals(i, jbi.getLong());
             assertEquals(i, jbi.getDouble(), 0.0);
             assertEquals((i & 3) == 0, jbi.getFlag());
+            assertEquals("hello", jbi.getString());
             array.recycle(jbi);
         }
         long time = System.nanoTime() - start;
