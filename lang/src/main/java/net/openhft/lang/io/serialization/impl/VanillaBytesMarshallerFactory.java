@@ -49,7 +49,7 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
         BytesMarshaller em = marshallerMap.get(eClass);
         if (em == null)
             if (eClass.isEnum())
-                marshallerMap.put(eClass, em = new VanillaBytesMarshaller(eClass, null));
+                marshallerMap.put(eClass, em = new EnumBytesMarshaller(eClass, null));
             else if (BytesMarshallable.class.isAssignableFrom(eClass))
                 marshallerMap.put(eClass, em = new BytesMarshallableMarshaller((Class) eClass));
             else if (Externalizable.class.isAssignableFrom(eClass))
@@ -62,5 +62,9 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
                 }
             }
         return em;
+    }
+
+    public <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller) {
+        marshallerMap.put(eClass, marshaller);
     }
 }

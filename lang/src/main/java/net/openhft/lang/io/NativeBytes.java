@@ -49,6 +49,8 @@ public class NativeBytes extends AbstractBytes {
         }
     }
 
+    protected static final long NO_PAGE = UNSAFE.allocateMemory(UNSAFE.pageSize());
+
     protected long startAddr;
     protected long positionAddr;
     protected long limitAddr;

@@ -1780,7 +1780,7 @@ public abstract class AbstractBytes implements Bytes {
         checkEndOfBuffer();
     }
 
-    private boolean autoGenerateMarshaller(Object obj) {
+    protected boolean autoGenerateMarshaller(Object obj) {
         return (obj instanceof Comparable && obj.getClass().getPackage().getName().startsWith("java"))
                 || obj instanceof Externalizable
                 || obj instanceof BytesMarshallable;
