@@ -46,7 +46,7 @@ public class DirectStore {
         cleaner = Cleaner.create(this, new Runnable() {
             @Override
             public void run() {
-                if (address > 0)
+                if (address != 0)
                     NativeBytes.UNSAFE.freeMemory(address);
                 address = DirectStore.this.size = 0;
             }

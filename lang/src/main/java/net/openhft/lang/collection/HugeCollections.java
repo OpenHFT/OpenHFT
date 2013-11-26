@@ -31,7 +31,7 @@ public enum HugeCollections {
     private static final DataValueGenerator VALUE_GENERATOR = new DataValueGenerator();
 
     static {
-        VALUE_GENERATOR.setDumpCode(true);
+//        VALUE_GENERATOR.setDumpCode(true);
     }
 
     public static <T> HugeArray<T> newArray(Class<T> tClass, long length) {

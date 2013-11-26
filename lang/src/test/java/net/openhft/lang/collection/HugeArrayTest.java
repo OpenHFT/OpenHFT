@@ -31,7 +31,8 @@ public class HugeArrayTest {
     public void testHugeArray() {
         // runs with a maximum heap size of 32 MB.
         int length = 10 * 1000 * 1000;
-        HugeArray<JavaBeanInterface> array = HugeCollections.newArray(JavaBeanInterface.class, length);
+        HugeArray<JavaBeanInterface> array =
+                HugeCollections.newArray(JavaBeanInterface.class, length);
         long start = System.nanoTime();
         for (int i = 0; i < array.length(); i++) {
             JavaBeanInterface jbi = array.get(i);
@@ -48,12 +49,12 @@ public class HugeArrayTest {
         }
         for (int i = 0; i < array.length(); i++) {
             JavaBeanInterface jbi = array.get(i);
-            assertEquals((byte) i, jbi.getByte());
-            assertEquals((char) i, jbi.getChar());
-            assertEquals((short) i, jbi.getShort());
-            assertEquals(i, jbi.getInt());
+            assertEquals2((byte) i, jbi.getByte());
+            assertEquals2((char) i, jbi.getChar());
+            assertEquals2((short) i, jbi.getShort());
+            assertEquals2(i, jbi.getInt());
             assertEquals(i, jbi.getFloat(), 0);
-            assertEquals(i, jbi.getLong());
+            assertEquals2(i, jbi.getLong());
             assertEquals(i, jbi.getDouble(), 0.0);
             assertEquals((i & 3) == 0, jbi.getFlag());
             assertEquals("hello", jbi.getString());
@@ -62,5 +63,10 @@ public class HugeArrayTest {
         long time = System.nanoTime() - start;
         double avg = time / 2.0 / length;
         System.out.printf("Average time to access a JavaBeanInterface was %.1f ns%n", avg);
+    }
+
+    static void assertEquals2(long a, long b) {
+        if (a != b)
+            org.junit.Assert.assertEquals(a, b);
     }
 }
