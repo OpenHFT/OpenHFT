@@ -780,8 +780,9 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * interface
      *
      * @param map to populate
+     * @return the map
      */
-    <K, V> void readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass);
+    <K, V> Map<K, V> readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass);
 
     // ObjectInput
 

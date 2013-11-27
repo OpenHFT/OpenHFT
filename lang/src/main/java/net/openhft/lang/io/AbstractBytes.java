@@ -737,7 +737,7 @@ public abstract class AbstractBytes implements Bytes {
         long utflen = 0, c;/* use charAt instead of copying String to char array */
         for (int i = 0; i < strlen; i++) {
             c = str.charAt(i);
-            if ((c >= 0x0001) && (c <= 0x007F)) {
+            if ((c >= 0x0000) && (c <= 0x007F)) {
                 utflen++;
             } else if (c > 0x07FF) {
                 utflen += 3;
@@ -757,14 +757,14 @@ public abstract class AbstractBytes implements Bytes {
         int i;
         for (i = 0; i < strlen; i++) {
             c = str.charAt(i);
-            if (!((c >= 0x0001) && (c <= 0x007F)))
+            if (!((c >= 0x0000) && (c <= 0x007F)))
                 break;
             write(c);
         }
 
         for (; i < strlen; i++) {
             c = str.charAt(i);
-            if ((c >= 0x0001) && (c <= 0x007F)) {
+            if ((c >= 0x0000) && (c <= 0x007F)) {
                 write(c);
 
             } else if (c > 0x07FF) {
@@ -1665,11 +1665,13 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public <K, V> void readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass) {
+    @NotNull
+    public <K, V> Map<K, V> readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass) {
         int len = (int) readStopBit();
         map.clear();
         for (int i = 0; i < len; i++)
             map.put(readEnum(kClass), readEnum(vClass));
+        return map;
     }
 
     @Override
