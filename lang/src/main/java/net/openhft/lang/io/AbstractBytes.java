@@ -992,6 +992,15 @@ public abstract class AbstractBytes implements Bytes {
             writeByte(bb.get());
     }
 
+    @Override
+    public void write(@NotNull Bytes bb) {
+        // TODO optimise this to use Unsafe copy memory
+        while (bb.remaining() >= 8)
+            writeLong(bb.readLong());
+        while (bb.remaining() >= 1)
+            writeByte(bb.readByte());
+    }
+
     // // ByteStringAppender
     @NotNull
     @Override
