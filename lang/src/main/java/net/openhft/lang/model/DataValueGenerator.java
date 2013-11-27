@@ -45,7 +45,7 @@ public class DataValueGenerator {
         @Override
         public int compare(Map.Entry<String, FieldModel> o1, Map.Entry<String, FieldModel> o2) {
             // descending
-            int cmp = -Integer.compare(o1.getValue().heapSize(), o2.getValue().heapSize());
+            int cmp = o2.getValue().heapSize() - o1.getValue().heapSize();
             return cmp == 0 ? o1.getKey().compareTo(o2.getKey()) : cmp;
         }
     };
