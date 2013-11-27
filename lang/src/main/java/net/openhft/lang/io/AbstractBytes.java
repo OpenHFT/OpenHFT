@@ -994,6 +994,8 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(@NotNull Bytes bb) {
+        if (bb.remaining() > remaining())
+            throw new IndexOutOfBoundsException("Trying to write " + bb.remaining() + " when only " + remaining() + " left");
         // TODO optimise this to use Unsafe copy memory
         while (bb.remaining() >= 8)
             writeLong(bb.readLong());
