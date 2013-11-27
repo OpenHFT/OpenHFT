@@ -993,14 +993,18 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void write(@NotNull Bytes bb) {
-        if (bb.remaining() > remaining())
-            throw new IndexOutOfBoundsException("Trying to write " + bb.remaining() + " when only " + remaining() + " left");
+    public void writeStartToPosition(@NotNull Bytes bb) {
+        final long position = bb.position();
+        long offset = 0;
+        if (position > remaining())
+            throw new IndexOutOfBoundsException("Trying to write " + position + " when only " + remaining() + " left");
         // TODO optimise this to use Unsafe copy memory
-        while (bb.remaining() >= 8)
-            writeLong(bb.readLong());
-        while (bb.remaining() >= 1)
-            writeByte(bb.readByte());
+        while (position - offset >= 8) {
+            writeLong(bb.readLong(offset));
+            offset += 8;
+        }
+        while (position - offset >= 1)
+            writeByte(bb.readByte(offset++));
     }
 
     // // ByteStringAppender

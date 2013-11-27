@@ -30,11 +30,11 @@ import java.util.RandomAccess;
  */
 public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommon {
     /**
-     * Copy from one Bytes to another
+     * Copy from one Bytes to another. Copied from the start to the current position.
      *
      * @param bytes to copy from
      */
-    void write(Bytes bytes);
+    void writeStartToPosition(Bytes bytes);
 
     /**
      * Writes to the output stream the eight low-order bits of the argument <code>b</code>. The 24 high-order  bits of
