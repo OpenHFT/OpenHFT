@@ -35,12 +35,18 @@ public class DirectStore {
     }
 
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
+        this(bytesMarshallerFactory, size, true);
+    }
+
+    public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size, boolean zeroOut) {
         this.bytesMarshallerFactory = bytesMarshallerFactory;
         address = NativeBytes.UNSAFE.allocateMemory(size);
 
 //        System.out.println("old value " + Integer.toHexString(NativeBytes.UNSAFE.getInt(null, address)));
-        NativeBytes.UNSAFE.setMemory(address, size, (byte) 0);
-        NativeBytes.UNSAFE.putLongVolatile(null, address, 0L);
+        if (zeroOut) {
+            NativeBytes.UNSAFE.setMemory(address, size, (byte) 0);
+            NativeBytes.UNSAFE.putLongVolatile(null, address, 0L);
+        }
 
         this.size = size;
         cleaner = Cleaner.create(this, new Runnable() {
