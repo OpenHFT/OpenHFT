@@ -16,6 +16,8 @@
 
 package net.openhft.lang.io.serialization.direct;
 
+import net.openhft.lang.Maths;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,19 +49,15 @@ public class Introspect {
     private static final class FieldOffsetComparator implements Comparator<Field> {
         public static final FieldOffsetComparator Instance = new FieldOffsetComparator();
 
+        @Override
+        public int compare(Field first, Field second) {
+            return Maths.compare(offset(first), offset(second));
+        }
+
         private static long offset(Field field) {
             return isStatic(field) ?
                     UNSAFE.staticFieldOffset(field) :
                     UNSAFE.objectFieldOffset(field);
-        }
-
-        @Override
-        public int compare(Field first, Field second) {
-            return longCompare(offset(first), offset(second));
-        }
-
-        private static int longCompare(long a, long b) {
-            return a > b ? +1 : a < b ? -1 : 0;
         }
     }
 }

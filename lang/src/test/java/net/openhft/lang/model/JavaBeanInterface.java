@@ -24,6 +24,14 @@ import net.openhft.lang.model.constraints.MaxSize;
  * Time: 16:59
  */
 public interface JavaBeanInterface {
+    int getRecord();
+
+    void setRecord(int record);
+
+    void busyLockRecord() throws InterruptedException;
+
+    void unlockRecord();
+
     void setFlag(boolean flag);
 
     boolean getFlag();
