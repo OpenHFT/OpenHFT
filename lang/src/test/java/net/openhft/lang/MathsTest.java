@@ -30,6 +30,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class MathsTest {
     @Test
+    public void testIntLog2() {
+        for (int i = 0; i < 63; i++) {
+            long l = 1L << i;
+            assertEquals(i, Maths.intLog2(l));
+        }
+    }
+
+    @Test
     public void testRounding() {
         Random rand = new Random(1);
         for (int i = 0; i < 1000; i++) {

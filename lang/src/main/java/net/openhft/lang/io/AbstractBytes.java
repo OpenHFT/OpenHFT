@@ -39,7 +39,8 @@ import java.util.logging.Logger;
  * @author peter.lawrey
  */
 @SuppressWarnings("MagicNumber")
-public abstract class AbstractBytes implements Bytes {
+public abstract class
+        AbstractBytes implements Bytes {
     public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     public static final int INT_LOCK_MASK = 0xFFFFFF;
     public static final int UNSIGNED_BYTE_MASK = 0xFF;

@@ -142,4 +142,8 @@ public class Maths {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 
+    public static int intLog2(long num) {
+        long l = Double.doubleToRawLongBits(num);
+        return (int) ((l >> 52) - 1023);
+    }
 }
