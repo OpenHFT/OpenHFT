@@ -994,6 +994,7 @@ public abstract class
             writeByte(bb.get());
     }
 
+    @Deprecated
     @Override
     public void writeStartToPosition(@NotNull Bytes bb) {
         final long position = bb.position();
@@ -2099,6 +2100,39 @@ public abstract class
         for (int i = start; i < end; i++)
             sb.append(charAt(i));
         return sb;
+    }
+
+    @Override
+    public void readMarshallable(@NotNull Bytes in) throws IllegalStateException {
+        long len = Math.min(remaining(), in.remaining());
+        long inPosition = in.position();
+        write(in, inPosition, len);
+        in.position(inPosition + len);
+    }
+
+    @Override
+    public void writeMarshallable(@NotNull Bytes out) {
+        out.write(this, position(), remaining());
+
+    }
+
+    @Override
+    public void write(BytesCommon bytes, long position, long length) {
+        if (length > bytes.remaining())
+            throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
+        RandomDataInput rdi = (RandomDataInput) bytes;
+        if (bytes.byteOrder() == byteOrder()) {
+            while (length >= 8) {
+                writeLong(rdi.readLong(position));
+                position += 8;
+                length -= 8;
+            }
+        }
+        while (rdi.remaining() >= 1) {
+            writeByte(rdi.readByte(position));
+            position++;
+            length--;
+        }
     }
 
     protected class BytesInputStream extends InputStream {

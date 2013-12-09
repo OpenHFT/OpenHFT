@@ -16,9 +16,11 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.io.serialization.BytesMarshallable;
+
 /**
  * @author peter.lawrey
  */
 public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate,
-        ByteStringAppender, ByteStringParser, CharSequence {
+        ByteStringAppender, ByteStringParser, CharSequence, BytesMarshallable {
 }

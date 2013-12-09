@@ -33,7 +33,9 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Copy from one Bytes to another. Copied from the start to the current position.
      *
      * @param bytes to copy from
+     * @deprecated Use write(BytesCommon bytes, long position, long length) instead.
      */
+    @Deprecated
     void writeStartToPosition(Bytes bytes);
 
     /**
@@ -212,7 +214,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Writes one or three bytes as follows; Short.MIN_VALUE =&gt; Byte.MIN_VALUE, Short.MAX_VALUE =&gt; Byte.MAX_VALUE,
-     * Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; writeByte(x), default =&gt; writeByte(Byte.MIN_VALUE+1; writeShort(x)
+     * Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; writeByte(x), default =&gt; writeByte(Byte.MIN_VALUE+1;
+     * writeShort(x)
      * <p/>
      * The bytes written by this method may be read by the <code>readCompactShort</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>short</code> equal to <code>(short)v</code>.
@@ -362,8 +365,9 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeUnsignedInt(long offset, long v);
 
     /**
-     * Writes two or six bytes as follows; Integer.MIN_VALUE =&gt; Short.MIN_VALUE, Integer.MAX_VALUE =&gt; Short.MAX_VALUE,
-     * Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; writeShort(x), default =&gt; writeShort(Short.MIN_VALUE+1; writeInt(x)
+     * Writes two or six bytes as follows; Integer.MIN_VALUE =&gt; Short.MIN_VALUE, Integer.MAX_VALUE =&gt;
+     * Short.MAX_VALUE, Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; writeShort(x), default =&gt;
+     * writeShort(Short.MIN_VALUE+1; writeInt(x)
      * <p/>
      * The bytes written by this method may be read by the <code>readCompactInt</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>int</code> equal to <code>v</code>.
@@ -373,7 +377,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeCompactInt(int v);
 
     /**
-     * Writes two or six bytes as follows; 0 to (1 &lt;&lt; 16) - 2 =&gt; writeInt(x), otherwise writeShort(-1); writeInt(x)
+     * Writes two or six bytes as follows; 0 to (1 &lt;&lt; 16) - 2 =&gt; writeInt(x), otherwise writeShort(-1);
+     * writeInt(x)
      * <p/>
      * The bytes written by this method may be read by the <code>readCompactUnsignedInt</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>int</code> equal to <code>v &amp;
@@ -519,8 +524,9 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeLong(long offset, long v);
 
     /**
-     * Writes four or twelve bytes as follows Long.MIN_VALUE =&gt; Integer.MIN_VALUE, Long.MAX_VALUE =&gt; Integer.MAX_VALUE,
-     * Integer.MIN_VALUE+2 to Integer.MAX_VALUE-1 =&gt; writeInt(x), default =&gt; writeInt(Integer.MIN_VALUE+1; writeLong(x)
+     * Writes four or twelve bytes as follows Long.MIN_VALUE =&gt; Integer.MIN_VALUE, Long.MAX_VALUE =&gt;
+     * Integer.MAX_VALUE, Integer.MIN_VALUE+2 to Integer.MAX_VALUE-1 =&gt; writeInt(x), default =&gt;
+     * writeInt(Integer.MIN_VALUE+1; writeLong(x)
      * <p/>
      * The bytes written by this method may be read by the <code>readCompactLong</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>long</code> equal to <code>v</code>.
@@ -650,9 +656,9 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeCompactDouble(double v);
 
     /**
-     * Same as writeDouble but include an ordered write barrier.  This means all writes will be visible on a read barrier
-     * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
-     * could see an old value
+     * Same as writeDouble but include an ordered write barrier.  This means all writes will be visible on a read
+     * barrier if this write is visible. This might not be visible to be same thread for some clock cycles so an
+     * immediate read could see an old value
      * <p/>
      * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
      * same time.
