@@ -17,7 +17,7 @@
 package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.Bytes;
-import net.openhft.lang.io.serialization.BytesMarshaller;
+import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +26,7 @@ import java.util.Date;
 /**
  * @author peter.lawrey
  */
-public class DateMarshaller implements BytesMarshaller<Date> {
+public class DateMarshaller implements CompactBytesMarshaller<Date> {
     final int size1;
     private final StringBuilder sb = new StringBuilder();
     @Nullable
@@ -86,5 +86,10 @@ public class DateMarshaller implements BytesMarshaller<Date> {
         h ^= (h >>> 41) ^ (h >>> 20);
         h ^= (h >>> 14) ^ (h >>> 7);
         return (int) (h & size1);
+    }
+
+    @Override
+    public byte code() {
+        return 'T' & 31; // Control T.
     }
 }

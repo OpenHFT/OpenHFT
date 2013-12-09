@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import sun.misc.Cleaner;
@@ -31,7 +32,7 @@ public class DirectStore {
     protected long size;
 
     public DirectStore(long size) {
-        this(null, size);
+        this(new VanillaBytesMarshallerFactory(), size);
     }
 
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
@@ -82,6 +83,10 @@ public class DirectStore {
 
     public long size() {
         return size;
+    }
+
+    public BytesMarshallerFactory bytesMarshallerFactory() {
+        return bytesMarshallerFactory;
     }
 
 }

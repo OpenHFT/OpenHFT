@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io.serialization;
+package net.openhft.lang.io.serialization.impl;
 
+import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author peter.lawrey
+ * Created with IntelliJ IDEA. User: peter Date: 09/12/13 Time: 17:05 To change this template use File | Settings | File
+ * Templates.
  */
-public interface BytesMarshallerFactory {
-    @NotNull
-    <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create);
+public class CompactEnumBytesMarshaller<E> extends GenericEnumMarshaller<E> implements CompactBytesMarshaller<E> {
+    private final byte code;
 
-    <E> BytesMarshaller<E> getMarshaller(byte code);
+    public CompactEnumBytesMarshaller(@NotNull Class<E> classMarshaled, int capacity, byte code) {
+        super(classMarshaled, capacity);
+        this.code = code;
+    }
 
-    <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller);
+    @Override
+    public byte code() {
+        return code;
+    }
 }

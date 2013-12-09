@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: peter.lawrey
- * Date: 08/10/13
- * Time: 08:11
+ * User: peter.lawrey Date: 08/10/13 Time: 08:11
  */
 public class HugeArrayImpl<T> implements HugeArray<T> {
     private static final int MAX_SIZE = 10;
@@ -48,7 +46,7 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
 
         T ref = valueGenerator.nativeInstance(tClass);
         size = ((Byteable) ref).maxSize();
-        store = new DirectStore(length * size);
+        store = new DirectStore(null, length * size);
         ((Byteable) ref).bytes(store.createSlice());
         recycle(ref);
     }

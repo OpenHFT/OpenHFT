@@ -54,7 +54,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
         }
         this.constructor = constructor;
         this.valueOf = valueOf;
-        map = new LinkedHashMap<String, E>(capacity * 10 / 7, 0.7f, true) {
+        map = new LinkedHashMap<String, E>(128, 0.7f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, E> eldest) {
                 return size() > capacity;

@@ -19,6 +19,7 @@ package net.openhft.lang.io.serialization.impl;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Externalizable;
@@ -32,14 +33,18 @@ import java.util.Map;
 public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
 
     private final Map<Class, BytesMarshaller> marshallerMap = new LinkedHashMap<Class, BytesMarshaller>();
+    private final BytesMarshaller[] compactMarshallerMap = new BytesMarshaller[256];
 
     //    private final Map<Class, BytesMarshaller> marshallerTextMap = new LinkedHashMap<Class, BytesMarshaller>();
     {
         BytesMarshaller stringMarshaller = new StringMarshaller(16 * 1024);
-        marshallerMap.put(String.class, stringMarshaller);
-        marshallerMap.put(CharSequence.class, stringMarshaller);
-        marshallerMap.put(Class.class, new ClassMarshaller(Thread.currentThread().getContextClassLoader()));
-        marshallerMap.put(Date.class, new DateMarshaller(10191));
+        addMarshaller(String.class, stringMarshaller);
+        addMarshaller(CharSequence.class, stringMarshaller);
+        addMarshaller(Class.class, new ClassMarshaller(Thread.currentThread().getContextClassLoader()));
+        addMarshaller(Date.class, new DateMarshaller(10191));
+        addMarshaller(Integer.class, new CompactEnumBytesMarshaller<Integer>(Integer.class, 10191, (byte) ('I' & 31)));
+        addMarshaller(Long.class, new CompactEnumBytesMarshaller<Long>(Long.class, 10191, (byte) ('L' & 31)));
+        addMarshaller(Double.class, new CompactEnumBytesMarshaller<Double>(Double.class, 10191, (byte) ('D' & 31)));
     }
 
     @NotNull
@@ -64,7 +69,14 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
         return em;
     }
 
+    @Override
+    public <E> BytesMarshaller<E> getMarshaller(byte code) {
+        return compactMarshallerMap[code & 0xFF];
+    }
+
     public <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller) {
         marshallerMap.put(eClass, marshaller);
+        if (marshaller instanceof CompactBytesMarshaller)
+            compactMarshallerMap[((CompactBytesMarshaller) marshaller).code()] = marshaller;
     }
 }

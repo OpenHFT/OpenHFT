@@ -20,6 +20,7 @@ import net.openhft.lang.Maths;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.io.serialization.impl.NoMarshaller;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.pool.StringInterner;
@@ -1797,7 +1798,7 @@ public abstract class
     @Nullable
     @Override
     public Object readObject() {
-        int type = readByte();
+        byte type = readByte();
         switch (type) {
             case NULL:
                 return null;
@@ -1813,7 +1814,10 @@ public abstract class
                 }
             }
             default:
-                throw new IllegalStateException("Unknown type " + (char) type);
+                BytesMarshaller<Object> m = bytesMarshallerFactory.getMarshaller(type);
+                if (m == null)
+                    throw new IllegalStateException("Unknown type " + (char) type);
+                return m.read(this);
         }
     }
 
@@ -1840,6 +1844,11 @@ public abstract class
             em = bytesMarshallerFactory.acquireMarshaller(clazz, true);
 
         if (em != NoMarshaller.INSTANCE) {
+            if (em instanceof CompactBytesMarshaller) {
+                writeByte(((CompactBytesMarshaller) em).code());
+                em.write(this, obj);
+                return;
+            }
             writeByte(ENUMED);
             writeEnum(clazz);
             em.write(this, obj);
@@ -2128,7 +2137,7 @@ public abstract class
                 length -= 8;
             }
         }
-        while (rdi.remaining() >= 1) {
+        while (length >= 1) {
             writeByte(rdi.readByte(position));
             position++;
             length--;
