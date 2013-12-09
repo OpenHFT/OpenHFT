@@ -24,14 +24,14 @@ import org.junit.Test;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * User: peter.lawrey Date: 22/09/13 Time: 17:06
  */
 public class RawCopierTest {
     static void printInts(Object o, int len) {
-        for (int i = 0; i < len; i += 4) {
+        for (long i = 0; i < len; i += 4) {
             System.out.print(NativeBytes.UNSAFE.getInt(o, i) + " ");
         }
         System.out.println();
