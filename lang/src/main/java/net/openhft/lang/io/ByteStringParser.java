@@ -52,7 +52,16 @@ public interface ByteStringParser extends BytesCommon {
     @NotNull
     MutableDecimal parseDecimal(@NotNull MutableDecimal decimal);
 
+    /**
+     * @return the next long, stopping at the first invalid character
+     */
     long parseLong();
+
+    /**
+     * @param base to use.
+     * @return the next long, stopping at the first invalid character
+     */
+    long parseLong(int base);
 
     double parseDouble();
 

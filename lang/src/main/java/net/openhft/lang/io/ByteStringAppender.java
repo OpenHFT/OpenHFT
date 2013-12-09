@@ -51,6 +51,9 @@ public interface ByteStringAppender extends Appendable, BytesCommon {
     ByteStringAppender append(long l);
 
     @NotNull
+    ByteStringAppender append(long l, int base);
+
+    @NotNull
     ByteStringAppender appendTimeMillis(long timeInMS);
 
     @NotNull

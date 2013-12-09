@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -1063,6 +1064,33 @@ public abstract class
         return this;
     }
 
+    private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
+
+    @NotNull
+    @Override
+    public ByteStringAppender append(long num, int base) {
+        if (base < 2 || base > Character.MAX_RADIX)
+            throw new IllegalArgumentException("Invalid base: " + base);
+        if (num < 0) {
+            if (num == Long.MIN_VALUE) {
+                writeBytes(BigInteger.valueOf(num).toString(base));
+                return this;
+            }
+            writeByte('-');
+            num = -num;
+        }
+        if (num == 0) {
+            writeByte('0');
+
+        } else {
+            while (num > 0) {
+                writeByte(RADIX[((int) (num % base))]);
+                num /= base;
+            }
+        }
+        return this;
+    }
+
     @NotNull
     @Override
     public ByteStringAppender appendDateMillis(long timeInMS) {
@@ -1328,6 +1356,35 @@ public abstract class
             if ((b - ('0' + Integer.MIN_VALUE)) <= 9 + Integer.MIN_VALUE)
                 num = num * 10 + b - '0';
             else if (b == '-')
+                negative = true;
+            else
+                break;
+        }
+        return negative ? -num : num;
+    }
+
+    static final byte[] RADIX_PARSE = new byte[256];
+
+    static {
+        Arrays.fill(RADIX_PARSE, (byte) -1);
+        for (int i = 0; i < 10; i++)
+            RADIX_PARSE['0' + i] = (byte) i;
+        for (int i = 0; i < 26; i++)
+            RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
+    }
+
+    @Override
+    public long parseLong(int base) {
+        if (base < 2 || base > Character.MAX_RADIX)
+            throw new IllegalArgumentException("Invalid base:" + base);
+        long num = 0;
+        boolean negative = false;
+        while (true) {
+            byte b = readByte();
+            byte rp = RADIX_PARSE[b];
+            if (rp >= 0 && rp < base) {
+                num = num * base + rp;
+            } else if (b == '-')
                 negative = true;
             else
                 break;
@@ -2024,6 +2081,24 @@ public abstract class
     @Override
     public void writeOrderedDouble(long offset, double v) {
         writeOrderedLong(offset, Double.doubleToRawLongBits(v));
+    }
+
+    @Override
+    public int length() {
+        return (int) Math.min(Integer.MAX_VALUE, remaining());
+    }
+
+    @Override
+    public char charAt(int index) {
+        return (char) readUnsignedByte(index);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+        StringBuilder sb = new StringBuilder(end - start + 1);
+        for (int i = start; i < end; i++)
+            sb.append(charAt(i));
+        return sb;
     }
 
     protected class BytesInputStream extends InputStream {

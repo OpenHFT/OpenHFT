@@ -19,5 +19,6 @@ package net.openhft.lang.io;
 /**
  * @author peter.lawrey
  */
-public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate, ByteStringAppender, ByteStringParser {
+public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate,
+        ByteStringAppender, ByteStringParser, CharSequence {
 }
