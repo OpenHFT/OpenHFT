@@ -20,7 +20,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import net.openhft.lang.collection.HugeArray;
 import net.openhft.lang.collection.HugeCollections;
-import net.openhft.lang.model.JavaBeanInterface;
+import net.openhft.langosgi.model.JavaBeanInterface;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -38,6 +39,7 @@ import static org.ops4j.pax.exam.CoreOptions.*;
 /**
  * @author lburgazzoli
  */
+@Ignore
 @RunWith(PaxExam.class)
 public class OSGiCollectionTest {
     @Inject
@@ -52,7 +54,8 @@ public class OSGiCollectionTest {
                 systemProperty("org.osgi.framework.storage.clean").value("true"),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
                 mavenBundle("net.openhft", "compiler", "2.1"),
-                new File("Java-Lang/lang/target/classes").exists() ? bundle("reference:file:Java-Lang/lang/target/classes") : bundle("reference:file:target/classes"),
+                new File("Java-Lang/lang/target/classes").exists() ? bundle("reference:file:Java-Lang/lang/target/classes") : bundle("reference:file:../lang/target/classes"),
+                new File("Java-Lang/lang-osgi/target/classes").exists() ? bundle("reference:file:Java-Lang/lang-osgi/target/classes") : bundle("reference:file:target/classes"),
                 junitBundles(),
                 systemPackage("sun.misc"),
                 systemPackage("sun.nio.ch"),
