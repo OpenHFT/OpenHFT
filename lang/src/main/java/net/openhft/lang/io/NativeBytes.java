@@ -68,6 +68,13 @@ public class NativeBytes extends AbstractBytes {
         this.limitAddr = limitAddr;
     }
 
+    public NativeBytes(NativeBytes bytes) {
+        super(bytes.bytesMarshallerFactory());
+        this.startAddr = bytes.startAddr;
+        this.positionAddr = bytes.positionAddr;
+        this.limitAddr = bytes.limitAddr;
+    }
+
     public static long longHash(byte[] bytes, int off, int len) {
         long hash = 0;
         int pos = 0;

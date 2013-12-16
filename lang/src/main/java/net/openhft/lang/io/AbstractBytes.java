@@ -41,8 +41,7 @@ import java.util.logging.Logger;
  * @author peter.lawrey
  */
 @SuppressWarnings("MagicNumber")
-public abstract class
-        AbstractBytes implements Bytes {
+public abstract class AbstractBytes implements Bytes {
     public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     public static final int INT_LOCK_MASK = 0xFFFFFF;
     public static final int UNSIGNED_BYTE_MASK = 0xFF;
@@ -50,6 +49,16 @@ public abstract class
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
     // extra 1 for decimal place.
     static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
+    static final byte[] RADIX_PARSE = new byte[256];
+
+    static {
+        Arrays.fill(RADIX_PARSE, (byte) -1);
+        for (int i = 0; i < 10; i++)
+            RADIX_PARSE['0' + i] = (byte) i;
+        for (int i = 0; i < 26; i++)
+            RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
+    }
+
     private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
@@ -72,6 +81,7 @@ public abstract class
     private static final byte NULL = 'N';
     private static final byte ENUMED = 'E';
     private static final byte SERIALIZED = 'S';
+    private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
     static boolean ID_LIMIT_WARNED = false;
     private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
     protected boolean finished;
@@ -284,6 +294,8 @@ public abstract class
         }
     }
 
+    // RandomDataOutput
+
     @NotNull
     private StringBuilder acquireUtfReader() {
         if (utfReader == null)
@@ -314,8 +326,6 @@ public abstract class
         readUTF0(appendable, utflen);
         return true;
     }
-
-    // RandomDataOutput
 
     private void readUTF0(@NotNull Appendable appendable, int utflen) throws IOException {
         int count = 0;
@@ -1066,8 +1076,6 @@ public abstract class
         return this;
     }
 
-    private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
-
     @NotNull
     @Override
     public ByteStringAppender append(long num, int base) {
@@ -1363,16 +1371,6 @@ public abstract class
                 break;
         }
         return negative ? -num : num;
-    }
-
-    static final byte[] RADIX_PARSE = new byte[256];
-
-    static {
-        Arrays.fill(RADIX_PARSE, (byte) -1);
-        for (int i = 0; i < 10; i++)
-            RADIX_PARSE['0' + i] = (byte) i;
-        for (int i = 0; i < 26; i++)
-            RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
     }
 
     @Override

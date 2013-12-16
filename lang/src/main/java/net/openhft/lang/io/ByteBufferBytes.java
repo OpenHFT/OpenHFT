@@ -42,6 +42,10 @@ public class ByteBufferBytes extends AbstractBytes {
         this.limit = limit;
     }
 
+    public ByteBuffer buffer() {
+        return buffer;
+    }
+
     protected void readBarrier() {
         if (barrier == null) barrier = new AtomicBoolean();
         barrier.get();
