@@ -19,6 +19,7 @@ package net.openhft.lang.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -42,7 +43,7 @@ public class LockingViaMMapMain {
         File tmpFile = new File(System.getProperty("java.io.tmpdir"), "lock-test.dat");
         FileChannel fc = new RandomAccessFile(tmpFile, "rw").getChannel();
         MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, 0, RECORDS * RECORD_SIZE);
-        ByteBufferBytes bytes = new ByteBufferBytes(mbb);
+        ByteBufferBytes bytes = new ByteBufferBytes(mbb.order(ByteOrder.nativeOrder()));
 
         long start = 0;
         for (int i = -WARMUP / RECORDS; i < (RUNS + RECORDS - 1) / RECORDS; i++) {
