@@ -56,11 +56,11 @@ public class LockingViaMMapMain {
                 for (int t = 9999; t >= 0; t--) {
                     if (t == 0)
                         if (i >= 0) {
-                            throw new AssertionError("Didn't toggle in time");
+                            throw new AssertionError("Didn't toggle in time !??");
                         } else {
                             System.out.println("waiting");
-                            t = 10000;
-                            Thread.sleep(100);
+                            t = 9999;
+                            Thread.sleep(200);
                         }
                     bytes.busyLockLong(recordOffset + LOCK);
                     try {
