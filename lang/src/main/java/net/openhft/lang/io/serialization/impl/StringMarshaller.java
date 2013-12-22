@@ -17,7 +17,7 @@
 package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.Bytes;
-import net.openhft.lang.io.serialization.BytesMarshaller;
+import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.pool.StringInterner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @author peter.lawrey
  */
-public class StringMarshaller implements BytesMarshaller<String> {
+public class StringMarshaller implements CompactBytesMarshaller<String> {
     private final int size;
     private final StringBuilder reader = new StringBuilder();
     private StringInterner interner;
@@ -52,5 +52,9 @@ public class StringMarshaller implements BytesMarshaller<String> {
         if (interner == null)
             interner = new StringInterner(size);
         return interner.intern(reader);
+    }
+
+    public byte code() {
+        return 'S' & 31;
     }
 }

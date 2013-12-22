@@ -21,6 +21,7 @@ import net.openhft.lang.Maths;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.io.serialization.impl.NoMarshaller;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.pool.StringInterner;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -49,6 +51,16 @@ public abstract class AbstractBytes implements Bytes {
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
     // extra 1 for decimal place.
     static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
+    static final byte[] RADIX_PARSE = new byte[256];
+
+    static {
+        Arrays.fill(RADIX_PARSE, (byte) -1);
+        for (int i = 0; i < 10; i++)
+            RADIX_PARSE['0' + i] = (byte) i;
+        for (int i = 0; i < 26; i++)
+            RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
+    }
+
     private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
@@ -71,6 +83,7 @@ public abstract class AbstractBytes implements Bytes {
     private static final byte NULL = 'N';
     private static final byte ENUMED = 'E';
     private static final byte SERIALIZED = 'S';
+    private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
     static boolean ID_LIMIT_WARNED = false;
     private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
     protected boolean finished;
@@ -283,6 +296,8 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
+    // RandomDataOutput
+
     @NotNull
     private StringBuilder acquireUtfReader() {
         if (utfReader == null)
@@ -313,8 +328,6 @@ public abstract class AbstractBytes implements Bytes {
         readUTF0(appendable, utflen);
         return true;
     }
-
-    // RandomDataOutput
 
     private void readUTF0(@NotNull Appendable appendable, int utflen) throws IOException {
         int count = 0;
@@ -994,6 +1007,7 @@ public abstract class AbstractBytes implements Bytes {
             writeByte(bb.get());
     }
 
+    @Deprecated
     @Override
     public void writeStartToPosition(@NotNull Bytes bb) {
         final long position = bb.position();
@@ -1060,6 +1074,31 @@ public abstract class AbstractBytes implements Bytes {
 
         } else {
             appendLong0(num);
+        }
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public ByteStringAppender append(long num, int base) {
+        if (base < 2 || base > Character.MAX_RADIX)
+            throw new IllegalArgumentException("Invalid base: " + base);
+        if (num < 0) {
+            if (num == Long.MIN_VALUE) {
+                writeBytes(BigInteger.valueOf(num).toString(base));
+                return this;
+            }
+            writeByte('-');
+            num = -num;
+        }
+        if (num == 0) {
+            writeByte('0');
+
+        } else {
+            while (num > 0) {
+                writeByte(RADIX[((int) (num % base))]);
+                num /= base;
+            }
         }
         return this;
     }
@@ -1329,6 +1368,25 @@ public abstract class AbstractBytes implements Bytes {
             if ((b - ('0' + Integer.MIN_VALUE)) <= 9 + Integer.MIN_VALUE)
                 num = num * 10 + b - '0';
             else if (b == '-')
+                negative = true;
+            else
+                break;
+        }
+        return negative ? -num : num;
+    }
+
+    @Override
+    public long parseLong(int base) {
+        if (base < 2 || base > Character.MAX_RADIX)
+            throw new IllegalArgumentException("Invalid base:" + base);
+        long num = 0;
+        boolean negative = false;
+        while (true) {
+            byte b = readByte();
+            byte rp = RADIX_PARSE[b];
+            if (rp >= 0 && rp < base) {
+                num = num * base + rp;
+            } else if (b == '-')
                 negative = true;
             else
                 break;
@@ -1740,7 +1798,7 @@ public abstract class AbstractBytes implements Bytes {
     @Nullable
     @Override
     public Object readObject() {
-        int type = readByte();
+        byte type = readByte();
         switch (type) {
             case NULL:
                 return null;
@@ -1756,7 +1814,10 @@ public abstract class AbstractBytes implements Bytes {
                 }
             }
             default:
-                throw new IllegalStateException("Unknown type " + (char) type);
+                BytesMarshaller<Object> m = bytesMarshallerFactory.getMarshaller(type);
+                if (m == null)
+                    throw new IllegalStateException("Unknown type " + (char) type);
+                return m.read(this);
         }
     }
 
@@ -1783,6 +1844,11 @@ public abstract class AbstractBytes implements Bytes {
             em = bytesMarshallerFactory.acquireMarshaller(clazz, true);
 
         if (em != NoMarshaller.INSTANCE) {
+            if (em instanceof CompactBytesMarshaller) {
+                writeByte(((CompactBytesMarshaller) em).code());
+                em.write(this, obj);
+                return;
+            }
             writeByte(ENUMED);
             writeEnum(clazz);
             em.write(this, obj);
@@ -2104,6 +2170,57 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeOrderedDouble(long offset, double v) {
         writeOrderedLong(offset, Double.doubleToRawLongBits(v));
+    }
+
+    @Override
+    public int length() {
+        return (int) Math.min(Integer.MAX_VALUE, remaining());
+    }
+
+    @Override
+    public char charAt(int index) {
+        return (char) readUnsignedByte(index);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+        StringBuilder sb = new StringBuilder(end - start + 1);
+        for (int i = start; i < end; i++)
+            sb.append(charAt(i));
+        return sb;
+    }
+
+    @Override
+    public void readMarshallable(@NotNull Bytes in) throws IllegalStateException {
+        long len = Math.min(remaining(), in.remaining());
+        long inPosition = in.position();
+        write(in, inPosition, len);
+        in.position(inPosition + len);
+    }
+
+    @Override
+    public void writeMarshallable(@NotNull Bytes out) {
+        out.write(this, position(), remaining());
+
+    }
+
+    @Override
+    public void write(BytesCommon bytes, long position, long length) {
+        if (length > bytes.remaining())
+            throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
+        RandomDataInput rdi = (RandomDataInput) bytes;
+        if (bytes.byteOrder() == byteOrder()) {
+            while (length >= 8) {
+                writeLong(rdi.readLong(position));
+                position += 8;
+                length -= 8;
+            }
+        }
+        while (length >= 1) {
+            writeByte(rdi.readByte(position));
+            position++;
+            length--;
+        }
     }
 
     protected class BytesInputStream extends InputStream {

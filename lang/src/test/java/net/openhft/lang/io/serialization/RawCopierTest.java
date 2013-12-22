@@ -24,16 +24,14 @@ import org.junit.Test;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
- * User: peter.lawrey
- * Date: 22/09/13
- * Time: 17:06
+ * User: peter.lawrey Date: 22/09/13 Time: 17:06
  */
 public class RawCopierTest {
     static void printInts(Object o, int len) {
-        for (int i = 0; i < len; i += 4) {
+        for (long i = 0; i < len; i += 4) {
             System.out.print(NativeBytes.UNSAFE.getInt(o, i) + " ");
         }
         System.out.println();
@@ -54,7 +52,7 @@ public class RawCopierTest {
 
     @Test
     public void testReadWrite() {
-        DirectStore ds = new DirectStore(1024);
+        DirectStore ds = new DirectStore(null, 1024);
         DirectBytes db = ds.createSlice();
         RawCopier<A> aRawCopier = RawCopier.copies(A.class);
         A a = new A();

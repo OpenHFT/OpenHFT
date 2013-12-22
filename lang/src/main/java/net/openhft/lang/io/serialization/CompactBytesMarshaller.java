@@ -16,16 +16,12 @@
 
 package net.openhft.lang.io.serialization;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
- * @author peter.lawrey
+ * A BytesMarshaller with a byte code for the class.
  */
-public interface BytesMarshallerFactory {
-    @NotNull
-    <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create);
-
-    <E> BytesMarshaller<E> getMarshaller(byte code);
-
-    <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller);
+public interface CompactBytesMarshaller<E> extends BytesMarshaller<E> {
+    /**
+     * the code for this marshaller
+     */
+    byte code();
 }

@@ -18,7 +18,7 @@ package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.Compare;
 import net.openhft.lang.io.Bytes;
-import net.openhft.lang.io.serialization.BytesMarshaller;
+import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * @author peter.lawrey
  */
-public class ClassMarshaller implements BytesMarshaller<Class> {
+public class ClassMarshaller implements CompactBytesMarshaller<Class> {
     private static final int CACHE_SIZE = 1019;
     private static final Map<String, Class> SC_SHORT_NAME = new LinkedHashMap<String, Class>();
     private static final Map<Class, String> CS_SHORT_NAME = new LinkedHashMap<Class, String>();
@@ -96,5 +96,10 @@ public class ClassMarshaller implements BytesMarshaller<Class> {
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    @Override
+    public byte code() {
+        return 'C' & 31; // control C
     }
 }

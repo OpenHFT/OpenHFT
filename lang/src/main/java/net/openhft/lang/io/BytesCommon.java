@@ -92,4 +92,13 @@ public interface BytesCommon {
      * @throws IndexOutOfBoundsException if the bounds of the Bytes has been exceeded.
      */
     void checkEndOfBuffer() throws IndexOutOfBoundsException;
+
+    /**
+     * Copy from one Bytes to another, moves the position by length
+     *
+     * @param bytes    to copy
+     * @param position to copy from
+     * @param length   to copy
+     */
+    void write(BytesCommon bytes, long position, long length);
 }

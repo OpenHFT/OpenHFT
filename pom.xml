@@ -30,5 +30,6 @@
 
     <modules>
         <module>lang</module>
+        <module>lang-osgi</module>
     </modules>
 </project>

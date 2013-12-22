@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.File;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
@@ -51,7 +51,8 @@ public class OSGiBundleTest {
                 systemProperty("org.osgi.framework.storage.clean").value("true"),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
                 mavenBundle("net.openhft", "compiler", "2.1"),
-                new File("Java-Lang/lang/target/classes").exists() ? bundle("reference:file:Java-Lang/lang/target/classes") : bundle("reference:file:target/classes"),
+                new File("Java-Lang/lang/target/classes").exists() ? bundle("reference:file:Java-Lang/lang/target/classes") : bundle("reference:file:../lang/target/classes"),
+                new File("Java-Lang/lang-osgi/target/classes").exists() ? bundle("reference:file:Java-Lang/lang-osgi/target/classes") : bundle("reference:file:target/classes"),
                 junitBundles(),
                 systemPackage("sun.misc"),
                 systemPackage("sun.nio.ch"),

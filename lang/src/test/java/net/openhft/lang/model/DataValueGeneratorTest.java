@@ -27,9 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * User: peter.lawrey
- * Date: 06/10/13
- * Time: 20:13
+ * User: peter.lawrey Date: 06/10/13 Time: 20:13
  */
 public class DataValueGeneratorTest {
     @Test
@@ -125,7 +123,7 @@ public class DataValueGeneratorTest {
         assertEquals(7.0, jbi.getDouble(), 0.0);
         assertTrue(jbi.getFlag());
         assertEquals("G'day", jbi.getString());
-        assertEquals(38, ((Byteable) jbi).maxSize());
+        assertEquals(42, ((Byteable) jbi).maxSize());
     }
 
 

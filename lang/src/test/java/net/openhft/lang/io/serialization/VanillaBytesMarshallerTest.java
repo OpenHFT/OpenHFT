@@ -16,6 +16,8 @@
 
 package net.openhft.lang.io.serialization;
 
+import net.openhft.lang.io.DirectBytes;
+import net.openhft.lang.io.DirectStore;
 import net.openhft.lang.io.NativeBytes;
 import org.junit.Test;
 import sun.nio.ch.DirectBuffer;
@@ -25,11 +27,25 @@ import java.nio.ByteBuffer;
 import static org.junit.Assert.assertEquals;
 
 /**
- * User: peter.lawrey
- * Date: 20/09/13
- * Time: 09:28
+ * User: peter.lawrey Date: 20/09/13 Time: 09:28
  */
 public class VanillaBytesMarshallerTest {
+    @Test
+    public void testObjects() {
+        DirectBytes bytes = new DirectStore(1024).createSlice();
+        Object[] objects = {1, 1L, 1.0, "Hello"};
+        for (Object o : objects) {
+            long pos = bytes.position();
+            bytes.writeObject(o);
+            System.out.printf("%s used %,d bytes%n", o.getClass(), bytes.position() - pos);
+        }
+        bytes.reset();
+        for (Object o : objects) {
+            Object o2 = bytes.readObject();
+            assertEquals(o, o2);
+        }
+    }
+
     @Test
     public void testMarshallable() {
         int capacity = 2 * 1024;

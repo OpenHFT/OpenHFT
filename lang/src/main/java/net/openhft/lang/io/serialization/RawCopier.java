@@ -29,9 +29,7 @@ import java.util.List;
 import static net.openhft.lang.io.NativeBytes.UNSAFE;
 
 /**
- * User: peter.lawrey
- * Date: 22/09/13
- * Time: 16:51
+ * User: peter.lawrey Date: 22/09/13 Time: 16:51
  */
 public class RawCopier<T> {
     final int start, end;
@@ -86,7 +84,7 @@ public class RawCopier<T> {
     }
 
     public void copy(T from, T to) {
-        int i;
+        long i;
         for (i = start; i < end - 7; i += 8) {
             UNSAFE.putLong(to, i, UNSAFE.getLong(from, i));
         }
