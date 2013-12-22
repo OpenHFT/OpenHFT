@@ -26,6 +26,11 @@ import org.junit.Test;
 public class JvmTest {
     @Test
     public void testIs64Bit() {
-        boolean is64 = Jvm.is64Bit();
+        System.out.println("is64 = " + Jvm.is64Bit());
+    }
+
+    @Test
+    public void testGetProcessId() {
+        System.out.println("pid = " + Jvm.getProcessId());
     }
 }

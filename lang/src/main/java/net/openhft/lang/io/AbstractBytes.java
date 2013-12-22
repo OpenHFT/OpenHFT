@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.Jvm;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
@@ -39,10 +40,10 @@ import java.util.logging.Logger;
  * @author peter.lawrey
  */
 @SuppressWarnings("MagicNumber")
-public abstract class
-        AbstractBytes implements Bytes {
+public abstract class AbstractBytes implements Bytes {
     public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     public static final int INT_LOCK_MASK = 0xFFFFFF;
+    public static final long LONG_LOCK_MASK = 0xFFFFFFFFL;
     public static final int UNSIGNED_BYTE_MASK = 0xFF;
     public static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
@@ -1806,7 +1807,7 @@ public abstract class
 
     @Override
     public boolean tryLockInt(long offset) {
-        long id = Thread.currentThread().getId();
+        long id = getId();
         if (!ID_LIMIT_WARNED && id > 1 << 24) {
             warnIdLimit(id);
         }
@@ -1815,7 +1816,7 @@ public abstract class
 
     @Override
     public boolean tryLockNanosInt(long offset, long nanos) {
-        long id = Thread.currentThread().getId();
+        long id = getId();
         if (!ID_LIMIT_WARNED && id > 1 << 24) {
             warnIdLimit(id);
         }
@@ -1859,14 +1860,76 @@ public abstract class
 
     @Override
     public void unlockInt(long offset) throws IllegalMonitorStateException {
-        int lowId = (int) Thread.currentThread().getId() & INT_LOCK_MASK;
+        int lowId = (int) getId() & INT_LOCK_MASK;
         int firstValue = ((1 << 24) | lowId);
         if (compareAndSwapInt(offset, firstValue, 0))
             return;
-        unlockFailed(offset, lowId);
+        // try to chek the lowId and the count.
+        unlockFailedInt(offset, lowId);
     }
 
-    private void unlockFailed(long offset, int lowId) throws IllegalMonitorStateException {
+    @Override
+    public boolean tryLockLong(long offset) {
+        long id = Jvm.getUniqueTid();
+        return tryLockNanos8a(offset, id);
+    }
+
+    @Override
+    public boolean tryLockNanosLong(long offset, long nanos) {
+        long id = Jvm.getUniqueTid();
+        int limit = nanos <= 10000 ? (int) nanos / 10 : 1000;
+        for (int i = 0; i < limit; i++)
+            if (tryLockNanos8a(offset, id))
+                return true;
+        if (nanos <= 10000)
+            return false;
+        long end = System.nanoTime() + nanos - 10000;
+        do {
+            if (tryLockNanos8a(offset, id))
+                return true;
+        } while (end > System.nanoTime() && !Thread.currentThread().isInterrupted());
+        return false;
+    }
+
+    private boolean tryLockNanos8a(long offset, long id) {
+        long firstValue = (1L << 48) | id;
+        if (compareAndSwapLong(offset, 0, firstValue))
+            return true;
+        long currentValue = readLong(offset);
+        if ((currentValue & (1L << 48) - 1) == id) {
+            if (currentValue >>> 48 == 65535)
+                throw new IllegalStateException("Reentred 65535 times without an unlock");
+            currentValue += 1L << 48;
+            writeOrderedLong(offset, currentValue);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void busyLockLong(long offset) throws InterruptedException, IllegalStateException {
+        boolean success = tryLockNanosLong(offset, BUSY_LOCK_LIMIT);
+        if (Thread.currentThread().isInterrupted())
+            throw new InterruptedException();
+        if (!success)
+            throw new IllegalStateException("Failed to acquire lock after " + BUSY_LOCK_LIMIT / 1e9 + " seconds.");
+    }
+
+    @Override
+    public void unlockLong(long offset) throws IllegalMonitorStateException {
+        long id = Jvm.getUniqueTid();
+        long firstValue = (1L << 48) | id;
+        if (compareAndSwapLong(offset, firstValue, 0))
+            return;
+        // try to check the lowId and the count.
+        unlockFailedLong(offset, id);
+    }
+
+    public long getId() {
+        return Thread.currentThread().getId();
+    }
+
+    private void unlockFailedInt(long offset, int lowId) throws IllegalMonitorStateException {
         long currentValue = readUnsignedInt(offset);
         long holderId = currentValue & INT_LOCK_MASK;
         if (holderId == lowId) {
@@ -1876,6 +1939,23 @@ public abstract class
             throw new IllegalMonitorStateException("No thread holds this lock");
         } else {
             throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
+        }
+    }
+
+    private void unlockFailedLong(long offset, long id) throws IllegalMonitorStateException {
+        long currentValue = readLong(offset);
+        long holderId = currentValue & (-1L >>> 16);
+        if (holderId == id) {
+            currentValue -= 1L << 48;
+            writeOrderedLong(offset, currentValue);
+        } else if (currentValue == 0) {
+            throw new IllegalMonitorStateException("No thread holds this lock");
+        } else {
+            throw new IllegalMonitorStateException("Process " + ((currentValue >>> 32) & 0xFFFF)
+                    + " thread " + (holderId & (-1L >>> 32))
+                    + " holds this lock, " + (currentValue >>> 48)
+                    + " times, unlock from " + Jvm.getProcessId()
+                    + " thread " + Thread.currentThread().getId());
         }
     }
 

@@ -16,6 +16,12 @@
 
 package net.openhft.lang;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.util.Random;
+import java.util.logging.Logger;
+
 /**
  * @author peter.lawrey
  */
@@ -40,6 +46,40 @@ public enum Jvm {
         }
         systemProp = System.getProperty("java.vm.version");
         return systemProp != null && systemProp.contains("_64");
+    }
+
+    private static int PROCESS_ID = Integer.MIN_VALUE;
+
+    public static int getProcessId() {
+        if (PROCESS_ID != Integer.MIN_VALUE)
+            return PROCESS_ID;
+
+        String pid = null;
+        final File self = new File("/proc/self");
+        try {
+            if (self.exists())
+                pid = self.getCanonicalFile().getName();
+        } catch (IOException ignored) {
+            // ignored
+        }
+        if (pid == null)
+            pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+        if (pid == null) {
+            PROCESS_ID = new Random().nextInt(1 << 16);
+            Logger.getLogger(Jvm.class.getName()).warning("Unable to determine PID, picked a random number=" + PROCESS_ID);
+        } else {
+            PROCESS_ID = Integer.parseInt(pid);
+        }
+        return PROCESS_ID;
+    }
+
+    /**
+     * This may or may not be the OS thread id, but should be unique across processes
+     *
+     * @return a unique tid of up to 48 bits.
+     */
+    public static long getUniqueTid() {
+        return (long) getProcessId() << 32 | (Thread.currentThread().getId() & 0xFFFFFFFFL);
     }
 
 }

@@ -19,13 +19,33 @@ package net.openhft.lang.io;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author peter.lawrey
  */
 public class DirectBytesTest {
+    @Test
+    public void testSimpleLock() {
+        DirectBytes bytes = new DirectStore(64).createSlice();
+        bytes.writeLong(0, -1L);
+        assertFalse(bytes.tryLockLong(0));
+        bytes.writeLong(0, 0L);
+        assertTrue(bytes.tryLockLong(0));
+        long val1 = bytes.readLong(0);
+        assertTrue(bytes.tryLockLong(0));
+        bytes.unlockLong(0);
+        assertEquals(val1, bytes.readLong(0));
+        bytes.unlockLong(0);
+        assertEquals(0L, bytes.readLong(0));
+        try {
+            bytes.unlockLong(0);
+            fail();
+        } catch (IllegalMonitorStateException e) {
+            // expected.
+        }
+    }
+
     private static void manyToggles(@NotNull DirectStore store1, int lockCount, int from, int to) {
         long id = Thread.currentThread().getId();
         assertEquals(0, id >>> 24);
@@ -33,7 +53,7 @@ public class DirectBytesTest {
 
         DirectBytes slice1 = store1.createSlice();
 
-        int records = 8;
+        int records = 64;
         for (int i = 0; i < lockCount; i += records) {
             for (long j = 0; j < records * 64; j += 64) {
                 slice1.positionAndSize(j, 64);
@@ -55,6 +75,40 @@ public class DirectBytesTest {
                     i--;
                 }
                 slice1.unlockInt(0L);
+                System.currentTimeMillis(); // small delay
+            }
+        }
+    }
+
+    private static void manyLongToggles(@NotNull DirectStore store1, int lockCount, int from, int to) {
+        long id = Thread.currentThread().getId();
+        assertEquals(0, id >>> 32);
+        System.out.println("Thread " + id);
+
+        DirectBytes slice1 = store1.createSlice();
+
+        int records = 64;
+        for (int i = 0; i < lockCount; i += records) {
+            for (long j = 0; j < records * 64; j += 64) {
+                slice1.positionAndSize(j, 64);
+                boolean condition = false;
+                for (int k = 0; k < 20; k++) {
+                    condition = slice1.tryLockLong(0L) || slice1.tryLockNanosLong(0L, 5 * 1000 * 1000);
+                    if (condition)
+                        break;
+                    if (k > 0)
+                        System.out.println("k: " + (5 + k * 5));
+                }
+                if (!condition)
+                    assertTrue("i= " + i, condition);
+                long toggle1 = slice1.readLong(8);
+                if (toggle1 == from) {
+                    slice1.writeLong(8L, to);
+                } else {
+                    // noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
+                    i--;
+                }
+                slice1.unlockLong(0L);
                 System.currentTimeMillis(); // small delay
             }
         }
@@ -90,6 +144,30 @@ public class DirectBytesTest {
         }).start();
 
         manyToggles(store1, lockCount, 0, 1);
+
+        store1.free();
+        long time = System.nanoTime() - start;
+        System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
+    }
+
+    @Test
+    public void testLockingLong() {
+        if (Runtime.getRuntime().availableProcessors() < 2) {
+            System.err.println("Test requires 2 CPUs, skipping");
+            return;
+        }
+        long start = System.nanoTime();
+        // a page
+        final DirectStore store1 = DirectStore.allocate(1 << 12);
+        final int lockCount = 10 * 1000 * 1000;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                manyLongToggles(store1, lockCount, 1, 0);
+            }
+        }).start();
+
+        manyLongToggles(store1, lockCount, 0, 1);
 
         store1.free();
         long time = System.nanoTime() - start;

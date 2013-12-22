@@ -89,4 +89,53 @@ public interface RandomDataUpdate {
      */
     void unlockInt(long offset) throws IllegalMonitorStateException;
 
+    /**
+     * Lock across processes
+     * <p/>
+     * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
+     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
+     * you will get an ISE
+     *
+     * @param offset of the start of the 8-byte lock
+     * @return did it lock or not.
+     */
+    boolean tryLockLong(long offset);
+
+    /**
+     * Lock across processes
+     * <p/>
+     * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
+     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
+     * you will get an ISE
+     *
+     * @param offset of the start of the 8-byte lock
+     * @param nanos  to try to lock for
+     * @return did it lock or not.
+     */
+    boolean tryLockNanosLong(long offset, long nanos);
+
+    /**
+     * Lock across processes
+     * <p/>
+     * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
+     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
+     * you will get an ISE
+     *
+     * @param offset of the start of the 8-byte lock
+     * @throws InterruptedException  if interrupted
+     * @throws IllegalStateException if the thread tries to lock it 65535 nested time (without an unlock)
+     */
+    void busyLockLong(long offset) throws InterruptedException, IllegalStateException;
+
+    /**
+     * Lock across processes
+     * <p/>
+     * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
+     * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
+     * you will get an ISE
+     *
+     * @param offset of the start of the 8-byte lock
+     * @throws IllegalMonitorStateException if this thread doesn't hold the lock
+     */
+    void unlockLong(long offset) throws IllegalMonitorStateException;
 }
