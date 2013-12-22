@@ -82,5 +82,7 @@ public class LockingViaMMapMain {
         final int toggles = (RUNS + RECORDS - 1) / RECORDS * RECORDS * 2; // one for each of two processes.
         System.out.printf("Toogled %,d times with an average delay of %,d ns%n",
                 toggles, time / toggles);
+        fc.close();
+        tmpFile.deleteOnExit();
     }
 }
