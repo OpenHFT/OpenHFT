@@ -45,7 +45,6 @@ import java.util.logging.Logger;
 public abstract class AbstractBytes implements Bytes {
     public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     public static final int INT_LOCK_MASK = 0xFFFFFF;
-    public static final long LONG_LOCK_MASK = 0xFFFFFFFFL;
     public static final int UNSIGNED_BYTE_MASK = 0xFF;
     public static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
@@ -1666,7 +1665,7 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public BytesMarshallerFactory bytesMarshallerFactory() {
-        return bytesMarshallerFactory;
+        return bytesMarshallerFactory == null ? bytesMarshallerFactory = new VanillaBytesMarshallerFactory() : bytesMarshallerFactory;
     }
 
     @SuppressWarnings("unchecked")
@@ -1814,7 +1813,7 @@ public abstract class AbstractBytes implements Bytes {
                 }
             }
             default:
-                BytesMarshaller<Object> m = bytesMarshallerFactory.getMarshaller(type);
+                BytesMarshaller<Object> m = bytesMarshallerFactory().getMarshaller(type);
                 if (m == null)
                     throw new IllegalStateException("Unknown type " + (char) type);
                 return m.read(this);
@@ -1839,6 +1838,7 @@ public abstract class AbstractBytes implements Bytes {
         }
 
         Class<?> clazz = obj.getClass();
+        final BytesMarshallerFactory bytesMarshallerFactory = bytesMarshallerFactory();
         BytesMarshaller em = bytesMarshallerFactory.acquireMarshaller(clazz, false);
         if (em == NoMarshaller.INSTANCE && autoGenerateMarshaller(obj))
             em = bytesMarshallerFactory.acquireMarshaller(clazz, true);

@@ -19,14 +19,13 @@ package net.openhft.lang.io;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import sun.misc.Cleaner;
 
 /**
  * @author peter.lawrey
  */
 public class DirectStore {
-    protected final BytesMarshallerFactory bytesMarshallerFactory;
+    protected BytesMarshallerFactory bytesMarshallerFactory;
     private final Cleaner cleaner;
     protected long address;
     protected long size;
@@ -60,12 +59,12 @@ public class DirectStore {
         });
     }
 
-    @Nullable
+    @NotNull
     public static DirectStore allocate(long size) {
-        return new DirectStore(size);
+        return new DirectStore(null, size);
     }
 
-    @Nullable
+    @NotNull
     public static DirectStore allocateLazy(long size) {
         return new DirectStore(null, size, false);
     }
