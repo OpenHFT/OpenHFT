@@ -24,14 +24,20 @@ import java.nio.ByteBuffer;
  * User: peter
  * Date: 24/12/13
  * Time: 19:43
+ * <p>
+ * buffers 64 KB took an average of 11,580 ns for heap ByteBuffer, 20,768 ns for direct ByteBuffer and 1,388 for DirectStore
+ * buffers 64 KB took an average of 4,461 ns for heap ByteBuffer, 7,490 ns for direct ByteBuffer and 159 for DirectStore
+ * buffers 64 KB took an average of 4,080 ns for heap ByteBuffer, 7,328 ns for direct ByteBuffer and 146 for DirectStore
+ * buffers 64 KB took an average of 6,470 ns for heap ByteBuffer, 7,297 ns for direct ByteBuffer and 167 for DirectStore
+ * buffers 64 KB took an average of 3,944 ns for heap ByteBuffer, 7,138 ns for direct ByteBuffer and 158 for DirectStore
  */
 public class AllocationRatesTest {
     static final int BUFFER_SIZE = 64 * 1024;
-    static final int ALLOCATIONS = 10000;
+    static final int ALLOCATIONS = 25000;
 
     @Test
     public void compareAllocationRates() {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             long timeHBB = timeHeapByteBufferAllocations();
             long timeDBB = timeDirectByteBufferAllocations();
             long timeDS = timeDirectStoreAllocations();
