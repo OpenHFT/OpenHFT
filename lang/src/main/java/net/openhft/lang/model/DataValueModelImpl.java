@@ -118,6 +118,13 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         break;
                     }
 
+                    String name6 = getGetter(name, returnType);
+                    if (name6 != null && parameterTypes[0] == int.class && returnType != void.class) {
+                        FieldModelImpl fm = acquireField(name6);
+                        fm.indexedGetter(method);
+                        break;
+                    }
+
                     if (returnType != void.class)
                         throw new IllegalArgumentException("setter must be void " + method);
                     String name2 = getSetter(name);
@@ -125,14 +132,20 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     fm.setter(method);
                     break;
                 }
-                case 2:
+                case 2: {
                     String name2 = getCAS(name);
                     if (name2 != null && returnType == boolean.class) {
                         FieldModelImpl fm = acquireField(name2);
                         fm.cas(method);
                         break;
                     }
-
+                    String name3 = getSetter(name);
+                    if (name3 != null && parameterTypes[0] == int.class && returnType == void.class) {
+                        FieldModelImpl fm = acquireField(name3);
+                        fm.indexedSetter(method);
+                        break;
+                    }
+                }
                 default: {
                     throw new IllegalArgumentException("method not supported " + method);
                 }
@@ -141,7 +154,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         for (Map.Entry<String, FieldModelImpl> entry : fieldModelMap.entrySet()) {
             FieldModelImpl model = entry.getValue();
             if (model.getter() == null || (model.setter() == null && model.getter().getReturnType().isPrimitive()))
-                throw new IllegalArgumentException("Field " + entry.getKey() + " must have a getter and setter.");
+                if (model.indexedGetter() == null || (model.indexedSetter() == null && model.indexedGetter().getReturnType().isPrimitive()))
+                    throw new IllegalArgumentException("Field " + entry.getKey() + " must have a getter and setter.");
             Class ftype = model.type();
             if (!isScalar(ftype) && !nestedMap.containsKey(ftype))
                 nestedMap.put(ftype, new DataValueModelImpl(ftype));
@@ -254,6 +268,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Digits digits;
         private Range range;
         private MaxSize maxSize;
+        private MaxSize indexSize;
         private Method adder;
         private Method atomicAdder;
         private Method cas;
@@ -261,6 +276,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Method tryLock;
         private Method busyLock;
         private Method unlock;
+        private Method indexedGetter;
+        private Method indexedSetter;
 
         public FieldModelImpl(String name) {
             this.name = name;
@@ -296,7 +313,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         @Override
         public Class<T> type() {
-            return (Class<T>) getter.getReturnType();
+            return (Class<T>) (getter != null ? getter.getReturnType() :
+                    indexedGetter != null ? indexedGetter.getReturnType() : null);
         }
 
         public void adder(Method method) {
@@ -345,11 +363,12 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         public String toString() {
             return "FieldModel{" +
                     "name='" + name + '\'' +
-                    ", getter=" + getter +
-                    ", setter=" + setter +
+                    ", getter=" + (indexedGetter != null ? indexedGetter : getter) +
+                    ", setter=" + (indexedSetter != null ? indexedSetter : setter) +
                     (digits == null ? "" : ", digits= " + digits) +
                     (range == null ? "" : ", range= " + range) +
                     (maxSize == null ? "" : ", size= " + maxSize) +
+                    ((indexedGetter == null && indexedSetter == null) ? "" : ", indexSize= " + indexSize) +
                     '}';
         }
 
@@ -399,6 +418,44 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         public Method unlock() {
             return unlock;
+        }
+
+        public void indexSize(MaxSize indexSize) {
+            if (indexSize != null)
+                this.indexSize = indexSize;
+        }
+
+        public MaxSize indexSize() {
+            return indexSize;
+        }
+
+        public void indexedGetter(Method indexedGetter) {
+            this.indexedGetter = indexedGetter;
+            indexAnnotations(indexedGetter);
+        }
+
+        public Method indexedGetter() {
+            return indexedGetter;
+        }
+
+        public void indexedSetter(Method indexedSetter) {
+            this.indexedSetter = indexedSetter;
+            indexAnnotations(indexedSetter);
+        }
+
+        public void indexAnnotations(Method method) {
+            for (Annotation a : method.getParameterAnnotations()[0]) {
+//                if (a instanceof Digits)
+//                    digits = (Digits) a;
+//                if (a instanceof Range)
+//                    range = (Range) a;
+                if (a instanceof MaxSize)
+                    indexSize = (MaxSize) a;
+            }
+        }
+
+        public Method indexedSetter() {
+            return indexedSetter;
         }
     }
 }

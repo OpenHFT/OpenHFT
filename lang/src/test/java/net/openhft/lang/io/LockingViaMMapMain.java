@@ -28,7 +28,7 @@ import java.nio.channels.FileChannel;
  * Date: 22/12/13
  * Time: 11:05
  *
- * Toogled 10,000,128 times with an average delay of 31 ns
+ * Toggled 10,000,128 times with an average delay of 31 ns
  */
 public class LockingViaMMapMain {
     static int RECORDS = Integer.getInteger("records", 128);

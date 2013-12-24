@@ -48,5 +48,12 @@ public class DataValueModelTest {
                 " short=FieldModel{name='short', getter=public abstract short net.openhft.lang.model.JavaBeanInterface.getShort(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setShort(short)}\n" +
                 " string=FieldModel{name='string', getter=public abstract java.lang.String net.openhft.lang.model.JavaBeanInterface.getString(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setString(java.lang.String), size= @net.openhft.lang.model.constraints.MaxSize(value=8)}}"
                 , jbdvm.fieldMap().toString().replaceAll("},", "}\n"));
+
+        DataValueModel<NestedArrayInterface> nais = DataValueModels.acquireModel(NestedArrayInterface.class);
+        assertEquals("{int=FieldModel{name='int', getter=public abstract int net.openhft.lang.model.NestedArrayInterface.getInt(int), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setInt(int,int), indexSize= @net.openhft.lang.model.constraints.MaxSize(value=16)}\n" +
+                " jBI=FieldModel{name='jBI', getter=public abstract net.openhft.lang.model.JavaBeanInterface net.openhft.lang.model.NestedArrayInterface.getJBI(int), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setJBI(int,net.openhft.lang.model.JavaBeanInterface), indexSize= @net.openhft.lang.model.constraints.MaxSize(value=32)}\n" +
+                " text=FieldModel{name='text', getter=public abstract java.lang.String net.openhft.lang.model.NestedArrayInterface.getText(), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setText(java.lang.String)}}"
+                , nais.fieldMap().toString().replaceAll("},", "}\n"));
+
     }
 }
