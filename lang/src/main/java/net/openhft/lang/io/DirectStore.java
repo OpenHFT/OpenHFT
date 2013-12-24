@@ -65,6 +65,11 @@ public class DirectStore {
         return new DirectStore(size);
     }
 
+    @Nullable
+    public static DirectStore allocateLazy(long size) {
+        return new DirectStore(null, size, false);
+    }
+
 /*    public void resize(long newSize) {
         if (newSize == size)
             return;
