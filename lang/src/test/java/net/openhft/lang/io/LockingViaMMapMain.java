@@ -31,7 +31,7 @@ import java.nio.channels.FileChannel;
 public class LockingViaMMapMain {
     static int RECORDS = Integer.getInteger("records", 128);
     static int RECORD_SIZE = Integer.getInteger("record_size", 64); // cache line size
-    static int WARMUP = Integer.getInteger("warmup", 12000);
+    static int WARMUP = Integer.getInteger("warmup", RECORDS * 100);
     static int RUNS = Integer.getInteger("runs", 5 * 1000 * 1000);
 
     // offsets
