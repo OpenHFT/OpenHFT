@@ -30,13 +30,14 @@ import java.nio.channels.FileChannel;
  * Date: 22/12/13
  * Time: 11:05
  * <p/>
- * Toggled 10,000,128 times with an average delay of 28 ns
+ * Toggled 10,000,128 times with an average delay of 20 ns on i7-4700
+ * Toggled 10,000,128 times with an average delay of 14 ns on i7-3970X
  */
 public class LockingViaMMapWithThreadIdMain {
-    static int RECORDS = Integer.getInteger("records", 128);
-    static int RECORD_SIZE = Integer.getInteger("record_size", 64); // cache line size
-    static int WARMUP = Integer.getInteger("warmup", RECORDS * 100);
-    static int RUNS = Integer.getInteger("runs", 5 * 1000 * 1000);
+    static int RECORDS = Integer.getInteger("records", 256);
+    static int RECORD_SIZE = Integer.getInteger("record_size", 64); // double cache line size
+    static int WARMUP = Integer.getInteger("warmup", RECORDS * 50);
+    static int RUNS = Integer.getInteger("runs", 50 * 1000 * 1000);
 
     // offsets
     static int LOCK = 0;
@@ -51,6 +52,7 @@ public class LockingViaMMapWithThreadIdMain {
         // set the the Thread.getId() to match the process thread id
         // this way the getId() can be used across processes..
         AffinitySupport.setThreadId();
+        AffinitySupport.setAffinity(toggleTo ? 1 << 3 : 1 << 2);
         ByteBufferBytes bytes = new ByteBufferBytes(mbb.order(ByteOrder.nativeOrder()));
         bytes.setCurrentThread();
 
