@@ -21,19 +21,19 @@ import org.junit.Test;
 import java.nio.ByteBuffer;
 
 /**
- * User: peter
- * Date: 24/12/13
- * Time: 19:43
- * <p>
- * buffers 64 KB took an average of 8,977 ns for heap ByteBuffer, 20,559 ns for direct ByteBuffer and 726 for DirectStore
- * buffers 64 KB took an average of 6,793 ns for heap ByteBuffer, 17,699 ns for direct ByteBuffer and 195 for DirectStore
- * buffers 64 KB took an average of 5,324 ns for heap ByteBuffer, 15,159 ns for direct ByteBuffer and 162 for DirectStore
- * buffers 64 KB took an average of 4,460 ns for heap ByteBuffer, 17,740 ns for direct ByteBuffer and 156 for DirectStore
- * buffers 64 KB took an average of 5,555 ns for heap ByteBuffer, 17,685 ns for direct ByteBuffer and 157 for DirectStore
+ * User: peter Date: 24/12/13 Time: 19:43
+ */
+/*
+buffers 128 KB took an average of 18,441 ns for heap ByteBuffer, 33,683 ns for direct ByteBuffer and 1,761 for DirectStore
+buffers 128 KB took an average of 13,062 ns for heap ByteBuffer, 17,855 ns for direct ByteBuffer and 903 for DirectStore
+buffers 128 KB took an average of 12,809 ns for heap ByteBuffer, 21,602 ns for direct ByteBuffer and 922 for DirectStore
+buffers 128 KB took an average of 10,768 ns for heap ByteBuffer, 21,444 ns for direct ByteBuffer and 894 for DirectStore
+buffers 128 KB took an average of 8,739 ns for heap ByteBuffer, 22,684 ns for direct ByteBuffer and 890 for DirectStore
  */
 public class AllocationRatesTest {
-    static final int BUFFER_SIZE = 64 * 1024;
+    static final int BUFFER_SIZE = 128 * 1024;
     static final int ALLOCATIONS = 25000;
+    public static final int BATCH = 10;
 
     @Test
     public void compareAllocationRates() {
@@ -49,25 +49,32 @@ public class AllocationRatesTest {
 
     private long timeHeapByteBufferAllocations() {
         long start = System.nanoTime();
-        for (int i = 0; i < ALLOCATIONS; i++) {
-            ByteBuffer bb = ByteBuffer.allocate(BUFFER_SIZE);
+        for (int i = 0; i < ALLOCATIONS; i += BATCH) {
+            ByteBuffer[] bb = new ByteBuffer[BATCH];
+            for (int j = 0; j < BATCH; j++)
+                bb[j] = ByteBuffer.allocate(BUFFER_SIZE);
         }
         return System.nanoTime() - start;
     }
 
     private long timeDirectByteBufferAllocations() {
         long start = System.nanoTime();
-        for (int i = 0; i < ALLOCATIONS; i++) {
-            ByteBuffer bb = ByteBuffer.allocateDirect(BUFFER_SIZE);
+        for (int i = 0; i < ALLOCATIONS; i += BATCH) {
+            ByteBuffer[] bb = new ByteBuffer[BATCH];
+            for (int j = 0; j < BATCH; j++)
+                bb[j] = ByteBuffer.allocateDirect(BUFFER_SIZE);
         }
         return System.nanoTime() - start;
     }
 
     private long timeDirectStoreAllocations() {
         long start = System.nanoTime();
-        for (int i = 0; i < ALLOCATIONS; i++) {
-            DirectStore ds = DirectStore.allocateLazy(BUFFER_SIZE);
-            ds.free();
+        for (int i = 0; i < ALLOCATIONS; i += BATCH) {
+            DirectStore[] ds = new DirectStore[BATCH];
+            for (int j = 0; j < BATCH; j++)
+                ds[j] = DirectStore.allocateLazy(BUFFER_SIZE);
+            for (int j = 0; j < BATCH; j++)
+                ds[j].free();
         }
         return System.nanoTime() - start;
     }
