@@ -1873,19 +1873,13 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public boolean tryLockInt(long offset) {
-        long id = getId();
-        if (!ID_LIMIT_WARNED && id > 1 << 24) {
-            warnIdLimit(id);
-        }
+        long id = shortThreadId();
         return tryLockNanos4a(offset, (int) id);
     }
 
     @Override
     public boolean tryLockNanosInt(long offset, long nanos) {
-        long id = getId();
-        if (!ID_LIMIT_WARNED && id > 1 << 24) {
-            warnIdLimit(id);
-        }
+        long id = shortThreadId();
         int limit = nanos <= 10000 ? (int) nanos / 10 : 1000;
         for (int i = 0; i < limit; i++)
             if (tryLockNanos4a(offset, (int) id))
@@ -1896,12 +1890,12 @@ public abstract class AbstractBytes implements Bytes {
         do {
             if (tryLockNanos4a(offset, (int) id))
                 return true;
-        } while (end > System.nanoTime() && !Thread.currentThread().isInterrupted());
+        } while (end > System.nanoTime() && !currentThread().isInterrupted());
         return false;
     }
 
     private boolean tryLockNanos4a(long offset, int id) {
-        int lowId = id & INT_LOCK_MASK;
+        int lowId = shortThreadId();
         int firstValue = ((1 << 24) | lowId);
         if (compareAndSwapInt(offset, 0, firstValue))
             return true;
@@ -1918,15 +1912,16 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void busyLockInt(long offset) throws InterruptedException, IllegalStateException {
         boolean success = tryLockNanosInt(offset, BUSY_LOCK_LIMIT);
-        if (Thread.currentThread().isInterrupted())
-            throw new InterruptedException();
         if (!success)
-            throw new IllegalStateException("Failed to acquire lock after " + BUSY_LOCK_LIMIT / 1e9 + " seconds.");
+            if (currentThread().isInterrupted())
+                throw new InterruptedException();
+            else
+                throw new IllegalStateException("Failed to acquire lock after " + BUSY_LOCK_LIMIT / 1e9 + " seconds.");
     }
 
     @Override
     public void unlockInt(long offset) throws IllegalMonitorStateException {
-        int lowId = (int) getId() & INT_LOCK_MASK;
+        int lowId = shortThreadId();
         int firstValue = ((1 << 24) | lowId);
         if (compareAndSwapInt(offset, firstValue, 0))
             return;
@@ -1934,15 +1929,43 @@ public abstract class AbstractBytes implements Bytes {
         unlockFailedInt(offset, lowId);
     }
 
+    private Thread currentThread;
+    private int shortThreadId = Integer.MIN_VALUE;
+
+    public int shortThreadId() {
+        return shortThreadId > 0 ? shortThreadId : shortThreadId0();
+    }
+
+    protected int shortThreadId0() {
+        final int tid = (int) getId() & INT_LOCK_MASK;
+        if (!ID_LIMIT_WARNED && tid > 1 << 24) {
+            warnIdLimit(tid);
+        }
+        return tid;
+    }
+
+    public void setCurrentThread() {
+        currentThread = Thread.currentThread();
+        shortThreadId = shortThreadId0();
+    }
+
+    public Thread currentThread() {
+        return currentThread == null ? Thread.currentThread() : currentThread;
+    }
+
     @Override
     public boolean tryLockLong(long offset) {
-        long id = Jvm.getUniqueTid();
+        long id = uniqueTid();
         return tryLockNanos8a(offset, id);
+    }
+
+    public long uniqueTid() {
+        return Jvm.getUniqueTid(currentThread());
     }
 
     @Override
     public boolean tryLockNanosLong(long offset, long nanos) {
-        long id = Jvm.getUniqueTid();
+        long id = uniqueTid();
         int limit = nanos <= 10000 ? (int) nanos / 10 : 1000;
         for (int i = 0; i < limit; i++)
             if (tryLockNanos8a(offset, id))
@@ -1953,7 +1976,7 @@ public abstract class AbstractBytes implements Bytes {
         do {
             if (tryLockNanos8a(offset, id))
                 return true;
-        } while (end > System.nanoTime() && !Thread.currentThread().isInterrupted());
+        } while (end > System.nanoTime() && !currentThread().isInterrupted());
         return false;
     }
 
@@ -1975,10 +1998,11 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void busyLockLong(long offset) throws InterruptedException, IllegalStateException {
         boolean success = tryLockNanosLong(offset, BUSY_LOCK_LIMIT);
-        if (Thread.currentThread().isInterrupted())
-            throw new InterruptedException();
         if (!success)
-            throw new IllegalStateException("Failed to acquire lock after " + BUSY_LOCK_LIMIT / 1e9 + " seconds.");
+            if (currentThread().isInterrupted())
+                throw new InterruptedException();
+            else
+                throw new IllegalStateException("Failed to acquire lock after " + BUSY_LOCK_LIMIT / 1e9 + " seconds.");
     }
 
     @Override
@@ -1991,8 +2015,8 @@ public abstract class AbstractBytes implements Bytes {
         unlockFailedLong(offset, id);
     }
 
-    public long getId() {
-        return Thread.currentThread().getId();
+    protected long getId() {
+        return currentThread().getId();
     }
 
     private void unlockFailedInt(long offset, int lowId) throws IllegalMonitorStateException {
@@ -2021,7 +2045,7 @@ public abstract class AbstractBytes implements Bytes {
                     + " thread " + (holderId & (-1L >>> 32))
                     + " holds this lock, " + (currentValue >>> 48)
                     + " times, unlock from " + Jvm.getProcessId()
-                    + " thread " + Thread.currentThread().getId());
+                    + " thread " + currentThread().getId());
         }
     }
 

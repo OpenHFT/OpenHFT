@@ -16,6 +16,8 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.affinity.AffinitySupport;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -27,10 +29,10 @@ import java.nio.channels.FileChannel;
  * User: peter
  * Date: 22/12/13
  * Time: 11:05
- *
+ * <p/>
  * Toggled 10,000,128 times with an average delay of 28 ns
  */
-public class LockingViaMMapMain {
+public class LockingViaMMapWithThreadIdMain {
     static int RECORDS = Integer.getInteger("records", 128);
     static int RECORD_SIZE = Integer.getInteger("record_size", 64); // cache line size
     static int WARMUP = Integer.getInteger("warmup", RECORDS * 100);
@@ -43,9 +45,12 @@ public class LockingViaMMapMain {
 
     public static void main(String... args) throws IOException, InterruptedException {
         boolean toggleTo = Boolean.parseBoolean(args[0]);
-        File tmpFile = new File(System.getProperty("java.io.tmpdir"), "lock-test.dat");
+        File tmpFile = new File(System.getProperty("java.io.tmpdir"), "lock-test-tid.dat");
         FileChannel fc = new RandomAccessFile(tmpFile, "rw").getChannel();
         MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, 0, RECORDS * RECORD_SIZE);
+        // set the the Thread.getId() to match the process thread id
+        // this way the getId() can be used across processes..
+        AffinitySupport.setThreadId();
         ByteBufferBytes bytes = new ByteBufferBytes(mbb.order(ByteOrder.nativeOrder()));
         bytes.setCurrentThread();
 
@@ -65,7 +70,7 @@ public class LockingViaMMapMain {
                         } else {
                             Thread.sleep(200);
                         }
-                    bytes.busyLockLong(recordOffset + LOCK);
+                    bytes.busyLockInt(recordOffset + LOCK);
                     try {
                         boolean flag = bytes.readBoolean(recordOffset + FLAG);
                         if (flag != toggleTo) {
@@ -73,11 +78,11 @@ public class LockingViaMMapMain {
                             break;
                         }
                     } finally {
-                        bytes.unlockLong(recordOffset + LOCK);
+                        bytes.unlockInt(recordOffset + LOCK);
                     }
                     if (t % 100 == 0)
                         System.out.println("waiting for " + j
-                                + " pid " + (int) bytes.readLong(recordOffset + LOCK)
+                                + " pid " + (bytes.readInt(recordOffset + LOCK) & (-1 >>> 8))
                                 + " is " + bytes.readBoolean(recordOffset + FLAG));
                     if (t > 100)
                         if (t > 200)

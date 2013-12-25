@@ -48,12 +48,13 @@ public enum Jvm {
         return systemProp != null && systemProp.contains("_64");
     }
 
-    private static int PROCESS_ID = Integer.MIN_VALUE;
+    private static final int PROCESS_ID = getProcessId0();
 
     public static int getProcessId() {
-        if (PROCESS_ID != Integer.MIN_VALUE)
-            return PROCESS_ID;
+        return PROCESS_ID;
+    }
 
+    private static int getProcessId0() {
         String pid = null;
         final File self = new File("/proc/self");
         try {
@@ -65,12 +66,12 @@ public enum Jvm {
         if (pid == null)
             pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
         if (pid == null) {
-            PROCESS_ID = new Random().nextInt(1 << 16);
-            Logger.getLogger(Jvm.class.getName()).warning("Unable to determine PID, picked a random number=" + PROCESS_ID);
+            int rpid = new Random().nextInt(1 << 16);
+            Logger.getLogger(Jvm.class.getName()).warning("Unable to determine PID, picked a random number=" + rpid);
+            return rpid;
         } else {
-            PROCESS_ID = Integer.parseInt(pid);
+            return Integer.parseInt(pid);
         }
-        return PROCESS_ID;
     }
 
     /**
@@ -79,7 +80,11 @@ public enum Jvm {
      * @return a unique tid of up to 48 bits.
      */
     public static long getUniqueTid() {
-        return (long) getProcessId() << 32 | (Thread.currentThread().getId() & 0xFFFFFFFFL);
+        return getUniqueTid(Thread.currentThread());
+    }
+
+    public static long getUniqueTid(Thread thread) {
+        return (long) getProcessId() << 32 | (thread.getId() & 0xFFFFFFFFL);
     }
 
 }
