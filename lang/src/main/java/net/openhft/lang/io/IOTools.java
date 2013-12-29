@@ -20,8 +20,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
@@ -53,5 +55,25 @@ public enum IOTools {
             count++;
         }
         return count;
+    }
+
+    public static void deleteDir(String dirPath) {
+        deleteDir(new File(dirPath));
+    }
+
+    public static void deleteDir(File dir) {
+        // delete one level.
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null)
+                for (File file : files)
+                    if (file.isDirectory()) {
+                        deleteDir(file);
+                    } else if (!file.delete()) {
+                        Logger.getLogger(IOTools.class.getName()).info("... unable to delete " + file);
+                    }
+
+        }
+        dir.delete();
     }
 }
