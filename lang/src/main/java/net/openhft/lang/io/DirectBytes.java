@@ -40,16 +40,4 @@ public class DirectBytes extends NativeBytes {
     public DirectStore store() {
         return store;
     }
-
-    public long startAddr() {
-        return startAddr;
-    }
-
-    public long positionAddr() {
-        return positionAddr;
-    }
-
-    public long limitAddr() {
-        return limitAddr;
-    }
 }

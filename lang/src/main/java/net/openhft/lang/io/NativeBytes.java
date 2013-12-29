@@ -397,4 +397,20 @@ public class NativeBytes extends AbstractBytes {
         if (position() > capacity())
             throw new IndexOutOfBoundsException("position is beyond the end of the buffer " + position() + " > " + capacity());
     }
+
+    public long startAddr() {
+        return startAddr;
+    }
+
+    public long positionAddr() {
+        return positionAddr;
+    }
+
+    public void positionAddr(long positionAddr) {
+        this.positionAddr = positionAddr;
+    }
+
+    public long limitAddr() {
+        return limitAddr;
+    }
 }
