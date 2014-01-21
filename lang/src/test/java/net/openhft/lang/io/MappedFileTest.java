@@ -39,6 +39,7 @@ public class MappedFileTest {
 
     public static void delete(File file) throws IOException {
         if (file.delete() || !file.exists()) return;
+        // get an error message as to why.
         ProcessBuilder pb = new ProcessBuilder("/bin/rm", file.getAbsolutePath());
         pb.redirectErrorStream(true);
         Process p = pb.start();
@@ -55,7 +56,8 @@ public class MappedFileTest {
     @Test
     public void testUnmap() throws IOException, InterruptedException {
 
-        String basePath = "/tmp/testUnmap";
+        String TMP = System.getProperty("java.io.tmpdir");
+        String basePath = TMP + "/testUnmap";
         File file = new File(basePath);
         File dir = file.getParentFile();
         long free0 = dir.getFreeSpace();
