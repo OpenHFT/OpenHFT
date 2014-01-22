@@ -90,7 +90,7 @@ public class LockingViaMMapMain {
         long time = System.nanoTime() - start;
         final int toggles = (RUNS + RECORDS - 1) / RECORDS * RECORDS * 2; // one for each of two processes.
         System.out.printf("Toggled %,d times with an average delay of %,d ns%n",
-                toggles, time / toggles);
+                toggles, 2 * time / toggles);
         fc.close();
         tmpFile.deleteOnExit();
     }
