@@ -28,7 +28,7 @@ import java.nio.channels.FileChannel;
  * Date: 22/12/13
  * Time: 11:05
  *
- * Toggled 10,000,128 times with an average delay of 28 ns
+ * Toggled 10,000,128 times with an average delay of 50 ns
  */
 public class LockingViaMMapMain {
     static int RECORDS = Integer.getInteger("records", 128);
@@ -90,7 +90,7 @@ public class LockingViaMMapMain {
         long time = System.nanoTime() - start;
         final int toggles = (RUNS + RECORDS - 1) / RECORDS * RECORDS * 2; // one for each of two processes.
         System.out.printf("Toggled %,d times with an average delay of %,d ns%n",
-                toggles, time / toggles);
+                toggles, 2 * time / toggles);
         fc.close();
         tmpFile.deleteOnExit();
     }
