@@ -35,7 +35,7 @@ import static org.ops4j.pax.exam.CoreOptions.*;
  * @author lburgazzoli
  */
 @RunWith(PaxExam.class)
-public class OSGiBundleTest {
+public class OSGiBundleTest extends OSGiTestBase {
     @Inject
     BundleContext context;
 
@@ -48,12 +48,8 @@ public class OSGiBundleTest {
                 mavenBundle("org.slf4j","slf4j-api","1.7.5"),
                 mavenBundle("org.slf4j","slf4j-simple","1.7.5").noStart(),
                 mavenBundle("net.openhft", "compiler", "2.1"),
-                new File("Java-Lang/lang/target/classes").exists()
-                    ? bundle("reference:file:Java-Lang/lang/target/classes")
-                    : bundle("reference:file:../lang/target/classes"),
-                new File("Java-Lang/lang-osgi/target/classes").exists()
-                    ? bundle("reference:file:Java-Lang/lang-osgi/target/classes")
-                    : bundle("reference:file:target/classes"),
+                openhftBundle("Java-Lang","lang"),
+                openhftBundle("Java-Lang","lang-osgi"),
                 junitBundles(),
                 systemPackage("sun.misc"),
                 systemPackage("sun.nio.ch"),
