@@ -24,4 +24,11 @@ import net.openhft.lang.io.serialization.BytesMarshallable;
  */
 public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate,
         ByteStringAppender, ByteStringParser, CharSequence, BytesMarshallable, ReferenceCounted {
+
+    /**
+     * fill the Bytes with zeros.
+     *
+     * @return this
+     */
+    Bytes clear();
 }

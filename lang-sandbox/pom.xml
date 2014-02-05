@@ -18,20 +18,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>Java-Lang</artifactId>
+        <groupId>net.openhft</groupId>
+        <version>6.1.3</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>lang-sandbox</artifactId>
+    <version>6.1.5-SNAPSHOT</version>
 
-    <groupId>net.openhft</groupId>
-    <artifactId>Java-Lang</artifactId>
-    <version>6.1.3</version>
-    <packaging>pom</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>lang</artifactId>
+            <version>6.1.5-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
-    <name>Java Lang Parent</name>
-    <description>High Performance Java Lang library</description>
 
-    <modules>
-        <module>lang</module>
-        <module>lang-osgi</module>
-        <module>lang-integration</module>
-        <module>lang-sandbox</module>
-    </modules>
 </project>

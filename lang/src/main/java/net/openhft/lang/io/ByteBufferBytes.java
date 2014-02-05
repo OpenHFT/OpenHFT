@@ -43,6 +43,16 @@ public class ByteBufferBytes extends AbstractBytes {
         this.limit = limit;
     }
 
+    @Override
+    public Bytes clear() {
+        int i = start;
+        for (; i < limit - 7; i++)
+            buffer.putLong(i, 0L);
+        for (; i < limit; i++)
+            buffer.put(i, (byte) 0);
+        return this;
+    }
+
     public ByteBuffer buffer() {
         return buffer;
     }

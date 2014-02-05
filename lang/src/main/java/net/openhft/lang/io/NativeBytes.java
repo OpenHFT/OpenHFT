@@ -35,6 +35,7 @@ public class NativeBytes extends AbstractBytes {
     @NotNull
     @SuppressWarnings("ALL")
     public static final Unsafe UNSAFE;
+    protected static final long NO_PAGE;
     static final int BYTES_OFFSET;
 
     static {
@@ -48,9 +49,8 @@ public class NativeBytes extends AbstractBytes {
         } catch (Exception e) {
             throw new AssertionError(e);
         }
+        NO_PAGE = UNSAFE.allocateMemory(UNSAFE.pageSize());
     }
-
-    protected static final long NO_PAGE = UNSAFE.allocateMemory(UNSAFE.pageSize());
 
     protected long startAddr;
     protected long positionAddr;
@@ -84,6 +84,12 @@ public class NativeBytes extends AbstractBytes {
         for (; pos < len; pos++)
             hash = hash * 57 + bytes[off + pos];
         return hash;
+    }
+
+    @Override
+    public Bytes clear() {
+        UNSAFE.setMemory(startAddr, limitAddr - startAddr, (byte) 0);
+        return this;
     }
 
     @Override
