@@ -2252,7 +2252,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(BytesCommon bytes, long position, long length) {
-        if (length > bytes.remaining())
+        if (length > remaining())
             throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
         RandomDataInput rdi = (RandomDataInput) bytes;
         if (bytes.byteOrder() == byteOrder()) {
