@@ -16,13 +16,14 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.ReferenceCounted;
 import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
 import java.nio.MappedByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MappedMemory {
+public class MappedMemory implements ReferenceCounted {
     private final MappedByteBuffer buffer;
     private final long index;
     private final AtomicInteger refCount = new AtomicInteger(1);
@@ -43,15 +44,22 @@ public class MappedMemory {
         return index;
     }
 
+    @Override
     public void reserve() {
         if (unmapped) throw new IllegalStateException();
         refCount.incrementAndGet();
     }
 
+    @Override
     public void release() {
         if (unmapped) throw new IllegalStateException();
         if (refCount.decrementAndGet() > 0) return;
         close();
+    }
+
+    @Override
+    public int refCount() {
+        return refCount.get();
     }
 
     public MappedByteBuffer buffer() {
@@ -60,10 +68,6 @@ public class MappedMemory {
 
     public long address() {
         return ((DirectBuffer) buffer).address();
-    }
-
-    public int refCount() {
-        return refCount.get();
     }
 
     public static void release(MappedMemory mapmem) {

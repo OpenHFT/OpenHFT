@@ -18,6 +18,8 @@ package net.openhft.lang.io;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author peter.lawrey
  */
@@ -25,8 +27,8 @@ public class DirectBytes extends NativeBytes {
     @NotNull
     private final DirectStore store;
 
-    DirectBytes(@NotNull DirectStore store) {
-        super(store.bytesMarshallerFactory, store.address, store.address, store.address + store.size);
+    DirectBytes(@NotNull DirectStore store, AtomicInteger refCount) {
+        super(store.bytesMarshallerFactory, store.address, store.address, store.address + store.size, refCount);
         this.store = store;
     }
 
@@ -39,5 +41,10 @@ public class DirectBytes extends NativeBytes {
 
     public DirectStore store() {
         return store;
+    }
+
+    @Override
+    protected void cleanup() {
+        store.free();
     }
 }

@@ -27,14 +27,14 @@ import java.nio.channels.FileChannel;
  * User: peter
  * Date: 22/12/13
  * Time: 11:05
- *
- * Toggled 10,000,128 times with an average delay of 50 ns
+ * <p/>
+ * Toggled 100,000,000 times with an average delay of 49 ns
  */
 public class LockingViaMMapMain {
     static int RECORDS = Integer.getInteger("records", 128);
     static int RECORD_SIZE = Integer.getInteger("record_size", 64); // cache line size
     static int WARMUP = Integer.getInteger("warmup", RECORDS * 100);
-    static int RUNS = Integer.getInteger("runs", 5 * 1000 * 1000);
+    static int RUNS = Integer.getInteger("runs", 50 * 1000 * 1000);
 
     // offsets
     static int LOCK = 0;

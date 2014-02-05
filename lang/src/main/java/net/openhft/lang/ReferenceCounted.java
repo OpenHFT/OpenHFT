@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io;
+package net.openhft.lang;
 
-import net.openhft.lang.ReferenceCounted;
-import net.openhft.lang.io.serialization.BytesMarshallable;
+public interface ReferenceCounted {
+    void reserve();
 
-/**
- * @author peter.lawrey
- */
-public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate,
-        ByteStringAppender, ByteStringParser, CharSequence, BytesMarshallable, ReferenceCounted {
+    void release();
+
+    int refCount();
 }

@@ -21,6 +21,8 @@ import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Cleaner;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author peter.lawrey
  */
@@ -29,6 +31,7 @@ public class DirectStore {
     private final Cleaner cleaner;
     protected long address;
     protected long size;
+    protected final AtomicInteger refCount = new AtomicInteger(1);
 
     public DirectStore(long size) {
         this(new VanillaBytesMarshallerFactory(), size);
@@ -78,7 +81,7 @@ public class DirectStore {
 
     @NotNull
     public DirectBytes createSlice() {
-        return new DirectBytes(this);
+        return new DirectBytes(this, refCount);
     }
 
     public void free() {

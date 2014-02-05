@@ -23,6 +23,7 @@ import sun.misc.Unsafe;
 import java.io.EOFException;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author peter.lawrey
@@ -61,15 +62,15 @@ public class NativeBytes extends AbstractBytes {
         this.limitAddr = limitAddr;
     }
 
-    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long startAddr, long positionAddr, long limitAddr) {
-        super(bytesMarshallerFactory);
+    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long startAddr, long positionAddr, long limitAddr, AtomicInteger refCount) {
+        super(bytesMarshallerFactory, refCount);
         this.startAddr = startAddr;
         this.positionAddr = positionAddr;
         this.limitAddr = limitAddr;
     }
 
     public NativeBytes(NativeBytes bytes) {
-        super(bytes.bytesMarshallerFactory());
+        super(bytes.bytesMarshallerFactory(), new AtomicInteger(1));
         this.startAddr = bytes.startAddr;
         this.positionAddr = bytes.positionAddr;
         this.limitAddr = bytes.limitAddr;
@@ -412,5 +413,10 @@ public class NativeBytes extends AbstractBytes {
 
     public long limitAddr() {
         return limitAddr;
+    }
+
+    @Override
+    protected void cleanup() {
+        // TODO nothing to do.
     }
 }

@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import org.jetbrains.annotations.NotNull;
+import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.EOFException;
@@ -437,5 +438,14 @@ public class ByteBufferBytes extends AbstractBytes {
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
         if (position < start || position > limit)
             throw new IndexOutOfBoundsException();
+    }
+
+    @Override
+    protected void cleanup() {
+        if (buffer instanceof DirectBuffer) {
+            Cleaner cleaner = ((DirectBuffer) buffer).cleaner();
+            if (cleaner != null)
+                cleaner.clean();
+        }
     }
 }

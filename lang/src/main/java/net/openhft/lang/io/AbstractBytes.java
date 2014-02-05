@@ -35,6 +35,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,6 +86,7 @@ public abstract class AbstractBytes implements Bytes {
     private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
     static boolean ID_LIMIT_WARNED = false;
     private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
+    private final AtomicInteger refCount;
     protected boolean finished;
     protected BytesMarshallerFactory bytesMarshallerFactory;
     private StringInterner stringInterner = null;
@@ -95,14 +97,17 @@ public abstract class AbstractBytes implements Bytes {
     private long lastDay = Long.MIN_VALUE;
     @Nullable
     private byte[] lastDateStr = null;
+    private Thread currentThread;
+    private int shortThreadId = Integer.MIN_VALUE;
 
     protected AbstractBytes() {
-        this(new VanillaBytesMarshallerFactory());
+        this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
     }
 
-    protected AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory) {
+    protected AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory, AtomicInteger refCount) {
         this.finished = false;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
+        this.refCount = refCount;
     }
 
     static boolean equalsCaseIgnore(StringBuilder sb, String s) {
@@ -174,6 +179,26 @@ public abstract class AbstractBytes implements Bytes {
         LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
 
         ID_LIMIT_WARNED = true;
+    }
+
+    @Override
+    public void reserve() {
+        if (refCount.get() < 1) throw new IllegalStateException();
+        refCount.incrementAndGet();
+    }
+
+    @Override
+    public void release() {
+        if (refCount.get() < 1) throw new IllegalStateException();
+        if (refCount.decrementAndGet() > 0) return;
+        cleanup();
+    }
+
+    protected abstract void cleanup();
+
+    @Override
+    public int refCount() {
+        return refCount.get();
     }
 
     protected StringInterner stringInterner() {
@@ -275,6 +300,8 @@ public abstract class AbstractBytes implements Bytes {
         return stringInterner().intern(input);
     }
 
+    // RandomDataOutput
+
     @Nullable
     @Override
     public String readUTFΔ() {
@@ -294,8 +321,6 @@ public abstract class AbstractBytes implements Bytes {
             position(position);
         }
     }
-
-    // RandomDataOutput
 
     @NotNull
     private StringBuilder acquireUtfReader() {
@@ -1928,9 +1953,6 @@ public abstract class AbstractBytes implements Bytes {
         // try to chek the lowId and the count.
         unlockFailedInt(offset, lowId);
     }
-
-    private Thread currentThread;
-    private int shortThreadId = Integer.MIN_VALUE;
 
     public int shortThreadId() {
         return shortThreadId > 0 ? shortThreadId : shortThreadId0();
