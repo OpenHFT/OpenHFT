@@ -31,7 +31,6 @@ import java.util.List;
  */
 public class HugeArrayImpl<T> implements HugeArray<T> {
     private static final int MAX_SIZE = 10;
-
     private final DataValueGenerator valueGenerator;
     private final Class<T> tClass;
     private final long length;
@@ -72,6 +71,11 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
 
     @Override
     public void get(long index, T element) {
+        if (tClass.isInstance(element)) {
+            DirectBytes bytes = (DirectBytes) ((Byteable) element).bytes();
+            bytes.positionAndSize(index * size, size);
+            return;
+        }
         T t = acquire();
         DirectBytes bytes = (DirectBytes) ((Byteable) t).bytes();
         bytes.positionAndSize(index * size, size);
