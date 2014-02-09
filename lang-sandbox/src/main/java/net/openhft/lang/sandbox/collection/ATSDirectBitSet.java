@@ -22,10 +22,13 @@ import net.openhft.lang.io.Bytes;
  * DirectBitSet with input validations and ThreadSafe memory access.
  */
 public class ATSDirectBitSet implements DirectBitSet {
+    public static final long NOT_FOUND = -1L;
     private final Bytes bytes;
+    private final long longLength;
 
     public ATSDirectBitSet(Bytes bytes) {
         this.bytes = bytes;
+        longLength = bytes.length() >> 8;
     }
 
     @Override
@@ -140,32 +143,100 @@ public class ATSDirectBitSet implements DirectBitSet {
 
     @Override
     public long nextSetBit(long fromIndex) {
-        throw new UnsupportedOperationException();
+        long fromLongIndex = fromIndex >> 6;
+        int bitIndex = (int) (fromIndex & 0x3f);
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long l = bytes.readVolatileLong(fromLongIndex << 3) >>> bitIndex;
+        if (l != 0) {
+            return Long.numberOfTrailingZeros(l) + bitIndex;
+        }
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
+            l = bytes.readLong(i << 3);
+            if (l != 0)
+                return (i << 6) + Long.numberOfTrailingZeros(l);
+        }
+        return NOT_FOUND;
     }
 
     @Override
-    public long nextSetLong(long fromIndex) {
-        throw new UnsupportedOperationException();
+    public long nextSetLong(long fromLongIndex) {
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long l = bytes.readVolatileLong(fromLongIndex << 3);
+        if (l != 0)
+            return fromLongIndex;
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
+            l = bytes.readLong(i << 3);
+            if (l != 0)
+                return i;
+        }
+        return NOT_FOUND;
     }
 
     @Override
     public long nextClearBit(long fromIndex) {
-        throw new UnsupportedOperationException();
+        long fromLongIndex = fromIndex >> 6;
+        int bitIndex = (int) (fromIndex & 0x3f);
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long l = ~(bytes.readVolatileLong(fromLongIndex << 3) >>> bitIndex);
+        if (l != 0) {
+            return Long.numberOfTrailingZeros(l) + bitIndex;
+        }
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
+            l = ~bytes.readLong(i << 3);
+            if (l != 0)
+                return (i << 6) + Long.numberOfTrailingZeros(l);
+        }
+        return NOT_FOUND;
     }
 
     @Override
-    public long nextClearLong(long fromIndex) {
-        throw new UnsupportedOperationException();
+    public long nextClearLong(long fromLongIndex) {
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long l = bytes.readVolatileLong(fromLongIndex << 3);
+        if (l != ~0)
+            return fromLongIndex;
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
+            l = bytes.readLong(i << 3);
+            if (l != ~0)
+                return i;
+        }
+        return NOT_FOUND;
     }
 
     @Override
     public long previousSetBit(long fromIndex) {
-        throw new UnsupportedOperationException();
+        long fromLongIndex = fromIndex >> 6;
+        int bitIndex = (int) (fromIndex & 0x3f);
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long l = bytes.readVolatileLong(fromLongIndex << 3) << -bitIndex;
+        if (l != 0)
+            return fromLongIndex << 6 + Long.numberOfLeadingZeros(l) + bitIndex;
+        for (long i = fromLongIndex - 1; i >= 0; i--) {
+            l = bytes.readLong(i << 3);
+            if (l != 0)
+                return fromLongIndex << 6 + Long.numberOfLeadingZeros(l);
+        }
+        return NOT_FOUND;
     }
 
     @Override
-    public long previousSetLong(long fromIndex) {
-        throw new UnsupportedOperationException();
+    public long previousSetLong(long fromLongIndex) {
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long l = bytes.readVolatileLong(fromLongIndex << 3);
+        if (l != 0)
+            return fromLongIndex;
+        for (long i = fromLongIndex - 1; i >= 0; i--) {
+            l = bytes.readLong(i << 3);
+            if (l != 0)
+                return i;
+        }
+        return NOT_FOUND;
     }
 
     @Override
@@ -174,33 +245,59 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public long previousClearLong(long fromIndex) {
-        throw new UnsupportedOperationException();
+    public long previousClearLong(long fromLongIndex) {
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long l = ~bytes.readVolatileLong(fromLongIndex << 3);
+        if (l != 0)
+            return fromLongIndex;
+        for (long i = fromLongIndex - 1; i >= 0; i--) {
+            l = ~bytes.readLong(i << 3);
+            if (l != 0)
+                return i;
+        }
+        return NOT_FOUND;
     }
 
     @Override
     public long length() {
-        throw new UnsupportedOperationException();
+        return longLength << 6;
     }
 
     @Override
     public long cardinality() {
-        throw new UnsupportedOperationException();
+        long count = Long.bitCount(bytes.readVolatileLong(0));
+        for (long i = 1; i < longLength; i++) {
+            count += Long.bitCount(bytes.readLong(i << 3));
+        }
+        return count;
     }
 
     @Override
     public DirectBitSet and(long index, long value) {
-        throw new UnsupportedOperationException();
+        while (true) {
+            long l = bytes.readVolatileLong(index << 3);
+            long l2 = l & value;
+            if (l == l2 || bytes.compareAndSwapLong(index << 3, l, l2)) return this;
+        }
     }
 
     @Override
     public DirectBitSet or(long index, long value) {
-        throw new UnsupportedOperationException();
+        while (true) {
+            long l = bytes.readVolatileLong(index << 3);
+            long l2 = l | value;
+            if (l == l2 || bytes.compareAndSwapLong(index << 3, l, l2)) return this;
+        }
     }
 
     @Override
     public DirectBitSet xor(long index, long value) {
-        throw new UnsupportedOperationException();
+        while (true) {
+            long l = bytes.readVolatileLong(index << 3);
+            long l2 = l ^ value;
+            if (bytes.compareAndSwapLong(index << 3, l, l2)) return this;
+        }
     }
 
     @Override

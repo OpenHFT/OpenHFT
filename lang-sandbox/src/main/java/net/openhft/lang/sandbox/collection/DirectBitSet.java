@@ -154,22 +154,22 @@ public interface DirectBitSet extends ReferenceCounted {
      * that occurs on or after the specified starting index. The index is the number of longs.
      * If no such bit exists then {@code -1} is returned.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromLongIndex the index to start checking from (inclusive)
      * @return the index of the next set long, or {@code -1} if there
      * is no such long
      * @throws IndexOutOfBoundsException if the specified index is negative
      */
-    long nextSetLong(long fromIndex);
+    long nextSetLong(long fromLongIndex);
 
     /**
      * Returns the index of the first bit that is set to {@code false}
      * that occurs on or after the specified starting index.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromLongIndex the index to start checking from (inclusive)
      * @return the index of the next clear bit
      * @throws IndexOutOfBoundsException if the specified index is negative
      */
-    long nextClearBit(long fromIndex);
+    long nextClearBit(long fromLongIndex);
 
     /**
      * Returns the index of the first long that contains a bit is set to {@code false}
@@ -195,13 +195,13 @@ public interface DirectBitSet extends ReferenceCounted {
      *     // operate on index i here
      * }}</pre>
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromLongIndex the index to start checking from (inclusive)
      * @return the index of the previous set bit, or {@code -1} if there
      * is no such bit
      * @throws IndexOutOfBoundsException if the specified index is less
      *                                   than {@code -1}
      */
-    long previousSetBit(long fromIndex);
+    long previousSetBit(long fromLongIndex);
 
     /**
      * Returns the index of the nearest long that contains a bit set to {@code true}
@@ -209,13 +209,13 @@ public interface DirectBitSet extends ReferenceCounted {
      * If no such bit exists, or if {@code -1} is given as the
      * starting index, then {@code -1} is returned.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromLongIndex the index to start checking from (inclusive)
      * @return the index of the previous set bit, or {@code -1} if there
      * is no such bit
      * @throws IndexOutOfBoundsException if the specified index is less
      *                                   than {@code -1}
      */
-    long previousSetLong(long fromIndex);
+    long previousSetLong(long fromLongIndex);
 
     /**
      * Returns the index of the nearest bit that is set to {@code false}
@@ -237,13 +237,13 @@ public interface DirectBitSet extends ReferenceCounted {
      * If no such bit exists, or if {@code -1} is given as the
      * starting index, then {@code -1} is returned.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromLongIndex the index to start checking from (inclusive)
      * @return the index of the previous clear bit, or {@code -1} if there
      * is no such bit
      * @throws IndexOutOfBoundsException if the specified index is less
      *                                   than {@code -1}
      */
-    long previousClearLong(long fromIndex);
+    long previousClearLong(long fromLongIndex);
 
     /**
      * Returns the "logical size" of this {@code BitSet}: the index of
