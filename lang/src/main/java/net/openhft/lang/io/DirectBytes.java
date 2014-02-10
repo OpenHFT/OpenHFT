@@ -25,21 +25,21 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DirectBytes extends NativeBytes {
     @NotNull
-    private final DirectStore store;
+    private final BytesStore store;
 
-    DirectBytes(@NotNull DirectStore store, AtomicInteger refCount) {
-        super(store.bytesMarshallerFactory, store.address, store.address, store.address + store.size, refCount);
+    public DirectBytes(@NotNull BytesStore store, AtomicInteger refCount) {
+        super(store.bytesMarshallerFactory(), store.address(), store.address(), store.address() + store.size(), refCount);
         this.store = store;
     }
 
     public void positionAndSize(long offset, long size) {
-        if (offset < 0 || size < 0 || offset + size > store.size)
+        if (offset < 0 || size < 0 || offset + size > store.size())
             throw new IllegalArgumentException();
-        startAddr = positionAddr = store.address + offset;
+        startAddr = positionAddr = store.address() + offset;
         limitAddr = startAddr + size;
     }
 
-    public DirectStore store() {
+    public BytesStore store() {
         return store;
     }
 

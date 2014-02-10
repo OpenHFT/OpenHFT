@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author peter.lawrey
  */
-public class DirectStore {
+public class DirectStore implements BytesStore {
     protected BytesMarshallerFactory bytesMarshallerFactory;
     private final Cleaner cleaner;
     protected long address;
@@ -82,6 +82,11 @@ public class DirectStore {
     @NotNull
     public DirectBytes createSlice() {
         return new DirectBytes(this, refCount);
+    }
+
+    @Override
+    public long address() {
+        return address;
     }
 
     public void free() {
