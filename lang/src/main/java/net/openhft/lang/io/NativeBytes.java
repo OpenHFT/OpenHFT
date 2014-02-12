@@ -87,6 +87,16 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
+    public NativeBytes createSlice() {
+        return new NativeBytes(bytesMarshallerFactory(), startAddr(), startAddr(), limitAddr(), refCount);
+    }
+
+    @Override
+    public long address() {
+        return startAddr;
+    }
+
+    @Override
     public Bytes clear() {
         UNSAFE.setMemory(startAddr, limitAddr - startAddr, (byte) 0);
         return this;

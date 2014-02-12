@@ -48,9 +48,11 @@ public abstract class AbstractBytes implements Bytes {
     public static final int INT_LOCK_MASK = 0xFFFFFF;
     public static final int UNSIGNED_BYTE_MASK = 0xFF;
     public static final int UNSIGNED_SHORT_MASK = 0xFFFF;
+    private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
     // extra 1 for decimal place.
     static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
+    private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
     static final byte[] RADIX_PARSE = new byte[256];
 
     static {
@@ -74,7 +76,6 @@ public abstract class AbstractBytes implements Bytes {
     private static final short SHORT_MIN_VALUE = Short.MIN_VALUE;
     private static final short SHORT_EXTENDED = Short.MIN_VALUE + 1;
     private static final short SHORT_MAX_VALUE = Short.MIN_VALUE + 2;
-    private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
     // RandomDataInput
     private static final int INT_MIN_VALUE = Integer.MIN_VALUE;
     private static final int INT_EXTENDED = Integer.MIN_VALUE + 1;
@@ -85,8 +86,7 @@ public abstract class AbstractBytes implements Bytes {
     private static final byte SERIALIZED = 'S';
     private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
     static boolean ID_LIMIT_WARNED = false;
-    private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
-    private final AtomicInteger refCount;
+    protected final AtomicInteger refCount;
     protected boolean finished;
     protected BytesMarshallerFactory bytesMarshallerFactory;
     private StringInterner stringInterner = null;
@@ -179,6 +179,16 @@ public abstract class AbstractBytes implements Bytes {
         LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
 
         ID_LIMIT_WARNED = true;
+    }
+
+    @Override
+    public long size() {
+        return capacity();
+    }
+
+    @Override
+    public void free() {
+        throw new UnsupportedOperationException("Forcing a free() via Bytes is unsafe, try reserve() + release()");
     }
 
     @Override
@@ -1954,6 +1964,16 @@ public abstract class AbstractBytes implements Bytes {
         unlockFailedInt(offset, lowId);
     }
 
+    @Override
+    public void resetLockInt(long offset) {
+        writeOrderedInt(offset, 0);
+    }
+
+    @Override
+    public int threadIdForLockInt(long offset) {
+        return readVolatileInt(offset) & INT_LOCK_MASK;
+    }
+
     public int shortThreadId() {
         return shortThreadId > 0 ? shortThreadId : shortThreadId0();
     }
@@ -2035,6 +2055,16 @@ public abstract class AbstractBytes implements Bytes {
             return;
         // try to check the lowId and the count.
         unlockFailedLong(offset, id);
+    }
+
+    @Override
+    public void resetLockLong(long offset) {
+        writeOrderedLong(offset, 0L);
+    }
+
+    @Override
+    public long threadIdForLockLong(long offset) {
+        return readVolatileLong(offset);
     }
 
     protected long getId() {
@@ -2251,22 +2281,37 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void write(BytesCommon bytes, long position, long length) {
+    public void write(RandomDataInput bytes, long position, long length) {
         if (length > remaining())
             throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
-        RandomDataInput rdi = (RandomDataInput) bytes;
         if (bytes.byteOrder() == byteOrder()) {
             while (length >= 8) {
-                writeLong(rdi.readLong(position));
+                writeLong(bytes.readLong(position));
                 position += 8;
                 length -= 8;
             }
         }
         while (length >= 1) {
-            writeByte(rdi.readByte(position));
+            writeByte(bytes.readByte(position));
             position++;
             length--;
         }
+    }
+
+    public boolean startsWith(RandomDataInput input) {
+        long inputRemaining = input.remaining();
+        if (remaining() < inputRemaining) return false;
+        long pos = position(), inputPos = input.position();
+        int i = 0;
+        for (; i < inputRemaining - 7; i += 8) {
+            if (readLong(pos + i) != input.readLong(inputPos + i))
+                return false;
+        }
+        for (; i < inputRemaining; i++) {
+            if (readByte(pos + i) != input.readByte(inputPos + i))
+                return false;
+        }
+        return true;
     }
 
     protected class BytesInputStream extends InputStream {
