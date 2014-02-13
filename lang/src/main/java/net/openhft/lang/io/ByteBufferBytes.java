@@ -30,25 +30,41 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ByteBufferBytes extends AbstractBytes {
     protected final ByteBuffer buffer;
-    protected int start, position, limit;
+    protected int start, position, capacity;
     protected AtomicBoolean barrier;
 
     public ByteBufferBytes(ByteBuffer buffer) {
         this(buffer, 0, buffer.capacity());
     }
 
-    public ByteBufferBytes(ByteBuffer buffer, int start, int limit) {
+    public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
         this.buffer = buffer;
         this.start = position = start;
-        this.limit = limit;
+        this.capacity = capacity;
+    }
+
+    @Override
+    public Bytes createSlice() {
+        return new ByteBufferBytes(buffer(), position, capacity);
+    }
+
+    @Override
+    public long address() {
+        if (buffer instanceof DirectBuffer) {
+            long address = ((DirectBuffer) buffer).address();
+            if (address == 0)
+                throw new IllegalStateException("This buffer has no address, is it empty?");
+            return address;
+        }
+        throw new IllegalStateException("A heap ByteBuffer doesn't have a fixed address");
     }
 
     @Override
     public Bytes clear() {
         int i = start;
-        for (; i < limit - 7; i++)
+        for (; i < capacity - 7; i++)
             buffer.putLong(i, 0L);
-        for (; i < limit; i++)
+        for (; i < capacity; i++)
             buffer.put(i, (byte) 0);
         return this;
     }
@@ -81,7 +97,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public byte readByte() {
-        if (position < limit)
+        if (position < capacity)
             return buffer.get(position++);
         throw new IndexOutOfBoundsException();
     }
@@ -89,7 +105,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public byte readByte(long offset) {
         int pos = (int) (start + offset);
-        if (pos < limit)
+        if (pos < capacity)
             return buffer.get(pos);
         throw new IndexOutOfBoundsException();
     }
@@ -107,7 +123,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public short readShort() {
-        if (position + 2 <= limit) {
+        if (position + 2 <= capacity) {
             short s = buffer.getShort(position);
             position += 2;
             return s;
@@ -118,14 +134,14 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public short readShort(long offset) {
         int pos = (int) (start + offset);
-        if (pos + 2 <= limit)
+        if (pos + 2 <= capacity)
             return buffer.getShort(pos);
         throw new IndexOutOfBoundsException();
     }
 
     @Override
     public char readChar() {
-        if (position + 2 <= limit) {
+        if (position + 2 <= capacity) {
             char ch = buffer.getChar(position);
             position += 2;
             return ch;
@@ -136,14 +152,14 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public char readChar(long offset) {
         int pos = (int) (start + offset);
-        if (pos + 2 <= limit)
+        if (pos + 2 <= capacity)
             return buffer.getChar(pos);
         throw new IndexOutOfBoundsException();
     }
 
     @Override
     public int readInt() {
-        if (position + 4 <= limit) {
+        if (position + 4 <= capacity) {
             int i = buffer.getInt(position);
             position += 4;
             return i;
@@ -154,7 +170,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public int readInt(long offset) {
         int pos = (int) (start + offset);
-        if (pos + 4 <= limit)
+        if (pos + 4 <= capacity)
             return buffer.getInt(pos);
         throw new IndexOutOfBoundsException();
     }
@@ -173,7 +189,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public long readLong() {
-        if (position + 8 <= limit) {
+        if (position + 8 <= capacity) {
             long l = buffer.getLong(position);
             position += 8;
             return l;
@@ -184,7 +200,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public long readLong(long offset) {
         int pos = (int) (start + offset);
-        if (pos + 8 <= limit)
+        if (pos + 8 <= capacity)
             return buffer.getLong(pos);
         throw new IndexOutOfBoundsException();
     }
@@ -203,7 +219,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public float readFloat() {
-        if (position + 4 <= limit) {
+        if (position + 4 <= capacity) {
             float f = buffer.getFloat(position);
             position += 4;
             return f;
@@ -214,14 +230,14 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public float readFloat(long offset) {
         int pos = (int) (start + offset);
-        if (pos + 4 <= limit)
+        if (pos + 4 <= capacity)
             return buffer.getFloat(pos);
         throw new IndexOutOfBoundsException();
     }
 
     @Override
     public double readDouble() {
-        if (position + 8 <= limit) {
+        if (position + 8 <= capacity) {
             double d = buffer.getDouble(position);
             position += 8;
             return d;
@@ -232,14 +248,14 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public double readDouble(long offset) {
         int pos = (int) (start + offset);
-        if (pos + 8 <= limit)
+        if (pos + 8 <= capacity)
             return buffer.getDouble(pos);
         throw new IndexOutOfBoundsException();
     }
 
     @Override
     public void write(int b) {
-        if (position < limit)
+        if (position < capacity)
             buffer.put(position++, (byte) b);
         else
             throw new IndexOutOfBoundsException();
@@ -248,7 +264,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public void writeByte(long offset, int b) {
         int pos = (int) (start + offset);
-        if (pos < limit)
+        if (pos < capacity)
             buffer.put(pos, (byte) b);
         else
             throw new IndexOutOfBoundsException();
@@ -256,7 +272,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void writeShort(int v) {
-        if (position + 2 <= limit) {
+        if (position + 2 <= capacity) {
             buffer.putShort(position, (short) v);
             position += 2;
         } else {
@@ -267,7 +283,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public void writeShort(long offset, int v) {
         int pos = (int) (start + offset);
-        if (pos + 2 <= limit)
+        if (pos + 2 <= capacity)
             buffer.putShort(pos, (short) v);
         else
             throw new IndexOutOfBoundsException();
@@ -275,7 +291,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void writeChar(int v) {
-        if (position + 2 <= limit) {
+        if (position + 2 <= capacity) {
             buffer.putChar(position, (char) v);
             position += 2;
         } else {
@@ -286,7 +302,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public void writeChar(long offset, int v) {
         int pos = (int) (start + offset);
-        if (pos + 2 <= limit)
+        if (pos + 2 <= capacity)
             buffer.putChar(pos, (char) v);
         else
             throw new IndexOutOfBoundsException();
@@ -294,7 +310,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void writeInt(int v) {
-        if (position + 4 <= limit) {
+        if (position + 4 <= capacity) {
             buffer.putInt(position, v);
             position += 4;
         } else {
@@ -305,7 +321,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public void writeInt(long offset, int v) {
         int pos = (int) (start + offset);
-        if (pos + 4 <= limit)
+        if (pos + 4 <= capacity)
             buffer.putInt(pos, v);
         else
             throw new IndexOutOfBoundsException();
@@ -332,7 +348,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void writeLong(long v) {
-        if (position + 8 <= limit) {
+        if (position + 8 <= capacity) {
             buffer.putLong(position, v);
             position += 8;
         } else {
@@ -343,7 +359,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public void writeLong(long offset, long v) {
         int pos = (int) (start + offset);
-        if (pos + 8 <= limit)
+        if (pos + 8 <= capacity)
             buffer.putLong(pos, v);
         else
             throw new IndexOutOfBoundsException();
@@ -370,7 +386,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void writeFloat(float v) {
-        if (position + 4 <= limit) {
+        if (position + 4 <= capacity) {
             buffer.putFloat(position, v);
             position += 4;
         } else {
@@ -381,7 +397,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public void writeFloat(long offset, float v) {
         int pos = (int) (start + offset);
-        if (pos + 4 <= limit)
+        if (pos + 4 <= capacity)
             buffer.putFloat(pos, v);
         else
             throw new IndexOutOfBoundsException();
@@ -389,7 +405,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void writeDouble(double v) {
-        if (position + 8 <= limit) {
+        if (position + 8 <= capacity) {
             buffer.putDouble(position, v);
             position += 8;
         } else {
@@ -400,7 +416,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public void writeDouble(long offset, double v) {
         int pos = (int) (start + offset);
-        if (pos + 8 <= limit)
+        if (pos + 8 <= capacity)
             buffer.putDouble(pos, v);
         else
             throw new IndexOutOfBoundsException();
@@ -430,12 +446,12 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public long capacity() {
-        return limit - start;
+        return capacity - start;
     }
 
     @Override
     public long remaining() {
-        return limit - position;
+        return capacity - position;
     }
 
     @NotNull
@@ -446,7 +462,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
-        if (position < start || position > limit)
+        if (position < start || position > capacity)
             throw new IndexOutOfBoundsException();
     }
 

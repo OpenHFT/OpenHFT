@@ -19,7 +19,7 @@ package net.openhft.lang.io;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 
 public interface BytesStore {
-    DirectBytes createSlice();
+    Bytes createSlice();
 
     BytesMarshallerFactory bytesMarshallerFactory();
 

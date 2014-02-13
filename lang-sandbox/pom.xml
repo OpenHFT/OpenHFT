@@ -25,13 +25,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang-sandbox</artifactId>
-    <version>6.1.5-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
-            <version>6.1.5-SNAPSHOT</version>
+            <version>6.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
