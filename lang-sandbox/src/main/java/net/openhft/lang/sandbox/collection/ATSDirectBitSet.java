@@ -90,6 +90,13 @@ public class ATSDirectBitSet implements DirectBitSet {
     @Override
     public DirectBitSet set(long fromIndex, long toIndex) {
         throw new UnsupportedOperationException();
+
+    @Override
+    public DirectBitSet setAll() {
+        for (long i = 0; i < longLength; i++) {
+            bytes.writeLong(i << 3, ~0L);
+        }
+        return this;
     }
 
     @Override

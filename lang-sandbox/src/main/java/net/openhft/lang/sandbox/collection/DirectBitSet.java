@@ -71,6 +71,14 @@ public interface DirectBitSet extends ReferenceCounted {
     DirectBitSet set(long fromIndex, long toIndex);
 
     /**
+     * Sets all bits, {@code bs.setAll()} is equivalent
+     * of {@code bs.set(0, bs.size()}.
+     *
+     * @return this bitset back
+     */
+    DirectBitSet setAll();
+
+    /**
      * Sets the bits from the specified {@code fromIndex} (inclusive) to the
      * specified {@code toIndex} (exclusive) to the specified value.
      *
