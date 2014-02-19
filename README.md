@@ -51,7 +51,7 @@ Both classes provide functionality:
 * addAndGetInt and getAndAddInt operations
 
 ####Example
-    ByteBuffer byteBuffer = ByteBuffer.allocate(SIZE).order(ByteOrder.nativeOrder());
+    ByteBuffer byteBuffer = ByteBuffer.allocate(SIZE);
     ByteBufferBytes bytes = new ByteBufferBytes(byteBuffer);
     for (long i = 0; i < bytes.capacity(); i++)
         bytes.writeLong(i);

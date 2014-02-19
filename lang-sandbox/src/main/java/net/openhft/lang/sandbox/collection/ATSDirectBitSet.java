@@ -63,8 +63,68 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public DirectBitSet flip(long fromIndex, long toIndex) {
-        throw new UnsupportedOperationException();
+    public DirectBitSet flip(long fromIndex, long exclusiveToIndex) {
+        long fromLongIndex = fromIndex >> 6;
+        long toIndex = exclusiveToIndex - 1;
+        long toLongIndex = toIndex >> 6;
+        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
+                toLongIndex >= longLength)
+            throw new IndexOutOfBoundsException();
+
+        if (fromLongIndex != toLongIndex) {
+            long firstFullLongIndex = fromLongIndex;
+            if ((fromIndex & 0x3F) != 0) {
+                long fromByteIndex = fromLongIndex << 3;
+                long mask = (~0L) << fromIndex;
+                while (true) {
+                    long l = bytes.readVolatileLong(fromByteIndex);
+                    long l2 = l ^ mask;
+                    if (bytes.compareAndSwapLong(fromByteIndex, l, l2))
+                        break;
+                }
+                firstFullLongIndex++;
+            }
+
+            if ((exclusiveToIndex & 0x3F) == 0) {
+                for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
+                    while (true) {
+                        long l = bytes.readVolatileLong(i << 3);
+                        long l2 = ~l;
+                        if (bytes.compareAndSwapLong(i << 3, l, l2))
+                            break;
+                    }
+                }
+            } else {
+                for (long i = firstFullLongIndex; i < toLongIndex; i++) {
+                    while (true) {
+                        long l = bytes.readVolatileLong(i << 3);
+                        long l2 = ~l;
+                        if (bytes.compareAndSwapLong(i << 3, l, l2))
+                            break;
+                    }
+                }
+
+                long toByteIndex = toLongIndex << 3;
+                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                long mask = (~0L) >>> ~toIndex;
+                while (true) {
+                    long l = bytes.readVolatileLong(toByteIndex);
+                    long l2 = l ^ mask;
+                    if (bytes.compareAndSwapLong(toByteIndex, l, l2))
+                        return this;
+                }
+            }
+        } else {
+            long byteIndex = fromLongIndex << 3;
+            long mask = ((~0L) << fromIndex) & ((~0L) >>> ~toIndex);
+            while (true) {
+                long l = bytes.readVolatileLong(byteIndex);
+                long l2 = l ^ mask;
+                if (bytes.compareAndSwapLong(byteIndex, l, l2))
+                    return this;
+            }
+        }
+        return this;
     }
 
     @Override
@@ -121,7 +181,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 }
 
                 long toByteIndex = toLongIndex << 3;
-                // see comment in previousSetBit explaining this
+                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
                 long mask = (~0L) >>> ~toIndex;
                 while (true) {
                     long l = bytes.readVolatileLong(toByteIndex);
@@ -173,8 +233,58 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public DirectBitSet clear(long fromIndex, long toIndex) {
-        throw new UnsupportedOperationException();
+    public DirectBitSet clear(long fromIndex, long exclusiveToIndex) {
+        long fromLongIndex = fromIndex >> 6;
+        long toIndex = exclusiveToIndex - 1;
+        long toLongIndex = toIndex >> 6;
+        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
+                toLongIndex >= longLength)
+            throw new IndexOutOfBoundsException();
+
+        if (fromLongIndex != toLongIndex) {
+            long firstFullLongIndex = fromLongIndex;
+            if ((fromIndex & 0x3F) != 0) {
+                long fromByteIndex = fromLongIndex << 3;
+                long mask = ~((~0L) << fromIndex);
+                while (true) {
+                    long l = bytes.readVolatileLong(fromByteIndex);
+                    long l2 = l & mask;
+                    if (bytes.compareAndSwapLong(fromByteIndex, l, l2))
+                        break;
+                }
+                firstFullLongIndex++;
+            }
+
+            if ((exclusiveToIndex & 0x3F) == 0) {
+                for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
+                    bytes.writeLong(i << 3, 0L);
+                }
+            } else {
+                for (long i = firstFullLongIndex; i < toLongIndex; i++) {
+                    bytes.writeLong(i << 3, 0L);
+                }
+
+                long toByteIndex = toLongIndex << 3;
+                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                long mask = ~((~0L) >>> ~toIndex);
+                while (true) {
+                    long l = bytes.readVolatileLong(toByteIndex);
+                    long l2 = l & mask;
+                    if (bytes.compareAndSwapLong(toByteIndex, l, l2))
+                        return this;
+                }
+            }
+        } else {
+            long byteIndex = fromLongIndex << 3;
+            long mask = (~((~0L) << fromIndex)) | (~((~0L) >>> ~toIndex));
+            while (true) {
+                long l = bytes.readVolatileLong(byteIndex);
+                long l2 = l & mask;
+                if (bytes.compareAndSwapLong(byteIndex, l, l2))
+                    return this;
+            }
+        }
+        return this;
     }
 
     @Override
@@ -258,10 +368,10 @@ public class ATSDirectBitSet implements DirectBitSet {
             throw new IndexOutOfBoundsException();
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
-        if (bytes.readVolatileLong(fromLongIndex << 3) != ~0)
+        if (bytes.readVolatileLong(fromLongIndex << 3) != ~0L)
             return fromLongIndex;
         for (long i = fromLongIndex + 1; i < longLength; i++) {
-            if (bytes.readLong(i << 3) != ~0)
+            if (bytes.readLong(i << 3) != ~0L)
                 return i;
         }
         return NOT_FOUND;
@@ -281,10 +391,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             fromLongIndex = longLength - 1;
             fromIndex = size() - 1;
         }
-        // x << ~fromIndex ===
-        // x << ((~fromIndex) & 0x3F) === x << (31 - (fromIndex & 0x3F))
-        // => x << ~fromIndex is pushing out highest-order bits of the x
-        // except (fromIndex & 0x3F) + 1 lowest-order ones
+        // << ~fromIndex === << (63 - (fromIndex & 0x3F))
         long l = bytes.readVolatileLong(fromLongIndex << 3) << ~fromIndex;
         if (l != 0)
             return fromIndex - Long.numberOfLeadingZeros(l);
@@ -346,10 +453,10 @@ public class ATSDirectBitSet implements DirectBitSet {
         }
         if (fromLongIndex >= longLength)
             fromLongIndex = longLength - 1;
-        if (bytes.readVolatileLong(fromLongIndex << 3) != ~0)
+        if (bytes.readVolatileLong(fromLongIndex << 3) != ~0L)
             return fromLongIndex;
         for (long i = fromLongIndex - 1; i >= 0; i--) {
-            if (bytes.readLong(i << 3) != ~0)
+            if (bytes.readLong(i << 3) != ~0L)
                 return i;
         }
         return NOT_FOUND;
@@ -358,11 +465,6 @@ public class ATSDirectBitSet implements DirectBitSet {
     @Override
     public long size() {
         return longLength << 6;
-    }
-
-    @Override
-    public long length() {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -403,6 +505,10 @@ public class ATSDirectBitSet implements DirectBitSet {
 
     @Override
     public DirectBitSet andNot(long longIndex, long value) {
-        throw new UnsupportedOperationException();
+        while (true) {
+            long l = bytes.readVolatileLong(longIndex << 3);
+            long l2 = l & ~value;
+            if (bytes.compareAndSwapLong(longIndex << 3, l, l2)) return this;
+        }
     }
 }

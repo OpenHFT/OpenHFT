@@ -38,6 +38,9 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
+        // We should set order to native, because compare-and-swap operations
+        // end up with native ops. Bytes interfaces handles only native order.
+        buffer.order(ByteOrder.nativeOrder());
         this.buffer = buffer;
         this.start = position = start;
         this.capacity = capacity;
