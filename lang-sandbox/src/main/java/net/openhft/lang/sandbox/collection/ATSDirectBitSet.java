@@ -361,11 +361,6 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public long length() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public long cardinality() {
         long count = Long.bitCount(bytes.readVolatileLong(0));
         for (long i = 1; i < longLength; i++) {

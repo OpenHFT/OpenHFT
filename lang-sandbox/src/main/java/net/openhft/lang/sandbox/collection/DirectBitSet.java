@@ -18,13 +18,24 @@ package net.openhft.lang.sandbox.collection;
 
 import net.openhft.lang.ReferenceCounted;
 
+/**
+ * Most notable logical difference of this interface with {@code java.util.BitSet}
+ * is that {@code DirectBitSet} has a rigid {@link #size},
+ * attempts to {@link #get}, {@link #set} or {@link #clear} bits at indices
+ * exceeding the size cause {@code IndexOutOfBoundsException}. There is also
+ * a {@link #setAll()} method to set all bits within the size.
+ * {@code java.util.BitSet} doesn't have such rigid capacity.
+ *
+ * @see java.util.BitSet
+ */
 public interface DirectBitSet extends ReferenceCounted {
     /**
      * Sets the bit at the specified index to the complement of its
      * current value.
      *
      * @param bitIndex the index of the bit to flip
-     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         {@code (index < 0 || index >= size())}
      */
     DirectBitSet flip(long bitIndex);
 
@@ -36,8 +47,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * @param fromIndex index of the first bit to flip
      * @param toIndex   index after the last bit to flip
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
-     *                                   or {@code toIndex} is negative, or {@code fromIndex} is
-     *                                   larger than {@code toIndex}
+     *         or {@code fromIndex} is larger than {@code toIndex},
+     *         or {@code toIndex} is larger or equal to {@code size()}
      */
     DirectBitSet flip(long fromIndex, long toIndex);
 
@@ -45,7 +56,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * Sets the bit at the specified index to {@code true}.
      *
      * @param bitIndex a bit index
-     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         {@code (index < 0 || index >= size())}
      */
     DirectBitSet set(long bitIndex);
 
@@ -54,7 +66,8 @@ public interface DirectBitSet extends ReferenceCounted {
      *
      * @param bitIndex a bit index
      * @param value    a boolean value to set
-     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         {@code (index < 0 || index >= size())}
      */
     DirectBitSet set(long bitIndex, boolean value);
 
@@ -65,8 +78,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * @param fromIndex index of the first bit to be set
      * @param toIndex   index after the last bit to be set
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
-     *                                   or {@code toIndex} is negative, or {@code fromIndex} is
-     *                                   larger than {@code toIndex}
+     *         or {@code fromIndex} is larger than {@code toIndex},
+     *         or {@code toIndex} is larger or equal to {@code size()}
      */
     DirectBitSet set(long fromIndex, long toIndex);
 
@@ -74,7 +87,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * Sets all bits, {@code bs.setAll()} is equivalent
      * of {@code bs.set(0, bs.size()}.
      *
-     * @return this bitset back
+     * @return this bit set back
      */
     DirectBitSet setAll();
 
@@ -86,8 +99,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * @param toIndex   index after the last bit to be set
      * @param value     value to set the selected bits to
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
-     *                                   or {@code toIndex} is negative, or {@code fromIndex} is
-     *                                   larger than {@code toIndex}
+     *         or {@code fromIndex} is larger than {@code toIndex},
+     *         or {@code toIndex} is larger or equal to {@code size()}
      */
     DirectBitSet set(long fromIndex, long toIndex, boolean value);
 
@@ -95,7 +108,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * Sets the bit specified by the index to {@code false}.
      *
      * @param bitIndex the index of the bit to be cleared
-     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         {@code (index < 0 || index >= size())}
      */
     DirectBitSet clear(long bitIndex);
 
@@ -106,8 +120,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * @param fromIndex index of the first bit to be cleared
      * @param toIndex   index after the last bit to be cleared
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
-     *                                   or {@code toIndex} is negative, or {@code fromIndex} is
-     *                                   larger than {@code toIndex}
+     *         or {@code fromIndex} is larger than {@code toIndex},
+     *         or {@code toIndex} is larger or equal to {@code size()}
      */
     DirectBitSet clear(long fromIndex, long toIndex);
 
@@ -119,12 +133,13 @@ public interface DirectBitSet extends ReferenceCounted {
     /**
      * Returns the value of the bit with the specified index. The value
      * is {@code true} if the bit with the index {@code bitIndex}
-     * is currently set in this {@code BitSet}; otherwise, the result
+     * is currently set in this {@code DirectBitSet}; otherwise, the result
      * is {@code false}.
      *
      * @param bitIndex the bit index
      * @return the value of the bit with the specified index
-     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         {@code (index < 0 || index >= size())}
      */
     boolean get(long bitIndex);
 
@@ -133,7 +148,8 @@ public interface DirectBitSet extends ReferenceCounted {
      *
      * @param longIndex the bit index
      * @return the value of the long with the specified index
-     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         {@code (index < 0 || index >= size() / 64)}
      */
     long getLong(long longIndex);
 
@@ -142,7 +158,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * that occurs on or after the specified starting index. If no such
      * bit exists then {@code -1} is returned.
      * <p/>
-     * <p>To iterate over the {@code true} bits in a {@code BitSet},
+     * <p>To iterate over the {@code true} bits in a {@code DirectBitSet},
      * use the following loop:
      * <p/>
      * <pre> {@code
@@ -171,20 +187,24 @@ public interface DirectBitSet extends ReferenceCounted {
 
     /**
      * Returns the index of the first bit that is set to {@code false}
-     * that occurs on or after the specified starting index.
+     * that occurs on or after the specified starting index. If no such
+     * bit exists then {@code -1} is returned.
      *
      * @param fromIndex the index to start checking from (inclusive)
-     * @return the index of the next clear bit
+     * @return the index of the next clear bit,
+     *         or {@code -1} if there is no such bit
      * @throws IndexOutOfBoundsException if the specified index is negative
      */
     long nextClearBit(long fromIndex);
 
     /**
      * Returns the index of the first long that contains a bit is set to {@code false}
-     * that occurs on or after the specified starting index. The index in multiples of 64-bit
+     * that occurs on or after the specified starting index. If no such
+     * bit exists then {@code -1} is returned.
      *
      * @param fromLongIndex the index to start checking from (inclusive)
-     * @return the index of the next long containing a clear bit
+     * @return the index of the next long containing a clear bit,
+     *         or {@code -1} if there is no such long
      * @throws IndexOutOfBoundsException if the specified index is negative
      */
     long nextClearLong(long fromLongIndex);
@@ -195,11 +215,11 @@ public interface DirectBitSet extends ReferenceCounted {
      * If no such bit exists, or if {@code -1} is given as the
      * starting index, then {@code -1} is returned.
      * <p/>
-     * <p>To iterate over the {@code true} bits in a {@code BitSet},
+     * <p>To iterate over the {@code true} bits in a {@code DirectBitSet},
      * use the following loop:
      * <p/>
      * <pre> {@code
-     * for (int i = bs.length(); (i = bs.previousSetBit(i-1)) >= 0; ) {
+     * for (int i = bs.size(); (i = bs.previousSetBit(i-1)) >= 0; ) {
      *     // operate on index i here
      * }}</pre>
      *
@@ -218,8 +238,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * starting index, then {@code -1} is returned.
      *
      * @param fromLongIndex the index to start checking from (inclusive)
-     * @return the index of the previous set bit, or {@code -1} if there
-     * is no such bit
+     * @return the index of the previous long containing a set bit,
+     *         or {@code -1} if there is no such long
      * @throws IndexOutOfBoundsException if the specified index is less
      *                                   than {@code -1}
      */
@@ -246,8 +266,8 @@ public interface DirectBitSet extends ReferenceCounted {
      * starting index, then {@code -1} is returned.
      *
      * @param fromLongIndex the index to start checking from (inclusive)
-     * @return the index of the previous clear bit, or {@code -1} if there
-     * is no such bit
+     * @return the index of the previous long containing a clear bit,
+     *         or {@code -1} if there is no such long
      * @throws IndexOutOfBoundsException if the specified index is less
      *                                   than {@code -1}
      */
@@ -255,33 +275,22 @@ public interface DirectBitSet extends ReferenceCounted {
 
     /**
      * Returns the number of bits of space actually in use by this BitSet to represent bit values.
-     * The maximum element in the set is the size - 1st element.
-     * @return the number of bits currently in this bit set
+     * The index of the last bit in the set eligible to be set or clear
+     * is {@code size() - 1}.
+     * @return the number of bits in this bit set
      */
     long size();
 
     /**
-     * Returns the "logical size" of this {@code BitSet}: the index of
-     * the highest set bit in the {@code BitSet} plus one. Returns zero
-     * if the {@code BitSet} contains no set bits.
+     * Returns the number of bits set to {@code true} in this {@code DirectBitSet}.
      *
-     * @return the logical size of this {@code BitSet}
-     */
-    long length();
-
-    /**
-     * Returns the number of bits set to {@code true} in this {@code BitSet}.
-     *
-     * @return the number of bits set to {@code true} in this {@code BitSet}
+     * @return the number of bits set to {@code true} in this {@code DirectBitSet}
      */
     long cardinality();
 
     /**
-     * Performs a logical <b>AND</b> of this target bit set with the
-     * argument bit set. This bit set is modified so that each bit in it
-     * has the value {@code true} if and only if it both initially
-     * had the value {@code true} and the corresponding bit in the
-     * bit set argument also had the value {@code true}.
+     * Performs a logical <b>AND</b> of the long at the specified index in this
+     * bit set with the argument long value.
      *
      * @param longIndex of long to AND
      * @param value of long to AND
@@ -289,11 +298,8 @@ public interface DirectBitSet extends ReferenceCounted {
     DirectBitSet and(long longIndex, long value);
 
     /**
-     * Performs a logical <b>OR</b> of this bit set with the bit set
-     * argument. This bit set is modified so that a bit in it has the
-     * value {@code true} if and only if it either already had the
-     * value {@code true} or the corresponding bit in the bit set
-     * argument has the value {@code true}.
+     * Performs a logical <b>OR</b> of the long at the specified index in this
+     * bit set with the argument long value.
      *
      * @param longIndex of long to OR
      * @param value of long to OR
@@ -301,16 +307,8 @@ public interface DirectBitSet extends ReferenceCounted {
     DirectBitSet or(long longIndex, long value);
 
     /**
-     * Performs a logical <b>XOR</b> of this bit set with the bit set
-     * argument. This bit set is modified so that a bit in it has the
-     * value {@code true} if and only if one of the following
-     * statements holds:
-     * <ul>
-     * <li>The bit initially has the value {@code true}, and the
-     * corresponding bit in the argument has the value {@code false}.
-     * <li>The bit initially has the value {@code false}, and the
-     * corresponding bit in the argument has the value {@code true}.
-     * </ul>
+     * Performs a logical <b>XOR</b> of the long at the specified index in this
+     * bit set with the argument long value.
      *
      * @param longIndex of long to XOR
      * @param value of long to XOR
@@ -318,8 +316,9 @@ public interface DirectBitSet extends ReferenceCounted {
     DirectBitSet xor(long longIndex, long value);
 
     /**
-     * Clears all of the bits in this {@code BitSet} whose corresponding
-     * bit is set in the specified {@code BitSet}.
+     * Clears all of the bits in the long at the specified index in this
+     * {@code DirectBitSet} whose corresponding bit is set in the specified
+     * long value.
      *
      * @param longIndex of long to AND NOT
      * @param value of long to AND NOT
