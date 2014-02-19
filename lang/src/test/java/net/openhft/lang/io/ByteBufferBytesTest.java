@@ -62,6 +62,13 @@ public class ByteBufferBytesTest {
     }
 
     @Test
+    public void testCAS() {
+        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(100));
+        bytes.compareAndSwapLong(0, 0L, 1L);
+        assertEquals(1L, bytes.readLong(0));
+    }
+
+    @Test
     public void testRead() throws Exception {
         for (int i = 0; i < bytes.capacity(); i++)
             bytes.writeByte(i, i);

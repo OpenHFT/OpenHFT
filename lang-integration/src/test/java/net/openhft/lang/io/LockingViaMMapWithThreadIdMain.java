@@ -21,7 +21,6 @@ import net.openhft.affinity.AffinitySupport;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -53,7 +52,7 @@ public class LockingViaMMapWithThreadIdMain {
         // this way the getId() can be used across processes..
         AffinitySupport.setThreadId();
         AffinitySupport.setAffinity(toggleTo ? 1 << 3 : 1 << 2);
-        ByteBufferBytes bytes = new ByteBufferBytes(mbb.order(ByteOrder.nativeOrder()));
+        ByteBufferBytes bytes = new ByteBufferBytes(mbb);
         bytes.setCurrentThread();
 
         long start = 0;

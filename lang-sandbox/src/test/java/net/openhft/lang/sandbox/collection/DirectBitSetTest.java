@@ -22,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -36,8 +35,7 @@ public class DirectBitSetTest {
         int capacityInBytes = 256 / 8;
         return Arrays.asList(new Object[][] { {
                 new ATSDirectBitSet(new ByteBufferBytes(
-                        ByteBuffer.allocate(capacityInBytes)
-                                .order(ByteOrder.nativeOrder())))
+                        ByteBuffer.allocate(capacityInBytes)))
         } });
     }
 
