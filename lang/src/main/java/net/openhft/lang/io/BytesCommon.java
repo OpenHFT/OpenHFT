@@ -100,5 +100,5 @@ public interface BytesCommon {
      * @param position to copy from
      * @param length   to copy
      */
-    void write(BytesCommon bytes, long position, long length);
+    void write(RandomDataInput bytes, long position, long length);
 }

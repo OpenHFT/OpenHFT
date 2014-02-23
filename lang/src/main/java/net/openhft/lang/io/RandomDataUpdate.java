@@ -90,6 +90,22 @@ public interface RandomDataUpdate {
     void unlockInt(long offset) throws IllegalMonitorStateException;
 
     /**
+     * Lock which uses 4 bytes.  Reset forces the lock to be cleared. Use this only when the program believes the
+     * locked thread is dead.
+     *
+     * @param offset of the start of the 4-byte lock
+     */
+    void resetLockInt(long offset);
+
+    /**
+     * Lock which uses 4 bytes.  This returns the lower bytes which contain the threadId.
+     *
+     * @param offset of the start of the 4-byte lock
+     * @return the threadId or 0 if no thread holds the lock.
+     */
+    int threadIdForLockInt(long offset);
+
+    /**
      * Lock across processes
      * <p/>
      * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
@@ -138,4 +154,21 @@ public interface RandomDataUpdate {
      * @throws IllegalMonitorStateException if this thread doesn't hold the lock
      */
     void unlockLong(long offset) throws IllegalMonitorStateException;
+
+    /**
+     * Lock which uses 8 bytes.  Reset forces the lock to be cleared. Use this only when the program believes the
+     * locked thread is dead.
+     *
+     * @param offset of the start of the 8-byte lock
+     */
+    void resetLockLong(long offset);
+
+    /**
+     * Lock which uses 8 bytes.  This returns the lower bytes which contain the threadId.
+     *
+     * @param offset of the start of the 8-byte lock
+     * @return the threadId or 0 if no thread holds the lock.
+     */
+    long threadIdForLockLong(long offset);
+
 }

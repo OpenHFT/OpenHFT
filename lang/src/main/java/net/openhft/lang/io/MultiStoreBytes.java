@@ -17,24 +17,16 @@
 package net.openhft.lang.io;
 
 public class MultiStoreBytes extends NativeBytes {
-    private DirectStore store;
-
     public MultiStoreBytes() {
         super(NO_PAGE, NO_PAGE, NO_PAGE);
-        this.store = store;
     }
 
-    public void storePositionAndSize(DirectStore store, long offset, long size) {
-        if (offset < 0 || size < 0 || offset + size > store.size)
+    public void storePositionAndSize(BytesStore store, long offset, long size) {
+        if (offset < 0 || size < 0 || offset + size > store.size())
             throw new IllegalArgumentException();
-        this.store = store;
-        this.bytesMarshallerFactory = store.bytesMarshallerFactory;
-        startAddr = positionAddr = store.address + offset;
+        this.bytesMarshallerFactory = store.bytesMarshallerFactory();
+        startAddr = positionAddr = store.address() + offset;
         limitAddr = startAddr + size;
-    }
-
-    public DirectStore store() {
-        return store;
     }
 }
 

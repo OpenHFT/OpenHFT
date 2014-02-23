@@ -660,7 +660,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * <code>(char)256</code>.
      *
      * @return the next line of text from the input stream, or <CODE>null</CODE> if the end of file is encountered
-     *         before a byte can be read.
+     * before a byte can be read.
      */
     @Override
     @Nullable
@@ -865,4 +865,10 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      */
     @Override
     void close();
+
+    /**
+     * @param keyBytes
+     * @return
+     */
+    boolean startsWith(RandomDataInput keyBytes);
 }

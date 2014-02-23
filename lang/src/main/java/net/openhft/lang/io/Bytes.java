@@ -22,7 +22,7 @@ import net.openhft.lang.io.serialization.BytesMarshallable;
 /**
  * @author peter.lawrey
  */
-public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate,
+public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate, BytesStore,
         ByteStringAppender, ByteStringParser, CharSequence, BytesMarshallable, ReferenceCounted {
 
     /**
