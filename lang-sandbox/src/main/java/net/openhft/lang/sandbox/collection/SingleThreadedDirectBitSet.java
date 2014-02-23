@@ -94,6 +94,11 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public DirectBitSet setAll() {
+        return null;
+    }
+
+    @Override
     public DirectBitSet set(long fromIndex, long toIndex, boolean value) {
         return value ? set(fromIndex, toIndex) : clear(fromIndex, toIndex);
     }
@@ -261,6 +266,11 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public long size() {
+        return 0;
+    }
+
+
     public long length() {
         return longLength << 6;
     }
