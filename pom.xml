@@ -23,7 +23,7 @@
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>Java-Direct</module>
+        <!--<module>Java-Direct</module>-->
         <module>Java-Thread-Affinity</module>
         <module>Java-Runtime-Compiler</module>
         <module>Java-Lang</module>
