@@ -37,7 +37,7 @@ public class ParserExampleMain {
         int runs = 10000000;
         long start = System.nanoTime();
         for (int i = 0; i < runs; i++) {
-            bufferBytes.reset();
+            bufferBytes.clear();
             // read the next message.
             bufferBytes.write(bytes);
             bufferBytes.position(0);

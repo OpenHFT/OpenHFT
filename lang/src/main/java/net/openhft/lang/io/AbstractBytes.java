@@ -1041,23 +1041,7 @@ public abstract class AbstractBytes implements Bytes {
             writeByte(bb.get());
     }
 
-    @Deprecated
-    @Override
-    public void writeStartToPosition(@NotNull Bytes bb) {
-        final long position = bb.position();
-        long offset = 0;
-        if (position > remaining())
-            throw new IndexOutOfBoundsException("Trying to write " + position + " when only " + remaining() + " left");
-        // TODO optimise this to use Unsafe copy memory
-        while (position - offset >= 8) {
-            writeLong(bb.readLong(offset));
-            offset += 8;
-        }
-        while (position - offset >= 1)
-            writeByte(bb.readByte(offset++));
-    }
-
-    // // ByteStringAppender
+    // ByteStringAppender
     @NotNull
     @Override
     public ByteStringAppender append(@NotNull CharSequence s, int start, int end) {
@@ -1819,9 +1803,18 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void reset() {
+    public Bytes clear() {
         finished = false;
         position(0L);
+        limit(capacity());
+        return this;
+    }
+
+    @Override
+    public Bytes flip() {
+        limit(position());
+        position(0);
+        return this;
     }
 
     @Override
@@ -1864,6 +1857,34 @@ public abstract class AbstractBytes implements Bytes {
         throw new ClassCastException("Cannot convert " + o.getClass().getName() + " to " + tClass.getName() + " was " + o);
     }
 
+    @NotNull
+    @Override
+    public <T> T readInstance(@NotNull Class<T> objClass, T obj) {
+        try {
+            if (BytesMarshallable.class.isAssignableFrom(objClass)) {
+                if (obj == null)
+                    obj = (T) NativeBytes.UNSAFE.allocateInstance(objClass);
+                ((BytesMarshallable) obj).readMarshallable(this);
+                return obj;
+            } else if (Externalizable.class.isAssignableFrom(objClass)) {
+                if (obj == null)
+                    obj = (T) NativeBytes.UNSAFE.allocateInstance(objClass);
+                ((Externalizable) obj).readExternal(this);
+                return obj;
+            } else if (CharSequence.class.isAssignableFrom(objClass)) {
+                if (obj instanceof StringBuilder) {
+                    readUTFΔ((StringBuilder) obj);
+                    return obj;
+                } else {
+                    return (T) readUTFΔ();
+                }
+            }
+            return (T) readObject();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void writeObject(@Nullable Object obj) {
@@ -1898,6 +1919,23 @@ public abstract class AbstractBytes implements Bytes {
             throw new IllegalStateException(e);
         }
         checkEndOfBuffer();
+    }
+
+    @Override
+    public <OBJ> void writeInstance(@NotNull Class<OBJ> objClass, @NotNull OBJ obj) {
+        try {
+            if (BytesMarshallable.class.isAssignableFrom(objClass)) {
+                ((BytesMarshallable) obj).writeMarshallable(this);
+            } else if (Externalizable.class.isAssignableFrom(objClass)) {
+                ((Externalizable) obj).writeExternal(this);
+            } else if (CharSequence.class.isAssignableFrom(objClass)) {
+                writeUTFΔ((CharSequence) obj);
+            } else {
+                writeObject(obj);
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     protected boolean autoGenerateMarshaller(Object obj) {
@@ -2281,6 +2319,11 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
+    public void write(RandomDataInput bytes) {
+        write(bytes, bytes.position(), bytes.remaining());
+    }
+
+    @Override
     public void write(RandomDataInput bytes, long position, long length) {
         if (length > remaining())
             throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
@@ -2386,5 +2429,11 @@ public abstract class AbstractBytes implements Bytes {
             checkWrite(1);
             writeUnsignedByte(b);
         }
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "[pos: " + position() + ", lim: " + limit() + ", cap: " + capacity() + " ]";
     }
 }

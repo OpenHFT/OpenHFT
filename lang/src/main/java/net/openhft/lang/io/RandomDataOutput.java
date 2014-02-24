@@ -29,14 +29,23 @@ import java.util.RandomAccess;
  * @author peter.lawrey
  */
 public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommon {
+
+
     /**
-     * Copy from one Bytes to another. Copied from the start to the current position.
+     * Copy from one Bytes to another, moves the position by length
      *
-     * @param bytes to copy from
-     * @deprecated Use write(BytesCommon bytes, long position, long length) instead.
+     * @param bytes to copy
      */
-    @Deprecated
-    void writeStartToPosition(Bytes bytes);
+    void write(RandomDataInput bytes);
+
+    /**
+     * Copy from one Bytes to another, moves the position by length
+     *
+     * @param bytes    to copy
+     * @param position to copy from
+     * @param length   to copy
+     */
+    void write(RandomDataInput bytes, long position, long length);
 
     /**
      * Writes to the output stream the eight low-order bits of the argument <code>b</code>. The 24 high-order  bits of
@@ -795,6 +804,14 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     @Override
     void writeObject(@Nullable Object object);
+
+    /**
+     * Write an object with the assumption that the objClass will be provided when the class is read.
+     *
+     * @param objClass class to write
+     * @param obj      to write
+     */
+    <OBJ> void writeInstance(@NotNull Class<OBJ> objClass, @NotNull OBJ obj);
 
     /**
      * Copy data from an Object from bytes start to end.

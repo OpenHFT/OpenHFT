@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ByteBufferBytes extends AbstractBytes {
     protected final ByteBuffer buffer;
-    protected int start, position, capacity;
+    protected int start, position, limit, capacity;
     protected AtomicBoolean barrier;
 
     public ByteBufferBytes(ByteBuffer buffer) {
@@ -43,12 +43,18 @@ public class ByteBufferBytes extends AbstractBytes {
         buffer.order(ByteOrder.nativeOrder());
         this.buffer = buffer;
         this.start = position = start;
-        this.capacity = capacity;
+        this.capacity = limit = capacity;
     }
 
     @Override
     public Bytes createSlice() {
         return new ByteBufferBytes(buffer(), position, capacity);
+    }
+
+    @Override
+    public Bytes createSlice(long offset, long length) {
+        assert offset + length <= capacity;
+        return new ByteBufferBytes(buffer(), (int) (position + offset), (int) length);
     }
 
     @Override
@@ -63,7 +69,8 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public Bytes clear() {
+    public Bytes zeroOut() {
+        clear();
         int i = start;
         for (; i < capacity - 7; i++)
             buffer.putLong(i, 0L);
@@ -441,10 +448,11 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void position(long position) {
+    public ByteBufferBytes position(long position) {
         if (start + position > Integer.MAX_VALUE)
             throw new IndexOutOfBoundsException("Position to large");
         this.position = (int) (start + position);
+        return this;
     }
 
     @Override
@@ -454,7 +462,18 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public long remaining() {
-        return capacity - position;
+        return limit - position;
+    }
+
+    @Override
+    public long limit() {
+        return limit - start;
+    }
+
+    @Override
+    public ByteBufferBytes limit(long limit) {
+        this.limit = (int) (start + limit);
+        return this;
     }
 
     @NotNull

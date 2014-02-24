@@ -55,18 +55,22 @@ public class NativeBytes extends AbstractBytes {
     protected long startAddr;
     protected long positionAddr;
     protected long limitAddr;
+    protected long capacityAddr;
 
-    public NativeBytes(long startAddr, long positionAddr, long limitAddr) {
-        this.startAddr = startAddr;
-        this.positionAddr = positionAddr;
-        this.limitAddr = limitAddr;
+    public NativeBytes(long startAddr, long capacityAddr) {
+        super();
+        this.positionAddr =
+                this.startAddr = startAddr;
+        this.limitAddr =
+                this.capacityAddr = capacityAddr;
     }
 
-    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long startAddr, long positionAddr, long limitAddr, AtomicInteger refCount) {
+    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(bytesMarshallerFactory, refCount);
-        this.startAddr = startAddr;
-        this.positionAddr = positionAddr;
-        this.limitAddr = limitAddr;
+        this.positionAddr =
+                this.startAddr = startAddr;
+        this.limitAddr =
+                this.capacityAddr = capacityAddr;
     }
 
     public NativeBytes(NativeBytes bytes) {
@@ -74,6 +78,7 @@ public class NativeBytes extends AbstractBytes {
         this.startAddr = bytes.startAddr;
         this.positionAddr = bytes.positionAddr;
         this.limitAddr = bytes.limitAddr;
+        this.capacityAddr = bytes.capacityAddr;
     }
 
     public static long longHash(byte[] bytes, int off, int len) {
@@ -88,7 +93,13 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public NativeBytes createSlice() {
-        return new NativeBytes(bytesMarshallerFactory(), startAddr(), startAddr(), limitAddr(), refCount);
+        return new NativeBytes(bytesMarshallerFactory(), startAddr(), capacityAddr(), refCount);
+    }
+
+    @Override
+    public NativeBytes createSlice(long offset, long length) {
+        assert offset + length <= limit();
+        return new NativeBytes(bytesMarshallerFactory(), startAddr() + offset, startAddr() + offset + length, refCount);
     }
 
     @Override
@@ -97,8 +108,9 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public Bytes clear() {
-        UNSAFE.setMemory(startAddr, limitAddr - startAddr, (byte) 0);
+    public Bytes zeroOut() {
+        clear();
+        UNSAFE.setMemory(startAddr, capacityAddr - startAddr, (byte) 0);
         return this;
     }
 
@@ -389,18 +401,35 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public void position(long position) {
+    public NativeBytes position(long position) {
+        if (position < 0 || position > limit())
+            throw new IllegalArgumentException("position: " + position + " limit: " + limit());
         this.positionAddr = startAddr + position;
+        return this;
     }
 
     @Override
     public long capacity() {
-        return (limitAddr - startAddr);
+        return (capacityAddr - startAddr);
     }
 
     @Override
     public long remaining() {
         return (limitAddr - positionAddr);
+    }
+
+    @Override
+    public long limit() {
+        return (limitAddr - startAddr);
+    }
+
+
+    @Override
+    public NativeBytes limit(long limit) {
+        if (limit < 0 || limit > capacity())
+            throw new IllegalArgumentException("limit: " + limit + " capacity: " + capacity());
+        limitAddr = startAddr + limit;
+        return this;
     }
 
     @NotNull
@@ -419,16 +448,8 @@ public class NativeBytes extends AbstractBytes {
         return startAddr;
     }
 
-    public long positionAddr() {
-        return positionAddr;
-    }
-
-    public void positionAddr(long positionAddr) {
-        this.positionAddr = positionAddr;
-    }
-
-    public long limitAddr() {
-        return limitAddr;
+    public long capacityAddr() {
+        return capacityAddr;
     }
 
     @Override

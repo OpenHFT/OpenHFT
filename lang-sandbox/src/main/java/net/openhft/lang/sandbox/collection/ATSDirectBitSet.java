@@ -22,7 +22,6 @@ import net.openhft.lang.io.Bytes;
  * DirectBitSet with input validations and ThreadSafe memory access.
  */
 public class ATSDirectBitSet implements DirectBitSet {
-    public static final long NOT_FOUND = -1L;
     private final Bytes bytes;
     private final long longLength;
 
@@ -142,6 +141,23 @@ public class ATSDirectBitSet implements DirectBitSet {
                 return this;
         }
     }
+
+    @Override
+    public boolean setIfClear(long bitIndex) {
+        long longIndex = bitIndex >> 6;
+        if (bitIndex < 0 || longIndex >= longLength)
+            throw new IndexOutOfBoundsException();
+        long byteIndex = longIndex << 3;
+        long mask = 1L << bitIndex;
+        while (true) {
+            long l = bytes.readVolatileLong(byteIndex);
+            if ((l & mask) != 0) return false;
+            long l2 = l | mask;
+            if (bytes.compareAndSwapLong(byteIndex, l, l2))
+                return true;
+        }
+    }
+
 
     @Override
     public DirectBitSet set(long bitIndex, boolean value) {
@@ -289,7 +305,7 @@ public class ATSDirectBitSet implements DirectBitSet {
 
     @Override
     public DirectBitSet clear() {
-        bytes.clear();
+        bytes.zeroOut();
         return this;
     }
 
@@ -360,6 +376,20 @@ public class ATSDirectBitSet implements DirectBitSet {
                 return (i << 6) + Long.numberOfTrailingZeros(l);
         }
         return NOT_FOUND;
+    }
+
+    @Override
+    public long setOne(long fromIndex) {
+        while (true) {
+            long fromLongIndex = fromIndex >> 6;
+            if (fromLongIndex >= longLength)
+                return NOT_FOUND;
+            fromIndex = nextClearBit(fromIndex);
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            if (setIfClear(fromIndex))
+                return fromIndex;
+        }
     }
 
     @Override

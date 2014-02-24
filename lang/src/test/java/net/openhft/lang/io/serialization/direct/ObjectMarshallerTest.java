@@ -1,6 +1,23 @@
+/*
+ * Copyright 2013 Peter Lawrey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.openhft.lang.io.serialization.direct;
 
-import net.openhft.lang.io.*;
+import net.openhft.lang.io.ByteBufferBytes;
+import net.openhft.lang.io.Bytes;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -8,7 +25,6 @@ import java.util.Collections;
 
 import static net.openhft.lang.io.serialization.direct.TestClasses.*;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class ObjectMarshallerTest {
 
@@ -22,12 +38,12 @@ public class ObjectMarshallerTest {
         marshaller.write(b, p);
 
         p.a = 0;
-        b.reset();
+        b.clear();
         marshaller.read(b, p);
 
         assertEquals(55, p.a);
 
-        b.reset();
+        b.clear();
 
         Primitives1 newP = new Primitives1();
         marshaller.read(b, newP);
@@ -47,13 +63,13 @@ public class ObjectMarshallerTest {
 
         p.a = 0;
         p.b = 0;
-        b.reset();
+        b.clear();
         marshaller.read(b, p);
 
         assertEquals(55, p.a);
         assertEquals(-10, p.b);
 
-        b.reset();
+        b.clear();
 
         Primitives2 newP = new Primitives2();
         marshaller.read(b, newP);
@@ -76,14 +92,14 @@ public class ObjectMarshallerTest {
         p.a = 0;
         p.b = 0;
         p.c = 0;
-        b.reset();
+        b.clear();
         marshaller.read(b, p);
 
         assertEquals(55, p.a);
         assertEquals(-10, p.b);
         assertEquals(92, p.c);
 
-        b.reset();
+        b.clear();
 
         Primitives3 newP = new Primitives3();
         marshaller.read(b, newP);
@@ -103,12 +119,12 @@ public class ObjectMarshallerTest {
         marshaller.write(b, p);
 
         p.a = false;
-        b.reset();
+        b.clear();
         marshaller.read(b, p);
 
         assertTrue(p.a);
 
-        b.reset();
+        b.clear();
 
         Primitives4 newP = new Primitives4();
         marshaller.read(b, newP);
@@ -128,13 +144,13 @@ public class ObjectMarshallerTest {
 
         p.a = false;
         p.b = 0;
-        b.reset();
+        b.clear();
         marshaller.read(b, p);
 
         assertTrue(p.a);
         assertEquals(Long.MIN_VALUE, p.b);
 
-        b.reset();
+        b.clear();
 
         Primitives5 newP = new Primitives5();
         marshaller.read(b, newP);
@@ -161,7 +177,7 @@ public class ObjectMarshallerTest {
         p.c = 0;
         p.d = 0;
         p.e = 0;
-        b.reset();
+        b.clear();
         marshaller.read(b, p);
 
         assertTrue(p.a);
@@ -170,7 +186,7 @@ public class ObjectMarshallerTest {
         assertEquals(Long.MAX_VALUE, p.d);
         assertEquals(Double.MAX_VALUE, p.e, 0);
 
-        b.reset();
+        b.clear();
 
         Primitives6 newP = new Primitives6();
         marshaller.read(b, newP);
@@ -210,7 +226,7 @@ public class ObjectMarshallerTest {
         m.transientShort = 0;
         m.transientObject = null;
 
-        b.reset();
+        b.clear();
         marshaller.read(b, m);
 
         assertEquals(Integer.MIN_VALUE + 1, m.intField);
@@ -223,7 +239,7 @@ public class ObjectMarshallerTest {
         assertNull(m.transientObject);
         assertEquals(0, m.transientShort);
 
-        b.reset();
+        b.clear();
 
         MixedFields newM = new MixedFields();
         marshaller.read(b, newM);

@@ -39,12 +39,12 @@ public class ExternalizableMarshallerTest {
         int capacity = 2 * 1024;
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(capacity);
         long addr = ((DirectBuffer) byteBuffer).address();
-        NativeBytes nativeBytes = new NativeBytes(addr, addr, addr + capacity);
+        NativeBytes nativeBytes = new NativeBytes(addr, addr + capacity);
 
         Externalizable bm = new MockExternalizable(12345678);
         nativeBytes.writeObject(bm);
         nativeBytes.finish();
-        nativeBytes.reset();
+        nativeBytes.clear();
         Externalizable bm2 = nativeBytes.readObject(MockExternalizable.class);
         assertEquals(bm, bm2);
     }
