@@ -38,7 +38,7 @@ public interface ByteStringParser extends BytesCommon {
     /**
      * Populate a StringBuilder with the UTF encoded text until the end.
      *
-     * @param builder to clear and append to.
+     * @param builder to zeroOut and append to.
      * @param tester  to detect when to stop.
      */
     void parseUTF(@NotNull StringBuilder builder, @NotNull StopCharTester tester);

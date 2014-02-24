@@ -18,15 +18,15 @@ package net.openhft.lang.io;
 
 public class MultiStoreBytes extends NativeBytes {
     public MultiStoreBytes() {
-        super(NO_PAGE, NO_PAGE, NO_PAGE);
+        super(NO_PAGE, NO_PAGE);
     }
 
     public void storePositionAndSize(BytesStore store, long offset, long size) {
         if (offset < 0 || size < 0 || offset + size > store.size())
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("offset: " + offset + ", size: " + size + ", store.size: " + store.size());
         this.bytesMarshallerFactory = store.bytesMarshallerFactory();
         startAddr = positionAddr = store.address() + offset;
-        limitAddr = startAddr + size;
+        capacityAddr = limitAddr = startAddr + size;
     }
 }
 

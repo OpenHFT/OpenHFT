@@ -49,7 +49,7 @@ public class NativeBytesTest {
     public void beforeTest() {
         byteBuffer = ByteBuffer.allocateDirect(SIZE);
         long addr = ((DirectBuffer) byteBuffer).address();
-        bytes = new NativeBytes(addr, addr, addr + SIZE);
+        bytes = new NativeBytes(addr, addr + SIZE);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class NativeBytesTest {
     @Test
     public void testCapacity() throws Exception {
         assertEquals(SIZE, bytes.capacity());
-        assertEquals(10, new NativeBytes(0, 0, 10).capacity());
+        assertEquals(10, new NativeBytes(0, 10).capacity());
     }
 
     @Test
@@ -128,10 +128,11 @@ public class NativeBytesTest {
     public void testCheckEndOfBuffer() throws Exception {
         bytes.checkEndOfBuffer();
 
-        bytes.position(SIZE + 2);
         try {
+            bytes.position(SIZE + 2);
             bytes.checkEndOfBuffer();
             fail();
+        } catch (IllegalArgumentException expected) {
         } catch (IndexOutOfBoundsException expected) {
         }
     }
@@ -797,7 +798,7 @@ public class NativeBytesTest {
         int capacity = 16 * 1024;
         byteBuffer = ByteBuffer.allocateDirect(capacity);
         long addr = ((DirectBuffer) byteBuffer).address();
-        bytes = new NativeBytes(addr, addr, addr + capacity);
+        bytes = new NativeBytes(addr, addr + capacity);
         Calendar cal = Calendar.getInstance();
         bytes.writeObject(cal);
         Dummy d = new Dummy();
@@ -839,7 +840,7 @@ public class NativeBytesTest {
         byteBuffer = ByteBuffer.allocateDirect(capacity);
         long addr = ((DirectBuffer) byteBuffer).address();
         // it is actually much bigger than it believes
-        bytes = new NativeBytes(addr, addr, addr + 16);
+        bytes = new NativeBytes(addr, addr + 16);
         bytes.writeLong(8);
         assertFalse(bytes.isFinished());
         bytes.finish();
@@ -859,7 +860,7 @@ public class NativeBytesTest {
             fail();
         } catch (IndexOutOfBoundsException expected) {
         }
-        bytes.reset();
+        bytes.clear();
         assertEquals(0, bytes.position());
         assertEquals(8, bytes.skip(8));
         assertEquals(8, bytes.position());
@@ -871,15 +872,15 @@ public class NativeBytesTest {
     public void testWriteList() {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4);
         bytes.writeList(ints);
-        bytes.reset();
+        bytes.clear();
         List<Integer> ints2 = new ArrayList<Integer>();
         bytes.readList(ints2, Integer.class);
         assertEquals(ints, ints2);
 
-        bytes.reset();
+        bytes.clear();
         List<String> words = Arrays.asList("Hello word byte for now".split(" "));
         bytes.writeList(words);
-        bytes.reset();
+        bytes.clear();
         List<String> words2 = new ArrayList<String>();
         bytes.readList(words2, String.class);
     }
@@ -898,7 +899,7 @@ public class NativeBytesTest {
         bytes.writeMap(map);
         bytes.finish();
 
-        bytes.reset();
+        bytes.clear();
         Map<String, Integer> map2 = new LinkedHashMap<String, Integer>();
         bytes.readMap(map2, String.class, Integer.class);
         assertEquals(map, map2);

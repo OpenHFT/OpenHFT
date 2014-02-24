@@ -764,7 +764,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     <E> E readEnum(@NotNull Class<E> eClass);
 
     /**
-     * Read a stop bit encoded length and populates this Collection after clear()ing it.
+     * Read a stop bit encoded length and populates this Collection after zeroOut()ing it.
      * <p/>
      * This is suitable to reading a list written using <code>writeList()</code> in the <code>RandomDataOutput</code>
      * interface
@@ -774,7 +774,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     <E> void readList(@NotNull Collection<E> list, @NotNull Class<E> eClass);
 
     /**
-     * Read a stop bit encoded length and populates this Map after clear()ing it.
+     * Read a stop bit encoded length and populates this Map after zeroOut()ing it.
      * <p/>
      * This is suitable to reading a list written using <code>writeMap()</code> in the <code>RandomDataOutput</code>
      * interface
@@ -807,6 +807,15 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      */
     @Nullable
     <T> T readObject(Class<T> tClass) throws IllegalStateException;
+
+    /**
+     * Read an instance of a class assuming objClass was provided when written.
+     *
+     * @param objClass class to write
+     * @param obj      to reuse or null if a new object is needed
+     */
+    @NotNull
+    <T> T readInstance(@NotNull Class<T> objClass, T obj);
 
     /**
      * Reads a byte of data. This method will block if no input is available.

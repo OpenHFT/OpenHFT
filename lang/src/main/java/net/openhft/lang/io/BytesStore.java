@@ -21,6 +21,8 @@ import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 public interface BytesStore {
     Bytes createSlice();
 
+    Bytes createSlice(long offset, long length);
+
     BytesMarshallerFactory bytesMarshallerFactory();
 
     long address();

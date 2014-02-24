@@ -37,12 +37,12 @@ public class ByteMarshallableMarshallerTest {
         int capacity = 2 * 1024;
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(capacity);
         long addr = ((DirectBuffer) byteBuffer).address();
-        NativeBytes nativeBytes = new NativeBytes(addr, addr, addr + capacity);
+        NativeBytes nativeBytes = new NativeBytes(addr, addr + capacity);
 
         BytesMarshallable bm = new MockBytesMarshallable(12345678);
         nativeBytes.writeObject(bm);
         nativeBytes.finish();
-        nativeBytes.reset();
+        nativeBytes.clear();
         BytesMarshallable bm2 = nativeBytes.readObject(MockBytesMarshallable.class);
         assertEquals(bm, bm2);
     }

@@ -114,7 +114,7 @@ public class ByteBufferBytesTest {
     @Test
     public void testCapacity() throws Exception {
         assertEquals(SIZE, bytes.capacity());
-        assertEquals(10, new NativeBytes(0, 0, 10).capacity());
+        assertEquals(10, new NativeBytes(0, 10).capacity());
     }
 
     @Test
@@ -860,7 +860,7 @@ public class ByteBufferBytesTest {
         bytes.finish();
         bytes.flush();
 
-        bytes.reset();
+        bytes.clear();
         assertEquals(0, bytes.position());
         assertEquals(8, bytes.skip(8));
         assertEquals(8, bytes.position());
@@ -872,15 +872,15 @@ public class ByteBufferBytesTest {
     public void testWriteList() {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4);
         bytes.writeList(ints);
-        bytes.reset();
+        bytes.clear();
         List<Integer> ints2 = new ArrayList<Integer>();
         bytes.readList(ints2, Integer.class);
         assertEquals(ints, ints2);
 
-        bytes.reset();
+        bytes.clear();
         List<String> words = Arrays.asList("Hello word byte for now".split(" "));
         bytes.writeList(words);
-        bytes.reset();
+        bytes.clear();
         List<String> words2 = new ArrayList<String>();
         bytes.readList(words2, String.class);
     }
@@ -899,7 +899,7 @@ public class ByteBufferBytesTest {
         bytes.writeMap(map);
         bytes.finish();
 
-        bytes.reset();
+        bytes.clear();
         Map<String, Integer> map2 = new LinkedHashMap<String, Integer>();
         bytes.readMap(map2, String.class, Integer.class);
         assertEquals(map, map2);

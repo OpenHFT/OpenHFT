@@ -28,7 +28,12 @@ public class DirectBytes extends NativeBytes {
     private final BytesStore store;
 
     public DirectBytes(@NotNull BytesStore store, AtomicInteger refCount) {
-        super(store.bytesMarshallerFactory(), store.address(), store.address(), store.address() + store.size(), refCount);
+        super(store.bytesMarshallerFactory(), store.address(), store.address() + store.size(), refCount);
+        this.store = store;
+    }
+
+    public DirectBytes(@NotNull BytesStore store, AtomicInteger refCount, long offset, long length) {
+        super(store.bytesMarshallerFactory(), store.address() + offset, store.address() + offset + length, refCount);
         this.store = store;
     }
 
@@ -36,7 +41,7 @@ public class DirectBytes extends NativeBytes {
         if (offset < 0 || size < 0 || offset + size > store.size())
             throw new IllegalArgumentException();
         startAddr = positionAddr = store.address() + offset;
-        limitAddr = startAddr + size;
+        capacityAddr = limitAddr = startAddr + size;
     }
 
     public BytesStore store() {

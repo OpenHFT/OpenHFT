@@ -84,6 +84,11 @@ public class DirectStore implements BytesStore {
         return new DirectBytes(this, refCount);
     }
 
+    @NotNull
+    public DirectBytes createSlice(long offset, long length) {
+        return new DirectBytes(this, refCount, offset, length);
+    }
+
     @Override
     public long address() {
         return address;

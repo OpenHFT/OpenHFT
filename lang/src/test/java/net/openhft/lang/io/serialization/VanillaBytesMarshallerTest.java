@@ -39,7 +39,7 @@ public class VanillaBytesMarshallerTest {
             bytes.writeObject(o);
             System.out.printf("%s used %,d bytes%n", o.getClass(), bytes.position() - pos);
         }
-        bytes.reset();
+        bytes.clear();
         for (Object o : objects) {
             Object o2 = bytes.readObject();
             assertEquals(o, o2);
@@ -51,12 +51,12 @@ public class VanillaBytesMarshallerTest {
         int capacity = 2 * 1024;
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(capacity);
         long addr = ((DirectBuffer) byteBuffer).address();
-        NativeBytes nativeBytes = new NativeBytes(addr, addr, addr + capacity);
+        NativeBytes nativeBytes = new NativeBytes(addr, addr + capacity);
 
         nativeBytes.writeObject(BuySell.BUY);
         nativeBytes.writeObject(BuySell.SELL);
         nativeBytes.finish();
-        nativeBytes.reset();
+        nativeBytes.clear();
         assertEquals(BuySell.BUY, nativeBytes.readObject());
         assertEquals(BuySell.SELL, nativeBytes.readObject());
     }

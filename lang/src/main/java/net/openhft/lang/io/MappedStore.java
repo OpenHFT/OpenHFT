@@ -138,6 +138,11 @@ public class MappedStore implements BytesStore {
         return new DirectBytes(this, refCount);
     }
 
+    @NotNull
+    public DirectBytes createSlice(long offset, long length) {
+        return new DirectBytes(this, refCount, offset, length);
+    }
+
     private int imodeFor(FileChannel.MapMode mode) {
         int imode = -1;
         if (mode == FileChannel.MapMode.READ_ONLY)

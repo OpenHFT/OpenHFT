@@ -28,14 +28,24 @@ import java.nio.ByteOrder;
  */
 public interface BytesCommon {
     /**
-     * @return the offset read/written so far
+     * @return the offset read/written which must be <= limit()
      */
     long position();
 
     /**
      * @param position to skip to
      */
-    void position(long position);
+    Bytes position(long position);
+
+    /**
+     * @return the current limit which must be <= capacity()
+     */
+    long limit();
+
+    /**
+     * @param limit the new limit which must be <= capacity()
+     */
+    Bytes limit(long limit);
 
     /**
      * @return space available
@@ -60,9 +70,53 @@ public interface BytesCommon {
     boolean isFinished();
 
     /**
-     * Start again, unfinished, position() == 0
+     * Clears this buffer.  The position is set to zero, the limit is set to
+     * the capacity, and the mark is discarded.
+     * <p></p>
+     * <p> Invoke this method before using a sequence of channel-read or
+     * <i>put</i> operations to fill this buffer.  For example:
+     * <p></p>
+     * <blockquote><pre>
+     * buf.clear();     // Prepare buffer for reading
+     * in.read(buf);    // Read data</pre></blockquote>
+     * <p></p>
+     * <p> This method does not actually erase the data in the buffer, but it
+     * is named as if it did because it will most often be used in situations
+     * in which that might as well be the case. </p>
+     *
+     * @return This buffer
      */
-    void reset();
+    Bytes clear();
+
+    /**
+     * Flips this buffer.  The limit is set to the current position and then
+     * the position is set to zero.  If the mark is defined then it is
+     * discarded.
+     * <p></p>
+     * <p> After a sequence of channel-read or <i>put</i> operations, invoke
+     * this method to prepare for a sequence of channel-write or relative
+     * <i>get</i> operations.  For example:
+     * <p></p>
+     * <blockquote><pre>
+     * buf.put(magic);    // Prepend header
+     * in.read(buf);      // Read data into rest of buffer
+     * buf.flip();        // Flip buffer
+     * out.write(buf);    // Write header + data to channel</pre></blockquote>
+     * <p></p>
+     * <p> This method is often used in conjunction with the {@link
+     * java.nio.ByteBuffer#compact compact} method when transferring data from
+     * one place to another.  </p>
+     *
+     * @return This buffer
+     */
+    Bytes flip();
+
+    /**
+     * fill the Bytes with zeros, and clear the position.
+     *
+     * @return this
+     */
+    Bytes zeroOut();
 
     /**
      * @return Byte order for reading binary
@@ -92,13 +146,4 @@ public interface BytesCommon {
      * @throws IndexOutOfBoundsException if the bounds of the Bytes has been exceeded.
      */
     void checkEndOfBuffer() throws IndexOutOfBoundsException;
-
-    /**
-     * Copy from one Bytes to another, moves the position by length
-     *
-     * @param bytes    to copy
-     * @param position to copy from
-     * @param length   to copy
-     */
-    void write(RandomDataInput bytes, long position, long length);
 }
