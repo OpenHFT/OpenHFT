@@ -49,6 +49,7 @@ public class MappedStore implements BytesStore {
     }
 
     public MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
+        if (size < 0) throw new IllegalArgumentException("size: " + size);
         this.size = size;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
         fileChannel = new RandomAccessFile(file, mode == FileChannel.MapMode.READ_WRITE ? "rw" : "r").getChannel();

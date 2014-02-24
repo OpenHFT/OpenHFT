@@ -32,11 +32,12 @@ import java.util.Map;
  */
 public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
 
-    private final Map<Class, BytesMarshaller> marshallerMap = new LinkedHashMap<Class, BytesMarshaller>();
-    private final BytesMarshaller[] compactMarshallerMap = new BytesMarshaller[256];
+    private Map<Class, BytesMarshaller> marshallerMap;
+    private BytesMarshaller[] compactMarshallerMap;
 
-    //    private final Map<Class, BytesMarshaller> marshallerTextMap = new LinkedHashMap<Class, BytesMarshaller>();
-    {
+    private void init() {
+        marshallerMap = new LinkedHashMap<Class, BytesMarshaller>();
+        compactMarshallerMap = new BytesMarshaller[256];
         BytesMarshaller stringMarshaller = new StringMarshaller(16 * 1024);
         addMarshaller(String.class, stringMarshaller);
         addMarshaller(CharSequence.class, stringMarshaller);
@@ -51,6 +52,7 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
     @SuppressWarnings("unchecked")
     @Override
     public <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create) {
+        if (marshallerMap == null) init();
         BytesMarshaller em = marshallerMap.get(eClass);
         if (em == null)
             if (eClass.isEnum())
@@ -71,10 +73,12 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
 
     @Override
     public <E> BytesMarshaller<E> getMarshaller(byte code) {
+        if (marshallerMap == null) init();
         return compactMarshallerMap[code & 0xFF];
     }
 
     public <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller) {
+        if (marshallerMap == null) init();
         marshallerMap.put(eClass, marshaller);
         if (marshaller instanceof CompactBytesMarshaller)
             compactMarshallerMap[((CompactBytesMarshaller) marshaller).code()] = marshaller;
