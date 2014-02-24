@@ -1998,7 +1998,7 @@ public abstract class AbstractBytes implements Bytes {
         int firstValue = ((1 << 24) | lowId);
         if (compareAndSwapInt(offset, firstValue, 0))
             return;
-        // try to chek the lowId and the count.
+        // try to cheek the lowId and the count.
         unlockFailedInt(offset, lowId);
     }
 
@@ -2116,7 +2116,7 @@ public abstract class AbstractBytes implements Bytes {
             currentValue -= 1 << 24;
             writeOrderedInt(offset, (int) currentValue);
         } else if (currentValue == 0) {
-            throw new IllegalMonitorStateException("No thread holds this lock");
+            LOGGER.severe("No thread holds this lock, threadId: " + shortThreadId());
         } else {
             throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
