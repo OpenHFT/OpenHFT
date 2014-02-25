@@ -52,7 +52,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             throw new IndexOutOfBoundsException();
         long byteIndex = longIndex << 3;
         // only 6 lowest-order bits used, JLS 15.19
-        long mask = (1L << bitIndex);
+        long mask = 1L << bitIndex;
         while (true) {
             long l = bytes.readVolatileLong(byteIndex);
             long l2 = l ^ mask;
