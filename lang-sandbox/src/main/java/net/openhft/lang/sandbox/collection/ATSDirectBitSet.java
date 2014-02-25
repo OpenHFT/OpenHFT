@@ -151,8 +151,9 @@ public class ATSDirectBitSet implements DirectBitSet {
         long mask = 1L << bitIndex;
         while (true) {
             long l = bytes.readVolatileLong(byteIndex);
-            if ((l & mask) != 0) return false;
             long l2 = l | mask;
+            if (l == l2)
+                return false;
             if (bytes.compareAndSwapLong(byteIndex, l, l2))
                 return true;
         }

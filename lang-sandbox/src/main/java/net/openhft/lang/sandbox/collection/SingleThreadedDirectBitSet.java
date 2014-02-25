@@ -130,8 +130,9 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         long byteIndex = longIndex << 3;
         long mask = 1L << bitIndex;
         long l = bytes.readLong(byteIndex);
-        if ((l & mask) != 0) return false;
         long l2 = l | mask;
+        if (l == l2)
+            return false;
         bytes.writeLong(byteIndex, l2);
         return true;
     }
