@@ -823,6 +823,21 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeObject(Object object, int start, int end);
 
     /**
+     * fill the Bytes with zeros, and clear the position.
+     *
+     * @return this
+     */
+    Bytes zeroOut();
+
+    /**
+     * fill the Bytes with zeros, and clear the position.
+     *
+     * @return this
+     */
+    Bytes zeroOut(long start, long end);
+
+
+    /**
      * Check the end of the stream has not overflowed.  Otherwise this doesn't do anything.
      */
     @Override

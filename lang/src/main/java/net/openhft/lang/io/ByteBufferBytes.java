@@ -79,6 +79,21 @@ public class ByteBufferBytes extends AbstractBytes {
         return this;
     }
 
+    @Override
+    public Bytes zeroOut(long start, long end) {
+        if (start < 0 || end > limit())
+            throw new IllegalArgumentException("start: " + start + ", end: " + end);
+        if (start >= end)
+            return this;
+        int i = (int) (this.start + start);
+        int j = (int) (this.start + end);
+        for (; i < j - 7; i++)
+            buffer.putLong(i, 0L);
+        for (; i < j; i++)
+            buffer.put(i, (byte) 0);
+        return this;
+    }
+
     public ByteBuffer buffer() {
         return buffer;
     }

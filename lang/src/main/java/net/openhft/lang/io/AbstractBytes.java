@@ -2434,6 +2434,29 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String toString() {
-        return "[pos: " + position() + ", lim: " + limit() + ", cap: " + capacity() + " ]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[pos: ").append(position()).append(", lim: ").append(limit()).append(", cap: ").append(capacity()).append(" ] ");
+        // before
+        if (position() > 0) {
+            for (long i = Math.max(position() - 64, 0), end = position(); i < end; i++) {
+                append(sb, i);
+            }
+            sb.append("\u2016");
+        }
+        // after
+        for (long i = position(), end = Math.min(limit(), i + 64); i < end; i++) {
+            append(sb, i);
+        }
+        return sb.toString();
+    }
+
+    private void append(StringBuilder sb, long i) {
+        byte b = readByte(i);
+        if (b == 0)
+            sb.append('\u0660');
+        else if (b < 21)
+            sb.append((char) (b + 0x2487));
+        else
+            sb.append((char) b);
     }
 }

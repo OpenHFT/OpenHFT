@@ -112,13 +112,6 @@ public interface BytesCommon {
     Bytes flip();
 
     /**
-     * fill the Bytes with zeros, and clear the position.
-     *
-     * @return this
-     */
-    Bytes zeroOut();
-
-    /**
      * @return Byte order for reading binary
      */
     @NotNull

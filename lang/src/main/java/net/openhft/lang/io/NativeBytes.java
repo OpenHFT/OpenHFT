@@ -110,7 +110,17 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public Bytes zeroOut() {
         clear();
-        UNSAFE.setMemory(startAddr, capacityAddr - startAddr, (byte) 0);
+        UNSAFE.setMemory(startAddr, capacity(), (byte) 0);
+        return this;
+    }
+
+    @Override
+    public Bytes zeroOut(long start, long end) {
+        if (start < 0 || end > limit())
+            throw new IllegalArgumentException("start: " + start + ", end: " + end);
+        if (start >= end)
+            return this;
+        UNSAFE.setMemory(startAddr + start, end - start, (byte) 0);
         return this;
     }
 
