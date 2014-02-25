@@ -16,19 +16,42 @@
 
 package net.openhft.lang.sandbox.collection;
 
+import net.openhft.lang.io.ByteBufferBytes;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public abstract class AbstractDirectBitSetTest {
+@RunWith(value = Parameterized.class)
+public class DirectBitSetTest {
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        int capacityInBytes = 256 / 8;
+        return Arrays.asList(new Object[][]{
+                {
+                        new ATSDirectBitSet(new ByteBufferBytes(
+                                ByteBuffer.allocate(capacityInBytes)))
+                },
+                {
+                        new SingleThreadedDirectBitSet(new ByteBufferBytes(
+                                ByteBuffer.allocate(capacityInBytes)))
+                }
+        });
+    }
 
     private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
 
     private DirectBitSet bs;
 
-    public AbstractDirectBitSetTest(DirectBitSet bs) {
+    public DirectBitSetTest(DirectBitSet bs) {
         this.bs = bs;
         assertTrue(bs.size() >= 256);
     }

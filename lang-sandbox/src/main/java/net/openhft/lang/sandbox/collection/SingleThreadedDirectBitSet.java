@@ -93,7 +93,6 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     long l = bytes.readLong(i << 3);
                     long l2 = ~l;
                     bytes.writeLong(i << 3, l2);
-                    break;
 
                 }
             } else {
@@ -102,7 +101,6 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     long l = bytes.readLong(i << 3);
                     long l2 = ~l;
                     bytes.writeLong(i << 3, l2);
-                    break;
 
                 }
 
