@@ -100,7 +100,7 @@
                 <version>0.32</version>
                 <configuration>
                     <targetClasses>
-                        <param>net.openhft.lang.sandbox.collection.ATS*</param>
+                        <param>net.openhft.lang.sandbox.collection.*</param>
                     </targetClasses>
                     <targetTests>
                         <param>net.openhft.lang.sandbox.collection.*</param>
