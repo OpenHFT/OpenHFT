@@ -511,4 +511,12 @@ public class ByteBufferBytes extends AbstractBytes {
                 cleaner.clean();
         }
     }
+
+    @Override
+    public Bytes load() {
+        int pageSize = NativeBytes.UNSAFE.pageSize();
+        for (int offset = start; offset < capacity; offset += pageSize)
+            buffer.get(offset);
+        return this;
+    }
 }

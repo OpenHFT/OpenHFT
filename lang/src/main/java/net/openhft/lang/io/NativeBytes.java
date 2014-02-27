@@ -466,4 +466,12 @@ public class NativeBytes extends AbstractBytes {
     protected void cleanup() {
         // TODO nothing to do.
     }
+
+    @Override
+    public Bytes load() {
+        int pageSize = UNSAFE.pageSize();
+        for (long addr = startAddr; addr < capacityAddr; addr += pageSize)
+            UNSAFE.getByte(addr);
+        return this;
+    }
 }

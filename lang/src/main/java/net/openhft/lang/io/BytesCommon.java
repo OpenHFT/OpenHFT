@@ -139,4 +139,11 @@ public interface BytesCommon {
      * @throws IndexOutOfBoundsException if the bounds of the Bytes has been exceeded.
      */
     void checkEndOfBuffer() throws IndexOutOfBoundsException;
+
+    /**
+     * Access every page to ensure those pages are in memory.
+     *
+     * @return this.
+     */
+    Bytes load();
 }
