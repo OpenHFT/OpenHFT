@@ -27,16 +27,15 @@
     <artifactId>lang-sandbox</artifactId>
     <version>7.0-SNAPSHOT</version>
 
-
-
-
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
                 <version>7.0-SNAPSHOT</version>
             </dependency>
+
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -60,15 +59,18 @@
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.sun.java</groupId>
             <artifactId>tools</artifactId>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>

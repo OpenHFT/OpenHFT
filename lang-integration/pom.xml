@@ -65,6 +65,7 @@
     </dependencyManagement>
 
     <dependencies>
+
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
@@ -74,7 +75,6 @@
             <groupId>com.sun.java</groupId>
             <artifactId>tools</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>net.openhft</groupId>
