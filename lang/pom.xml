@@ -22,11 +22,13 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>lang</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>OpenHFT/Java-Lang/lang</name>
-    <description>Java Lang library for High Frequency Trading (Java 6+)</description>
+    <description>Java Lang library for High Frequency Trading (Java 7+), builds on Java 6, but only Java 7 works for all
+        classes.
+    </description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

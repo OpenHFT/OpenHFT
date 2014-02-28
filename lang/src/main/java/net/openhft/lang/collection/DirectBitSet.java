@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.sandbox.collection;
+package net.openhft.lang.collection;
 
 import net.openhft.lang.ReferenceCounted;
 
