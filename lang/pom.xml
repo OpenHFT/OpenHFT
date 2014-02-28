@@ -29,35 +29,58 @@
     <description>Java Lang library for High Frequency Trading (Java 6+)</description>
 
     <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <felix.bundle.plugin.version>2.4.0</felix.bundle.plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <felix.bundle.plugin.version>2.4.0</felix.bundle.plugin.version>
     </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.kohsuke.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>compiler</artifactId>
+                <version>2.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>3.1</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <dependencies>
         <dependency>
             <groupId>org.kohsuke.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>9.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>compiler</artifactId>
-            <version>2.1</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-            <version>3.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
