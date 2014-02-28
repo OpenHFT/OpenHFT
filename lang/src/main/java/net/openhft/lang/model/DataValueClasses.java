@@ -52,7 +52,7 @@ public enum DataValueClasses {
         synchronized (cacheMap) {
             dataValueClassCache = cacheMap.get(classLoader);
             if (dataValueClassCache == null)
-                cacheMap.put(classLoader, dataValueClassCache);
+                cacheMap.put(classLoader, dataValueClassCache = new DataValueClassCache());
         }
         return dataValueClassCache;
     }
