@@ -53,6 +53,14 @@
                 <version>4.11</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.sun.java</groupId>
+                <artifactId>tools</artifactId>
+                <version>${java.version}</version>
+                <scope>system</scope>
+                <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -61,6 +69,12 @@
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.sun.java</groupId>
+            <artifactId>tools</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>net.openhft</groupId>

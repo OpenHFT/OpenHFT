@@ -113,10 +113,24 @@
                 <version>${pax.url.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.sun.java</groupId>
+                <artifactId>tools</artifactId>
+                <version>${java.version}</version>
+                <scope>system</scope>
+                <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.sun.java</groupId>
+            <artifactId>tools</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.kohsuke.jetbrains</groupId>
