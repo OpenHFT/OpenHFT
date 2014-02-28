@@ -497,4 +497,16 @@ public class NativeBytes extends AbstractBytes {
             UNSAFE.getByte(addr);
         return this;
     }
+
+    public void alignPositionAddr(int powerOf2) {
+        positionAddr = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
+    }
+
+    public void positionAddr(long positionAddr) {
+        this.positionAddr = positionAddr;
+    }
+
+    public long positionAddr() {
+        return positionAddr;
+    }
 }

@@ -1803,7 +1803,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public Bytes clear() {
+    public AbstractBytes clear() {
         finished = false;
         position(0L);
         limit(capacity());

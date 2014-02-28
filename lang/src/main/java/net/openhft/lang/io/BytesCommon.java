@@ -86,7 +86,7 @@ public interface BytesCommon {
      *
      * @return This buffer
      */
-    Bytes clear();
+    BytesCommon clear();
 
     /**
      * Flips this buffer.  The limit is set to the current position and then
