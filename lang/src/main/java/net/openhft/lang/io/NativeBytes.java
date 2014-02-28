@@ -405,6 +405,29 @@ public class NativeBytes extends AbstractBytes {
         }
     }
 
+    public boolean startsWith(RandomDataInput input) {
+        long inputRemaining = input.remaining();
+        if ((limitAddr - positionAddr) < inputRemaining) return false;
+        long pos = position(), inputPos = input.position();
+
+        // pull into cache...
+        UNSAFE.getLong(startAddr + pos);
+
+        if (inputRemaining >= 8 && UNSAFE.getLong(startAddr + pos) != input.readLong(inputPos))
+            return false;
+
+        int i = 8;
+        for (; i < inputRemaining - 7; i += 8) {
+            if (UNSAFE.getInt(startAddr + pos + i) != input.readInt(inputPos + i))
+                return false;
+        }
+        for (; i < inputRemaining; i++) {
+            if (UNSAFE.getByte(startAddr + pos + i) != input.readByte(inputPos + i))
+                return false;
+        }
+        return true;
+    }
+
     @Override
     public long position() {
         return (positionAddr - startAddr);

@@ -2345,9 +2345,10 @@ public abstract class AbstractBytes implements Bytes {
         long inputRemaining = input.remaining();
         if (remaining() < inputRemaining) return false;
         long pos = position(), inputPos = input.position();
+
         int i = 0;
-        for (; i < inputRemaining - 7; i += 8) {
-            if (readLong(pos + i) != input.readLong(inputPos + i))
+        for (; i < inputRemaining - 3; i += 4) {
+            if (readInt(pos + i) != input.readInt(inputPos + i))
                 return false;
         }
         for (; i < inputRemaining; i++) {
