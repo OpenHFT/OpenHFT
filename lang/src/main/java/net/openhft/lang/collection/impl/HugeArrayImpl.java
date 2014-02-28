@@ -21,7 +21,7 @@ import net.openhft.lang.io.DirectBytes;
 import net.openhft.lang.io.DirectStore;
 import net.openhft.lang.model.Byteable;
 import net.openhft.lang.model.Copyable;
-import net.openhft.lang.model.DataValueGenerator;
+import net.openhft.lang.model.DataValueClasses;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +31,17 @@ import java.util.List;
  */
 public class HugeArrayImpl<T> implements HugeArray<T> {
     private static final int MAX_SIZE = 10;
-    private final DataValueGenerator valueGenerator;
     private final Class<T> tClass;
     private final long length;
     private final int size;
     private final DirectStore store;
     private final List<T> freeList = new ArrayList<T>(MAX_SIZE);
 
-    public HugeArrayImpl(DataValueGenerator valueGenerator, Class<T> tClass, long length) {
-        this.valueGenerator = valueGenerator;
+    public HugeArrayImpl(Class<T> tClass, long length) {
         this.tClass = tClass;
         this.length = length;
 
-        T ref = valueGenerator.nativeInstance(tClass);
+        T ref = DataValueClasses.newDirectReference(tClass);
         size = ((Byteable) ref).maxSize();
         store = new DirectStore(null, length * size);
         ((Byteable) ref).bytes(store.createSlice());
@@ -51,7 +49,7 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
     }
 
     private T createRef() {
-        T ref = valueGenerator.nativeInstance(tClass);
+        T ref = DataValueClasses.newInstance(tClass);
         ((Byteable) ref).bytes(store.createSlice());
         return ref;
     }

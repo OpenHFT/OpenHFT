@@ -72,14 +72,24 @@ public class DataValueGenerator {
         }
     }
 
-    public <T> Class acquireHeapClass(Class<T> tClass) throws ClassNotFoundException {
+    public <T> Class acquireHeapClass(Class<T> tClass) {
         Class heapClass = heapClassMap.get(tClass);
         if (heapClass != null)
             return heapClass;
         String actual = new DataValueGenerator().generateHeapObject(tClass);
         if (dumpCode)
             LOGGER.info(actual);
-        heapClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "£heap", actual);
+        ClassLoader classLoader = tClass.getClassLoader();
+        String className = tClass.getName() + "£heap";
+        try {
+            heapClass = classLoader.loadClass(className);
+        } catch (ClassNotFoundException ignored) {
+            try {
+                heapClass = cc.loadFromJava(classLoader, className, actual);
+            } catch (ClassNotFoundException e) {
+                throw new AssertionError(e);
+            }
+        }
         heapClassMap.put(tClass, heapClass);
         return heapClass;
     }
@@ -282,18 +292,29 @@ public class DataValueGenerator {
         }
     }
 
-    public <T> Class acquireNativeClass(Class<T> tClass) throws ClassNotFoundException {
+    public <T> Class acquireNativeClass(Class<T> tClass) {
         Class nativeClass = nativeClassMap.get(tClass);
         if (nativeClass != null)
             return nativeClass;
         DataValueModel<T> dvmodel = DataValueModels.acquireModel(tClass);
         for (Class clazz : dvmodel.nestedModels()) {
+            // touch them to make sure they are loaded.
             Class clazz2 = acquireNativeClass(clazz);
         }
         String actual = new DataValueGenerator().generateNativeObject(dvmodel);
         if (dumpCode)
             LOGGER.info(actual);
-        nativeClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "£native", actual);
+        ClassLoader classLoader = tClass.getClassLoader();
+        String className = tClass.getName() + "£native";
+        try {
+            nativeClass = classLoader.loadClass(className);
+        } catch (ClassNotFoundException ignored) {
+            try {
+                nativeClass = cc.loadFromJava(classLoader, className, actual);
+            } catch (ClassNotFoundException e) {
+                throw new AssertionError(e);
+            }
+        }
         nativeClassMap.put(tClass, nativeClass);
         return nativeClass;
     }
