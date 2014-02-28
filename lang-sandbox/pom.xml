@@ -27,6 +27,9 @@
     <artifactId>lang-sandbox</artifactId>
     <version>6.2-SNAPSHOT</version>
 
+
+
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -39,14 +42,27 @@
                 <artifactId>junit</artifactId>
                 <version>4.11</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.sun.java</groupId>
+                <artifactId>tools</artifactId>
+                <version>${java.version}</version>
+                <scope>system</scope>
+                <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
-
     <dependencies>
+
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.java</groupId>
+            <artifactId>tools</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
