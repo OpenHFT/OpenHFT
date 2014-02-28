@@ -75,7 +75,6 @@
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.compendium</artifactId>
                 <version>${osgi.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -136,6 +135,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
