@@ -32,6 +32,10 @@ public class HugeArrayTest {
             org.junit.Assert.assertEquals(a, b);
     }
 
+    /*
+    With lock: false, average time to access a JavaBeanInterface was 71.9 ns
+    With lock: true, average time to access a JavaBeanInterface was 124.7 ns
+     */
     @Test
     public void testHugeArray() throws InterruptedException {
         // runs with a maximum heap size of 32 MB.
