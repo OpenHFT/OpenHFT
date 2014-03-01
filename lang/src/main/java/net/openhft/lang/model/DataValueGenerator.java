@@ -149,7 +149,7 @@ public class DataValueGenerator {
             Method atomicAdder = model.atomicAdder();
             if (atomicAdder != null) {
                 getterSetters.append("    public synchronized ").append(type.getName()).append(' ').append(atomicAdder.getName())
-                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                        .append("(").append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
                         .append("        return _").append(name).append(" += _;\n")
                         .append("    }");
             }
