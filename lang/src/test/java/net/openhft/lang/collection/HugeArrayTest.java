@@ -38,46 +38,52 @@ public class HugeArrayTest {
         int length = 10 * 1000 * 1000;
         HugeArray<JavaBeanInterface> array =
                 HugeCollections.newArray(JavaBeanInterface.class, length);
-        long start = System.nanoTime();
-        for (int i = 0; i < array.length(); i++) {
-            JavaBeanInterface jbi = array.get(i);
-//            jbi.busyLockRecord();
-//            try {
-            jbi.setByte((byte) i);
-            jbi.setChar((char) i);
-            jbi.setShort((short) i);
-            jbi.setInt(i);
-            jbi.setFloat(i);
-            jbi.setLong(i); // System.nanoTime());
-            jbi.setDouble(i);
-            jbi.setFlag((i & 3) == 0);
-            jbi.setString("hello");
-//            } finally {
-//                jbi.unlockRecord();
-//            }
-            array.recycle(jbi);
-        }
-        for (int i = 0; i < array.length(); i++) {
-            JavaBeanInterface jbi = array.get(i);
-//            jbi.busyLockRecord();
-//            try {
-            assertEquals2((byte) i, jbi.getByte());
-            assertEquals2((char) i, jbi.getChar());
-            assertEquals2((short) i, jbi.getShort());
-            assertEquals2(i, jbi.getInt());
-            assertEquals(i, jbi.getFloat(), 0);
+        for (boolean withLock : new boolean[]{false, true}) {
+            long start = System.nanoTime();
+            for (int i = 0; i < array.length(); i++) {
+                JavaBeanInterface jbi = array.get(i);
+                if (withLock)
+                    jbi.busyLockRecord();
+                try {
+                    jbi.setByte((byte) i);
+                    jbi.setChar((char) i);
+                    jbi.setShort((short) i);
+                    jbi.setInt(i);
+                    jbi.setFloat(i);
+                    jbi.setLong(i); // System.nanoTime());
+                    jbi.setDouble(i);
+                    jbi.setFlag((i & 3) == 0);
+                    jbi.setString("hello");
+                } finally {
+                    if (withLock)
+                        jbi.unlockRecord();
+                }
+                array.recycle(jbi);
+            }
+            for (int i = 0; i < array.length(); i++) {
+                JavaBeanInterface jbi = array.get(i);
+                if (withLock)
+                    jbi.busyLockRecord();
+                try {
+                    assertEquals2((byte) i, jbi.getByte());
+                    assertEquals2((char) i, jbi.getChar());
+                    assertEquals2((short) i, jbi.getShort());
+                    assertEquals2(i, jbi.getInt());
+                    assertEquals(i, jbi.getFloat(), 0);
 //            long time = System.nanoTime() - jbi.getLong();
-            assertEquals2(i, jbi.getLong());
-            assertEquals(i, jbi.getDouble(), 0.0);
-            assertEquals((i & 3) == 0, jbi.getFlag());
-            assertEquals("hello", jbi.getString());
-//            } finally {
-//                jbi.unlockRecord();
-//            }
-            array.recycle(jbi);
+                    assertEquals2(i, jbi.getLong());
+                    assertEquals(i, jbi.getDouble(), 0.0);
+                    assertEquals((i & 3) == 0, jbi.getFlag());
+                    assertEquals("hello", jbi.getString());
+                } finally {
+                    if (withLock)
+                        jbi.unlockRecord();
+                }
+                array.recycle(jbi);
+            }
+            long time = System.nanoTime() - start;
+            double avg = time / 2.0 / length;
+            System.out.printf("With lock: %s, average time to access a JavaBeanInterface was %.1f ns%n", withLock, avg);
         }
-        long time = System.nanoTime() - start;
-        double avg = time / 2.0 / length;
-        System.out.printf("Average time to access a JavaBeanInterface was %.1f ns%n", avg);
     }
 }
