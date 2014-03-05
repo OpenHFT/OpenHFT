@@ -178,7 +178,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * &lt;p/&gt;
      * &lt;pre&gt; {@code
      * for (int i = bs.nextSetBit(0); i &gt;= 0; i = bs.nextSetBit(i+1)) {
-     *     // operate on index i here
+     * &nbsp;&nbsp;&nbsp;&nbsp;// operate on index i here
      * }}&lt;/pre&gt;
      *
      * @param fromIndex the index to start checking from (inclusive)
@@ -235,7 +235,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * &lt;p/&gt;
      * &lt;pre&gt; {@code
      * for (int i = bs.size(); (i = bs.previousSetBit(i-1)) &gt;= 0; ) {
-     *     // operate on index i here
+     * // operate on index i here
      * }}&lt;/pre&gt;
      *
      * @param fromIndex the index to start checking from (inclusive)
