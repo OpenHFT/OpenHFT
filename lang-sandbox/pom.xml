@@ -29,6 +29,10 @@
     <artifactId>lang-sandbox</artifactId>
     <version>7.0-SNAPSHOT</version>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
 
