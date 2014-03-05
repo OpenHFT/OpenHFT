@@ -29,6 +29,6 @@
         <module>Java-Lang</module>
         <module>Java-Chronicle</module>
         <module>HugeCollections</module>
-        <module>TransFIX</module>
+        <!--<module>TransFIX</module>-->
     </modules>
 </project>
