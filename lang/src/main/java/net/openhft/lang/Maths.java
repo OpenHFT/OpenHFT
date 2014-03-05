@@ -23,7 +23,7 @@ public class Maths {
     /**
      * Numbers larger than this are whole numbers due to representation error.
      */
-    public static final double WHOLE_NUMBER = 1L << 53;
+    private static final double WHOLE_NUMBER = 1L << 53;
     private static final long[] TENS = new long[19];
 
     static {
@@ -141,7 +141,7 @@ public class Maths {
      * @param x the first {@code long} to compare
      * @param y the second {@code long} to compare
      * @return the value {@code 0} if {@code x == y}; a value less than {@code 0} if {@code x < y}; and a value greater
-     *         than {@code 0} if {@code x > y}
+     * than {@code 0} if {@code x > y}
      */
     public static int compare(long x, long y) {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);

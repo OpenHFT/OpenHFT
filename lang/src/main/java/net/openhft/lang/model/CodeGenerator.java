@@ -16,5 +16,5 @@
 
 package net.openhft.lang.model;
 
-public interface CodeGenerator {
+interface CodeGenerator {
 }

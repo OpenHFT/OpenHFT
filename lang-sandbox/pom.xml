@@ -27,7 +27,7 @@
     <name>OpenHFT/Java-Lang/lang-sandbox</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang-sandbox</artifactId>
-    <version>7.0-SNAPSHOT</version>
+    <version>6.3-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,7 +39,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>6.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>

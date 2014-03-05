@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DataValueMetaModel {
+class DataValueMetaModel {
     private final Set<Class> ignoredClasses = new HashSet<Class>();
     private final List<MethodFilter> filters = new ArrayList<MethodFilter>();
 
@@ -40,11 +40,11 @@ public class DataValueMetaModel {
         }
     }
 
-    public void addIgnoredClass(Class aClass) {
+    void addIgnoredClass(Class aClass) {
         ignoredClasses.add(aClass);
     }
 
-    public void addMethodFilter(MethodFilter filter) {
+    void addMethodFilter(MethodFilter filter) {
         int pos = insertionPoint(filter);
         filters.add(pos, filter);
     }

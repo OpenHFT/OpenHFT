@@ -26,6 +26,7 @@ public class DirectBitSetBuilder {
     public DirectBitSetBuilder() {
         threadSafe = true;
         assertions = false;
+        //noinspection ConstantConditions,AssertWithSideEffects
         assert assertions = true;
     }
 
@@ -51,7 +52,7 @@ public class DirectBitSetBuilder {
         return wrap(DirectStore.allocate((size + 7) >>> 3).createSlice());
     }
 
-    public DirectBitSet wrap(Bytes bytes) {
+    static DirectBitSet wrap(Bytes bytes) {
         return new ATSDirectBitSet(bytes);
     }
 }

@@ -37,6 +37,7 @@ public class MappedStore implements BytesStore {
     private static final int MAP_RO = 0;
     private static final int MAP_RW = 1;
     private static final int MAP_PV = 2;
+    // retain to prevent GC.
     private final FileChannel fileChannel;
     private final Cleaner cleaner;
     private final long address;
@@ -48,7 +49,7 @@ public class MappedStore implements BytesStore {
         this(file, mode, size, new VanillaBytesMarshallerFactory());
     }
 
-    public MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
+    private MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
         if (size < 0) throw new IllegalArgumentException("size: " + size);
         this.size = size;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
@@ -144,7 +145,7 @@ public class MappedStore implements BytesStore {
         return new DirectBytes(this, refCount, offset, length);
     }
 
-    private int imodeFor(FileChannel.MapMode mode) {
+    private static int imodeFor(FileChannel.MapMode mode) {
         int imode = -1;
         if (mode == FileChannel.MapMode.READ_ONLY)
             imode = MAP_RO;
@@ -156,7 +157,7 @@ public class MappedStore implements BytesStore {
         return imode;
     }
 
-    private FileDescriptor getFD(FileChannel fileChannel) throws IOException {
+    private static FileDescriptor getFD(FileChannel fileChannel) throws IOException {
         try {
             Field fd = fileChannel.getClass().getDeclaredField("fd");
             fd.setAccessible(true);

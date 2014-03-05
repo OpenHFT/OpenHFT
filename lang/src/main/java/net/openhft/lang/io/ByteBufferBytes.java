@@ -29,9 +29,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author peter.lawrey
  */
 public class ByteBufferBytes extends AbstractBytes {
-    protected final ByteBuffer buffer;
-    protected int start, position, limit, capacity;
-    protected AtomicBoolean barrier;
+    private final ByteBuffer buffer;
+    private final int start;
+    private int position;
+    private int limit;
+    private final int capacity;
+    private AtomicBoolean barrier;
 
     public ByteBufferBytes(ByteBuffer buffer) {
         this(buffer, 0, buffer.capacity());
@@ -94,16 +97,16 @@ public class ByteBufferBytes extends AbstractBytes {
         return this;
     }
 
-    public ByteBuffer buffer() {
+    ByteBuffer buffer() {
         return buffer;
     }
 
-    protected void readBarrier() {
+    void readBarrier() {
         if (barrier == null) barrier = new AtomicBoolean();
         barrier.get();
     }
 
-    protected void writeBarrier() {
+    void writeBarrier() {
         if (barrier == null) barrier = new AtomicBoolean();
         barrier.lazySet(false);
     }

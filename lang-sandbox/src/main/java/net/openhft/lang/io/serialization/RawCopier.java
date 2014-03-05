@@ -32,10 +32,11 @@ import static net.openhft.lang.io.NativeBytes.UNSAFE;
  * User: peter.lawrey Date: 22/09/13 Time: 16:51
  */
 public class RawCopier<T> {
-    final int start, end;
+    final int start;
+    final int end;
     private final Class<T> tClass;
 
-    public RawCopier(Class<T> tClass) {
+    private RawCopier(Class<T> tClass) {
         this.tClass = tClass;
         List<Field> fields = new ArrayList<Field>();
         addAllFields(fields, tClass);
@@ -93,12 +94,14 @@ public class RawCopier<T> {
         }
     }
 
-    private void addAllFields(List<Field> fields, Class tClass) {
+    private static void addAllFields(List<Field> fields, Class tClass) {
         if (tClass != null && tClass != Object.class)
             addAllFields(fields, tClass.getSuperclass());
-        for (Field field : tClass.getDeclaredFields()) {
-            if (!Modifier.isStatic(field.getModifiers()))
-                fields.add(field);
+        if (tClass != null) {
+            for (Field field : tClass.getDeclaredFields()) {
+                if (!Modifier.isStatic(field.getModifiers()))
+                    fields.add(field);
+            }
         }
     }
 }

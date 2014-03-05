@@ -814,7 +814,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @param objClass class to write
      * @param obj      to reuse or null if a new object is needed
      */
-    @NotNull
+    @Nullable
     <T> T readInstance(@NotNull Class<T> objClass, T obj);
 
     /**
@@ -875,9 +875,5 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     @Override
     void close();
 
-    /**
-     * @param keyBytes
-     * @return
-     */
     boolean startsWith(RandomDataInput keyBytes);
 }

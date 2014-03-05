@@ -19,14 +19,13 @@ package net.openhft.lang.io;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 /**
  * @author peter.lawrey
  */
 @SuppressWarnings({"CompareToUsesNonFinalVariable", "NonFinalFieldReferenceInEquals", "NonFinalFieldReferencedInHashCode"})
 public class MutableDecimal extends Number implements Comparable<MutableDecimal> {
-    static final double[] TENS = new double[16];
+    private static final double[] TENS = new double[16];
 
     static {
         TENS[0] = 1;
@@ -54,15 +53,13 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
         set(d, precision);
     }
 
-    public void set(double d, int precision) {
-        double d2 = precision > 0 ? d * tens(precision) : d / tens(-precision);
-        scale = precision;
-        if (Math.abs(d2) < 1e16) {
-            value = Math.round(d2);
-        } else {
-            BigDecimal bd = BigDecimal.valueOf(d).setScale(precision, RoundingMode.HALF_UP);
-            value = bd.unscaledValue().longValue();
+    void set(double d, int precision) {
+        while (d > Long.MAX_VALUE) {
+            d /= 10;
+            precision++;
         }
+        value = Math.round(d);
+        this.scale = precision;
     }
 
     public void set(long value, int scale) {
@@ -74,7 +71,7 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
         return value;
     }
 
-    public int scale() {
+    int scale() {
         return scale;
     }
 

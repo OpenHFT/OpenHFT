@@ -16,7 +16,7 @@
 
 package net.openhft.lang.model;
 
-public enum HeapCodeGenerator implements CodeGenerator {
+enum HeapCodeGenerator implements CodeGenerator {
   /*  GET_VALUE {
         public void addCode(CodeModel codeModel, Method method) {
                StringBuilder sb = codeModel.acquireMethod()

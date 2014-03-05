@@ -380,7 +380,8 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public long setOne(long fromIndex) {
+    public long setNFrom(long fromIndex, int numberOfBits) {
+        if (numberOfBits != 1) throw new UnsupportedOperationException("Not yet implemented");
         while (true) {
             long fromLongIndex = fromIndex >> 6;
             if (fromLongIndex >= longLength)

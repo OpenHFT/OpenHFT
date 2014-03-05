@@ -103,7 +103,7 @@ public class DataValueGeneratorTest {
         Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "£native", actual);
         JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
-        ((Byteable) jbi).bytes(bytes);
+        ((Byteable) jbi).bytes(bytes, 0L);
         jbi.setByte((byte) 1);
         jbi.setChar('2');
         jbi.setShort((short) 3);
@@ -136,7 +136,7 @@ public class DataValueGeneratorTest {
 
         StringInterface si2 = dvg.nativeInstance(StringInterface.class);
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
-        ((Byteable) si2).bytes(bytes);
+        ((Byteable) si2).bytes(bytes, 0L);
         si2.setString("Hello world £€");
         si2.setText("Hello world £€");
         assertEquals("Hello world £€", si2.getString());
@@ -157,7 +157,7 @@ public class DataValueGeneratorTest {
 //        dvg.setDumpCode(true);
         NestedA nestedA = dvg.nativeInstance(NestedA.class);
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
-        ((Byteable) nestedA).bytes(bytes);
+        ((Byteable) nestedA).bytes(bytes, 0L);
         nestedA.key("key");
         nestedA.one(nestedB1);
         nestedA.two(nestedB2);

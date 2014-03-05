@@ -44,13 +44,13 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
         T ref = DataValueClasses.newDirectReference(tClass);
         size = ((Byteable) ref).maxSize();
         store = new DirectStore(null, length * size);
-        ((Byteable) ref).bytes(store.createSlice());
+        ((Byteable) ref).bytes(store.createSlice(), 0L);
         recycle(ref);
     }
 
     private T createRef() {
         T ref = DataValueClasses.newInstance(tClass);
-        ((Byteable) ref).bytes(store.createSlice());
+        ((Byteable) ref).bytes(store.createSlice(), 0L);
         return ref;
     }
 

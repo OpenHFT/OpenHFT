@@ -18,7 +18,7 @@ package net.openhft.lang.model;
 
 import java.lang.reflect.Method;
 
-public interface MethodFilter {
+interface MethodFilter {
     int matches();
 
     String nameFor(Method method, Class<?>[] parameterTypes);

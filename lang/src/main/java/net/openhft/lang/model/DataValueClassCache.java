@@ -19,11 +19,12 @@ package net.openhft.lang.model;
 /**
  * This is cache for the generated classes for a ClassLoader.
  */
-public class DataValueClassCache {
+class DataValueClassCache {
     private final DataValueGenerator dvg = new DataValueGenerator();
 
     public <T> T newInstance(Class<T> interfaceClass) {
         try {
+            //noinspection ClassNewInstance
             return heapClassFor(interfaceClass).newInstance();
         } catch (Exception e) {
             throw new AssertionError(e);
@@ -32,6 +33,7 @@ public class DataValueClassCache {
 
     public <T> T newDirectReference(Class<T> interfaceClass) {
         try {
+            //noinspection ClassNewInstance
             return directClassFor(interfaceClass).newInstance();
         } catch (Exception e) {
             throw new AssertionError(e);

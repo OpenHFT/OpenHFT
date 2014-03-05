@@ -30,8 +30,6 @@ import java.util.Map;
  * @author peter.lawrey
  */
 public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
-    @NotNull
-    private final Class<E> classMarshaled;
     @Nullable
     private final Constructor<E> constructor;
     @Nullable
@@ -40,7 +38,6 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
     private final Map<String, E> map;
 
     public GenericEnumMarshaller(@NotNull Class<E> classMarshaled, final int capacity) {
-        this.classMarshaled = classMarshaled;
         Constructor<E> constructor = null;
         Method valueOf = null;
         try {

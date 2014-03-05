@@ -60,7 +60,7 @@ public enum StopCharTesters implements StopCharTester {
     }
 
     @NotNull
-    public static StopCharTester forChar(char ch) {
+    private static StopCharTester forChar(char ch) {
         return new CharCSTester(ch);
     }
 
