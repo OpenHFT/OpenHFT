@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>lang-osgi</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.3</version>
     <packaging>bundle</packaging>
 
     <name>OpenHFT/Java-Lang/lang-osgi</name>
