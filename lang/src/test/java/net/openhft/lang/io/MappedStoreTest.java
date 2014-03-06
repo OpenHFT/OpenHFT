@@ -24,18 +24,83 @@ import java.nio.channels.FileChannel;
 import static org.junit.Assert.assertEquals;
 
 public class MappedStoreTest {
+    //private static final long MS_SIZE = 3L << 30;
+    private static final long MS_SIZE = 1024;
+
     @Test
     public void testCreateSlice() throws Exception {
-        File file = new File("/tmp/deleteme");
-        file.deleteOnExit();
-        MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, 3L << 30);
+        File file = getStoreFile("mapped-store-1");
+
+        MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);
         DirectBytes slice = ms.createSlice();
         assertEquals(1, slice.refCount());
-
         assertEquals(0L, slice.readLong(0L));
         assertEquals(0L, slice.readLong(ms.size() - 8));
-//        System.in.read();
+
+        slice.writeLong(0,1L);
+        assertEquals(1L,slice.readLong(0));
+
         slice.release();
 
+        ms.free();
+    }
+
+    @Test
+    public void testOpenExistingFile() throws Exception {
+        File file = getStoreFile("mapped-store-2");
+
+        {
+            MappedStore ms1 = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);
+            DirectBytes slice1 = ms1.createSlice();
+            assertEquals(1, slice1.refCount());
+
+            slice1.writeLong(1L);
+            slice1.writeLong(2L);
+            slice1.release();
+
+            ms1.free();
+        }
+
+        {
+            MappedStore ms2 = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);
+            DirectBytes slice2 = ms2.createSlice();
+            assertEquals( 1, slice2.refCount());
+            assertEquals(1L, slice2.readLong());
+            assertEquals(2L, slice2.readLong());
+
+            slice2.release();
+
+            ms2.free();
+        }
+    }
+
+    /*
+    @Test
+    public void testSliceSize() throws Exception {
+        File file = getStoreFile("mapped-store");
+
+        MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);
+        DirectBytes slice = ms.createSlice();
+
+        for(long i=0;i<MS_SIZE+1;i += 8) {
+            slice.writeLong(i);
+        }
+
+        slice.release();
+        ms.free();
+    }
+    */
+
+    // *************************************************************************
+    // Helpers
+    // *************************************************************************
+
+    private static File getStoreFile(String fileName) {
+        File file = new File(System.getProperty("java.io.tmpdir"),fileName);
+        file.delete();
+        file.deleteOnExit();
+
+        return file;
     }
 }
+
