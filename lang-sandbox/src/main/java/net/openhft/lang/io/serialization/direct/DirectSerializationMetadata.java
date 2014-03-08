@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013 Peter Lawrey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.openhft.lang.io.serialization.direct;
 
 import net.openhft.lang.Jvm;
@@ -12,10 +28,10 @@ public class DirectSerializationMetadata {
     private static final int OBJECT_ALIGNMENT_MASK = OBJECT_ALIGNMENT - 1;
 
     static final long NATIVE_WORD_SIZE = Jvm.is64Bit() ? 8 : 4;
-    static final long OOP_SIZE = UNSAFE.arrayIndexScale(Object[].class);
+    private static final long OOP_SIZE = UNSAFE.arrayIndexScale(Object[].class);
     static final long OBJECT_HEADER_SIZE = NATIVE_WORD_SIZE + OOP_SIZE; // Object header has a native sized mark word + variable sized oop to klass meta object
 
-    public static final SerializationMetadata EmptyObjectMetadata = new SerializationMetadata(0, 0);
+    private static final SerializationMetadata EmptyObjectMetadata = new SerializationMetadata(0, 0);
 
     public static final class SerializationMetadata {
         final long start;
@@ -58,7 +74,7 @@ public class DirectSerializationMetadata {
         return new Offsets(minOffset, maxOffset);
     }
 
-    static long padToObjectAlignment(long length) {
+    private static long padToObjectAlignment(long length) {
         if ((length & OBJECT_ALIGNMENT_MASK) != 0) {
             long padding = OBJECT_ALIGNMENT - (length & OBJECT_ALIGNMENT_MASK);
             length += padding;

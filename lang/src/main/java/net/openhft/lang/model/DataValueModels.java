@@ -24,15 +24,15 @@ import java.util.WeakHashMap;
  * Date: 06/10/13
  * Time: 17:14
  */
-public enum DataValueModels {
+enum DataValueModels {
     ;
     private static final Map<Class, DataValueModel> MODEL_MAP = new WeakHashMap<Class, DataValueModel>();
 
-    public static synchronized <T> DataValueModel<T> getModel(Class<T> tClass) {
+    private static synchronized <T> DataValueModel<T> getModel(Class<T> tClass) {
         return MODEL_MAP.get(tClass);
     }
 
-    public static synchronized <T> void putModel(Class<T> tClass, DataValueModel<T> model) {
+    private static synchronized <T> void putModel(Class<T> tClass, DataValueModel<T> model) {
         MODEL_MAP.put(tClass, model);
     }
 

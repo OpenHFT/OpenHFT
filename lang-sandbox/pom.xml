@@ -21,24 +21,62 @@
     <parent>
         <artifactId>Java-Lang</artifactId>
         <groupId>net.openhft</groupId>
-        <version>6.1.3</version>
+        <version>6.3</version>
     </parent>
+
+    <name>OpenHFT/Java-Lang/lang-sandbox</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang-sandbox</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.3</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>lang</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.java</groupId>
+                <artifactId>tools</artifactId>
+                <version>${java.version}</version>
+                <scope>system</scope>
+                <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
+
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
-            <version>6.2-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.sun.java</groupId>
+            <artifactId>tools</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -100,7 +138,7 @@
                 <version>0.32</version>
                 <configuration>
                     <targetClasses>
-                        <param>net.openhft.lang.sandbox.collection.ATS*</param>
+                        <param>net.openhft.lang.sandbox.collection.*</param>
                     </targetClasses>
                     <targetTests>
                         <param>net.openhft.lang.sandbox.collection.*</param>

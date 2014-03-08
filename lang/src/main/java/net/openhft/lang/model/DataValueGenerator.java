@@ -16,7 +16,7 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.compiler.CachedCompiler;
+import net.openhft.compiler.CompilerUtils;
 import net.openhft.lang.Compare;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.Bytes;
@@ -36,13 +36,13 @@ import java.util.logging.Logger;
  * Time: 19:17
  */
 public class DataValueGenerator {
-    public static final Comparator<Class> COMPARATOR = new Comparator<Class>() {
+    private static final Comparator<Class> COMPARATOR = new Comparator<Class>() {
         @Override
         public int compare(Class o1, Class o2) {
             return o1.getName().compareTo(o2.getName());
         }
     };
-    public static final Comparator<Map.Entry<String, FieldModel>> COMPARE_BY_HEAP_SIZE = new Comparator<Map.Entry<String, FieldModel>>() {
+    private static final Comparator<Map.Entry<String, FieldModel>> COMPARE_BY_HEAP_SIZE = new Comparator<Map.Entry<String, FieldModel>>() {
         @Override
         public int compare(Map.Entry<String, FieldModel> o1, Map.Entry<String, FieldModel> o2) {
             // descending
@@ -51,7 +51,6 @@ public class DataValueGenerator {
         }
     };
     private static final Logger LOGGER = Logger.getLogger(DataValueGenerator.class.getName());
-    final CachedCompiler cc = new CachedCompiler(null, null);
     private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
     private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
     private boolean dumpCode = false;
@@ -66,29 +65,40 @@ public class DataValueGenerator {
 
     public <T> T heapInstance(Class<T> tClass) {
         try {
+            //noinspection ClassNewInstance
             return (T) acquireHeapClass(tClass).newInstance();
         } catch (Exception e) {
             throw new AssertionError(e);
         }
     }
 
-    public <T> Class acquireHeapClass(Class<T> tClass) throws ClassNotFoundException {
+    public <T> Class acquireHeapClass(Class<T> tClass) {
         Class heapClass = heapClassMap.get(tClass);
         if (heapClass != null)
             return heapClass;
         String actual = new DataValueGenerator().generateHeapObject(tClass);
         if (dumpCode)
             LOGGER.info(actual);
-        heapClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "£heap", actual);
+        ClassLoader classLoader = tClass.getClassLoader();
+        String className = tClass.getName() + "£heap";
+        try {
+            heapClass = classLoader.loadClass(className);
+        } catch (ClassNotFoundException ignored) {
+            try {
+                heapClass = CompilerUtils.CACHED_COMPILER.loadFromJava(classLoader, className, actual);
+            } catch (ClassNotFoundException e) {
+                throw new AssertionError(e);
+            }
+        }
         heapClassMap.put(tClass, heapClass);
         return heapClass;
     }
 
-    public String generateHeapObject(Class<?> tClass) {
+    String generateHeapObject(Class<?> tClass) {
         return generateHeapObject(DataValueModels.acquireModel(tClass));
     }
 
-    public String generateHeapObject(DataValueModel<?> dvmodel) {
+    static String generateHeapObject(DataValueModel<?> dvmodel) {
         SortedSet<Class> imported = new TreeSet<Class>(COMPARATOR);
         imported.add(BytesMarshallable.class);
         imported.add(Bytes.class);
@@ -132,20 +142,20 @@ public class DataValueGenerator {
             Method adder = model.adder();
             if (adder != null) {
                 getterSetters.append("    public ").append(type.getName()).append(' ').append(adder.getName())
-                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                        .append('(').append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
                         .append("        return _").append(name).append(" += _;\n")
                         .append("    }");
             }
             Method atomicAdder = model.atomicAdder();
             if (atomicAdder != null) {
                 getterSetters.append("    public synchronized ").append(type.getName()).append(' ').append(atomicAdder.getName())
-                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                        .append('(').append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
                         .append("        return _").append(name).append(" += _;\n")
                         .append("    }");
             }
             Method cas = model.cas();
             if (cas != null) {
-                getterSetters.append("    public synchronized boolean ").append(cas.getName()).append("(")
+                getterSetters.append("    public synchronized boolean ").append(cas.getName()).append('(')
                         .append(type.getName()).append(" _1, ")
                         .append(type.getName()).append(" _2) {\n")
                         .append("        if (_").append(name).append(" == _1) {\n")
@@ -180,7 +190,7 @@ public class DataValueGenerator {
                         .append("    }");
             }
             writeMarshal.append("         out.write").append(bytesType(type)).append("(_").append(name).append(");\n");
-            readMarshal.append("         _").append(name).append(" = in.read").append(bytesType(type)).append("(");
+            readMarshal.append("         _").append(name).append(" = in.read").append(bytesType(type)).append('(');
             if ("Object".equals(bytesType(type)))
                 readMarshal.append(type.getName()).append(".class");
             readMarshal.append(");\n");
@@ -234,7 +244,6 @@ public class DataValueGenerator {
         for (Map.Entry<String, FieldModel> entry : entries) {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
-            Class type = model.type();
             if (count > 0)
                 hashCode.append(") * 10191 +\n            ");
             String getterName = model.getter().getName();
@@ -247,7 +256,7 @@ public class DataValueGenerator {
                 "        long lhc = longHashCode();\n" +
                 "        return (int) ((lhc >>> 32) ^ lhc);\n" +
                 "    }\n" +
-                "\n" +
+                '\n' +
                 "    public long longHashCode() {\n" +
                 "        return ");
         for (int i = 1; i < count; i++)
@@ -256,16 +265,16 @@ public class DataValueGenerator {
         String simpleName = dvmodel.type().getSimpleName();
         sb.append(";\n")
                 .append("    }\n")
-                .append("\n")
+                .append('\n')
                 .append("    public boolean equals(Object o) {\n")
                 .append("        if (this == o) return true;\n")
                 .append("        if (!(o instanceof ").append(simpleName).append(")) return false;\n")
                 .append("        ").append(simpleName).append(" that = (").append(simpleName).append(") o;\n")
-                .append("\n")
+                .append('\n')
                 .append(equals)
                 .append("        return true;\n" +
                         "    }\n" +
-                        "\n" +
+                        '\n' +
                         "    public String toString() {\n" +
                         "        return \"").append(simpleName).append(" {\" +\n")
                 .append(toString.substring(0, toString.length() - 3)).append(";\n")
@@ -276,24 +285,36 @@ public class DataValueGenerator {
 
     public <T> T nativeInstance(Class<T> tClass) {
         try {
+            //noinspection ClassNewInstance
             return (T) acquireNativeClass(tClass).newInstance();
         } catch (Exception e) {
             throw new AssertionError(e);
         }
     }
 
-    public <T> Class acquireNativeClass(Class<T> tClass) throws ClassNotFoundException {
+    public <T> Class acquireNativeClass(Class<T> tClass) {
         Class nativeClass = nativeClassMap.get(tClass);
         if (nativeClass != null)
             return nativeClass;
         DataValueModel<T> dvmodel = DataValueModels.acquireModel(tClass);
         for (Class clazz : dvmodel.nestedModels()) {
+            // touch them to make sure they are loaded.
             Class clazz2 = acquireNativeClass(clazz);
         }
         String actual = new DataValueGenerator().generateNativeObject(dvmodel);
         if (dumpCode)
             LOGGER.info(actual);
-        nativeClass = cc.loadFromJava(tClass.getClassLoader(), tClass.getName() + "£native", actual);
+        ClassLoader classLoader = tClass.getClassLoader();
+        String className = tClass.getName() + "£native";
+        try {
+            nativeClass = classLoader.loadClass(className);
+        } catch (ClassNotFoundException ignored) {
+            try {
+                nativeClass = CompilerUtils.CACHED_COMPILER.loadFromJava(classLoader, className, actual);
+            } catch (ClassNotFoundException e) {
+                throw new AssertionError(e);
+            }
+        }
         nativeClassMap.put(tClass, nativeClass);
         return nativeClass;
     }
@@ -302,7 +323,7 @@ public class DataValueGenerator {
         return generateNativeObject(DataValueModels.acquireModel(tClass));
     }
 
-    public String generateNativeObject(DataValueModel<?> dvmodel) {
+    static String generateNativeObject(DataValueModel<?> dvmodel) {
         SortedSet<Class> imported = new TreeSet<Class>(COMPARATOR);
         imported.add(BytesMarshallable.class);
         imported.add(ObjectOutput.class);
@@ -337,31 +358,31 @@ public class DataValueGenerator {
                 copy.append("        ").append(setter.getName()).append("(from.").append(getter.getName()).append("());\n");
                 Class<?> setterType = setter.getParameterTypes()[0];
                 getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
-                getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME).append(", ");
+                getterSetters.append("        _bytes.write").append(bytesType(type)).append('(').append(NAME).append(", ");
                 if (CharSequence.class.isAssignableFrom(type))
                     getterSetters.append(model.size().value()).append(", ");
                 getterSetters.append("_);\n");
                 getterSetters.append("    }\n\n");
                 getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
-                getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME).append(");\n");
+                getterSetters.append("        return _bytes.read").append(bytesType(type)).append('(').append(NAME).append(");\n");
                 getterSetters.append("    }\n\n");
                 Method adder = model.adder();
                 if (adder != null) {
                     getterSetters.append("    public ").append(type.getName()).append(' ').append(adder.getName())
-                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
-                            .append("        return _bytes.add").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
+                            .append('(').append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                            .append("        return _bytes.add").append(bytesType(type)).append('(').append(NAME).append(", _);\n")
                             .append("    }");
                 }
                 Method atomicAdder = model.atomicAdder();
                 if (atomicAdder != null) {
                     getterSetters.append("    public ").append(type.getName()).append(' ').append(atomicAdder.getName())
-                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
-                            .append("        return _bytes.addAtomic").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
+                            .append('(').append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
+                            .append("        return _bytes.addAtomic").append(bytesType(type)).append('(').append(NAME).append(", _);\n")
                             .append("    }");
                 }
                 Method cas = model.cas();
                 if (cas != null) {
-                    getterSetters.append("    public boolean ").append(cas.getName()).append("(")
+                    getterSetters.append("    public boolean ").append(cas.getName()).append('(')
                             .append(type.getName()).append(" _1, ")
                             .append(type.getName()).append(" _2) {\n")
                             .append("        return _bytes.compareAndSwap").append(bytesType(type)).append('(').append(NAME).append(", _1, _2);\n")
@@ -391,7 +412,7 @@ public class DataValueGenerator {
                             .append("         _bytes.busyLock").append(bytesType(type)).append('(').append(NAME).append(");\n")
                             .append("    }");
                 }
-                writeMarshal.append("         out.write").append(bytesType(type)).append("(")
+                writeMarshal.append("         out.write").append(bytesType(type)).append('(')
                         .append(getter.getName()).append("());\n");
                 readMarshal.append("         ").append(setter.getName()).append("(in.read").append(bytesType(type)).append("());\n");
                 offset += (model.nativeSize() + 7) >> 3;
@@ -429,7 +450,7 @@ public class DataValueGenerator {
                 }
             }
         }
-        fieldDeclarations.append("\n")
+        fieldDeclarations.append('\n')
                 .append("    private Bytes _bytes;\n")
                 .append("    private long _offset;\n");
         StringBuilder sb = new StringBuilder();

@@ -27,11 +27,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author peter.lawrey
  */
 public class DirectStore implements BytesStore {
-    protected BytesMarshallerFactory bytesMarshallerFactory;
+    private final BytesMarshallerFactory bytesMarshallerFactory;
     private final Cleaner cleaner;
-    protected long address;
-    protected long size;
-    protected final AtomicInteger refCount = new AtomicInteger(1);
+    private long address;
+    private long size;
+    private final AtomicInteger refCount = new AtomicInteger(1);
 
     public DirectStore(long size) {
         this(new VanillaBytesMarshallerFactory(), size);

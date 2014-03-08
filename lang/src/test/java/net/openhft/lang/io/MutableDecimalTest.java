@@ -36,7 +36,11 @@ public class MutableDecimalTest {
         assertEquals(Long.MAX_VALUE / 1e10, md2.doubleValue(), 0);
         assertEquals("922337203.6854775807", md2.toString());
 
-        MutableDecimal md3 = new MutableDecimal(Math.PI, 6);
+        MutableDecimal md2b = new MutableDecimal((double) Long.MAX_VALUE, 10);
+        assertEquals(Long.MAX_VALUE / 1e10, md2b.doubleValue(), 0);
+        assertEquals("922337203.6854775807", md2b.toString());
+
+        MutableDecimal md3 = new MutableDecimal(Math.PI * Math.pow(10, 6), 6);
         assertEquals(3.141593, md3.doubleValue(), 0);
         assertEquals(3.141593f, md3.floatValue(), 0);
         assertEquals(3, md3.intValue());

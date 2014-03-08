@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class StringMarshaller implements CompactBytesMarshaller<String> {
     private final int size;
-    private final StringBuilder reader = new StringBuilder();
+    private final StringBuilder reader = new StringBuilder(128);
     private StringInterner interner;
 
     public StringMarshaller(int size) {

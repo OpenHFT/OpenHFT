@@ -29,18 +29,15 @@ import java.util.Map;
  * @author peter.lawrey
  */
 public class EnumBytesMarshaller<E extends Enum<E>> implements BytesMarshaller<E> {
-    @NotNull
-    private final Class<E> classMarshaled;
     @SuppressWarnings("unchecked")
     private final E[] interner = (E[]) new Enum[1024];
     private final BitSet internerDup = new BitSet(1024);
-    private final Map<String, E> map = new LinkedHashMap<String, E>();
+    private final Map<String, E> map = new LinkedHashMap<String, E>(64);
     private final E defaultValue;
     private final int mask;
     private final StringBuilder reader = new StringBuilder();
 
     public EnumBytesMarshaller(@NotNull Class<E> classMarshaled, E defaultValue) {
-        this.classMarshaled = classMarshaled;
         this.defaultValue = defaultValue;
 
         mask = interner.length - 1;

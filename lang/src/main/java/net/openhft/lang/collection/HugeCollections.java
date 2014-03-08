@@ -18,7 +18,6 @@ package net.openhft.lang.collection;
 
 import net.openhft.lang.collection.impl.HugeArrayImpl;
 import net.openhft.lang.collection.impl.HugeQueueImpl;
-import net.openhft.lang.model.DataValueGenerator;
 
 /**
  * User: peter.lawrey
@@ -28,21 +27,11 @@ import net.openhft.lang.model.DataValueGenerator;
 public enum HugeCollections {
     ;
 
-    private static final DataValueGenerator VALUE_GENERATOR = new DataValueGenerator();
-
-    static {
-        VALUE_GENERATOR.setDumpCode(true);
-    }
-
-    public static DataValueGenerator getDataValueGenerator() {
-        return VALUE_GENERATOR;
-    }
-
     public static <T> HugeArray<T> newArray(Class<T> tClass, long length) {
-        return new HugeArrayImpl<T>(VALUE_GENERATOR, tClass, length);
+        return new HugeArrayImpl<T>(tClass, length);
     }
 
     public static <T> HugeQueue<T> newQueue(Class<T> tClass, long length) {
-        return new HugeQueueImpl<T>(new HugeArrayImpl<T>(VALUE_GENERATOR, tClass, length + 1), length + 1);
+        return new HugeQueueImpl<T>(new HugeArrayImpl<T>(tClass, length + 1), length + 1);
     }
 }

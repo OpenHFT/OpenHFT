@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.sandbox.collection;
+package net.openhft.lang.collection;
 
 import net.openhft.lang.io.Bytes;
 
@@ -52,7 +52,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             throw new IndexOutOfBoundsException();
         long byteIndex = longIndex << 3;
         // only 6 lowest-order bits used, JLS 15.19
-        long mask = (1L << bitIndex);
+        long mask = 1L << bitIndex;
         while (true) {
             long l = bytes.readVolatileLong(byteIndex);
             long l2 = l ^ mask;
@@ -151,8 +151,9 @@ public class ATSDirectBitSet implements DirectBitSet {
         long mask = 1L << bitIndex;
         while (true) {
             long l = bytes.readVolatileLong(byteIndex);
-            if ((l & mask) != 0) return false;
             long l2 = l | mask;
+            if (l == l2)
+                return false;
             if (bytes.compareAndSwapLong(byteIndex, l, l2))
                 return true;
         }
@@ -379,7 +380,8 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public long setOne(long fromIndex) {
+    public long setNFrom(long fromIndex, int numberOfBits) {
+        if (numberOfBits != 1) throw new UnsupportedOperationException("Not yet implemented");
         while (true) {
             long fromLongIndex = fromIndex >> 6;
             if (fromLongIndex >= longLength)

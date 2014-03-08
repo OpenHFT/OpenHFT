@@ -44,7 +44,7 @@ public class MappedFile {
         this(basePath, blockSize, 0L);
     }
 
-    public MappedFile(String basePath, long blockSize, long overlapSize) throws FileNotFoundException {
+    private MappedFile(String basePath, long blockSize, long overlapSize) throws FileNotFoundException {
         this.basePath = basePath;
         this.blockSize = blockSize;
         this.overlapSize = overlapSize;

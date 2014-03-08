@@ -86,7 +86,7 @@ public interface BytesCommon {
      *
      * @return This buffer
      */
-    Bytes clear();
+    BytesCommon clear();
 
     /**
      * Flips this buffer.  The limit is set to the current position and then
@@ -139,4 +139,11 @@ public interface BytesCommon {
      * @throws IndexOutOfBoundsException if the bounds of the Bytes has been exceeded.
      */
     void checkEndOfBuffer() throws IndexOutOfBoundsException;
+
+    /**
+     * Access every page to ensure those pages are in memory.
+     *
+     * @return this.
+     */
+    Bytes load();
 }

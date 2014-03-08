@@ -37,6 +37,8 @@ public class MappedStore implements BytesStore {
     private static final int MAP_RO = 0;
     private static final int MAP_RW = 1;
     private static final int MAP_PV = 2;
+
+    // retain to prevent GC.
     private final FileChannel fileChannel;
     private final Cleaner cleaner;
     private final long address;
@@ -48,70 +50,30 @@ public class MappedStore implements BytesStore {
         this(file, mode, size, new VanillaBytesMarshallerFactory());
     }
 
-    public MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
-        if (size < 0) throw new IllegalArgumentException("size: " + size);
+    private MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
+        if (size < 0) {
+            throw new IllegalArgumentException("size: " + size);
+        }
+
         this.size = size;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
-        fileChannel = new RandomAccessFile(file, mode == FileChannel.MapMode.READ_WRITE ? "rw" : "r").getChannel();
+
         try {
-            FileDescriptor fd = getFD(fileChannel);
-            if (fileChannel.size() < size) {
-                if (mode != FileChannel.MapMode.READ_WRITE)
+            RandomAccessFile raf = new RandomAccessFile(file, accesModeFor(mode));
+            if (raf.length() != this.size) {
+                if (mode != FileChannel.MapMode.READ_WRITE) {
                     throw new IOException("Cannot resize file to " + size + " as mode is not READ_WRITE");
-                int rv;
-                do {
-                    rv = truncate0(fd, size);
-                } while ((rv == IOStatus.INTERRUPTED) && fileChannel.isOpen());
+                }
+
+                raf.setLength(this.size);
             }
-            int imode = imodeFor(mode);
-            address = map0(fileChannel, imode, 0L, size);
-            cleaner = Cleaner.create(this, new Unmapper(address, size, fd));
+
+            this.fileChannel = raf.getChannel();
+            this.address = map0(fileChannel, imodeFor(mode), 0L, size);
+            this.cleaner = Cleaner.create(this, new Unmapper(address, size, fileChannel));
         } catch (Exception e) {
             throw wrap(e);
         }
-    }
-
-    private static long map0(FileChannel fileChannel, int imode, long start, long size) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Method map0 = fileChannel.getClass().getDeclaredMethod("map0", int.class, long.class, long.class);
-        map0.setAccessible(true);
-        return (Long) map0.invoke(fileChannel, imode, start, size);
-    }
-
-    private static int truncate0(FileDescriptor fd, long size) throws IOException {
-        try {
-            Method close0 = Class.forName("sun.nio.ch.FileDispatcherImpl").getDeclaredMethod("truncate0", FileDescriptor.class, long.class);
-            close0.setAccessible(true);
-            return (Integer) close0.invoke(null, fd, size);
-        } catch (Exception e) {
-            throw wrap(e);
-        }
-    }
-
-    private static void unmap0(long address, long size) throws IOException {
-        try {
-            Method unmap0 = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class, long.class);
-            unmap0.setAccessible(true);
-            unmap0.invoke(null, address, size);
-        } catch (Exception e) {
-            throw wrap(e);
-        }
-    }
-
-    private static void close0(FileDescriptor fd) {
-        try {
-            Method close0 = Class.forName("sun.nio.ch.FileDispatcherImpl").getDeclaredMethod("close0", FileDescriptor.class);
-            close0.setAccessible(true);
-            close0.invoke(null, fd);
-        } catch (Exception ignored) {
-        }
-    }
-
-    private static IOException wrap(Throwable e) {
-        if (e instanceof InvocationTargetException)
-            e = e.getCause();
-        if (e instanceof IOException)
-            return (IOException) e;
-        return new IOException(e);
     }
 
     @Override
@@ -144,7 +106,35 @@ public class MappedStore implements BytesStore {
         return new DirectBytes(this, refCount, offset, length);
     }
 
-    private int imodeFor(FileChannel.MapMode mode) {
+    private static long map0(FileChannel fileChannel, int imode, long start, long size) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method map0 = fileChannel.getClass().getDeclaredMethod("map0", int.class, long.class, long.class);
+        map0.setAccessible(true);
+        return (Long) map0.invoke(fileChannel, imode, start, size);
+    }
+
+    private static void unmap0(long address, long size) throws IOException {
+        try {
+            Method unmap0 = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class, long.class);
+            unmap0.setAccessible(true);
+            unmap0.invoke(null, address, size);
+        } catch (Exception e) {
+            throw wrap(e);
+        }
+    }
+
+    private static IOException wrap(Throwable e) {
+        if (e instanceof InvocationTargetException)
+            e = e.getCause();
+        if (e instanceof IOException)
+            return (IOException) e;
+        return new IOException(e);
+    }
+
+    private static String accesModeFor(FileChannel.MapMode mode) {
+        return mode == FileChannel.MapMode.READ_WRITE ? "rw" : "r";
+    }
+
+    private static int imodeFor(FileChannel.MapMode mode) {
         int imode = -1;
         if (mode == FileChannel.MapMode.READ_ONLY)
             imode = MAP_RO;
@@ -156,7 +146,7 @@ public class MappedStore implements BytesStore {
         return imode;
     }
 
-    private FileDescriptor getFD(FileChannel fileChannel) throws IOException {
+    private static FileDescriptor getFD(FileChannel fileChannel) throws IOException {
         try {
             Field fd = fileChannel.getClass().getDeclaredField("fd");
             fd.setAccessible(true);
@@ -166,43 +156,34 @@ public class MappedStore implements BytesStore {
         }
     }
 
-    enum IOStatus {
-        ;
-
-        static final int EOF = -1;
-        static final int UNAVAILABLE = -2;
-        static final int INTERRUPTED = -3;
-        static final int UNSUPPORTED = -4;
-        static final int THROWN = -5;
-        static final int UNSUPPORTED_CASE = -6;
-    }
-
     static class Unmapper implements Runnable {
         private final long size;
-        private final FileDescriptor fd;
+        private final FileChannel channel;
         private volatile long address;
 
-        Unmapper(long address, long size, FileDescriptor fd) {
+        Unmapper(long address, long size, FileChannel channel) {
             assert (address != 0);
             this.address = address;
             this.size = size;
-            this.fd = fd;
+            this.channel = channel;
         }
 
         public void run() {
             if (address == 0)
                 return;
+
             try {
                 unmap0(address, size);
                 address = 0;
 
-                // if this mapping has a valid file descriptor then we close it
-                if (fd.valid()) {
-                    close0(fd);
+                if (channel.isOpen()) {
+                    channel.close();
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 }
+

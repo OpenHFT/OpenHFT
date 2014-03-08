@@ -17,9 +17,9 @@
 package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.Bytes;
+import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
-import net.openhft.lang.io.NativeBytes;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.sandbox.collection;
+package net.openhft.lang.collection;
 
 import net.openhft.lang.io.ByteBufferBytes;
 import org.junit.Test;
@@ -25,7 +25,9 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 @RunWith(value = Parameterized.class)
 public class DirectBitSetTest {
@@ -33,13 +35,19 @@ public class DirectBitSetTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         int capacityInBytes = 256 / 8;
-        return Arrays.asList(new Object[][] { {
-                new ATSDirectBitSet(new ByteBufferBytes(
-                        ByteBuffer.allocate(capacityInBytes)))
-        } });
+        return Arrays.asList(new Object[][]{
+                {
+                        new ATSDirectBitSet(new ByteBufferBytes(
+                                ByteBuffer.allocate(capacityInBytes)))
+                },
+                {
+                        new SingleThreadedDirectBitSet(new ByteBufferBytes(
+                                ByteBuffer.allocate(capacityInBytes)))
+                }
+        });
     }
 
-    private static final int[] INDICES = new int[] {0, 50, 100, 127, 128, 255};
+    private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
 
     private DirectBitSet bs;
 
@@ -77,6 +85,11 @@ public class DirectBitSetTest {
             assertEquals("At index " + i, true, bs.get(i));
             bs.clear(i);
             assertEquals("At index " + i, false, bs.get(i));
+        }
+
+        for (int i : INDICES) {
+            assertEquals("At index " + i, true, bs.setIfClear(i));
+            assertEquals("At index " + i, false, bs.setIfClear(i));
         }
     }
 
@@ -215,7 +228,7 @@ public class DirectBitSetTest {
         bs.clear(255);
         long[] clearLongs = {0, 3};
         int order = clearLongs.length;
-        for (long i = bs.size() / 64; (i = bs.previousClearLong(i - 1)) >= 0;) {
+        for (long i = bs.size() / 64; (i = bs.previousClearLong(i - 1)) >= 0; ) {
             order--;
             assertEquals(clearLongs[order], i);
         }
@@ -329,6 +342,16 @@ public class DirectBitSetTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetOverCapacity() {
         bs.set(bs.size());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeSetIfClearNegative() {
+        bs.setIfClear(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeSetIfClearOverCapacity() {
+        bs.setIfClear(bs.size());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)

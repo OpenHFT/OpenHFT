@@ -55,7 +55,7 @@ public class NativeBytes extends AbstractBytes {
     protected long startAddr;
     protected long positionAddr;
     protected long limitAddr;
-    protected long capacityAddr;
+    long capacityAddr;
 
     public NativeBytes(long startAddr, long capacityAddr) {
         super();
@@ -405,6 +405,29 @@ public class NativeBytes extends AbstractBytes {
         }
     }
 
+    public boolean startsWith(RandomDataInput input) {
+        long inputRemaining = input.remaining();
+        if ((limitAddr - positionAddr) < inputRemaining) return false;
+        long pos = position(), inputPos = input.position();
+
+        // pull into cache...
+        UNSAFE.getLong(startAddr + pos);
+
+        if (inputRemaining >= 8 && UNSAFE.getLong(startAddr + pos) != input.readLong(inputPos))
+            return false;
+
+        int i = 8;
+        for (; i < inputRemaining - 7; i += 8) {
+            if (UNSAFE.getInt(startAddr + pos + i) != input.readInt(inputPos + i))
+                return false;
+        }
+        for (; i < inputRemaining; i++) {
+            if (UNSAFE.getByte(startAddr + pos + i) != input.readByte(inputPos + i))
+                return false;
+        }
+        return true;
+    }
+
     @Override
     public long position() {
         return (positionAddr - startAddr);
@@ -458,12 +481,32 @@ public class NativeBytes extends AbstractBytes {
         return startAddr;
     }
 
-    public long capacityAddr() {
+    long capacityAddr() {
         return capacityAddr;
     }
 
     @Override
     protected void cleanup() {
         // TODO nothing to do.
+    }
+
+    @Override
+    public Bytes load() {
+        int pageSize = UNSAFE.pageSize();
+        for (long addr = startAddr; addr < capacityAddr; addr += pageSize)
+            UNSAFE.getByte(addr);
+        return this;
+    }
+
+    public void alignPositionAddr(int powerOf2) {
+        positionAddr = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
+    }
+
+    public void positionAddr(long positionAddr) {
+        this.positionAddr = positionAddr;
+    }
+
+    public long positionAddr() {
+        return positionAddr;
     }
 }

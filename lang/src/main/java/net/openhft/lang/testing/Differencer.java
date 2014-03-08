@@ -21,6 +21,6 @@ package net.openhft.lang.testing;
  * Date: 05/08/13
  * Time: 19:06
  */
-public interface Differencer {
+interface Differencer {
     long sample(long startTime, long endTime);
 }

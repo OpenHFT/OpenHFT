@@ -61,7 +61,7 @@ public enum IOTools {
         deleteDir(new File(dirPath));
     }
 
-    public static void deleteDir(File dir) {
+    private static void deleteDir(File dir) {
         // delete one level.
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();

@@ -11,6 +11,9 @@ This module is available on maven central as
 
 The version 6.x signifies that it is build for Java 6+. (It requires Java 6 update 18 or later to build)
 
+##  JavaDoc
+Check out our documentation at [JavaDoc] (http://openhft.github.io/Java-Lang/apidocs/)
+
 ## Working with off heap objects.
 
 Java-Lang 6.1 adds support for basic off heap data structures.  More collections types and more complex data types will be added in future versions.
@@ -72,3 +75,5 @@ Unzip master.zip, Java-Lang-master folder will be extracted from zip.
 Now you have an eclipse project, import project into Eclipse
 
 If your Eclipse configuration is not UTF-8, after importing the project you may see some errors and strange characters in some .java files. To get rid of this problem change character enconding to UTF-8: project->properties->resource->text file encoding->utf8
+
+

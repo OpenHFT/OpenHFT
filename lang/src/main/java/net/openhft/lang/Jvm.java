@@ -64,7 +64,7 @@ public enum Jvm {
             // ignored
         }
         if (pid == null)
-            pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+            pid = ManagementFactory.getRuntimeMXBean().getName().split("@", 0)[0];
         if (pid == null) {
             int rpid = new Random().nextInt(1 << 16);
             Logger.getLogger(Jvm.class.getName()).warning("Unable to determine PID, picked a random number=" + rpid);

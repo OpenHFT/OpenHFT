@@ -24,8 +24,10 @@ import net.openhft.lang.model.constraints.MaxSize;
  * Time: 16:59
  */
 public interface JavaBeanInterface {
+    // TODO remove the need for getter for field "record"
     int getRecord();
 
+    // TODO remove the need for setter for field "record"
     void setRecord(int record);
 
     void busyLockRecord() throws InterruptedException;
@@ -60,9 +62,13 @@ public interface JavaBeanInterface {
 
     long getLong();
 
+    long addAtomicLong(long toAdd);
+
     void setDouble(double d);
 
     double getDouble();
+
+    double addAtomicDouble(double toAdd);
 
     void setString(@MaxSize(8) String s);
 

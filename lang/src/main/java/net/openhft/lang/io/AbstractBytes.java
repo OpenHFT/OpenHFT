@@ -44,16 +44,16 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("MagicNumber")
 public abstract class AbstractBytes implements Bytes {
-    public static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
-    public static final int INT_LOCK_MASK = 0xFFFFFF;
-    public static final int UNSIGNED_BYTE_MASK = 0xFF;
-    public static final int UNSIGNED_SHORT_MASK = 0xFFFF;
+    private static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
+    private static final int INT_LOCK_MASK;
+    private static final int UNSIGNED_BYTE_MASK = 0xFF;
+    private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
     // extra 1 for decimal place.
-    static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
+    private static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
     private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
-    static final byte[] RADIX_PARSE = new byte[256];
+    private static final byte[] RADIX_PARSE = new byte[256];
 
     static {
         Arrays.fill(RADIX_PARSE, (byte) -1);
@@ -61,6 +61,7 @@ public abstract class AbstractBytes implements Bytes {
             RADIX_PARSE['0' + i] = (byte) i;
         for (int i = 0; i < 26; i++)
             RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
+        INT_LOCK_MASK = 0xFFFFFF;
     }
 
     private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
@@ -85,10 +86,10 @@ public abstract class AbstractBytes implements Bytes {
     private static final byte ENUMED = 'E';
     private static final byte SERIALIZED = 'S';
     private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
-    static boolean ID_LIMIT_WARNED = false;
-    protected final AtomicInteger refCount;
+    private static boolean ID_LIMIT_WARNED = false;
+    final AtomicInteger refCount;
     protected boolean finished;
-    protected BytesMarshallerFactory bytesMarshallerFactory;
+    BytesMarshallerFactory bytesMarshallerFactory;
     private StringInterner stringInterner = null;
     private BytesInputStream inputStream = null;
     private BytesOutputStream outputStream = null;
@@ -100,17 +101,17 @@ public abstract class AbstractBytes implements Bytes {
     private Thread currentThread;
     private int shortThreadId = Integer.MIN_VALUE;
 
-    protected AbstractBytes() {
+    AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
     }
 
-    protected AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory, AtomicInteger refCount) {
+    AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory, AtomicInteger refCount) {
         this.finished = false;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
         this.refCount = refCount;
     }
 
-    static boolean equalsCaseIgnore(StringBuilder sb, String s) {
+    private static boolean equalsCaseIgnore(StringBuilder sb, String s) {
         if (sb.length() != s.length())
             return false;
         for (int i = 0; i < s.length(); i++)
@@ -211,7 +212,7 @@ public abstract class AbstractBytes implements Bytes {
         return refCount.get();
     }
 
-    protected StringInterner stringInterner() {
+    StringInterner stringInterner() {
         if (stringInterner == null)
             stringInterner = new StringInterner(8 * 1024);
         return stringInterner;
@@ -335,7 +336,7 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     private StringBuilder acquireUtfReader() {
         if (utfReader == null)
-            utfReader = new StringBuilder();
+            utfReader = new StringBuilder(128);
         else
             utfReader.setLength(0);
         return utfReader;
@@ -775,8 +776,6 @@ public abstract class AbstractBytes implements Bytes {
 
     @NotNull
     public ByteStringAppender append(@NotNull CharSequence str) {
-        if (str == null)
-            return this;
         long strlen = str.length();
         writeUTF0(str, strlen);
         return this;
@@ -1340,7 +1339,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @NotNull
-    public <E> ByteStringAppender append(@NotNull List<E> list, @NotNull CharSequence separator) {
+    <E> ByteStringAppender append(@NotNull List<E> list, @NotNull CharSequence separator) {
         for (int i = 0; i < list.size(); i++) {
             if (i > 0)
                 append(separator);
@@ -1494,7 +1493,6 @@ public abstract class AbstractBytes implements Bytes {
         if (num <= 0)
             return 2;
         numberBuffer[1] = (byte) (num % 10L + '0');
-        num /= 10;
         return 1;
     }
 
@@ -1737,7 +1735,7 @@ public abstract class AbstractBytes implements Bytes {
         list.clear();
         for (int i = 0; i < len; i++) {
             @SuppressWarnings("unchecked")
-            E e = (E) readEnum(eClass);
+            E e = readEnum(eClass);
             list.add(e);
         }
     }
@@ -1803,7 +1801,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public Bytes clear() {
+    public AbstractBytes clear() {
         finished = false;
         position(0L);
         limit(capacity());
@@ -1831,6 +1829,7 @@ public abstract class AbstractBytes implements Bytes {
                 return null;
             case ENUMED: {
                 Class clazz = readEnum(Class.class);
+                assert clazz != null;
                 return readEnum(clazz);
             }
             case SERIALIZED: {
@@ -1857,8 +1856,9 @@ public abstract class AbstractBytes implements Bytes {
         throw new ClassCastException("Cannot convert " + o.getClass().getName() + " to " + tClass.getName() + " was " + o);
     }
 
-    @NotNull
+    @Nullable
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T readInstance(@NotNull Class<T> objClass, T obj) {
         try {
             if (BytesMarshallable.class.isAssignableFrom(objClass)) {
@@ -1938,7 +1938,7 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    protected boolean autoGenerateMarshaller(Object obj) {
+    static boolean autoGenerateMarshaller(Object obj) {
         return (obj instanceof Comparable && obj.getClass().getPackage().getName().startsWith("java"))
                 || obj instanceof Externalizable
                 || obj instanceof BytesMarshallable;
@@ -1946,28 +1946,26 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public boolean tryLockInt(long offset) {
-        long id = shortThreadId();
-        return tryLockNanos4a(offset, (int) id);
+        return tryLockNanos4a(offset);
     }
 
     @Override
     public boolean tryLockNanosInt(long offset, long nanos) {
-        long id = shortThreadId();
         int limit = nanos <= 10000 ? (int) nanos / 10 : 1000;
         for (int i = 0; i < limit; i++)
-            if (tryLockNanos4a(offset, (int) id))
+            if (tryLockNanos4a(offset))
                 return true;
         if (nanos <= 10000)
             return false;
         long end = System.nanoTime() + nanos - 10000;
         do {
-            if (tryLockNanos4a(offset, (int) id))
+            if (tryLockNanos4a(offset))
                 return true;
         } while (end > System.nanoTime() && !currentThread().isInterrupted());
         return false;
     }
 
-    private boolean tryLockNanos4a(long offset, int id) {
+    private boolean tryLockNanos4a(long offset) {
         int lowId = shortThreadId();
         int firstValue = ((1 << 24) | lowId);
         if (compareAndSwapInt(offset, 0, firstValue))
@@ -2012,11 +2010,11 @@ public abstract class AbstractBytes implements Bytes {
         return readVolatileInt(offset) & INT_LOCK_MASK;
     }
 
-    public int shortThreadId() {
+    int shortThreadId() {
         return shortThreadId > 0 ? shortThreadId : shortThreadId0();
     }
 
-    protected int shortThreadId0() {
+    int shortThreadId0() {
         final int tid = (int) getId() & INT_LOCK_MASK;
         if (!ID_LIMIT_WARNED && tid > 1 << 24) {
             warnIdLimit(tid);
@@ -2029,7 +2027,7 @@ public abstract class AbstractBytes implements Bytes {
         shortThreadId = shortThreadId0();
     }
 
-    public Thread currentThread() {
+    Thread currentThread() {
         return currentThread == null ? Thread.currentThread() : currentThread;
     }
 
@@ -2039,7 +2037,7 @@ public abstract class AbstractBytes implements Bytes {
         return tryLockNanos8a(offset, id);
     }
 
-    public long uniqueTid() {
+    long uniqueTid() {
         return Jvm.getUniqueTid(currentThread());
     }
 
@@ -2105,7 +2103,7 @@ public abstract class AbstractBytes implements Bytes {
         return readVolatileLong(offset);
     }
 
-    protected long getId() {
+    long getId() {
         return currentThread().getId();
     }
 
@@ -2345,9 +2343,10 @@ public abstract class AbstractBytes implements Bytes {
         long inputRemaining = input.remaining();
         if (remaining() < inputRemaining) return false;
         long pos = position(), inputPos = input.position();
+
         int i = 0;
-        for (; i < inputRemaining - 7; i += 8) {
-            if (readLong(pos + i) != input.readLong(inputPos + i))
+        for (; i < inputRemaining - 3; i += 4) {
+            if (readInt(pos + i) != input.readInt(inputPos + i))
                 return false;
         }
         for (; i < inputRemaining; i++) {
@@ -2357,7 +2356,7 @@ public abstract class AbstractBytes implements Bytes {
         return true;
     }
 
-    protected class BytesInputStream extends InputStream {
+    class BytesInputStream extends InputStream {
         private long mark = 0;
 
         @Override
@@ -2383,8 +2382,8 @@ public abstract class AbstractBytes implements Bytes {
         }
 
         @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            return AbstractBytes.this.read(b, off, len);
+        public int read(@NotNull byte[] bytes, int off, int len) throws IOException {
+            return AbstractBytes.this.read(bytes, off, len);
         }
 
         @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
@@ -2408,7 +2407,7 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    protected class BytesOutputStream extends OutputStream {
+    private class BytesOutputStream extends OutputStream {
         @Override
         public void close() throws IOException {
             finish();
@@ -2434,14 +2433,14 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("[pos: ").append(position()).append(", lim: ").append(limit()).append(", cap: ").append(capacity()).append(" ] ");
         // before
         if (position() > 0) {
             for (long i = Math.max(position() - 64, 0), end = position(); i < end; i++) {
                 append(sb, i);
             }
-            sb.append("\u2016");
+            sb.append('\u2016');
         }
         // after
         for (long i = position(), end = Math.min(limit(), i + 64); i < end; i++) {

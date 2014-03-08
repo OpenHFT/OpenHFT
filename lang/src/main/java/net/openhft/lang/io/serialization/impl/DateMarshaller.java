@@ -27,7 +27,7 @@ import java.util.Date;
  * @author peter.lawrey
  */
 public class DateMarshaller implements CompactBytesMarshaller<Date> {
-    final int size1;
+    private final int size1;
     private final StringBuilder sb = new StringBuilder();
     @Nullable
     private Date[] interner = null;

@@ -31,7 +31,7 @@ public class RunningMinimum implements Differencer {
         this(actualMinimum, 100 * 1000);
     }
 
-    public RunningMinimum(long actualMinimum, int drift) {
+    private RunningMinimum(long actualMinimum, int drift) {
         this.actualMinimum = actualMinimum;
         this.drift = drift;
     }

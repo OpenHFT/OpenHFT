@@ -27,7 +27,7 @@ public abstract class Compare {
         return a == b;
     }
 
-    public static long calcLongHashCode(boolean a) {
+    private static long calcLongHashCode(boolean a) {
         return a ? 1 : 0;
     }
 
@@ -43,7 +43,7 @@ public abstract class Compare {
         return a == b;
     }
 
-    public static long calcLongHashCode(byte a) {
+    private static long calcLongHashCode(byte a) {
         return a;
     }
 
@@ -59,7 +59,7 @@ public abstract class Compare {
         return a == b;
     }
 
-    public static long calcLongHashCode(char a) {
+    private static long calcLongHashCode(char a) {
         return a;
     }
 
@@ -75,7 +75,7 @@ public abstract class Compare {
         return a == b;
     }
 
-    public static long calcLongHashCode(short a) {
+    private static long calcLongHashCode(short a) {
         return a;
     }
 
@@ -91,7 +91,7 @@ public abstract class Compare {
         return a == b;
     }
 
-    public static long calcLongHashCode(int a) {
+    private static long calcLongHashCode(int a) {
         return a;
     }
 
@@ -107,7 +107,7 @@ public abstract class Compare {
         return a == b;
     }
 
-    public static long calcLongHashCode(long a) {
+    private static long calcLongHashCode(long a) {
         return a;
     }
 
@@ -119,11 +119,11 @@ public abstract class Compare {
         return a == null ? NULL_HASHCODE : calcLongHashCode(a.longValue());
     }
 
-    public static boolean isEqual(float a, float b) {
+    private static boolean isEqual(float a, float b) {
         return Float.floatToRawIntBits(a) == Float.floatToRawIntBits(b);
     }
 
-    public static long calcLongHashCode(float a) {
+    private static long calcLongHashCode(float a) {
         return Float.floatToRawIntBits(a);
     }
 
@@ -135,11 +135,11 @@ public abstract class Compare {
         return a == null ? NULL_HASHCODE : calcLongHashCode(a.floatValue());
     }
 
-    public static boolean isEqual(double a, double b) {
+    private static boolean isEqual(double a, double b) {
         return Double.doubleToRawLongBits(a) == Double.doubleToRawLongBits(b);
     }
 
-    public static long calcLongHashCode(double a) {
+    private static long calcLongHashCode(double a) {
         return Double.doubleToRawLongBits(a);
     }
 
@@ -155,7 +155,7 @@ public abstract class Compare {
         return a == null ? b == null : b != null && a.equals(b);
     }
 
-    public static long calcLongHashCode(LongHashable t) {
+    private static long calcLongHashCode(LongHashable t) {
         return t.longHashCode();
     }
 

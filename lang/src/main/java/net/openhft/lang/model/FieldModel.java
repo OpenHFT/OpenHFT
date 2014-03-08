@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  * Date: 06/10/13
  * Time: 18:22
  */
-public interface FieldModel<T> {
+interface FieldModel<T> {
     String name();
 
     Method getter();
