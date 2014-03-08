@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.Jvm;
 import org.junit.Test;
 
 import java.io.File;
@@ -26,9 +27,10 @@ import static org.junit.Assert.assertEquals;
 public class MappedStoreTest {
     @Test
     public void testCreateSlice() throws Exception {
-        File file = new File("/tmp/deleteme");
+        File file = new File(System.getProperty("java.io.tmpdir") + "/MappedStoreTest-testCreateSlice");
         file.deleteOnExit();
-        MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, 3L << 30);
+        long size = Jvm.is64Bit() ? 3L << 30 : 256 << 20;
+        MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, size);
         DirectBytes slice = ms.createSlice();
         assertEquals(1, slice.refCount());
 
