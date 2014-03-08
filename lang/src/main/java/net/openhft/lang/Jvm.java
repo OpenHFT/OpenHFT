@@ -86,5 +86,4 @@ public enum Jvm {
     public static long getUniqueTid(Thread thread) {
         return ((long) getProcessId() << 32) | thread.getId();
     }
-
 }
