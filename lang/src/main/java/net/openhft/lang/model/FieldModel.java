@@ -27,13 +27,18 @@ import java.lang.reflect.Method;
  * Date: 06/10/13
  * Time: 18:22
  */
-interface FieldModel<T> {
+public interface FieldModel<T> {
     String name();
 
     Method getter();
 
     Method setter();
 
+    /*DS*/
+    Method indexedGetter();
+
+    Method indexedSetter();
+    /*DS*/
     Method adder();
 
     Method atomicAdder();
@@ -59,4 +64,8 @@ interface FieldModel<T> {
     Range range();
 
     MaxSize size();
+
+    MaxSize indexSize();
+
+    boolean isArray();
 }
