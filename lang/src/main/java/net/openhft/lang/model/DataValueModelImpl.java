@@ -31,11 +31,11 @@ import java.util.TreeMap;
 
 /**
  * User: peter.lawrey
- * Date: 06/10/13
+ * Date: 06/10/13private static final int VALUE
  * Time: 17:23
  */
 public class DataValueModelImpl<T> implements DataValueModel<T> {
-    private static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
+    static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
 
     static {
         HEAP_SIZE_MAP.put(boolean.class, 1);
@@ -199,28 +199,28 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         return name;
     }
 
-    private static String getBusyLock(String name) {
+    private String getBusyLock(String name) {
         final int len = 8;
         if (name.length() > len && name.startsWith("busyLock") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return null;
     }
 
-    private static String getUnlock(String name) {
+    private String getUnlock(String name) {
         final int len = 6;
         if (name.length() > len && name.startsWith("unlock") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return null;
     }
 
-    private static String getTryLockNanos(String name) {
+    private String getTryLockNanos(String name) {
         final int len = 12;
         if (name.length() > len && name.startsWith("tryLockNanos") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return null;
     }
 
-    private static String getTryLock(String name) {
+    private String getTryLock(String name) {
         final int len = 7;
         if (name.length() > len && name.startsWith("tryLock") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
@@ -278,6 +278,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Method unlock;
         private Method indexedGetter;
         private Method indexedSetter;
+        private boolean isArray = false;
 
         public FieldModelImpl(String name) {
             this.name = name;
@@ -285,6 +286,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         public String name() {
             return name;
+        }
+
+        public boolean isArray(){
+            return isArray;
         }
 
         public void getter(Method getter) {
@@ -430,6 +435,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
         public void indexedGetter(Method indexedGetter) {
+            isArray = true;
             this.indexedGetter = indexedGetter;
             indexAnnotations(indexedGetter);
         }
@@ -439,6 +445,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
         public void indexedSetter(Method indexedSetter) {
+            isArray = true;
             this.indexedSetter = indexedSetter;
             indexAnnotations(indexedSetter);
         }
