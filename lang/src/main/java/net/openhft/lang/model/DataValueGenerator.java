@@ -120,25 +120,18 @@ public class DataValueGenerator {
             Class type = model.type();
             if (!type.isPrimitive() && !type.getPackage().getName().equals("java.lang"))
                 imported.add(type);
-            fieldDeclarations.append("    private ").append(type.getName()).append(" _").append(name).append(";\n");
+            heapFieldDeclarations(fieldDeclarations,type,name,model);
 
-            final Method setter = model.setter();
-            final Method getter = model.getter();
+            final Method setter = getSetter(model);
+            final Method getter = getGetter(model);
             if (setter == null) {
                 copy.append("        ((Copyable) ").append(getter.getName()).append("()).copyFrom(from.").append(getter.getName()).append("());\n");
             } else {
-                copy.append("        ").append(setter.getName()).append("(from.").append(getter.getName()).append("());\n");
-                Class<?> setterType = setter.getParameterTypes()[0];
-                getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
-                if (type == String.class && setterType != String.class)
-                    getterSetters.append("        _").append(name).append(" = _.toString();\n");
-                else
-                    getterSetters.append("        _").append(name).append(" = _;\n");
-                getterSetters.append("    }\n\n");
+                methodCopy(copy,getter,setter,model);
+                methodHeapSet(getterSetters,setter,name,type,model);
             }
-            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
-            getterSetters.append("        return _").append(name).append(";\n");
-            getterSetters.append("    }\n\n");
+            methodHeapGet(getterSetters,getter,name,type,model);
+
             Method adder = model.adder();
             if (adder != null) {
                 getterSetters.append("    public ").append(type.getName()).append(' ').append(adder.getName())
@@ -189,11 +182,8 @@ public class DataValueGenerator {
                         .append("        throw new UnsupportedOperationException();\n")
                         .append("    }");
             }
-            writeMarshal.append("         out.write").append(bytesType(type)).append("(_").append(name).append(");\n");
-            readMarshal.append("         _").append(name).append(" = in.read").append(bytesType(type)).append("(");
-            if ("Object".equals(bytesType(type)))
-                readMarshal.append(type.getName()).append(".class");
-            readMarshal.append(");\n");
+            methodWriteMarshall(writeMarshal, getter,type,model);
+            methodHeapReadMarshall(readMarshal, name, type, model);
         }
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(dvmodel.type().getPackage().getName()).append(";\n\n");
@@ -206,8 +196,8 @@ public class DataValueGenerator {
                 .append(", BytesMarshallable, Copyable<").append(dvmodel.type().getName()).append(">  {\n");
         sb.append(fieldDeclarations).append('\n');
         sb.append(getterSetters);
-        sb.append("        @SuppressWarnings(\"unchecked\")\n" +
-                "        public void copyFrom(").append(dvmodel.type().getName()).append(" from) {\n");
+        sb.append("    @SuppressWarnings(\"unchecked\")\n" +
+                "    public void copyFrom(").append(dvmodel.type().getName()).append(" from) {\n");
         sb.append(copy);
         sb.append("    }\n\n");
         sb.append("    public void writeMarshallable(Bytes out) {\n");
@@ -524,7 +514,7 @@ public class DataValueGenerator {
         getterSetters.append("    }\n\n");
     }
 
-    private void methodCopy(StringBuilder copy, Method getter, Method setter, FieldModel model){
+    private static void methodCopy(StringBuilder copy, Method getter, Method setter, FieldModel model){
         if(!model.isArray()){
             copy.append("        ").append(setter.getName());
             copy.append("(from.").append(getter.getName()).append("());\n");
@@ -535,7 +525,7 @@ public class DataValueGenerator {
         }
     }  
  
-    private void methodWriteMarshall(StringBuilder writeMarshal, Method getter, Class type, FieldModel model){
+    private static void methodWriteMarshall(StringBuilder writeMarshal, Method getter, Class type, FieldModel model){
         if(!model.isArray()){
             writeMarshal.append("        out.write").append(bytesType(type)).append("(")
             .append(getter.getName()).append("());\n");
@@ -565,7 +555,27 @@ public class DataValueGenerator {
             readMarshal.append("            ").append(setter.getName()).append("(i, in.read").append(bytesType(type)).append("());\n");
             readMarshal.append("        }\n");
         }
+
+
     }
+
+    private static void methodHeapReadMarshall(StringBuilder readMarshal, String name, Class type, FieldModel model){
+        if(!model.isArray()){
+            readMarshal.append("        _").append(name).append(" = in.read").append(bytesType(type)).append("(");
+            if ("Object".equals(bytesType(type)))
+                readMarshal.append(type.getName()).append(".class");
+            readMarshal.append(");\n");
+        }else{
+            readMarshal.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            readMarshal.append("            _").append(name).append("[i] = in.read").append(bytesType(type)).append("(");
+            if ("Object".equals(bytesType(type)))
+                readMarshal.append(type.getName()).append(".class");
+            readMarshal.append(");\n");
+            readMarshal.append("        }\n");
+        }
+
+    }
+
 
     private void methodNonScalarReadMarshall(StringBuilder readMarshal, String name, FieldModel model){
         if(!model.isArray()){
@@ -686,6 +696,44 @@ public class DataValueGenerator {
             sizeOfMethod.append("\n    public int sizeOf" + name + "(){\n");
             sizeOfMethod.append("        return " + model.indexSize().value() + ";\n");
             sizeOfMethod.append("    }\n\n");
+        }
+    }
+
+    private static void methodHeapSet(StringBuilder getterSetters, Method setter, String name, Class type, FieldModel model){
+        Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length-1];
+        if(!model.isArray()){
+            getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
+            if (type == String.class && setterType != String.class)
+                getterSetters.append("        _").append(name).append(" = _.toString();\n");
+            else
+                getterSetters.append("        _").append(name).append(" = _;\n");
+        }else{
+            getterSetters.append("    public void ").append(setter.getName()).append("(int i, ").append(setterType.getName()).append(" _) {\n");
+            if (type == String.class && setterType != String.class)
+                getterSetters.append("        _").append(name).append("[i] = _.toString();\n");
+            else
+                getterSetters.append("        _").append(name).append("[i] = _;\n");
+
+        }
+        getterSetters.append("    }\n\n");
+    }
+
+    private static void methodHeapGet(StringBuilder getterSetters, Method getter, String name, Class type, FieldModel model){
+        if(!model.isArray()){
+            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
+            getterSetters.append("        return _").append(name).append(";\n");
+        }else{
+            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("(int i) {\n");
+            getterSetters.append("        return _").append(name).append("[i];\n");
+        }
+        getterSetters.append("    }\n\n");
+    }
+
+    private static void heapFieldDeclarations(StringBuilder fieldDeclarations, Class type, String name, FieldModel model){
+        if(!model.isArray()){
+            fieldDeclarations.append("    private ").append(type.getName()).append(" _").append(name).append(";\n");
+        }else{
+            fieldDeclarations.append("    private ").append(type.getName()).append(" _").append(name).append("[];\n");
         }
     }
 }
