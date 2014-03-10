@@ -142,20 +142,20 @@ public class DataValueGenerator {
             Method adder = model.adder();
             if (adder != null) {
                 getterSetters.append("    public ").append(type.getName()).append(' ').append(adder.getName())
-                        .append('(').append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
                         .append("        return _").append(name).append(" += _;\n")
                         .append("    }");
             }
             Method atomicAdder = model.atomicAdder();
             if (atomicAdder != null) {
                 getterSetters.append("    public synchronized ").append(type.getName()).append(' ').append(atomicAdder.getName())
-                        .append('(').append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
+                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
                         .append("        return _").append(name).append(" += _;\n")
                         .append("    }");
             }
             Method cas = model.cas();
             if (cas != null) {
-                getterSetters.append("    public synchronized boolean ").append(cas.getName()).append('(')
+                getterSetters.append("    public synchronized boolean ").append(cas.getName()).append("(")
                         .append(type.getName()).append(" _1, ")
                         .append(type.getName()).append(" _2) {\n")
                         .append("        if (_").append(name).append(" == _1) {\n")
@@ -190,7 +190,7 @@ public class DataValueGenerator {
                         .append("    }");
             }
             writeMarshal.append("         out.write").append(bytesType(type)).append("(_").append(name).append(");\n");
-            readMarshal.append("         _").append(name).append(" = in.read").append(bytesType(type)).append('(');
+            readMarshal.append("         _").append(name).append(" = in.read").append(bytesType(type)).append("(");
             if ("Object".equals(bytesType(type)))
                 readMarshal.append(type.getName()).append(".class");
             readMarshal.append(");\n");
@@ -244,19 +244,18 @@ public class DataValueGenerator {
         for (Map.Entry<String, FieldModel> entry : entries) {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
-            if (count > 0)
-                hashCode.append(") * 10191 +\n            ");
-            String getterName = model.getter().getName();
-            hashCode.append("calcLongHashCode(").append(getterName).append("())");
-            equals.append("        if(!isEqual(").append(getterName).append("(), that.").append(getterName).append("())) return false;\n");
-            toString.append("            \", ").append(name).append("= \" + ").append(getterName).append("() +\n");
+            Class type = model.type();
+            String getterName = getGetter(model).getName();
+            methodLongHashCode(hashCode, getterName, model, count);
+            methodEquals(equals, getterName, model);
+            methodToString(toString, getterName, name, model);
             count++;
         }
         sb.append("    public int hashCode() {\n" +
                 "        long lhc = longHashCode();\n" +
                 "        return (int) ((lhc >>> 32) ^ lhc);\n" +
                 "    }\n" +
-                '\n' +
+                "\n" +
                 "    public long longHashCode() {\n" +
                 "        return ");
         for (int i = 1; i < count; i++)
@@ -265,16 +264,16 @@ public class DataValueGenerator {
         String simpleName = dvmodel.type().getSimpleName();
         sb.append(";\n")
                 .append("    }\n")
-                .append('\n')
+                .append("\n")
                 .append("    public boolean equals(Object o) {\n")
                 .append("        if (this == o) return true;\n")
                 .append("        if (!(o instanceof ").append(simpleName).append(")) return false;\n")
                 .append("        ").append(simpleName).append(" that = (").append(simpleName).append(") o;\n")
-                .append('\n')
+                .append("\n")
                 .append(equals)
                 .append("        return true;\n" +
                         "    }\n" +
-                        '\n' +
+                        "\n" +
                         "    public String toString() {\n" +
                         "        return \"").append(simpleName).append(" {\" +\n")
                 .append(toString.substring(0, toString.length() - 3)).append(";\n")
@@ -323,7 +322,7 @@ public class DataValueGenerator {
         return generateNativeObject(DataValueModels.acquireModel(tClass));
     }
 
-    static String generateNativeObject(DataValueModel<?> dvmodel) {
+    public String generateNativeObject(DataValueModel<?> dvmodel) {
         SortedSet<Class> imported = new TreeSet<Class>(COMPARATOR);
         imported.add(BytesMarshallable.class);
         imported.add(ObjectOutput.class);
@@ -340,6 +339,7 @@ public class DataValueGenerator {
         StringBuilder readMarshal = new StringBuilder();
         StringBuilder copy = new StringBuilder();
         StringBuilder nestedBytes = new StringBuilder();
+        StringBuilder sizeOfMethods = new StringBuilder();
         Map<String, ? extends FieldModel> fieldMap = dvmodel.fieldMap();
         Map.Entry<String, FieldModel>[] entries = fieldMap.entrySet().toArray(new Map.Entry[fieldMap.size()]);
         Arrays.sort(entries, COMPARE_BY_HEAP_SIZE);
@@ -351,38 +351,31 @@ public class DataValueGenerator {
             if (!type.isPrimitive() && !type.getPackage().getName().equals("java.lang"))
                 imported.add(type);
             String NAME = "_offset + " + name.toUpperCase();
-            final Method setter = model.setter();
-            final Method getter = model.getter();
+            final Method setter = getSetter(model);
+            final Method getter = getGetter(model);
+            methodSizeOf(sizeOfMethods, name, model);
             if (dvmodel.isScalar(type)) {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
-                copy.append("        ").append(setter.getName()).append("(from.").append(getter.getName()).append("());\n");
-                Class<?> setterType = setter.getParameterTypes()[0];
-                getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
-                getterSetters.append("        _bytes.write").append(bytesType(type)).append('(').append(NAME).append(", ");
-                if (CharSequence.class.isAssignableFrom(type))
-                    getterSetters.append(model.size().value()).append(", ");
-                getterSetters.append("_);\n");
-                getterSetters.append("    }\n\n");
-                getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
-                getterSetters.append("        return _bytes.read").append(bytesType(type)).append('(').append(NAME).append(");\n");
-                getterSetters.append("    }\n\n");
+                methodCopy(copy, getter, setter, model);
+                methodSet(getterSetters, setter, type, NAME, model);
+                methodGet(getterSetters, getter, type, NAME, model);
                 Method adder = model.adder();
                 if (adder != null) {
                     getterSetters.append("    public ").append(type.getName()).append(' ').append(adder.getName())
-                            .append('(').append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
-                            .append("        return _bytes.add").append(bytesType(type)).append('(').append(NAME).append(", _);\n")
+                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                            .append("        return _bytes.add").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
                             .append("    }");
                 }
                 Method atomicAdder = model.atomicAdder();
                 if (atomicAdder != null) {
                     getterSetters.append("    public ").append(type.getName()).append(' ').append(atomicAdder.getName())
-                            .append('(').append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
-                            .append("        return _bytes.addAtomic").append(bytesType(type)).append('(').append(NAME).append(", _);\n")
+                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
+                            .append("        return _bytes.addAtomic").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
                             .append("    }");
                 }
                 Method cas = model.cas();
                 if (cas != null) {
-                    getterSetters.append("    public boolean ").append(cas.getName()).append('(')
+                    getterSetters.append("    public boolean ").append(cas.getName()).append("(")
                             .append(type.getName()).append(" _1, ")
                             .append(type.getName()).append(" _2) {\n")
                             .append("        return _bytes.compareAndSwap").append(bytesType(type)).append('(').append(NAME).append(", _1, _2);\n")
@@ -412,45 +405,30 @@ public class DataValueGenerator {
                             .append("         _bytes.busyLock").append(bytesType(type)).append('(').append(NAME).append(");\n")
                             .append("    }");
                 }
-                writeMarshal.append("         out.write").append(bytesType(type)).append('(')
-                        .append(getter.getName()).append("());\n");
-                readMarshal.append("         ").append(setter.getName()).append("(in.read").append(bytesType(type)).append("());\n");
-                offset += (model.nativeSize() + 7) >> 3;
+                methodWriteMarshall(writeMarshal, getter, type, model);
+                methodReadMarshall(readMarshal, setter, type, model);
+
+                offset += computeOffset((model.nativeSize() + 7) >> 3, model);
             } else {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
-                fieldDeclarations.append("    private final ").append(type.getName()).append("£native _").append(name).append(" = new ").append(type.getName()).append("£native();\n");
+                nonScalarFieldDeclaration(staticFieldDeclarations, type, name, model);
                 if (setter == null) {
                     copy.append("        _").append(name).append(".copyFrom(from.").append(getter.getName()).append("());\n");
                 } else {
-                    copy.append("        ").append(setter.getName()).append("(from.").append(getter.getName()).append("());\n");
-                    Class<?> setterType = setter.getParameterTypes()[0];
-                    getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
-                    if (type == String.class && setterType != String.class)
-                        getterSetters.append("        _").append(name).append(" = _.toString();\n");
-                    else
-                        getterSetters.append("        _").append(name).append(".copyFrom(_);\n");
-                    getterSetters.append("    }\n\n");
+                    methodCopy(copy, getter,setter,model);
+                    methodNonScalarSet(getterSetters, setter, name, type, model);
                 }
 
-                getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
-                getterSetters.append("        return _").append(name).append(";\n");
-                getterSetters.append("    }\n\n");
+                int size = computeNonScalarOffset(dvmodel, type);
+                methodNonScalarGet(getterSetters, getter, name, type, model);
+                methodNonScalarWriteMarshall(writeMarshal, name, model);
+                methodNonScalarReadMarshall(readMarshal, name, model);
+                methodNonScalarBytes(nestedBytes,name,NAME,size, model);
 
-                writeMarshal.append("         _").append(name).append(".writeMarshallable(out);\n");
-                readMarshal.append("         _").append(name).append(".readMarshallable(in);\n");
-
-                nestedBytes.append("        ((Byteable) _").append(name).append(").bytes(bytes, ").append(NAME).append(");\n");
-                DataValueModel dvmodel2 = dvmodel.nestedModel(type);
-                Map<String, ? extends FieldModel> fieldMap2 = dvmodel2.fieldMap();
-                Map.Entry<String, FieldModel>[] entries2 = fieldMap2.entrySet().toArray(new Map.Entry[fieldMap2.size()]);
-                Arrays.sort(entries2, COMPARE_BY_HEAP_SIZE);
-                for (Map.Entry<String, ? extends FieldModel> entry2 : entries2) {
-                    FieldModel model2 = entry2.getValue();
-                    offset += (model2.nativeSize() + 7) >> 3;
-                }
+                offset += computeOffset(size, model);
             }
         }
-        fieldDeclarations.append('\n')
+        fieldDeclarations.append("\n")
                 .append("    private Bytes _bytes;\n")
                 .append("    private long _offset;\n");
         StringBuilder sb = new StringBuilder();
@@ -488,6 +466,7 @@ public class DataValueGenerator {
         sb.append("    public int maxSize() {\n");
         sb.append("       return ").append(offset).append(";\n");
         sb.append("    }\n");
+        sb.append(sizeOfMethods);
         generateObjectMethods(sb, dvmodel, entries);
         sb.append("}\n");
 //        System.out.println(sb);
@@ -500,5 +479,213 @@ public class DataValueGenerator {
 
     public void setDumpCode(boolean dumpCode) {
         this.dumpCode = dumpCode;
+    }
+
+    private static Method getGetter(FieldModel model){
+        Method getter = model.getter();
+        if(getter==null)getter = model.indexedGetter();
+        return getter;
+    }
+
+    private static Method getSetter(FieldModel model){
+        Method setter = model.setter();
+        if(setter==null)setter = model.indexedSetter();
+        return setter;
+    } 
+    private void methodSet(StringBuilder getterSetters, Method setter, Class type, String NAME, FieldModel model){
+        Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length-1];
+        if(!model.isArray()){
+            getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
+            getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME).append(", ");
+        }else {
+            getterSetters.append("    public void ").append(setter.getName()).append("(int i, ");
+            getterSetters.append(setterType.getName()).append(" _) {\n");
+            getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME);
+            getterSetters.append(" + i*" + ((model.nativeSize() + 7) >> 3) + ", ");
+        }
+
+        if (CharSequence.class.isAssignableFrom(type))
+            getterSetters.append(model.size().value()).append(", ");
+        getterSetters.append("_);\n");
+        getterSetters.append("    }\n\n");
+    }
+
+    private void methodGet(StringBuilder getterSetters, Method getter, Class type, String NAME, FieldModel model){
+        if(!model.isArray()){
+            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
+            getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME).append(");\n");
+        }else {
+            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("(int i) {\n");
+            getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME);
+            getterSetters.append(" + i*" + ((model.nativeSize() + 7) >> 3));
+            getterSetters.append(");\n");
+
+        }
+        getterSetters.append("    }\n\n");
+    }
+
+    private void methodCopy(StringBuilder copy, Method getter, Method setter, FieldModel model){
+        if(!model.isArray()){
+            copy.append("        ").append(setter.getName());
+            copy.append("(from.").append(getter.getName()).append("());\n");
+        } else {
+            copy.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){");
+            copy.append("\n            " + setter.getName() + "(i, from.").append(getter.getName()).append("(i));\n");
+            copy.append("        }\n");
+        }
+    }  
+ 
+    private void methodWriteMarshall(StringBuilder writeMarshal, Method getter, Class type, FieldModel model){
+        if(!model.isArray()){
+            writeMarshal.append("        out.write").append(bytesType(type)).append("(")
+            .append(getter.getName()).append("());\n");
+        }else {
+            writeMarshal.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            writeMarshal.append("            out.write").append(bytesType(type)).append("(")
+                    .append(getter.getName()).append("(i));\n");
+            writeMarshal.append("        }\n");
+        }
+    }
+
+    private void methodNonScalarWriteMarshall(StringBuilder writeMarshal, String name, FieldModel model){
+        if(!model.isArray()){
+            writeMarshal.append("         _").append(name).append(".writeMarshallable(out);\n");
+        }else {
+            writeMarshal.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            writeMarshal.append("            _").append(name).append("[i].writeMarshallable(out);\n");
+            writeMarshal.append("        }\n");
+        }
+    }
+      
+    private void methodReadMarshall(StringBuilder readMarshal, Method setter, Class type, FieldModel model){
+        if(!model.isArray()){
+            readMarshal.append("        ").append(setter.getName()).append("(in.read").append(bytesType(type)).append("());\n");
+        }else {
+            readMarshal.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            readMarshal.append("            ").append(setter.getName()).append("(i, in.read").append(bytesType(type)).append("());\n");
+            readMarshal.append("        }\n");
+        }
+    }
+
+    private void methodNonScalarReadMarshall(StringBuilder readMarshal, String name, FieldModel model){
+        if(!model.isArray()){
+            readMarshal.append("         _").append(name).append(".readMarshallable(in);\n");
+        }else {
+            readMarshal.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            readMarshal.append("            _").append(name).append("[i].readMarshallable(in);\n");
+            readMarshal.append("        }\n");
+        }
+    }
+
+    private static void methodLongHashCode(StringBuilder hashCode, String getterName, FieldModel model, int count){
+        if (count > 0)
+            hashCode.append(") * 10191 +\n            ");
+
+        if(!model.isArray()){
+            hashCode.append("calcLongHashCode(").append(getterName).append("())");
+        }else {
+            //for(int i=0; i<model.indexSize().value(); i++){
+                hashCode.append("calcLongHashCode(").append(getterName).append("(0))");
+            //}
+        }
+    }
+
+    private static void methodEquals(StringBuilder equals, String getterName, FieldModel model){
+        if(!model.isArray()){
+            equals.append("        if(!isEqual(").append(getterName).append("(), that.").append(getterName).append("())) return false;\n");
+        } else {
+            equals.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            equals.append("            if(!isEqual(").append(getterName).append("(i), that.").append(getterName).append("(i))) return false;\n");
+            equals.append("        }\n");
+        }
+    }
+
+    private static void methodToString(StringBuilder toString, String getterName, String name, FieldModel model){
+        if(!model.isArray()){
+            toString.append("            \", ").append(name).append("= \" + ").append(getterName).append("() +\n");
+        } else {
+            toString.append("            \", ").append(name).append("= \" + ").append(getterName).append("(0) +\n");
+        }
+    }
+
+    private int computeOffset(int offset, FieldModel model){
+        if(model.indexSize() == null){
+            return offset;
+        }else{
+            return model.indexSize().value() * offset;
+        }
+    }
+
+    private void nonScalarFieldDeclaration(StringBuilder fieldDeclarations, Class type, String name, FieldModel model){
+        fieldDeclarations.append("    private final ").append(type.getName()).append("£native _").append(name);
+        if(!model.isArray()){
+            fieldDeclarations.append(" = new ").append(type.getName()).append("£native();\n");
+        } else {
+            fieldDeclarations.append("[] = new ").append(type.getName()).append("£native[" + model.indexSize().value()+ "];\n");
+        }
+    }
+      
+    private void methodNonScalarSet(StringBuilder getterSetters, Method setter, String name, Class type, FieldModel model){
+        Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length-1];
+
+        if(!model.isArray()){
+            getterSetters.append("    public void ").append(setter.getName()).append('(').append(setterType.getName()).append(" _) {\n");
+            if (type == String.class && setterType != String.class)
+                getterSetters.append("        _").append(name).append(" = _.toString();\n");
+            else
+                getterSetters.append("        _").append(name).append(".copyFrom(_);\n");
+        } else {
+            getterSetters.append("    public void ").append(setter.getName()).append("(int i, ").append(setterType.getName()).append(" _) {\n");
+            if (type == String.class && setterType != String.class)
+                getterSetters.append("        _").append(name).append("[i] = _.toString();\n");
+            else
+                getterSetters.append("        _").append(name).append("[i].copyFrom(_);\n");
+
+        }
+        getterSetters.append("    }\n\n");
+    }
+
+    private void methodNonScalarGet(StringBuilder getterSetters, Method getter, String name, Class type, FieldModel model){
+        if(!model.isArray()){
+            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("() {\n");
+            getterSetters.append("        return _").append(name).append(";\n");
+        }else {
+            getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("(int i) {\n");
+            getterSetters.append("        return _").append(name).append("[i];\n");
+        }
+        getterSetters.append("    }\n\n");
+    }
+
+    private void methodNonScalarBytes(StringBuilder nestedBytes, String name, String NAME, int size, FieldModel model){
+        if(!model.isArray()){
+            nestedBytes.append("        ((Byteable) _").append(name).append(").bytes(bytes, ").append(NAME).append(");\n");
+        }else {
+            nestedBytes.append("       for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            nestedBytes.append("           ((Byteable) _").append(name).append("[i]).bytes(bytes, ").append(NAME);
+            nestedBytes.append(" + (i*" + size + "));\n");
+            nestedBytes.append("       }\n");
+        }
+    }
+
+    private int computeNonScalarOffset(DataValueModel dvmodel, Class type){
+        int offset = 0;
+        DataValueModel dvmodel2 = dvmodel.nestedModel(type);
+        Map<String, ? extends FieldModel> fieldMap2 = dvmodel2.fieldMap();
+        Map.Entry<String, FieldModel>[] entries2 = fieldMap2.entrySet().toArray(new Map.Entry[fieldMap2.size()]);
+        Arrays.sort(entries2, COMPARE_BY_HEAP_SIZE);
+        for (Map.Entry<String, ? extends FieldModel> entry2 : entries2) {
+            FieldModel model2 = entry2.getValue();
+            offset += computeOffset((model2.nativeSize() + 7) >> 3, model2);
+        }
+        return offset;
+    }
+
+    private void methodSizeOf(StringBuilder sizeOfMethod, String name, FieldModel model){
+        if(model.isArray()){
+            name = name.substring(0,1).toUpperCase() + name.substring(1,name.length());
+            sizeOfMethod.append("\n    public int sizeOf" + name + "(){\n");
+            sizeOfMethod.append("        return " + model.indexSize().value() + ";\n");
+            sizeOfMethod.append("    }\n\n");
+        }
     }
 }

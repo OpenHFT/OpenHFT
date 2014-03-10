@@ -35,7 +35,7 @@ import java.util.TreeMap;
  * Time: 17:23
  */
 public class DataValueModelImpl<T> implements DataValueModel<T> {
-    static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
+    private static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
 
     static {
         HEAP_SIZE_MAP.put(boolean.class, 1);
@@ -199,28 +199,28 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         return name;
     }
 
-    private String getBusyLock(String name) {
+    private static String getBusyLock(String name) {
         final int len = 8;
         if (name.length() > len && name.startsWith("busyLock") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return null;
     }
 
-    private String getUnlock(String name) {
+    private static String getUnlock(String name) {
         final int len = 6;
         if (name.length() > len && name.startsWith("unlock") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return null;
     }
 
-    private String getTryLockNanos(String name) {
+    private static String getTryLockNanos(String name) {
         final int len = 12;
         if (name.length() > len && name.startsWith("tryLockNanos") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return null;
     }
 
-    private String getTryLock(String name) {
+    private static String getTryLock(String name) {
         final int len = 7;
         if (name.length() > len && name.startsWith("tryLock") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
