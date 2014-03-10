@@ -52,6 +52,8 @@ public interface FieldModel<T> {
 
     Method unlock();
 
+    Method sizeOf();
+
     Class<T> type();
 
     int heapSize();

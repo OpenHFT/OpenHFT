@@ -139,12 +139,19 @@ public class DataValueGenerator {
                         .append("        return _").append(name).append(" += _;\n")
                         .append("    }");
             }
+            Method sizeOf = model.sizeOf();
+            if (sizeOf != null) {
+                getterSetters.append("    public int ").append(sizeOf.getName())
+                        .append("() {\n")
+                        .append("        return " + model.indexSize().value() + ";\n")
+                        .append("    }\n\n");
+            }
             Method atomicAdder = model.atomicAdder();
             if (atomicAdder != null) {
                 getterSetters.append("    public synchronized ").append(type.getName()).append(' ').append(atomicAdder.getName())
                         .append("(").append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
                         .append("        return _").append(name).append(" += _;\n")
-                        .append("    }");
+                        .append("    }\n\n");
             }
             Method cas = model.cas();
             if (cas != null) {
@@ -329,7 +336,7 @@ public class DataValueGenerator {
         StringBuilder readMarshal = new StringBuilder();
         StringBuilder copy = new StringBuilder();
         StringBuilder nestedBytes = new StringBuilder();
-        StringBuilder sizeOfMethods = new StringBuilder();
+
         Map<String, ? extends FieldModel> fieldMap = dvmodel.fieldMap();
         Map.Entry<String, FieldModel>[] entries = fieldMap.entrySet().toArray(new Map.Entry[fieldMap.size()]);
         Arrays.sort(entries, COMPARE_BY_HEAP_SIZE);
@@ -343,7 +350,6 @@ public class DataValueGenerator {
             String NAME = "_offset + " + name.toUpperCase();
             final Method setter = getSetter(model);
             final Method getter = getGetter(model);
-            methodSizeOf(sizeOfMethods, name, model);
             if (dvmodel.isScalar(type)) {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
                 methodCopy(copy, getter, setter, model);
@@ -362,6 +368,13 @@ public class DataValueGenerator {
                             .append("(").append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
                             .append("        return _bytes.addAtomic").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
                             .append("    }");
+                }
+                Method sizeOf = model.sizeOf();
+                if (sizeOf != null) {
+                    getterSetters.append("    public int ").append(sizeOf.getName())
+                            .append("() {\n")
+                            .append("        return " + model.indexSize().value() + ";\n")
+                            .append("    }\n\n");
                 }
                 Method cas = model.cas();
                 if (cas != null) {
@@ -456,7 +469,7 @@ public class DataValueGenerator {
         sb.append("    public int maxSize() {\n");
         sb.append("       return ").append(offset).append(";\n");
         sb.append("    }\n");
-        sb.append(sizeOfMethods);
+
         generateObjectMethods(sb, dvmodel, entries);
         sb.append("}\n");
 //        System.out.println(sb);
@@ -490,6 +503,7 @@ public class DataValueGenerator {
         }else {
             getterSetters.append("    public void ").append(setter.getName()).append("(int i, ");
             getterSetters.append(setterType.getName()).append(" _) {\n");
+            getterSetters.append(boundsCheck(model.indexSize().value()));
             getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME);
             getterSetters.append(" + i*" + ((model.nativeSize() + 7) >> 3) + ", ");
         }
@@ -506,6 +520,7 @@ public class DataValueGenerator {
             getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME).append(");\n");
         }else {
             getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("(int i) {\n");
+            getterSetters.append(boundsCheck(model.indexSize().value()));
             getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME);
             getterSetters.append(" + i*" + ((model.nativeSize() + 7) >> 3));
             getterSetters.append(");\n");
@@ -690,15 +705,6 @@ public class DataValueGenerator {
         return offset;
     }
 
-    private void methodSizeOf(StringBuilder sizeOfMethod, String name, FieldModel model){
-        if(model.isArray()){
-            name = name.substring(0,1).toUpperCase() + name.substring(1,name.length());
-            sizeOfMethod.append("\n    public int sizeOf" + name + "(){\n");
-            sizeOfMethod.append("        return " + model.indexSize().value() + ";\n");
-            sizeOfMethod.append("    }\n\n");
-        }
-    }
-
     private static void methodHeapSet(StringBuilder getterSetters, Method setter, String name, Class type, FieldModel model){
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length-1];
         if(!model.isArray()){
@@ -709,6 +715,7 @@ public class DataValueGenerator {
                 getterSetters.append("        _").append(name).append(" = _;\n");
         }else{
             getterSetters.append("    public void ").append(setter.getName()).append("(int i, ").append(setterType.getName()).append(" _) {\n");
+            getterSetters.append(boundsCheck(model.indexSize().value()));
             if (type == String.class && setterType != String.class)
                 getterSetters.append("        _").append(name).append("[i] = _.toString();\n");
             else
@@ -724,6 +731,7 @@ public class DataValueGenerator {
             getterSetters.append("        return _").append(name).append(";\n");
         }else{
             getterSetters.append("    public ").append(type.getName()).append(' ').append(getter.getName()).append("(int i) {\n");
+            getterSetters.append(boundsCheck(model.indexSize().value()));
             getterSetters.append("        return _").append(name).append("[i];\n");
         }
         getterSetters.append("    }\n\n");
@@ -735,5 +743,11 @@ public class DataValueGenerator {
         }else{
             fieldDeclarations.append("    private ").append(type.getName()).append(" _").append(name).append("[];\n");
         }
+    }
+
+    private static String boundsCheck(int check){
+        String s_check = "        if(i<0) throw new ArrayIndexOutOfBoundsException(i + \" must be greater than 0\");\n";
+        s_check += "        if(i>=" + check + ") throw new ArrayIndexOutOfBoundsException(i + \" must be less than "+ check + "\");\n";
+        return s_check;
     }
 }

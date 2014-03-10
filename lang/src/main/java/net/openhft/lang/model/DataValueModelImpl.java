@@ -89,6 +89,12 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         fm.tryLock(method);
                         break;
                     }
+                    String name6 = getSizeOf(name);
+                    if (name6 != null && returnType == int.class) {
+                        FieldModelImpl fm = acquireField(name6);
+                        fm.sizeOf(method);
+                        break;
+                    }
                     if (returnType == void.class)
                         throw new IllegalArgumentException("void () not supported " + method);
                     String name2 = getGetter(name, returnType);
@@ -165,6 +171,13 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
     private static String getCAS(String name) {
         final int len = 14;
         if (name.length() > len && name.startsWith("compareAndSwap") && Character.isUpperCase(name.charAt(len)))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
+        return null;
+    }
+
+    private static String getSizeOf(String name) {
+        final int len = 6;
+        if (name.length() > len && name.startsWith("sizeOf") && Character.isUpperCase(name.charAt(len)))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1);
         return null;
     }
@@ -278,6 +291,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Method unlock;
         private Method indexedGetter;
         private Method indexedSetter;
+        private Method sizeOf;
         private boolean isArray = false;
 
         public FieldModelImpl(String name) {
@@ -391,6 +405,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         public Method cas() {
             return cas;
+        }
+
+        public void sizeOf(Method method) {
+            sizeOf = method;
+        }
+
+        public Method sizeOf() {
+            return sizeOf;
         }
 
         public void tryLockNanos(Method method) {
