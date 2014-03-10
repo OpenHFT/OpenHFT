@@ -124,7 +124,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         break;
                     }
 
-                    String name6 = getGetter(name, returnType);
+                    String name6 = getGetterAt(name, returnType);
                     if (name6 != null && parameterTypes[0] == int.class && returnType != void.class) {
                         FieldModelImpl fm = acquireField(name6);
                         fm.indexedGetter(method);
@@ -145,7 +145,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         fm.cas(method);
                         break;
                     }
-                    String name3 = getSetter(name);
+                    String name3 = getSetterAt(name);
                     if (name3 != null && parameterTypes[0] == int.class && returnType == void.class) {
                         FieldModelImpl fm = acquireField(name3);
                         fm.indexedSetter(method);
@@ -203,12 +203,28 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         return name;
     }
 
+    private static String getSetterAt(String name) {
+        final int len = 3;
+        final int len2 = 2;
+        if (name.length() > len + len2 && name.startsWith("set") && Character.isUpperCase(name.charAt(len)) && name.endsWith("At"))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1, name.length() - len2);
+        return name;
+    }
+
     private static String getGetter(String name, Class returnType) {
         if (name.length() > 3 && name.startsWith("get") && Character.isUpperCase(name.charAt(3)))
             return Character.toLowerCase(name.charAt(3)) + name.substring(4);
         if ((returnType == boolean.class || returnType == Boolean.class)
                 && name.length() > 2 && name.startsWith("is") && Character.isUpperCase(name.charAt(2)))
             return Character.toLowerCase(name.charAt(2)) + name.substring(3);
+        return name;
+    }
+
+    private static String getGetterAt(String name, Class returnType) {
+        final int len = 3;
+        final int len2 = 2;
+        if (name.length() > len + len2 && name.startsWith("get") && Character.isUpperCase(name.charAt(len)) && name.endsWith("At"))
+            return Character.toLowerCase(name.charAt(len)) + name.substring(4, name.length() - len2);
         return name;
     }
 
@@ -289,8 +305,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Method tryLock;
         private Method busyLock;
         private Method unlock;
-        private Method indexedGetter;
-        private Method indexedSetter;
+        private Method getterAt;
+        private Method setterAt;
         private Method sizeOf;
         private boolean isArray = false;
 
@@ -333,7 +349,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         @Override
         public Class<T> type() {
             return (Class<T>) (getter != null ? getter.getReturnType() :
-                    indexedGetter != null ? indexedGetter.getReturnType() : null);
+                    getterAt != null ? getterAt.getReturnType() : null);
         }
 
         public void adder(Method method) {
@@ -382,12 +398,12 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         public String toString() {
             return "FieldModel{" +
                     "name='" + name + '\'' +
-                    ", getter=" + (indexedGetter != null ? indexedGetter : getter) +
-                    ", setter=" + (indexedSetter != null ? indexedSetter : setter) +
+                    ", getter=" + (getterAt != null ? getterAt : getter) +
+                    ", setter=" + (setterAt != null ? setterAt : setter) +
                     (digits == null ? "" : ", digits= " + digits) +
                     (range == null ? "" : ", range= " + range) +
                     (maxSize == null ? "" : ", size= " + maxSize) +
-                    ((indexedGetter == null && indexedSetter == null) ? "" : ", indexSize= " + indexSize) +
+                    ((getterAt == null && setterAt == null) ? "" : ", indexSize= " + indexSize.toString().replace("@net.openhft.lang.model.constraints.", "")) +
                     '}';
         }
 
@@ -458,17 +474,17 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         public void indexedGetter(Method indexedGetter) {
             isArray = true;
-            this.indexedGetter = indexedGetter;
+            this.getterAt = indexedGetter;
             indexAnnotations(indexedGetter);
         }
 
         public Method indexedGetter() {
-            return indexedGetter;
+            return getterAt;
         }
 
         public void indexedSetter(Method indexedSetter) {
             isArray = true;
-            this.indexedSetter = indexedSetter;
+            this.setterAt = indexedSetter;
             indexAnnotations(indexedSetter);
         }
 
@@ -484,7 +500,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
         public Method indexedSetter() {
-            return indexedSetter;
+            return setterAt;
         }
     }
 }

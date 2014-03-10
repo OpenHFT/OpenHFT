@@ -25,11 +25,11 @@ public interface NestedArrayInterface {
 
     void setText(String text);
 
-    int getInt(int index);
+    int getIntAt(int index);
 
-    void setInt(@MaxSize(16) int index, int value);
+    void setIntAt(@MaxSize(16) int index, int value);
 
-    JavaBeanInterface getJBI(@MaxSize(32) int index);
+    JavaBeanInterface getJBIAt(@MaxSize(32) int index);
 
-    void setJBI(int index, JavaBeanInterface jbi);
+    void setJBIAt(int index, JavaBeanInterface jbi);
 }

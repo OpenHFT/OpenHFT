@@ -50,10 +50,23 @@ public class DataValueModelTest {
                 , jbdvm.fieldMap().toString().replaceAll("},", "}\n"));
 
         DataValueModel<NestedArrayInterface> nais = DataValueModels.acquireModel(NestedArrayInterface.class);
-        assertEquals("{int=FieldModel{name='int', getter=public abstract int net.openhft.lang.model.NestedArrayInterface.getInt(int), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setInt(int,int), indexSize= @net.openhft.lang.model.constraints.MaxSize(value=16)}\n" +
-                " jBI=FieldModel{name='jBI', getter=public abstract net.openhft.lang.model.JavaBeanInterface net.openhft.lang.model.NestedArrayInterface.getJBI(int), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setJBI(int,net.openhft.lang.model.JavaBeanInterface), indexSize= @net.openhft.lang.model.constraints.MaxSize(value=32)}\n" +
+        assertEquals("{int=FieldModel{name='int', getter=public abstract int net.openhft.lang.model.NestedArrayInterface.getIntAt(int), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setIntAt(int,int), indexSize= MaxSize(value=16)}\n" +
+                " jBI=FieldModel{name='jBI', getter=public abstract net.openhft.lang.model.JavaBeanInterface net.openhft.lang.model.NestedArrayInterface.getJBIAt(int), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setJBIAt(int,net.openhft.lang.model.JavaBeanInterface), indexSize= MaxSize(value=32)}\n" +
                 " text=FieldModel{name='text', getter=public abstract java.lang.String net.openhft.lang.model.NestedArrayInterface.getText(), setter=public abstract void net.openhft.lang.model.NestedArrayInterface.setText(java.lang.String)}}"
                 , nais.fieldMap().toString().replaceAll("},", "}\n"));
+
+        DataValueModel<HasArraysInterface> haim = DataValueModels.acquireModel(HasArraysInterface.class);
+        assertEquals("{byte=FieldModel{name='byte', getter=public abstract byte net.openhft.lang.model.HasArraysInterface.getByteAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setByteAt(int,byte), indexSize= MaxSize(value=4)}\n" +
+                " char=FieldModel{name='char', getter=public abstract char net.openhft.lang.model.HasArraysInterface.getCharAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setCharAt(int,char), indexSize= MaxSize(value=4)}\n" +
+                " double=FieldModel{name='double', getter=public abstract double net.openhft.lang.model.HasArraysInterface.getDoubleAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setDoubleAt(int,double), indexSize= MaxSize(value=4)}\n" +
+                " flag=FieldModel{name='flag', getter=public abstract boolean net.openhft.lang.model.HasArraysInterface.getFlagAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setFlagAt(int,boolean), indexSize= MaxSize(value=4)}\n" +
+                " float=FieldModel{name='float', getter=public abstract float net.openhft.lang.model.HasArraysInterface.getFloatAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setFloatAt(int,float), indexSize= MaxSize(value=4)}\n" +
+                " int=FieldModel{name='int', getter=public abstract int net.openhft.lang.model.HasArraysInterface.getIntAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setIntAt(int,int), indexSize= MaxSize(value=4)}\n" +
+                " long=FieldModel{name='long', getter=public abstract long net.openhft.lang.model.HasArraysInterface.getLongAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setLongAt(int,long), indexSize= MaxSize(value=4)}\n" +
+                " short=FieldModel{name='short', getter=public abstract short net.openhft.lang.model.HasArraysInterface.getShortAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setShortAt(int,short), indexSize= MaxSize(value=4)}\n" +
+                " string=FieldModel{name='string', getter=public abstract java.lang.String net.openhft.lang.model.HasArraysInterface.getStringAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setStringAt(int,java.lang.String), indexSize= MaxSize(value=4)}}"
+                , haim.fieldMap().toString().replaceAll("},", "}\n"));
+
 
     }
 }
