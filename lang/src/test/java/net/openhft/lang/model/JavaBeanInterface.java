@@ -24,13 +24,9 @@ import net.openhft.lang.model.constraints.MaxSize;
  * Time: 16:59
  */
 public interface JavaBeanInterface {
-    // TODO remove the need for getter for field "record"
-    int getRecord();
-
-    // TODO remove the need for setter for field "record"
-    void setRecord(int record);
-
     void busyLockRecord() throws InterruptedException;
+
+    boolean tryLockRecord();
 
     void unlockRecord();
 
