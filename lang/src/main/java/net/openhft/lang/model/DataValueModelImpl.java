@@ -157,6 +157,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                 }
             }
         }
+
         for (Map.Entry<String, FieldModelImpl> entry : fieldModelMap.entrySet()) {
             FieldModelImpl model = entry.getValue();
             if (model.getter() == null || (model.setter() == null && model.getter().getReturnType().isPrimitive()))
@@ -319,7 +320,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             return name;
         }
 
-        public boolean isArray(){
+        public boolean isArray() {
             return isArray;
         }
 
@@ -402,6 +403,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     "name='" + name + '\'' +
                     ", getter=" + (getterAt != null ? getterAt : getter) +
                     ", setter=" + (setterAt != null ? setterAt : setter) +
+                    (unlock == null ? "" : ", busyLock=" + busyLock + ", tryLock=" + tryLock + ", unlock=" + unlock) +
                     (digits == null ? "" : ", digits= " + digits) +
                     (range == null ? "" : ", range= " + range) +
                     (maxSize == null ? "" : ", size= " + maxSize) +
