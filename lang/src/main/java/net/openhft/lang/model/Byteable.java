@@ -28,5 +28,7 @@ public interface Byteable {
 
     Bytes bytes();
 
+    long offset();
+
     int maxSize();
 }

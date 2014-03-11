@@ -53,7 +53,7 @@ public class DataValueGenerator {
     private static final Logger LOGGER = Logger.getLogger(DataValueGenerator.class.getName());
     private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
     private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
-    private boolean dumpCode = false;
+    private boolean dumpCode = Boolean.getBoolean("dvg.dumpCode");
 
     private static String bytesType(Class type) {
         if (type.isPrimitive())
@@ -179,14 +179,14 @@ public class DataValueGenerator {
         sb.append(readMarshal);
         sb.append("    }\n");
         if (Byteable.class.isAssignableFrom(dvmodel.type())) {
-            sb.append("    public void bytes(Bytes bytes) {\n");
-            sb.append("       throw new UnsupportedOperationException();\n");
-            sb.append("    }\n");
             sb.append("    public void bytes(Bytes bytes, long l) {\n");
             sb.append("       throw new UnsupportedOperationException();\n");
             sb.append("    }\n");
             sb.append("    public Bytes bytes() {\n");
             sb.append("       return null;\n");
+            sb.append("    }\n");
+            sb.append("    public long offset() {\n");
+            sb.append("       return 0L;\n");
             sb.append("    }\n");
             sb.append("    public int maxSize() {\n");
             sb.append("       throw new UnsupportedOperationException();\n");
@@ -605,29 +605,36 @@ public class DataValueGenerator {
         sb.append(staticFieldDeclarations).append('\n');
         sb.append(fieldDeclarations).append('\n');
         sb.append(getterSetters);
-        sb.append("    public void copyFrom(").append(normalize(dvmodel.type())).append(" from) {\n");
-        sb.append(copy);
-        sb.append("    }\n\n");
-        sb.append("    public void writeMarshallable(Bytes out) {\n");
-        sb.append(writeMarshal);
-        sb.append("    }\n");
-        sb.append("    public void readMarshallable(Bytes in) {\n");
-        sb.append(readMarshal);
-        sb.append("    }\n");
-        sb.append("    public void bytes(Bytes bytes) {\n");
-        sb.append("       bytes(bytes, 0L);\n");
-        sb.append("    }\n");
-        sb.append("    public void bytes(Bytes bytes, long offset) {\n");
-        sb.append("       this._bytes = bytes;\n");
-        sb.append("       this._offset = offset;\n");
-        sb.append(nestedBytes);
-        sb.append("    }\n");
-        sb.append("    public Bytes bytes() {\n");
-        sb.append("       return _bytes;\n");
-        sb.append("    }\n");
-        sb.append("    public int maxSize() {\n");
-        sb.append("       return ").append(offset).append(";\n");
-        sb.append("    }\n");
+        sb.append("    @Override\n")
+                .append("    public void copyFrom(").append(normalize(dvmodel.type())).append(" from) {\n")
+                .append(copy)
+                .append("    }\n\n");
+        sb.append("    @Override\n")
+                .append("    public void writeMarshallable(Bytes out) {\n")
+                .append(writeMarshal)
+                .append("    }\n");
+        sb.append("    @Override\n")
+                .append("    public void readMarshallable(Bytes in) {\n")
+                .append(readMarshal)
+                .append("    }\n");
+        sb.append("    @Override\n")
+                .append("    public void bytes(Bytes bytes, long offset) {\n")
+                .append("       this._bytes = bytes;\n")
+                .append("       this._offset = offset;\n")
+                .append(nestedBytes)
+                .append("    }\n");
+        sb.append("    @Override\n")
+                .append("    public Bytes bytes() {\n")
+                .append("       return _bytes;\n")
+                .append("    }\n");
+        sb.append("    @Override\n")
+                .append("    public long offset() {\n")
+                .append("        return _offset;\n")
+                .append("    }\n");
+        sb.append("    @Override\n")
+                .append("    public int maxSize() {\n")
+                .append("       return ").append(offset).append(";\n")
+                .append("    }\n");
 
         generateObjectMethods(sb, dvmodel, entries);
         sb.append("}\n");

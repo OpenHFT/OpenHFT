@@ -62,7 +62,8 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
     @Override
     public T get(long index) {
         T t = acquire();
-        DirectBytes bytes = (DirectBytes) ((Byteable) t).bytes();
+        Byteable byteable = (Byteable) t;
+        DirectBytes bytes = (DirectBytes) byteable.bytes();
         bytes.positionAndSize(index * size, size);
         return t;
     }
