@@ -53,7 +53,7 @@ public class DataValueGenerator {
     private static final Logger LOGGER = Logger.getLogger(DataValueGenerator.class.getName());
     private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
     private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
-    private boolean dumpCode = true;
+    private boolean dumpCode = false;
 
     private static String bytesType(Class type) {
         if (type.isPrimitive())
