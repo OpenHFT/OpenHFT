@@ -382,15 +382,18 @@ public class DataValueGenerator {
         } else {
             fieldDeclarations.append("    private ").append(normalize(type)).append("[] _").append(name)
                     .append(" = new ").append(normalize(type)).append("[").append(model.indexSize().value()).append("];\n");
-            fieldDeclarations.append("    {\n")
+            if(!type.isPrimitive()){
+                fieldDeclarations.append("    {\n")
                     .append("        for(int i = 0; i < _").append(name).append(".length; i++)\n")
                     .append("            _").append(name).append("[i] = new ").append(type.getName());
-            if (type.isInterface()) {
-                fieldDeclarations.append("£heap();\n");
-            } else {
-                fieldDeclarations.append("();\n");
+
+                if (type.isInterface()) {
+                    fieldDeclarations.append("£heap();\n");
+                } else {
+                    fieldDeclarations.append("();\n");
+                }
+                fieldDeclarations.append("    }");
             }
-            fieldDeclarations.append("    }");
         }
     }
 
@@ -433,7 +436,7 @@ public class DataValueGenerator {
     String generateHeapObject(Class<?> tClass) {
         DataValueModel<?> dvmodel = DataValueModels.acquireModel(tClass);
         for (FieldModel fieldModel : dvmodel.fieldMap().values()) {
-            if (fieldModel.isArray())
+            if (fieldModel.isArray() && !fieldModel.type().isPrimitive())
                 acquireHeapClass(fieldModel.type());
         }
         return generateHeapObject(dvmodel);
