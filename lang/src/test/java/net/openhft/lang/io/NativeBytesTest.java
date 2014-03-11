@@ -924,4 +924,26 @@ public class NativeBytesTest {
             assertEquals(IllegalMonitorStateException.class, e.getCause().getClass());
         }
     }
+
+    @Test
+    public void testToString() {
+        NativeBytes bytes = new DirectStore(32).createSlice();
+        assertEquals("[pos: 0, lim: 32, cap: 32 ] ٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(1);
+        assertEquals("[pos: 1, lim: 32, cap: 32 ] ⒈‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(2);
+        assertEquals("[pos: 2, lim: 32, cap: 32 ] ⒈⒉‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(3);
+        assertEquals("[pos: 3, lim: 32, cap: 32 ] ⒈⒉⒊‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(4);
+        assertEquals("[pos: 4, lim: 32, cap: 32 ] ⒈⒉⒊⒋‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(5);
+        assertEquals("[pos: 5, lim: 32, cap: 32 ] ⒈⒉⒊⒋⒌‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(6);
+        assertEquals("[pos: 6, lim: 32, cap: 32 ] ⒈⒉⒊⒋⒌⒍‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(7);
+        assertEquals("[pos: 7, lim: 32, cap: 32 ] ⒈⒉⒊⒋⒌⒍⒎‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+        bytes.writeByte(8);
+        assertEquals("[pos: 8, lim: 32, cap: 32 ] ⒈⒉⒊⒋⒌⒍⒎⒏‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
+    }
 }
