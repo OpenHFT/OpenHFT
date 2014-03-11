@@ -90,12 +90,14 @@ public class DataValueGenerator {
             final Method setter = getSetter(model);
             final Method getter = getGetter(model);
             if (setter == null) {
-                copy.append("        ((Copyable) ").append(getter.getName()).append("()).copyFrom(from.").append(getter.getName()).append("());\n");
+                if (getter != null)
+                    copy.append("        ((Copyable) ").append(getter.getName()).append("()).copyFrom(from.").append(getter.getName()).append("());\n");
             } else {
                 methodCopy(copy, getter, setter, model);
                 methodHeapSet(getterSetters, setter, name, type, model);
             }
-            methodHeapGet(getterSetters, getter, name, type, model);
+            if (getter != null)
+                methodHeapGet(getterSetters, getter, name, type, model);
 
             Method adder = model.adder();
             if (adder != null) {
