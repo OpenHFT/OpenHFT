@@ -225,6 +225,26 @@ public class DataValueGenerator {
                 methodToString(toString, getterName, name, model);
                 count++;
             }
+
+            if(model.isArray()){
+                String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+                sb.append("\n    public long longHashCode_"+ name + "() {\n" +
+                          "        long hc = 0;\n" +
+                          "        for(int i=0; i<" + model.indexSize().value() + "; i++){\n" +
+                          "            hc += calcLongHashCode(get" + nameWithUpper + "At(i));\n" +
+                          "        }\n" +
+                          "        return hc;\n" +
+                          "    }\n\n");
+
+                sb.append("\n    public String toString_"+ name + "() {\n" +
+                        "        String s = \" , " +  name     + "= [\";\n" +
+                        "        for(int i=0; i<" + model.indexSize().value() + "; i++){\n" +
+                        "            s += \",\" + get" + nameWithUpper + "At(i);\n" +
+                        "        }\n" +
+                        "        s += \"]\";\n" +
+                        "        return s;\n" +
+                        "    }\n\n");
+            }
         }
         sb.append("    public int hashCode() {\n" +
                 "        long lhc = longHashCode();\n" +
@@ -251,8 +271,8 @@ public class DataValueGenerator {
                         "\n" +
                         "    public String toString() {\n" +
                         "        return \"").append(simpleName).append(" {\" +\n")
-                .append(toString.substring(0, toString.length() - 3)).append(";\n")
-                .append("    }");
+                .append(toString.substring(0, toString.length()-3)).append(" + \"}\";\n")
+                .append("    }\n");
 
 
     }
@@ -320,9 +340,7 @@ public class DataValueGenerator {
         if (!model.isArray()) {
             hashCode.append("calcLongHashCode(").append(getterName).append("())");
         } else {
-            //for(int i=0; i<model.indexSize().value(); i++){
-            hashCode.append("calcLongHashCode(").append(getterName).append("(0))");
-            //}
+            hashCode.append("longHashCode_").append(model.name()).append("()");
         }
     }
 
@@ -340,7 +358,7 @@ public class DataValueGenerator {
         if (!model.isArray()) {
             toString.append("            \", ").append(name).append("= \" + ").append(getterName).append("() +\n");
         } else {
-            toString.append("            \", ").append(name).append("= \" + ").append(getterName).append("(0) +\n");
+            toString.append("            ").append("toString_" + name).append("() +\n");
         }
     }
 
