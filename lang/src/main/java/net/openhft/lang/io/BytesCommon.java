@@ -146,4 +146,22 @@ public interface BytesCommon {
      * @return this.
      */
     Bytes load();
+
+
+    /**
+     * Write a portion of the Bytes to an Appendable for printing.
+     *
+     * @param sb       to append to
+     * @param start    first byte
+     * @param position where to place a cursor or 0 = none.
+     * @param end      last byte to append.
+     */
+    void toString(Appendable sb, long start, long position, long end);
+
+    /**
+     * Align the position address to a power of 2.
+     *
+     * @param alignment power of 2 to align to.
+     */
+    void alignPositionAddr(int alignment);
 }

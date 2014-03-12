@@ -522,4 +522,9 @@ public class ByteBufferBytes extends AbstractBytes {
             buffer.get(offset);
         return this;
     }
+
+    public void alignPositionAddr(int powerOf2) {
+        position = (position + powerOf2 - 1) & ~(powerOf2 - 1);
+    }
+
 }

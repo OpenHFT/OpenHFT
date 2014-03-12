@@ -39,6 +39,7 @@ public class MappedStore implements BytesStore {
     private static final int MAP_PV = 2;
 
     // retain to prevent GC.
+    private final File file;
     private final FileChannel fileChannel;
     private final Cleaner cleaner;
     private final long address;
@@ -55,6 +56,7 @@ public class MappedStore implements BytesStore {
             throw new IllegalArgumentException("size: " + size);
         }
 
+        this.file = file;
         this.size = size;
         this.bytesMarshallerFactory = bytesMarshallerFactory;
 
@@ -154,6 +156,10 @@ public class MappedStore implements BytesStore {
         } catch (Exception e) {
             throw wrap(e);
         }
+    }
+
+    public File file() {
+        return null;
     }
 
     static class Unmapper implements Runnable {

@@ -2435,21 +2435,38 @@ public abstract class AbstractBytes implements Bytes {
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
         sb.append("[pos: ").append(position()).append(", lim: ").append(limit()).append(", cap: ").append(capacity()).append(" ] ");
-        // before
-        if (position() > 0) {
-            for (long i = Math.max(position() - 64, 0), end = position(); i < end; i++) {
-                append(sb, i);
-            }
-            sb.append('\u2016');
-        }
-        // after
-        for (long i = position(), end = Math.min(limit(), i + 64); i < end; i++) {
-            append(sb, i);
-        }
+        toString(sb, position() - 64, position(), position() + 64);
+
         return sb.toString();
     }
 
-    private void append(StringBuilder sb, long i) {
+    @Override
+    public void toString(Appendable sb, long start, long position, long end) {
+        try {
+            // before
+            if (start < 0) start = 0;
+            if (position > start) {
+                for (long i = start; i < position; i++) {
+                    append(sb, i);
+                }
+                sb.append('\u2016');
+            }
+            if (end > limit())
+                end = limit();
+            // after
+            for (long i = position; i < end; i++) {
+                append(sb, i);
+            }
+        } catch (IOException e) {
+            try {
+                sb.append(e.toString());
+            } catch (IOException e1) {
+                throw new AssertionError(e);
+            }
+        }
+    }
+
+    private void append(Appendable sb, long i) throws IOException {
         byte b = readByte(i);
         if (b == 0)
             sb.append('\u0660');
