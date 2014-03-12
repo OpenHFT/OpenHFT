@@ -346,6 +346,44 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public long clearNextSetBit(long fromIndex) {
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long fromByteIndex = fromLongIndex << 3;
+        while (true) {
+            long w = bytes.readVolatileLong(fromByteIndex);
+            long l = w >>> fromIndex;
+            if (l != 0) {
+                long indexOfSetBit = fromIndex + Long.numberOfTrailingZeros(l);
+                long mask = 1L << indexOfSetBit;
+                if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
+                    return indexOfSetBit;
+            } else {
+                break;
+            }
+        }
+        longLoop: for (long i = fromLongIndex + 1; i < longLength; i++) {
+            long byteIndex = i << 3;
+            while (true) {
+                long l = bytes.readLong(byteIndex);
+                if (l != 0) {
+                    long indexOfSetBit =
+                            (i << 6) + Long.numberOfTrailingZeros(l);
+                    long mask = 1L << indexOfSetBit;
+                    if (bytes.compareAndSwapLong(byteIndex, l, l ^ mask))
+                        return indexOfSetBit;
+                } else {
+                    continue longLoop;
+                }
+            }
+        }
+        return NOT_FOUND;
+    }
+
+    @Override
     public long nextSetLong(long fromLongIndex) {
         if (fromLongIndex < 0)
             throw new IndexOutOfBoundsException();
@@ -380,18 +418,43 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public long setNFrom(long fromIndex, int numberOfBits) {
-        if (numberOfBits != 1) throw new UnsupportedOperationException("Not yet implemented");
+    public long setNextClearBit(long fromIndex) {
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long fromByteIndex = fromLongIndex << 3;
         while (true) {
-            long fromLongIndex = fromIndex >> 6;
-            if (fromLongIndex >= longLength)
-                return NOT_FOUND;
-            fromIndex = nextClearBit(fromIndex);
-            if (fromIndex == NOT_FOUND)
-                return NOT_FOUND;
-            if (setIfClear(fromIndex))
-                return fromIndex;
+            long w = bytes.readVolatileLong(fromByteIndex);
+            long l = (~w) >>> fromIndex;
+            if (l != 0) {
+                long indexOfClearBit =
+                        fromIndex + Long.numberOfTrailingZeros(l);
+                long mask = 1L << indexOfClearBit;
+                if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
+                    return indexOfClearBit;
+            } else {
+                break;
+            }
         }
+        longLoop: for (long i = fromLongIndex + 1; i < longLength; i++) {
+            long byteIndex = i << 3;
+            while (true) {
+                long w = bytes.readLong(byteIndex);
+                long l = ~w;
+                if (l != 0) {
+                    long indexOfClearBit =
+                            (i << 6) + Long.numberOfTrailingZeros(l);
+                    long mask = 1L << indexOfClearBit;
+                    if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask))
+                        return indexOfClearBit;
+                } else {
+                    continue longLoop;
+                }
+            }
+        }
+        return NOT_FOUND;
     }
 
     @Override
@@ -436,6 +499,49 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public long clearPreviousSetBit(long fromIndex) {
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength) {
+            fromLongIndex = longLength - 1;
+            fromIndex = size() - 1;
+        }
+        long fromByteIndex = fromLongIndex << 3;
+        while (true) {
+            long w = bytes.readVolatileLong(fromByteIndex);
+            long l = w << ~fromIndex;
+            if (l != 0) {
+                long indexOfSetBit = fromIndex - Long.numberOfLeadingZeros(l);
+                long mask = 1L << indexOfSetBit;
+                if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
+                    return indexOfSetBit;
+            } else {
+                break;
+            }
+        }
+        longLoop: for (long i = fromLongIndex - 1; i >= 0; i--) {
+            long byteIndex = i << 3;
+            while (true) {
+                long l = bytes.readLong(byteIndex);
+                if (l != 0) {
+                    long indexOfSetBit =
+                            (i << 6) + 63 - Long.numberOfLeadingZeros(l);
+                    long mask = 1L << indexOfSetBit;
+                    if (bytes.compareAndSwapLong(byteIndex, l, l ^ mask))
+                        return indexOfSetBit;
+                } else {
+                    continue longLoop;
+                }
+            }
+        }
+        return NOT_FOUND;
+    }
+
+    @Override
     public long previousSetLong(long fromLongIndex) {
         if (fromLongIndex < 0) {
             if (fromLongIndex == NOT_FOUND)
@@ -472,6 +578,50 @@ public class ATSDirectBitSet implements DirectBitSet {
             l = ~bytes.readLong(i << 3);
             if (l != 0)
                 return (i << 6) + 63 - Long.numberOfLeadingZeros(l);
+        }
+        return NOT_FOUND;
+    }
+
+    @Override
+    public long setPreviousClearBit(long fromIndex) {
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength) {
+            fromLongIndex = longLength - 1;
+            fromIndex = size() - 1;
+        }
+        long fromByteIndex = fromLongIndex << 3;
+        while (true) {
+            long w = bytes.readVolatileLong(fromByteIndex);
+            long l = (~w) << ~fromIndex;
+            if (l != 0) {
+                long indexOfClearBit = fromIndex - Long.numberOfLeadingZeros(l);
+                long mask = 1L << indexOfClearBit;
+                if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
+                    return indexOfClearBit;
+            } else {
+                break;
+            }
+        }
+        longLoop: for (long i = fromLongIndex - 1; i >= 0; i--) {
+            long byteIndex = i << 3;
+            while (true) {
+                long w = bytes.readLong(byteIndex);
+                long l = ~w;
+                if (l != 0) {
+                    long indexOfClearBit =
+                            (i << 6) + 63 - Long.numberOfLeadingZeros(l);
+                    long mask = 1L << indexOfClearBit;
+                    if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask))
+                        return indexOfClearBit;
+                } else {
+                    continue longLoop;
+                }
+            }
         }
         return NOT_FOUND;
     }
@@ -541,6 +691,401 @@ public class ATSDirectBitSet implements DirectBitSet {
             long l = bytes.readVolatileLong(longIndex << 3);
             long l2 = l & ~value;
             if (bytes.compareAndSwapLong(longIndex << 3, l, l2)) return this;
+        }
+    }
+
+
+    private static long rightShiftOneFill(long l, long shift) {
+        return (l >> shift) | ~((~0L) >>> shift);
+    }
+
+    /**
+     * WARNING! This implementation doesn't strictly follow the contract
+     * from {@code DirectBitSet} interface. For the sake of atomicity this
+     * implementation couldn't find and flip the range crossing native word
+     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     *
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long setNextNContinuousClearBits(long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return setNextClearBit(fromIndex);
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+
+        int n64Complement = 64 - numberOfBits;
+        long nTrailingOnes = (~0L) >>> n64Complement;
+
+        long bitIndex = fromIndex;
+        long longIndex = bitIndex >> 6;
+        long byteIndex = longIndex << 3;
+        long w, l;
+        if ((bitIndex & 63) > n64Complement) {
+            if (++longIndex >= longLength)
+                return NOT_FOUND;
+            byteIndex += 8;
+            bitIndex = longIndex << 6;
+            l = w = bytes.readVolatileLong(byteIndex);
+        } else {
+            if (longIndex >= longLength)
+                return NOT_FOUND;
+            w = bytes.readVolatileLong(byteIndex);
+            l = rightShiftOneFill(w, bitIndex);
+        }
+        // long loop
+        while (true) {
+            continueLongLoop: {
+                // (1)
+                if ((l & 1) != 0) {
+                    long x = ~l;
+                    if (x != 0) {
+                        int trailingOnes = Long.numberOfTrailingZeros(x);
+                        bitIndex += trailingOnes;
+                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        if ((bitIndex & 63) > n64Complement)
+                            break continueLongLoop;
+                        // (2)
+                        l = rightShiftOneFill(l, trailingOnes);
+                    } else {
+                        // all bits are ones, go to the next long
+                        break continueLongLoop;
+                    }
+                }
+                // bit search within a long
+                while (true) {
+                    // CAS retry loop
+                    while ((l & nTrailingOnes) == 0) {
+                        long mask = nTrailingOnes << bitIndex;
+                        if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
+                            return bitIndex;
+                        } else {
+                            w = bytes.readLong(byteIndex);
+                            l = rightShiftOneFill(w, bitIndex);
+                        }
+                    }
+                    // n > trailing zeros > 0
+                    // > 0 ensured by block (1)
+                    int trailingZeros = Long.numberOfTrailingZeros(l);
+                    bitIndex += trailingZeros;
+                    // (3)
+                    l = rightShiftOneFill(l, trailingZeros);
+
+                    long x = ~l;
+                    if (x != 0) {
+                        int trailingOnes = Long.numberOfTrailingZeros(x);
+                        bitIndex += trailingOnes;
+                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        if ((bitIndex & 63) > n64Complement)
+                            break continueLongLoop;
+                        // already shifted with one-filling at least once
+                        // at (2) or (3), => garanteed highest bit is 1 =>
+                        // "natural" one-filling
+                        l >>= trailingOnes;
+                    } else {
+                        // zeros in this long exhausted, go to the next long
+                        break continueLongLoop;
+                    }
+                }
+            }
+            if (++longIndex >= longLength)
+                return NOT_FOUND;
+            byteIndex += 8;
+            bitIndex = longIndex << 6;
+            l = w = bytes.readLong(byteIndex);
+        }
+    }
+
+    /**
+     * WARNING! This implementation doesn't strictly follow the contract
+     * from {@code DirectBitSet} interface. For the sake of atomicity this
+     * implementation couldn't find and flip the range crossing native word
+     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     *
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long clearNextNContinuousSetBits(long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return clearNextSetBit(fromIndex);
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+
+        int n64Complement = 64 - numberOfBits;
+        long nTrailingOnes = (~0L) >>> n64Complement;
+
+        long bitIndex = fromIndex;
+        long longIndex = bitIndex >> 6;
+        long byteIndex = longIndex << 3;
+        long w, l;
+        if ((bitIndex & 63) > n64Complement) {
+            if (++longIndex >= longLength)
+                return NOT_FOUND;
+            byteIndex += 8;
+            bitIndex = longIndex << 6;
+            l = w = bytes.readVolatileLong(byteIndex);
+        } else {
+            if (longIndex >= longLength)
+                return NOT_FOUND;
+            w = bytes.readVolatileLong(byteIndex);
+            l = w >>> bitIndex;
+        }
+        // long loop
+        while (true) {
+            continueLongLoop: {
+                if ((l & 1) == 0) {
+                    if (l != 0) {
+                        int trailingZeros = Long.numberOfTrailingZeros(l);
+                        bitIndex += trailingZeros;
+                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        if ((bitIndex & 63) > n64Complement)
+                            break continueLongLoop;
+                        l >>>= trailingZeros;
+                    } else {
+                        // all bits are zeros, go to the next long
+                        break continueLongLoop;
+                    }
+                }
+                // bit search within a long
+                while (true) {
+                    // CAS retry loop
+                    while (((~l) & nTrailingOnes) == 0) {
+                        long mask = nTrailingOnes << bitIndex;
+                        if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
+                            return bitIndex;
+                        } else {
+                            w = bytes.readLong(byteIndex);
+                            l = w >>> bitIndex;
+                        }
+                    }
+                    // n > trailing ones > 0
+                    int trailingOnes = Long.numberOfTrailingZeros(~l);
+                    bitIndex += trailingOnes;
+                    l >>>= trailingOnes;
+
+                    if (l != 0) {
+                        int trailingZeros = Long.numberOfTrailingZeros(l);
+                        bitIndex += trailingZeros;
+                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        if ((bitIndex & 63) > n64Complement)
+                            break continueLongLoop;
+                        l >>>= trailingZeros;
+                    } else {
+                        // ones in this long exhausted, go to the next long
+                        break continueLongLoop;
+                    }
+                }
+            }
+            if (++longIndex >= longLength)
+                return NOT_FOUND;
+            byteIndex += 8;
+            bitIndex = longIndex << 6;
+            l = w = bytes.readLong(byteIndex);
+        }
+    }
+
+    private static long leftShiftOneFill(long l, long shift) {
+        return (l << shift) | ((1L << shift) - 1L);
+    }
+
+    /**
+     * WARNING! This implementation doesn't strictly follow the contract
+     * from {@code DirectBitSet} interface. For the sake of atomicity this
+     * implementation couldn't find and flip the range crossing native word
+     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     *
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long setPreviousNContinuousClearBits(
+            long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return setPreviousClearBit(fromIndex);
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+
+        int numberOfBitsMinusOne = numberOfBits - 1;
+        long nLeadingOnes = (~0L) << (64 - numberOfBits);
+
+        long bitIndex = fromIndex;
+        long longIndex = bitIndex >> 6;
+        if (longIndex >= longLength) {
+            longIndex = longLength - 1;
+            bitIndex = (longIndex << 6) + 63;
+        }
+        long byteIndex = longIndex << 3;
+        long w, l;
+        if ((bitIndex & 63) < numberOfBitsMinusOne) {
+            if (--longIndex < 0)
+                return NOT_FOUND;
+            byteIndex -= 8;
+            bitIndex = (longIndex << 6) + 63;
+            l = w = bytes.readVolatileLong(byteIndex);
+        } else {
+            w = bytes.readVolatileLong(byteIndex);
+            // left shift by ~bitIndex === left shift by (63 - (bitIndex & 63))
+            l = leftShiftOneFill(w, ~bitIndex);
+        }
+        // long loop
+        while (true) {
+            continueLongLoop: {
+                if (l < 0) { // condition means the highest bit is one
+                    long x = ~l;
+                    if (x != 0) {
+                        int leadingOnes = Long.numberOfLeadingZeros(x);
+                        bitIndex -= leadingOnes;
+                        if ((bitIndex & 63) < numberOfBitsMinusOne)
+                            break continueLongLoop;
+                        l = leftShiftOneFill(l, leadingOnes);
+                    } else {
+                        // all bits are ones, go to the next long
+                        break continueLongLoop;
+                    }
+                }
+                // bit search within a long
+                while (true) {
+                    // CAS retry loop
+                    while ((l & nLeadingOnes) == 0) {
+                        // >>> ~bitIndex === >>> (63 - (butIndex & 63))
+                        long mask = nLeadingOnes >>> ~bitIndex;
+                        if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
+                            return bitIndex - numberOfBitsMinusOne;
+                        } else {
+                            w = bytes.readLong(byteIndex);
+                            l = leftShiftOneFill(w, ~bitIndex);
+                        }
+                    }
+                    // n > leading zeros > 0
+                    int leadingZeros = Long.numberOfLeadingZeros(l);
+                    bitIndex -= leadingZeros;
+                    l = leftShiftOneFill(l, leadingZeros);
+
+                    long x = ~l;
+                    if (x != 0) {
+                        int leadingOnes = Long.numberOfLeadingZeros(x);
+                        bitIndex -= leadingOnes;
+                        if ((bitIndex & 63) < numberOfBitsMinusOne)
+                            break continueLongLoop;
+                        l = leftShiftOneFill(l, leadingOnes);
+                    } else {
+                        // zeros in this long exhausted, go to the next long
+                        break continueLongLoop;
+                    }
+                }
+            }
+            if (--longIndex < 0)
+                return NOT_FOUND;
+            byteIndex -= 8;
+            bitIndex = (longIndex << 6) + 63;
+            l = w = bytes.readLong(byteIndex);
+        }
+    }
+
+    /**
+     * WARNING! This implementation doesn't strictly follow the contract
+     * from {@code DirectBitSet} interface. For the sake of atomicity this
+     * implementation couldn't find and flip the range crossing native word
+     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     *
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long clearPreviousNContinuousSetBits(
+            long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return clearPreviousSetBit(fromIndex);
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+
+        int numberOfBitsMinusOne = numberOfBits - 1;
+        long nLeadingOnes = (~0L) << (64 - numberOfBits);
+
+        long bitIndex = fromIndex;
+        long longIndex = bitIndex >> 6;
+        if (longIndex >= longLength) {
+            longIndex = longLength - 1;
+            bitIndex = (longIndex << 6) + 63;
+        }
+        long byteIndex = longIndex << 3;
+        long w, l;
+        if ((bitIndex & 63) < numberOfBitsMinusOne) {
+            if (--longIndex < 0)
+                return NOT_FOUND;
+            byteIndex -= 8;
+            bitIndex = (longIndex << 6) + 63;
+            l = w = bytes.readVolatileLong(byteIndex);
+        } else {
+            w = bytes.readVolatileLong(byteIndex);
+            // << ~bitIndex === << (63 - (bitIndex & 63))
+            l = w << ~bitIndex;
+        }
+        // long loop
+        while (true) {
+            continueLongLoop: {
+                // condition means the highest bit is zero, but not all
+                if (l > 0) {
+                    int leadingZeros = Long.numberOfLeadingZeros(l);
+                    bitIndex -= leadingZeros;
+                    if ((bitIndex & 63) < numberOfBitsMinusOne)
+                        break continueLongLoop;
+                    l <<= leadingZeros;
+                } else if (l == 0) {
+                    // all bits are zeros, go to the next long
+                    break continueLongLoop;
+                }
+                // bit search within a long
+                while (true) {
+                    // CAS retry loop
+                    while (((~l) & nLeadingOnes) == 0) {
+                        // >>> ~bitIndex === >>> (63 - (butIndex & 63))
+                        long mask = nLeadingOnes >>> ~bitIndex;
+                        if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
+                            return bitIndex - numberOfBitsMinusOne;
+                        } else {
+                            w = bytes.readLong(byteIndex);
+                            l = w << ~bitIndex;
+                        }
+                    }
+                    // n > leading ones > 0
+                    int leadingOnes = Long.numberOfLeadingZeros(~l);
+                    bitIndex -= leadingOnes;
+                    l <<= leadingOnes;
+
+                    if (l != 0) {
+                        int leadingZeros = Long.numberOfLeadingZeros(l);
+                        bitIndex -= leadingZeros;
+                        if ((bitIndex & 63) < numberOfBitsMinusOne)
+                            break continueLongLoop;
+                        l <<= leadingZeros;
+                    } else {
+                        // ones in this long exhausted, go to the next long
+                        break continueLongLoop;
+                    }
+                }
+            }
+            if (--longIndex < 0)
+                return NOT_FOUND;
+            byteIndex -= 8;
+            bitIndex = (longIndex << 6) + 63;
+            l = w = bytes.readLong(byteIndex);
         }
     }
 }

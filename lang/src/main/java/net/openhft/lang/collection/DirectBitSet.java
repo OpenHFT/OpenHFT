@@ -185,6 +185,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * @return the index of the next set bit, or {@code -1} if there
      * is no such bit
      * @throws IndexOutOfBoundsException if the specified index is negative
+     * @see #clearNextSetBit(long)
      */
     long nextSetBit(long fromIndex);
 
@@ -209,6 +210,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * @return the index of the next zeroOut bit,
      * or {@code -1} if there is no such bit
      * @throws IndexOutOfBoundsException if the specified index is negative
+     * @see #setNextClearBit(long)
      */
     long nextClearBit(long fromIndex);
 
@@ -243,6 +245,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * is no such bit
      * @throws IndexOutOfBoundsException if the specified index is less
      *                                   than {@code -1}
+     * @see #clearPreviousSetBit(long)
      */
     long previousSetBit(long fromIndex);
 
@@ -271,6 +274,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * is no such bit
      * @throws IndexOutOfBoundsException if the specified index is less
      *                                   than {@code -1}
+     * @see #setPreviousClearBit(long)
      */
     long previousClearBit(long fromIndex);
 
@@ -342,10 +346,138 @@ public interface DirectBitSet extends ReferenceCounted {
     DirectBitSet andNot(long longIndex, long value);
 
     /**
-     * Set a cleared bit and return which bit was set.
+     * Finds and sets to {@code true} the first bit that is set to {@code false}
+     * that occurs on or after the specified starting index. If no such
+     * bit exists then {@code -1} is returned.
      *
-     * @param fromIndex first bit to search from
-     * @return the bit set.
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the next zeroOut bit,
+     * or {@code -1} if there is no such bit
+     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @see #nextClearBit(long)
      */
-    long setNFrom(long fromIndex, int numberOfBits);
+    long setNextClearBit(long fromIndex);
+
+    /**
+     * Finds and clears the first bit that is set to {@code true}
+     * that occurs on or after the specified starting index. If no such
+     * bit exists then {@code -1} is returned.
+     *
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the next set bit, or {@code -1} if there
+     * is no such bit
+     * @throws IndexOutOfBoundsException if the specified index is negative
+     * @see #nextSetBit(long)
+     */
+    long clearNextSetBit(long fromIndex);
+
+    /**
+     * Finds and sets to {@code true} the nearest bit that is set
+     * to {@code false} that occurs on or before the specified starting index.
+     * If no such bit exists, or if {@code -1} is given as the
+     * starting index, then {@code -1} is returned.
+     *
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the previous zeroOut bit, or {@code -1} if there
+     * is no such bit
+     * @throws IndexOutOfBoundsException if the specified index is less
+     *                                   than {@code -1}
+     * @see #previousClearBit(long)
+     */
+    long setPreviousClearBit(long fromIndex);
+
+    /**
+     * Finds and clears the nearest bit that is set to {@code true}
+     * that occurs on or before the specified starting index.
+     * If no such bit exists, or if {@code -1} is given as the
+     * starting index, then {@code -1} is returned.
+     *
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the previous set bit, or {@code -1} if there
+     * is no such bit
+     * @throws IndexOutOfBoundsException if the specified index is less
+     *                                   than {@code -1}
+     * @see #previousSetBit(long)
+     */
+    long clearPreviousSetBit(long fromIndex);
+
+    /**
+     * Finds the next {@code numberOfBits} consecutive bits set to {@code false},
+     * starting from the specified {@code fromIndex}. Then all bits of the found
+     * range are set to {@code true}. The first index of the found block
+     * is returned. If there is no such range of clear bits, {@code -1}
+     * is returned.
+     *
+     * <p>{@code fromIndex} could be the first index of the found range, thus
+     * {@code setNextNContinuousClearBits(i, 1)} is exact equivalent of
+     * {@code setNextClearBit(i)}.
+     *
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the first bit in the found range of clear bits,
+     * or {@code -1} if there is no such range
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     */
+    long setNextNContinuousClearBits(long fromIndex, int numberOfBits);
+
+    /**
+     * Finds the next {@code numberOfBits} consecutive bits set to {@code true},
+     * starting from the specified {@code fromIndex}. Then all bits of the found
+     * range are set to {@code false}. The first index of the found block
+     * is returned. If there is no such range of {@code true} bits, {@code -1}
+     * is returned.
+     *
+     * <p>{@code fromIndex} could be the first index of the found range, thus
+     * {@code clearNextNContinuousSetBits(i, 1)} is exact equivalent of
+     * {@code clearNextSetBit(i)}.
+     *
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the first bit in the found range
+     * of {@code true} bits, or {@code -1} if there is no such range
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     */
+    long clearNextNContinuousSetBits(long fromIndex, int numberOfBits);
+
+    /**
+     * Finds the previous {@code numberOfBits} consecutive bits
+     * set to {@code false}, starting from the specified {@code fromIndex}.
+     * Then all bits of the found range are set to {@code true}.
+     * The first index of the found block is returned. If there is no such
+     * range of clear bits, or if {@code -1} is given as the starting index,
+     * {@code -1} is returned.
+     *
+     * <p>{@code fromIndex} could be the last index of the found range, thus
+     * {@code setPreviousNContinuousClearBits(i, 1)} is exact equivalent of
+     * {@code setPreviousClearBit(i)}.
+     *
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the first bit in the found range of clear bits,
+     * or {@code -1} if there is no such range
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is less
+     *                                   than {@code -1}
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     */
+    long setPreviousNContinuousClearBits(long fromIndex, int numberOfBits);
+
+    /**
+     * Finds the previous {@code numberOfBits} consecutive bits
+     * set to {@code true}, starting from the specified {@code fromIndex}.
+     * Then all bits of the found range are set to {@code false}.
+     * The first index of the found block is returned. If there is no such
+     * range of {@code true} bits, or if {@code -1} is given as the starting
+     * index, {@code -1} is returned.
+     *
+     * <p>{@code fromIndex} could be the last index of the found range, thus
+     * {@code clearPreviousNContinuousSetBits(i, 1)} is exact equivalent of
+     * {@code clearPreviousSetBit(i)}.
+     *
+     * @param fromIndex the index to start checking from (inclusive)
+     * @return the index of the first bit in the found range
+     * of {@code true} bits, or {@code -1} if there is no such range
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is less
+     *                                   than {@code -1}
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     */
+    long clearPreviousNContinuousSetBits(long fromIndex, int numberOfBits);
 }

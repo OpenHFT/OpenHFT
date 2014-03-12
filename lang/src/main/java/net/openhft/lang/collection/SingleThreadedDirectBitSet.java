@@ -301,6 +301,35 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public long clearNextSetBit(long fromIndex) {
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long fromByteIndex = fromLongIndex << 3;
+        long w = bytes.readLong(fromByteIndex);
+        long l = w >>> fromIndex;
+        if (l != 0) {
+            long indexOfSetBit = fromIndex + Long.numberOfTrailingZeros(l);
+            long mask = 1L << indexOfSetBit;
+            bytes.writeLong(fromByteIndex, w ^ mask);
+            return indexOfSetBit;
+        }
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
+            long byteIndex = i << 3;
+            l = bytes.readLong(byteIndex);
+            if (l != 0) {
+                long indexOfSetBit = (i << 6) + Long.numberOfTrailingZeros(l);
+                long mask = 1L << indexOfSetBit;
+                bytes.writeLong(byteIndex, l ^ mask);
+                return indexOfSetBit;
+            }
+        }
+        return NOT_FOUND;
+    }
+
+    @Override
     public long nextSetLong(long fromLongIndex) {
         if (fromLongIndex < 0)
             throw new IndexOutOfBoundsException();
@@ -335,19 +364,33 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public long setNFrom(long fromIndex, int numberOfBits) {
-        if (numberOfBits != 1) throw new UnsupportedOperationException("Not yet implemented");
-
-        while (true) {
-            long fromLongIndex = fromIndex >> 6;
-            if (fromLongIndex >= longLength)
-                return NOT_FOUND;
-            fromIndex = nextClearBit(fromIndex);
-            if (fromIndex == NOT_FOUND)
-                return NOT_FOUND;
-            if (setIfClear(fromIndex))
-                return fromIndex;
+    public long setNextClearBit(long fromIndex) {
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength)
+            return NOT_FOUND;
+        long fromByteIndex = fromLongIndex << 3;
+        long w = bytes.readLong(fromByteIndex);
+        long l = (~w) >>> fromIndex;
+        if (l != 0) {
+            long indexOfClearBit = fromIndex + Long.numberOfTrailingZeros(l);
+            long mask = 1L << indexOfClearBit;
+            bytes.writeLong(fromByteIndex, w ^ mask);
+            return indexOfClearBit;
         }
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
+            long byteIndex = i << 3;
+            w = bytes.readLong(byteIndex);
+            l = ~w;
+            if (l != 0) {
+                long indexOfClearBit = (i << 6) + Long.numberOfTrailingZeros(l);
+                long mask = 1L << indexOfClearBit;
+                bytes.writeLong(byteIndex, w ^ mask);
+                return indexOfClearBit;
+            }
+        }
+        return NOT_FOUND;
     }
 
     @Override
@@ -392,6 +435,41 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public long clearPreviousSetBit(long fromIndex) {
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength) {
+            fromLongIndex = longLength - 1;
+            fromIndex = size() - 1;
+        }
+        long fromByteIndex = fromLongIndex << 3;
+        long w = bytes.readLong(fromByteIndex);
+        long l = w << ~fromIndex;
+        if (l != 0) {
+            long indexOfSetBit = fromIndex - Long.numberOfLeadingZeros(l);
+            long mask = 1L << indexOfSetBit;
+            bytes.writeLong(fromByteIndex, w ^ mask);
+            return indexOfSetBit;
+        }
+        for (long i = fromLongIndex - 1; i >= 0; i--) {
+            long byteIndex = i << 3;
+            l = bytes.readLong(byteIndex);
+            if (l != 0) {
+                long indexOfSetBit =
+                        (i << 6) + 63 - Long.numberOfLeadingZeros(l);
+                long mask = 1L << indexOfSetBit;
+                bytes.writeLong(byteIndex, l ^ mask);
+                return indexOfSetBit;
+            }
+        }
+        return NOT_FOUND;
+    }
+
+    @Override
     public long previousSetLong(long fromLongIndex) {
         if (fromLongIndex < 0) {
             if (fromLongIndex == NOT_FOUND)
@@ -428,6 +506,42 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             l = ~bytes.readLong(i << 3);
             if (l != 0)
                 return (i << 6) + 63 - Long.numberOfLeadingZeros(l);
+        }
+        return NOT_FOUND;
+    }
+
+    @Override
+    public long setPreviousClearBit(long fromIndex) {
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+        long fromLongIndex = fromIndex >> 6;
+        if (fromLongIndex >= longLength) {
+            fromLongIndex = longLength - 1;
+            fromIndex = size() - 1;
+        }
+        long fromByteIndex = fromLongIndex << 3;
+        long w = bytes.readLong(fromByteIndex);
+        long l = (~w) << ~fromIndex;
+        if (l != 0) {
+            long indexOfClearBit = fromIndex - Long.numberOfLeadingZeros(l);
+            long mask = 1L << indexOfClearBit;
+            bytes.writeLong(fromByteIndex, w ^ mask);
+            return indexOfClearBit;
+        }
+        for (long i = fromLongIndex - 1; i >= 0; i--) {
+            long byteIndex = i << 3;
+            w = bytes.readLong(byteIndex);
+            l = ~w;
+            if (l != 0) {
+                long indexOfClearBit =
+                        (i << 6) + 63 - Long.numberOfLeadingZeros(l);
+                long mask = 1L << indexOfClearBit;
+                bytes.writeLong(byteIndex, w ^ mask);
+                return indexOfClearBit;
+            }
         }
         return NOT_FOUND;
     }
@@ -496,4 +610,446 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         return this;
     }
 
+    /**
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long setNextNContinuousClearBits(long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return setNextClearBit(fromIndex);
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+
+        long nTrailingOnes = (~0L) >>> (64 - numberOfBits);
+
+        long bitIndex = fromIndex;
+        long longIndex2 = bitIndex >> 6;
+        if (longIndex2 >= longLength)
+            return NOT_FOUND;
+        int bitsFromFirstWord = 64 - (((int) bitIndex) & 63);
+        long byteIndex2 = longIndex2 << 3;
+        long w1, w2 = bytes.readLong(byteIndex2);
+        longLoop: while (true) {
+            w1 = w2;
+            byteIndex2 += 8;
+            if (++longIndex2 < longLength) {
+                w2 = bytes.readLong(byteIndex2);
+            } else if (longIndex2 == longLength) {
+                w2 = ~0L;
+            } else {
+                return NOT_FOUND;
+            }
+            long l;
+            // (1)
+            if (bitsFromFirstWord != 64) {
+                l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+            } else {
+                // special case, because if bitsFromFirstWord is 64
+                // w2 shift is overflowed
+                l = w1;
+            }
+            // (2)
+            if ((l & 1) != 0) {
+                long x = ~l;
+                if (x != 0) {
+                    int trailingOnes = Long.numberOfTrailingZeros(x);
+                    bitIndex += trailingOnes;
+                    // (3)
+                    if ((bitsFromFirstWord -= trailingOnes) <= 0) {
+                        bitsFromFirstWord += 64;
+                        continue; // long loop
+                    }
+                    l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+                } else {
+                    // all bits are ones, skip a whole word,
+                    // bitsFromFirstWord not changed
+                    bitIndex += 64;
+                    continue; // long loop
+                }
+            }
+            while (true) {
+                if ((l & nTrailingOnes) == 0) {
+                    long mask1 = nTrailingOnes << bitIndex;
+                    bytes.writeLong(byteIndex2 - 8, w1 ^ mask1);
+                    int bitsFromSecondWordToSwitch =
+                            numberOfBits - bitsFromFirstWord;
+                    if (bitsFromSecondWordToSwitch > 0) {
+                        long mask2 = (1L << bitsFromSecondWordToSwitch) - 1;
+                        bytes.writeLong(byteIndex2, w2 ^ mask2);
+                    }
+                    return bitIndex;
+                }
+                // n > trailing zeros > 0
+                // > 0 ensured by block (2)
+                int trailingZeros = Long.numberOfTrailingZeros(l);
+                bitIndex += trailingZeros;
+                // (4)
+                if ((bitsFromFirstWord -= trailingZeros) <= 0) {
+                    bitsFromFirstWord += 64;
+                    continue longLoop;
+                }
+                // (5)
+                // subtractions (3) and (4) together ensure that
+                // bitsFromFirstWord != 64, => no need in condition like (1)
+                l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
+                long x = ~l;
+                if (x != 0) {
+                    int trailingOnes = Long.numberOfTrailingZeros(x);
+                    bitIndex += trailingOnes;
+                    if ((bitsFromFirstWord -= trailingOnes) <= 0) {
+                        bitsFromFirstWord += 64;
+                        continue longLoop;
+                    }
+                    // same as (5)
+                    l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+                } else {
+                    // all bits are ones, skip a whole word,
+                    // bitsFromFirstWord not changed
+                    bitIndex += 64;
+                    continue longLoop;
+                }
+            }
+        }
+    }
+
+    /**
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long clearNextNContinuousSetBits(long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return clearNextSetBit(fromIndex);
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException();
+
+        long nTrailingOnes = (~0L) >>> (64 - numberOfBits);
+
+        long bitIndex = fromIndex;
+        long longIndex2 = bitIndex >> 6;
+        if (longIndex2 >= longLength)
+            return NOT_FOUND;
+        int bitsFromFirstWord = 64 - (((int) bitIndex) & 63);
+        long byteIndex2 = longIndex2 << 3;
+        long w1, w2 = bytes.readLong(byteIndex2);
+        longLoop: while (true) {
+            w1 = w2;
+            byteIndex2 += 8;
+            if (++longIndex2 < longLength) {
+                w2 = bytes.readLong(byteIndex2);
+            } else if (longIndex2 == longLength) {
+                w2 = 0L;
+            } else {
+                return NOT_FOUND;
+            }
+            long l;
+            // (1)
+            if (bitsFromFirstWord != 64) {
+                l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+            } else {
+                // special case, because if bitsFromFirstWord is 64
+                // w2 shift is overflowed
+                l = w1;
+            }
+            // (2)
+            if ((l & 1) == 0) {
+                if (l != 0) {
+                    int trailingZeros = Long.numberOfTrailingZeros(l);
+                    bitIndex += trailingZeros;
+                    // (3)
+                    if ((bitsFromFirstWord -= trailingZeros) <= 0) {
+                        bitsFromFirstWord += 64;
+                        continue; // long loop
+                    }
+                    l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+                } else {
+                    // all bits are zeros, skip a whole word,
+                    // bitsFromFirstWord not changed
+                    bitIndex += 64;
+                    continue; // long loop
+                }
+            }
+            while (true) {
+                if (((~l) & nTrailingOnes) == 0) {
+                    long mask1 = nTrailingOnes << bitIndex;
+                    bytes.writeLong(byteIndex2 - 8, w1 ^ mask1);
+                    int bitsFromSecondWordToSwitch =
+                            numberOfBits - bitsFromFirstWord;
+                    if (bitsFromSecondWordToSwitch > 0) {
+                        long mask2 = (1L << bitsFromSecondWordToSwitch) - 1;
+                        bytes.writeLong(byteIndex2, w2 ^ mask2);
+                    }
+                    return bitIndex;
+                }
+                // n > trailing ones > 0
+                // > 0 ensured by block (2)
+                int trailingOnes = Long.numberOfTrailingZeros(~l);
+                bitIndex += trailingOnes;
+                // (4)
+                if ((bitsFromFirstWord -= trailingOnes) <= 0) {
+                    bitsFromFirstWord += 64;
+                    continue longLoop;
+                }
+                // (5)
+                // subtractions (3) and (4) together ensure that
+                // bitsFromFirstWord != 64, => no need in condition like (1)
+                l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
+                if (l != 0) {
+                    int trailingZeros = Long.numberOfTrailingZeros(l);
+                    bitIndex += trailingZeros;
+                    if ((bitsFromFirstWord -= trailingZeros) <= 0) {
+                        bitsFromFirstWord += 64;
+                        continue longLoop;
+                    }
+                    // same as (5)
+                    l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+                } else {
+                    // all bits are zeros, skip a whole word,
+                    // bitsFromFirstWord not changed
+                    bitIndex += 64;
+                    continue longLoop;
+                }
+            }
+        }
+    }
+
+    /**
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long setPreviousNContinuousClearBits(
+            long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return setPreviousClearBit(fromIndex);
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+
+        int n64Complement = 64 - numberOfBits;
+        long nLeadingOnes = (~0L) << n64Complement;
+
+        long higherBitBound = fromIndex + 1;
+        long lowLongIndex = fromIndex >> 6;
+        if (lowLongIndex >= longLength) {
+            lowLongIndex = longLength - 1;
+            higherBitBound = longLength << 6;
+        }
+        int bitsFromLowWord = (64 - (((int) higherBitBound) & 63)) & 63;
+        long lowByteIndex = lowLongIndex << 3;
+        // low word, high word
+        long hw, lw = bytes.readLong(lowByteIndex);
+        longLoop: while (true) {
+            hw = lw;
+            lowByteIndex -= 8;
+            if (--lowLongIndex >= 0) {
+                lw = bytes.readLong(lowByteIndex);
+            } else if (lowLongIndex == -1) {
+                lw = ~0L;
+            } else {
+                return NOT_FOUND;
+            }
+            long l;
+            if (bitsFromLowWord != 0) { // (1)
+                l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+            } else {
+                // all bits from high word, special case needed because
+                // higherBitBound is multiple of 64 and lw not shifted away
+                l = hw;
+            }
+            // (2)
+            if (l < 0) { // condition means the highest bit is one
+                long x = ~l;
+                if (x != 0) {
+                    int leadingOnes = Long.numberOfLeadingZeros(x);
+                    higherBitBound -= leadingOnes;
+                    bitsFromLowWord += leadingOnes; // (3)
+                    int flw;
+                    if ((flw = bitsFromLowWord - 64) >= 0) {
+                        bitsFromLowWord = flw;
+                        continue; // long loop
+                    }
+                    l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+                } else {
+                    // all bits are ones, skip a whole word,
+                    // bitsFromLowWord not changed
+                    higherBitBound -= 64;
+                    continue; // long loop
+                }
+            }
+            while (true) {
+                if ((l & nLeadingOnes) == 0) {
+                    long hMask = nLeadingOnes >>> bitsFromLowWord;
+                    bytes.writeLong(lowByteIndex + 8, hw ^ hMask);
+                    // bitsFromLow - (64 - n) = n - (64 - bitsFromLow) =
+                    // = n - bitsFromHigh
+                    int bitsFromLowWordToSwitch =
+                            bitsFromLowWord - n64Complement;
+                    if (bitsFromLowWordToSwitch > 0) {
+                        long lMask = ~((~0L) >>> bitsFromLowWordToSwitch);
+                        bytes.writeLong(lowByteIndex, lw ^ lMask);
+                    }
+                    return higherBitBound - numberOfBits;
+                }
+                // n > leading zeros > 0
+                // > 0 ensured by block (2)
+                int leadingZeros = Long.numberOfLeadingZeros(l);
+                higherBitBound -= leadingZeros;
+                bitsFromLowWord += leadingZeros; // (4)
+                int flw;
+                if ((flw = bitsFromLowWord - 64) >= 0) {
+                    bitsFromLowWord = flw;
+                    continue longLoop;
+                }
+                // (5)
+                // additions (3) and (4) together ensure that
+                // bitsFromFirstWord > 0, => no need in condition like (1)
+                l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
+                long x = ~l;
+                if (x != 0) {
+                    int leadingOnes = Long.numberOfLeadingZeros(x);
+                    higherBitBound -= leadingOnes;
+                    bitsFromLowWord += leadingOnes;
+                    if ((flw = bitsFromLowWord - 64) >= 0) {
+                        bitsFromLowWord = flw;
+                        continue longLoop;
+                    }
+                    // same as (5)
+                    l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+                } else {
+                    // all bits are ones, skip a whole word,
+                    // bitsFromLowWord not changed
+                    higherBitBound -= 64;
+                    continue longLoop;
+                }
+            }
+        }
+    }
+
+    /**
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
+     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     */
+    @Override
+    public long clearPreviousNContinuousSetBits(
+            long fromIndex, int numberOfBits) {
+        if (numberOfBits < 0 || numberOfBits > 64)
+            throw new IllegalArgumentException();
+        if (numberOfBits == 1)
+            return clearPreviousSetBit(fromIndex);
+        if (fromIndex < 0) {
+            if (fromIndex == NOT_FOUND)
+                return NOT_FOUND;
+            throw new IndexOutOfBoundsException();
+        }
+
+        int n64Complement = 64 - numberOfBits;
+        long nLeadingOnes = (~0L) << n64Complement;
+
+        long higherBitBound = fromIndex + 1;
+        long lowLongIndex = fromIndex >> 6;
+        if (lowLongIndex >= longLength) {
+            lowLongIndex = longLength - 1;
+            higherBitBound = longLength << 6;
+        }
+        int bitsFromLowWord = (64 - (((int) higherBitBound) & 63)) & 63;
+        long lowByteIndex = lowLongIndex << 3;
+        // low word, high word
+        long hw, lw = bytes.readLong(lowByteIndex);
+        longLoop: while (true) {
+            hw = lw;
+            lowByteIndex -= 8;
+            if (--lowLongIndex >= 0) {
+                lw = bytes.readLong(lowByteIndex);
+            } else if (lowLongIndex == -1) {
+                lw = 0L;
+            } else {
+                return NOT_FOUND;
+            }
+            long l;
+            if (bitsFromLowWord != 0) { // (1)
+                l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+            } else {
+                // all bits from high word, special case needed because
+                // higherBitBound is multiple of 64 and lw not shifted away
+                l = hw;
+            }
+            // (2)
+            if (l > 0) { // condition means the highest bit is zero, but not all
+                int leadingZeros = Long.numberOfLeadingZeros(l);
+                higherBitBound -= leadingZeros;
+                bitsFromLowWord += leadingZeros; // (3)
+                int flw;
+                if ((flw = bitsFromLowWord - 64) >= 0) {
+                    bitsFromLowWord = flw;
+                    continue; // long loop
+                }
+                l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+            } else if (l == 0) {
+                // all bits are zeros, skip a whole word,
+                // bitsFromLowWord not changed
+                higherBitBound -= 64;
+                continue; // long loop
+            }
+            while (true) {
+                if (((~l) & nLeadingOnes) == 0) {
+                    long hMask = nLeadingOnes >>> bitsFromLowWord;
+                    bytes.writeLong(lowByteIndex + 8, hw ^ hMask);
+                    // bitsFromLow - (64 - n) = n - (64 - bitsFromLow) =
+                    // = n - bitsFromHigh
+                    int bitsFromLowWordToSwitch =
+                            bitsFromLowWord - n64Complement;
+                    if (bitsFromLowWordToSwitch > 0) {
+                        long lMask = ~((~0L) >>> bitsFromLowWordToSwitch);
+                        bytes.writeLong(lowByteIndex, lw ^ lMask);
+                    }
+                    return higherBitBound - numberOfBits;
+                }
+                // n > leading ones > 0
+                // > 0 ensured by block (2)
+                int leadingOnes = Long.numberOfLeadingZeros(~l);
+                higherBitBound -= leadingOnes;
+                bitsFromLowWord += leadingOnes; // (4)
+                int flw;
+                if ((flw = bitsFromLowWord - 64) >= 0) {
+                    bitsFromLowWord = flw;
+                    continue longLoop;
+                }
+                // (5)
+                // additions (3) and (4) together ensure that
+                // bitsFromFirstWord > 0, => no need in condition like (1)
+                l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
+
+                if (l != 0) {
+                    int leadingZeros = Long.numberOfLeadingZeros(l);
+                    higherBitBound -= leadingZeros;
+                    bitsFromLowWord += leadingZeros;
+                    if ((flw = bitsFromLowWord - 64) >= 0) {
+                        bitsFromLowWord = flw;
+                        continue longLoop;
+                    }
+                    // same as (5)
+                    l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+                } else {
+                    // all bits are zeros, skip a whole word,
+                    // bitsFromLowWord not changed
+                    higherBitBound -= 64;
+                    continue longLoop;
+                }
+            }
+        }
+    }
 }

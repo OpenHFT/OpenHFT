@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -66,6 +67,30 @@ public class DirectBitSetTest {
     private void setIndicesComplement() {
         setIndices();
         bs.flip(0, bs.size());
+    }
+
+    private void assertRangeIsClear(long from, long to) {
+        for (long i = from; i < to; i++) {
+            assertFalse(bs.get(i));
+        }
+    }
+
+    private void assertRangeIsClear(String message, long from, long to) {
+        for (long i = from; i < to; i++) {
+            assertFalse(message + ", bit: " + i, bs.get(i));
+        }
+    }
+
+    private void assertRangeIsSet(long from, long to) {
+        for (long i = from; i < to; i++) {
+            assertTrue(bs.get(i));
+        }
+    }
+
+    private void assertRangeIsSet(String message, long from, long to) {
+        for (long i = from; i < to; i++) {
+            assertTrue(message + ", bit: " + i, bs.get(i));
+        }
     }
 
     @Test
@@ -129,6 +154,42 @@ public class DirectBitSetTest {
     }
 
     @Test
+    public void testClearNextSetBit() {
+        setIndices();
+        long cardinality = bs.cardinality();
+        int order = 0;
+        for (long i = bs.clearNextSetBit(0L); i >= 0;
+                i = bs.clearNextSetBit(i + 1)) {
+            assertEquals(INDICES[order], i);
+            assertFalse(bs.get(i));
+            order++;
+            cardinality--;
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.clearNextSetBit(bs.size()));
+        assertEquals(0, bs.cardinality());
+        assertEquals(-1, bs.clearNextSetBit(0L));
+    }
+
+    @Test
+    public void testClearNext1SetBit() {
+        setIndices();
+        long cardinality = bs.cardinality();
+        int order = 0;
+        for (long i = bs.clearNextNContinuousSetBits(0L, 1); i >= 0;
+             i = bs.clearNextNContinuousSetBits(i + 1, 1)) {
+            assertEquals(INDICES[order], i);
+            assertFalse(bs.get(i));
+            order++;
+            cardinality--;
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.clearNextNContinuousSetBits(bs.size(), 1));
+        assertEquals(0, bs.cardinality());
+        assertEquals(-1, bs.clearNextNContinuousSetBits(0L, 1));
+    }
+
+    @Test
     public void testNextSetLong() {
         bs.clear();
         bs.set(0);
@@ -157,6 +218,42 @@ public class DirectBitSetTest {
 
         bs.setAll();
         assertEquals(-1, bs.nextClearBit(0L));
+    }
+
+    @Test
+    public void testSetNextClearBit() {
+        setIndicesComplement();
+        long cardinality = bs.cardinality();
+        int order = 0;
+        for (long i = bs.setNextClearBit(0L); i >= 0;
+             i = bs.setNextClearBit(i + 1)) {
+            assertEquals(INDICES[order], i);
+            assertTrue(bs.get(i));
+            order++;
+            cardinality++;
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.setNextClearBit(bs.size()));
+        assertEquals(bs.size(), bs.cardinality());
+        assertEquals(-1, bs.setNextClearBit(0L));
+    }
+
+    @Test
+    public void testSetNext1ClearBit() {
+        setIndicesComplement();
+        long cardinality = bs.cardinality();
+        int order = 0;
+        for (long i = bs.setNextNContinuousClearBits(0L, 1); i >= 0;
+             i = bs.setNextNContinuousClearBits(i + 1, 1)) {
+            assertEquals(INDICES[order], i);
+            assertTrue(bs.get(i));
+            order++;
+            cardinality++;
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.setNextNContinuousClearBits(bs.size(), 1));
+        assertEquals(bs.size(), bs.cardinality());
+        assertEquals(-1, bs.setNextNContinuousClearBits(0L, 1));
     }
 
     @Test
@@ -191,6 +288,41 @@ public class DirectBitSetTest {
     }
 
     @Test
+    public void testClearPreviousSetBit() {
+        setIndices();
+        long cardinality = bs.cardinality();
+        int order = INDICES.length;
+        for (long i = bs.size(); (i = bs.clearPreviousSetBit(i - 1)) >= 0; ) {
+            order--;
+            cardinality--;
+            assertEquals(INDICES[order], i);
+            assertFalse(bs.get(i));
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.clearPreviousSetBit(-1));
+        assertEquals(0, bs.cardinality());
+        assertEquals(-1, bs.clearPreviousSetBit(bs.size()));
+    }
+
+    @Test
+    public void testClearPrevious1SetBit() {
+        setIndices();
+        long cardinality = bs.cardinality();
+        int order = INDICES.length;
+        for (long i = bs.size();
+                (i = bs.clearPreviousNContinuousSetBits(i - 1, 1)) >= 0; ) {
+            order--;
+            cardinality--;
+            assertEquals(INDICES[order], i);
+            assertFalse(bs.get(i));
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.clearPreviousNContinuousSetBits(-1, 1));
+        assertEquals(0, bs.cardinality());
+        assertEquals(-1, bs.clearPreviousNContinuousSetBits(bs.size(), 1));
+    }
+
+    @Test
     public void testPreviousSetLong() {
         bs.clear();
         bs.set(0);
@@ -219,6 +351,41 @@ public class DirectBitSetTest {
 
         bs.setAll();
         assertEquals(-1, bs.previousClearBit(bs.size()));
+    }
+
+    @Test
+    public void testSetPreviousClearBit() {
+        setIndicesComplement();
+        long cardinality = bs.cardinality();
+        int order = INDICES.length;
+        for (long i = bs.size(); (i = bs.setPreviousClearBit(i - 1)) >= 0; ) {
+            order--;
+            cardinality++;
+            assertEquals(INDICES[order], i);
+            assertTrue(bs.get(i));
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.setPreviousClearBit(-1));
+        assertEquals(bs.size(), bs.cardinality());
+        assertEquals(-1, bs.setPreviousClearBit(bs.size()));
+    }
+
+    @Test
+    public void testSetPrevious1ClearBit() {
+        setIndicesComplement();
+        long cardinality = bs.cardinality();
+        int order = INDICES.length;
+        for (long i = bs.size();
+                (i = bs.setPreviousNContinuousClearBits(i - 1, 1)) >= 0; ) {
+            order--;
+            cardinality++;
+            assertEquals(INDICES[order], i);
+            assertTrue(bs.get(i));
+            assertEquals(cardinality, bs.cardinality());
+        }
+        assertEquals(-1, bs.setPreviousNContinuousClearBits(-1, 1));
+        assertEquals(bs.size(), bs.cardinality());
+        assertEquals(-1, bs.setPreviousNContinuousClearBits(bs.size(), 1));
     }
 
     @Test
@@ -323,6 +490,296 @@ public class DirectBitSetTest {
         assertEquals(bs.size(), bs.cardinality());
     }
 
+    private String m(int n) {
+        return "N: " + n + ", " + bs.getClass().getSimpleName();
+    }
+
+    @Test
+    public void testSetNextNContinuousClearBitsWithinLongCase() {
+        long size = (bs.size() + 63) / 64 * 64;
+        for (int n = 1; n <= 64; n *= 2) {
+            bs.clear();
+            for (int i = 0; i < size / n; i++) {
+                assertRangeIsClear(i * n, i * n + n);
+                assertEquals(m(n), i * n, bs.setNextNContinuousClearBits(0L, n));
+                assertRangeIsSet(i * n, i * n + n);
+                assertEquals(i * n + n, bs.cardinality());
+            }
+        }
+        for (int n = 2; n <= 64; n *= 2) {
+            bs.setAll();
+            bs.clear(size - n, size);
+            assertEquals(size - n, bs.setNextNContinuousClearBits(0L, n));
+            assertRangeIsSet(size - n, size);
+
+            long offset = (64 - n) / 2;
+            long from = size - n - offset;
+            long to = size - offset;
+            bs.clear(from, to);
+            assertEquals(from, bs.setNextNContinuousClearBits(from, n));
+            assertRangeIsSet(from, to);
+
+            bs.clear(from, to);
+            for (long i = from - 2; i >= 0; i -= 2) {
+                bs.clear(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.setNextNContinuousClearBits(0, n));
+            assertEquals(cardinality + n, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void testSetNextNContinuousClearBitsCrossLongCase() {
+        if (bs instanceof ATSDirectBitSet)
+            return;
+        long size = bs.size();
+        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+            bs.clear();
+            for (int i = 0; i < size / n; i++) {
+                assertRangeIsClear(i * n, i * n + n);
+                assertEquals(m(n), i * n, bs.setNextNContinuousClearBits(0L, n));
+                assertRangeIsSet(i * n, i * n + n);
+                assertEquals(i * n + n, bs.cardinality());
+            }
+        }
+        long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
+        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+            bs.setAll();
+            long from = lastBound - (n / 2);
+            long to = from + n;
+            bs.clear(from, to);
+            assertEquals(from, bs.setNextNContinuousClearBits(0L, n));
+            assertRangeIsSet(from, to);
+
+            bs.clear(from, to);
+            for (long i = from - 2; i >= 0; i -= 2) {
+                bs.clear(i);
+            }
+            for (long i = to + 1; i < bs.size(); i += 2) {
+                bs.clear(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.setNextNContinuousClearBits(from, n));
+            assertEquals(cardinality + n, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void testClearNextNContinuousSetBitsWithinLongCase() {
+        long size = (bs.size() + 63) / 64 * 64;
+        for (int n = 1; n <= 64; n *= 2) {
+            bs.setAll();
+            long cardinality = bs.cardinality();
+            for (int i = 0; i < size / n; i++) {
+                assertRangeIsSet(i * n, i * n + n);
+                assertEquals(m(n), i * n, bs.clearNextNContinuousSetBits(0L, n));
+                assertRangeIsClear(i * n, i * n + n);
+                assertEquals(cardinality - (i * n + n), bs.cardinality());
+            }
+        }
+        for (int n = 2; n <= 64; n *= 2) {
+            bs.clear();
+            bs.set(size - n, size);
+            assertEquals(size - n, bs.clearNextNContinuousSetBits(0L, n));
+            assertRangeIsClear(size - n, size);
+
+            long offset = (64 - n) / 2;
+            long from = size - n - offset;
+            long to = size - offset;
+            bs.set(from, to);
+            assertEquals(from, bs.clearNextNContinuousSetBits(from, n));
+            assertRangeIsClear(from, to);
+
+            bs.set(from, to);
+            for (long i = from - 2; i >= 0; i -= 2) {
+                bs.set(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.clearNextNContinuousSetBits(0, n));
+            assertEquals(cardinality - n, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void testClearNextNContinuousSetBitsCrossLongCase() {
+        if (bs instanceof ATSDirectBitSet)
+            return;
+        long size = bs.size();
+        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+            bs.setAll();
+            long cardinality = bs.cardinality();
+            for (int i = 0; i < size / n; i++) {
+                assertRangeIsSet(i * n, i * n + n);
+                assertEquals(m(n), i * n, bs.clearNextNContinuousSetBits(0L, n));
+                assertRangeIsClear(i * n, i * n + n);
+                assertEquals(cardinality -= n, bs.cardinality());
+            }
+        }
+        long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
+        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+            bs.clear();
+            long from = lastBound - (n / 2);
+            long to = from + n;
+            bs.set(from, to);
+            assertEquals(from, bs.clearNextNContinuousSetBits(0L, n));
+            assertRangeIsClear(from, to);
+
+            bs.set(from, to);
+            for (long i = from - 2; i >= 0; i -= 2) {
+                bs.set(i);
+            }
+            for (long i = to + 1; i < bs.size(); i += 2) {
+                bs.set(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.clearNextNContinuousSetBits(from, n));
+            assertEquals(cardinality - n, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void testSetPreviousNContinuousClearBitsWithinLongCase() {
+        long size = (bs.size() + 63) / 64 * 64;
+        for (int n = 1; n <= 64; n *= 2) {
+            bs.clear();
+            long cardinality = 0;
+            for (long i = size / n - 1; i >= 0; i--) {
+                assertRangeIsClear(i * n, i * n + n);
+                assertEquals(m(n), i * n, bs.setPreviousNContinuousClearBits(size, n));
+                assertRangeIsSet(i * n, i * n + n);
+                assertEquals(cardinality += n, bs.cardinality());
+            }
+        }
+        for (int n = 2; n <= 64; n *= 2) {
+            bs.setAll();
+            bs.clear(0, n);
+            assertEquals(0, bs.setPreviousNContinuousClearBits(bs.size(), n));
+            assertRangeIsSet(0, n);
+
+            long from = (64 - n) / 2;
+            long to = from + n;
+            bs.clear(from, to);
+            assertEquals(from, bs.setPreviousNContinuousClearBits(to - 1, n));
+            assertRangeIsSet(from, to);
+
+            bs.clear(from, to);
+            for (long i = to + 1; i < bs.size(); i += 2) {
+                bs.clear(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.setPreviousNContinuousClearBits(bs.size(), n));
+            assertEquals(cardinality + n, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void testSetPreviousNContinuousClearBitsCrossLongCase() {
+        if (bs instanceof ATSDirectBitSet)
+            return;
+        long size = bs.size();
+        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+            bs.clear();
+            long cardinality = 0;
+            for (long from = size - n; from >= 0; from -= n) {
+                assertRangeIsClear(from, from + n);
+                assertEquals(m(n), from, bs.setPreviousNContinuousClearBits(size, n));
+                assertRangeIsSet(from, from + n);
+                assertEquals(cardinality += n, bs.cardinality());
+            }
+        }
+        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+            bs.setAll();
+            long from = 64 - (n / 2);
+            long to = from + n;
+            bs.clear(from, to);
+            assertEquals(from, bs.setPreviousNContinuousClearBits(size, n));
+            assertRangeIsSet(from, to);
+
+            bs.clear(from, to);
+            for (long i = from - 2; i >= 0; i -= 2) {
+                bs.clear(i);
+            }
+            for (long i = to + 1; i < bs.size(); i += 2) {
+                bs.clear(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.setPreviousNContinuousClearBits(to - 1, n));
+            assertEquals(cardinality + n, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void testClearPreviousNContinuousSetBitsWithinLongCase() {
+        long size = (bs.size() + 63) / 64 * 64;
+        for (int n = 1; n <= 64; n *= 2) {
+            bs.setAll();
+            long cardinality = bs.cardinality();
+            for (long i = size / n - 1; i >= 0; i--) {
+                assertRangeIsSet(i * n, i * n + n);
+                assertEquals(m(n), i * n, bs.clearPreviousNContinuousSetBits(size, n));
+                assertRangeIsClear(m(n), i * n, i * n + n);
+                assertEquals(cardinality -= n, bs.cardinality());
+            }
+        }
+        for (int n = 2; n <= 64; n *= 2) {
+            bs.clear();
+            bs.set(0, n);
+            assertEquals(0, bs.clearPreviousNContinuousSetBits(bs.size(), n));
+            assertRangeIsClear(0, n);
+
+            long from = (64 - n) / 2;
+            long to = from + n;
+            bs.set(from, to);
+            assertEquals(from, bs.clearPreviousNContinuousSetBits(to - 1, n));
+            assertRangeIsClear(from, to);
+
+            bs.set(from, to);
+            for (long i = to + 1; i < bs.size(); i += 2) {
+                bs.set(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.clearPreviousNContinuousSetBits(bs.size(), n));
+            assertEquals(cardinality - n, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void testClearPreviousNContinuousSetBitsCrossLongCase() {
+        if (bs instanceof ATSDirectBitSet)
+            return;
+        long size = bs.size();
+        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+            bs.setAll();
+            long cardinality = bs.cardinality();
+            for (long from = size - n; from >= 0; from -= n) {
+                assertRangeIsSet(from, from + n);
+                assertEquals(m(n), from, bs.clearPreviousNContinuousSetBits(size, n));
+                assertRangeIsClear(from, from + n);
+                assertEquals(cardinality -= n, bs.cardinality());
+            }
+        }
+        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+            bs.clear();
+            long from = 64 - (n / 2);
+            long to = from + n;
+            bs.set(from, to);
+            assertEquals(from, bs.clearPreviousNContinuousSetBits(size, n));
+            assertRangeIsClear(from, to);
+
+            bs.set(from, to);
+            for (long i = from - 2; i >= 0; i -= 2) {
+                bs.set(i);
+            }
+            for (long i = to + 1; i < bs.size(); i += 2) {
+                bs.set(i);
+            }
+            long cardinality = bs.cardinality();
+            assertEquals(from, bs.clearPreviousNContinuousSetBits(to - 1, n));
+            assertEquals(cardinality - n, bs.cardinality());
+        }
+    }
+
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetNegative() {
@@ -413,6 +870,47 @@ public class DirectBitSetTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousClearLong() {
         bs.previousClearLong(-2);
+    }
+
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeClearNextSetBit() {
+        bs.clearNextSetBit(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeClearNextNContinuousSetBits() {
+        bs.clearNextNContinuousSetBits(-1, 2);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeSetNextClearBit() {
+        bs.setNextClearBit(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeSetNextNContinuousClearBits() {
+        bs.setNextNContinuousClearBits(-1, 2);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeClearPreviousSetBit() {
+        bs.clearPreviousSetBit(-2);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeClearPreviousNContinuousSetBit() {
+        bs.clearPreviousNContinuousSetBits(-2, 2);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeSetPreviousClearBit() {
+        bs.setPreviousClearBit(-2);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeSetPreviousNContinuousClearBit() {
+        bs.setPreviousNContinuousClearBits(-2, 2);
     }
 
 
