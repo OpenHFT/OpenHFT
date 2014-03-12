@@ -123,28 +123,6 @@
                     <nohelp>true</nohelp>
                 </configuration>
             </plugin>
-            <plugin>
-                <!-- For debugging in IntelliJ IDEA -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
-                <configuration>
-                    <forkMode>never</forkMode>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>0.32</version>
-                <configuration>
-                    <targetClasses>
-                        <param>net.openhft.lang.sandbox.collection.*</param>
-                    </targetClasses>
-                    <targetTests>
-                        <param>net.openhft.lang.sandbox.collection.*</param>
-                    </targetTests>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 

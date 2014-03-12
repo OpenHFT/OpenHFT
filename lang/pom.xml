@@ -240,6 +240,30 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <!-- For debugging in IntelliJ IDEA -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.16</version>
+                <configuration>
+                    <forkMode>never</forkMode>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>0.33</version>
+                <configuration>
+                    <targetClasses>
+                        <param>net.openhft.lang.collection.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>net.openhft.lang.collection.*</param>
+                    </targetTests>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
