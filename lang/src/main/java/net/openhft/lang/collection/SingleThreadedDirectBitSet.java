@@ -70,7 +70,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 0x3F) != 0) {
+            if ((fromIndex & 63) != 0) {
                 long fromByteIndex = fromLongIndex << 3;
                 long mask = (~0L) << fromIndex;
                 long l = bytes.readLong(fromByteIndex);
@@ -79,7 +79,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 firstFullLongIndex++;
             }
 
-            if ((exclusiveToIndex & 0x3F) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     bytes.writeLong(i << 3, ~bytes.readLong(i << 3));
                 }
@@ -89,7 +89,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 }
 
                 long toByteIndex = toLongIndex << 3;
-                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
                 long mask = (~0L) >>> ~toIndex;
                 long l = bytes.readLong(toByteIndex);
                 long l2 = l ^ mask;
@@ -151,7 +151,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 0x3F) != 0) {
+            if ((fromIndex & 63) != 0) {
                 long fromByteIndex = fromLongIndex << 3;
                 long mask = (~0L) << fromIndex;
                 long l = bytes.readLong(fromByteIndex);
@@ -160,7 +160,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 firstFullLongIndex++;
             }
 
-            if ((exclusiveToIndex & 0x3F) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     bytes.writeLong(i << 3, ~0L);
                 }
@@ -170,7 +170,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 }
 
                 long toByteIndex = toLongIndex << 3;
-                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
                 long mask = (~0L) >>> ~toIndex;
                 long l = bytes.readLong(toByteIndex);
                 long l2 = l | mask;
@@ -224,7 +224,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 0x3F) != 0) {
+            if ((fromIndex & 63) != 0) {
                 long fromByteIndex = fromLongIndex << 3;
                 long mask = ~((~0L) << fromIndex);
                 long l = bytes.readLong(fromByteIndex);
@@ -233,7 +233,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 firstFullLongIndex++;
             }
 
-            if ((exclusiveToIndex & 0x3F) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     bytes.writeLong(i << 3, 0L);
                 }
@@ -243,7 +243,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 }
 
                 long toByteIndex = toLongIndex << 3;
-                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
                 long mask = ~((~0L) >>> ~toIndex);
                 long l = bytes.readLong(toByteIndex);
                 long l2 = l & mask;
@@ -379,7 +379,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             fromLongIndex = longLength - 1;
             fromIndex = size() - 1;
         }
-        // << ~fromIndex === << (63 - (fromIndex & 0x3F))
+        // << ~fromIndex === << (63 - (fromIndex & 63))
         long l = bytes.readLong(fromLongIndex << 3) << ~fromIndex;
         if (l != 0)
             return fromIndex - Long.numberOfLeadingZeros(l);

@@ -72,7 +72,7 @@ public class ATSDirectBitSet implements DirectBitSet {
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 0x3F) != 0) {
+            if ((fromIndex & 63) != 0) {
                 long fromByteIndex = fromLongIndex << 3;
                 long mask = (~0L) << fromIndex;
                 while (true) {
@@ -84,7 +84,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 firstFullLongIndex++;
             }
 
-            if ((exclusiveToIndex & 0x3F) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     while (true) {
                         long l = bytes.readVolatileLong(i << 3);
@@ -104,7 +104,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 }
 
                 long toByteIndex = toLongIndex << 3;
-                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
                 long mask = (~0L) >>> ~toIndex;
                 while (true) {
                     long l = bytes.readVolatileLong(toByteIndex);
@@ -176,7 +176,7 @@ public class ATSDirectBitSet implements DirectBitSet {
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 0x3F) != 0) {
+            if ((fromIndex & 63) != 0) {
                 long fromByteIndex = fromLongIndex << 3;
                 long mask = (~0L) << fromIndex;
                 while (true) {
@@ -188,7 +188,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 firstFullLongIndex++;
             }
 
-            if ((exclusiveToIndex & 0x3F) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     bytes.writeLong(i << 3, ~0L);
                 }
@@ -198,7 +198,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 }
 
                 long toByteIndex = toLongIndex << 3;
-                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
                 long mask = (~0L) >>> ~toIndex;
                 while (true) {
                     long l = bytes.readVolatileLong(toByteIndex);
@@ -260,7 +260,7 @@ public class ATSDirectBitSet implements DirectBitSet {
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 0x3F) != 0) {
+            if ((fromIndex & 63) != 0) {
                 long fromByteIndex = fromLongIndex << 3;
                 long mask = ~((~0L) << fromIndex);
                 while (true) {
@@ -272,7 +272,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 firstFullLongIndex++;
             }
 
-            if ((exclusiveToIndex & 0x3F) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     bytes.writeLong(i << 3, 0L);
                 }
@@ -282,7 +282,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 }
 
                 long toByteIndex = toLongIndex << 3;
-                // >>> ~toIndex === >>> (63 - (toIndex & 0x3F))
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
                 long mask = ~((~0L) >>> ~toIndex);
                 while (true) {
                     long l = bytes.readVolatileLong(toByteIndex);
@@ -423,7 +423,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             fromLongIndex = longLength - 1;
             fromIndex = size() - 1;
         }
-        // << ~fromIndex === << (63 - (fromIndex & 0x3F))
+        // << ~fromIndex === << (63 - (fromIndex & 63))
         long l = bytes.readVolatileLong(fromLongIndex << 3) << ~fromIndex;
         if (l != 0)
             return fromIndex - Long.numberOfLeadingZeros(l);
