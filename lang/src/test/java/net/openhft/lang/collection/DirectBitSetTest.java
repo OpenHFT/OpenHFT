@@ -958,4 +958,25 @@ public class DirectBitSetTest {
     public void testIoobeFlipRangeToOverCapacity() {
         bs.flip(0, bs.size() + 1);
     }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIaeClearNextNContinuousSetBits() {
+        bs.clearNextNContinuousSetBits(0, 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIaeSetNextNContinuousClearBits() {
+        bs.setNextNContinuousClearBits(0, 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIaeClearPreviousNContinuousSetBits() {
+        bs.clearPreviousNContinuousSetBits(bs.size(), 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIaeSetPreviousNContinuousClearBits() {
+        bs.setPreviousNContinuousClearBits(bs.size(), 0);
+    }
 }

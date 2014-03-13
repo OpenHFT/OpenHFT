@@ -710,7 +710,7 @@ public class ATSDirectBitSet implements DirectBitSet {
      */
     @Override
     public long setNextNContinuousClearBits(long fromIndex, int numberOfBits) {
-        if (numberOfBits < 0 || numberOfBits > 64)
+        if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException();
         if (numberOfBits == 1)
             return setNextClearBit(fromIndex);
@@ -810,7 +810,7 @@ public class ATSDirectBitSet implements DirectBitSet {
      */
     @Override
     public long clearNextNContinuousSetBits(long fromIndex, int numberOfBits) {
-        if (numberOfBits < 0 || numberOfBits > 64)
+        if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException();
         if (numberOfBits == 1)
             return clearNextSetBit(fromIndex);
@@ -906,7 +906,7 @@ public class ATSDirectBitSet implements DirectBitSet {
     @Override
     public long setPreviousNContinuousClearBits(
             long fromIndex, int numberOfBits) {
-        if (numberOfBits < 0 || numberOfBits > 64)
+        if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException();
         if (numberOfBits == 1)
             return setPreviousClearBit(fromIndex);
@@ -1005,7 +1005,7 @@ public class ATSDirectBitSet implements DirectBitSet {
     @Override
     public long clearPreviousNContinuousSetBits(
             long fromIndex, int numberOfBits) {
-        if (numberOfBits < 0 || numberOfBits > 64)
+        if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException();
         if (numberOfBits == 1)
             return clearPreviousSetBit(fromIndex);

@@ -416,7 +416,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * @return the index of the first bit in the found range of clear bits,
      * or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
-     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits <= 0}
      */
     long setNextNContinuousClearBits(long fromIndex, int numberOfBits);
 
@@ -435,7 +435,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * @return the index of the first bit in the found range
      * of {@code true} bits, or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
-     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits <= 0}
      */
     long clearNextNContinuousSetBits(long fromIndex, int numberOfBits);
 
@@ -456,7 +456,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is less
      *                                   than {@code -1}
-     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits <= 0}
      */
     long setPreviousNContinuousClearBits(long fromIndex, int numberOfBits);
 
@@ -477,7 +477,7 @@ public interface DirectBitSet extends ReferenceCounted {
      * of {@code true} bits, or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is less
      *                                   than {@code -1}
-     * @throws java.lang.IllegalArgumentException if {@code numberOfBits} is negative
+     * @throws java.lang.IllegalArgumentException if {@code numberOfBits <= 0}
      */
     long clearPreviousNContinuousSetBits(long fromIndex, int numberOfBits);
 }
