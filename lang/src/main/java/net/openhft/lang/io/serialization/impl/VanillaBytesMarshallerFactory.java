@@ -20,7 +20,7 @@ import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
-import org.jetbrains.annotations.NotNull;
+import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.Externalizable;
 import java.util.Date;

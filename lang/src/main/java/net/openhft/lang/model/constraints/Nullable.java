@@ -14,32 +14,17 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io.serialization;
+package net.openhft.lang.model.constraints;
 
-import net.openhft.lang.io.Bytes;
-import net.openhft.lang.model.constraints.Nullable;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-/**
- * External marshaller for classes.
- *
- * @author peter.lawrey
- * @see BytesMarshallable
- */
-public interface BytesMarshaller<E> {
-    /**
-     * write the object out as bytes.
-     *
-     * @param bytes to write to
-     * @param e     to write
-     */
-    void write(Bytes bytes, E e);
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 
-    /**
-     * Read bytes and obtain an object
-     *
-     * @param bytes to read
-     * @return the object
-     */
-    @Nullable
-    E read(Bytes bytes);
+@Documented
+@Retention(CLASS)
+@Target({METHOD, FIELD, PARAMETER, LOCAL_VARIABLE})
+public @interface Nullable {
 }

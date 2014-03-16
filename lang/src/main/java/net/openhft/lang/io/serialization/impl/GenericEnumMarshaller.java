@@ -18,8 +18,8 @@ package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshaller;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.openhft.lang.model.constraints.NotNull;
+import net.openhft.lang.model.constraints.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

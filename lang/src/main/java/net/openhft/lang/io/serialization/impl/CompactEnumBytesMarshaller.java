@@ -17,7 +17,7 @@
 package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
-import org.jetbrains.annotations.NotNull;
+import net.openhft.lang.model.constraints.NotNull;
 
 /**
  * Created with IntelliJ IDEA. User: peter Date: 09/12/13 Time: 17:05 To change this template use File | Settings | File

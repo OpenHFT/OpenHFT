@@ -20,7 +20,7 @@ import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
-import org.jetbrains.annotations.NotNull;
+import net.openhft.lang.model.constraints.NotNull;
 
 /**
  * @author peter.lawrey

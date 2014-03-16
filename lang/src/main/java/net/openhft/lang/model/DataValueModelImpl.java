@@ -164,6 +164,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                 if (model.indexedGetter() == null || (model.indexedSetter() == null && model.indexedGetter().getReturnType().isPrimitive()))
                     if (model.busyLock() == null || model.unlock() == null)
                         throw new IllegalArgumentException("Field " + entry.getKey() + " must have a getter & setter, or getAt & setAt, or busyLock & unlock.");
+            if (model.indexedGetter() != null || model.indexedSetter() != null)
+                if (model.indexSize() == null)
+                    throw new IllegalStateException("You must set a MaxSize for the range of the index for the getter or setter");
+
             Class ftype = model.type();
             if (!isScalar(ftype) && !nestedMap.containsKey(ftype))
                 nestedMap.put(ftype, new DataValueModelImpl(ftype));

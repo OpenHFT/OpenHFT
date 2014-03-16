@@ -24,9 +24,9 @@ import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.io.serialization.impl.NoMarshaller;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
+import net.openhft.lang.model.constraints.NotNull;
+import net.openhft.lang.model.constraints.Nullable;
 import net.openhft.lang.pool.StringInterner;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.math.BigInteger;

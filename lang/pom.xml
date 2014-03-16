@@ -26,9 +26,7 @@
     <packaging>bundle</packaging>
 
     <name>OpenHFT/Java-Lang/lang</name>
-    <description>Java Lang library for High Frequency Trading (Java 7+), builds on Java 6, but only Java 7 works for all
-        classes.
-    </description>
+    <description>Java Lang library for High Frequency Trading (Java 6+)</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,13 +36,6 @@
 
     <dependencyManagement>
         <dependencies>
-
-            <dependency>
-                <groupId>org.kohsuke.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>9.0</version>
-            </dependency>
-
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
@@ -79,11 +70,6 @@
         <dependency>
             <groupId>com.sun.java</groupId>
             <artifactId>tools</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.kohsuke.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
         </dependency>
 
         <dependency>
@@ -224,7 +210,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Bundle-Version>${project.version}</Bundle-Version>
                         <Export-Package>
-                            net.openhft.*
+                            net.openhft.lang.*
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -241,29 +227,29 @@
                 </executions>
             </plugin>
 
-
-            <plugin>
-                <!-- For debugging in IntelliJ IDEA -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
-                <configuration>
-                    <forkMode>never</forkMode>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>0.33</version>
-                <configuration>
-                    <targetClasses>
-                        <param>net.openhft.lang.collection.*</param>
-                    </targetClasses>
-                    <targetTests>
-                        <param>net.openhft.lang.collection.*</param>
-                    </targetTests>
-                </configuration>
-            </plugin>
+            <!--
+                        <plugin>
+                            <- For debugging in IntelliJ IDEA ->
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>2.16</version>
+                            <configuration>
+                                <forkMode>never</forkMode>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.pitest</groupId>
+                            <artifactId>pitest-maven</artifactId>
+                            <version>0.33</version>
+                            <configuration>
+                                <targetClasses>
+                                    <param>net.openhft.lang.collection.*</param>
+                                </targetClasses>
+                                <targetTests>
+                                    <param>net.openhft.lang.collection.*</param>
+                                </targetTests>
+                            </configuration>
+                        </plugin>-->
         </plugins>
     </build>
 

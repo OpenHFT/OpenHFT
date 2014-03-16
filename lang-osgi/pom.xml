@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>lang-osgi</artifactId>
-    <version>6.3.2</version>
+    <version>6.3.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>OpenHFT/Java-Lang/lang-osgi</name>
@@ -42,12 +42,6 @@
 
     <dependencyManagement>
         <dependencies>
-
-            <dependency>
-                <groupId>org.kohsuke.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>9.0</version>
-            </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
@@ -132,11 +126,6 @@
         <dependency>
             <groupId>com.sun.java</groupId>
             <artifactId>tools</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.kohsuke.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
         </dependency>
 
         <dependency>

@@ -16,7 +16,7 @@
 
 package net.openhft.lang.io.serialization;
 
-import org.jetbrains.annotations.NotNull;
+import net.openhft.lang.model.constraints.NotNull;
 
 /**
  * @author peter.lawrey

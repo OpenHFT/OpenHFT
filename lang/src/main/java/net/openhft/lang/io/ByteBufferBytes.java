@@ -16,7 +16,7 @@
 
 package net.openhft.lang.io;
 
-import org.jetbrains.annotations.NotNull;
+import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 

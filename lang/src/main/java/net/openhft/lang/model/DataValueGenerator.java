@@ -102,8 +102,8 @@ public class DataValueGenerator {
             Method adder = model.adder();
             if (adder != null) {
                 getterSetters.append("    public ").append(normalize(type)).append(' ').append(adder.getName())
-                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
-                        .append("        return _").append(name).append(" += _;\n")
+                        .append("(").append(adder.getParameterTypes()[0].getName()).append(" $) {\n")
+                        .append("        return _").append(name).append(" += $;\n")
                         .append("    }");
             }
             Method sizeOf = model.sizeOf();
@@ -116,8 +116,8 @@ public class DataValueGenerator {
             Method atomicAdder = model.atomicAdder();
             if (atomicAdder != null) {
                 getterSetters.append("    public synchronized ").append(normalize(type)).append(' ').append(atomicAdder.getName())
-                        .append("(").append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
-                        .append("        return _").append(name).append(" += _;\n")
+                        .append("(").append(atomicAdder.getParameterTypes()[0].getName()).append(" $) {\n")
+                        .append("        return _").append(name).append(" += $;\n")
                         .append("    }\n\n");
             }
             Method cas = model.cas();
@@ -194,7 +194,7 @@ public class DataValueGenerator {
             sb.append("       throw new UnsupportedOperationException();\n");
             sb.append("    }\n");
         }
-        generateObjectMethods(sb, dvmodel, entries);
+        generateObjectMethods(sb, dvmodel, entries, false);
         sb.append("}\n");
 //        System.out.println(sb);
         return sb.toString();
@@ -209,7 +209,7 @@ public class DataValueGenerator {
         return aClass.getName().replace('$', '.');
     }
 
-    private static void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel, Map.Entry<String, FieldModel>[] entries) {
+    private static void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel, Map.Entry<String, FieldModel>[] entries, boolean offHeap) {
         int count = 0;
         StringBuilder hashCode = new StringBuilder();
         StringBuilder equals = new StringBuilder();
@@ -226,23 +226,14 @@ public class DataValueGenerator {
                 count++;
             }
 
-            if(model.isArray()){
+            if (model.isArray()) {
                 String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-                sb.append("\n    public long longHashCode_"+ name + "() {\n" +
-                          "        long hc = 0;\n" +
-                          "        for(int i=0; i<" + model.indexSize().value() + "; i++){\n" +
-                          "            hc += calcLongHashCode(get" + nameWithUpper + "At(i));\n" +
-                          "        }\n" +
-                          "        return hc;\n" +
-                          "    }\n\n");
-
-                sb.append("\n    public String toString_"+ name + "() {\n" +
-                        "        String s = \" , " +  name     + "= [\";\n" +
-                        "        for(int i=0; i<" + model.indexSize().value() + "; i++){\n" +
-                        "            s += \",\" + get" + nameWithUpper + "At(i);\n" +
+                sb.append("\n    public long longHashCode_" + name + "() {\n" +
+                        "        long hc = 0;\n" +
+                        "        for (int i = 0; i < " + model.indexSize().value() + "; i++) {\n" +
+                        "            hc += calcLongHashCode(get" + nameWithUpper + "At(i));\n" +
                         "        }\n" +
-                        "        s += \"]\";\n" +
-                        "        return s;\n" +
+                        "        return hc;\n" +
                         "    }\n\n");
             }
         }
@@ -259,22 +250,24 @@ public class DataValueGenerator {
         CharSequence simpleName = simpleName(dvmodel.type()).replace('$', '.');
         sb.append(";\n")
                 .append("    }\n")
-                .append("\n")
-                .append("    public boolean equals(Object o) {\n")
+                .append("\n");
+        sb.append("    public boolean equals(Object o) {\n")
                 .append("        if (this == o) return true;\n")
                 .append("        if (!(o instanceof ").append(simpleName).append(")) return false;\n")
                 .append("        ").append(simpleName).append(" that = (").append(simpleName).append(") o;\n")
                 .append("\n")
                 .append(equals)
-                .append("        return true;\n" +
-                        "    }\n" +
-                        "\n" +
-                        "    public String toString() {\n" +
-                        "        return \"").append(simpleName).append(" {\" +\n")
-                .append(toString.substring(0, toString.length()-3)).append(" + \"}\";\n")
+                .append("        return true;\n")
+                .append("    }\n")
+                .append("\n");
+        sb.append("    public String toString() {\n")
+                .append(offHeap ? "        if (_bytes == null) return \"bytes is null\";\n" : "")
+                .append("        StringBuilder sb = new StringBuilder();\n")
+                .append("        sb.append(\"").append(simpleName).append("{ \");\n")
+                .append(toString)
+                .append("        sb.append(\" }\");\n")
+                .append("        return sb.toString();\n")
                 .append("    }\n");
-
-
     }
 
     private static Method getGetter(FieldModel model) {
@@ -296,7 +289,7 @@ public class DataValueGenerator {
                 copy.append("(from.").append(getter.getName()).append("());\n");
             }
         } else {
-            copy.append("        for(int i = 0; i < ").append(model.indexSize().value()).append("; i++){");
+            copy.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){");
             copy.append("\n            ").append(setter.getName()).append("(i, from.").append(getter.getName()).append("(i));\n");
             copy.append("        }\n");
         }
@@ -309,7 +302,7 @@ public class DataValueGenerator {
                         .append(getter.getName()).append("());\n");
             // otherwise skip.
         } else {
-            writeMarshal.append("        for(int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
+            writeMarshal.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
             writeMarshal.append("            out.write").append(bytesType(type)).append("(")
                     .append(getter.getName()).append("(i));\n");
             writeMarshal.append("        }\n");
@@ -323,7 +316,7 @@ public class DataValueGenerator {
                 readMarshal.append(normalize(type)).append(".class");
             readMarshal.append(");\n");
         } else {
-            readMarshal.append("        for(int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
+            readMarshal.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
             readMarshal.append("            _").append(name).append("[i] = in.read").append(bytesType(type)).append("(");
             if ("Object".equals(bytesType(type)))
                 readMarshal.append(normalize(type)).append(".class");
@@ -348,35 +341,43 @@ public class DataValueGenerator {
         if (!model.isArray()) {
             equals.append("        if(!isEqual(").append(getterName).append("(), that.").append(getterName).append("())) return false;\n");
         } else {
-            equals.append("        for(int i=0; i<" + model.indexSize().value() + "; i++){\n");
+            equals.append("        for (int i = 0; i <" + model.indexSize().value() + "; i++) {\n");
             equals.append("            if(!isEqual(").append(getterName).append("(i), that.").append(getterName).append("(i))) return false;\n");
             equals.append("        }\n");
         }
     }
 
     private static void methodToString(StringBuilder toString, String getterName, String name, FieldModel model) {
+        if (toString.length() > 2)
+            toString.append("sb.append(\", \")\n;");
         if (!model.isArray()) {
-            toString.append("            \", ").append(name).append("= \" + ").append(getterName).append("() +\n");
+            toString.append("            sb.append(\"").append(name).append("= \").append(").append(getterName).append("());\n");
         } else {
-            toString.append("            ").append("toString_" + name).append("() +\n");
+            toString
+                    .append("              sb.append(\"").append(name).append("\").append(\"= [\");")
+                    .append("              for (int i = 0; i < ").append(model.indexSize().value()).append("; i++) {\n")
+                    .append("                  if (i > 0) sb.append(\", \") ;\n")
+                    .append("                  sb.append(").append(getterName).append("(i));\n")
+                    .append("              }\n")
+                    .append("              sb.append(\"]\");\n");
         }
     }
 
     private static void methodHeapSet(StringBuilder getterSetters, Method setter, String name, Class type, FieldModel model) {
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length - 1];
         if (!model.isArray()) {
-            getterSetters.append("    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" _) {\n");
+            getterSetters.append("    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
             if (type == String.class && setterType != String.class)
-                getterSetters.append("        _").append(name).append(" = _.toString();\n");
+                getterSetters.append("        _").append(name).append(" = $.toString();\n");
             else
-                getterSetters.append("        _").append(name).append(" = _;\n");
+                getterSetters.append("        _").append(name).append(" = $;\n");
         } else {
-            getterSetters.append("    public void ").append(setter.getName()).append("(int i, ").append(normalize(setterType)).append(" _) {\n");
+            getterSetters.append("    public void ").append(setter.getName()).append("(int i, ").append(normalize(setterType)).append(" $) {\n");
             getterSetters.append(boundsCheck(model.indexSize().value()));
             if (type == String.class && setterType != String.class)
-                getterSetters.append("        _").append(name).append("[i] = _.toString();\n");
+                getterSetters.append("        _").append(name).append("[i] = $.toString();\n");
             else
-                getterSetters.append("        _").append(name).append("[i] = _;\n");
+                getterSetters.append("        _").append(name).append("[i] = $;\n");
 
         }
         getterSetters.append("    }\n\n");
@@ -400,10 +401,10 @@ public class DataValueGenerator {
         } else {
             fieldDeclarations.append("    private ").append(normalize(type)).append("[] _").append(name)
                     .append(" = new ").append(normalize(type)).append("[").append(model.indexSize().value()).append("];\n");
-            if(!type.isPrimitive()){
+            if (!type.isPrimitive()) {
                 fieldDeclarations.append("    {\n")
-                    .append("        for(int i = 0; i < _").append(name).append(".length; i++)\n")
-                    .append("            _").append(name).append("[i] = new ").append(type.getName());
+                        .append("        for (int i = 0; i < _").append(name).append(".length; i++)\n")
+                        .append("            _").append(name).append("[i] = new ").append(type.getName());
 
                 if (type.isInterface()) {
                     fieldDeclarations.append("£heap();\n");
@@ -541,15 +542,15 @@ public class DataValueGenerator {
                 Method adder = model.adder();
                 if (adder != null) {
                     getterSetters.append("    public ").append(normalize(type)).append(' ').append(adder.getName())
-                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" _) {\n")
-                            .append("        return _bytes.add").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
+                            .append("(").append(adder.getParameterTypes()[0].getName()).append(" $) {\n")
+                            .append("        return _bytes.add").append(bytesType(type)).append("(").append(NAME).append(", $);\n")
                             .append("    }");
                 }
                 Method atomicAdder = model.atomicAdder();
                 if (atomicAdder != null) {
                     getterSetters.append("    public ").append(normalize(type)).append(' ').append(atomicAdder.getName())
-                            .append("(").append(atomicAdder.getParameterTypes()[0].getName()).append(" _) {\n")
-                            .append("        return _bytes.addAtomic").append(bytesType(type)).append("(").append(NAME).append(", _);\n")
+                            .append("(").append(atomicAdder.getParameterTypes()[0].getName()).append(" $) {\n")
+                            .append("        return _bytes.addAtomic").append(bytesType(type)).append("(").append(NAME).append(", $);\n")
                             .append("    }");
                 }
                 Method sizeOf = model.sizeOf();
@@ -659,7 +660,7 @@ public class DataValueGenerator {
                 .append("       return ").append(offset).append(";\n")
                 .append("    }\n");
 
-        generateObjectMethods(sb, dvmodel, entries);
+        generateObjectMethods(sb, dvmodel, entries, true);
         sb.append("}\n");
 //        System.out.println(sb);
         return sb.toString();
@@ -676,11 +677,11 @@ public class DataValueGenerator {
     private void methodSet(StringBuilder getterSetters, Method setter, Class type, String NAME, FieldModel model) {
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length - 1];
         if (!model.isArray()) {
-            getterSetters.append("    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" _) {\n");
+            getterSetters.append("    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
             getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME).append(", ");
         } else {
             getterSetters.append("    public void ").append(setter.getName()).append("(int i, ");
-            getterSetters.append(normalize(setterType)).append(" _) {\n");
+            getterSetters.append(normalize(setterType)).append(" $) {\n");
             getterSetters.append(boundsCheck(model.indexSize().value()));
             getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME);
             getterSetters.append(" + i * ").append((model.nativeSize() + 7) >> 3).append(", ");
@@ -688,7 +689,7 @@ public class DataValueGenerator {
 
         if (CharSequence.class.isAssignableFrom(type))
             getterSetters.append(model.size().value()).append(", ");
-        getterSetters.append("_);\n");
+        getterSetters.append("$);\n");
         getterSetters.append("    }\n\n");
     }
 
@@ -711,7 +712,7 @@ public class DataValueGenerator {
         if (!model.isArray()) {
             writeMarshal.append("         _").append(name).append(".writeMarshallable(out);\n");
         } else {
-            writeMarshal.append("        for(int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
+            writeMarshal.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
             writeMarshal.append("            _").append(name).append("[i].writeMarshallable(out);\n");
             writeMarshal.append("        }\n");
         }
@@ -722,7 +723,7 @@ public class DataValueGenerator {
             if (getter != null && setter != null)
                 readMarshal.append("        ").append(setter.getName()).append("(in.read").append(bytesType(type)).append("());\n");
         } else {
-            readMarshal.append("        for(int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
+            readMarshal.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
             readMarshal.append("            ").append(setter.getName()).append("(i, in.read").append(bytesType(type)).append("());\n");
             readMarshal.append("        }\n");
         }
@@ -734,7 +735,7 @@ public class DataValueGenerator {
         if (!model.isArray()) {
             readMarshal.append("         _").append(name).append(".readMarshallable(in);\n");
         } else {
-            readMarshal.append("        for(int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
+            readMarshal.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
             readMarshal.append("            _").append(name).append("[i].readMarshallable(in);\n");
             readMarshal.append("        }\n");
         }
@@ -755,7 +756,7 @@ public class DataValueGenerator {
         } else {
             fieldDeclarations.append("[] = new ").append(type.getName()).append("£native[").append(model.indexSize().value()).append("];\n");
             fieldDeclarations.append("    {\n")
-                    .append("        for(int i = 0; i < ").append(model.indexSize().value()).append("; i++)\n")
+                    .append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++)\n")
                     .append("            _").append(name).append("[i] = new ").append(type.getName()).append("£native();\n")
                     .append("    }\n");
         }
@@ -765,17 +766,17 @@ public class DataValueGenerator {
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length - 1];
 
         if (!model.isArray()) {
-            getterSetters.append("    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" _) {\n");
+            getterSetters.append("    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
             if (type == String.class && setterType != String.class)
-                getterSetters.append("        _").append(name).append(" = _.toString();\n");
+                getterSetters.append("        _").append(name).append(" = $.toString();\n");
             else
-                getterSetters.append("        _").append(name).append(".copyFrom(_);\n");
+                getterSetters.append("        _").append(name).append(".copyFrom($);\n");
         } else {
-            getterSetters.append("    public void ").append(setter.getName()).append("(int i, ").append(normalize(setterType)).append(" _) {\n");
+            getterSetters.append("    public void ").append(setter.getName()).append("(int i, ").append(normalize(setterType)).append(" $) {\n");
             if (type == String.class && setterType != String.class)
-                getterSetters.append("        _").append(name).append("[i] = _.toString();\n");
+                getterSetters.append("        _").append(name).append("[i] = $.toString();\n");
             else
-                getterSetters.append("        _").append(name).append("[i].copyFrom(_);\n");
+                getterSetters.append("        _").append(name).append("[i].copyFrom($);\n");
 
         }
         getterSetters.append("    }\n\n");
@@ -796,7 +797,7 @@ public class DataValueGenerator {
         if (!model.isArray()) {
             nestedBytes.append("        ((Byteable) _").append(name).append(").bytes(bytes, ").append(NAME).append(");\n");
         } else {
-            nestedBytes.append("       for(int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
+            nestedBytes.append("       for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
             nestedBytes.append("           ((Byteable) _").append(name).append("[i]).bytes(bytes, ").append(NAME);
             nestedBytes.append(" + (i * ").append(size).append("));\n");
             nestedBytes.append("       }\n");

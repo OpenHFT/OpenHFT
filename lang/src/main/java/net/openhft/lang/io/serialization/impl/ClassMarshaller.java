@@ -19,8 +19,8 @@ package net.openhft.lang.io.serialization.impl;
 import net.openhft.lang.Compare;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.openhft.lang.model.constraints.NotNull;
+import net.openhft.lang.model.constraints.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;

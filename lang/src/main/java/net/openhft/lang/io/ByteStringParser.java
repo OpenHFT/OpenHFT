@@ -16,8 +16,8 @@
 
 package net.openhft.lang.io;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.openhft.lang.model.constraints.NotNull;
+import net.openhft.lang.model.constraints.Nullable;
 
 /**
  * @author peter.lawrey
