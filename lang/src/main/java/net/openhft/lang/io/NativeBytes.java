@@ -413,10 +413,7 @@ public class NativeBytes extends AbstractBytes {
         // pull into cache...
         UNSAFE.getLong(startAddr + pos);
 
-        if (inputRemaining >= 8 && UNSAFE.getLong(startAddr + pos) != input.readLong(inputPos))
-            return false;
-
-        int i = 8;
+        int i = 0;
         for (; i < inputRemaining - 7; i += 8) {
             if (UNSAFE.getInt(startAddr + pos + i) != input.readInt(inputPos + i))
                 return false;
