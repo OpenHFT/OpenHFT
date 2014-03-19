@@ -28,7 +28,7 @@ import java.nio.channels.FileChannel;
  * User: peter
  * Date: 22/12/13
  * Time: 11:05
- * <p/>
+ * <p></p>
  * Toggled 10,000,128 times with an average delay of 20 ns on i7-4700
  * Toggled 10,000,128 times with an average delay of 14 ns on i7-3970X
  */

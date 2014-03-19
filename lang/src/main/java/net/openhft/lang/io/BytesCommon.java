@@ -28,7 +28,7 @@ import java.nio.ByteOrder;
  */
 public interface BytesCommon {
     /**
-     * @return the offset read/written which must be <= limit()
+     * @return the offset read/written which must be &gt;= limit()
      */
     long position();
 
@@ -38,12 +38,12 @@ public interface BytesCommon {
     Bytes position(long position);
 
     /**
-     * @return the current limit which must be <= capacity()
+     * @return the current limit which must be &gt;= capacity()
      */
     long limit();
 
     /**
-     * @param limit the new limit which must be <= capacity()
+     * @param limit the new limit which must be &gt;= capacity()
      */
     Bytes limit(long limit);
 
@@ -70,16 +70,18 @@ public interface BytesCommon {
     boolean isFinished();
 
     /**
-     * Clears this buffer.  The position is set to zero, the limit is set to
+     *
+     * <p>
+     *     Clears this buffer.  The position is set to zero, the limit is set to
      * the capacity, and the mark is discarded.
-     * <p></p>
+     * </p>
      * <p> Invoke this method before using a sequence of channel-read or
      * <i>put</i> operations to fill this buffer.  For example:
      * <p></p>
      * <blockquote><pre>
      * buf.clear();     // Prepare buffer for reading
-     * in.read(buf);    // Read data</pre></blockquote>
-     * <p></p>
+     * in.read(buf);    // Read data
+     * </pre></blockquote>
      * <p> This method does not actually erase the data in the buffer, but it
      * is named as if it did because it will most often be used in situations
      * in which that might as well be the case. </p>

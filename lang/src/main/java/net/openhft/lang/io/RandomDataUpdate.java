@@ -107,7 +107,7 @@ public interface RandomDataUpdate {
 
     /**
      * Lock across processes
-     * <p/>
+     * <p></p>
      * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
      * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
      * you will get an ISE
@@ -119,7 +119,7 @@ public interface RandomDataUpdate {
 
     /**
      * Lock across processes
-     * <p/>
+     * <p></p>
      * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
      * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
      * you will get an ISE
@@ -132,7 +132,7 @@ public interface RandomDataUpdate {
 
     /**
      * Lock across processes
-     * <p/>
+     * <p></p>
      * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
      * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
      * you will get an ISE
@@ -145,7 +145,7 @@ public interface RandomDataUpdate {
 
     /**
      * Lock across processes
-     * <p/>
+     * <p></p>
      * Lock which uses 8 bytes.  It store the lower 32 bits of the Thread Id, 16 bits are the process id and the re-entrant count as 16 bit.  This
      * means if you create more than 16 million threads you can get a collision, and if you try to re-enter 65535 times
      * you will get an ISE

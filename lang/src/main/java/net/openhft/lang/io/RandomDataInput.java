@@ -30,21 +30,22 @@ import java.util.RandomAccess;
  */
 public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon {
     /**
-     * Reads some bytes from an input stream and stores them into the buffer array <code>b</code>. The number of bytes
+     * <p>Reads some bytes from an input stream and stores them into the buffer array <code>b</code>. The number of bytes
      * read is equal to the length of <code>b</code>.
-     * <p/>
-     * This method blocks until one of the following conditions occurs:<p> <ul> <li><code>b.length</code> bytes of input
-     * data are available, in which case a normal return is made.
-     * <p/>
-     * <li>End of file is detected, in which case an <code>EOFException</code> is thrown.
-     * <p/>
-     * <li>An I/O error occurs, in which case an <code>IOException</code> other than <code>EOFException</code> is
-     * thrown. </ul>
-     * <p/>
+     * </p><p>
+     * This method blocks until one of the following conditions occurs:
+     * </p>
+     * <ul>
+     * <li><code>b.length</code> bytes of input data are available, in which case a normal return is made. </li>
+     * <li>End of file is detected, in which case an <code>EOFException</code> is thrown.</li>
+     * <li>An I/O error occurs, in which case an <code>IOException</code> other than <code>EOFException</code> is thrown.</li>
+     * </ul>
+     * <p>
      * If <code>b</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. If <code>b.length</code>
      * is zero, then no bytes are read. Otherwise, the first byte read is stored into element <code>b[0]</code>, the
      * next one into <code>b[1]</code>, and so on. If an exception is thrown from this method, then it may be that some
      * but not all bytes of <code>b</code> have been updated with data from the input stream.
+     * </p>
      *
      * @param bytes the buffer into which the data is read.
      */
@@ -52,21 +53,22 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     void readFully(@NotNull byte[] bytes);
 
     /**
-     * Reads <code>len</code> bytes from an input stream.
-     * <p/>
-     * This method blocks until one of the following conditions occurs:<p> <ul> <li><code>len</code> bytes of input data
-     * are available, in which case a normal return is made.
-     * <p/>
-     * <li>End of file is detected, in which case an <code>EOFException</code> is thrown.
-     * <p/>
-     * <li>An I/O error occurs, in which case an <code>IOException</code> other than <code>EOFException</code> is
-     * thrown. </ul>
-     * <p/>
+     * <p>Reads <code>len</code> bytes from an input stream.
+     * </p><p>
+     * This method blocks until one of the following conditions occurs:
+     * </p>
+     * <ul>
+     * <li><code>len</code> bytes of input data are available, in which case a normal return is made.</li>
+     * <li>End of file is detected, in which case an <code>EOFException</code> is thrown.</li>
+     * <li>An I/O error occurs, in which case an <code>IOException</code> other than <code>EOFException</code> is thrown. </li>
+     * </ul>
+     * <p>
      * If <code>b</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. If <code>off</code> is
      * negative, or <code>len</code> is negative, or <code>off+len</code> is greater than the length of the array
      * <code>b</code>, then an <code>IndexOutOfBoundsException</code> is thrown. If <code>len</code> is zero, then no
      * bytes are read. Otherwise, the first byte read is stored into element <code>b[off]</code>, the next one into
      * <code>b[off+1]</code>, and so on. The number of bytes read is, at most, equal to <code>len</code>.
+     * </p>
      *
      * @param bytes the buffer into which the data is read.
      * @param off   an int specifying the offset into the data.
@@ -153,7 +155,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * Reads two input bytes and returns a <code>short</code> value. Let <code>a</code> be the first byte read and
      * <code>b</code> be the second byte on big endian machines, and the opposite on little endian machines. The value
      * returned is:
-     * <p><pre><code>(short)((a &lt;&lt; 8) | (b &amp; 0xff))
+     * <pre><code>(short)((a &lt;&lt; 8) | (b &amp; 0xff))
      * </code></pre>
      * This method is suitable for reading the bytes written by the <code>writeShort</code> method of interface
      * <code>DataOutput</code>.
@@ -167,7 +169,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * Reads two input bytes and returns a <code>short</code> value. Let <code>a</code> be the first byte read and
      * <code>b</code> be the second byte on big endian machines, and the opposite on little endian machines. The value
      * returned is:
-     * <p><pre><code>
+     * <pre><code>
      *     (short)((a &lt;&lt; 8) | (b &amp; 0xff))
      * </code></pre>
      * This method is suitable for reading the bytes written by the <code>writeShort</code> method of interface
@@ -214,7 +216,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * Reads one or three input bytes and returns a <code>short</code> value. Let <code>a</code> be the first byte read.
      * This mapped as follows; Byte.MIN_VALUE =&gt; Short.MIN_VALUE, Byte.MAX_VALUE =&gt; Short.MAX_VALUE, Byte.MIN_VALUE+2 to
      * Byte.MAX_VALUE-1 =&gt; same as short value, Byte.MIN_VALUE+1 =&gt; readShort().
-     * <p/>
+     * <p></p>
      * This method is suitable for reading the bytes written by the <code>writeCompactShort</code> method of interface
      * <code>RandomDataOutput</code>.
      *
@@ -225,7 +227,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     /**
      * Reads one or three input bytes and returns a <code>short</code> value. Let <code>a</code> be the first byte read.
      * This mapped as follows; -1 =&gt; readUnsignedShort(), default =&gt; (a &amp; 0xFF)
-     * <p/>
+     * <p></p>
      * This method is suitable for reading the bytes written by the <code>writeCompactUnsignedShort</code> method of
      * interface <code>RandomDataOutput</code>.
      *
@@ -387,7 +389,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * with readShort(). This mapped as follows; Short.MIN_VALUE =&gt; Integer.MIN_VALUE, Short.MAX_VALUE =&gt;
      * Integer.MAX_VALUE, Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; same as short value, Short.MIN_VALUE+1 =&gt;
      * readInt().
-     * <p/>
+     * <p></p>
      * This method is suitable for reading the bytes written by the <code>writeCompactInt</code> method of interface
      * <code>RandomDataOutput</code>.
      *
@@ -398,7 +400,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     /**
      * Reads two or six input bytes and returns an <code>int</code> value. Let <code>a</code> be the first short read
      * with readShort(). This mapped as follows; -1 =&gt; readUnsignedInt(), default =&gt; (a &amp; 0xFFFF)
-     * <p/>
+     * <p></p>
      * This method is suitable for reading the bytes written by the <code>writeCompactUnsignedInt</code> method of
      * interface <code>RandomDataOutput</code>.
      *
@@ -419,7 +421,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *  ((long)(g &amp; 0xff) &lt;&lt;  8) |
      *  ((long)(h &amp; 0xff)))
      * </code></pre>
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeLong</code> method of interface
      * <code>DataOutput</code>.
      *
@@ -441,7 +443,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *  ((long)(g &amp; 0xff) &lt;&lt;  8) |
      *  ((long)(h &amp; 0xff)))
      * </code></pre>
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeLong</code> method of interface
      * <code>RandomDataOutput</code>.
      *
@@ -452,7 +454,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * This is the same readLong() except a dread barrier is performed first
-     * <p/>
+     * <p></p>
      * Reads eight input bytes and returns a <code>long</code> value. Let <code>a-h</code> be the first through eighth
      * bytes read on big endian machines, and the opposite on little endian machines. The value returned is:
      * <p><pre> <code>
@@ -465,7 +467,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *  ((long)(g &amp; 0xff) &lt;&lt;  8) |
      *  ((long)(h &amp; 0xff)))
      * </code></pre>
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeOrderedLong</code> or
      * <code>writeVolatileLong</code> method of interface <code>RandomDataOutput</code>.
      *
@@ -475,7 +477,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * This is the same readLong() except a dread barrier is performed first
-     * <p/>
+     * <p></p>
      * Reads eight input bytes and returns a <code>long</code> value. Let <code>a-h</code> be the first through eighth
      * bytes read on big endian machines, and the opposite on little endian machines. The value returned is:
      * <p><pre> <code>
@@ -488,7 +490,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *  ((long)(g &amp; 0xff) &lt;&lt;  8) |
      *  ((long)(h &amp; 0xff)))
      * </code></pre>
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeOrderedLong</code> or
      * <code>writeVolatileLong</code> method of interface <code>RandomDataOutput</code>.
      *
@@ -508,7 +510,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *  ((long)(e &amp; 0xff) &lt;&lt; 24) |
      *  ((long)(f &amp; 0xff) &lt;&lt; 16)) &gt;&gt; 16
      * </code></pre>
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeInt48</code> method of interface
      * <code>RandomDataOutput</code>.
      *
@@ -527,7 +529,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *  ((long)(e &amp; 0xff) &lt;&lt; 24) |
      *  ((long)(f &amp; 0xff) &lt;&lt; 16)) &gt;&gt; 16
      * </code></pre>
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeInt48</code> method of interface
      * <code>RandomDataOutput</code>.
      *
@@ -540,7 +542,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * Reads four or twelve input bytes and returns a <code>long</code> value. Let <code>a</code> be the first int read
      * with readInt(). This mapped as follows; Integer.MIN_VALUE =&gt; Long.MIN_VALUE, Integer.MAX_VALUE =&gt; Long.MAX_VALUE,
      * Integer.MIN_VALUE+2 to Integer.MAX_VALUE-1 =&gt; same as short value, Integer.MIN_VALUE+1 =&gt; readLong().
-     * <p/>
+     * <p></p>
      * This method is suitable for reading the bytes written by the <code>writeCompactLong</code> method of interface
      * <code>RandomDataOutput</code>.
      *
@@ -557,7 +559,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      *     l |= (b &amp; 0x7FL) &lt;&lt; count;
      *     count += 7;
      * }
-     * if (b == 0 && count &gt; 0)
+     * if (b == 0 &amp;&amp; count &gt; 0)
      *     return ~l;
      * return l | (b &lt;&lt; count);
      * </code></pre>
@@ -593,7 +595,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     /**
      * This is the same as readFloat() except a read barrier is performed first. <p> Reads four input bytes and returns
      * a <code>float</code> value.
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeOrderedFloat</code> method of interface <code>RandomDataOutput</code>.
      *
      * @param offset to read from
@@ -635,7 +637,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     /**
      * This is the same as readDouble() except a read barrier is performed first. <p> Reads four input bytes and returns
      * a <code>float</code> value.
-     * <p/>
+     * <p></p>
      * This method is suitable for reading bytes written by the <code>writeOrderedFloat</code> method of interface <code>RandomDataOutput</code>.
      *
      * @param offset to read from
@@ -648,7 +650,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * into a character, until it encounters a line terminator or end of file; the characters read are then returned as
      * a <code>String</code>. Note that because this method processes bytes, it does not support input of the full
      * Unicode character set.
-     * <p/>
+     * <p></p>
      * If end of file is encountered before even one byte can be read, then <code>null</code> is returned. Otherwise,
      * each byte that is read is converted to type <code>char</code> by zero-extension. If the character
      * <code>'\n'</code> is encountered, it is discarded and reading ceases. If the character <code>'\r'</code> is
@@ -670,17 +672,17 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * Reads in a string that has been encoded using a <a href="#modified-utf-8">modified UTF-8</a> format. The general
      * contract of <code>readUTF</code> is that it reads a representation of a Unicode character string encoded in
      * modified UTF-8 format; this string of characters is then returned as a <code>String</code>.
-     * <p/>
+     * <p></p>
      * First, two bytes are read and used to construct an unsigned 16-bit integer in exactly the manner of the
      * <code>readUnsignedShort</code> method . This integer value is called the <i>UTF length</i> and specifies the
      * number of additional bytes to be read. These bytes are then converted to characters by considering them in
      * groups. The length of each group is computed from the value of the first byte of the group. The byte following a
      * group, if any, is the first byte of the next group.
-     * <p/>
+     * <p></p>
      * If the first byte of a group matches the bit pattern <code>0xxxxxxx</code> (where <code>x</code> means "may be
      * <code>0</code> or <code>1</code>"), then the group consists of just that byte. The byte is zero-extended to form
      * a character.
-     * <p/>
+     * <p></p>
      * If the first byte of a group matches the bit pattern <code>110xxxxx</code>, then the group consists of that byte
      * <code>a</code> and a second byte <code>b</code>. If there is no byte <code>b</code> (because byte <code>a</code>
      * was the last of the bytes to be read), or if byte <code>b</code> does not match the bit pattern
@@ -698,14 +700,14 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * </code></pre>
      * If the first byte of a group matches the pattern <code>1111xxxx</code> or the pattern <code>10xxxxxx</code>, then
      * a <code>UTFDataFormatException</code> is thrown.
-     * <p/>
+     * <p></p>
      * If end of file is encountered at any time during this entire process, then an <code>EOFException</code> is
      * thrown.
-     * <p/>
+     * <p></p>
      * After every group has been converted to a character by this process, the characters are gathered, in the same
      * order in which their corresponding groups were read from the input stream, to form a <code>String</code>, which
      * is returned.
-     * <p/>
+     * <p></p>
      * The <code>writeUTF</code> method of interface <code>DataOutput</code> may be used to write data that is suitable
      * for reading by this method.
      *
@@ -753,7 +755,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     /**
      * Read a String with <code>readUTFΔ</code> which is converted to an enumerable type. i.e. where there is a one to
      * one mapping between an object and it's toString().
-     * <p/>
+     * <p></p>
      * This is suitable to read an object written using <code>writeEnum()</code> in the <code>RandomDataOutput</code>
      * interface
      *
@@ -765,7 +767,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Read a stop bit encoded length and populates this Collection after zeroOut()ing it.
-     * <p/>
+     * <p></p>
      * This is suitable to reading a list written using <code>writeList()</code> in the <code>RandomDataOutput</code>
      * interface
      *
@@ -775,7 +777,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     /**
      * Read a stop bit encoded length and populates this Map after zeroOut()ing it.
-     * <p/>
+     * <p></p>
      * This is suitable to reading a list written using <code>writeMap()</code> in the <code>RandomDataOutput</code>
      * interface
      *

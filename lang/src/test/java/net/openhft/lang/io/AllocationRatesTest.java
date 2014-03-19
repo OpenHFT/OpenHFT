@@ -32,7 +32,7 @@ buffers 128 KB took an average of 8,739 ns for heap ByteBuffer, 22,684 ns for di
  */
 public class AllocationRatesTest {
     static final int BUFFER_SIZE = 128 * 1024;
-    static final int ALLOCATIONS = 25000;
+    static final int ALLOCATIONS = 10000;
     public static final int BATCH = 10;
 
     @Test
