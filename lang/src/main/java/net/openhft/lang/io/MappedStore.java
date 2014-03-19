@@ -159,7 +159,7 @@ public class MappedStore implements BytesStore {
     }
 
     public File file() {
-        return null;
+        return file;
     }
 
     static class Unmapper implements Runnable {
