@@ -166,7 +166,7 @@ public class DataValueGenerator {
             sb.append("import ").append(normalize(aClass)).append(";\n");
         }
         sb.append("\npublic class ").append(simpleName(dvmodel.type()))
-                .append("£heap implements ").append(dvmodel.type().getSimpleName())
+                .append("$$Heap implements ").append(dvmodel.type().getSimpleName())
                 .append(", BytesMarshallable, Copyable<").append(normalize(dvmodel.type())).append(">  {\n");
         sb.append(fieldDeclarations).append('\n');
         sb.append(getterSetters);
@@ -407,7 +407,7 @@ public class DataValueGenerator {
                         .append("            _").append(name).append("[i] = new ").append(type.getName());
 
                 if (type.isInterface()) {
-                    fieldDeclarations.append("£heap();\n");
+                    fieldDeclarations.append("$$Heap();\n");
                 } else {
                     fieldDeclarations.append("();\n");
                 }
@@ -435,7 +435,7 @@ public class DataValueGenerator {
         if (heapClass != null)
             return heapClass;
         ClassLoader classLoader = tClass.getClassLoader();
-        String className = tClass.getName() + "£heap";
+        String className = tClass.getName() + "$$Heap";
         try {
             heapClass = classLoader.loadClass(className);
         } catch (ClassNotFoundException ignored) {
@@ -483,7 +483,7 @@ public class DataValueGenerator {
         if (dumpCode)
             LOGGER.info(actual);
         ClassLoader classLoader = tClass.getClassLoader();
-        String className = tClass.getName() + "£native";
+        String className = tClass.getName() + "$$Native";
         try {
             nativeClass = classLoader.loadClass(className);
         } catch (ClassNotFoundException ignored) {
@@ -624,7 +624,7 @@ public class DataValueGenerator {
             sb.append("import ").append(aClass.getName().replace('$', '.')).append(";\n");
         }
         sb.append("\npublic class ").append(simpleName(dvmodel.type()))
-                .append("£native implements ").append(simpleName(dvmodel.type()).replace('$', '.'))
+                .append("$$Native implements ").append(simpleName(dvmodel.type()).replace('$', '.'))
                 .append(", BytesMarshallable, Byteable, Copyable<").append(normalize(dvmodel.type())).append("> {\n");
         sb.append(staticFieldDeclarations).append('\n');
         sb.append(fieldDeclarations).append('\n');
@@ -750,14 +750,14 @@ public class DataValueGenerator {
     }
 
     private void nonScalarFieldDeclaration(StringBuilder fieldDeclarations, Class type, String name, FieldModel model) {
-        fieldDeclarations.append("    private final ").append(type.getName()).append("£native _").append(name);
+        fieldDeclarations.append("    private final ").append(type.getName()).append("$$Native _").append(name);
         if (!model.isArray()) {
-            fieldDeclarations.append(" = new ").append(type.getName()).append("£native();\n");
+            fieldDeclarations.append(" = new ").append(type.getName()).append("$$Native();\n");
         } else {
-            fieldDeclarations.append("[] = new ").append(type.getName()).append("£native[").append(model.indexSize().value()).append("];\n");
+            fieldDeclarations.append("[] = new ").append(type.getName()).append("$$Native[").append(model.indexSize().value()).append("];\n");
             fieldDeclarations.append("    {\n")
                     .append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++)\n")
-                    .append("            _").append(name).append("[i] = new ").append(type.getName()).append("£native();\n")
+                    .append("            _").append(name).append("[i] = new ").append(type.getName()).append("$$Native();\n")
                     .append("    }\n");
         }
     }

@@ -100,7 +100,7 @@ public class DataValueGeneratorTest {
         String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterface.class);
 //        System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
-        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "£native", actual);
+        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "$$Native", actual);
         JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
         ((Byteable) jbi).bytes(bytes, 0L);
