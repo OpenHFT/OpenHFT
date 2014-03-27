@@ -658,8 +658,9 @@ public class DirectByteBufferBytesTest {
         bytes.append(1234).append(' ');
         bytes.append(123456L).append(' ');
         bytes.append(1.2345).append(' ');
-        bytes.append(1.5555, 3).append(' ');
 
+        bytes.append(1.1234567891, 9).append(' ');
+        bytes.append(1.1234567).append(' ');
         bytes.position(0);
         assertEquals(false, bytes.parseBoolean(SPACE_STOP));
         assertEquals(true, bytes.parseBoolean(SPACE_STOP));
@@ -669,24 +670,51 @@ public class DirectByteBufferBytesTest {
         assertEquals(1234, bytes.parseLong());
         assertEquals(123456L, bytes.parseLong());
         assertEquals(1.2345, bytes.parseDouble(), 0);
+        assertEquals(1.123456789, bytes.parseDouble(), 0);
+        assertEquals(1.1234567, bytes.parseDouble(), 0);
     }
 
 
     @Test
     public void testAppendParseDouble0() {
 
-        bytes.append(1.123456789, 9).append(' ');
+        bytes.append(1.123456789, 9);
         bytes.position(0);
         assertEquals(1.123456789, bytes.parseDouble(), 0);
     }
 
     @Test
     public void testAppendParseDouble1() {
-        bytes.append(1.123456789).append(' ');
+        bytes.append(1.123456789);
         bytes.position(0);
         assertEquals(1.123456789, bytes.parseDouble(), 0);
 
     }
+
+
+    @Test
+    public void testAppendParseDoubleWithPadding() {
+        bytes.append("qwertyuiop").append(' ');
+        bytes.append(1.123456789).append(' ');
+        bytes.append(123456L);
+        bytes.position(0);
+        assertEquals("qwertyuiop", bytes.parseUTF(SPACE_STOP));
+        assertEquals(1.123456789, bytes.parseDouble(), 0);
+        assertEquals(123456, bytes.parseLong());
+
+    }
+
+
+    @Test
+    public void testAppendParseDoubleWithPadding2() {
+        bytes.append(1.2345, 3).append(' ');
+        bytes.append(2.1234567891, 9).append(' ');
+        bytes.position(0);
+        assertEquals(1.235, bytes.parseDouble(), 0);
+        assertEquals(2.123456789, bytes.parseDouble(), 0);
+
+    }
+
 
     @Test
     public void testAppendParseDouble2() {
