@@ -18,6 +18,7 @@ package net.openhft.lang.collection;
 
 import net.openhft.lang.model.constraints.MaxSize;
 import net.openhft.lang.model.constraints.Range;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -62,8 +63,12 @@ interface TimedQuote extends Quote {
     void setTimestamp(long price);
 }
 
+
 public class HugePricesMain {
-    public static void main(String[] args) {
+
+
+    @Test
+    public  void test() {
         int length = 1000;
         final HugeArray<Price> prices =
                 HugeCollections.newArray(Price.class, length);
@@ -72,7 +77,7 @@ public class HugePricesMain {
             price.setInstrument("ID" + i);
             price.getAsk().setPrice(100.1);
             price.getAsk().setAmount(1000);
-            price.getBid().setPrice(99.8);
+            price.getBid().setPrice(99.8123456789);
             price.getBid().setAmount(2000);
             prices.recycle(price);
         }
@@ -81,7 +86,7 @@ public class HugePricesMain {
             assertEquals("ID" + i, price.getInstrument());
             assertEquals(100.1, price.getAsk().getPrice(), 0.0);
             assertEquals(1000, price.getAsk().getAmount());
-            assertEquals(99.8, price.getBid().getPrice(), 0.0);
+            assertEquals(99.8123456789, price.getBid().getPrice(), 0.0);
             assertEquals(2000, price.getBid().getAmount());
             prices.recycle(price);
         }
