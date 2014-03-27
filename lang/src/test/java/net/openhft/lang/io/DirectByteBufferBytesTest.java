@@ -659,6 +659,7 @@ public class DirectByteBufferBytesTest {
         bytes.append(123456L).append(' ');
         bytes.append(1.2345).append(' ');
         bytes.append(1.5555, 3).append(' ');
+
         bytes.position(0);
         assertEquals(false, bytes.parseBoolean(SPACE_STOP));
         assertEquals(true, bytes.parseBoolean(SPACE_STOP));
@@ -668,7 +669,30 @@ public class DirectByteBufferBytesTest {
         assertEquals(1234, bytes.parseLong());
         assertEquals(123456L, bytes.parseLong());
         assertEquals(1.2345, bytes.parseDouble(), 0);
-        assertEquals(1.556, bytes.parseDouble(), 0);
+    }
+
+
+    @Test
+    public void testAppendParseDouble0() {
+
+        bytes.append(1.123456789, 9).append(' ');
+        bytes.position(0);
+        assertEquals(1.123456789, bytes.parseDouble(), 0);
+    }
+
+    @Test
+    public void testAppendParseDouble1() {
+        bytes.append(1.123456789).append(' ');
+        bytes.position(0);
+        assertEquals(1.123456789, bytes.parseDouble(), 0);
+
+    }
+
+    @Test
+    public void testAppendParseDouble2() {
+        bytes.append(1.1234).append(' ');
+        bytes.position(0);
+        assertEquals(1.1234, bytes.parseDouble(), 0);
 
     }
 
