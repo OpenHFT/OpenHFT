@@ -678,9 +678,11 @@ public class DirectByteBufferBytesTest {
     @Test
     public void testAppendParseDouble0() {
 
-        bytes.append(1.123456789, 9);
+        bytes.append(1.123456789234, 7).append(' ');
+        bytes.append(1.123456789234, 7).append(' ');
         bytes.position(0);
-        assertEquals(1.123456789, bytes.parseDouble(), 0);
+        assertEquals(1.1234568, bytes.parseDouble(), 0);
+        assertEquals(1.1234568, bytes.parseDouble(), 0);
     }
 
     @Test
