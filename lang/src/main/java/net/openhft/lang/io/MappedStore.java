@@ -23,10 +23,8 @@ import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
@@ -146,16 +144,6 @@ public class MappedStore implements BytesStore {
             imode = MAP_PV;
         assert (imode >= 0);
         return imode;
-    }
-
-    private static FileDescriptor getFD(FileChannel fileChannel) throws IOException {
-        try {
-            Field fd = fileChannel.getClass().getDeclaredField("fd");
-            fd.setAccessible(true);
-            return (FileDescriptor) fd.get(fileChannel);
-        } catch (Exception e) {
-            throw wrap(e);
-        }
     }
 
     public File file() {
