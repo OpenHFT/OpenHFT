@@ -21,11 +21,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.openhft</groupId>
-    <artifactId>lang-osgi</artifactId>
+    <artifactId>lang-test</artifactId>
     <version>6.3.4-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>OpenHFT/Java-Lang/lang-osgi</name>
+    <name>OpenHFT/Java-Lang/lang-test</name>
     <description>Java Lang library for High Frequency Trading (Java 6+)</description>
 
     <properties>
@@ -203,9 +203,13 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${openhft.java.version}</source>
+                    <target>${openhft.java.version}</target>
                     <encoding>UTF-8</encoding>
+                    <verbose>true</verbose>
+                    <fork>true</fork>
+                    <executable>${openhft.java.home}/bin/javac</executable>
+                    <compilerVersion>${openhft.java.version}</compilerVersion>
                 </configuration>
             </plugin>
             <plugin>
@@ -261,6 +265,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.16</version>
                 <configuration>
+                    <jvm>${openhft.java.home}/bin/java</jvm>
                     <systemPropertyVariables>
                         <openhft.compiler.version>${openhft.compiler.version}</openhft.compiler.version>
                         <main.basedir>${project.basedir}</main.basedir>
@@ -314,6 +319,10 @@
         <url>scm:git:https://github.com/OpenHFT/Java-Lang.git</url>
     </scm>
 
+    <!-- ******************************************************************* -->
+    <!-- PROFILES                                                            -->
+    <!-- ******************************************************************* -->
+
     <profiles>
         <profile>
             <id>felix</id>
@@ -337,6 +346,51 @@
                 </dependency>
             </dependencies>
         </profile>
+
+        <profile>
+            <id>jdk_default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME}</openhft.java.home>
+                <openhft.java.version>1.6</openhft.java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk_1.6</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME_6}</openhft.java.home>
+                <openhft.java.version>1.6</openhft.java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk_1.7</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME_7}</openhft.java.home>
+                <openhft.java.version>1.7</openhft.java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk_1.8</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME_8}</openhft.java.home>
+                <openhft.java.version>1.7</openhft.java.version>
+            </properties>
+        </profile>
+
     </profiles>
 
 </project>
