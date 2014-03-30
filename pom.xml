@@ -23,12 +23,11 @@
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
-        <!--<module>Java-Direct</module>-->
+        <module>third-party-bom</module>
         <module>Java-Thread-Affinity</module>
         <module>Java-Runtime-Compiler</module>
         <module>Java-Lang</module>
         <module>Java-Chronicle</module>
         <module>HugeCollections</module>
-        <!--<module>TransFIX</module>-->
     </modules>
 </project>
