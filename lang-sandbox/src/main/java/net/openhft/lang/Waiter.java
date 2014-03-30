@@ -15,8 +15,9 @@
  */
 package net.openhft.lang;
 
-/*
- * JLANGX-10 Wait strategy
+/**
+ *
  */
-public interface WaitStrategy extends Waiter {
+public interface Waiter {
+    public void await();
 }

@@ -15,8 +15,17 @@
  */
 package net.openhft.lang;
 
-/*
- * JLANGX-10 Wait strategy
- */
-public interface WaitStrategy extends Waiter {
+
+public class WaitStrategies {
+    public static final class CountingWaitStrategy implements WaitStrategy {
+        @Override
+        public void await() {
+        }
+    }
+
+    public static final class TimedWaitStrategy implements WaitStrategy {
+        @Override
+        public void await() {
+        }
+    }
 }
