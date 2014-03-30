@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.openhft</groupId>
     <artifactId>third-party-bom</artifactId>
-    <version>3.0</version>
+    <version>3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the other
@@ -34,7 +34,6 @@
         <pax.exam.version>3.4.0</pax.exam.version>
         <pax.url.version>1.6.0</pax.url.version>
         <!--<logback.version>0.9.6</logback.version>-->
-        <!--<openhft.lang.version>6.3.4</openhft.lang.version>-->
         <osgi.version>5.0.0</osgi.version>
         <slf4j.version>1.7.6</slf4j.version>
     </properties>
@@ -152,7 +151,7 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!-- plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.5</version>
@@ -168,7 +167,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin -->
         </plugins>
     </build>
 
