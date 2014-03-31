@@ -39,7 +39,6 @@
         <logback.version>0.9.6</logback.version>
     </properties>
 
-
     <dependencyManagement>
         <dependencies>
 
@@ -47,6 +46,12 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>compiler</artifactId>
+                <version>${openhft.compiler.version}</version>
             </dependency>
 
             <dependency>
@@ -131,6 +136,11 @@
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>compiler</artifactId>
         </dependency>
 
         <dependency>
@@ -267,11 +277,34 @@
                 <configuration>
                     <jvm>${openhft.java.home}/bin/java</jvm>
                     <systemPropertyVariables>
-                        <openhft.compiler.version>${openhft.compiler.version}</openhft.compiler.version>
+                        <!-- needed for OSGi testing -->
                         <main.basedir>${project.basedir}</main.basedir>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
+            <!--
+                generate maven dependencies versions file that can be used later
+                to install the right bundle in test phase.
+
+                The file is:
+
+                    target/classes/META-INF/maven/dependencies.properties
+            -->
+            <plugin>
+              <groupId>org.apache.servicemix.tooling</groupId>
+              <artifactId>depends-maven-plugin</artifactId>
+              <version>1.2</version>
+              <executions>
+                <execution>
+                  <id>generate-depends-file</id>
+                  <goals>
+                    <goal>generate-depends-file</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>

@@ -33,6 +33,9 @@ import java.io.File;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.MavenUtils.asInProject;
+import org.ops4j.pax.exam.MavenUtils;
+
 
 /**
  * @author lburgazzoli
@@ -43,21 +46,21 @@ public class OSGiBundleTest extends OSGiTestBase {
     BundleContext context;
 
     @Configuration
-    public Option[] config() { 
+    public Option[] config() {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
 
         return options(
-                systemProperty("org.osgi.framework.storage.clean").value("true"),
-                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
-                mavenBundle("net.openhft", "compiler", System.getProperty("openhft.compiler.version")),
-                workspaceBundle("lang"),
-                workspaceBundle("lang-osgi"),
-                junitBundles(),
-                systemPackage("sun.misc"),
-                systemPackage("sun.nio.ch"),
-                systemPackage("com.sun.tools.javac.api"),
-                cleanCaches()
+            systemProperty("org.osgi.framework.storage.clean").value("true"),
+            systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
+            mavenBundle().groupId("net.openhft").artifactId("compiler").versionAsInProject(),
+            workspaceBundle("lang"),
+            workspaceBundle("lang-test"),
+            junitBundles(),
+            systemPackage("sun.misc"),
+            systemPackage("sun.nio.ch"),
+            systemPackage("com.sun.tools.javac.api"),
+            cleanCaches()
         );
     }
 
