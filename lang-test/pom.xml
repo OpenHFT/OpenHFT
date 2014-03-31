@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>lang-test</artifactId>
-    <version>6.3.4-SNAPSHOT</version>
+    <version>6.3.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>OpenHFT/Java-Lang/lang-test</name>
@@ -359,7 +359,7 @@
         </profile>
 
         <profile>
-            <id>jdk_1.6</id>
+            <id>jdk_6</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -370,7 +370,7 @@
         </profile>
 
         <profile>
-            <id>jdk_1.7</id>
+            <id>jdk_7</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -381,7 +381,7 @@
         </profile>
 
         <profile>
-            <id>jdk_1.8</id>
+            <id>jdk_8</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
