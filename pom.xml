@@ -14,8 +14,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.openhft</groupId>
@@ -24,10 +24,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>third-party-bom</module>
-        <module>Java-Thread-Affinity</module>
+        <!--<module>Java-Thread-Affinity</module>
         <module>Java-Runtime-Compiler</module>
         <module>Java-Lang</module>
         <module>Java-Chronicle</module>
-        <module>HugeCollections</module>
+        <module>HugeCollections</module>-->
     </modules>
 </project>
