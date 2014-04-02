@@ -415,7 +415,7 @@ public class NativeBytes extends AbstractBytes {
 
         int i = 0;
         for (; i < inputRemaining - 7; i += 8) {
-            if (UNSAFE.getInt(startAddr + pos + i) != input.readInt(inputPos + i))
+            if (UNSAFE.getLong(startAddr + pos + i) != input.readLong(inputPos + i))
                 return false;
         }
         for (; i < inputRemaining; i++) {
