@@ -15,9 +15,6 @@
  */
 package net.openhft.lang;
 
-/**
- *
- */
 public interface Waiter {
     public void await();
 }

@@ -18,11 +18,11 @@ package net.openhft.lang;
 import java.util.concurrent.locks.LockSupport;
 
 public class Waiters {
-    public static final Waiter BUSY_WAITER = new BusySpinWaiter();
+    public static final Waiter BUSY_WAITER = new BusyWaiter();
     public static final Waiter YELD_WAITER = new YieldWaiter();
-    public static final Waiter APRK_WAITER = new ParkWaiter();
+    public static final Waiter PARK_WAITER = new ParkWaiter();
 
-    public static final class BusySpinWaiter implements Waiter {
+    public static final class BusyWaiter implements Waiter {
         @Override
         public void await() {
         }
