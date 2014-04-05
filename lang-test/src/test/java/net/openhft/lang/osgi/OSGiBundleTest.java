@@ -16,8 +16,8 @@
 
 package net.openhft.lang.osgi;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+//import ch.qos.logback.classic.Level;
+//import ch.qos.logback.classic.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -32,6 +32,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.MavenUtils.asInProject;
 import org.ops4j.pax.exam.MavenUtils;
@@ -47,13 +48,13 @@ public class OSGiBundleTest extends OSGiTestBase {
 
     @Configuration
     public Option[] config() {
-        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.INFO);
-
         return options(
             systemProperty("org.osgi.framework.storage.clean").value("true"),
             systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
-            mavenBundle().groupId("net.openhft").artifactId("compiler").versionAsInProject(),
+            mavenBundleAsInProject("org.slf4j","slf4j-api"),
+            mavenBundleAsInProject("org.slf4j","slf4j-simple").noStart(),
+            mavenBundleAsInProject("net.openhft","compiler"),
+            mavenBundleAsInProject("net.openhft","collections"),
             workspaceBundle("lang"),
             workspaceBundle("lang-test"),
             junitBundles(),
@@ -70,23 +71,19 @@ public class OSGiBundleTest extends OSGiTestBase {
     }
 
     @Test
-    public void checkHelloBundle() {
+    public void checkBundle() {
         Boolean bundleFound = false;
-        Boolean bundleActive = false;
 
         Bundle[] bundles = context.getBundles();
         for (Bundle bundle : bundles) {
             if (bundle != null) {
                 if (bundle.getSymbolicName().equals("net.openhft.lang")) {
                     bundleFound = true;
-                    if (bundle.getState() == Bundle.ACTIVE) {
-                        bundleActive = true;
-                    }
+                    assertEquals(bundle.getState(),Bundle.ACTIVE);
                 }
             }
         }
 
         assertTrue(bundleFound);
-        assertTrue(bundleActive);
     }
 }
