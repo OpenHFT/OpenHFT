@@ -18,6 +18,14 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>net.openhft</groupId>
+        <artifactId>java-parent-pom</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.openhft</groupId>
@@ -27,10 +35,6 @@
 
     <name>OpenHFT/Java-Lang/lang-test</name>
     <description>Java Lang library for High Frequency Trading (Java 6+)</description>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -129,47 +133,15 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
+       <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>2.2.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-scm-publish-plugin</artifactId>
-                    <version>1.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.4.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.17</version>
-                </plugin>
-                <plugin>
-                      <groupId>org.apache.servicemix.tooling</groupId>
-                      <artifactId>depends-maven-plugin</artifactId>
+                    <groupId>org.apache.servicemix.tooling</groupId>
+                    <artifactId>depends-maven-plugin</artifactId>
                     <version>1.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
-
-        <testSourceDirectory>src/test/java</testSourceDirectory>
 
         <plugins>
             <plugin>
@@ -183,36 +155,6 @@
                     <fork>true</fork>
                     <executable>${openhft.java.home}/bin/javac</executable>
                     <compilerVersion>${openhft.java.version}</compilerVersion>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <show>public</show>
-                    <nohelp>true</nohelp>
                 </configuration>
             </plugin>
             <plugin>
@@ -276,23 +218,6 @@
         </plugins>
     </build>
 
-    <url>http://www.openhft.net</url>
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>Peter Lawrey</name>
-            <email>peter.lawrey@higherfrequencytrading.com</email>
-        </developer>
-    </developers>
-
     <scm>
         <url>scm:git:https://github.com/OpenHFT/Java-Lang.git</url>
     </scm>
@@ -302,28 +227,6 @@
     <!-- ******************************************************************* -->
 
     <profiles>
-        <profile>
-            <id>felix</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>pax.exam.framework</name>
-                    <value>felix</value>
-                </property>
-            </activation>
-            <properties>
-                <pax.exam.framework>felix</pax.exam.framework>
-                <pax.exam.logging>none</pax.exam.logging>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.apache.felix.framework</artifactId>
-                    <version>4.2.1</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
 
         <profile>
             <id>jdk_default</id>
@@ -371,27 +274,5 @@
 
     </profiles>
 
-    <repositories>
-        <repository>
-            <id>Snapshot Repository</id>
-            <name>Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
 </project>
+

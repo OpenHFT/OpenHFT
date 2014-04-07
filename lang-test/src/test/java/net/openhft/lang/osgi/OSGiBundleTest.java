@@ -55,7 +55,7 @@ public class OSGiBundleTest extends OSGiTestBase {
             mavenBundleAsInProject("org.slf4j","slf4j-simple").noStart(),
             mavenBundleAsInProject("net.openhft","compiler"),
             mavenBundleAsInProject("net.openhft","collections"),
-            workspaceBundle("lang"),
+            mavenBundleAsInProject("net.openhft","lang"),
             workspaceBundle("lang-test"),
             junitBundles(),
             systemPackage("sun.misc"),
