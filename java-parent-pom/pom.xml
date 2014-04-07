@@ -28,6 +28,13 @@
     <description>This parent pom is used by all the OpenHft java projects.</description>
 
     <url>http://www.openhft.net</url>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -99,6 +106,24 @@
                     <version>1.5</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.6</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.4.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.16</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -160,9 +185,14 @@
                 </configuration>
             </plugin>
 
-        </plugins>
-    </build>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
 
+        </plugins>
+
+    </build>
 
     <profiles>
         <profile>
