@@ -30,17 +30,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.scmpublish.plugin.version>1.0</maven.scmpublish.plugin.version>
-        <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
-        <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
-        <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
-        <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
-        <maven.surefire.plugin.version>2.17</maven.surefire.plugin.version>
-        <maven.depends.plugin.version>1.2</maven.depends.plugin.version>
-        <openhft.bom.version>3.1-SNAPSHOT</openhft.bom.version>
-        <openhft.lang.version>${project.version}</openhft.lang.version>
-        <openhft.collections.version>3.0e</openhft.collections.version>
-        <openhft.compiler.version>2.1.1-SNAPSHOT</openhft.compiler.version>
     </properties>
 
     <dependencyManagement>
@@ -49,23 +38,23 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>third-party-bom</artifactId>
                 <type>pom</type>
-                <version>${openhft.bom.version}</version>
+                <version>3.1-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>${openhft.lang.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>${openhft.compiler.version}</version>
+                <version>2.1.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>collections</artifactId>
-                <version>${openhft.collections.version}</version>
+                <version>3.0e</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -140,12 +129,52 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scm-publish-plugin</artifactId>
+                    <version>1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.17</version>
+                </plugin>
+                <plugin>
+                      <groupId>org.apache.servicemix.tooling</groupId>
+                      <artifactId>depends-maven-plugin</artifactId>
+                    <version>1.2</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <testSourceDirectory>src/test/java</testSourceDirectory>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <source>${openhft.java.version}</source>
                     <target>${openhft.java.version}</target>
@@ -159,7 +188,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>${maven.source.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -173,7 +201,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven.javadoc.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -191,7 +218,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <jvm>${openhft.java.home}/bin/java</jvm>
                     <systemPropertyVariables>
@@ -210,7 +236,6 @@
             <plugin>
               <groupId>org.apache.servicemix.tooling</groupId>
               <artifactId>depends-maven-plugin</artifactId>
-              <version>${maven.depends.plugin.version}</version>
               <executions>
                 <execution>
                   <id>generate-depends-file</id>
@@ -224,7 +249,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${maven.bundle.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
