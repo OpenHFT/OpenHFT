@@ -23,11 +23,12 @@
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>Java-Lang</artifactId>
-    <version>6.3</version>
+    <version>6.3.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Java Lang Parent</name>
@@ -35,9 +36,10 @@
 
     <modules>
         <module>lang</module>
-        <module>lang-osgi</module>
         <module>lang-integration</module>
         <module>lang-sandbox</module>
+        <module>lang-test</module>
     </modules>
 
 </project>
+
