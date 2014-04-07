@@ -23,20 +23,21 @@
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>lang-osgi</artifactId>
+    <groupId>net.openhft</groupId>
+    <artifactId>lang-test</artifactId>
     <version>6.3.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>OpenHFT/Java-Lang/lang-osgi</name>
+    <name>OpenHFT/Java-Lang/lang-test</name>
     <description>Java Lang library for High Frequency Trading (Java 6+)</description>
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>third-party-bom</artifactId>
@@ -44,111 +45,162 @@
                 <version>3.1-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
-
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>compiler</artifactId>
+                <version>2.1.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>collections</artifactId>
+                <version>3.0e</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-
         <dependency>
             <groupId>com.sun.java</groupId>
             <artifactId>tools</artifactId>
         </dependency>
-
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>compiler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>collections</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-native</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-link-mvn</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-reference</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
+       <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.servicemix.tooling</groupId>
+                    <artifactId>depends-maven-plugin</artifactId>
+                    <version>1.2</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <source>${openhft.java.version}</source>
+                    <target>${openhft.java.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <verbose>true</verbose>
+                    <fork>true</fork>
+                    <executable>${openhft.java.home}/bin/javac</executable>
+                    <compilerVersion>${openhft.java.version}</compilerVersion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <jvm>${openhft.java.home}/bin/java</jvm>
                     <systemPropertyVariables>
-                        <openhft.compiler.version>2.1</openhft.compiler.version>
                         <main.basedir>${project.basedir}</main.basedir>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+            <!--
+                generate maven dependencies versions file that can be used later
+                to install the right bundle in test phase.
+
+                The file is:
+
+                    target/classes/META-INF/maven/dependencies.properties
+            -->
+            <plugin>
+              <groupId>org.apache.servicemix.tooling</groupId>
+              <artifactId>depends-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>generate-depends-file</id>
+                  <goals>
+                    <goal>generate-depends-file</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Import-Package>
+                            net.openhft.lang.io.serialization,
+                            net.openhft.lang.model,
+                            *
+                        </Import-Package>
                     </instructions>
                 </configuration>
                 <executions>
@@ -170,4 +222,57 @@
         <url>scm:git:https://github.com/OpenHFT/Java-Lang.git</url>
     </scm>
 
+    <!-- ******************************************************************* -->
+    <!-- PROFILES                                                            -->
+    <!-- ******************************************************************* -->
+
+    <profiles>
+
+        <profile>
+            <id>jdk_default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME}</openhft.java.home>
+                <openhft.java.version>1.6</openhft.java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk_6</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME_6}</openhft.java.home>
+                <openhft.java.version>1.6</openhft.java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk_7</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME_7}</openhft.java.home>
+                <openhft.java.version>1.7</openhft.java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk_8</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openhft.java.home>${env.JAVA_HOME_8}</openhft.java.home>
+                <openhft.java.version>1.7</openhft.java.version>
+            </properties>
+        </profile>
+
+    </profiles>
+
 </project>
+
