@@ -29,11 +29,9 @@
 
     <url>http://www.openhft.net</url>
 
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
 
     <licenses>
         <license>
@@ -70,6 +68,18 @@
             <email>daniel.shaya@higherfrequencytrading.com</email>
         </developer>
     </developers>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.framework</artifactId>
+                <version>4.2.1</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
     <build>
 
@@ -215,6 +225,29 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>felix</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>pax.exam.framework</name>
+                    <value>felix</value>
+                </property>
+            </activation>
+            <properties>
+                <pax.exam.framework>felix</pax.exam.framework>
+                <pax.exam.logging>none</pax.exam.logging>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.framework</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
     </profiles>
 
     <distributionManagement>
