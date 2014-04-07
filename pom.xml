@@ -24,6 +24,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>third-party-bom</module>
+        <module>java-parent-pom</module>
         <module>Java-Thread-Affinity</module>
         <module>Java-Runtime-Compiler</module>
         <module>Java-Lang</module>
