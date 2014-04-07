@@ -42,6 +42,26 @@
             <name>Peter Lawrey</name>
             <email>peter.lawrey@higherfrequencytrading.com</email>
         </developer>
+        <developer>
+            <name>Luca Burgazzoli</name>
+            <email>luca.burgazzoli@higherfrequencytrading.com</email>
+        </developer>
+        <developer>
+            <name>Roman Leventov</name>
+            <email>roman.leventov@higherfrequencytrading.com</email>
+        </developer>
+        <developer>
+            <name>Jozsef Bartok</name>
+            <email>jozsef.bartok@higherfrequencytrading.com</email>
+        </developer>
+        <developer>
+            <name>Rob Austin</name>
+            <email>rob.austin@higherfrequencytrading.com</email>
+        </developer>
+        <developer>
+            <name>Daniel Shaya</name>
+            <email>daniel.shaya@higherfrequencytrading.com</email>
+        </developer>
     </developers>
 
     <build>
@@ -180,60 +200,6 @@
         </repository>
     </distributionManagement>
 
-
-    <url>http://www.openhft.net</url>
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>Peter Lawrey</name>
-            <email>peter.lawrey@higherfrequencytrading.com</email>
-        </developer>
-    </developers>
-
-
-    <profiles>
-        <profile>
-            <id>sign-artifact</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-
-        </profile>
-    </profiles>
-
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <repositories>
         <repository>
