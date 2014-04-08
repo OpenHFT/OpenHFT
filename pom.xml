@@ -36,7 +36,6 @@
 
     <modules>
         <module>lang</module>
-        <module>lang-integration</module>
         <module>lang-sandbox</module>
         <module>lang-test</module>
     </modules>
