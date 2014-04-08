@@ -57,6 +57,11 @@
             </dependency>
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>affinity</artifactId>
+                <version>2.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>collections</artifactId>
                 <version>3.0e</version>
             </dependency>
@@ -71,6 +76,10 @@
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>affinity</artifactId>
         </dependency>
         <dependency>
             <groupId>net.openhft</groupId>
@@ -196,6 +205,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Export-Package>
+                            !net.openhft.lang.io,
+                            *
+                        </Export-Package>
                         <Import-Package>
                             net.openhft.lang.io.serialization,
                             net.openhft.lang.model,
