@@ -16,8 +16,6 @@
 
 package net.openhft.lang.osgi;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -25,14 +23,12 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.File;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
+
 
 /**
  * @author lburgazzoli
@@ -43,21 +39,24 @@ public class OSGiBundleTest extends OSGiTestBase {
     BundleContext context;
 
     @Configuration
-    public Option[] config() { 
-        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(Level.INFO);
-
+    public Option[] config() {
         return options(
-                systemProperty("org.osgi.framework.storage.clean").value("true"),
-                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
-                mavenBundle("net.openhft", "compiler", System.getProperty("openhft.compiler.version")),
-                workspaceBundle("lang"),
-                workspaceBundle("lang-osgi"),
-                junitBundles(),
-                systemPackage("sun.misc"),
-                systemPackage("sun.nio.ch"),
-                systemPackage("com.sun.tools.javac.api"),
-                cleanCaches()
+            systemProperty("org.osgi.framework.storage.clean").value("true"),
+            systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("WARN"),
+            mavenBundleAsInProject("org.slf4j","slf4j-api"),
+            mavenBundleAsInProject("org.slf4j","slf4j-simple").noStart(),
+            mavenBundleAsInProject("net.openhft","affinity"),
+            mavenBundleAsInProject("net.openhft","compiler"),
+            mavenBundleAsInProject("net.openhft","collections"),
+            mavenBundleAsInProject("net.openhft","lang"),
+            workspaceBundle("lang-test"),
+            junitBundles(),
+            systemPackage("sun.misc"),
+            systemPackage("sun.nio.ch"),
+            systemPackage("com.sun.jna"),
+            systemPackage("com.sun.jna.ptr"),
+            systemPackage("com.sun.tools.javac.api"),
+            cleanCaches()
         );
     }
 
@@ -67,23 +66,19 @@ public class OSGiBundleTest extends OSGiTestBase {
     }
 
     @Test
-    public void checkHelloBundle() {
+    public void checkBundle() {
         Boolean bundleFound = false;
-        Boolean bundleActive = false;
 
         Bundle[] bundles = context.getBundles();
         for (Bundle bundle : bundles) {
             if (bundle != null) {
                 if (bundle.getSymbolicName().equals("net.openhft.lang")) {
                     bundleFound = true;
-                    if (bundle.getState() == Bundle.ACTIVE) {
-                        bundleActive = true;
-                    }
+                    assertEquals(bundle.getState(),Bundle.ACTIVE);
                 }
             }
         }
 
         assertTrue(bundleFound);
-        assertTrue(bundleActive);
     }
 }

@@ -31,9 +31,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ByteBufferBytes extends AbstractBytes {
     private final ByteBuffer buffer;
     private final int start;
+    private final int capacity;
     private int position;
     private int limit;
-    private final int capacity;
     private AtomicBoolean barrier;
 
     public ByteBufferBytes(ByteBuffer buffer) {
@@ -50,12 +50,12 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public Bytes createSlice() {
+    public ByteBufferBytes createSlice() {
         return new ByteBufferBytes(buffer(), position, capacity);
     }
 
     @Override
-    public Bytes createSlice(long offset, long length) {
+    public ByteBufferBytes createSlice(long offset, long length) {
         assert offset + length <= capacity;
         return new ByteBufferBytes(buffer(), (int) (position + offset), (int) length);
     }
@@ -97,7 +97,7 @@ public class ByteBufferBytes extends AbstractBytes {
         return this;
     }
 
-    ByteBuffer buffer() {
+    public ByteBuffer buffer() {
         return buffer;
     }
 
