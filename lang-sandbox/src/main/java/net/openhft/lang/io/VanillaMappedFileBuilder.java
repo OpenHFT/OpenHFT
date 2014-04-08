@@ -26,23 +26,33 @@ public class VanillaMappedFileBuilder {
     private File path;
     private VanillaMappedMode mode;
     private long size;
-    private long blockSize;
-    private long overlapSize;
 
     public VanillaMappedFileBuilder() {
         this.path = null;
         this.mode = VanillaMappedMode.defaultMode();
         this.size = -1;
-        this.blockSize = -1;
-        this.overlapSize = -1;
     }
 
     public VanillaMappedFileBuilder path(String path) {
         return path(new File(path));
     }
 
+    public VanillaMappedFileBuilder path(String root,String file) {
+        return path(new File(root, file));
+    }
+
     public VanillaMappedFileBuilder path(File path) {
         this.path = path;
+        return this;
+    }
+
+    public VanillaMappedFileBuilder readWrite() {
+        this.mode = VanillaMappedMode.RW;
+        return this;
+    }
+
+    public VanillaMappedFileBuilder readOnly() {
+        this.mode = VanillaMappedMode.RO;
         return this;
     }
 
@@ -71,16 +81,6 @@ public class VanillaMappedFileBuilder {
         return this;
     }
 
-    public VanillaMappedFileBuilder blockSize(long blockSize) {
-        this.blockSize = blockSize;
-        return this;
-    }
-
-    public VanillaMappedFileBuilder overlapSize(long overlapSize) {
-        this.overlapSize = overlapSize;
-        return this;
-    }
-
     /**
      * Create a VanillaMappedFile instance.
      *
@@ -88,9 +88,6 @@ public class VanillaMappedFileBuilder {
      * @throws IOException
      */
     public VanillaMappedFile build() throws IOException {
-        //TODO validate params
-        return size != -1
-            ? new VanillaMappedFile(this.path,this.mode,this.size)
-            : new VanillaMappedFile(this.path,this.mode,this.blockSize,this.overlapSize);
+        return new VanillaMappedFile(this.path,this.mode,this.size);
     }
 }

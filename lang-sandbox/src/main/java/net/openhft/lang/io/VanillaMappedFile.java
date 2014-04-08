@@ -19,7 +19,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.LinkedList;
+import java.util.List;
 
 /*
  * Merge memory mapped files:
@@ -29,32 +33,93 @@ import java.nio.channels.FileChannel;
  */
 public class VanillaMappedFile {
 
-    private final FileChannel fileChannel;
+    private final FileChannel channel;
     private final VanillaMappedMode mode;
     private final long size;
-    private final long blockSize;
-    private final long overlapSize;
+    private long address;
+    private List<VanillaMappedBlocks> blocks;
+
+    public VanillaMappedFile(final File path, VanillaMappedMode mode) throws IOException {
+        this(path,mode,-1);
+    }
 
     public VanillaMappedFile(final File path, VanillaMappedMode mode, long size) throws IOException {
         this.mode = mode;
         this.size = size;
-        this.blockSize = -1;
-        this.overlapSize = -1;
-        this.fileChannel = fileChannel(path,mode,this.size);
-
-        //this.address = map0(fileChannel, imodeFor(mode), 0L, size);
-        //this.cleaner = Cleaner.create(this, new Unmapper(address, size, fileChannel));
+        this.address = 0;
+        this.channel = fileChannel(path,mode,this.size);
+        this.blocks = new LinkedList<VanillaMappedBlocks>();
     }
 
-    public VanillaMappedFile(final File path, VanillaMappedMode mode, long blockSize, long overlapSize) throws IOException {
-        this.mode = mode;
-        this.size = -1;
-        this.blockSize = blockSize;
-        this.overlapSize =overlapSize;
-        this.fileChannel = fileChannel(path,mode,this.size);
+    // *************************************************************************
+    //
+    // *************************************************************************
 
-        //this.address = map0(fileChannel, imodeFor(mode), 0L, size);
-        //this.cleaner = Cleaner.create(this, new Unmapper(address, size, fileChannel));
+    public VanillaMappedBuffer acquire(long size) throws IOException {
+        return acquire(size,-1);
+    }
+
+    public synchronized VanillaMappedBuffer acquire(long size,int id) throws IOException {
+        MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),this.address,size);
+        buffer.order(ByteOrder.nativeOrder());
+
+        this.address += size;
+
+        return new VanillaMappedBuffer(buffer,id);
+    }
+
+    public VanillaMappedBlocks blocks(final long blockSize, final long overlapSize) throws IOException {
+        return blocks(blockSize + overlapSize);
+    }
+
+    public VanillaMappedBlocks blocks(final long size) throws IOException {
+        final List<VanillaMappedBuffer> buffers = new LinkedList<VanillaMappedBuffer>();
+        final VanillaMappedBlocks vmb = new VanillaMappedBlocks() {
+            @Override
+            public VanillaMappedBuffer acquire(int index) throws IOException {
+                VanillaMappedBuffer mb = null;
+
+                for(int i = buffers.size() - 1; i >= 0;i--) {
+                    if(buffers.get(i).id() == index) {
+                        mb = buffers.get(i);
+                        mb.reserve();
+                    } else if(buffers.get(i).refCount() <= 0) {
+                        buffers.remove(i);
+                    }
+                }
+
+                if(mb == null) {
+                    mb = VanillaMappedFile.this.acquire(size,index);
+                    buffers.add(mb);
+                }
+
+                return mb;
+            }
+
+            @Override
+            public void close() throws IOException {
+                for(int i = buffers.size() - 1; i >= 0;i--) {
+                    buffers.get(i).cleanup();
+                }
+            }
+        };
+
+        this.blocks.add(vmb);
+
+        return vmb;
+    }
+
+    public long size() throws IOException {
+        return this.channel.size();
+    }
+
+    public synchronized void close() throws IOException {
+        for(VanillaMappedBlocks vmb : this.blocks) {
+            vmb.close();
+        }
+
+        this.blocks.clear();
+        this.channel.close();
     }
 
     // *************************************************************************
