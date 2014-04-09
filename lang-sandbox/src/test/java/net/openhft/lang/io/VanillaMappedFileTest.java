@@ -15,17 +15,18 @@
  */
 package net.openhft.lang.io;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for net.openhft.lang.io.VanillaMappedFile
  */
-@Ignore
+//@Ignore
 public class VanillaMappedFileTest {
 
     private static File newTempraryFile(String name) {
@@ -47,15 +48,15 @@ public class VanillaMappedFileTest {
     // *************************************************************************
 
     @Test
-    public void testBuilder() throws Exception {
-        VanillaMappedFile vmf1 = new VanillaMappedFileBuilder()
-            .path(newTempraryFile("vmf-builder-1"))
-            .build();
+    public void testCreate() throws Exception {
+        File f1 = newTempraryFile("vmf-create-1");
+        File f2 = newTempraryFile("vmf-create-2");
 
-        VanillaMappedFile vmf2 = new VanillaMappedFileBuilder()
-            .path(newTempraryFile("vmf-builder-2"))
-            .size(128)
-            .build();
+        VanillaMappedFile vmf1 = new VanillaMappedFile(f1,VanillaMappedMode.RW);
+        VanillaMappedFile vmf2 = new VanillaMappedFile(f2,VanillaMappedMode.RW,128);
+
+        assertTrue(f1.exists());
+        assertTrue(f2.exists());
 
         assertEquals(  0, vmf1.size());
         assertEquals(128, vmf2.size());
@@ -66,12 +67,11 @@ public class VanillaMappedFileTest {
 
     @Test
     public void testAcquireBuffer() throws Exception {
-        VanillaMappedFile vmf = new VanillaMappedFileBuilder()
-            .path(newTempraryFile("vmf-acquire-buffer"))
-            .readWrite()
-            .build();
+        VanillaMappedFile vmf = new VanillaMappedFile(
+            newTempraryFile("vmf-acquireOf-buffer"),
+            VanillaMappedMode.RW);
 
-        VanillaMappedBuffer buffer = vmf.acquire(128);
+        VanillaMappedBuffer buffer = vmf.acquireOf(128);
         assertEquals( 1, buffer.refCount());
         assertEquals(0L, buffer.readLong(0L));
         assertEquals(0L, buffer.readLong(1L));
@@ -90,10 +90,9 @@ public class VanillaMappedFileTest {
 
     @Test
     public void testAcquireBlocks() throws Exception {
-        VanillaMappedFile vmf = new VanillaMappedFileBuilder()
-            .path(newTempraryFile("vmf-acquire-blocks"))
-            .readWrite()
-            .build();
+        VanillaMappedFile vmf = new VanillaMappedFile(
+            newTempraryFile("vmf-acquireOf-blocks"),
+            VanillaMappedMode.RW);
 
         VanillaMappedBlocks blocks = vmf.blocks(128);
 
@@ -120,12 +119,11 @@ public class VanillaMappedFileTest {
         File file = newTempraryFile("vmf-reopen");
 
         {
-            VanillaMappedFile vmf = new VanillaMappedFileBuilder()
-                .path(file)
-                .readWrite()
-                .build();
+            VanillaMappedFile vmf = new VanillaMappedFile(
+                file,
+                VanillaMappedMode.RW);
 
-            VanillaMappedBuffer buffer = vmf.acquire(128);
+            VanillaMappedBuffer buffer = vmf.acquireOf(128);
             buffer.writeLong(0, 1L);
 
             buffer.release();
@@ -133,16 +131,72 @@ public class VanillaMappedFileTest {
         }
 
         {
-            VanillaMappedFile vmf = new VanillaMappedFileBuilder()
-                .path(file)
-                .readWrite()
-                .build();
+            VanillaMappedFile vmf = new VanillaMappedFile(
+                file,
+                VanillaMappedMode.RW);
 
-            VanillaMappedBuffer buffer = vmf.acquire(128);
+            VanillaMappedBuffer buffer = vmf.acquireOf(128);
             assertEquals(1L, buffer.readLong(0));
 
             buffer.release();
             vmf.close();
         }
+    }
+
+    @Test
+    public void testCleanup() throws IOException, InterruptedException {
+        File file = newTempraryFile("vmf-cleanup");
+        File dir  = file.getParentFile();
+
+        long free0 = dir.getFreeSpace();
+
+        VanillaMappedFile vmf = new VanillaMappedFile(
+            file,
+            VanillaMappedMode.RW);
+
+        VanillaMappedBlocks blocks = vmf.blocks(1024 * 1024);
+        VanillaMappedBuffer map0 = blocks.acquire(0);
+        VanillaMappedBuffer map1 = blocks.acquire(1);
+
+        map0.position(0);
+        while (map0.remaining() >= 8) {
+            map0.writeLong(0x123456789ABCDEFL);
+        }
+
+        map0.position(1);
+        while (map1.remaining() >= 8) {
+            map1.writeLong(0x123456789ABCDEFL);
+        }
+
+        long free1 = dir.getFreeSpace();
+
+        map1.release();
+        map0.release();
+        vmf.close();
+
+        long free2 = dir.getFreeSpace();
+
+        file.delete();
+
+        long free3 = 0;
+        for (int i = 0; i < 100; i++) {
+            free3 = dir.getFreeSpace();
+
+            System.out.println("Freed " + free0
+                + " ~ " + free1
+                + " ~ " + free2
+                + " ~ " + free3
+                + ", delete = " + file.delete()
+            );
+
+            if (free3 > free1) {
+                break;
+            }
+
+            Thread.sleep(500);
+        }
+
+        assertTrue("free3-free1: " + (free3 - free1), free3 > free1);
+
     }
 }

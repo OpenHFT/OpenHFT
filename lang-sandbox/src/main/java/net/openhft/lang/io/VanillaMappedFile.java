@@ -55,18 +55,32 @@ public class VanillaMappedFile {
     //
     // *************************************************************************
 
-    public VanillaMappedBuffer acquire(long size) throws IOException {
-        return acquire(size,-1);
+    public VanillaMappedBuffer acquireOf(long size) throws IOException {
+        return acquireAt(this.address,size,-1);
     }
 
-    public synchronized VanillaMappedBuffer acquire(long size,int id) throws IOException {
-        MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),this.address,size);
+    public synchronized VanillaMappedBuffer acquireOf(long size, int id) throws IOException {
+        return acquireAt(this.address,size,id);
+    }
+
+    public synchronized VanillaMappedBuffer acquireAt(long address, long size) throws IOException {
+        return acquireAt(address,size,-1);
+    }
+
+    public synchronized VanillaMappedBuffer acquireAt(long address, long size, int id) throws IOException {
+        MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),address,size);
         buffer.order(ByteOrder.nativeOrder());
 
-        this.address += size;
+        if(address + size > this.address) {
+            this.address = address + size;
+        }
 
         return new VanillaMappedBuffer(buffer,id);
     }
+
+    // *************************************************************************
+    //
+    // *************************************************************************
 
     public VanillaMappedBlocks blocks(final long blockSize, final long overlapSize) throws IOException {
         return blocks(blockSize + overlapSize);
@@ -89,7 +103,7 @@ public class VanillaMappedFile {
                 }
 
                 if(mb == null) {
-                    mb = VanillaMappedFile.this.acquire(size,index);
+                    mb = VanillaMappedFile.this.acquireOf(size, index);
                     buffers.add(mb);
                 }
 
@@ -108,6 +122,10 @@ public class VanillaMappedFile {
 
         return vmb;
     }
+
+    // *************************************************************************
+    //
+    // *************************************************************************
 
     public long size() throws IOException {
         return this.channel.size();
@@ -139,6 +157,7 @@ public class VanillaMappedFile {
             }
 
             fileChannel = raf.getChannel();
+            fileChannel.force(true);
         } catch (Exception e) {
             throw wrap(e);
         }
