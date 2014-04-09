@@ -121,7 +121,6 @@
         <url>scm:git:https://github.com/OpenHFT/OpenHFT.git</url>
         <connection>scm:git:ssh://github.com/OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:ssh://github.com/OpenHFT/OpenHFT.git</developerConnection>
-        <tag>HEAD</tag>
     </scm>
 
 
