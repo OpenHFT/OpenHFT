@@ -127,9 +127,9 @@
     </repositories>
 
     <scm>
-        <url>scm:git:git@ggithub.com/OpenHFT/OpenHFT.git</url>
+        <url>scm:git:git@ggithub.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
-        <developerConnection>https://github.com/OpenHFT/OpenHFT.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
         <tag>master</tag>
     </scm>
 
