@@ -11,8 +11,7 @@
     <packaging>pom</packaging>
 
     <name>Root Parent Pom</name>
-    <description>This root parent pom is used by all of OpenHft.</description>
-
+    <description>This root parent pom is used by all of OpenHft</description>
     <url>http://www.openhft.net</url>
 
     <licenses>
@@ -57,7 +56,7 @@
 
     <build>
 
-    <pluginManagement>
+        <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -116,7 +115,6 @@
         </repository>
     </distributionManagement>
 
-
     <repositories>
         <repository>
             <id>Snapshot Repository</id>
@@ -127,7 +125,6 @@
             </snapshots>
         </repository>
     </repositories>
-
 
     <scm>
         <url>git@github.com:OpenHFT/OpenHFT.git</url>
