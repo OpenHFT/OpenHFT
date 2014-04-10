@@ -29,6 +29,13 @@
         projects in a dependencyManagement section.
     </description>
 
+    <parent>
+        <groupId>net.openhft</groupId>
+        <artifactId>root-parent-pom</artifactId>
+        <version>1.1.24</version>
+        <relativePath/>
+    </parent>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <pax.exam.version>3.4.0</pax.exam.version>
@@ -270,7 +277,10 @@
     </repositories>
 
     <scm>
-        <url>scm:git:https://github.com/OpenHFT/OpenHFT.git</url>
+        <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
+        <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
+        <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
+        <tag>master</tag>
     </scm>
 
 </project>
