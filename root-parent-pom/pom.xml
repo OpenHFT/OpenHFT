@@ -5,7 +5,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>1.1.17-SNAPSHOT</version>
+    <version>1.1.18-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Root Parent Pom</name>
@@ -100,6 +100,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <serverId>sonatype-nexus-staging</serverId>
+                    <nexusUrl>https://oss.sonatype.org/content/repositories/snapshots</nexusUrl>
+                    <!-- explicit matching using the staging profile id -->
+
+                </configuration>
             </plugin>
         </plugins>
     </build>
