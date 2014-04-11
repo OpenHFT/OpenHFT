@@ -30,7 +30,7 @@
     <version>1.0.1</version>
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
-    <description>This parent pom is used by all the OpenHft java projects.</description>
+    <description>This parent pom is used by all the OpenHft java projects</description>
 
     <dependencyManagement>
         <dependencies>
