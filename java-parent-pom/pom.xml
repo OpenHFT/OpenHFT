@@ -21,13 +21,13 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
         <relativePath/>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>java-parent-pom</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
