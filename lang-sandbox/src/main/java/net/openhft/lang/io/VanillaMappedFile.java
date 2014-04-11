@@ -98,6 +98,10 @@ public class VanillaMappedFile {
                         mb = buffers.get(i);
                         mb.reserve();
                     } else if(buffers.get(i).refCount() <= 0) {
+                        if(!buffers.get(i).unmapped()) {
+                            buffers.get(i).cleanup();
+                        }
+
                         buffers.remove(i);
                     }
                 }

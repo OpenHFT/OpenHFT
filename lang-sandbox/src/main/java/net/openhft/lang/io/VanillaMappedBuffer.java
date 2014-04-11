@@ -40,6 +40,10 @@ public class VanillaMappedBuffer extends NativeBytes {
         return this.id;
     }
 
+    public boolean unmapped() {
+        return this.unmapped;
+    }
+
     @Override
     public void cleanup() {
         if(!this.unmapped) {

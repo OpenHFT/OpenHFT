@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -68,7 +69,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBuffer() throws Exception {
         VanillaMappedFile vmf = new VanillaMappedFile(
-            newTempraryFile("vmf-acquireOf-buffer"),
+            newTempraryFile("vmf-acquire-buffer"),
             VanillaMappedMode.RW);
 
         VanillaMappedBuffer buffer = vmf.acquireOf(128);
@@ -91,7 +92,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBlocks() throws Exception {
         VanillaMappedFile vmf = new VanillaMappedFile(
-            newTempraryFile("vmf-acquireOf-blocks"),
+            newTempraryFile("vmf-acquire-blocks"),
             VanillaMappedMode.RW);
 
         VanillaMappedBlocks blocks = vmf.blocks(128);
@@ -105,11 +106,54 @@ public class VanillaMappedFileTest {
         VanillaMappedBuffer b3 = blocks.acquire(1);
         assertEquals(256, vmf.size());
 
+        assertNotEquals(b1.address(), b2.address());
+        assertNotEquals(b1.address(), b3.address());
+        assertEquals(b2.address(), b3.address());
+
         assertEquals(128, b1.size());
         assertEquals(  1, b1.refCount());
         assertEquals(128, b2.size());
         assertEquals(  2, b2.refCount());
         assertEquals(  2, b3.refCount());
+
+        vmf.close();
+    }
+
+    @Test
+    public void testAcquireOverlap() throws Exception {
+        VanillaMappedFile vmf = new VanillaMappedFile(
+            newTempraryFile("vmf-acquire-overlap"),
+            VanillaMappedMode.RW);
+
+        VanillaMappedBlocks blocks = vmf.blocks(128);
+
+        VanillaMappedBuffer b1 = blocks.acquire(0);
+        b1.writeLong(1);
+        b1.release();
+
+        assertEquals(0,b1.refCount());
+        assertTrue(b1.unmapped());
+
+        VanillaMappedBuffer b2 = blocks.acquire(1);
+        b2.writeLong(2);
+        b2.release();
+
+        assertEquals(0,b2.refCount());
+        assertTrue(b2.unmapped());
+
+        VanillaMappedBuffer b3 = blocks.acquire(2);
+        b3.writeLong(3);
+        b3.release();
+
+        assertEquals(0,b3.refCount());
+        assertTrue(b3.unmapped());
+
+        VanillaMappedBuffer b4 = vmf.acquireAt(0,128 * 3);
+        assertEquals(  1, b4.refCount());
+        assertEquals(384, b4.size());
+        assertEquals( 1L, b4.readLong(0));
+        assertEquals( 2L, b4.readLong(128));
+        assertEquals( 3L, b4.readLong(256));
 
         vmf.close();
     }
@@ -170,8 +214,14 @@ public class VanillaMappedFileTest {
 
         long free1 = dir.getFreeSpace();
 
-        map1.release();
         map0.release();
+        assertEquals(0,map0.refCount());
+        assertTrue(map0.unmapped());
+
+        map1.release();
+        assertEquals(0,map1.refCount());
+        assertTrue(map1.unmapped());
+
         vmf.close();
 
         long free2 = dir.getFreeSpace();
