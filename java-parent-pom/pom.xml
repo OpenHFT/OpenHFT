@@ -21,7 +21,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.1.24</version>
+        <version>1.0.0</version>
         <relativePath />
     </parent>
 
@@ -46,7 +46,6 @@
 
 
     <build>
-
 
         <pluginManagement>
             <plugins>
