@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.openhft</groupId>
@@ -94,26 +86,18 @@
         </pluginManagement>
 
         <plugins>
-            <!--  <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-release-plugin</artifactId>
-                  <version>2.3.2</version>
-                  <configuration>
-                      <autoVersionSubmodules>true</autoVersionSubmodules>
-                  </configuration>
-              </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.3.2</version>
 
-            <!--      <plugin>
-                      <groupId>org.sonatype.plugins</groupId>
-                      <artifactId>nexus-staging-maven-plugin</artifactId>
-                      <version>1.6</version>
-                      <extensions>true</extensions>
-                      <configuration>
-                          &lt;!&ndash; The Base URL of Nexus instance where we want to stage &ndash;&gt;
-                          <nexusUrl>https://oss.sonatype.org/service/local/staging/deploy/maven2/</nexusUrl>
-                          <serverId>sonatype-nexus-staging</serverId>
-                      </configuration>
-                  </plugin>-->
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <mavenExecutorId>forked-path</mavenExecutorId>
+                    <useReleaseProfile>false</useReleaseProfile>
+                </configuration>
+
+            </plugin>
 
         </plugins>
     </build>
@@ -141,17 +125,17 @@
         </profile>
     </profiles>
 
-    <!--
-        <distributionManagement>
-            <snapshotRepository>
-                <id>sonatype-nexus-snapshots</id>
-                <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            </snapshotRepository>
-            <repository>
-                <id>sonatype-nexus-staging</id>
-                <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-            </repository>
-        </distributionManagement>-->
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>
@@ -162,13 +146,13 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <!--  <repository>
-              <id>sonatype-nexus-staging</id>
-              <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-              <releases>
-                  <enabled>true</enabled>
-              </releases>
-          </repository>-->
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
     </repositories>
 
     <scm>
