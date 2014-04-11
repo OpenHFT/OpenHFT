@@ -86,14 +86,27 @@
         </pluginManagement>
 
         <plugins>
+            <!--  <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-release-plugin</artifactId>
+                  <version>2.3.2</version>
+                  <configuration>
+                      <autoVersionSubmodules>true</autoVersionSubmodules>
+                  </configuration>
+              </plugin>-->
+
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.3.2</version>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6</version>
+                <extensions>true</extensions>
                 <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <!-- The Base URL of Nexus instance where we want to stage -->
+                    <nexusUrl>https://oss.sonatype.org/service/local/staging/deploy/maven2/</nexusUrl>
+                    <serverId>sonatype-nexus-staging</serverId>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
