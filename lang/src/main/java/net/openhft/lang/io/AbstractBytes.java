@@ -659,15 +659,27 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public long readStopBit() {
-        long l = 0, b;
-        int count = 0;
+        long l;
+        if ((l = readByte()) >= 0)
+            return l;
+        l &= 0x7FL;
+        long b;
+        int count = 7;
         while ((b = readByte()) < 0) {
             l |= (b & 0x7FL) << count;
             count += 7;
         }
-        if (b == 0 && count > 0)
+        if (b != 0) {
+            if (count > 56)
+                throw new IllegalStateException(
+                        "Cannot read more than 9 stop bits of positive value");
+            return l | (b << count);
+        } else {
+            if (count > 63)
+                throw new IllegalStateException(
+                        "Cannot read more than 10 stop bits of negative value");
             return ~l;
-        return l | (b << count);
+        }
     }
 
     @Override
@@ -1003,20 +1015,17 @@ public abstract class AbstractBytes implements Bytes {
             neg = true;
             n = ~n;
         }
-        while (true) {
-            long n2 = n >>> 7;
-            if (n2 != 0) {
-                writeByte((byte) (0x80 | (n & 0x7F)));
-                n = n2;
-            } else {
-                if (neg) {
-                    writeByte((byte) (0x80 | (n & 0x7F)));
-                    writeByte(0);
-                } else {
-                    writeByte((byte) (n & 0x7F));
-                }
-                break;
-            }
+        long n2;
+        while ((n2 = n >>> 7) != 0) {
+            writeByte((byte) (0x80L | n));
+            n = n2;
+        }
+        // final byte
+        if (!neg) {
+            writeByte((byte) n);
+        } else {
+            writeByte((byte) (0x80L | n));
+            writeByte(0);
         }
     }
 
