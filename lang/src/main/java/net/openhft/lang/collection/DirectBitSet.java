@@ -158,6 +158,28 @@ public interface DirectBitSet extends ReferenceCounted {
      */
     boolean get(long bitIndex);
 
+
+    /**
+     * Synonym of {@link #get(long)}.
+     *
+     * @param bitIndex the bit index
+     * @return the value of the bit with the specified index
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *                                   {@code (index < 0 || index >= size())}
+     */
+    boolean isSet(long bitIndex);
+
+    /**
+     * Synonym of {@code !get(long)}.
+     * @param bitIndex the bit index
+     * @return {@code true} is the bit at the specified index is clear in this
+     *         bit set; if the bit is set to {@code true} then returns {@code false}
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *                                   {@code (index < 0 || index >= size())}
+     */
+    boolean isClear(long bitIndex);
+
+
     /**
      * Returns the value of the long with the specified long index.
      *
