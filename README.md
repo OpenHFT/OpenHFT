@@ -20,7 +20,11 @@ Tools
 =====
 OpenHFT recommends;
 
-- IntelliJ CE, however Netbeans and Eclipse will also work.
-- YourKit, which is what we use.  Other commercial profilers can be used.  VisualVM creates too much noise to be useful at this level.
+![IntelliJ](http://www.jetbrains.com/img/logos/logo_intellij_idea.png)
+
+![YourKit](http://www.red-soft.biz/files/downloads/partners_logo/YourKit_index_logo.gif)
+
+
+Other commercial profilers can be used.  VisualVM creates too much noise to be useful at this level.
 
 
