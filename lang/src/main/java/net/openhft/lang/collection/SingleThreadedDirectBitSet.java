@@ -226,9 +226,9 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             long firstFullLongIndex = fromLongIndex;
             if ((fromIndex & 63) != 0) {
                 long fromByteIndex = fromLongIndex << 3;
-                long mask = ~((~0L) << fromIndex);
+                long mask = (~0L) << fromIndex;
                 long l = bytes.readLong(fromByteIndex);
-                long l2 = l & mask;
+                long l2 = l & ~mask;
                 bytes.writeLong(fromByteIndex, l2);
                 firstFullLongIndex++;
             }
@@ -244,19 +244,121 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
 
                 long toByteIndex = toLongIndex << 3;
                 // >>> ~toIndex === >>> (63 - (toIndex & 63))
-                long mask = ~((~0L) >>> ~toIndex);
+                long mask = (~0L) >>> ~toIndex;
                 long l = bytes.readLong(toByteIndex);
-                long l2 = l & mask;
+                long l2 = l & ~mask;
                 bytes.writeLong(toByteIndex, l2);
             }
         } else {
             long byteIndex = fromLongIndex << 3;
-            long mask = (~((~0L) << fromIndex)) | (~((~0L) >>> ~toIndex));
+            long mask = ((~0L) << fromIndex) & ((~0L) >>> ~toIndex);
             long l = bytes.readLong(byteIndex);
-            long l2 = l & mask;
+            long l2 = l & ~mask;
             bytes.writeLong(byteIndex, l2);
         }
         return this;
+    }
+
+    /**
+     * Checks if each bit from the specified {@code fromIndex} (inclusive)
+     * to the specified {@code exclusiveToIndex} is set to {@code true}.
+     *
+     * @param fromIndex index of the first bit to check
+     * @param exclusiveToIndex index after the last bit to check
+     * @return {@code true} if all bits in the specified range are
+     *         set to {@code true}, {@code false} otherwise
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
+     *         or {@code fromIndex} is larger than {@code toIndex},
+     *         or {@code exclusiveToIndex} is larger or equal to {@code size()}
+     */
+    public boolean allSet(long fromIndex, long exclusiveToIndex) {
+        long fromLongIndex = fromIndex >> 6;
+        long toIndex = exclusiveToIndex - 1;
+        long toLongIndex = toIndex >> 6;
+        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
+                toLongIndex >= longLength)
+            throw new IndexOutOfBoundsException();
+
+        if (fromLongIndex != toLongIndex) {
+            long firstFullLongIndex = fromLongIndex;
+            if ((fromIndex & 63) != 0) {
+                long mask = (~0L) << fromIndex;
+                if ((~(bytes.readLong(fromLongIndex << 3)) & mask) != 0L)
+                    return false;
+                firstFullLongIndex++;
+            }
+
+            if ((exclusiveToIndex & 63) == 0) {
+                for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
+                    if (~bytes.readLong(i << 3) != 0L)
+                        return false;
+                }
+                return true;
+            } else {
+                for (long i = firstFullLongIndex; i < toLongIndex; i++) {
+                    if (~bytes.readLong(i << 3) != 0L)
+                        return false;
+                }
+
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
+                long mask = (~0L) >>> ~toIndex;
+                return ((~bytes.readLong(toLongIndex << 3)) & mask) == 0L;
+            }
+        } else {
+            long mask = ((~0L) << fromIndex) & ((~0L) >>> ~toIndex);
+            return ((~bytes.readLong(fromLongIndex << 3)) & mask) == 0L;
+        }
+    }
+
+    /**
+     * Checks if each bit from the specified {@code fromIndex} (inclusive)
+     * to the specified {@code exclusiveToIndex} is set to {@code false}.
+     *
+     * @param fromIndex index of the first bit to check
+     * @param exclusiveToIndex index after the last bit to check
+     * @return {@code true} if all bits in the specified range are
+     *         set to {@code false}, {@code false} otherwise
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
+     *         or {@code fromIndex} is larger than {@code toIndex},
+     *         or {@code exclusiveToIndex} is larger or equal to {@code size()}
+     */
+    public boolean allClear(long fromIndex, long exclusiveToIndex) {
+        long fromLongIndex = fromIndex >> 6;
+        long toIndex = exclusiveToIndex - 1;
+        long toLongIndex = toIndex >> 6;
+        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
+                toLongIndex >= longLength)
+            throw new IndexOutOfBoundsException();
+
+        if (fromLongIndex != toLongIndex) {
+            long firstFullLongIndex = fromLongIndex;
+            if ((fromIndex & 63) != 0) {
+                long mask = (~0L) << fromIndex;
+                if ((bytes.readLong(fromLongIndex << 3) & mask) != 0L)
+                    return false;
+                firstFullLongIndex++;
+            }
+
+            if ((exclusiveToIndex & 63) == 0) {
+                for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
+                    if (bytes.readLong(i << 3) != 0L)
+                        return false;
+                }
+                return true;
+            } else {
+                for (long i = firstFullLongIndex; i < toLongIndex; i++) {
+                    if (bytes.readLong(i << 3) != 0L)
+                        return false;
+                }
+
+                // >>> ~toIndex === >>> (63 - (toIndex & 63))
+                long mask = (~0L) >>> ~toIndex;
+                return (bytes.readLong(toLongIndex << 3) & mask) == 0L;
+            }
+        } else {
+            long mask = ((~0L) << fromIndex) & ((~0L) >>> ~toIndex);
+            return (bytes.readLong(fromLongIndex << 3) & mask) == 0L;
+        }
     }
 
     @Override
@@ -272,6 +374,16 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             throw new IndexOutOfBoundsException();
         long l = bytes.readLong(longIndex << 3);
         return (l & (1L << bitIndex)) != 0;
+    }
+
+    @Override
+    public boolean isSet(long bitIndex) {
+        return get(bitIndex);
+    }
+
+    @Override
+    public boolean isClear(long bitIndex) {
+        return !get(bitIndex);
     }
 
     @Override
