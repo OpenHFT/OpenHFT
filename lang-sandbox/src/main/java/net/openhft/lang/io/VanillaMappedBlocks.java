@@ -19,6 +19,6 @@ package net.openhft.lang.io;
 import java.io.IOException;
 
 public interface VanillaMappedBlocks {
-    public VanillaMappedBuffer acquire(int index) throws IOException;
+    public VanillaMappedBuffer acquire(long index) throws IOException;
     public void close() throws IOException;
 }

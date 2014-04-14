@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests for net.openhft.lang.io.VanillaMappedFile
  */
-//@Ignore
 public class VanillaMappedFileTest {
 
     private static File newTempraryFile(String name) {
@@ -72,7 +71,7 @@ public class VanillaMappedFileTest {
             newTempraryFile("vmf-acquire-buffer"),
             VanillaMappedMode.RW);
 
-        VanillaMappedBuffer buffer = vmf.acquireOf(128);
+        VanillaMappedBuffer buffer = vmf.sliceOf(128);
         assertEquals( 1, buffer.refCount());
         assertEquals(0L, buffer.readLong(0L));
         assertEquals(0L, buffer.readLong(1L));
@@ -148,7 +147,7 @@ public class VanillaMappedFileTest {
         assertEquals(0,b3.refCount());
         assertTrue(b3.unmapped());
 
-        VanillaMappedBuffer b4 = vmf.acquireAt(0,128 * 3);
+        VanillaMappedBuffer b4 = vmf.sliceAt(0, 128 * 3);
         assertEquals(  1, b4.refCount());
         assertEquals(384, b4.size());
         assertEquals( 1L, b4.readLong(0));
@@ -167,7 +166,7 @@ public class VanillaMappedFileTest {
                 file,
                 VanillaMappedMode.RW);
 
-            VanillaMappedBuffer buffer = vmf.acquireOf(128);
+            VanillaMappedBuffer buffer = vmf.sliceOf(128);
             buffer.writeLong(0, 1L);
 
             buffer.release();
@@ -179,7 +178,7 @@ public class VanillaMappedFileTest {
                 file,
                 VanillaMappedMode.RW);
 
-            VanillaMappedBuffer buffer = vmf.acquireOf(128);
+            VanillaMappedBuffer buffer = vmf.sliceOf(128);
             assertEquals(1L, buffer.readLong(0));
 
             buffer.release();

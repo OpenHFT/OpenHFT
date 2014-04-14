@@ -55,19 +55,19 @@ public class VanillaMappedFile {
     //
     // *************************************************************************
 
-    public VanillaMappedBuffer acquireOf(long size) throws IOException {
-        return acquireAt(this.address,size,-1);
+    public VanillaMappedBuffer sliceOf(long size) throws IOException {
+        return sliceAtWithId(this.address, size, -1);
     }
 
-    public synchronized VanillaMappedBuffer acquireOf(long size, int id) throws IOException {
-        return acquireAt(this.address,size,id);
+    public synchronized VanillaMappedBuffer sliceOfWithId(long size, long id) throws IOException {
+        return sliceAtWithId(this.address, size, id);
     }
 
-    public synchronized VanillaMappedBuffer acquireAt(long address, long size) throws IOException {
-        return acquireAt(address,size,-1);
+    public synchronized VanillaMappedBuffer sliceAt(long address, long size) throws IOException {
+        return sliceAtWithId(address, size, -1);
     }
 
-    public synchronized VanillaMappedBuffer acquireAt(long address, long size, int id) throws IOException {
+    public synchronized VanillaMappedBuffer sliceAtWithId(long address, long size, long id) throws IOException {
         MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),address,size);
         buffer.order(ByteOrder.nativeOrder());
 
@@ -90,14 +90,17 @@ public class VanillaMappedFile {
         final List<VanillaMappedBuffer> buffers = new LinkedList<VanillaMappedBuffer>();
         final VanillaMappedBlocks vmb = new VanillaMappedBlocks() {
             @Override
-            public VanillaMappedBuffer acquire(int index) throws IOException {
+            public VanillaMappedBuffer acquire(long index) throws IOException {
                 VanillaMappedBuffer mb = null;
 
                 for(int i = buffers.size() - 1; i >= 0;i--) {
-                    if(buffers.get(i).id() == index) {
+                    if(buffers.get(i).id() == index && !buffers.get(i).unmapped()) {
+                        // if mapped, get id and increase usage
                         mb = buffers.get(i);
                         mb.reserve();
                     } else if(buffers.get(i).refCount() <= 0) {
+                        // if unmapped and not used (reference count <= 0) unmap
+                        // it and clean id up
                         if(!buffers.get(i).unmapped()) {
                             buffers.get(i).cleanup();
                         }
@@ -107,7 +110,7 @@ public class VanillaMappedFile {
                 }
 
                 if(mb == null) {
-                    mb = VanillaMappedFile.this.acquireOf(size, index);
+                    mb = VanillaMappedFile.this.sliceOfWithId(size,index);
                     buffers.add(mb);
                 }
 
