@@ -20,7 +20,7 @@ Tools
 =====
 OpenHFT recommends;
 
-![IntelliJ](http://www.jetbrains.com/img/logos/logo_intellij_idea.png)
+![<img src="http://www.jetbrains.com/img/logos/logo_intellij_idea.png">](http://www.jetbrains.com/idea/)
 
 ![YourKit](http://www.red-soft.biz/files/downloads/partners_logo/YourKit_index_logo.gif)
 
