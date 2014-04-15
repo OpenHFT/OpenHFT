@@ -168,6 +168,7 @@ public class VanillaMappedFileTest {
 
             VanillaMappedBuffer buffer = vmf.sliceOf(128);
             buffer.writeLong(0, 1L);
+            assertEquals(128, vmf.size());
 
             buffer.release();
             vmf.close();
@@ -180,10 +181,13 @@ public class VanillaMappedFileTest {
 
             VanillaMappedBuffer buffer = vmf.sliceOf(128);
             assertEquals(1L, buffer.readLong(0));
+            assertEquals(128, vmf.size());
 
             buffer.release();
             vmf.close();
         }
+
+        assertEquals(128,file.length());
     }
 
     @Test
