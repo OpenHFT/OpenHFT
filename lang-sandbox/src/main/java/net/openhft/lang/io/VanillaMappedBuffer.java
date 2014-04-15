@@ -22,26 +22,26 @@ import java.nio.MappedByteBuffer;
 
 public class VanillaMappedBuffer extends NativeBytes {
     private final MappedByteBuffer buffer;
-    private final long id;
+    private final long index;
     private boolean unmapped;
 
     public VanillaMappedBuffer(final MappedByteBuffer buffer) {
         this(buffer,-1);
     }
 
-    public VanillaMappedBuffer(final MappedByteBuffer buffer, long id) {
+    public VanillaMappedBuffer(final MappedByteBuffer buffer, long index) {
         super(
             ((DirectBuffer)buffer).address(),
             ((DirectBuffer)buffer).address() + buffer.capacity()
         );
 
-        this.buffer = buffer;
+        this.buffer   = buffer;
         this.unmapped = false;
-        this.id = id;
+        this.index    = index;
     }
 
-    public long id() {
-        return this.id;
+    public long index() {
+        return this.index;
     }
 
     public boolean unmapped() {
@@ -49,7 +49,7 @@ public class VanillaMappedBuffer extends NativeBytes {
     }
 
     @Override
-    public void cleanup() {
+    public synchronized void cleanup() {
         if(!this.unmapped) {
             Cleaner cl = ((DirectBuffer)this.buffer).cleaner();
             if (cl != null) {
