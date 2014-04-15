@@ -15,6 +15,8 @@
  */
 package net.openhft.lang.io;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -34,13 +36,29 @@ public class VanillaMappedFileTest {
     }
 
     private static File newTempraryFile(String name,boolean delete) {
-        File file = new File(System.getProperty("java.io.tmpdir"),name);
+        File file = new File(
+            System.getProperty("java.io.tmpdir") + File.separator + "vmf",
+            name);
+
         if(delete) {
             file.delete();
             file.deleteOnExit();
         }
 
         return file;
+    }
+
+    // *************************************************************************
+    //
+    // *************************************************************************
+
+    @Before
+    public void setUp() {
+        System.out.println("Temporay directory is " +  System.getProperty("java.io.tmpdir"));
+    }
+
+    @After
+    public void tearDown() {
     }
 
     // *************************************************************************
@@ -89,9 +107,9 @@ public class VanillaMappedFileTest {
     }
 
     @Test
-    public void testAcquireBlocks() throws Exception {
+    public void testAcquireBlocks1() throws Exception {
         VanillaMappedFile vmf = new VanillaMappedFile(
-            newTempraryFile("vmf-acquire-blocks"),
+            newTempraryFile("vmf-acquire-blocks-1"),
             VanillaMappedMode.RW);
 
         VanillaMappedBlocks blocks = vmf.blocks(128);
@@ -114,6 +132,28 @@ public class VanillaMappedFileTest {
         assertEquals(128, b2.size());
         assertEquals(  2, b2.refCount());
         assertEquals(  2, b3.refCount());
+
+        vmf.close();
+    }
+
+    @Test
+    public void testAcquireBlocks2() throws Exception {
+        VanillaMappedFile vmf = new VanillaMappedFile(
+            newTempraryFile("vmf-acquire-blocks-2"),
+            VanillaMappedMode.RW);
+
+        final long nblocks = 50 * 100 * 1000;
+        final VanillaMappedBlocks blocks = vmf.blocks(64);
+
+        for(long i=0; i<nblocks; i++) {
+            VanillaMappedBuffer b = blocks.acquire(i);
+            assertEquals(1, b.refCount());
+
+            b.release();
+
+            assertEquals(0,b.refCount());
+            assertTrue(b.unmapped());
+        }
 
         vmf.close();
     }

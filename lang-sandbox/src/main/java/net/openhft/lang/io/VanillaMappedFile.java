@@ -24,6 +24,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /*
  * Merge memory mapped files:
@@ -33,6 +34,7 @@ import java.util.List;
  */
 public class VanillaMappedFile {
 
+    private final File path;
     private final FileChannel channel;
     private final VanillaMappedMode mode;
     private final long size;
@@ -44,6 +46,7 @@ public class VanillaMappedFile {
     }
 
     public VanillaMappedFile(final File path, VanillaMappedMode mode, long size) throws IOException {
+        this.path = path;
         this.mode = mode;
         this.size = size;
         this.address = 0;
@@ -119,8 +122,20 @@ public class VanillaMappedFile {
 
             @Override
             public synchronized void close() throws IOException {
-                for(int i = buffers.size() - 1; i >= 0;i--) {
-                    buffers.get(i).cleanup();
+                int count = 0;
+
+                for(VanillaMappedBuffer vmb : buffers) {
+                    if(vmb.refCount() > 0) {
+                        count++;
+                    }
+
+                    vmb.cleanup();
+                }
+
+                if(count > 0) {
+                    Logger.getLogger(VanillaMappedFile.class.getName()).info(
+                        VanillaMappedFile.this.path.getAbsolutePath()
+                        + ": memory mappings left unreleased, num= " + count);
                 }
 
                 buffers.clear();
