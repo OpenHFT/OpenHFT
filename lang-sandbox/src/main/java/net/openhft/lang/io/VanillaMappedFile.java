@@ -110,7 +110,7 @@ public class VanillaMappedFile {
                 }
 
                 if(mb == null) {
-                    mb = VanillaMappedFile.this.sliceOfWithId(size,index);
+                    mb = VanillaMappedFile.this.sliceAtWithId(index * size,size,index);
                     buffers.add(mb);
                 }
 
