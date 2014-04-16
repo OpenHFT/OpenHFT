@@ -64,6 +64,10 @@ public class VanillaMappedCache<T> {
     }
 
     public VanillaMappedBuffer put(T key, File path, long size) {
+        return put(key,path,size,-1);
+    }
+
+    public VanillaMappedBuffer put(T key, File path, long size, long index) {
         DataHolder data = this.cache.get(key);
         if(data != null) {
             data.close();
@@ -75,7 +79,8 @@ public class VanillaMappedCache<T> {
             data.recycle(
                 VanillaMappedFile.readWrite(path, size),
                 0,
-                size);
+                size,
+                index);
 
             this.cache.put(key,data);
         } catch(IOException e) {
@@ -131,6 +136,10 @@ public class VanillaMappedCache<T> {
 
         public void recycle(final VanillaMappedFile file, long address, long size) throws IOException {
             recycle(file,file.sliceAt(address,size));
+        }
+
+        public void recycle(final VanillaMappedFile file, long address, long size, long index) throws IOException {
+            recycle(file,file.sliceAt(address,size,index));
         }
 
         public void close()  {

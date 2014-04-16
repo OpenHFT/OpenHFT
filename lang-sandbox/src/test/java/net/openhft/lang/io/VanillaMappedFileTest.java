@@ -262,7 +262,7 @@ public class VanillaMappedFileTest {
         final int size = 5;
         VanillaMappedCache<Integer> cache = new VanillaMappedCache(size, 1.0f, true);
         for(int i=0;i<10;i++) {
-            cache.put(i,newTempraryFile("vmc-2-v" + i),8 * i);
+            cache.put(i,newTempraryFile("vmc-2-v" + i),8 * i,i);
             if(i >= size) {
                 assertEquals(cache.size(), size - 1);
             }
@@ -271,6 +271,7 @@ public class VanillaMappedFileTest {
         for(int i=10-1;i>=0;i--) {
             if(i >= 6) {
                 assertNotNull(cache.get(i));
+                assertEquals(cache.get(i).index(),i);
             } else {
                 assertNull(cache.get(i));
             }
