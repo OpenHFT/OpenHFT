@@ -37,11 +37,15 @@ public class VanillaMappedCache<T> {
     }
 
     public VanillaMappedCache(final int initialCapacity,final float loadFactor, final boolean accessOrder) {
+        this(initialCapacity,loadFactor,accessOrder,true);
+    }
+
+    public VanillaMappedCache(final int initialCapacity,final float loadFactor, final boolean accessOrder, final boolean cleanOnRemove) {
         this(new LinkedHashMap<T, DataHolder>() {
             @Override
             protected boolean removeEldestEntry(Map.Entry<T, DataHolder> eldest) {
                 boolean removed = size() >= initialCapacity;
-                if (removed) {
+                if (removed && cleanOnRemove) {
                     eldest.getValue().close();
                 }
 
