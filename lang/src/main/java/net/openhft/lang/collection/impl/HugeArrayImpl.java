@@ -49,7 +49,7 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
     }
 
     private T createRef() {
-        T ref = DataValueClasses.newInstance(tClass);
+        T ref = DataValueClasses.newDirectReference(tClass);
         ((Byteable) ref).bytes(store.createSlice(), 0L);
         return ref;
     }
