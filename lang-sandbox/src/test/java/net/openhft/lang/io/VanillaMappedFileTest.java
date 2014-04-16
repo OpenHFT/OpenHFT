@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for net.openhft.lang.io.VanillaMappedFile
@@ -224,5 +225,57 @@ public class VanillaMappedFileTest {
         }
 
         assertEquals(128, file.length());
+    }
+
+    // *************************************************************************
+    //
+    // *************************************************************************
+
+    @Test
+    public void testMappedCache1() throws Exception {
+        VanillaMappedCache<Integer> cache = new VanillaMappedCache();
+
+        assertEquals(cache.size(),0);
+        assertNull(cache.get(1));
+
+        cache.put(1,newTempraryFile("vmc-1-v1"), 64);
+        cache.put(2,newTempraryFile("vmc-1-v2"),128);
+
+        assertEquals(cache.size(),2);
+
+        assertNotNull(cache.get(1));
+        assertNotNull(cache.get(2));
+
+        VanillaMappedBuffer b1 = cache.get(1);
+        assertEquals(  1, b1.refCount());
+        assertEquals( 64, b1.size());
+
+        VanillaMappedBuffer b2 = cache.get(2);
+        assertEquals(  1, b2.refCount());
+        assertEquals(128, b2.size());
+
+        cache.close();
+    }
+
+    @Test
+    public void testMappedCache2() throws Exception {
+        final int size = 5;
+        VanillaMappedCache<Integer> cache = new VanillaMappedCache(size, 1.0f, true);
+        for(int i=0;i<10;i++) {
+            cache.put(i,newTempraryFile("vmc-2-v" + i),8 * i);
+            if(i >= size) {
+                assertEquals(cache.size(), size - 1);
+            }
+        }
+
+        for(int i=10-1;i>=0;i--) {
+            if(i >= 6) {
+                assertNotNull(cache.get(i));
+            } else {
+                assertNull(cache.get(i));
+            }
+        }
+
+        cache.close();
     }
 }
