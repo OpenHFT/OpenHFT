@@ -22,9 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 /*
  * Merge memory mapped files:
@@ -32,14 +29,13 @@ import java.util.logging.Logger;
  * - net.openhft.lang.io.MappedStore
  * - net.openhft.chronicle.sandbox.VanillaFile
  */
-public class VanillaMappedFile {
+public class VanillaMappedFile implements VanillaMappedResource {
 
     private final File path;
     private final FileChannel channel;
     private final VanillaMappedMode mode;
     private final long size;
     private long address;
-    private List<VanillaMappedBlocks> blocks;
 
     public VanillaMappedFile(final File path, VanillaMappedMode mode) throws IOException {
         this(path,mode,-1);
@@ -51,7 +47,6 @@ public class VanillaMappedFile {
         this.size = size;
         this.address = 0;
         this.channel = fileChannel(path,mode,this.size);
-        this.blocks = new ArrayList<VanillaMappedBlocks>();
     }
 
     // *************************************************************************
@@ -62,11 +57,11 @@ public class VanillaMappedFile {
         return sliceAt(this.address, size, -1);
     }
 
-    public synchronized VanillaMappedBuffer sliceOf(long size, long index) throws IOException {
+    public VanillaMappedBuffer sliceOf(long size, long index) throws IOException {
         return sliceAt(this.address, size, index);
     }
 
-    public synchronized VanillaMappedBuffer sliceAt(long address, long size) throws IOException {
+    public VanillaMappedBuffer sliceAt(long address, long size) throws IOException {
         return sliceAt(address, size, -1);
     }
 
@@ -85,72 +80,12 @@ public class VanillaMappedFile {
     //
     // *************************************************************************
 
-    public VanillaMappedBlocks blocks(final long blockSize, final long overlapSize) throws IOException {
-        return blocks(blockSize + overlapSize);
+    @Override
+    public String path() {
+        return this.path.getAbsolutePath();
     }
 
-    public synchronized VanillaMappedBlocks blocks(final long size) throws IOException {
-        final List<VanillaMappedBuffer> buffers = new ArrayList<VanillaMappedBuffer>();
-        final VanillaMappedBlocks vmb = new VanillaMappedBlocks() {
-            @Override
-            public synchronized VanillaMappedBuffer acquire(long index) throws IOException {
-                VanillaMappedBuffer mb = null;
-
-                for(int i = buffers.size() - 1; i >= 0;i--) {
-                    if(buffers.get(i).index() == index && !buffers.get(i).unmapped()) {
-                        // if mapped, get id and increase usage
-                        mb = buffers.get(i);
-                        mb.reserve();
-                    } else if(buffers.get(i).refCount() <= 0 || buffers.get(i).unmapped()) {
-                        // if not unmapped and not used (reference count <= 0)
-                        // unmap it and clean id up
-                        if(!buffers.get(i).unmapped()) {
-                            buffers.get(i).cleanup();
-                        }
-
-                        buffers.remove(i);
-                    }
-                }
-
-                if(mb == null) {
-                    mb = VanillaMappedFile.this.sliceAt(index * size,size,index);
-                    buffers.add(mb);
-                }
-
-                return mb;
-            }
-
-            @Override
-            public synchronized void close() throws IOException {
-                int count = 0;
-
-                for(VanillaMappedBuffer vmb : buffers) {
-                    if(vmb.refCount() > 0) {
-                        count++;
-                    }
-
-                    vmb.cleanup();
-                }
-
-                if(count > 0) {
-                    Logger.getLogger(VanillaMappedFile.class.getName()).info(
-                        VanillaMappedFile.this.path.getAbsolutePath()
-                        + ": memory mappings left unreleased, num= " + count);
-                }
-
-                buffers.clear();
-            }
-        };
-
-        this.blocks.add(vmb);
-
-        return vmb;
-    }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
-
+    @Override
     public long size() {
         try {
             return this.channel.size();
@@ -159,12 +94,8 @@ public class VanillaMappedFile {
         }
     }
 
+    @Override
     public synchronized void close() throws IOException {
-        for(VanillaMappedBlocks vmb : this.blocks) {
-            vmb.close();
-        }
-
-        this.blocks.clear();
         this.channel.close();
     }
 
@@ -201,5 +132,25 @@ public class VanillaMappedFile {
         }
 
         return new IOException(throwable);
+    }
+
+    // *************************************************************************
+    //
+    // *************************************************************************
+
+    public static VanillaMappedFile readWrite(final File path) throws IOException {
+        return new VanillaMappedFile(path,VanillaMappedMode.RW);
+    }
+
+    public static VanillaMappedFile readWrite(final File path, long size) throws IOException {
+        return new VanillaMappedFile(path,VanillaMappedMode.RW,size);
+    }
+
+    public static VanillaMappedFile readOnly(final File path) throws IOException {
+        return new VanillaMappedFile(path,VanillaMappedMode.RO);
+    }
+
+    public static VanillaMappedFile readOnly(final File path, long size) throws IOException {
+        return new VanillaMappedFile(path,VanillaMappedMode.RO,size);
     }
 }
