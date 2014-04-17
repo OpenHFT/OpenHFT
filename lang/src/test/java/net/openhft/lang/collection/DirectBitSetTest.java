@@ -51,9 +51,14 @@ public class DirectBitSetTest {
     private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
 
     private DirectBitSet bs;
+    private boolean singleThreaded;
+    private SingleThreadedDirectBitSet st;
 
     public DirectBitSetTest(DirectBitSet bs) {
         this.bs = bs;
+        singleThreaded = bs instanceof SingleThreadedDirectBitSet;
+        if (singleThreaded)
+            st = (SingleThreadedDirectBitSet) bs;
         assertTrue(bs.size() >= 256);
     }
 
@@ -100,16 +105,24 @@ public class DirectBitSetTest {
         int c = 0;
         for (int i : INDICES) {
             c++;
-            assertEquals("At index " + i, false, bs.get(i));
+            assertFalse("At index " + i, bs.get(i));
+            assertFalse("At index " + i, bs.isSet(i));
+            assertTrue("At index " + i, bs.isClear(i));
             bs.set(i);
-            assertEquals("At index " + i, true, bs.get(i));
+            assertTrue("At index " + i, bs.get(i));
+            assertTrue("At index " + i, bs.isSet(i));
+            assertFalse("At index " + i, bs.isClear(i));
             assertEquals(c, bs.cardinality());
         }
 
         for (int i : INDICES) {
-            assertEquals("At index " + i, true, bs.get(i));
+            assertTrue("At index " + i, bs.get(i));
+            assertTrue("At index " + i, bs.isSet(i));
+            assertFalse("At index " + i, bs.isClear(i));
             bs.clear(i);
-            assertEquals("At index " + i, false, bs.get(i));
+            assertFalse("At index " + i, bs.get(i));
+            assertFalse("At index " + i, bs.isSet(i));
+            assertTrue("At index " + i, bs.isClear(i));
         }
 
         for (int i : INDICES) {
@@ -415,6 +428,12 @@ public class DirectBitSetTest {
     @Test
     public void testRangeOpsWithinLongCase() {
         bs.clear();
+        if (singleThreaded) {
+            assertTrue(st.allClear(0, 0));
+            assertTrue(st.allClear(63, 63));
+            assertTrue(st.allSet(0, 0));
+            assertTrue(st.allSet(63, 63));
+        }
 
         bs.flip(0, 0);
         assertEquals(false, bs.get(0));
@@ -422,6 +441,11 @@ public class DirectBitSetTest {
         bs.flip(0, 1);
         assertEquals(true, bs.get(0));
         assertEquals(1, bs.cardinality());
+        if (singleThreaded) {
+            assertTrue(st.allSet(0, 1));
+            assertFalse(st.allSet(0, 2));
+            assertFalse(st.allClear(0, 1));
+        }
 
         bs.clear(0, 0);
         assertEquals(true, bs.get(0));
@@ -446,10 +470,18 @@ public class DirectBitSetTest {
         assertEquals(true, bs.get(63));
         assertEquals(false, bs.get(64));
         assertEquals(1, bs.cardinality());
+        if (singleThreaded) {
+            assertFalse(st.allSet(63, 65));
+            assertFalse(st.allClear(63, 65));
+        }
         bs.flip(63, 65);
         assertEquals(false, bs.get(63));
         assertEquals(true, bs.get(64));
         assertEquals(1, bs.cardinality());
+        if (singleThreaded) {
+            assertFalse(st.allSet(63, 65));
+            assertFalse(st.allClear(63, 65));
+        }
 
         bs.clear(64);
         bs.set(63, 64);
@@ -468,20 +500,35 @@ public class DirectBitSetTest {
         assertEquals(true, bs.get(63));
         assertEquals(true, bs.get(64));
         assertEquals(2, bs.cardinality());
+        if (singleThreaded) {
+            assertTrue(st.allSet(63, 65));
+            assertFalse(st.allClear(63, 65));
+        }
 
         bs.clear(63, 65);
         assertEquals(false, bs.get(63));
         assertEquals(false, bs.get(64));
         assertEquals(0, bs.cardinality());
-
+        if (singleThreaded) {
+            assertFalse(st.allSet(63, 65));
+            assertTrue(st.allClear(63, 65));
+        }
     }
 
     @Test
     public void testRangeOpsSpanLongCase() {
         bs.clear();
+        if (singleThreaded) {
+            assertTrue(st.allClear(0, st.size()));
+            assertFalse(st.allSet(0, st.size()));
+        }
 
         bs.set(0, bs.size());
         assertEquals(bs.size(), bs.cardinality());
+        if (singleThreaded) {
+            assertFalse(st.allClear(0, st.size()));
+            assertTrue(st.allSet(0, st.size()));
+        }
 
         bs.clear(0, bs.size());
         assertEquals(0, bs.cardinality());

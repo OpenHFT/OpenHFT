@@ -320,6 +320,16 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public boolean isSet(long bitIndex) {
+        return get(bitIndex);
+    }
+
+    @Override
+    public boolean isClear(long bitIndex) {
+        return !get(bitIndex);
+    }
+
+    @Override
     public long getLong(long longIndex) {
         if (longIndex < 0 || longIndex >= longLength)
             throw new IndexOutOfBoundsException();
