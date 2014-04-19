@@ -24,7 +24,7 @@ import java.util.WeakHashMap;
  * Date: 06/10/13
  * Time: 17:14
  */
-enum DataValueModels {
+public enum DataValueModels {
     ;
     private static final Map<Class, DataValueModel> MODEL_MAP = new WeakHashMap<Class, DataValueModel>();
 

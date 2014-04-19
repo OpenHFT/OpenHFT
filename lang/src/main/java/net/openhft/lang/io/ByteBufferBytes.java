@@ -17,7 +17,6 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.model.constraints.NotNull;
-import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.EOFException;
@@ -508,11 +507,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     protected void cleanup() {
-        if (buffer instanceof DirectBuffer) {
-            Cleaner cleaner = ((DirectBuffer) buffer).cleaner();
-            if (cleaner != null)
-                cleaner.clean();
-        }
+        IOTools.clean(buffer);
     }
 
     @Override

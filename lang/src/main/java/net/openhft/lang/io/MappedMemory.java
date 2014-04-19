@@ -17,7 +17,6 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.ReferenceCounted;
-import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
 import java.nio.MappedByteBuffer;
@@ -32,12 +31,6 @@ public class MappedMemory implements ReferenceCounted {
     public MappedMemory(MappedByteBuffer buffer, long index) {
         this.buffer = buffer;
         this.index = index;
-    }
-
-    private static void unmap(MappedByteBuffer bb) {
-        Cleaner cl = ((DirectBuffer) bb).cleaner();
-        if (cl != null)
-            cl.clean();
     }
 
     public long index() {
@@ -81,7 +74,7 @@ public class MappedMemory implements ReferenceCounted {
     }
 
     public void close() {
-        unmap(buffer);
+        IOTools.clean(buffer);
         unmapped = true;
     }
 }

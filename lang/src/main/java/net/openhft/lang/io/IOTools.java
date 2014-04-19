@@ -18,10 +18,13 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
+import sun.misc.Cleaner;
+import sun.nio.ch.DirectBuffer;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
@@ -75,5 +78,13 @@ public enum IOTools {
 
         }
         dir.delete();
+    }
+
+    public static void clean(ByteBuffer bb) {
+        if (bb instanceof DirectBuffer) {
+            Cleaner cl = ((DirectBuffer) bb).cleaner();
+            if (cl != null)
+                cl.clean();
+        }
     }
 }
