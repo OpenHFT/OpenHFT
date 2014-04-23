@@ -1975,16 +1975,29 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private boolean tryLockNanos4a(long offset) {
+    	//lowId = bottom 24 bytes of the thread id
         int lowId = shortThreadId();
+        //Use the top 8 bytes as a counter, and the bottom 24 bytes as the thread id
         int firstValue = ((1 << 24) | lowId);
+        //If the cas works, it was unlocked and we now atomically have the lock
         if (compareAndSwapInt(offset, 0, firstValue))
             return true;
-        long currentValue = readUnsignedInt(offset);
+        //The cas failed so get the value of the current lock
+        int currentValue = readInt(offset);
+        //if the bottom 24 bytes match our thread id ... 
+        // TODO but what if we're in a different process?
         if ((currentValue & INT_LOCK_MASK) == lowId) {
-            if (currentValue >= (255L << 24))
-                throw new IllegalStateException("Reentred 255 times without an unlock");
+        	//then if the counter in the top 8 bytes is 255, throw an exception
+            if ((currentValue >>> 24) >= 255)
+                throw new IllegalStateException("Reentered 255 times without an unlock - if you are using this to lock across processes, there could be a thread id conflict letting one process 'steal' the lock from another process. To avoid this, call AffinitySupport.setThreadId() during startup which will make all threads have unique ids");
+            //otherwise increase the counter in the top 8 bytes by one
             currentValue += 1 << 24;
+            //and store it - no other threads can successfully write at this point
+            //because their cas will fail (the value is not 0), so no update concurrency
+            //conflict, but we do want other threads to read the value we write
             writeOrderedInt(offset, (int) currentValue);
+            //we've got the lock - and incremented it, so return true
+            return true;
         }
         return false;
     }
@@ -2117,7 +2130,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private void unlockFailedInt(long offset, int lowId) throws IllegalMonitorStateException {
-        long currentValue = readUnsignedInt(offset);
+        long currentValue = readInt(offset);
         long holderId = currentValue & INT_LOCK_MASK;
         if (holderId == lowId) {
             currentValue -= 1 << 24;
