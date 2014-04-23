@@ -33,6 +33,28 @@ public class HugeArrayTest {
     }
 
     /*
+     * Test proves that you can get more than one object from the array
+     * The first object is created at construction time to get the size of an element
+     * The second one is created on the fly due to freelist being empty.
+     * There was a bug where acquire() was creating a heap object on freelist miss
+     */
+    @Test
+    public void testGetTwoObjects() {
+        HugeArray<JavaBeanInterface> array =
+                HugeCollections.newArray(JavaBeanInterface.class, 2);
+        JavaBeanInterface obj1 = array.get(0);
+        JavaBeanInterface obj2 = array.get(1);
+/*
+Can't call recycle due to recycle using .equals checks on your model.
+Two unmodified objects are .equals().
+Recycle should use identity to know if it's putting the same object back in the list.
+
+        array.recycle(obj1);
+        array.recycle(obj2);
+*/
+    }
+
+    /*
     With lock: false, average time to access a JavaBeanInterface was 71.9 ns
     With lock: true, average time to access a JavaBeanInterface was 124.7 ns
      */

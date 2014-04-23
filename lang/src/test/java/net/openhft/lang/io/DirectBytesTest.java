@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.model.constraints.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -297,4 +298,23 @@ public class DirectBytesTest {
         store2.free();
     }
 
+
+    @Test
+    @Ignore
+    public void benchmarkByteLargeArray() {
+        long length = 1L << 32;
+        long start = System.nanoTime();
+        DirectBytes array = DirectStore.allocateLazy(length).createSlice();
+        System.out.println("Constructor time: " + (System.nanoTime() - start) / 1e9 + " sec");
+        int iters = 2;
+        byte one = 1;
+        start = System.nanoTime();
+        for (int it = 0; it < iters; it++) {
+            for (long i = 0; i < length; i++) {
+                array.writeByte(i, one);
+                array.writeByte(i, (byte) (array.readByte(i) + one));
+            }
+        }
+        System.out.println("Computation time: " + (System.nanoTime() - start) / 1e9 / iters + " sec");
+    }
 }
