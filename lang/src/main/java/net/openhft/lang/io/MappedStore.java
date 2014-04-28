@@ -52,8 +52,8 @@ public class MappedStore implements BytesStore {
     }
 
     private MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
-        if (size < 0) {
-            throw new IllegalArgumentException("size: " + size);
+        if (size < 0 || size > 128L << 40) {
+            throw new IllegalArgumentException("invalid size: " + size);
         }
 
         this.file = file;
