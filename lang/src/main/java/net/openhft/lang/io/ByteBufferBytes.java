@@ -45,7 +45,7 @@ public class ByteBufferBytes extends AbstractBytes {
         buffer.order(ByteOrder.nativeOrder());
         this.buffer = buffer;
         this.start = position = start;
-        this.capacity = limit = capacity;
+        this.capacity = limit = (capacity+start);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public ByteBufferBytes createSlice(long offset, long length) {
         assert offset + length <= capacity;
-        return new ByteBufferBytes(buffer(), (int) (position + offset), (int) length);
+        return new ByteBufferBytes(buffer(), (int) (position + offset),    (int) length);
     }
 
     @Override
