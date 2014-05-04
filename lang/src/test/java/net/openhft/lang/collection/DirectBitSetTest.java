@@ -129,6 +129,11 @@ public class DirectBitSetTest {
             assertEquals("At index " + i, true, bs.setIfClear(i));
             assertEquals("At index " + i, false, bs.setIfClear(i));
         }
+
+        for (int i : INDICES) {
+            assertEquals("At index " + i, true, bs.clearIfSet(i));
+            assertEquals("At index " + i, false, bs.clearIfSet(i));
+        }
     }
 
     @Test
@@ -856,6 +861,16 @@ public class DirectBitSetTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetIfClearOverCapacity() {
         bs.setIfClear(bs.size());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeClearIfSetNegative() {
+        bs.clearIfSet(-1);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIoobeClearIfSetOverCapacity() {
+        bs.clearIfSet(bs.size());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)

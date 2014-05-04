@@ -77,6 +77,16 @@ public interface DirectBitSet extends ReferenceCounted {
     boolean setIfClear(long bitIndex);
 
     /**
+     * Clears the bit at the specified index (sets it to {@code false}).
+     *
+     * @param bitIndex a bit index
+     * @return the previous value of the bit at the specified index
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *                                   {@code (index < 0 || index >= size())}
+     */
+    boolean clearIfSet(long bitIndex);
+
+    /**
      * Sets the bit at the specified index to the specified value.
      *
      * @param bitIndex a bit index
