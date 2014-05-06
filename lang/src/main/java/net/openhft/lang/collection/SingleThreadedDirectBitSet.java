@@ -214,6 +214,20 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     @Override
+    public boolean clearIfSet(long bitIndex) {
+        long longIndex = bitIndex >> 6;
+        if (bitIndex < 0 || longIndex >= longLength)
+            throw new IndexOutOfBoundsException();
+        long byteIndex = longIndex << 3;
+        long mask = 1L << bitIndex;
+        long l = bytes.readLong(byteIndex);
+        if ((l & mask) == 0) return false;
+        long l2 = l & ~mask;
+        bytes.writeLong(byteIndex, l2);
+        return true;
+    }
+
+    @Override
     public DirectBitSet clear(long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = fromIndex >> 6;
         long toIndex = exclusiveToIndex - 1;
