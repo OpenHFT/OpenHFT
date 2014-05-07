@@ -862,7 +862,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(byte[] bytes, int off, int len) {
-        checkWrite(bytes.length);
+        checkWrite(len);
 
         for (int i = 0; i < len; i++)
             write(bytes[off + i]);
