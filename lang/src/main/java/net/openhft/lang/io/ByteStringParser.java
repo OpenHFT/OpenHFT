@@ -80,4 +80,18 @@ public interface ByteStringParser extends BytesCommon {
      * @return true if we stopped at a stop character, false if we ran out of data.
      */
     boolean skipTo(@NotNull StopCharTester tester);
+
+    /**
+     * Dump the contents of this Bytes as text in the Appendable.
+     *
+     * @param appendable to append to
+     */
+    void asString(Appendable appendable);
+
+    /**
+     * Dump the contents of Bytes as a CharSequence
+     *
+     * @return the CharSequence for these Bytes.
+     */
+    CharSequence asString();
 }

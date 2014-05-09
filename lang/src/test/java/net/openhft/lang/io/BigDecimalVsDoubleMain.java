@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 
 public class BigDecimalVsDoubleMain {
 
@@ -36,6 +37,9 @@ public class BigDecimalVsDoubleMain {
     static int count = 0;
 
     public static void main(String[] args) throws InterruptedException {
+        ByteBufferBytes x = new ByteBufferBytes(ByteBuffer.allocateDirect(16));
+        x.writeUTFΔ("Hello World");
+        System.out.println(x);
         int runs = 5000;
 
         for (int t = 0; t < 5; t++) {
@@ -90,6 +94,8 @@ public class BigDecimalVsDoubleMain {
         long start = System.nanoTime();
         saved = IN_BYTES[count].parseDouble();
         OUT_BYTES.append(saved);
+        System.out.println(OUT_BYTES);
+
         return System.nanoTime() - start;
     }
 
