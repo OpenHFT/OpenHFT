@@ -41,7 +41,7 @@ public interface BytesStore {
      * {@code offset + length} should be less or equal to {@link #size()}.
      *
      * @param offset offset of the new bytes from the bytes store address
-     * @param length capacity & limit of the new bytes
+     * @param length capacity and limit of the new bytes
      * @return the sliced {@code Bytes}
      * @see #bytes()
      */

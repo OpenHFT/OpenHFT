@@ -21,7 +21,7 @@ package net.openhft.lang.io.serialization;
  */
 public interface CompactBytesMarshaller<E> extends BytesMarshaller<E> {
     /**
-     * the code for this marshaller
+     * @return the code for this marshaller
      */
     byte code();
 }
