@@ -25,8 +25,8 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Run with -verbosegc -Xmx32m
- * <p></p>
- * Average time was 282 nano-seconds
+ *
+ * <p>Average time was 282 nano-seconds
  */
 public class ParserExampleMain {
     public static void main(String... ignored) {

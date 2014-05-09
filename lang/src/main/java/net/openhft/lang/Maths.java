@@ -51,6 +51,7 @@ public class Maths {
      * precision of double.
      *
      * @param d value to round
+     * @return rounded value
      */
     public static double round4(double d) {
         final double factor = 1e4;
@@ -64,6 +65,7 @@ public class Maths {
      * precision of double.
      *
      * @param d value to round
+     * @return rounded value
      */
     public static double round6(double d) {
         final double factor = 1e6;
@@ -77,6 +79,7 @@ public class Maths {
      * precision of double.
      *
      * @param d value to round
+     * @return rounded value
      */
     public static double round8(double d) {
         final double factor = 1e8;

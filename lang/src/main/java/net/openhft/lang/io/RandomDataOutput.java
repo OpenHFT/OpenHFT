@@ -164,7 +164,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Writes two bytes to the output stream to represent the value of the argument. The byte values to be written, in
-     * the  order shown for big endian machines and the opposite for little endian, are: <p>
+     * the  order shown for big endian machines and the opposite for little endian, are:
      * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 8))
      * (byte)(0xff &amp; v)
@@ -179,7 +179,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Writes two bytes to the output stream to represent the value of the argument. The byte values to be written, in
-     * the  order shown for big endian machines and the opposite for little endian, are: <p>
+     * the  order shown for big endian machines and the opposite for little endian, are:
      * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 8))
      * (byte)(0xff &amp; v)
@@ -194,7 +194,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Writes two bytes to the output stream to represent the value of the argument. The byte values to be written, in
-     * the  order shown for big endian machines and the opposite for little endian, are: <p>
+     * the  order shown for big endian machines and the opposite for little endian, are:
      * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 8))
      * (byte)(0xff &amp; v)
@@ -208,7 +208,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Writes two bytes to the output stream to represent the value of the argument. The byte values to be written, in
-     * the  order shown for big endian machines and the opposite for little endian, are: <p>
+     * the  order shown for big endian machines and the opposite for little endian, are:
      * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 8))
      * (byte)(0xff &amp; v)
@@ -225,8 +225,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Writes one or three bytes as follows; Short.MIN_VALUE =&gt; Byte.MIN_VALUE, Short.MAX_VALUE =&gt; Byte.MAX_VALUE,
      * Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; writeByte(x), default =&gt; writeByte(Byte.MIN_VALUE+1;
      * writeShort(x)
-     * <p></p>
-     * The bytes written by this method may be read by the <code>readCompactShort</code> method of interface
+     *
+     * <p>The bytes written by this method may be read by the <code>readCompactShort</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>short</code> equal to <code>(short)v</code>.
      *
      * @param v the <code>short</code> value to be written.
@@ -235,8 +235,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
 
     /**
      * Writes one or three bytes as follows; 0 to 254 =&gt; writeByte(x); otherwise writeByte(255); writeByteShort(x);
-     * <p></p>
-     * The bytes written by this method may be read by the <code>readCompactUnsignedShort</code> method of interface
+     *
+     * <p>The bytes written by this method may be read by the <code>readCompactUnsignedShort</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>short</code> equal to <code>v &amp; 0xFFFF</code>.
      *
      * @param v the unsigned <code>short</code> value to be written.
@@ -246,7 +246,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes a <code>char</code> value, which is comprised of two bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 8))
      * (byte)(0xff &amp; v)
      * </code></pre><p>
@@ -261,7 +261,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes a <code>char</code> value, which is comprised of two bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 8))
      * (byte)(0xff &amp; v)
      * </code></pre><p>
@@ -276,7 +276,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes an <code>int</code> value, which is comprised of three bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 16))
      * (byte)(0xff &amp; (v &gt;&gt; &#32; &#32;8))
      * (byte)(0xff &amp; v)
@@ -291,7 +291,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes an <code>int</code> value, which is comprised of three bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 16))
      * (byte)(0xff &amp; (v &gt;&gt; &#32; &#32;8))
      * (byte)(0xff &amp; v)
@@ -307,7 +307,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes an <code>int</code> value, which is comprised of four bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 24))
      * (byte)(0xff &amp; (v &gt;&gt; 16))
      * (byte)(0xff &amp; (v &gt;&gt; &#32; &#32;8))
@@ -324,7 +324,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes an <code>int</code> value, which is comprised of four bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 24))
      * (byte)(0xff &amp; (v &gt;&gt; 16))
      * (byte)(0xff &amp; (v &gt;&gt; &#32; &#32;8))
@@ -341,7 +341,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes an <code>int</code> value, which is comprised of four bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 24))
      * (byte)(0xff &amp; (v &gt;&gt; 16))
      * (byte)(0xff &amp; (v &gt;&gt; &#32; &#32;8))
@@ -358,7 +358,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes an <code>int</code> value, which is comprised of four bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 24))
      * (byte)(0xff &amp; (v &gt;&gt; 16))
      * (byte)(0xff &amp; (v &gt;&gt; &#32; &#32;8))
@@ -377,8 +377,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Writes two or six bytes as follows; Integer.MIN_VALUE =&gt; Short.MIN_VALUE, Integer.MAX_VALUE =&gt;
      * Short.MAX_VALUE, Short.MIN_VALUE+2 to Short.MAX_VALUE-1 =&gt; writeShort(x), default =&gt;
      * writeShort(Short.MIN_VALUE+1; writeInt(x)
-     * <p></p>
-     * The bytes written by this method may be read by the <code>readCompactInt</code> method of interface
+     *
+     * <p>The bytes written by this method may be read by the <code>readCompactInt</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>int</code> equal to <code>v</code>.
      *
      * @param v the <code>int</code> value to be written.
@@ -388,8 +388,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes two or six bytes as follows; 0 to (1 &lt;&lt; 16) - 2 =&gt; writeInt(x), otherwise writeShort(-1);
      * writeInt(x)
-     * <p></p>
-     * The bytes written by this method may be read by the <code>readCompactUnsignedInt</code> method of interface
+     *
+     * <p>The bytes written by this method may be read by the <code>readCompactUnsignedInt</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>int</code> equal to <code>v &amp;
      * 0xFFFFFFFF</code>.
      *
@@ -401,8 +401,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Same as writeInt but include an ordered write barrier.  This means all writes will be visible on a read barrier
      * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
      * could see an old value
-     * <p></p>
-     * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
+     *
+     * <p>This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
      * same time.
      *
      * @param v value to write
@@ -413,8 +413,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Same as writeInt but include an ordered write barrier.  This means all writes will be visible on a read barrier
      * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
      * could see an old value
-     * <p></p>
-     * This is much faster than <code>writeVolatileInt</code> as the volatile write stalls the pipeline.  The data is
+     *
+     * <p>This is much faster than <code>writeVolatileInt</code> as the volatile write stalls the pipeline.  The data is
      * visible to other threads at the same time.
      *
      * @param offset to write to
@@ -454,7 +454,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes a <code>long</code> value, which is comprised of eight bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 40))
      * (byte)(0xff &amp; (v &gt;&gt; 32))
      * (byte)(0xff &amp; (v &gt;&gt; 24))
@@ -473,7 +473,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes a <code>long</code> value, which is comprised of eight bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 40))
      * (byte)(0xff &amp; (v &gt;&gt; 32))
      * (byte)(0xff &amp; (v &gt;&gt; 24))
@@ -493,7 +493,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes a <code>long</code> value, which is comprised of eight bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 56))
      * (byte)(0xff &amp; (v &gt;&gt; 48))
      * (byte)(0xff &amp; (v &gt;&gt; 40))
@@ -514,7 +514,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Writes a <code>long</code> value, which is comprised of eight bytes, to the output stream. The byte values to be
      * written, in the  order shown for big endian machines and the opposite for little endian, are:
-     * <p><pre><code>
+     * <pre><code>
      * (byte)(0xff &amp; (v &gt;&gt; 56))
      * (byte)(0xff &amp; (v &gt;&gt; 48))
      * (byte)(0xff &amp; (v &gt;&gt; 40))
@@ -536,8 +536,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Writes four or twelve bytes as follows Long.MIN_VALUE =&gt; Integer.MIN_VALUE, Long.MAX_VALUE =&gt;
      * Integer.MAX_VALUE, Integer.MIN_VALUE+2 to Integer.MAX_VALUE-1 =&gt; writeInt(x), default =&gt;
      * writeInt(Integer.MIN_VALUE+1; writeLong(x)
-     * <p></p>
-     * The bytes written by this method may be read by the <code>readCompactLong</code> method of interface
+     *
+     * <p>The bytes written by this method may be read by the <code>readCompactLong</code> method of interface
      * <code>RandomDataInput</code> , which will then return a <code>long</code> equal to <code>v</code>.
      *
      * @param v the <code>long</code> value to be written.
@@ -548,8 +548,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Same as writeLong but include an ordered write barrier.  This means all writes will be visible on a read barrier
      * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
      * could see an old value
-     * <p></p>
-     * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
+     *
+     * <p>This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
      * same time.
      *
      * @param v value to write
@@ -560,8 +560,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Same as writeLong but include an ordered write barrier.  This means all writes will be visible on a read barrier
      * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
      * could see an old value
-     * <p></p>
-     * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
+     *
+     * <p>This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
      * same time.
      *
      * @param offset to be written to
@@ -581,7 +581,10 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     boolean compareAndSwapLong(long offset, long expected, long x);
 
     /**
-     * Stop bit encoding numbers. This will write the same number of bytes whether you used a byte, short or int.
+     * Stop bit encoding numbers. This will write the same number of bytes
+     * whether you used a byte, short or int.
+     *
+     * @param n the number to write
      */
     void writeStopBit(long n);
 
@@ -613,10 +616,11 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Same as writeFloat but include an ordered write barrier.  This means all writes will be visible on a read barrier
      * if this write is visible. This might not be visible to be same thread for some clock cycles so an immediate read
      * could see an old value
-     * <p></p>
-     * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
+     *
+     * <p>This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
      * same time.
      *
+     * @param offset to write to
      * @param v value to write
      */
     void writeOrderedFloat(long offset, float v);
@@ -669,10 +673,11 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * Same as writeDouble but include an ordered write barrier.  This means all writes will be visible on a read
      * barrier if this write is visible. This might not be visible to be same thread for some clock cycles so an
      * immediate read could see an old value
-     * <p></p>
-     * This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
+     *
+     * <p>This is much faster than a volatile write which stalls the pipeline.  The data is visible to other threads at the
      * same time.
      *
+     * @param offset to write to
      * @param v value to write
      */
     void writeOrderedDouble(long offset, double v);
@@ -708,17 +713,17 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * <code>s</code>. If <code>s</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. Each
      * character in the string <code>s</code> is converted to a group of one, two, or three bytes, depending on the
      * value of the character.<p> If a character <code>c</code> is in the range <code>&#92;u0001</code> through
-     * <code>&#92;u007f</code>, it is represented by one byte:<p>
+     * <code>&#92;u007f</code>, it is represented by one byte:
      * <pre>(byte)c </pre>  <p>
      * If a character <code>c</code> is <code>&#92;u0000</code> or is in the range <code>&#92;u0080</code> through
      * <code>&#92;u07ff</code>, then it is represented by two bytes, to be written
-     * in the order shown:<p> <pre><code>
+     * in the order shown:<pre><code>
      * (byte)(0xc0 | (0x1f &amp; (c &gt;&gt; 6)))
      * (byte)(0x80 | (0x3f &amp; c))
      *  </code></pre>  <p> If a character
      * <code>c</code> is in the range <code>&#92;u0800</code> through <code>uffff</code>, then it is represented by
      * three bytes, to be written
-     * in the order shown:<p> <pre><code>
+     * in the order shown:<pre><code>
      * (byte)(0xe0 | (0x0f &amp; (c &gt;&gt; 12)))
      * (byte)(0x80 | (0x3f &amp; (c &gt;&gt;  6)))
      * (byte)(0x80 | (0x3f &amp; c))
@@ -776,10 +781,11 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Write an ordered collection of "enumerable objects" (See writeEnum).  This writes the stop bit encoded length,
      * followed by multiple calls to <code>writeEnum</code>  All the elements must be of the same type.
-     * <p></p>
-     * This can be read by the <code>readList</code> method of <code>RandomInputStream</code> and the reader must know
+     *
+     * <p>This can be read by the <code>readList</code> method of <code>RandomInputStream</code> and the reader must know
      * the type of each element.  You can send the class first by using <code>writeEnum</code> of the element class
      *
+     * @param <E> the class of the list elements
      * @param list to be written
      */
     <E> void writeList(@NotNull Collection<E> list);
@@ -789,9 +795,10 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * length, followed by multiple calls to <code>writeEnum</code> for each key and value.  All the keys must be of the
      * same type. All values must be of the same type.
      *
+     * @param <K> the class of the map keys
+     * @param <V> the class of the map values
      * @param map to write out
      */
-
     <K, V> void writeMap(@NotNull Map<K, V> map);
 
     // ObjectOutput
@@ -809,6 +816,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Write an object with the assumption that the objClass will be provided when the class is read.
      *
+     * @param <OBJ> the class of the object to write
      * @param objClass class to write
      * @param obj      to write
      */
@@ -833,6 +841,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * fill the Bytes with zeros, and clear the position.
      *
+     * @param start first byte to zero out
+     * @param end the first byte after the last to zero out (exclusive bound)
      * @return this
      */
     Bytes zeroOut(long start, long end);

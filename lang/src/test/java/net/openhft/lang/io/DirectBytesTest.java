@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public class DirectBytesTest {
     @Test
     public void testSimpleLock() {
-        DirectBytes bytes = new DirectStore(64).createSlice();
+        DirectBytes bytes = new DirectStore(64).bytes();
         bytes.writeLong(0, -1L);
         assertFalse(bytes.tryLockLong(0));
         bytes.writeLong(0, 0L);
@@ -52,7 +52,7 @@ public class DirectBytesTest {
         assertEquals(0, id >>> 24);
         System.out.println("Thread " + id);
 
-        DirectBytes slice1 = store1.createSlice();
+        DirectBytes slice1 = store1.bytes();
 
         int records = 64;
         for (int i = 0; i < lockCount; i += records) {
@@ -86,7 +86,7 @@ public class DirectBytesTest {
         assertEquals(0, id >>> 32);
         System.out.println("Thread " + id);
 
-        DirectBytes slice1 = store1.createSlice();
+        DirectBytes slice1 = store1.bytes();
 
         int records = 64;
         for (int i = 0; i < lockCount; i += records) {
@@ -120,7 +120,7 @@ public class DirectBytesTest {
         long size = 1L << 24; // 31; don't overload cloud-bees
         DirectStore store = DirectStore.allocate(size);
         assertEquals(size, store.size());
-        DirectBytes slice = store.createSlice();
+        DirectBytes slice = store.bytes();
         slice.positionAndSize(0, size);
         slice.writeLong(0, size);
         slice.writeLong(size - 8, size);
@@ -194,8 +194,8 @@ public class DirectBytesTest {
                 assertEquals(0, id >>> 24);
                 int expected = (1 << 24) | (int) id;
                 try {
-                    DirectBytes slice1 = store1.createSlice();
-                    DirectBytes slice2 = store2.createSlice();
+                    DirectBytes slice1 = store1.bytes();
+                    DirectBytes slice2 = store2.bytes();
 
                     for (int i = 0; i < lockCount; i += 2) {
                         slice1.busyLockInt(0);
@@ -250,8 +250,8 @@ public class DirectBytesTest {
         int expected = (1 << 24) | (int) id;
         System.out.println("Thread " + id);
 
-        DirectBytes slice1 = store1.createSlice();
-        DirectBytes slice2 = store2.createSlice();
+        DirectBytes slice1 = store1.bytes();
+        DirectBytes slice2 = store2.bytes();
         for (int i = 0; i < lockCount; i += 2) {
             slice1.busyLockInt(0);
             slice2.busyLockInt(0);
@@ -304,7 +304,7 @@ public class DirectBytesTest {
     public void benchmarkByteLargeArray() {
         long length = 1L << 32;
         long start = System.nanoTime();
-        DirectBytes array = DirectStore.allocateLazy(length).createSlice();
+        DirectBytes array = DirectStore.allocateLazy(length).bytes();
         System.out.println("Constructor time: " + (System.nanoTime() - start) / 1e9 + " sec");
         int iters = 2;
         byte one = 1;

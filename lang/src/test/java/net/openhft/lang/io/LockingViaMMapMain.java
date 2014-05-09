@@ -26,8 +26,8 @@ import java.nio.channels.FileChannel;
  * User: peter
  * Date: 22/12/13
  * Time: 11:05
- * <p></p>
- * Toggled 100,000,000 times with an average delay of 49 ns
+ *
+ * <p>Toggled 100,000,000 times with an average delay of 49 ns
  */
 public class LockingViaMMapMain {
     static int RECORDS = Integer.getInteger("records", 128);

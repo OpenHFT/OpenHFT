@@ -99,12 +99,12 @@ public class MappedStore implements BytesStore {
     }
 
     @NotNull
-    public DirectBytes createSlice() {
+    public DirectBytes bytes() {
         return new DirectBytes(this, refCount);
     }
 
     @NotNull
-    public DirectBytes createSlice(long offset, long length) {
+    public DirectBytes bytes(long offset, long length) {
         return new DirectBytes(this, refCount, offset, length);
     }
 

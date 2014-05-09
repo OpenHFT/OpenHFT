@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 public class VanillaBytesMarshallerTest {
     @Test
     public void testObjects() {
-        DirectBytes bytes = new DirectStore(1024).createSlice();
+        DirectBytes bytes = new DirectStore(1024).bytes();
         Object[] objects = {1, 1L, 1.0, "Hello"};
         for (Object o : objects) {
             long pos = bytes.position();
