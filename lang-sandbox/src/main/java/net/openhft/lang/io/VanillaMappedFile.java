@@ -35,7 +35,6 @@ public class VanillaMappedFile implements VanillaMappedResource {
     private final FileChannel channel;
     private final VanillaMappedMode mode;
     private final long size;
-    private long address;
 
     public VanillaMappedFile(final File path, VanillaMappedMode mode) throws IOException {
         this(path,mode,-1);
@@ -45,21 +44,12 @@ public class VanillaMappedFile implements VanillaMappedResource {
         this.path = path;
         this.mode = mode;
         this.size = size;
-        this.address = 0;
         this.channel = fileChannel(path,mode,this.size);
     }
 
     // *************************************************************************
     //
     // *************************************************************************
-
-    public VanillaMappedBuffer sliceOf(long size) throws IOException {
-        return sliceAt(this.address, size, -1);
-    }
-
-    public VanillaMappedBuffer sliceOf(long size, long index) throws IOException {
-        return sliceAt(this.address, size, index);
-    }
 
     public VanillaMappedBuffer sliceAt(long address, long size) throws IOException {
         return sliceAt(address, size, -1);
@@ -68,10 +58,6 @@ public class VanillaMappedFile implements VanillaMappedResource {
     public synchronized VanillaMappedBuffer sliceAt(long address, long size, long index) throws IOException {
         MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),address,size);
         buffer.order(ByteOrder.nativeOrder());
-
-        if(address + size > this.address) {
-            this.address = address + size;
-        }
 
         return new VanillaMappedBuffer(buffer,index);
     }

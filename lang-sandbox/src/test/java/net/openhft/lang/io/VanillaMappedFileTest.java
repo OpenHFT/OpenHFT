@@ -90,7 +90,7 @@ public class VanillaMappedFileTest {
         VanillaMappedFile vmf = VanillaMappedFile.readWrite(
             newTempraryFile("vmf-acquire-buffer"));
 
-        VanillaMappedBuffer buffer = vmf.sliceOf(128);
+        VanillaMappedBuffer buffer = vmf.sliceAt(0,128);
         assertEquals(1, buffer.refCount());
         assertEquals(0L, buffer.readLong(0L));
         assertEquals(0L, buffer.readLong(1L));
@@ -204,9 +204,11 @@ public class VanillaMappedFileTest {
 
         {
             VanillaMappedFile   vmf = VanillaMappedFile.readWrite(file);
-            VanillaMappedBuffer buf = vmf.sliceOf(128);
+            VanillaMappedBuffer buf = vmf.sliceAt(0,128);
 
             buf.writeLong(0, 1L);
+            
+            assertEquals(1L , buf.readLong(0));
             assertEquals(128, vmf.size());
 
             buf.release();
@@ -215,9 +217,9 @@ public class VanillaMappedFileTest {
 
         {
             VanillaMappedFile   vmf = VanillaMappedFile.readWrite(file);
-            VanillaMappedBuffer buf = vmf.sliceOf(128);
+            VanillaMappedBuffer buf = vmf.sliceAt(0,128);
 
-            assertEquals(1L, buf.readLong(0));
+            assertEquals(1L , buf.readLong(0));
             assertEquals(128, vmf.size());
 
             buf.release();

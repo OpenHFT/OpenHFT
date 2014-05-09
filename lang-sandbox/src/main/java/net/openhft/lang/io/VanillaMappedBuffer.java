@@ -44,7 +44,7 @@ public class VanillaMappedBuffer extends NativeBytes {
         return this.index;
     }
 
-    public boolean unmapped() {
+    public synchronized boolean unmapped() {
         return this.unmapped;
     }
 
