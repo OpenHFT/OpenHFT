@@ -19,9 +19,33 @@ package net.openhft.lang.io;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 
 public interface BytesStore {
-    Bytes createSlice();
+    /**
+     * Create a bytes whose content is the whole bytes store. Call of this
+     * method is equivalent to {@code bytes(0, size())} call.
+     *
+     * @return the new bytes
+     * @see #bytes(long, long)
+     */
+    Bytes bytes();
 
-    Bytes createSlice(long offset, long length);
+    /**
+     * Slice a {@code Bytes} object with start address of
+     * {@link #address()}{@code + offset} and capacity of {@code length}.
+     *
+     * <p>If this {@code BytesStore} is {@code Bytes} itself rather than natural
+     * {@code BytesStore} object, this method will offset the new bytes from the
+     * bytes' start, not from bytes' position like
+     * {@link Bytes#slice(long, long)}.
+     *
+     * <p>{@code offset} should be non-negative, {@code length} should be positive,
+     * {@code offset + length} should be less or equal to {@link #size()}.
+     *
+     * @param offset offset of the new bytes from the bytes store address
+     * @param length capacity & limit of the new bytes
+     * @return the sliced {@code Bytes}
+     * @see #bytes()
+     */
+    Bytes bytes(long offset, long length);
 
     BytesMarshallerFactory bytesMarshallerFactory();
 

@@ -49,14 +49,31 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public ByteBufferBytes createSlice() {
-        return new ByteBufferBytes(buffer(), position, capacity);
+    public ByteBufferBytes slice() {
+        return new ByteBufferBytes(buffer(), position, limit - position);
     }
 
     @Override
-    public ByteBufferBytes createSlice(long offset, long length) {
-        assert offset + length <= capacity;
-        return new ByteBufferBytes(buffer(), (int) (position + offset),    (int) length);
+    public ByteBufferBytes slice(long offset, long length) {
+        long sliceStart = position + offset;
+        assert sliceStart >= start && sliceStart < capacity;
+        long sliceEnd = sliceStart + length;
+        assert sliceEnd > sliceStart && sliceEnd <= capacity;
+        return new ByteBufferBytes(buffer(), (int) sliceStart, (int) length);
+    }
+
+    @Override
+    public ByteBufferBytes bytes() {
+        return new ByteBufferBytes(buffer(), start, capacity - start);
+    }
+
+    @Override
+    public ByteBufferBytes bytes(long offset, long length) {
+        long sliceStart = start + offset;
+        assert sliceStart >= start && sliceStart < capacity;
+        long sliceEnd = sliceStart + length;
+        assert sliceEnd > sliceStart && sliceEnd <= capacity;
+        return new ByteBufferBytes(buffer(), (int) sliceStart, (int) length);
     }
 
     @Override

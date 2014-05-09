@@ -34,7 +34,7 @@ public class MappedStoreTest {
         file.deleteOnExit();
         long size = Jvm.is64Bit() ? 3L << 30 : 256 << 20;
         MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, size);
-        DirectBytes slice = ms.createSlice();
+        DirectBytes slice = ms.bytes();
         assertEquals(1, slice.refCount());
         assertEquals(0L, slice.readLong(0L));
         assertEquals(0L, slice.readLong(ms.size() - 8));
@@ -53,7 +53,7 @@ public class MappedStoreTest {
 
         {
             MappedStore ms1 = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);
-            DirectBytes slice1 = ms1.createSlice();
+            DirectBytes slice1 = ms1.bytes();
             assertEquals(1, slice1.refCount());
 
             slice1.writeLong(1L);
@@ -65,7 +65,7 @@ public class MappedStoreTest {
 
         {
             MappedStore ms2 = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);
-            DirectBytes slice2 = ms2.createSlice();
+            DirectBytes slice2 = ms2.bytes();
             assertEquals( 1, slice2.refCount());
             assertEquals(1L, slice2.readLong());
             assertEquals(2L, slice2.readLong());
@@ -82,7 +82,7 @@ public class MappedStoreTest {
         File file = getStoreFile("mapped-store");
 
         MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);
-        DirectBytes slice = ms.createSlice();
+        DirectBytes slice = ms.bytes();
 
         for(long i=0;i<MS_SIZE+1;i += 8) {
             slice.writeLong(i);

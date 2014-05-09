@@ -27,10 +27,10 @@ public class BigDecimalVsDoubleMain {
     static {
         DirectStore store = new DirectStore((NUMBER.length + 1) * 16);
         for (int i = 0; i < NUMBER.length; i++) {
-            IN_BYTES[i] = store.createSlice((i + 1) * 16, 16);
+            IN_BYTES[i] = store.bytes((i + 1) * 16, 16);
             IN_BYTES[i].append(NUMBER[i]);
         }
-        OUT_BYTES = store.createSlice(0, 16);
+        OUT_BYTES = store.bytes(0, 16);
     }
 
     static int count = 0;

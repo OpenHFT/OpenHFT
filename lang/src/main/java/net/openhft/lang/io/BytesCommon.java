@@ -166,4 +166,47 @@ public interface BytesCommon {
      * @param alignment power of 2 to align to.
      */
     void alignPositionAddr(int alignment);
+
+    /**
+     * Creates a new bytes whose content is a shared subsequence of this bytes'
+     * content.
+     *
+     * <p>The content of the new bytes will start at this bytes' current
+     * position. Changes to this bytes' content will be visible in the new bytes,
+     * and vice versa; the two bytes' position and limit values will be
+     * independent.
+     *
+     * <p>The new bytes' position will be zero, its capacity and its limit
+     * will be the number of bytes remaining in this bytes.
+     *
+     * <p>{@code slice()} is equivalent of {@code slice(0, remaining())}.
+     *
+     * @return the new bytes
+     * @see #slice(long, long)
+     */
+    Bytes slice();
+
+    /**
+     * Creates a new bytes whose content is a shared subsequence of this bytes'
+     * content.
+     *
+     * <p>The content of the new bytes will start at this bytes' current
+     * {@link #position()}{@code + offset}. Changes to this bytes' content
+     * will be visible in the new bytes, and vice versa; the two bytes'
+     * position and limit values will be independent.
+     *
+     * <p>The new bytes' position will be zero, its capacity and its limit
+     * will be equal to {@code length}.
+     *
+     * <p>{@code offset} can be negative (if current bytes' position is positive)
+     * and {@code length} can run out of current bytes' limit, the restriction
+     * is that new bytes' should be within this bytes' absolute bounds.
+     *
+     * @param offset relative offset of the new bytes from the current bytes'
+     *               position
+     * @param length capacity of the new bytes
+     * @return the new bytes
+     * @see #slice()
+     */
+    Bytes slice(long offset, long length);
 }
