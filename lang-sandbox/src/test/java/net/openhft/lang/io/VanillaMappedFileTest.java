@@ -262,7 +262,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testMappedCache2() throws Exception {
         final int size = 5;
-        VanillaMappedCache<Integer> cache = new VanillaMappedCache(size, 1.0f, true, true);
+        VanillaMappedCache<Integer> cache = new VanillaMappedCache(size, true);
         for(int i=0;i<10;i++) {
             cache.put(i,newTempraryFile("vmc-2-v" + i),8 * i,i);
             if(i >= size) {
