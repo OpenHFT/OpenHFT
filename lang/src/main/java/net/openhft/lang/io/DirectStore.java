@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DirectStore implements BytesStore {
     private final BytesMarshallerFactory bytesMarshallerFactory;
     private final Cleaner cleaner;
-    private long address;
-    private long size;
+    private final long address;
+    private final long size;
     private final AtomicInteger refCount = new AtomicInteger(1);
 
     public DirectStore(long size) {
@@ -52,14 +52,7 @@ public class DirectStore implements BytesStore {
         }
 
         this.size = size;
-        cleaner = Cleaner.create(this, new Runnable() {
-            @Override
-            public void run() {
-                if (address != 0)
-                    NativeBytes.UNSAFE.freeMemory(address);
-                address = DirectStore.this.size = 0;
-            }
-        });
+        cleaner = Cleaner.create(this, new Deallocator(address));
     }
 
     @NotNull
@@ -106,4 +99,25 @@ public class DirectStore implements BytesStore {
         return bytesMarshallerFactory;
     }
 
+    /**
+     * Static nested class instead of anonymous because the latter would hold
+     * a strong reference to this DirectStore preventing it from becoming
+     * phantom-reachable.
+     */
+    private static class Deallocator implements Runnable {
+        private volatile long address;
+
+        Deallocator(long address) {
+            assert address != 0;
+            this.address = address;
+        }
+
+        @Override
+        public void run() {
+            if (address == 0)
+                return;
+            NativeBytes.UNSAFE.freeMemory(address);
+            address = 0;
+        }
+    }
 }
