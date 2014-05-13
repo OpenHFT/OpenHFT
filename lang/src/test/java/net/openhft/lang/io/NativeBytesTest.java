@@ -927,7 +927,7 @@ public class NativeBytesTest {
 
     @Test
     public void testToString() {
-        NativeBytes bytes = new DirectStore(32).createSlice();
+        NativeBytes bytes = new DirectStore(32).bytes();
         assertEquals("[pos: 0, lim: 32, cap: 32 ] ٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());
         bytes.writeByte(1);
         assertEquals("[pos: 1, lim: 32, cap: 32 ] ⒈‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toString());

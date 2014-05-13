@@ -24,11 +24,12 @@ import net.openhft.lang.model.constraints.Nullable;
  */
 public interface ByteStringParser extends BytesCommon {
     /**
-     * Return true or false, or null if it could not be detected as true or false.  Case is not important
-     * <p></p>
-     * false: f, false, n, no, 0
-     * <p></p>
-     * true: t, true, y, yes, 1
+     * Return true or false, or null if it could not be detected
+     * as true or false.  Case is not important
+     *
+     * <p>false: f, false, n, no, 0
+     *
+     * <p>true: t, true, y, yes, 1
      *
      * @param tester to detect the end of the text.
      * @return true, false, or null if neither.
@@ -80,4 +81,18 @@ public interface ByteStringParser extends BytesCommon {
      * @return true if we stopped at a stop character, false if we ran out of data.
      */
     boolean skipTo(@NotNull StopCharTester tester);
+
+    /**
+     * Dump the contents of this Bytes as text in the Appendable.
+     *
+     * @param appendable to append to
+     */
+    void asString(Appendable appendable);
+
+    /**
+     * Dump the contents of Bytes as a CharSequence
+     *
+     * @return the CharSequence for these Bytes.
+     */
+    CharSequence asString();
 }

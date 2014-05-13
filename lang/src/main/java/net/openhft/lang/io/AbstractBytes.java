@@ -862,7 +862,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(byte[] bytes, int off, int len) {
-        checkWrite(bytes.length);
+        checkWrite(len);
 
         for (int i = 0; i < len; i++)
             write(bytes[off + i]);
@@ -1975,7 +1975,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private boolean tryLockNanos4a(long offset) {
-    	//lowId = bottom 24 bytes of the thread id
+        //lowId = bottom 24 bytes of the thread id
         int lowId = shortThreadId();
         //Use the top 8 bytes as a counter, and the bottom 24 bytes as the thread id
         int firstValue = ((1 << 24) | lowId);
@@ -1987,7 +1987,7 @@ public abstract class AbstractBytes implements Bytes {
         //if the bottom 24 bytes match our thread id ... 
         // TODO but what if we're in a different process?
         if ((currentValue & INT_LOCK_MASK) == lowId) {
-        	//then if the counter in the top 8 bytes is 255, throw an exception
+            //then if the counter in the top 8 bytes is 255, throw an exception
             if ((currentValue >>> 24) >= 255)
                 throw new IllegalStateException("Reentered 255 times without an unlock - if you are using this to lock across processes, there could be a thread id conflict letting one process 'steal' the lock from another process. To avoid this, call AffinitySupport.setThreadId() during startup which will make all threads have unique ids");
             //otherwise increase the counter in the top 8 bytes by one
@@ -2496,5 +2496,23 @@ public abstract class AbstractBytes implements Bytes {
             sb.append((char) (b + 0x2487));
         else
             sb.append((char) b);
+    }
+
+    @Override
+    public void asString(Appendable appendable) {
+        try {
+            for (long i = position(); i < limit(); i++)
+                append(appendable, i);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+
+    }
+
+    @Override
+    public CharSequence asString() {
+        StringBuilder sb = new StringBuilder();
+        asString(sb);
+        return sb;
     }
 }

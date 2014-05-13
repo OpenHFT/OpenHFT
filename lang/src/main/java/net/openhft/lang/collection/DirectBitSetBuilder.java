@@ -49,7 +49,7 @@ public class DirectBitSetBuilder {
     }
 
     public DirectBitSet create(long size) {
-        return wrap(DirectStore.allocate((size + 7) >>> 3).createSlice());
+        return wrap(DirectStore.allocate((size + 7) >>> 3).bytes());
     }
 
     static DirectBitSet wrap(Bytes bytes) {

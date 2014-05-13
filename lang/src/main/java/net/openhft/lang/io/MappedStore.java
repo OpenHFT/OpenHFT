@@ -50,8 +50,8 @@ public class MappedStore implements BytesStore {
     }
 
     private MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
-        if (size < 0) {
-            throw new IllegalArgumentException("size: " + size);
+        if (size < 0 || size > 128L << 40) {
+            throw new IllegalArgumentException("invalid size: " + size);
         }
 
         this.file = file;
@@ -97,12 +97,12 @@ public class MappedStore implements BytesStore {
     }
 
     @NotNull
-    public DirectBytes createSlice() {
+    public DirectBytes bytes() {
         return new DirectBytes(this, refCount);
     }
 
     @NotNull
-    public DirectBytes createSlice(long offset, long length) {
+    public DirectBytes bytes(long offset, long length) {
         return new DirectBytes(this, refCount, offset, length);
     }
 

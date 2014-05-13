@@ -17,9 +17,11 @@
 package net.openhft.lang;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 /**
@@ -85,5 +87,49 @@ public enum Jvm {
 
     public static long getUniqueTid(Thread thread) {
         return ((long) getProcessId() << 32) | thread.getId();
+    }
+
+    private static final String OS = System.getProperty("os.name").toLowerCase();
+
+    public static boolean isWindows() {
+        return OS.startsWith("win");
+    }
+
+    public static boolean isMacOSX() {
+        return OS.contains("mac");
+    }
+
+    public static boolean isLinux() {
+        return OS.startsWith("linux");
+    }
+
+    public static boolean isUnix() {
+        return OS.contains("nix") ||
+                OS.contains("nux") ||
+                OS.contains("aix") ||
+                OS.contains("bsd") ||
+                OS.contains("hpux");
+    }
+
+    public static boolean isSolaris() {
+        return OS.startsWith("sun");
+    }
+
+    public static final int PID_BITS = Maths.intLog2(getPidMax());
+
+    public static long getPidMax() {
+        if (isLinux()) {
+            File file = new File("/proc/sys/kernel/pid_max");
+            if (file.canRead())
+                try {
+                    return new Scanner(file).nextLong();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+        } else if (isMacOSX()) {
+            return 1L << 24;
+        }
+        // the default.
+        return 1L << 16;
     }
 }

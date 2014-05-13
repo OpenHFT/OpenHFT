@@ -92,14 +92,31 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public NativeBytes createSlice() {
-        return new NativeBytes(bytesMarshallerFactory(), startAddr(), capacityAddr(), refCount);
+    public NativeBytes slice() {
+        return new NativeBytes(bytesMarshallerFactory(), positionAddr, limitAddr, refCount);
     }
 
     @Override
-    public NativeBytes createSlice(long offset, long length) {
-        assert offset + length <= limit();
-        return new NativeBytes(bytesMarshallerFactory(), startAddr() + offset, startAddr() + offset + length, refCount);
+    public NativeBytes slice(long offset, long length) {
+        long sliceStart = positionAddr + offset;
+        assert sliceStart >= startAddr && sliceStart < capacityAddr;
+        long sliceEnd = sliceStart + length;
+        assert sliceEnd > sliceStart && sliceEnd <= capacityAddr;
+        return new NativeBytes(bytesMarshallerFactory(), sliceStart, sliceEnd, refCount);
+    }
+
+    @Override
+    public NativeBytes bytes() {
+        return new NativeBytes(bytesMarshallerFactory(), startAddr, capacityAddr, refCount);
+    }
+
+    @Override
+    public NativeBytes bytes(long offset, long length) {
+        long sliceStart = startAddr + offset;
+        assert sliceStart >= startAddr && sliceStart < capacityAddr;
+        long sliceEnd = sliceStart + length;
+        assert sliceEnd > sliceStart && sliceEnd <= capacityAddr;
+        return new NativeBytes(bytesMarshallerFactory(), sliceStart, sliceEnd, refCount);
     }
 
     @Override

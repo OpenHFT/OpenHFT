@@ -27,8 +27,8 @@ import java.nio.channels.FileLock;
  * User: peter
  * Date: 22/12/13
  * Time: 11:05
- * <p></p>
- * Toggled 10,000,128 times with an average delay of 2,402 ns
+ *
+ * <p>Toggled 10,000,128 times with an average delay of 2,402 ns
  */
 public class LockingViaFileLockMain {
     static int RECORDS = Integer.getInteger("records", 128);
