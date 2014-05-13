@@ -24,6 +24,7 @@ import sun.nio.ch.DirectBuffer;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
@@ -32,8 +33,7 @@ import java.util.concurrent.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static net.openhft.lang.io.StopCharTesters.CONTROL_STOP;
-import static net.openhft.lang.io.StopCharTesters.SPACE_STOP;
+import static net.openhft.lang.io.StopCharTesters.*;
 import static org.junit.Assert.*;
 
 /**
@@ -149,11 +149,28 @@ public class NativeBytesTest {
     }
 
     private void testAppendDouble0(double d) {
-        bytes.position(0);
+        bytes.clear();
         bytes.append(d).append(' ');
-        bytes.position(0);
+        bytes.flip();
         double d2 = bytes.parseDouble();
         assertEquals(d, d2, 0);
+
+        bytes.selfTerminating(true);
+        bytes.clear();
+        bytes.append(d);
+        bytes.flip();
+        double d3 = bytes.parseDouble();
+        assertEquals(d, d3, 0);
+
+        bytes.selfTerminating(false);
+        bytes.clear();
+        bytes.append(d);
+        bytes.flip();
+        try {
+            fail("got " + bytes.parseDouble());
+        } catch (BufferUnderflowException expected) {
+            // expected
+        }
     }
 
     @Test
@@ -255,7 +272,7 @@ public class NativeBytesTest {
             bytes.append(word).append('\t');
         }
         bytes.append('\t');
-        bytes.position(0);
+        bytes.flip();
         for (String word : words) {
             assertEquals(word, bytes.parseUTF(CONTROL_STOP));
         }
@@ -275,10 +292,11 @@ public class NativeBytesTest {
         assertEquals(6, bytes.position());
         bytes.skipTo(CONTROL_STOP);
         assertEquals(13, bytes.position());
-        bytes.skipTo(CONTROL_STOP);
-        assertEquals(17, bytes.position());
-        bytes.skipTo(CONTROL_STOP);
-        assertEquals(18, bytes.position());
+        assertTrue(bytes.skipTo(CONTROL_STOP));
+        assertEquals(23, bytes.position());
+        assertTrue(bytes.skipTo(CONTROL_STOP));
+        assertEquals(24, bytes.position());
+        assertFalse(bytes.skipTo(CONTROL_STOP));
 
         bytes.position(0);
         bytes.stepBackAndSkipTo(CONTROL_STOP);
@@ -672,7 +690,39 @@ public class NativeBytesTest {
         assertEquals(123456L, bytes.parseLong());
         assertEquals(1.2345, bytes.parseDouble(), 0);
         assertEquals(1.556, bytes.parseDouble(), 0);
+    }
 
+    @Test
+    public void testSelfTerminating() {
+        bytes.limit(0);
+        bytes.selfTerminating(true);
+        assertEquals(null, bytes.parseBoolean(ALL));
+        assertEquals(0L, bytes.parseLong());
+        assertEquals(0.0, bytes.parseDouble(), 0.0);
+        assertEquals("", bytes.parseUTF(ALL));
+        assertEquals(null, bytes.parseEnum(StopCharTesters.class, ALL));
+
+        bytes.selfTerminating(false);
+        try {
+            fail("got " + bytes.parseBoolean(ALL));
+        } catch (BufferUnderflowException ignored) {
+        }
+        try {
+            fail("got " + bytes.parseLong());
+        } catch (BufferUnderflowException ignored) {
+        }
+        try {
+            fail("got " + bytes.parseDouble());
+        } catch (BufferUnderflowException ignored) {
+        }
+        try {
+            fail("got " + bytes.parseUTF(ALL));
+        } catch (BufferUnderflowException ignored) {
+        }
+        try {
+            fail("got " + bytes.parseEnum(StopCharTesters.class, ALL));
+        } catch (BufferUnderflowException ignored) {
+        }
     }
 
     @Test
