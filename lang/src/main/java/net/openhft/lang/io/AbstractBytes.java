@@ -30,6 +30,7 @@ import net.openhft.lang.pool.StringInterner;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -44,6 +45,7 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("MagicNumber")
 public abstract class AbstractBytes implements Bytes {
+    private static final int END_OF_BUFFER = Integer.MIN_VALUE;
     private static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     private static final int INT_LOCK_MASK;
     private static final int UNSIGNED_BYTE_MASK = 0xFF;
@@ -100,6 +102,7 @@ public abstract class AbstractBytes implements Bytes {
     private byte[] lastDateStr = null;
     private Thread currentThread;
     private int shortThreadId = Integer.MIN_VALUE;
+    private boolean selfTerminating = false;
 
     AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
@@ -219,6 +222,30 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
+    public void selfTerminating(boolean selfTerminating) {
+        this.selfTerminating = selfTerminating;
+    }
+
+    @Override
+    public boolean selfTerminating() {
+        return selfTerminating;
+    }
+
+    @Override
+    public int readUnsignedByteOrThrow() throws BufferUnderflowException {
+        return readByteOrThrow(selfTerminating);
+    }
+
+    public int readByteOrThrow(boolean selfTerminating) throws BufferUnderflowException {
+        return remaining() < 1 ? returnOrThrowEndOfBuffer(selfTerminating) : readUnsignedByte();
+    }
+
+    static int returnOrThrowEndOfBuffer(boolean selfTerminating) {
+        if (selfTerminating) return END_OF_BUFFER;
+        throw new BufferUnderflowException();
+    }
+
+    @Override
     public Boolean parseBoolean(@NotNull StopCharTester tester) {
         StringBuilder sb = acquireUtfReader();
         parseUTF(sb, tester);
@@ -260,7 +287,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public boolean readBoolean() {
-        return readByte() != 0;
+        return readByteOrThrow(false) != 0;
     }
 
     @Override
@@ -294,8 +321,9 @@ public abstract class AbstractBytes implements Bytes {
         StringBuilder input = acquireUtfReader();
         EOL:
         while (position() < capacity()) {
-            int c = readUnsignedByte();
+            int c = readUnsignedByteOrThrow();
             switch (c) {
+                case END_OF_BUFFER:
                 case '\n':
                     break EOL;
                 case '\r':
@@ -367,10 +395,12 @@ public abstract class AbstractBytes implements Bytes {
     private void readUTF0(@NotNull Appendable appendable, int utflen) throws IOException {
         int count = 0;
         while (count < utflen) {
-            int c = readByte();
-            if (c < 0) {
+            int c = readUnsignedByteOrThrow();
+            if (c >= 128) {
                 position(position() - 1);
                 break;
+            } else if (c < 0) {
+
             }
             count++;
             appendable.append((char) c);
@@ -451,9 +481,9 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private void readUTF0(@NotNull Appendable appendable, @NotNull StopCharTester tester) throws IOException {
-        while (remaining() > 0) {
-            int c = readByte();
-            if (c < 0) {
+        while (true) {
+            int c = readUnsignedByteOrThrow();
+            if (c >= 128) {
                 position(position() - 1);
                 break;
             }
@@ -462,8 +492,8 @@ public abstract class AbstractBytes implements Bytes {
             appendable.append((char) c);
         }
 
-        while (remaining() > 0) {
-            int c = readUnsignedByte();
+        while (true) {
+            int c = readUnsignedByteOrThrow();
             switch (c >> 4) {
                 case 0:
                 case 1:
@@ -527,7 +557,7 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public boolean skipTo(@NotNull StopCharTester tester) {
         while (remaining() > 0) {
-            int ch = readByte();
+            int ch = readUnsignedByteOrThrow();
             if (tester.isStopChar(ch))
                 return true;
         }
@@ -1311,7 +1341,7 @@ public abstract class AbstractBytes implements Bytes {
         boolean negative = false;
         int decimalPlaces = Integer.MIN_VALUE;
         while (true) {
-            byte ch = readByte();
+            int ch = readUnsignedByteOrThrow();
             if (ch >= '0' && ch <= '9') {
                 while (value >= MAX_VALUE_DIVIDE_10) {
                     value >>>= 1;
@@ -1365,7 +1395,7 @@ public abstract class AbstractBytes implements Bytes {
         long num = 0, scale = Long.MIN_VALUE;
         boolean negative = false;
         while (true) {
-            byte b = readByte();
+            int b = readUnsignedByteOrThrow();
             // if (b >= '0' && b <= '9')
             if ((b - ('0' + Integer.MIN_VALUE)) <= 9 + Integer.MIN_VALUE) {
                 num = num * 10 + b - '0';
@@ -1389,7 +1419,7 @@ public abstract class AbstractBytes implements Bytes {
         long num = 0;
         boolean negative = false;
         while (true) {
-            byte b = readByte();
+            int b = readUnsignedByteOrThrow();
             // if (b >= '0' && b <= '9')
             if ((b - ('0' + Integer.MIN_VALUE)) <= 9 + Integer.MIN_VALUE)
                 num = num * 10 + b - '0';
@@ -1408,7 +1438,7 @@ public abstract class AbstractBytes implements Bytes {
         long num = 0;
         boolean negative = false;
         while (true) {
-            byte b = readByte();
+            int b = readUnsignedByteOrThrow();
             byte rp = RADIX_PARSE[b];
             if (rp >= 0 && rp < base) {
                 num = num * base + rp;
@@ -1832,8 +1862,9 @@ public abstract class AbstractBytes implements Bytes {
     @Nullable
     @Override
     public Object readObject() {
-        byte type = readByte();
+        int type = readUnsignedByteOrThrow();
         switch (type) {
+            case END_OF_BUFFER:
             case NULL:
                 return null;
             case ENUMED: {
@@ -1849,7 +1880,7 @@ public abstract class AbstractBytes implements Bytes {
                 }
             }
             default:
-                BytesMarshaller<Object> m = bytesMarshallerFactory().getMarshaller(type);
+                BytesMarshaller<Object> m = bytesMarshallerFactory().getMarshaller((byte) type);
                 if (m == null)
                     throw new IllegalStateException("Unknown type " + (char) type);
                 return m.read(this);
