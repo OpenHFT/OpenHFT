@@ -58,16 +58,16 @@ public class VanillaMappedCache<T> {
     //
     // *************************************************************************
 
-    public VanillaMappedBuffer get(T key) {
+    public VanillaMappedBytes get(T key) {
         DataHolder data = this.cache.get(key);
-        return data != null ? data.buffer() : null;
+        return data != null ? data.bytes() : null;
     }
 
-    public VanillaMappedBuffer put(T key, File path, long size) {
+    public VanillaMappedBytes put(T key, File path, long size) {
         return put(key,path,size,-1);
     }
 
-    public VanillaMappedBuffer put(T key, File path, long size, long index) {
+    public VanillaMappedBytes put(T key, File path, long size, long index) {
         DataHolder data = this.cache.get(key);
         if(data != null) {
             data.close();
@@ -87,7 +87,7 @@ public class VanillaMappedCache<T> {
             e.printStackTrace();
         }
 
-        return data.buffer();
+        return data.bytes();
     }
 
     public int size() {
@@ -108,52 +108,52 @@ public class VanillaMappedCache<T> {
 
     private class DataHolder {
         private VanillaMappedFile file;
-        private VanillaMappedBuffer buffer;
+        private VanillaMappedBytes bytes;
 
         public DataHolder() {
             this(null,null);
         }
 
-        public DataHolder(final VanillaMappedFile file, final VanillaMappedBuffer buffer) {
+        public DataHolder(final VanillaMappedFile file, final VanillaMappedBytes bytes) {
             this.file = file;
-            this.buffer = buffer;
+            this.bytes = bytes;
         }
 
         public VanillaMappedFile file() {
             return this.file;
         }
 
-        public VanillaMappedBuffer buffer() {
-            return this.buffer;
+        public VanillaMappedBytes bytes() {
+            return this.bytes;
         }
 
-        public void recycle(final VanillaMappedFile file, final VanillaMappedBuffer buffer) {
+        public void recycle(final VanillaMappedFile file, final VanillaMappedBytes bytes) {
             close();
 
             this.file   = file;
-            this.buffer = buffer;
+            this.bytes = bytes;
         }
 
         public void recycle(final VanillaMappedFile file, long address, long size) throws IOException {
-            recycle(file,file.sliceAt(address,size));
+            recycle(file,file.bytes(address,size));
         }
 
         public void recycle(final VanillaMappedFile file, long address, long size, long index) throws IOException {
-            recycle(file,file.sliceAt(address,size,index));
+            recycle(file,file.bytes(address,size,index));
         }
 
         public void close()  {
             try {
-                if(this.buffer != null) {
-                    this.buffer.release();
+                if(this.bytes != null) {
+                    this.bytes.release();
                 }
 
                 if(this.file != null) {
                     this.file.close();
                 }
 
-                this.buffer = null;
-                this.file = null;
+                this.bytes = null;
+                this.file  = null;
             } catch(IOException e) {
                 e.printStackTrace();
             }

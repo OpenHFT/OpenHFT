@@ -23,7 +23,7 @@ import java.util.List;
 
 public class VanillaMappedBlocks implements VanillaMappedResource {
     private final VanillaMappedFile mappedFile;
-    private final List<VanillaMappedBuffer> buffers;
+    private final List<VanillaMappedBytes> bytes;
     private final long blockSize;
     private final Object lock;
 
@@ -33,7 +33,7 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
 
     public VanillaMappedBlocks(final File path, VanillaMappedMode mode, long blockSize) throws IOException {
         this.mappedFile = new VanillaMappedFile(path,mode,-1);
-        this.buffers    = new ArrayList<VanillaMappedBuffer>();
+        this.bytes      = new ArrayList<VanillaMappedBytes>();
         this.blockSize  = blockSize;
         this.lock       = new Object();
     }
@@ -42,29 +42,29 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
     //
     // *************************************************************************
 
-    public VanillaMappedBuffer acquire(long index) throws IOException {
-        VanillaMappedBuffer mb = null;
+    public VanillaMappedBytes acquire(long index) throws IOException {
+        VanillaMappedBytes mb = null;
 
         synchronized(this.lock) {
-            for (int i = buffers.size() - 1; i >= 0; i--) {
-                if (buffers.get(i).index() == index && !buffers.get(i).unmapped()) {
+            for (int i = bytes.size() - 1; i >= 0; i--) {
+                if (bytes.get(i).index() == index && !bytes.get(i).unmapped()) {
                     // if mapped, get id and increase usage
-                    mb = buffers.get(i);
+                    mb = bytes.get(i);
                     mb.reserve();
-                } else if (buffers.get(i).refCount() <= 0 || buffers.get(i).unmapped()) {
+                } else if (bytes.get(i).refCount() <= 0 || bytes.get(i).unmapped()) {
                     // if not unmapped and not used (reference count <= 0)
                     // unmap it and clean id up
-                    if (!buffers.get(i).unmapped()) {
-                        buffers.get(i).cleanup();
+                    if (!bytes.get(i).unmapped()) {
+                        bytes.get(i).cleanup();
                     }
 
-                    buffers.remove(i);
+                    bytes.remove(i);
                 }
             }
 
             if (mb == null) {
-                mb = this.mappedFile.sliceAt(index * this.blockSize, this.blockSize, index);
-                buffers.add(mb);
+                mb = this.mappedFile.bytes(index * this.blockSize, this.blockSize, index);
+                bytes.add(mb);
             }
         }
 
@@ -91,7 +91,7 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
         //int count = 0;
 
         synchronized(this.lock) {
-            for (VanillaMappedBuffer vmb : this.buffers) {
+            for (VanillaMappedBytes vmb : this.bytes) {
                 //if (vmb.refCount() > 0) {
                 //    count++;
                 //}
@@ -108,7 +108,7 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
             }
             */
 
-            this.buffers.clear();
+            this.bytes.clear();
             this.mappedFile.close();
         }
     }

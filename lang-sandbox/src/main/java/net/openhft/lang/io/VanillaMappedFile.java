@@ -27,7 +27,7 @@ import java.nio.channels.FileChannel;
  * Merge memory mapped files:
  * - net.openhft.lang.io.MappedFile
  * - net.openhft.lang.io.MappedStore
- * - net.openhft.chronicle.sandbox.VanillaFile
+ * - net.openhft.chronicle.VanillaFile
  */
 public class VanillaMappedFile implements VanillaMappedResource {
 
@@ -37,13 +37,13 @@ public class VanillaMappedFile implements VanillaMappedResource {
     private final long size;
 
     public VanillaMappedFile(final File path, VanillaMappedMode mode) throws IOException {
-        this(path,mode,-1);
+        this(path, mode, -1);
     }
 
     public VanillaMappedFile(final File path, VanillaMappedMode mode, long size) throws IOException {
-        this.path = path;
-        this.mode = mode;
-        this.size = size;
+        this.path    = path;
+        this.mode    = mode;
+        this.size    = size;
         this.channel = fileChannel(path,mode,this.size);
     }
 
@@ -51,15 +51,15 @@ public class VanillaMappedFile implements VanillaMappedResource {
     //
     // *************************************************************************
 
-    public VanillaMappedBuffer sliceAt(long address, long size) throws IOException {
-        return sliceAt(address, size, -1);
+    public VanillaMappedBytes bytes(long address, long size) throws IOException {
+        return bytes(address, size, -1);
     }
 
-    public synchronized VanillaMappedBuffer sliceAt(long address, long size, long index) throws IOException {
+    public synchronized VanillaMappedBytes bytes(long address, long size, long index) throws IOException {
         MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),address,size);
         buffer.order(ByteOrder.nativeOrder());
 
-        return new VanillaMappedBuffer(buffer,index);
+        return new VanillaMappedBytes(buffer,index);
     }
 
     // *************************************************************************
@@ -92,7 +92,7 @@ public class VanillaMappedFile implements VanillaMappedResource {
     private static FileChannel fileChannel(final File path, VanillaMappedMode mapMode, long size) throws IOException {
         FileChannel fileChannel = null;
         try {
-            RandomAccessFile raf = new RandomAccessFile(path, mapMode.stringValue());
+            final RandomAccessFile raf = new RandomAccessFile(path, mapMode.stringValue());
             if (size > 0 && raf.length() != size) {
                 if (mapMode.mapValue() != FileChannel.MapMode.READ_WRITE) {
                     throw new IOException("Cannot resize file to " + size + " as mode is not READ_WRITE");

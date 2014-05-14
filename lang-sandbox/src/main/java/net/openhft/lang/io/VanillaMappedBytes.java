@@ -20,16 +20,16 @@ import sun.nio.ch.DirectBuffer;
 
 import java.nio.MappedByteBuffer;
 
-public class VanillaMappedBuffer extends NativeBytes {
+public class VanillaMappedBytes extends NativeBytes {
     private final MappedByteBuffer buffer;
     private final long index;
     private boolean unmapped;
 
-    public VanillaMappedBuffer(final MappedByteBuffer buffer) {
+    public VanillaMappedBytes(final MappedByteBuffer buffer) {
         this(buffer,-1);
     }
 
-    public VanillaMappedBuffer(final MappedByteBuffer buffer, long index) {
+    public VanillaMappedBytes(final MappedByteBuffer buffer, long index) {
         super(
             ((DirectBuffer)buffer).address(),
             ((DirectBuffer)buffer).address() + buffer.capacity()

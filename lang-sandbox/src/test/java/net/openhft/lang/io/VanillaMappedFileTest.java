@@ -90,7 +90,7 @@ public class VanillaMappedFileTest {
         VanillaMappedFile vmf = VanillaMappedFile.readWrite(
             newTempraryFile("vmf-acquire-buffer"));
 
-        VanillaMappedBuffer buffer = vmf.sliceAt(0,128);
+        VanillaMappedBytes buffer = vmf.bytes(0,128);
         assertEquals(1, buffer.refCount());
         assertEquals(0L, buffer.readLong(0L));
         assertEquals(0L, buffer.readLong(1L));
@@ -113,13 +113,13 @@ public class VanillaMappedFileTest {
             newTempraryFile("vmf-acquire-blocks-1"),
             128);
 
-        VanillaMappedBuffer b1 = blocks.acquire(0);
+        VanillaMappedBytes b1 = blocks.acquire(0);
         assertEquals(128, blocks.size());
 
-        VanillaMappedBuffer b2 = blocks.acquire(1);
+        VanillaMappedBytes b2 = blocks.acquire(1);
         assertEquals(256, blocks.size());
 
-        VanillaMappedBuffer b3 = blocks.acquire(1);
+        VanillaMappedBytes b3 = blocks.acquire(1);
         assertEquals(256, blocks.size());
 
         assertNotEquals(b1.address(), b2.address());
@@ -147,7 +147,7 @@ public class VanillaMappedFileTest {
 
         final long nblocks = 50 * 100 * 1000;
         for (long i = 0; i < nblocks; i++) {
-            VanillaMappedBuffer b = blocks.acquire(i);
+            VanillaMappedBytes b = blocks.acquire(i);
             assertEquals(1, b.refCount());
 
             b.release();
@@ -166,33 +166,33 @@ public class VanillaMappedFileTest {
         VanillaMappedFile   vmf    = VanillaMappedFile.readWrite(path);
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(path,128);
 
-        VanillaMappedBuffer b1 = blocks.acquire(0);
+        VanillaMappedBytes b1 = blocks.acquire(0);
         b1.writeLong(1);
         b1.release();
 
         assertEquals(0, b1.refCount());
         assertTrue(b1.unmapped());
 
-        VanillaMappedBuffer b2 = blocks.acquire(1);
+        VanillaMappedBytes b2 = blocks.acquire(1);
         b2.writeLong(2);
         b2.release();
 
         assertEquals(0, b2.refCount());
         assertTrue(b2.unmapped());
 
-        VanillaMappedBuffer b3 = blocks.acquire(2);
+        VanillaMappedBytes b3 = blocks.acquire(2);
         b3.writeLong(3);
         b3.release();
 
         assertEquals(0, b3.refCount());
         assertTrue(b3.unmapped());
 
-        VanillaMappedBuffer b4 = vmf.sliceAt(0, 128 * 3);
-        assertEquals(1, b4.refCount());
+        VanillaMappedBytes b4 = vmf.bytes(0, 128 * 3);
+        assertEquals(  1, b4.refCount());
         assertEquals(384, b4.size());
-        assertEquals(1L, b4.readLong(0));
-        assertEquals(2L, b4.readLong(128));
-        assertEquals(3L, b4.readLong(256));
+        assertEquals( 1L, b4.readLong(0));
+        assertEquals( 2L, b4.readLong(128));
+        assertEquals( 3L, b4.readLong(256));
 
         vmf.close();
         blocks.close();
@@ -203,8 +203,8 @@ public class VanillaMappedFileTest {
         File file = newTempraryFile("vmf-reopen");
 
         {
-            VanillaMappedFile   vmf = VanillaMappedFile.readWrite(file);
-            VanillaMappedBuffer buf = vmf.sliceAt(0,128);
+            VanillaMappedFile  vmf = VanillaMappedFile.readWrite(file);
+            VanillaMappedBytes buf = vmf.bytes(0,128);
 
             buf.writeLong(0, 1L);
             
@@ -216,8 +216,8 @@ public class VanillaMappedFileTest {
         }
 
         {
-            VanillaMappedFile   vmf = VanillaMappedFile.readWrite(file);
-            VanillaMappedBuffer buf = vmf.sliceAt(0,128);
+            VanillaMappedFile  vmf = VanillaMappedFile.readWrite(file);
+            VanillaMappedBytes buf = vmf.bytes(0,128);
 
             assertEquals(1L , buf.readLong(0));
             assertEquals(128, vmf.size());
@@ -248,11 +248,11 @@ public class VanillaMappedFileTest {
         assertNotNull(cache.get(1));
         assertNotNull(cache.get(2));
 
-        VanillaMappedBuffer b1 = cache.get(1);
+        VanillaMappedBytes b1 = cache.get(1);
         assertEquals(  1, b1.refCount());
         assertEquals( 64, b1.size());
 
-        VanillaMappedBuffer b2 = cache.get(2);
+        VanillaMappedBytes b2 = cache.get(2);
         assertEquals(  1, b2.refCount());
         assertEquals(128, b2.size());
 
