@@ -21,14 +21,19 @@ import net.openhft.lang.Compare;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * User: peter.lawrey
@@ -50,7 +55,7 @@ public class DataValueGenerator {
             return cmp == 0 ? o1.getKey().compareTo(o2.getKey()) : cmp;
         }
     };
-    private static final Logger LOGGER = Logger.getLogger(DataValueGenerator.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataValueGenerator.class);
     private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
     private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
     private boolean dumpCode = Boolean.getBoolean("dvg.dumpCode");

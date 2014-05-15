@@ -18,6 +18,7 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
+import org.slf4j.LoggerFactory;
 import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
@@ -26,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
@@ -73,7 +73,7 @@ public enum IOTools {
                     if (file.isDirectory()) {
                         deleteDir(file);
                     } else if (!file.delete()) {
-                        Logger.getLogger(IOTools.class.getName()).info("... unable to delete " + file);
+                        LoggerFactory.getLogger(IOTools.class).info("... unable to delete {}",file);
                     }
 
         }
