@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.model.constraints.NotNull;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,7 +27,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * This manages the full life cycle of a file and its mappings.
@@ -130,8 +130,10 @@ public class MappedFile {
                 count++;
             }
         }
-        if (count > 1)
-            Logger.getLogger(MappedFile.class.getName()).info(basePath + " memory mappings left unreleased, num= " + count);
+        if (count > 1) {
+            LoggerFactory.getLogger(MappedFile.class).info("{} memory mappings left unreleased, num= {}", basePath, count);
+        }
+
         maps.clear();
         fileChannel.close();
     }

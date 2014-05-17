@@ -27,18 +27,31 @@ import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
 import net.openhft.lang.pool.StringInterner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.StreamCorruptedException;
+import java.io.UTFDataFormatException;
 import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.RandomAccess;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
@@ -66,7 +79,7 @@ public abstract class AbstractBytes implements Bytes {
         INT_LOCK_MASK = 0xFFFFFF;
     }
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBytes.class);
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
     private static final byte[] Infinity = "Infinity".getBytes();
@@ -180,7 +193,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private static void warnIdLimit(long id) {
-        LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
+        LOGGER.warn("High thread id may result in collisions id: {}",id);
 
         ID_LIMIT_WARNED = true;
     }
@@ -2167,7 +2180,7 @@ public abstract class AbstractBytes implements Bytes {
             currentValue -= 1 << 24;
             writeOrderedInt(offset, (int) currentValue);
         } else if (currentValue == 0) {
-            LOGGER.severe("No thread holds this lock, threadId: " + shortThreadId());
+            LOGGER.warn("No thread holds this lock, threadId: {}",shortThreadId());
         } else {
             throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }

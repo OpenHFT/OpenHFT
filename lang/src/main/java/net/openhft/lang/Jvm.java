@@ -16,13 +16,14 @@
 
 package net.openhft.lang;
 
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
@@ -69,7 +70,7 @@ public enum Jvm {
             pid = ManagementFactory.getRuntimeMXBean().getName().split("@", 0)[0];
         if (pid == null) {
             int rpid = new Random().nextInt(1 << 16);
-            Logger.getLogger(Jvm.class.getName()).warning("Unable to determine PID, picked a random number=" + rpid);
+            LoggerFactory.getLogger(Jvm.class).warn("Unable to determine PID, picked a random number={}",rpid);
             return rpid;
         } else {
             return Integer.parseInt(pid);
