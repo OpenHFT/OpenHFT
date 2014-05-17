@@ -41,15 +41,11 @@ public class VanillaMappedFile implements VanillaMappedResource {
     }
 
     public VanillaMappedFile(final File path, VanillaMappedMode mode, long size) throws IOException {
-        this.path    = path;
-        this.mode    = mode;
-        this.size    = size;
+        this.path = path;
+        this.mode = mode;
+        this.size = size;
         this.channel = fileChannel(path,mode,this.size);
     }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
 
     public VanillaMappedBytes bytes(long address, long size) throws IOException {
         return bytes(address, size, -1);
@@ -61,10 +57,6 @@ public class VanillaMappedFile implements VanillaMappedResource {
 
         return new VanillaMappedBytes(buffer,index);
     }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
 
     @Override
     public String path() {
@@ -119,10 +111,6 @@ public class VanillaMappedFile implements VanillaMappedResource {
 
         return new IOException(throwable);
     }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
 
     public static VanillaMappedFile readWrite(final File path) throws IOException {
         return new VanillaMappedFile(path,VanillaMappedMode.RW);

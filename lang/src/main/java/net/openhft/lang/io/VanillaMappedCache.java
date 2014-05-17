@@ -28,10 +28,6 @@ public class VanillaMappedCache<T> {
 
     private final Map<T,DataHolder> cache;
 
-    // *************************************************************************
-    //
-    // *************************************************************************
-
     public VanillaMappedCache() {
         this(new LinkedHashMap<T, DataHolder>());
     }
@@ -53,10 +49,6 @@ public class VanillaMappedCache<T> {
     private VanillaMappedCache(final Map<T,DataHolder> cache) {
         this.cache = cache;
     }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
 
     public VanillaMappedBytes get(T key) {
         DataHolder data = this.cache.get(key);
@@ -102,10 +94,6 @@ public class VanillaMappedCache<T> {
         this.cache.clear();
     }
 
-    // *************************************************************************
-    //
-    // *************************************************************************
-
     private class DataHolder {
         private VanillaMappedFile file;
         private VanillaMappedBytes bytes;
@@ -130,7 +118,7 @@ public class VanillaMappedCache<T> {
         public void recycle(final VanillaMappedFile file, final VanillaMappedBytes bytes) {
             close();
 
-            this.file   = file;
+            this.file = file;
             this.bytes = bytes;
         }
 

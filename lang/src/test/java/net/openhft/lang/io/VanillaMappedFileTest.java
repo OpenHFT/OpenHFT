@@ -56,7 +56,6 @@ public class VanillaMappedFileTest {
 
     @Before
     public void setUp() {
-        //System.out.println("Temporay directory is " + System.getProperty("java.io.tmpdir"));
     }
 
     @After
@@ -86,7 +85,7 @@ public class VanillaMappedFileTest {
     }
 
     @Test
-    public void testAcquireBuffer() throws Exception {
+    public void testAcquireBytes() throws Exception {
         VanillaMappedFile vmf = VanillaMappedFile.readWrite(
             newTempraryFile("vmf-acquire-buffer"));
 

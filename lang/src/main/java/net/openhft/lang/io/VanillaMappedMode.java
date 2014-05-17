@@ -26,14 +26,16 @@ public enum VanillaMappedMode {
     RW("rw",1,FileChannel.MapMode.READ_WRITE)
     ;
 
+    private static final VanillaMappedMode[] VALUES = values();
+
     private String stringValue;
     private int intValue;
     private FileChannel.MapMode mapValue;
 
     VanillaMappedMode(String stringValue, int intValue, FileChannel.MapMode mapValue) {
         this.stringValue = stringValue;
-        this.intValue    = intValue;
-        this.mapValue    = mapValue;
+        this.intValue = intValue;
+        this.mapValue = mapValue;
     }
 
     public int intValue() {
@@ -53,7 +55,7 @@ public enum VanillaMappedMode {
     }
 
     public static VanillaMappedMode fromValue(int value) {
-        for(VanillaMappedMode mode : VanillaMappedMode.values()) {
+        for(VanillaMappedMode mode : VALUES) {
             if(mode.intValue() == value) {
                 return mode;
             }
@@ -63,7 +65,7 @@ public enum VanillaMappedMode {
     }
 
     public static VanillaMappedMode fromValue(String value) {
-        for(VanillaMappedMode mode : VanillaMappedMode.values()) {
+        for(VanillaMappedMode mode : VALUES) {
             if(mode.stringValue().equalsIgnoreCase(value)) {
                 return mode;
             }
@@ -73,7 +75,7 @@ public enum VanillaMappedMode {
     }
 
     public static VanillaMappedMode fromValue(FileChannel.MapMode value) {
-        for(VanillaMappedMode mode : VanillaMappedMode.values()) {
+        for(VanillaMappedMode mode : VALUES) {
             if(mode.mapValue() == value) {
                 return mode;
             }

@@ -33,14 +33,10 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
 
     public VanillaMappedBlocks(final File path, VanillaMappedMode mode, long blockSize) throws IOException {
         this.mappedFile = new VanillaMappedFile(path,mode,-1);
-        this.bytes      = new ArrayList<VanillaMappedBytes>();
-        this.blockSize  = blockSize;
-        this.lock       = new Object();
+        this.bytes = new ArrayList<VanillaMappedBytes>();
+        this.blockSize = blockSize;
+        this.lock = new Object();
     }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
 
     public VanillaMappedBytes acquire(long index) throws IOException {
         VanillaMappedBytes mb = null;
@@ -70,10 +66,6 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
 
         return mb;
     }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
 
     @Override
     public String path() {
@@ -112,10 +104,6 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
             this.mappedFile.close();
         }
     }
-
-    // *************************************************************************
-    //
-    // *************************************************************************
 
     public static VanillaMappedBlocks readWrite(final File path, long size) throws IOException {
         return new VanillaMappedBlocks(path,VanillaMappedMode.RW,size);

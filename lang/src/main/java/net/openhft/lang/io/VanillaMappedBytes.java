@@ -35,9 +35,9 @@ public class VanillaMappedBytes extends NativeBytes {
             ((DirectBuffer)buffer).address() + buffer.capacity()
         );
 
-        this.buffer   = buffer;
+        this.buffer = buffer;
         this.unmapped = false;
-        this.index    = index;
+        this.index = index;
     }
 
     public long index() {
