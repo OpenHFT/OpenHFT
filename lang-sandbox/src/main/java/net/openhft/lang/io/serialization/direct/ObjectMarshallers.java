@@ -16,18 +16,19 @@
 
 package net.openhft.lang.io.serialization.direct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import static java.util.logging.Level.WARNING;
 import static net.openhft.lang.io.serialization.direct.DirectSerializationMetadata.SerializationMetadata;
 
 final class ObjectMarshallers {
-    private static final Logger Log = Logger.getLogger(ObjectMarshallers.class.getName());
+    private static final Logger Log = LoggerFactory.getLogger(ObjectMarshallers.class);
 
     private static final Map<Class, ObjectMarshaller> metadata = new HashMap<Class, ObjectMarshaller>();
 
@@ -48,7 +49,7 @@ final class ObjectMarshallers {
             }
 
             om = new ObjectMarshaller<T>(serializationMetadata);
-            Log.log(WARNING, String.format("Class %s has metadata %s", clazz.getName(), serializationMetadata));
+            Log.warn("Class {} has metadata {}", clazz.getName(), serializationMetadata);
             metadata.put(clazz, om);
         }
 
@@ -62,11 +63,11 @@ final class ObjectMarshallers {
     private static class WarnAboutIneligibleFields {
         static void apply(Class clazz, List<Field> allFields, List<Field> eligibleFields) {
             List<Field> ineligibleFields = allFields.subList(eligibleFields.size(), allFields.size());
-            Log.log(WARNING, String.format(
-                    "The following fields in Class %s will not be copied by ObjectMarshaller:\n%s",
-                    clazz.getName(),
-                    commaSeparate(ineligibleFields)
-            ));
+            Log.warn(
+                "The following fields in Class {} will not be copied by ObjectMarshaller:\n{}",
+                clazz.getName(),
+                commaSeparate(ineligibleFields)
+            );
         }
 
         private static String commaSeparate(Collection<Field> fields) {
