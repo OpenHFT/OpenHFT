@@ -217,7 +217,7 @@ public class NativeBytesTest {
 
         this.bytes.write(22, bytes);
         byte[] bytes3 = new byte[bytes.length];
-        this.bytes.skipBytes((int) (22 - this.bytes.position()));
+        this.bytes.position(22);
         assertEquals(bytes3.length, this.bytes.read(bytes3));
         assertTrue(Arrays.equals(bytes, bytes3));
         this.bytes.position(this.bytes.capacity());
