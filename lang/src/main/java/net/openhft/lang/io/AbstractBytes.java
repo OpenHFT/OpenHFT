@@ -292,10 +292,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int skipBytes(int n) {
-        long position = position();
-        int n2 = (int) Math.min(n, capacity() - position);
-        position(position + n2);
-        return n2;
+        return (int) skip(n);
     }
 
     @Override
@@ -1809,7 +1806,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int read() {
-        return remaining() > 0 ? readByte() : -1;
+        return remaining() > 0 ? readUnsignedByte() : -1;
     }
 
     @Override
@@ -1826,7 +1823,7 @@ public abstract class AbstractBytes implements Bytes {
             throw new IllegalArgumentException("Skip bytes out of range, was " + n);
         if (n > remaining())
             n = remaining();
-        skipBytes((int) n);
+        position(position() + n);
         return n;
     }
 
@@ -2426,19 +2423,18 @@ public abstract class AbstractBytes implements Bytes {
         private long mark = 0;
 
         @Override
-        public int available() throws IOException {
-            long remaining = remaining();
-            return (int) Math.min(Integer.MAX_VALUE, remaining);
+        public int available() {
+            return AbstractBytes.this.available();
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             finish();
         }
 
         @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
         @Override
-        public void mark(int readlimit) {
+        public void mark(int readLimit) {
             mark = position();
         }
 
@@ -2448,49 +2444,45 @@ public abstract class AbstractBytes implements Bytes {
         }
 
         @Override
-        public int read(@NotNull byte[] bytes, int off, int len) throws IOException {
+        public int read(@NotNull byte[] bytes, int off, int len) {
             return AbstractBytes.this.read(bytes, off, len);
         }
 
         @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
         @Override
-        public void reset() throws IOException {
+        public void reset() {
             position(mark);
         }
 
         @Override
-        public long skip(long n) throws IOException {
-            if (n > Integer.MAX_VALUE)
-                throw new IOException("Skip too large");
-            return skipBytes((int) n);
+        public long skip(long n) {
+            return AbstractBytes.this.skip(n);
         }
 
         @Override
-        public int read() throws IOException {
-            if (remaining() > 0)
-                return readUnsignedByte();
-            return -1;
+        public int read() {
+            return AbstractBytes.this.read();
         }
     }
 
     private class BytesOutputStream extends OutputStream {
         @Override
-        public void close() throws IOException {
+        public void close() {
             finish();
         }
 
         @Override
-        public void write(@NotNull byte[] b) throws IOException {
+        public void write(@NotNull byte[] b) {
             AbstractBytes.this.write(b);
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
+        public void write(@NotNull byte[] b, int off, int len) {
             AbstractBytes.this.write(b, off, len);
         }
 
         @Override
-        public void write(int b) throws IOException {
+        public void write(int b) {
             checkWrite(1);
             writeUnsignedByte(b);
         }
