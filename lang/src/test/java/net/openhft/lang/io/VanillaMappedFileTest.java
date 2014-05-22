@@ -24,9 +24,6 @@ import java.io.File;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Tests for net.openhft.lang.io.VanillaMappedFile
- */
 public class VanillaMappedFileTest {
 
     private static File newTempraryFile(String name) {
@@ -279,5 +276,29 @@ public class VanillaMappedFileTest {
         }
 
         cache.close();
+    }
+
+    @Test
+    public void testMappedCache3() throws Exception {
+        VanillaMappedCache<Integer> cache = new VanillaMappedCache(10000, true);
+        VanillaMappedBytes buffer = null;
+
+        for (int j = 0; j < 5; j++) {
+            long start = System.nanoTime();
+            int runs = 10000;
+            for (int i = 0; i < runs; i++) {
+                buffer = cache.put(i,newTempraryFile("vmc-3-v" + i),256,i);
+                buffer.writeLong(0, 0x12345678);
+
+                assertEquals(0x12345678L, buffer.readLong(0));
+
+                buffer.release();
+                buffer.close();
+                buffer = null;
+            }
+
+            long time = System.nanoTime() - start;
+            System.out.printf("The average time was %,d us%n", time / runs / 1000);
+        }
     }
 }

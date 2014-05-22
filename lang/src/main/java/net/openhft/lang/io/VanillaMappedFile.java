@@ -74,7 +74,9 @@ public class VanillaMappedFile implements VanillaMappedResource {
 
     @Override
     public synchronized void close() throws IOException {
-        this.channel.close();
+        if(this.channel.isOpen()) {
+            this.channel.close();
+        }
     }
 
     // *************************************************************************
