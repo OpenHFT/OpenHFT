@@ -16,15 +16,17 @@
 package net.openhft.lang.io;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * TODO: concurrency
- */
 public class VanillaMappedCache<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(VanillaMappedCache.class);
 
     private final Map<T,DataHolder> cache;
 
@@ -68,6 +70,15 @@ public class VanillaMappedCache<T> {
         }
 
         try {
+            final Iterator<Map.Entry<T,DataHolder>> it = this.cache.entrySet().iterator();
+            while(it.hasNext()) {
+                Map.Entry<T,DataHolder> entry = it.next();
+                if(entry.getValue().bytes().unmapped()) {
+                    entry.getValue().close();
+                    it.remove();
+                }
+            }
+
             data.recycle(
                 VanillaMappedFile.readWrite(path, size),
                 0,
@@ -76,7 +87,7 @@ public class VanillaMappedCache<T> {
 
             this.cache.put(key,data);
         } catch(IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("",e);
         }
 
         return data.bytes();
@@ -92,6 +103,15 @@ public class VanillaMappedCache<T> {
         }
 
         this.cache.clear();
+    }
+
+    public synchronized void checkCounts(int min, int max) {
+        for(DataHolder data : this.cache.values()) {
+            if (data.bytes().refCount() < min || data.bytes().refCount() > max) {
+                throw new IllegalStateException(
+                    data.file().path() + " has a count of " + data.bytes().refCount());
+            }
+        }
     }
 
     private class DataHolder {
@@ -141,9 +161,9 @@ public class VanillaMappedCache<T> {
                 }
 
                 this.bytes = null;
-                this.file  = null;
+                this.file = null;
             } catch(IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("",e);
             }
         }
     }

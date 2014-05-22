@@ -49,6 +49,13 @@ public class VanillaMappedBytes extends NativeBytes {
     }
 
     @Override
+    public void release() {
+        if(!unmapped()) {
+            super.release();
+        }
+    }
+
+    @Override
     public synchronized void cleanup() {
         if(!this.unmapped) {
             Cleaner cl = ((DirectBuffer)this.buffer).cleaner();
