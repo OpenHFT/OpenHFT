@@ -70,14 +70,7 @@ public class VanillaMappedCache<T> {
         }
 
         try {
-            final Iterator<Map.Entry<T,DataHolder>> it = this.cache.entrySet().iterator();
-            while(it.hasNext()) {
-                Map.Entry<T,DataHolder> entry = it.next();
-                if(entry.getValue().bytes().unmapped()) {
-                    entry.getValue().close();
-                    it.remove();
-                }
-            }
+            cleanup();
 
             data.recycle(
                 VanillaMappedFile.readWrite(path, size),
@@ -98,11 +91,7 @@ public class VanillaMappedCache<T> {
     }
 
     public void close() {
-        for(Map.Entry<T, DataHolder> entry : this.cache.entrySet()) {
-            entry.getValue().close();
-        }
-
-        this.cache.clear();
+        cleanup();
     }
 
     public synchronized void checkCounts(int min, int max) {
@@ -110,6 +99,17 @@ public class VanillaMappedCache<T> {
             if (data.bytes().refCount() < min || data.bytes().refCount() > max) {
                 throw new IllegalStateException(
                     data.file().path() + " has a count of " + data.bytes().refCount());
+            }
+        }
+    }
+
+    private void cleanup() {
+        final Iterator<Map.Entry<T,DataHolder>> it = this.cache.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry<T,DataHolder> entry = it.next();
+            if(entry.getValue().bytes().unmapped()) {
+                entry.getValue().close();
+                it.remove();
             }
         }
     }
@@ -154,14 +154,14 @@ public class VanillaMappedCache<T> {
             try {
                 if(this.bytes != null) {
                     this.bytes.release();
-                }
 
-                if(this.file != null) {
-                    this.file.close();
-                }
+                    if(this.file != null && this.bytes.unmapped()) {
+                        this.file.close();
 
-                this.bytes = null;
-                this.file = null;
+                        this.bytes = null;
+                        this.file = null;
+                    }
+                }
             } catch(IOException e) {
                 LOGGER.warn("",e);
             }
