@@ -48,14 +48,11 @@ public class VanillaMappedFile implements VanillaMappedResource {
     }
 
     public VanillaMappedBytes bytes(long address, long size) throws IOException {
-        return bytes(address, size, -1);
+        return new VanillaMappedBytes(map(address,size), -1, null);
     }
 
-    public synchronized VanillaMappedBytes bytes(long address, long size, long index) throws IOException {
-        MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),address,size);
-        buffer.order(ByteOrder.nativeOrder());
-
-        return new VanillaMappedBytes(buffer,index);
+    public VanillaMappedBytes bytes(long address, long size, long index) throws IOException {
+        return new VanillaMappedBytes(map(address,size), index, null);
     }
 
     @Override
@@ -82,6 +79,13 @@ public class VanillaMappedFile implements VanillaMappedResource {
     // *************************************************************************
     // Helpers
     // *************************************************************************
+
+    private synchronized MappedByteBuffer map(long address, long size) throws IOException {
+        MappedByteBuffer buffer = this.channel.map(this.mode.mapValue(),address,size);
+        buffer.order(ByteOrder.nativeOrder());
+
+        return buffer;
+    }
 
     private static FileChannel fileChannel(final File path, VanillaMappedMode mapMode, long size) throws IOException {
         FileChannel fileChannel = null;
@@ -128,5 +132,14 @@ public class VanillaMappedFile implements VanillaMappedResource {
 
     public static VanillaMappedFile readOnly(final File path, long size) throws IOException {
         return new VanillaMappedFile(path,VanillaMappedMode.RO,size);
+    }
+
+    public static VanillaMappedBytes readWriteBytes(final File path, long size) throws IOException {
+        return readWriteBytes(path, size, -1);
+    }
+
+    public static VanillaMappedBytes readWriteBytes(final File path, long size, long index) throws IOException {
+        VanillaMappedFile vmf = new VanillaMappedFile(path,VanillaMappedMode.RW);
+        return new VanillaMappedBytes(vmf.map(0,size), index, vmf.channel);
     }
 }
