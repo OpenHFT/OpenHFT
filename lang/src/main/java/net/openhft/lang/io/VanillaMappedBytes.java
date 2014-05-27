@@ -18,24 +18,32 @@ package net.openhft.lang.io;
 import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
+import java.io.IOException;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 public class VanillaMappedBytes extends NativeBytes {
     private final MappedByteBuffer buffer;
+    private final FileChannel channel;
     private final long index;
     private boolean unmapped;
 
     public VanillaMappedBytes(final MappedByteBuffer buffer) {
-        this(buffer,-1);
+        this(buffer,-1,null);
     }
 
     public VanillaMappedBytes(final MappedByteBuffer buffer, long index) {
+        this(buffer,index,null);
+    }
+
+    protected VanillaMappedBytes(final MappedByteBuffer buffer, long index, final FileChannel channel) {
         super(
             ((DirectBuffer)buffer).address(),
             ((DirectBuffer)buffer).address() + buffer.capacity()
         );
 
         this.buffer = buffer;
+        this.channel = channel;
         this.unmapped = false;
         this.index = index;
     }
@@ -61,6 +69,14 @@ public class VanillaMappedBytes extends NativeBytes {
             Cleaner cl = ((DirectBuffer)this.buffer).cleaner();
             if (cl != null) {
                 cl.clean();
+            }
+
+            try {
+                if (this.channel != null && this.channel.isOpen()) {
+                    this.channel.close();
+                }
+            } catch(IOException e) {
+                throw new AssertionError(e);
             }
 
             this.unmapped = true;

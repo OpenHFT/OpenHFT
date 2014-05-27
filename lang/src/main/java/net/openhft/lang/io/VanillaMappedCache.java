@@ -28,16 +28,16 @@ import java.util.Map;
 public class VanillaMappedCache<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(VanillaMappedCache.class);
 
-    private final Map<T,DataHolder> cache;
+    private final Map<T,VanillaMappedBytes> cache;
 
     public VanillaMappedCache() {
-        this(new LinkedHashMap<T, DataHolder>());
+        this(new LinkedHashMap<T, VanillaMappedBytes>());
     }
 
     public VanillaMappedCache(final int maximumCacheSize, final boolean cleanOnRemove) {
-        this(new LinkedHashMap<T, DataHolder>(maximumCacheSize,1.0f,true) {
+        this(new LinkedHashMap<T, VanillaMappedBytes>(maximumCacheSize,1.0f,true) {
             @Override
-            protected boolean removeEldestEntry(Map.Entry<T, DataHolder> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<T, VanillaMappedBytes> eldest) {
                 boolean removed = size() >= maximumCacheSize;
                 if (removed && cleanOnRemove) {
                     eldest.getValue().close();
@@ -48,13 +48,12 @@ public class VanillaMappedCache<T> {
         });
     }
 
-    private VanillaMappedCache(final Map<T,DataHolder> cache) {
+    private VanillaMappedCache(final Map<T,VanillaMappedBytes> cache) {
         this.cache = cache;
     }
 
     public VanillaMappedBytes get(T key) {
-        DataHolder data = this.cache.get(key);
-        return data != null ? data.bytes() : null;
+        return this.cache.get(key);
     }
 
     public VanillaMappedBytes put(T key, File path, long size) {
@@ -62,28 +61,27 @@ public class VanillaMappedCache<T> {
     }
 
     public VanillaMappedBytes put(T key, File path, long size, long index) {
-        DataHolder data = this.cache.get(key);
-        if(data != null) {
-            data.close();
-        } else {
-            data = new DataHolder();
-        }
+        VanillaMappedBytes data = this.cache.get(key);
 
         try {
-            cleanup();
+            if(data != null) {
+                if (!data.unmapped()) {
+                    data.cleanup();
 
-            data.recycle(
-                VanillaMappedFile.readWrite(path, size),
-                0,
-                size,
-                index);
+                    throw new IllegalStateException(
+                        "Buffer at " + data.index() + " has a count of " + + data.refCount()
+                    );
+                }
+            }
+
+            data = VanillaMappedFile.readWriteBytes(path,size,index);
 
             this.cache.put(key,data);
         } catch(IOException e) {
             LOGGER.warn("",e);
         }
 
-        return data.bytes();
+        return data;
     }
 
     public int size() {
@@ -91,80 +89,26 @@ public class VanillaMappedCache<T> {
     }
 
     public void close() {
-        for(Map.Entry<T,DataHolder> entry : this.cache.entrySet()) {
-            entry.getValue().close();
-        }
-
-        cleanup();
-    }
-
-    public synchronized void checkCounts(int min, int max) {
-        for(DataHolder data : this.cache.values()) {
-            if (data.bytes().refCount() < min || data.bytes().refCount() > max) {
-                throw new IllegalStateException(
-                    data.file().path() + " has a count of " + data.bytes().refCount());
-            }
-        }
-    }
-
-    private void cleanup() {
-        final Iterator<Map.Entry<T,DataHolder>> it = this.cache.entrySet().iterator();
+        final Iterator<Map.Entry<T,VanillaMappedBytes>> it = this.cache.entrySet().iterator();
         while(it.hasNext()) {
-            Map.Entry<T,DataHolder> entry = it.next();
-            if(entry.getValue().bytes().unmapped()) {
+            Map.Entry<T,VanillaMappedBytes> entry = it.next();
+            entry.getValue().release();
+
+            if(entry.getValue().unmapped()) {
                 entry.getValue().close();
                 it.remove();
             }
         }
+
+        this.cache.clear();
     }
 
-    private class DataHolder {
-        private VanillaMappedFile file;
-        private VanillaMappedBytes bytes;
-
-        public DataHolder() {
-            this(null,null);
-        }
-
-        public DataHolder(final VanillaMappedFile file, final VanillaMappedBytes bytes) {
-            this.file = file;
-            this.bytes = bytes;
-        }
-
-        public VanillaMappedFile file() {
-            return this.file;
-        }
-
-        public VanillaMappedBytes bytes() {
-            return this.bytes;
-        }
-
-        public void recycle(final VanillaMappedFile file, final VanillaMappedBytes bytes) {
-            close();
-
-            this.file = file;
-            this.bytes = bytes;
-        }
-
-        public void recycle(final VanillaMappedFile file, long address, long size) throws IOException {
-            recycle(file,file.bytes(address,size));
-        }
-
-        public void recycle(final VanillaMappedFile file, long address, long size, long index) throws IOException {
-            recycle(file,file.bytes(address,size,index));
-        }
-
-        public void close()  {
-            try {
-                if(this.bytes != null) {
-                    this.bytes.release();
-
-                    if(this.file != null && this.bytes.unmapped()) {
-                        this.file.close();
-                    }
-                }
-            } catch(IOException e) {
-                LOGGER.warn("",e);
+    public synchronized void checkCounts(int min, int max) {
+        for(VanillaMappedBytes data : this.cache.values()) {
+            if (data.refCount() < min || data.refCount() > max) {
+                throw new IllegalStateException(
+                    "Buffer at " + data.index() + " has a count of " + + data.refCount()
+                );
             }
         }
     }
