@@ -47,7 +47,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.4.0</version>
+                <version>6.4.2</version>
             </dependency>
             <dependency>
                 <groupId>net.openhft</groupId>
@@ -141,7 +141,7 @@
     </dependencies>
 
     <build>
-       <pluginManagement>
+        <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>
@@ -184,16 +184,16 @@
                     target/classes/META-INF/maven/dependencies.properties
             -->
             <plugin>
-              <groupId>org.apache.servicemix.tooling</groupId>
-              <artifactId>depends-maven-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>generate-depends-file</id>
-                  <goals>
-                    <goal>generate-depends-file</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>org.apache.servicemix.tooling</groupId>
+                <artifactId>depends-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-depends-file</id>
+                        <goals>
+                            <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -202,7 +202,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}
+                        </Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
                             !net.openhft.lang.io,
