@@ -56,7 +56,7 @@ public class VanillaMappedBytes extends NativeBytes {
     }
 
     @Override
-    public synchronized void cleanup() {
+    protected synchronized void cleanup() {
         if(!this.unmapped) {
             Cleaner cl = ((DirectBuffer)this.buffer).cleaner();
             if (cl != null) {
