@@ -301,4 +301,20 @@ public class VanillaMappedFileTest {
             System.out.printf("The average time was %,d us%n", time / runs / 1000);
         }
     }
+
+    @Test
+    public void testMappedCache4() throws Exception {
+        VanillaMappedCache<Integer> cache = new VanillaMappedCache(10000, true);
+        VanillaMappedBytes buffer = cache.put(1,newTempraryFile("vmc-4"),256,1);
+
+        buffer.reserve();
+        assertEquals(2,buffer.refCount());
+
+        buffer.release();
+        assertEquals(1,buffer.refCount());
+
+        cache.close();
+        assertEquals(0,buffer.refCount());
+    }
 }
+

@@ -91,6 +91,10 @@ public class VanillaMappedCache<T> {
     }
 
     public void close() {
+        for(Map.Entry<T,DataHolder> entry : this.cache.entrySet()) {
+            entry.getValue().close();
+        }
+
         cleanup();
     }
 
@@ -157,9 +161,6 @@ public class VanillaMappedCache<T> {
 
                     if(this.file != null && this.bytes.unmapped()) {
                         this.file.close();
-
-                        this.bytes = null;
-                        this.file = null;
                     }
                 }
             } catch(IOException e) {
