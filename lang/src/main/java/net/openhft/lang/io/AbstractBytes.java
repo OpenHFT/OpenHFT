@@ -30,27 +30,14 @@ import net.openhft.lang.pool.StringInterner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.StreamCorruptedException;
-import java.io.UTFDataFormatException;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.RandomAccess;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -193,7 +180,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private static void warnIdLimit(long id) {
-        LOGGER.warn("High thread id may result in collisions id: {}",id);
+        LOGGER.warn("High thread id may result in collisions id: {}", id);
 
         ID_LIMIT_WARNED = true;
     }
@@ -2177,7 +2164,7 @@ public abstract class AbstractBytes implements Bytes {
             currentValue -= 1 << 24;
             writeOrderedInt(offset, (int) currentValue);
         } else if (currentValue == 0) {
-            LOGGER.warn("No thread holds this lock, threadId: {}",shortThreadId());
+            LOGGER.warn("No thread holds this lock, threadId: {}", shortThreadId());
         } else {
             throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
@@ -2551,4 +2538,43 @@ public abstract class AbstractBytes implements Bytes {
         asString(sb);
         return sb;
     }
+
+
+    /**
+     * display the hex data of a byte buffer from the position() to the limit()
+     *
+     * @param buffer the buffer you wish to toString()
+     * @return hex representation of the buffer, from example [0D ,OA, FF]
+     */
+    public static String toHex(@org.jetbrains.annotations.NotNull final ByteBuffer buffer) {
+
+        final ByteBuffer slice = buffer.slice();
+        final StringBuilder builder = new StringBuilder("[");
+
+        while (slice.hasRemaining()) {
+            final byte b = slice.get();
+            builder.append(String.format("%02X ", b));
+            builder.append(",");
+        }
+
+        // remove the last comma
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    public static String toString(@org.jetbrains.annotations.NotNull final Bytes buffer) {
+
+        final Bytes slice = buffer.slice();
+
+        final StringBuilder builder = new StringBuilder();
+
+        while (slice.remaining() > 0) {
+            final byte b = slice.readByte();
+            builder.append((char) b);
+        }
+
+        return builder.toString();
+    }
+
 }
