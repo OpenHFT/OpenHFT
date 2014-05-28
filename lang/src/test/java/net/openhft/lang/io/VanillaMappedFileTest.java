@@ -118,26 +118,26 @@ public class VanillaMappedFileTest {
 
         VanillaMappedBytes b1 = blocks.acquire(0);
         assertEquals(128, blocks.size());
+        assertEquals(2, b1.refCount());
+        assertEquals(128, b1.size());
 
         VanillaMappedBytes b2 = blocks.acquire(1);
         assertEquals(256, blocks.size());
+        assertEquals(2, b2.refCount());
+        assertEquals(128, b2.size());
 
         VanillaMappedBytes b3 = blocks.acquire(1);
         assertEquals(256, blocks.size());
+        assertEquals(3, b3.refCount());
+        assertEquals(128, b2.size());
 
         assertNotEquals(b1.address(), b2.address());
         assertNotEquals(b1.address(), b3.address());
         assertEquals(b2.address(), b3.address());
 
-        assertEquals(128, b1.size());
-        assertEquals(1, b1.refCount());
-        assertEquals(128, b2.size());
-        assertEquals(2, b2.refCount());
-        assertEquals(2, b3.refCount());
-
         b1.release();
         b2.release();
-        b3.release();
+        b2.release();
 
         blocks.close();
     }
@@ -150,15 +150,15 @@ public class VanillaMappedFileTest {
 
         assertTrue(new File(blocks.path()).exists());
 
-        final long nblocks = 50 * 100 * 1000;
+        final long nblocks = 10000;
         for (long i = 0; i < nblocks; i++) {
             VanillaMappedBytes b = blocks.acquire(i);
-            assertEquals(1, b.refCount());
+            assertEquals(2, b.refCount());
 
             b.release();
 
-            assertEquals(0, b.refCount());
-            assertTrue(b.unmapped());
+            assertEquals(1, b.refCount());
+            assertFalse(b.unmapped());
         }
 
         blocks.close();
@@ -175,22 +175,25 @@ public class VanillaMappedFileTest {
         b1.writeLong(1);
         b1.release();
 
-        assertEquals(0, b1.refCount());
-        assertTrue(b1.unmapped());
+        assertEquals(1, b1.refCount());
+        assertFalse(b1.unmapped());
 
         VanillaMappedBytes b2 = blocks.acquire(1);
         b2.writeLong(2);
         b2.release();
 
-        assertEquals(0, b2.refCount());
-        assertTrue(b2.unmapped());
+        assertEquals(1, b2.refCount());
+        assertFalse(b1.unmapped());
+        assertFalse(b2.unmapped());
 
         VanillaMappedBytes b3 = blocks.acquire(2);
         b3.writeLong(3);
         b3.release();
 
-        assertEquals(0, b3.refCount());
-        assertTrue(b3.unmapped());
+        assertEquals(1, b3.refCount());
+        assertTrue(b1.unmapped());
+        assertFalse(b2.unmapped());
+        assertFalse(b3.unmapped());
 
         VanillaMappedBytes b4 = vmf.bytes(0, 128 * 3);
         assertEquals(  1, b4.refCount());
