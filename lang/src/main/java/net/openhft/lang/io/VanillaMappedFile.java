@@ -100,7 +100,7 @@ public class VanillaMappedFile implements VanillaMappedResource {
             }
 
             fileChannel = raf.getChannel();
-            fileChannel.force(true);
+            //fileChannel.force(true);
         } catch (Exception e) {
             throw wrap(e);
         }

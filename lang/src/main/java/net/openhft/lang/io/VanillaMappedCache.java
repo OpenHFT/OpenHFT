@@ -19,37 +19,49 @@ package net.openhft.lang.io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class VanillaMappedCache<T> {
+public class VanillaMappedCache<T> implements Closeable {
     private static final Logger LOGGER = LoggerFactory.getLogger(VanillaMappedCache.class);
 
+    private final boolean cleanOnClose;
     private final Map<T,VanillaMappedBytes> cache;
 
     public VanillaMappedCache() {
-        this(new LinkedHashMap<T, VanillaMappedBytes>());
+        this(new LinkedHashMap<T, VanillaMappedBytes>(),false);
     }
 
-    public VanillaMappedCache(final int maximumCacheSize, final boolean cleanOnRemove) {
+    public VanillaMappedCache(final boolean cleanOnClose) {
+        this(new LinkedHashMap<T, VanillaMappedBytes>(), cleanOnClose);
+    }
+
+    public VanillaMappedCache(final int maximumCacheSize, boolean releaseOnRemove) {
+        this(maximumCacheSize, releaseOnRemove, false);
+    }
+
+    public VanillaMappedCache(final int maximumCacheSize, final boolean releaseOnRemove, final boolean cleanOnClose) {
         this(new LinkedHashMap<T, VanillaMappedBytes>(maximumCacheSize,1.0f,true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<T, VanillaMappedBytes> eldest) {
                 boolean removed = size() >= maximumCacheSize;
-                if (removed && cleanOnRemove) {
-                    eldest.getValue().close();
+                if (removed && releaseOnRemove) {
+                    eldest.getValue().release();
                 }
 
                 return removed;
             }
-        });
+        },
+        cleanOnClose);
     }
 
-    private VanillaMappedCache(final Map<T,VanillaMappedBytes> cache) {
+    private VanillaMappedCache(final Map<T,VanillaMappedBytes> cache, final boolean cleanOnClose) {
         this.cache = cache;
+        this.cleanOnClose = cleanOnClose;
     }
 
     public VanillaMappedBytes get(T key) {
@@ -88,13 +100,18 @@ public class VanillaMappedCache<T> {
         return this.cache.size();
     }
 
+    @Override
     public void close() {
         final Iterator<Map.Entry<T,VanillaMappedBytes>> it = this.cache.entrySet().iterator();
         while(it.hasNext()) {
             Map.Entry<T,VanillaMappedBytes> entry = it.next();
             entry.getValue().release();
 
-            if(entry.getValue().unmapped()) {
+            if(this.cleanOnClose && !entry.getValue().unmapped()) {
+                entry.getValue().cleanup();
+                entry.getValue().close();
+                it.remove();
+            } else  if(entry.getValue().unmapped()) {
                 entry.getValue().close();
                 it.remove();
             }
