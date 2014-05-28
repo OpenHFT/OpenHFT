@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 public class VanillaMappedFileTest {
     public static String TMPDIR    = System.getProperty("java.io.tmpdir");
     public static String SEPARATOR = System.getProperty("file.separator");
-    public static String BASEPATH  = TMPDIR + SEPARATOR;
+    public static String BASEPATH  = TMPDIR + SEPARATOR + "vmf";
 
     private static File newTempraryFile(String name) {
         return newTempraryFile(name, true);
@@ -35,7 +35,7 @@ public class VanillaMappedFileTest {
 
     private static File newTempraryFile(String name, boolean delete) {
         File file = new File(
-            BASEPATH + "vmf",
+            BASEPATH,
             name);
 
         if (delete) {
@@ -89,6 +89,8 @@ public class VanillaMappedFileTest {
         VanillaMappedFile vmf = VanillaMappedFile.readWrite(
             newTempraryFile("vmf-acquire-buffer"));
 
+        assertTrue(new File(vmf.path()).exists());
+
         VanillaMappedBytes buffer = vmf.bytes(0,128);
         assertEquals(1, buffer.refCount());
         assertEquals(0L, buffer.readLong(0L));
@@ -111,6 +113,8 @@ public class VanillaMappedFileTest {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
             newTempraryFile("vmf-acquire-blocks-1"),
             128);
+
+        assertTrue(new File(blocks.path()).exists());
 
         VanillaMappedBytes b1 = blocks.acquire(0);
         assertEquals(128, blocks.size());
@@ -143,6 +147,8 @@ public class VanillaMappedFileTest {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
             newTempraryFile("vmf-acquire-blocks-2"),
             64);
+
+        assertTrue(new File(blocks.path()).exists());
 
         final long nblocks = 50 * 100 * 1000;
         for (long i = 0; i < nblocks; i++) {
@@ -291,7 +297,7 @@ public class VanillaMappedFileTest {
             long start = System.nanoTime();
             int runs = 10000;
             for (int i = 0; i < runs; i++) {
-                file = newTempraryFile("vmc-3-v" + i);
+                file = newTempraryFile("vmc-3-v" + i, false);
 
                 buffer = cache.put(i,file,256,i);
                 buffer.writeLong(0, 0x12345678);
