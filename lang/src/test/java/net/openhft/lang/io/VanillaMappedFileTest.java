@@ -25,6 +25,9 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class VanillaMappedFileTest {
+    public static String TMPDIR    = System.getProperty("java.io.tmpdir");
+    public static String SEPARATOR = System.getProperty("file.separator");
+    public static String BASEPATH  = TMPDIR + SEPARATOR + "vmf";
 
     private static File newTempraryFile(String name) {
         return newTempraryFile(name, true);
@@ -32,7 +35,7 @@ public class VanillaMappedFileTest {
 
     private static File newTempraryFile(String name, boolean delete) {
         File file = new File(
-            System.getProperty("java.io.tmpdir") + File.separator + "vmf",
+            BASEPATH,
             name);
 
         if (delete) {
@@ -86,6 +89,8 @@ public class VanillaMappedFileTest {
         VanillaMappedFile vmf = VanillaMappedFile.readWrite(
             newTempraryFile("vmf-acquire-buffer"));
 
+        assertTrue(new File(vmf.path()).exists());
+
         VanillaMappedBytes buffer = vmf.bytes(0,128);
         assertEquals(1, buffer.refCount());
         assertEquals(0L, buffer.readLong(0L));
@@ -108,6 +113,8 @@ public class VanillaMappedFileTest {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
             newTempraryFile("vmf-acquire-blocks-1"),
             128);
+
+        assertTrue(new File(blocks.path()).exists());
 
         VanillaMappedBytes b1 = blocks.acquire(0);
         assertEquals(128, blocks.size());
@@ -140,6 +147,8 @@ public class VanillaMappedFileTest {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
             newTempraryFile("vmf-acquire-blocks-2"),
             64);
+
+        assertTrue(new File(blocks.path()).exists());
 
         final long nblocks = 50 * 100 * 1000;
         for (long i = 0; i < nblocks; i++) {
@@ -280,26 +289,34 @@ public class VanillaMappedFileTest {
 
     @Test
     public void testMappedCache3() throws Exception {
-        VanillaMappedCache<Integer> cache = new VanillaMappedCache(10000, true);
+        VanillaMappedCache<Integer> cache = new VanillaMappedCache(32, false);
         VanillaMappedBytes buffer = null;
+        File file = null;
 
         for (int j = 0; j < 5; j++) {
             long start = System.nanoTime();
             int runs = 10000;
             for (int i = 0; i < runs; i++) {
-                buffer = cache.put(i,newTempraryFile("vmc-3-v" + i),256,i);
+                file = newTempraryFile("vmc-3-v" + i, false);
+
+                buffer = cache.put(i,file,256,i);
                 buffer.writeLong(0, 0x12345678);
 
                 assertEquals(0x12345678L, buffer.readLong(0));
+                assertEquals(i, buffer.index());
 
                 buffer.release();
                 buffer.close();
-                buffer = null;
+
+                assertEquals(0, buffer.refCount());
+                assertTrue(file.delete());
             }
 
             long time = System.nanoTime() - start;
             System.out.printf("The average time was %,d us%n", time / runs / 1000);
         }
+
+        cache.close();
     }
 
     @Test
