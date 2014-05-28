@@ -130,7 +130,7 @@ public enum Jvm {
                     final long n = new Scanner(file).nextLong();
 
                     //  if the number of threads is not a power of 2 then we round up
-                    return (n & (n - 1)) == 0 ? n : (1 << (64L - numberOfLeadingZeros(n)));
+                    return (n & (n - 1)) == 0 ? n : 1L << -numberOfLeadingZeros(n);
 
                 } catch (FileNotFoundException e) {
                     LOG.error("", e);
@@ -141,5 +141,6 @@ public enum Jvm {
         // the default.
         return 1L << 16;
     }
+
 
 }
