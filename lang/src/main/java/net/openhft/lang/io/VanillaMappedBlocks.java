@@ -25,7 +25,6 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
     private final VanillaMappedFile mappedFile;
     private final List<VanillaMappedBytes> bytes;
     private final long blockSize;
-    private final Object lock;
 
     public VanillaMappedBlocks(final File path, VanillaMappedMode mode, long blockSize, long overlapSize) throws IOException {
         this(path,mode,blockSize + overlapSize);
@@ -35,36 +34,37 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
         this.mappedFile = new VanillaMappedFile(path,mode,-1);
         this.bytes = new ArrayList<VanillaMappedBytes>();
         this.blockSize = blockSize;
-        this.lock = new Object();
     }
 
-    public VanillaMappedBytes acquire(long index) throws IOException {
+    public synchronized VanillaMappedBytes acquire(long index) throws IOException {
         VanillaMappedBytes mb = null;
 
-        synchronized(this.lock) {
-            for (int i = bytes.size() - 1; i >= 0; i--) {
-                if (bytes.get(i).index() == index && !bytes.get(i).unmapped()) {
-                    // if mapped, get id and increase usage
-                    mb = bytes.get(i);
-                    mb.reserve();
-                } else if (bytes.get(i).refCount() <= 0 || bytes.get(i).unmapped()) {
-                    // if not unmapped and not used (reference count <= 0)
-                    // unmap it and clean id up
-                    if (!bytes.get(i).unmapped()) {
-                        bytes.get(i).cleanup();
-                    }
-
-                    bytes.remove(i);
+        for (int i = bytes.size() - 1; i >= 0; i--) {
+            if (bytes.get(i).index() == index && !bytes.get(i).unmapped()) {
+                // if mapped, get it and increase usage
+                mb = bytes.get(i);
+                mb.reserve();
+            } else if (bytes.get(i).refCount() <= 0 || bytes.get(i).unmapped()) {
+                // if not unmapped and not used (reference count <= 0)
+                // unmap it and clean id up
+                if (!bytes.get(i).unmapped()) {
+                    bytes.get(i).cleanup();
                 }
-            }
 
-            if (mb == null) {
-                mb = this.mappedFile.bytes(index * this.blockSize, this.blockSize, index);
-                bytes.add(mb);
+                bytes.remove(i);
             }
         }
 
+        if (mb == null) {
+            mb = this.mappedFile.bytes(index * this.blockSize, this.blockSize, index);
+            bytes.add(mb);
+        }
+
         return mb;
+    }
+
+    public synchronized int blocks() {
+        return this.bytes.size();
     }
 
     @Override
@@ -73,36 +73,34 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
     }
 
     @Override
-    public long size() {
+    public synchronized long size() {
         return this.mappedFile.size();
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         //TODO: resource leack check
         //int count = 0;
 
-        synchronized(this.lock) {
-            for (VanillaMappedBytes vmb : this.bytes) {
-                //if (vmb.refCount() > 0) {
-                //    count++;
-                //}
+        for (VanillaMappedBytes vmb : this.bytes) {
+            //if (vmb.refCount() > 0) {
+            //    count++;
+            //}
 
-                vmb.cleanup();
-            }
-
-            /*
-            if(count > 0) {
-                Logger.getLogger(VanillaMappedBlocks.class.getName()).info(
-                    this.mappedFile.path()
-                        + ": memory mappings left unreleased, num= " + count
-                );
-            }
-            */
-
-            this.bytes.clear();
-            this.mappedFile.close();
+            vmb.cleanup();
         }
+
+        /*
+        if(count > 0) {
+            Logger.getLogger(VanillaMappedBlocks.class.getName()).info(
+                this.mappedFile.path()
+                    + ": memory mappings left unreleased, num= " + count
+            );
+        }
+        */
+
+        this.bytes.clear();
+        this.mappedFile.close();
     }
 
     public static VanillaMappedBlocks readWrite(final File path, long size) throws IOException {
