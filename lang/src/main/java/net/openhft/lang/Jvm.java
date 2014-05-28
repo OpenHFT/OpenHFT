@@ -16,6 +16,7 @@
 
 package net.openhft.lang;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -25,6 +26,8 @@ import java.lang.management.ManagementFactory;
 import java.util.Random;
 import java.util.Scanner;
 
+import static java.lang.Long.numberOfLeadingZeros;
+
 /**
  * @author peter.lawrey
  */
@@ -32,6 +35,7 @@ public enum Jvm {
     ;
     public static final String TMP = System.getProperty("java.io.tmpdir");
     private static final boolean IS64BIT = is64Bit0();
+    private static final Logger LOG = LoggerFactory.getLogger(Jvm.class);
 
     public static boolean is64Bit() {
         return IS64BIT;
@@ -70,7 +74,7 @@ public enum Jvm {
             pid = ManagementFactory.getRuntimeMXBean().getName().split("@", 0)[0];
         if (pid == null) {
             int rpid = new Random().nextInt(1 << 16);
-            LoggerFactory.getLogger(Jvm.class).warn("Unable to determine PID, picked a random number={}",rpid);
+            LoggerFactory.getLogger(Jvm.class).warn("Unable to determine PID, picked a random number={}", rpid);
             return rpid;
         } else {
             return Integer.parseInt(pid);
@@ -123,9 +127,13 @@ public enum Jvm {
             File file = new File("/proc/sys/kernel/pid_max");
             if (file.canRead())
                 try {
-                    return new Scanner(file).nextLong();
+                    final long n = new Scanner(file).nextLong();
+
+                    //  if the number of threads is not a power of 2 then we round up
+                    return (n & (n - 1)) == 0 ? n : (1 << (64L - numberOfLeadingZeros(n)));
+
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    LOG.error("", e);
                 }
         } else if (isMacOSX()) {
             return 1L << 24;
@@ -133,4 +141,5 @@ public enum Jvm {
         // the default.
         return 1L << 16;
     }
+
 }
