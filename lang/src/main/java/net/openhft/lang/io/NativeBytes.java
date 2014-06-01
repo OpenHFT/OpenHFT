@@ -106,6 +106,19 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
+    public CharSequence subSequence(int start, int end) {
+        long subStart = positionAddr + start;
+        if (subStart < positionAddr || subStart > limitAddr)
+            throw new IndexOutOfBoundsException();
+        long subEnd = positionAddr + end;
+        if (subEnd < subStart || subEnd > limitAddr)
+            throw new IndexOutOfBoundsException();
+        if (start == end)
+            return "";
+        return new NativeBytes(bytesMarshallerFactory(), subStart, subEnd, refCount);
+    }
+
+    @Override
     public NativeBytes bytes() {
         return new NativeBytes(bytesMarshallerFactory(), startAddr, capacityAddr, refCount);
     }
