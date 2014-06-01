@@ -55,7 +55,7 @@ public class NativeBytes extends AbstractBytes {
     protected long startAddr;
     protected long positionAddr;
     protected long limitAddr;
-    long capacityAddr;
+    protected long capacityAddr;
 
     public NativeBytes(long startAddr, long capacityAddr) {
         super();
