@@ -795,6 +795,7 @@ public abstract class AbstractBytes implements Bytes {
     public void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException {
         assert maxSize > 1;
         if (s == null) {
+            position(offset);
             writeStopBit(-1);
             return;
         }
