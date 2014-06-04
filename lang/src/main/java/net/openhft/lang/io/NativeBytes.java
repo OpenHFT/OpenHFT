@@ -55,7 +55,7 @@ public class NativeBytes extends AbstractBytes {
     protected long startAddr;
     protected long positionAddr;
     protected long limitAddr;
-    long capacityAddr;
+    protected long capacityAddr;
 
     public NativeBytes(long startAddr, long capacityAddr) {
         super();
@@ -103,6 +103,19 @@ public class NativeBytes extends AbstractBytes {
         long sliceEnd = sliceStart + length;
         assert sliceEnd > sliceStart && sliceEnd <= capacityAddr;
         return new NativeBytes(bytesMarshallerFactory(), sliceStart, sliceEnd, refCount);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+        long subStart = positionAddr + start;
+        if (subStart < positionAddr || subStart > limitAddr)
+            throw new IndexOutOfBoundsException();
+        long subEnd = positionAddr + end;
+        if (subEnd < subStart || subEnd > limitAddr)
+            throw new IndexOutOfBoundsException();
+        if (start == end)
+            return "";
+        return new NativeBytes(bytesMarshallerFactory(), subStart, subEnd, refCount);
     }
 
     @Override

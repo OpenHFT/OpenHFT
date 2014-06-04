@@ -63,6 +63,19 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
+    public CharSequence subSequence(int start, int end) {
+        int subStart = position + start;
+        if (subStart < position || subStart > limit)
+            throw new IndexOutOfBoundsException();
+        int subEnd = position + end;
+        if (subEnd < subStart || subEnd > limit)
+            throw new IndexOutOfBoundsException();
+        if (start == end)
+            return "";
+        return new ByteBufferBytes(buffer(), subStart, end - start);
+    }
+
+    @Override
     public ByteBufferBytes bytes() {
         return new ByteBufferBytes(buffer(), start, capacity - start);
     }

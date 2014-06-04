@@ -29,8 +29,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DirectStore implements BytesStore {
     private final BytesMarshallerFactory bytesMarshallerFactory;
     private final Cleaner cleaner;
-    private final long address;
-    private final long size;
+    private final Deallocator deallocator;
+    private long address;
+    private long size;
     private final AtomicInteger refCount = new AtomicInteger(1);
 
     public DirectStore(long size) {
@@ -52,7 +53,8 @@ public class DirectStore implements BytesStore {
         }
 
         this.size = size;
-        cleaner = Cleaner.create(this, new Deallocator(address));
+        deallocator = new Deallocator(address);
+        cleaner = Cleaner.create(this, deallocator);
     }
 
     @NotNull
@@ -65,12 +67,29 @@ public class DirectStore implements BytesStore {
         return new DirectStore(null, size, false);
     }
 
-/*    public void resize(long newSize) {
-        if (newSize == size)
-            return;
-        address = NativeBytes.UNSAFE.reallocateMemory(address, newSize);
+    /**
+     * Resizes this {@code DirectStore} to the {@code newSize}.
+     *
+     * <p>If {@code zeroOut} is {@code false}, the memory past the old size is not zeroed out
+     * and will generally be garbage.
+     *
+     * <p>{@code DirectStore} don't keep track of the child {@code DirectBytes} instances,
+     * so after the resize they might point to the wrong memory. Use at your own risk.
+     *
+     * @param newSize new size of this {@code DirectStore}
+     * @param zeroOut if the memory past the old size should be zeroed out on increasing resize
+     * @throws IllegalArgumentException if the {@code newSize} is not positive
+     */
+    public void resize(long newSize, boolean zeroOut) {
+        if (newSize <= 0)
+            throw new IllegalArgumentException("Given newSize is " + newSize +
+                    " but should be positive");
+        address = deallocator.address = NativeBytes.UNSAFE.reallocateMemory(address, newSize);
+        if (zeroOut && newSize > size) {
+            NativeBytes.UNSAFE.setMemory(address + size, newSize - size, (byte) 0);
+        }
         size = newSize;
-    }*/
+    }
 
     @NotNull
     public DirectBytes bytes() {

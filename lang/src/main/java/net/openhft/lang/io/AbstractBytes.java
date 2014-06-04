@@ -795,6 +795,7 @@ public abstract class AbstractBytes implements Bytes {
     public void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException {
         assert maxSize > 1;
         if (s == null) {
+            position(offset);
             writeStopBit(-1);
             return;
         }
@@ -2341,15 +2342,9 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public char charAt(int index) {
-        return (char) readUnsignedByte(index);
-    }
-
-    @Override
-    public CharSequence subSequence(int start, int end) {
-        StringBuilder sb = new StringBuilder(end - start + 1);
-        for (int i = start; i < end; i++)
-            sb.append(charAt(i));
-        return sb;
+        if (index < 0 || index >= length())
+            throw new IndexOutOfBoundsException();
+        return (char) readUnsignedByte(position() + index);
     }
 
     @Override
