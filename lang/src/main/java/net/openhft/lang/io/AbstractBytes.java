@@ -2577,4 +2577,10 @@ public abstract class AbstractBytes implements Bytes {
         return builder.toString();
     }
 
+    @Override
+    public boolean compareAndSwapDouble(long offset, double expected, double value) {
+        long exp = Double.doubleToRawLongBits(expected);
+        long val = Double.doubleToRawLongBits(value);
+        return compareAndSwapLong(offset, exp, val);
+    }
 }

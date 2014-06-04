@@ -581,6 +581,17 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     boolean compareAndSwapLong(long offset, long expected, long x);
 
     /**
+     * Perform a compare and set operation.  The value is set to <code>x</code> provided the <code>expected</code> value
+     * is set already.  This operation is atomic.
+     *
+     * @param offset   to write to.
+     * @param expected to expect
+     * @param x        to set if expected was found
+     * @return true if set, false if the value was not expected
+     */
+    boolean compareAndSwapDouble(long offset, double expected, double x);
+
+    /**
      * Stop bit encoding numbers. This will write the same number of bytes
      * whether you used a byte, short or int.
      *
