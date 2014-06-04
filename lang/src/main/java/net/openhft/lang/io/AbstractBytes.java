@@ -2473,8 +2473,20 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String toString() {
+        char[] chars = new char[(int) remaining()];
+        long pos = position();
+        for (long i = pos; i < limit(); i++) {
+            chars[((int) (i - pos))] = (char) readUnsignedByte(i);
+        }
+        return new String(chars);
+    }
+
+    @NotNull
+    @Override
+    public String toDebugString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("[pos: ").append(position()).append(", lim: ").append(limit()).append(", cap: ").append(capacity()).append(" ] ");
+        sb.append("[pos: ").append(position()).append(", lim: ").append(limit()).append(", cap: ")
+                .append(capacity()).append(" ] ");
         toString(sb, position() - 64, position(), position() + 64);
 
         return sb.toString();
@@ -2555,20 +2567,6 @@ public abstract class AbstractBytes implements Bytes {
         // remove the last comma
         builder.deleteCharAt(builder.length() - 1);
         builder.append("]");
-        return builder.toString();
-    }
-
-    public static String toString(@org.jetbrains.annotations.NotNull final Bytes buffer) {
-
-        final Bytes slice = buffer.slice();
-
-        final StringBuilder builder = new StringBuilder();
-
-        while (slice.remaining() > 0) {
-            final byte b = slice.readByte();
-            builder.append((char) b);
-        }
-
         return builder.toString();
     }
 
