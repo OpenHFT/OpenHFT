@@ -26,6 +26,10 @@ public interface LongValue {
 
     void setValue(long value);
 
+    // TODO add these methods JLANG-27
+//    long getVolatileValue();
+//    void setOrderedValue(long value);
+
     long addValue(long delta);
 
     long addAtomicValue(long delta);

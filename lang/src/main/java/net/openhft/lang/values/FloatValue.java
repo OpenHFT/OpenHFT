@@ -26,6 +26,10 @@ public interface FloatValue {
 
     void setValue(float value);
 
+    // TODO add these methods JLANG-27
+    //  void setOrderedValue(float value);
+    //  float getVolatileValue();
+
     float addValue(float delta);
 
     float addAtomicValue(float delta);
