@@ -209,4 +209,7 @@ public interface BytesCommon {
      * @see #slice()
      */
     Bytes slice(long offset, long length);
+
+    @NotNull
+    String toDebugString();
 }
