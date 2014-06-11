@@ -69,4 +69,8 @@ public interface FieldModel<T> {
     MaxSize indexSize();
 
     boolean isArray();
+
+    public void setVolatile(boolean isVolatile);
+
+    public boolean isVolatile();
 }

@@ -48,6 +48,10 @@ public interface JavaBeanInterface {
 
     void setInt(int i);
 
+    int getVolatileInt();
+
+    void setOrderedInt(int i);
+
     int getInt();
 
     void setFloat(float f);

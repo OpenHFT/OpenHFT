@@ -33,7 +33,7 @@ public class DataValueGeneratorTest {
     @Test
     public void testGenerateJavaCode() throws Exception {
         DataValueGenerator dvg = new DataValueGenerator();
-//        dvg.setDumpCode(true);
+        //dvg.setDumpCode(true);
         JavaBeanInterface jbi = dvg.heapInstance(JavaBeanInterface.class);
         jbi.setByte((byte) 1);
         jbi.setChar('2');
@@ -98,7 +98,7 @@ public class DataValueGeneratorTest {
     @Test
     public void testGenerateNative() throws Exception {
         String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterface.class);
-//        System.out.println(actual);
+        System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
         Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "$$Native", actual);
         JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
@@ -108,6 +108,7 @@ public class DataValueGeneratorTest {
         jbi.setChar('2');
         jbi.setShort((short) 3);
         jbi.setInt(4);
+        jbi.setOrderedInt(14);
         jbi.setFloat(5);
         jbi.setLong(6);
         jbi.setDouble(7);
@@ -118,12 +119,13 @@ public class DataValueGeneratorTest {
         assertEquals('2', jbi.getChar());
         assertEquals(3, jbi.getShort());
         assertEquals(4, jbi.getInt());
+        assertEquals(14, jbi.getVolatileInt());
         assertEquals(5.0, jbi.getFloat(), 0);
         assertEquals(6, jbi.getLong());
         assertEquals(7.0, jbi.getDouble(), 0.0);
         assertTrue(jbi.getFlag());
         assertEquals("G'day", jbi.getString());
-        assertEquals(42, ((Byteable) jbi).maxSize());
+        assertEquals(46, ((Byteable) jbi).maxSize());
     }
 
 
