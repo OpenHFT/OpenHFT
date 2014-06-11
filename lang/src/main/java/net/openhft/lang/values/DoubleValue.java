@@ -26,9 +26,9 @@ public interface DoubleValue {
 
     void setValue(double value);
 
-    // TODO add these methods JLANG-27
-//    double getVolatileValue();
-//    void setOrderedValue(double value);
+    double getVolatileValue();
+
+    void setOrderedValue(double value);
 
     double addValue(double delta);
 

@@ -37,7 +37,9 @@ public class DataValueModelTest {
                 " short$=FieldModel{name='short$', getter=public abstract short net.openhft.lang.model.MinimalInterface.short$(), setter=public abstract void net.openhft.lang.model.MinimalInterface.short$(short)}}"
                 , midvm.fieldMap().toString().replaceAll("},", "}\n"));
         DataValueModel<JavaBeanInterface> jbdvm = DataValueModels.acquireModel(JavaBeanInterface.class);
-        assertEquals("{byte=FieldModel{name='byte', getter=public abstract byte net.openhft.lang.model.JavaBeanInterface.getByte(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setByte(byte)}\n" +
+
+        assertEquals("{__vol__Int=FieldModel{name='__vol__Int', getter=public abstract int net.openhft.lang.model.JavaBeanInterface.getVolatileInt(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setOrderedInt(int)}\n" +
+                " byte=FieldModel{name='byte', getter=public abstract byte net.openhft.lang.model.JavaBeanInterface.getByte(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setByte(byte)}\n" +
                 " char=FieldModel{name='char', getter=public abstract char net.openhft.lang.model.JavaBeanInterface.getChar(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setChar(char)}\n" +
                 " double=FieldModel{name='double', getter=public abstract double net.openhft.lang.model.JavaBeanInterface.getDouble(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setDouble(double)}\n" +
                 " flag=FieldModel{name='flag', getter=public abstract boolean net.openhft.lang.model.JavaBeanInterface.getFlag(), setter=public abstract void net.openhft.lang.model.JavaBeanInterface.setFlag(boolean)}\n" +

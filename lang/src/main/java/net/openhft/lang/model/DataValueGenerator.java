@@ -233,6 +233,7 @@ public class DataValueGenerator {
 
             if (model.isArray()) {
                 String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+                if(model.isVolatile())nameWithUpper = nameWithUpper.replace(DataValueModelImpl.VOL_FIELD_NAME_PREFIX, "Volatile");
                 sb.append("\n    public long longHashCode_" + name + "() {\n" +
                         "        long hc = 0;\n" +
                         "        for (int i = 0; i < " + model.indexSize().value() + "; i++) {\n" +
@@ -401,10 +402,13 @@ public class DataValueGenerator {
     }
 
     private static void heapFieldDeclarations(StringBuilder fieldDeclarations, Class type, String name, FieldModel model) {
+        String vol = "";
+        if (model.isVolatile())vol = "volatile ";
+
         if (!model.isArray()) {
-            fieldDeclarations.append("    private ").append(normalize(type)).append(" _").append(name).append(";\n");
+            fieldDeclarations.append("    private ").append(vol).append(normalize(type)).append(" _").append(name).append(";\n");
         } else {
-            fieldDeclarations.append("    private ").append(normalize(type)).append("[] _").append(name)
+            fieldDeclarations.append("    private ").append(vol).append(normalize(type)).append("[] _").append(name)
                     .append(" = new ").append(normalize(type)).append("[").append(model.indexSize().value()).append("];\n");
             if (!type.isPrimitive()) {
                 fieldDeclarations.append("    {\n")
@@ -681,14 +685,17 @@ public class DataValueGenerator {
 
     private void methodSet(StringBuilder getterSetters, Method setter, Class type, String NAME, FieldModel model) {
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length - 1];
+        String write = "write";
+        if(model.isVolatile()) write = "writeOrdered";
+
         if (!model.isArray()) {
-            getterSetters.append("    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
-            getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME).append(", ");
+            getterSetters.append("\n\n    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
+            getterSetters.append("        _bytes.").append(write).append(bytesType(type)).append("(").append(NAME).append(", ");
         } else {
             getterSetters.append("    public void ").append(setter.getName()).append("(int i, ");
             getterSetters.append(normalize(setterType)).append(" $) {\n");
             getterSetters.append(boundsCheck(model.indexSize().value()));
-            getterSetters.append("        _bytes.write").append(bytesType(type)).append("(").append(NAME);
+            getterSetters.append("        _bytes.").append(write).append(bytesType(type)).append("(").append(NAME);
             getterSetters.append(" + i * ").append((model.nativeSize() + 7) >> 3).append(", ");
         }
 
@@ -699,13 +706,17 @@ public class DataValueGenerator {
     }
 
     private void methodGet(StringBuilder getterSetters, Method getter, Class type, String NAME, FieldModel model) {
+        String read = "read";
+        if(model.isVolatile()) read = "readVolatile";
+
         if (!model.isArray()) {
             getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("() {\n");
-            getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME).append(");\n");
+            getterSetters.append("        return _bytes.").append(read).append(bytesType(type)).append("(").append(NAME).append(");\n");
+
         } else {
             getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("(int i) {\n");
             getterSetters.append(boundsCheck(model.indexSize().value()));
-            getterSetters.append("        return _bytes.read").append(bytesType(type)).append("(").append(NAME);
+            getterSetters.append("        return _bytes.").append(read).append(bytesType(type)).append("(").append(NAME);
             getterSetters.append(" + i * ").append((model.nativeSize() + 7) >> 3);
             getterSetters.append(");\n");
 

@@ -26,9 +26,9 @@ public interface IntValue {
 
     void setValue(int value);
 
-    // TODO add these methods JLANG-27
-//    int getVolatileValue();
-//    void setOrderedValue(int value);
+    int getVolatileValue();
+
+    void setOrderedValue(int value);
 
     int addValue(int delta);
 
