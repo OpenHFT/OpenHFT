@@ -92,8 +92,25 @@ public class DataValueGenerator {
                 imported.add(type);
             heapFieldDeclarations(fieldDeclarations, type, name, model);
 
-            final Method setter = getSetter(model);
-            final Method getter = getGetter(model);
+            Method setter = getSetter(model);
+            Method getter = getGetter(model);
+
+            boolean bothVolatileAndPlain = false;
+
+            final Method orderedSetter = getOrderedSetter(model);
+            final Method volatileGetter = getVolatileGetter(model);
+
+            if(getter != null && volatileGetter != null){
+                bothVolatileAndPlain = true;
+            }
+            if(setter == null && orderedSetter != null){
+                setter = orderedSetter;
+            }
+            if(getter==null && volatileGetter!= null){
+                getter = volatileGetter;
+            }
+
+
             if (setter == null) {
                 if (getter != null)
                     copy.append("        ((Copyable) ").append(getter.getName()).append("()).copyFrom(from.").append(getter.getName()).append("());\n");
@@ -103,6 +120,14 @@ public class DataValueGenerator {
             }
             if (getter != null)
                 methodHeapGet(getterSetters, getter, name, type, model);
+
+            //In the case where there are both volatile and plain gets and sets they need to be written here
+            //If there is just a volatile get and set it would have been written above.
+             if(bothVolatileAndPlain){
+                methodHeapGet(getterSetters, volatileGetter, name, type, model);
+                 methodHeapSet(getterSetters, orderedSetter, name, type, model);
+            }
+
 
             Method adder = model.adder();
             if (adder != null) {
@@ -223,6 +248,8 @@ public class DataValueGenerator {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
             Method getter = getGetter(model);
+            if(getter==null)getter=getVolatileGetter(model);
+
             if (getter != null) {
                 String getterName = getter.getName();
                 methodLongHashCode(hashCode, getterName, model, count);
@@ -233,7 +260,7 @@ public class DataValueGenerator {
 
             if (model.isArray()) {
                 String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-                if(model.isVolatile())nameWithUpper = nameWithUpper.replace(DataValueModelImpl.VOL_FIELD_NAME_PREFIX, "Volatile");
+                if(model.isVolatile())nameWithUpper = "Volatile" + nameWithUpper;
                 sb.append("\n    public long longHashCode_" + name + "() {\n" +
                         "        long hc = 0;\n" +
                         "        for (int i = 0; i < " + model.indexSize().value() + "; i++) {\n" +
@@ -276,15 +303,30 @@ public class DataValueGenerator {
                 .append("    }\n");
     }
 
+
     private static Method getGetter(FieldModel model) {
         Method getter = model.getter();
         if (getter == null) getter = model.indexedGetter();
+       return getter;
+    }
+
+    private static Method getVolatileGetter(FieldModel model) {
+        Method getter = model.volatileGetter();
+        if (getter == null) getter = model.volatileIndexedGetter();
         return getter;
     }
 
     private static Method getSetter(FieldModel model) {
         Method setter = model.setter();
         if (setter == null) setter = model.indexedSetter();
+
+        return setter;
+    }
+
+    private static Method getOrderedSetter(FieldModel model) {
+        Method setter = model.orderedSetter();
+        if (setter == null)setter = model.orderedIndexedSetter();
+
         return setter;
     }
 
@@ -541,13 +583,26 @@ public class DataValueGenerator {
             String NAME = "_offset + " + name.toUpperCase();
             final Method setter = getSetter(model);
             final Method getter = getGetter(model);
+
+            final Method orderedSetter = getOrderedSetter(model);
+            final Method volatileGetter = getVolatileGetter(model);
+
+            final Method defaultSetter = setter != null ? setter : orderedSetter;
+            final Method defaultGetter = getter!= null ? getter : volatileGetter;
+
             if (dvmodel.isScalar(type)) {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
-                methodCopy(copy, getter, setter, model);
+                methodCopy(copy, defaultGetter, defaultSetter, model);
                 if (setter != null)
-                    methodSet(getterSetters, setter, type, NAME, model);
+                    methodSet(getterSetters, setter, type, NAME, model, false);
                 if (getter != null)
-                    methodGet(getterSetters, getter, type, NAME, model);
+                    methodGet(getterSetters, getter, type, NAME, model, false);
+
+                if (orderedSetter != null)
+                    methodSet(getterSetters, orderedSetter, type, NAME, model, true);
+                if (volatileGetter != null)
+                    methodGet(getterSetters, volatileGetter, type, NAME, model, true);
+
                 Method adder = model.adder();
                 if (adder != null) {
                     getterSetters.append("    public ").append(normalize(type)).append(' ').append(adder.getName())
@@ -600,18 +655,18 @@ public class DataValueGenerator {
                             .append("         _bytes.busyLock").append(bytesType(type)).append('(').append(NAME).append(");\n")
                             .append("    }");
                 }
-                methodWriteMarshall(writeMarshal, getter, setter, type, model);
-                methodReadMarshall(readMarshal, getter, setter, type, model);
+                methodWriteMarshall(writeMarshal, defaultGetter, defaultSetter, type, model);
+                methodReadMarshall(readMarshal, defaultGetter, defaultSetter, type, model);
 
                 offset += computeOffset((model.nativeSize() + 7) >> 3, model);
             } else {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
                 nonScalarFieldDeclaration(staticFieldDeclarations, type, name, model);
-                if (setter == null) {
+                if (defaultSetter == null) {
                     copy.append("        _").append(name).append(".copyFrom(from.").append(getter.getName()).append("());\n");
                 } else {
-                    methodCopy(copy, getter, setter, model);
-                    methodNonScalarSet(getterSetters, setter, name, type, model);
+                    methodCopy(copy, defaultGetter, defaultSetter, model);
+                    methodNonScalarSet(getterSetters, defaultSetter, name, type, model);
                 }
 
                 int size = computeNonScalarOffset(dvmodel, type);
@@ -683,10 +738,10 @@ public class DataValueGenerator {
         this.dumpCode = dumpCode;
     }
 
-    private void methodSet(StringBuilder getterSetters, Method setter, Class type, String NAME, FieldModel model) {
+    private void methodSet(StringBuilder getterSetters, Method setter, Class type, String NAME, FieldModel model, boolean isVolatile) {
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length - 1];
         String write = "write";
-        if(model.isVolatile()) write = "writeOrdered";
+        if(isVolatile) write = "writeOrdered";
 
         if (!model.isArray()) {
             getterSetters.append("\n\n    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
@@ -705,9 +760,9 @@ public class DataValueGenerator {
         getterSetters.append("    }\n\n");
     }
 
-    private void methodGet(StringBuilder getterSetters, Method getter, Class type, String NAME, FieldModel model) {
+    private void methodGet(StringBuilder getterSetters, Method getter, Class type, String NAME, FieldModel model, boolean isVolatile) {
         String read = "read";
-        if(model.isVolatile()) read = "readVolatile";
+        if(isVolatile) read = "readVolatile";
 
         if (!model.isArray()) {
             getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("() {\n");

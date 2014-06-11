@@ -38,6 +38,15 @@ public interface FieldModel<T> {
 
     Method indexedSetter();
 
+    Method volatileGetter();
+
+    Method orderedSetter();
+
+    Method volatileIndexedGetter();
+
+    Method orderedIndexedSetter();
+
+
     Method adder();
 
     Method atomicAdder();

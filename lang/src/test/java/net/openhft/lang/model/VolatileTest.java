@@ -4,6 +4,8 @@ import net.openhft.compiler.CachedCompiler;
 import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.model.constraints.MaxSize;
+import net.openhft.lang.values.IntValue;
+import net.openhft.lang.values.LongValue;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -19,9 +21,9 @@ public class VolatileTest {
     @Test
     public void testGenerateJavaCode() throws Exception {
         DataValueGenerator dvg = new DataValueGenerator();
-        //dvg.setDumpCode(true);
+       // dvg.setDumpCode(true);
 
-        try{
+   /*     try{
             BadInterface1 jbi = dvg.heapInstance(BadInterface1.class);
             assertFalse("Should have thrown an IllegalArgumentException", true);
         }catch(AssertionError e){
@@ -34,13 +36,13 @@ public class VolatileTest {
         }catch(AssertionError e){
             assertTrue("Throws an IllegalArgumentException", true);
         }
-
+*/
         //Test the heap interface
         try{
             GoodInterface jbi = dvg.heapInstance(GoodInterface.class);
 
-            jbi.setOrderedX(5);
-            assertEquals(5, jbi.getVolatileX());
+            jbi.setOrderedY(5);
+            assertEquals(5, jbi.getVolatileY());
             jbi.setOrderedIntAt(0,0);
             jbi.setOrderedIntAt(1,1);
             jbi.setOrderedIntAt(2,2);
@@ -64,9 +66,9 @@ public class VolatileTest {
             GoodInterface jbi = (GoodInterface) aClass.asSubclass(GoodInterface.class).newInstance();
             Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
             ((Byteable) jbi).bytes(bytes, 0L);
-            
-            jbi.setOrderedX(5);
-            assertEquals(5, jbi.getVolatileX());
+
+            jbi.setOrderedY(5);
+            assertEquals(5, jbi.getVolatileY());
             jbi.setOrderedIntAt(0,0);
             jbi.setOrderedIntAt(1,1);
             jbi.setOrderedIntAt(2,2);
@@ -94,8 +96,12 @@ public class VolatileTest {
     }
 
     public interface GoodInterface{
-        public int getVolatileX();
-        public void setOrderedX(int x);
+        public int getX();
+        public void setX(int x);
+        public int getVolatileY();
+        public void setOrderedY(int y);
+        public int getY();
+        public void setY(int y);
 
         void setOrderedIntAt(@MaxSize(4) int idx, int i);
         int getVolatileIntAt(int idx);

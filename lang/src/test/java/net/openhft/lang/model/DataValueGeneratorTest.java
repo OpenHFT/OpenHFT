@@ -108,7 +108,7 @@ public class DataValueGeneratorTest {
         jbi.setChar('2');
         jbi.setShort((short) 3);
         jbi.setInt(4);
-        jbi.setOrderedInt(14);
+        jbi.setOrderedInt(4);
         jbi.setFloat(5);
         jbi.setLong(6);
         jbi.setDouble(7);
@@ -119,13 +119,13 @@ public class DataValueGeneratorTest {
         assertEquals('2', jbi.getChar());
         assertEquals(3, jbi.getShort());
         assertEquals(4, jbi.getInt());
-        assertEquals(14, jbi.getVolatileInt());
+        assertEquals(4, jbi.getVolatileInt());
         assertEquals(5.0, jbi.getFloat(), 0);
         assertEquals(6, jbi.getLong());
         assertEquals(7.0, jbi.getDouble(), 0.0);
         assertTrue(jbi.getFlag());
         assertEquals("G'day", jbi.getString());
-        assertEquals(46, ((Byteable) jbi).maxSize());
+        assertEquals(42, ((Byteable) jbi).maxSize());
     }
 
 
