@@ -19,6 +19,7 @@ package net.openhft.lang.osgi;
 import net.openhft.lang.collection.HugeArray;
 import net.openhft.lang.collection.HugeCollections;
 import net.openhft.langosgi.model.JavaBeanInterface;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -62,6 +63,7 @@ public class OSGiCollectionTest extends OSGiTestBase {
     }
 
     @Test
+    @Ignore
     public void checkHugeArray() {
         int length = 10 * 1000 * 1000;
         HugeArray<JavaBeanInterface> array = HugeCollections.newArray(JavaBeanInterface.class, length);

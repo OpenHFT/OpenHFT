@@ -16,6 +16,7 @@
 
 package net.openhft.lang.osgi;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -66,6 +67,7 @@ public class OSGiBundleTest extends OSGiTestBase {
     }
 
     @Test
+    @Ignore
     public void checkBundle() {
         Boolean bundleFound = false;
 
