@@ -22,7 +22,6 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class VanillaMappedFileTest {
     public static String TMPDIR    = System.getProperty("java.io.tmpdir");
@@ -298,21 +297,23 @@ public class VanillaMappedFileTest {
 
         for (int j = 0; j < 5; j++) {
             long start = System.nanoTime();
-            int runs = 10000;
-            for (int i = 0; i < runs; i++) {
-                file = newTempraryFile("vmc-3-v" + i, false);
+            int maxRuns = 10000, runs;
+            for (runs = 0; runs < maxRuns; runs++) {
+                file = newTempraryFile("vmc-3-v" + runs, false);
 
-                buffer = cache.put(i,file,256,i);
+                buffer = cache.put(runs, file, 256, runs);
                 buffer.writeLong(0, 0x12345678);
 
                 assertEquals(0x12345678L, buffer.readLong(0));
-                assertEquals(i, buffer.index());
+                assertEquals(runs, buffer.index());
 
                 buffer.release();
                 buffer.close();
 
                 assertEquals(0, buffer.refCount());
                 assertTrue(file.delete());
+                if (System.nanoTime() - start > 1e9)
+                    break;
             }
 
             long time = System.nanoTime() - start;

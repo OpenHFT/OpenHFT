@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io.serialization;
 
+import net.openhft.lang.io.Bytes;
 import net.openhft.lang.model.constraints.NotNull;
 
 /**
@@ -28,4 +29,8 @@ public interface BytesMarshallerFactory {
     <E> BytesMarshaller<E> getMarshaller(byte code);
 
     <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller);
+
+    void writeSerializable(Bytes bytes, Object obj);
+
+    Object readSerializable(Bytes bytes);
 }

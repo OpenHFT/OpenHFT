@@ -16,6 +16,7 @@
 
 package net.openhft.lang.io.serialization.impl;
 
+import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
@@ -23,6 +24,8 @@ import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.Externalizable;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -82,5 +85,23 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
         marshallerMap.put(eClass, marshaller);
         if (marshaller instanceof CompactBytesMarshaller)
             compactMarshallerMap[((CompactBytesMarshaller) marshaller).code()] = marshaller;
+    }
+
+    @Override
+    public void writeSerializable(Bytes bytes, Object obj) {
+        try {
+            new ObjectOutputStream(bytes.outputStream()).writeObject(obj);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public Object readSerializable(Bytes bytes) {
+        try {
+            return new ObjectInputStream(bytes.inputStream()).readObject();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

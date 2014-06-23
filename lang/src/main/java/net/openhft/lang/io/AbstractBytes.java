@@ -1871,11 +1871,7 @@ public abstract class AbstractBytes implements Bytes {
                 return readEnum(clazz);
             }
             case SERIALIZED: {
-                try {
-                    return new ObjectInputStream(this.inputStream()).readObject();
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
+                return bytesMarshallerFactory.readSerializable(this);
             }
             default:
                 BytesMarshaller<Object> m = bytesMarshallerFactory().getMarshaller((byte) type);
@@ -1950,12 +1946,7 @@ public abstract class AbstractBytes implements Bytes {
         }
         writeByte(SERIALIZED);
         // TODO this is the lame implementation, but it works.
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(this.outputStream());
-            oos.writeObject(obj);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        bytesMarshallerFactory.writeSerializable(this, obj);
         checkEndOfBuffer();
     }
 
