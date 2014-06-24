@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Unsafe;
 
@@ -65,6 +66,10 @@ public class NativeBytes extends AbstractBytes {
                 this.capacityAddr = capacityAddr;
     }
 
+    /**
+     * @deprecated Use the constructor with ObjectSerializer
+     */
+    @Deprecated
     public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(bytesMarshallerFactory, refCount);
         this.positionAddr =
@@ -73,8 +78,16 @@ public class NativeBytes extends AbstractBytes {
                 this.capacityAddr = capacityAddr;
     }
 
+    public NativeBytes(ObjectSerializer objectSerializer, long startAddr, long capacityAddr, AtomicInteger refCount) {
+        super(objectSerializer, refCount);
+        this.positionAddr =
+                this.startAddr = startAddr;
+        this.limitAddr =
+                this.capacityAddr = capacityAddr;
+    }
+
     public NativeBytes(NativeBytes bytes) {
-        super(bytes.bytesMarshallerFactory(), new AtomicInteger(1));
+        super(bytes.objectSerializer(), new AtomicInteger(1));
         this.startAddr = bytes.startAddr;
         this.positionAddr = bytes.positionAddr;
         this.limitAddr = bytes.limitAddr;
@@ -93,7 +106,7 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public NativeBytes slice() {
-        return new NativeBytes(bytesMarshallerFactory(), positionAddr, limitAddr, refCount);
+        return new NativeBytes(objectSerializer(), positionAddr, limitAddr, refCount);
     }
 
     @Override
@@ -102,7 +115,7 @@ public class NativeBytes extends AbstractBytes {
         assert sliceStart >= startAddr && sliceStart < capacityAddr;
         long sliceEnd = sliceStart + length;
         assert sliceEnd > sliceStart && sliceEnd <= capacityAddr;
-        return new NativeBytes(bytesMarshallerFactory(), sliceStart, sliceEnd, refCount);
+        return new NativeBytes(objectSerializer(), sliceStart, sliceEnd, refCount);
     }
 
     @Override
@@ -115,12 +128,12 @@ public class NativeBytes extends AbstractBytes {
             throw new IndexOutOfBoundsException();
         if (start == end)
             return "";
-        return new NativeBytes(bytesMarshallerFactory(), subStart, subEnd, refCount);
+        return new NativeBytes(objectSerializer(), subStart, subEnd, refCount);
     }
 
     @Override
     public NativeBytes bytes() {
-        return new NativeBytes(bytesMarshallerFactory(), startAddr, capacityAddr, refCount);
+        return new NativeBytes(objectSerializer(), startAddr, capacityAddr, refCount);
     }
 
     @Override
@@ -129,7 +142,7 @@ public class NativeBytes extends AbstractBytes {
         assert sliceStart >= startAddr && sliceStart < capacityAddr;
         long sliceEnd = sliceStart + length;
         assert sliceEnd > sliceStart && sliceEnd <= capacityAddr;
-        return new NativeBytes(bytesMarshallerFactory(), sliceStart, sliceEnd, refCount);
+        return new NativeBytes(objectSerializer(), sliceStart, sliceEnd, refCount);
     }
 
     @Override

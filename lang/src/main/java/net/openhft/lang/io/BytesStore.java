@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.ObjectSerializer;
 
 public interface BytesStore {
     /**
@@ -31,12 +32,12 @@ public interface BytesStore {
     /**
      * Slice a {@code Bytes} object with start address of
      * {@link #address() address}{@code + offset} and capacity of {@code length}.
-     *
+     * <p/>
      * <p>If this {@code BytesStore} is {@code Bytes} itself rather than natural
      * {@code BytesStore} object, this method will offset the new bytes from the
      * bytes' start, not from bytes' position like
      * {@link Bytes#slice(long, long)}.
-     *
+     * <p/>
      * <p>{@code offset} should be non-negative, {@code length} should be positive,
      * {@code offset + length} should be less or equal to {@link #size() size}.
      *
@@ -47,11 +48,11 @@ public interface BytesStore {
      */
     Bytes bytes(long offset, long length);
 
-    BytesMarshallerFactory bytesMarshallerFactory();
-
     long address();
 
     long size();
 
     void free();
+
+    ObjectSerializer objectSerializer();
 }

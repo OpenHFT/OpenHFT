@@ -18,11 +18,7 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.Jvm;
 import net.openhft.lang.Maths;
-import net.openhft.lang.io.serialization.BytesMarshallable;
-import net.openhft.lang.io.serialization.BytesMarshaller;
-import net.openhft.lang.io.serialization.BytesMarshallerFactory;
-import net.openhft.lang.io.serialization.CompactBytesMarshaller;
-import net.openhft.lang.io.serialization.impl.NoMarshaller;
+import net.openhft.lang.io.serialization.*;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
@@ -45,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @SuppressWarnings("MagicNumber")
 public abstract class AbstractBytes implements Bytes {
-    private static final int END_OF_BUFFER = Integer.MIN_VALUE;
+    public static final int END_OF_BUFFER = -1;
     private static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
     private static final int INT_LOCK_MASK;
     private static final int UNSIGNED_BYTE_MASK = 0xFF;
@@ -84,14 +80,10 @@ public abstract class AbstractBytes implements Bytes {
     private static final int INT_EXTENDED = Integer.MIN_VALUE + 1;
     private static final int INT_MAX_VALUE = Integer.MIN_VALUE + 2;
     private static final long MAX_VALUE_DIVIDE_10 = Long.MAX_VALUE / 10;
-    private static final byte NULL = 'N';
-    private static final byte ENUMED = 'E';
-    private static final byte SERIALIZED = 'S';
     private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
     private static boolean ID_LIMIT_WARNED = false;
     final AtomicInteger refCount;
     protected boolean finished;
-    BytesMarshallerFactory bytesMarshallerFactory;
     private StringInterner stringInterner = null;
     private BytesInputStream inputStream = null;
     private BytesOutputStream outputStream = null;
@@ -103,15 +95,20 @@ public abstract class AbstractBytes implements Bytes {
     private Thread currentThread;
     private int shortThreadId = Integer.MIN_VALUE;
     private boolean selfTerminating = false;
+    ObjectSerializer objectSerializer;
 
     AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
     }
 
     AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory, AtomicInteger refCount) {
+        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE), refCount);
+    }
+
+    AbstractBytes(ObjectSerializer objectSerializer, AtomicInteger refCount) {
         this.finished = false;
-        this.bytesMarshallerFactory = bytesMarshallerFactory;
         this.refCount = refCount;
+        this.objectSerializer = objectSerializer;
     }
 
     private static boolean equalsCaseIgnore(StringBuilder sb, String s) {
@@ -1718,8 +1715,8 @@ public abstract class AbstractBytes implements Bytes {
 
     @NotNull
     @Override
-    public BytesMarshallerFactory bytesMarshallerFactory() {
-        return bytesMarshallerFactory == null ? bytesMarshallerFactory = new VanillaBytesMarshallerFactory() : bytesMarshallerFactory;
+    public ObjectSerializer objectSerializer() {
+        return objectSerializer;
     }
 
     @SuppressWarnings("unchecked")
@@ -1730,15 +1727,13 @@ public abstract class AbstractBytes implements Bytes {
             aClass = String.class;
         else
             aClass = (Class) e.getClass();
-        BytesMarshaller<E> em = bytesMarshallerFactory().acquireMarshaller(aClass, true);
-        em.write(this, e);
+        writeInstance(aClass, e);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <E> E readEnum(@NotNull Class<E> eClass) {
-        BytesMarshaller<E> em = bytesMarshallerFactory().acquireMarshaller(eClass, true);
-        return em.read(this);
+        return readInstance(eClass, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -1860,24 +1855,10 @@ public abstract class AbstractBytes implements Bytes {
     @Nullable
     @Override
     public Object readObject() {
-        int type = readUnsignedByteOrThrow();
-        switch (type) {
-            case END_OF_BUFFER:
-            case NULL:
-                return null;
-            case ENUMED: {
-                Class clazz = readEnum(Class.class);
-                assert clazz != null;
-                return readEnum(clazz);
-            }
-            case SERIALIZED: {
-                return bytesMarshallerFactory.readSerializable(this);
-            }
-            default:
-                BytesMarshaller<Object> m = bytesMarshallerFactory().getMarshaller((byte) type);
-                if (m == null)
-                    throw new IllegalStateException("Unknown type " + (char) type);
-                return m.read(this);
+        try {
+            return objectSerializer.readSerializable(this);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -1922,31 +1903,11 @@ public abstract class AbstractBytes implements Bytes {
     @SuppressWarnings("unchecked")
     @Override
     public void writeObject(@Nullable Object obj) {
-        if (obj == null) {
-            writeByte(NULL);
-            return;
+        try {
+            objectSerializer.writeSerializable(this, obj);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
-
-        Class<?> clazz = obj.getClass();
-        final BytesMarshallerFactory bytesMarshallerFactory = bytesMarshallerFactory();
-        BytesMarshaller em = bytesMarshallerFactory.acquireMarshaller(clazz, false);
-        if (em == NoMarshaller.INSTANCE && autoGenerateMarshaller(obj))
-            em = bytesMarshallerFactory.acquireMarshaller(clazz, true);
-
-        if (em != NoMarshaller.INSTANCE) {
-            if (em instanceof CompactBytesMarshaller) {
-                writeByte(((CompactBytesMarshaller) em).code());
-                em.write(this, obj);
-                return;
-            }
-            writeByte(ENUMED);
-            writeEnum(clazz);
-            em.write(this, obj);
-            return;
-        }
-        writeByte(SERIALIZED);
-        // TODO this is the lame implementation, but it works.
-        bytesMarshallerFactory.writeSerializable(this, obj);
         checkEndOfBuffer();
     }
 
@@ -1960,17 +1921,12 @@ public abstract class AbstractBytes implements Bytes {
             } else if (CharSequence.class.isAssignableFrom(objClass)) {
                 writeUTFΔ((CharSequence) obj);
             } else {
-                writeObject(obj);
+                objectSerializer.writeSerializable(this, obj);
             }
+            checkEndOfBuffer();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    static boolean autoGenerateMarshaller(Object obj) {
-        return (obj instanceof Comparable && obj.getClass().getPackage().getName().startsWith("java"))
-                || obj instanceof Externalizable
-                || obj instanceof BytesMarshallable;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Peter Lawrey
+ * Copyright 2014 Higher Frequency Trading
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,11 @@
 package net.openhft.lang.io.serialization;
 
 import net.openhft.lang.io.Bytes;
-import net.openhft.lang.model.constraints.NotNull;
 
-/**
- * @author peter.lawrey
- */
-public interface BytesMarshallerFactory {
-    @NotNull
-    <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create);
+import java.io.IOException;
 
-    <E> BytesMarshaller<E> getMarshaller(byte code);
+public interface ObjectSerializer {
+    void writeSerializable(Bytes bytes, Object object) throws IOException;
 
-    <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller);
+    Object readSerializable(Bytes bytes) throws IOException, ClassNotFoundException;
 }

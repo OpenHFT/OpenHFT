@@ -835,7 +835,7 @@ public class ByteBufferBytesTest {
 
     @Test
     public void testWriteObject() {
-        for (Object o : new Object[]{10, 9.9, "string", new Date(), BigDecimal.valueOf(1.1)}) {
+        for (Object o : new Object[]{BigDecimal.valueOf(-1.234), 10, 9.9, "string", new Date(), BigDecimal.valueOf(1.1)}) {
             bytes.position(0);
             bytes.writeObject(o);
 //            System.out.println(o +" size: "+bytes.position());

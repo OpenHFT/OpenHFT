@@ -16,7 +16,10 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Cleaner;
@@ -43,20 +46,25 @@ public class MappedStore implements BytesStore {
     private final long address;
     private final AtomicInteger refCount = new AtomicInteger(1);
     private final long size;
-    private final BytesMarshallerFactory bytesMarshallerFactory;
+    private ObjectSerializer objectSerializer;
 
     public MappedStore(File file, FileChannel.MapMode mode, long size) throws IOException {
         this(file, mode, size, new VanillaBytesMarshallerFactory());
     }
 
+    @Deprecated
     public MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
+        this(file, mode, size, BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE));
+    }
+
+    public MappedStore(File file, FileChannel.MapMode mode, long size, ObjectSerializer objectSerializer) throws IOException {
         if (size < 0 || size > 128L << 40) {
             throw new IllegalArgumentException("invalid size: " + size);
         }
 
         this.file = file;
         this.size = size;
-        this.bytesMarshallerFactory = bytesMarshallerFactory;
+        this.objectSerializer = objectSerializer;
 
         try {
             RandomAccessFile raf = new RandomAccessFile(file, accesModeFor(mode));
@@ -77,8 +85,8 @@ public class MappedStore implements BytesStore {
     }
 
     @Override
-    public BytesMarshallerFactory bytesMarshallerFactory() {
-        return bytesMarshallerFactory;
+    public ObjectSerializer objectSerializer() {
+        return objectSerializer;
     }
 
     @Override

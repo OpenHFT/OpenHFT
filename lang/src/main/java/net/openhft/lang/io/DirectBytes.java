@@ -28,12 +28,12 @@ public class DirectBytes extends NativeBytes {
     private final BytesStore store;
 
     public DirectBytes(@NotNull BytesStore store, AtomicInteger refCount) {
-        super(store.bytesMarshallerFactory(), store.address(), store.address() + store.size(), refCount);
+        super(store.objectSerializer(), store.address(), store.address() + store.size(), refCount);
         this.store = store;
     }
 
     public DirectBytes(@NotNull BytesStore store, AtomicInteger refCount, long offset, long length) {
-        super(store.bytesMarshallerFactory(), store.address() + offset, store.address() + offset + length, refCount);
+        super(store.objectSerializer(), store.address() + offset, store.address() + offset + length, refCount);
         this.store = store;
     }
 

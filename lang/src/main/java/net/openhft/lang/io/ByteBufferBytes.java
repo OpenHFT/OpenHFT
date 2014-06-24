@@ -16,6 +16,9 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
+import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.nio.ch.DirectBuffer;
 
@@ -23,6 +26,7 @@ import java.io.EOFException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author peter.lawrey
@@ -40,6 +44,7 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
+        super(BytesMarshallableSerializer.create(new VanillaBytesMarshallerFactory(), JDKObjectSerializer.INSTANCE), new AtomicInteger(1));
         // We should set order to native, because compare-and-swap operations
         // end up with native ops. Bytes interfaces handles only native order.
         buffer.order(ByteOrder.nativeOrder());

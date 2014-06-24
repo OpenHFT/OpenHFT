@@ -86,22 +86,4 @@ public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
         if (marshaller instanceof CompactBytesMarshaller)
             compactMarshallerMap[((CompactBytesMarshaller) marshaller).code()] = marshaller;
     }
-
-    @Override
-    public void writeSerializable(Bytes bytes, Object obj) {
-        try {
-            new ObjectOutputStream(bytes.outputStream()).writeObject(obj);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    @Override
-    public Object readSerializable(Bytes bytes) {
-        try {
-            return new ObjectInputStream(bytes.inputStream()).readObject();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
 }

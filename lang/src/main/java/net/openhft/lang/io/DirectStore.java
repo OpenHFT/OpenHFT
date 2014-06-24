@@ -16,7 +16,7 @@
 
 package net.openhft.lang.io;
 
-import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.*;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Cleaner;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author peter.lawrey
  */
 public class DirectStore implements BytesStore {
-    private final BytesMarshallerFactory bytesMarshallerFactory;
+    private final ObjectSerializer objectSerializer;
     private final Cleaner cleaner;
     private final Deallocator deallocator;
     private long address;
@@ -38,12 +38,18 @@ public class DirectStore implements BytesStore {
         this(new VanillaBytesMarshallerFactory(), size);
     }
 
+    @Deprecated
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
         this(bytesMarshallerFactory, size, true);
     }
 
+    @Deprecated
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size, boolean zeroOut) {
-        this.bytesMarshallerFactory = bytesMarshallerFactory;
+        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE), size, zeroOut);
+    }
+
+    public DirectStore(ObjectSerializer objectSerializer, long size, boolean zeroOut) {
+        this.objectSerializer = objectSerializer;
         address = NativeBytes.UNSAFE.allocateMemory(size);
 
 //        System.out.println("old value " + Integer.toHexString(NativeBytes.UNSAFE.getInt(null, address)));
@@ -57,6 +63,11 @@ public class DirectStore implements BytesStore {
         cleaner = Cleaner.create(this, deallocator);
     }
 
+    @Override
+    public ObjectSerializer objectSerializer() {
+        return objectSerializer;
+    }
+
     @NotNull
     public static DirectStore allocate(long size) {
         return new DirectStore(null, size);
@@ -64,15 +75,15 @@ public class DirectStore implements BytesStore {
 
     @NotNull
     public static DirectStore allocateLazy(long size) {
-        return new DirectStore(null, size, false);
+        return new DirectStore((BytesMarshallerFactory) null, size, false);
     }
 
     /**
      * Resizes this {@code DirectStore} to the {@code newSize}.
-     *
+     * <p/>
      * <p>If {@code zeroOut} is {@code false}, the memory past the old size is not zeroed out
      * and will generally be garbage.
-     *
+     * <p/>
      * <p>{@code DirectStore} don't keep track of the child {@code DirectBytes} instances,
      * so after the resize they might point to the wrong memory. Use at your own risk.
      *
@@ -112,10 +123,6 @@ public class DirectStore implements BytesStore {
 
     public long size() {
         return size;
-    }
-
-    public BytesMarshallerFactory bytesMarshallerFactory() {
-        return bytesMarshallerFactory;
     }
 
     /**

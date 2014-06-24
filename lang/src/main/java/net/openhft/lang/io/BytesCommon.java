@@ -17,6 +17,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.InputStream;
@@ -74,14 +75,14 @@ public interface BytesCommon {
     /**
      * Clears this buffer.  The position is set to zero, the limit is set to
      * the capacity, and the mark is discarded.
-     *
+     * <p/>
      * <p> Invoke this method before using a sequence of channel-read or
      * <i>put</i> operations to fill this buffer.  For example:
      * <pre>{@code
      * buf.clear();     // Prepare buffer for reading
      * in.read(buf);    // Read data
      * }</pre>
-     *
+     * <p/>
      * <p>This method does not actually erase the data in the buffer, but it
      * is named as if it did because it will most often be used in situations
      * in which that might as well be the case. </p>
@@ -94,7 +95,7 @@ public interface BytesCommon {
      * Flips this buffer.  The limit is set to the current position and then
      * the position is set to zero.  If the mark is defined then it is
      * discarded.
-     *
+     * <p/>
      * <p> After a sequence of channel-read or <i>put</i> operations, invoke
      * this method to prepare for a sequence of channel-write or relative
      * <i>get</i> operations.  For example:
@@ -104,7 +105,7 @@ public interface BytesCommon {
      * buf.flip();        // Flip buffer
      * out.write(buf);    // Write header + data to channel
      * }</pre>
-     *
+     * <p/>
      * <p> This method is often used in conjunction with the {@link
      * java.nio.ByteBuffer#compact compact} method when transferring data from
      * one place to another.  </p>
@@ -135,7 +136,7 @@ public interface BytesCommon {
      * @return the factory for marshallers.
      */
     @NotNull
-    BytesMarshallerFactory bytesMarshallerFactory();
+    ObjectSerializer objectSerializer();
 
     /**
      * @throws IndexOutOfBoundsException if the bounds of the Bytes has been exceeded.
@@ -170,15 +171,15 @@ public interface BytesCommon {
     /**
      * Creates a new bytes whose content is a shared subsequence of this bytes'
      * content.
-     *
+     * <p/>
      * <p>The content of the new bytes will start at this bytes' current
      * position. Changes to this bytes' content will be visible in the new bytes,
      * and vice versa; the two bytes' position and limit values will be
      * independent.
-     *
+     * <p/>
      * <p>The new bytes' position will be zero, its capacity and its limit
      * will be the number of bytes remaining in this bytes.
-     *
+     * <p/>
      * <p>{@code slice()} is equivalent of {@code slice(0, remaining())}.
      *
      * @return the new bytes
@@ -189,15 +190,15 @@ public interface BytesCommon {
     /**
      * Creates a new bytes whose content is a shared subsequence of this bytes'
      * content.
-     *
+     * <p/>
      * <p>The content of the new bytes will start at this bytes' current
      * {@link #position()}{@code + offset}. Changes to this bytes' content
      * will be visible in the new bytes, and vice versa; the two bytes'
      * position and limit values will be independent.
-     *
+     * <p/>
      * <p>The new bytes' position will be zero, its capacity and its limit
      * will be equal to {@code length}.
-     *
+     * <p/>
      * <p>{@code offset} can be negative (if current bytes' position is positive)
      * and {@code length} can run out of current bytes' limit, the restriction
      * is that new bytes' should be within this bytes' absolute bounds.
