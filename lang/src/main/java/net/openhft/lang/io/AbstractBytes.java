@@ -18,7 +18,10 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.Jvm;
 import net.openhft.lang.Maths;
-import net.openhft.lang.io.serialization.*;
+import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
+import net.openhft.lang.io.serialization.BytesMarshallerFactory;
+import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
@@ -1856,7 +1859,7 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public Object readObject() {
         try {
-            return objectSerializer.readSerializable(this);
+            return objectSerializer.readSerializable(this, null, null);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -1876,25 +1879,7 @@ public abstract class AbstractBytes implements Bytes {
     @SuppressWarnings("unchecked")
     public <T> T readInstance(@NotNull Class<T> objClass, T obj) {
         try {
-            if (BytesMarshallable.class.isAssignableFrom(objClass)) {
-                if (obj == null)
-                    obj = (T) NativeBytes.UNSAFE.allocateInstance(objClass);
-                ((BytesMarshallable) obj).readMarshallable(this);
-                return obj;
-            } else if (Externalizable.class.isAssignableFrom(objClass)) {
-                if (obj == null)
-                    obj = (T) NativeBytes.UNSAFE.allocateInstance(objClass);
-                ((Externalizable) obj).readExternal(this);
-                return obj;
-            } else if (CharSequence.class.isAssignableFrom(objClass)) {
-                if (obj instanceof StringBuilder) {
-                    readUTFΔ((StringBuilder) obj);
-                    return obj;
-                } else {
-                    return (T) readUTFΔ();
-                }
-            }
-            return (T) readObject();
+            return objectSerializer.<T>readSerializable(this, objClass, obj);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -1904,7 +1889,7 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeObject(@Nullable Object obj) {
         try {
-            objectSerializer.writeSerializable(this, obj);
+            objectSerializer.writeSerializable(this, obj, null);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -1914,19 +1899,11 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public <OBJ> void writeInstance(@NotNull Class<OBJ> objClass, @NotNull OBJ obj) {
         try {
-            if (BytesMarshallable.class.isAssignableFrom(objClass)) {
-                ((BytesMarshallable) obj).writeMarshallable(this);
-            } else if (Externalizable.class.isAssignableFrom(objClass)) {
-                ((Externalizable) obj).writeExternal(this);
-            } else if (CharSequence.class.isAssignableFrom(objClass)) {
-                writeUTFΔ((CharSequence) obj);
-            } else {
-                objectSerializer.writeSerializable(this, obj);
-            }
-            checkEndOfBuffer();
+            objectSerializer.writeSerializable(this, obj, objClass);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+        checkEndOfBuffer();
     }
 
     @Override

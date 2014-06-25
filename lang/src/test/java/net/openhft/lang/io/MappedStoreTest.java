@@ -30,7 +30,7 @@ public class MappedStoreTest {
 
     @Test
     public void testCreateSlice() throws Exception {
-        File file = new File(System.getProperty("java.io.tmpdir") + "/MappedStoreTest-testCreateSlice");
+        File file = new File(System.getProperty("java.io.tmpdir") + "/MappedStoreTest-testCreateSlice" + System.nanoTime() + ".tmp");
         file.deleteOnExit();
         long size = Jvm.is64Bit() ? 3L << 30 : 256 << 20;
         MappedStore ms = new MappedStore(file, FileChannel.MapMode.READ_WRITE, size);
@@ -49,7 +49,7 @@ public class MappedStoreTest {
 
     @Test
     public void testOpenExistingFile() throws Exception {
-        File file = getStoreFile("mapped-store-2");
+        File file = getStoreFile("mapped-store-2.tmp");
 
         {
             MappedStore ms1 = new MappedStore(file, FileChannel.MapMode.READ_WRITE, MS_SIZE);

@@ -18,6 +18,7 @@ package net.openhft.lang.io.serialization;
 
 import net.openhft.lang.io.AbstractBytes;
 import net.openhft.lang.io.Bytes;
+import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.serialization.impl.NoMarshaller;
 
 import java.io.Externalizable;
@@ -37,12 +38,23 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
     }
 
     @Override
-    public void writeSerializable(Bytes bytes, Object object) throws IOException {
+    public void writeSerializable(Bytes bytes, Object object, Class expectedClass) throws IOException {
         if (object == null) {
             bytes.writeByte(NULL);
             return;
         }
-
+        if (expectedClass != null) {
+            if (BytesMarshallable.class.isAssignableFrom(expectedClass)) {
+                ((BytesMarshallable) object).writeMarshallable(bytes);
+                return;
+            } else if (Externalizable.class.isAssignableFrom(expectedClass)) {
+                ((Externalizable) object).writeExternal(bytes);
+                return;
+            } else if (CharSequence.class.isAssignableFrom(expectedClass)) {
+                bytes.writeUTFΔ((CharSequence) object);
+                return;
+            }
+        }
         Class<?> clazz = object.getClass();
         BytesMarshaller em = bytesMarshallerFactory.acquireMarshaller(clazz, false);
         if (em == NoMarshaller.INSTANCE && autoGenerateMarshaller(object))
@@ -61,10 +73,8 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
         }
         bytes.writeByte(SERIALIZED);
         // TODO this is the lame implementation, but it works.
-        objectSerializer.writeSerializable(bytes, object);
-
+        objectSerializer.writeSerializable(bytes, object, null);
     }
-
 
     static boolean autoGenerateMarshaller(Object obj) {
         return (obj instanceof Comparable && obj.getClass().getPackage().getName().startsWith("java"))
@@ -72,9 +82,21 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
                 || obj instanceof BytesMarshallable;
     }
 
-
     @Override
-    public Object readSerializable(Bytes bytes) throws IOException, ClassNotFoundException {
+    public <T> T readSerializable(@org.jetbrains.annotations.NotNull Bytes bytes, Class<T> expectedClass, T object) throws IOException, ClassNotFoundException {
+        if (expectedClass != null) {
+            try {
+                if (BytesMarshallable.class.isAssignableFrom(expectedClass)) {
+                    return readBytesMarshallable(bytes, expectedClass, object);
+                } else if (Externalizable.class.isAssignableFrom(expectedClass)) {
+                    return readExternalizable(bytes, expectedClass, object);
+                } else if (CharSequence.class.isAssignableFrom(expectedClass)) {
+                    return readCharSequence(bytes, object);
+                }
+            } catch (InstantiationException e) {
+                throw new IOException("Unable to create " + expectedClass, e);
+            }
+        }
         int type = bytes.readUnsignedByteOrThrow();
         switch (type) {
             case AbstractBytes.END_OF_BUFFER:
@@ -83,17 +105,40 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
             case ENUMED: {
                 Class clazz = bytes.readEnum(Class.class);
                 assert clazz != null;
-                return bytesMarshallerFactory.acquireMarshaller(clazz, true).read(bytes);
+                return (T) bytesMarshallerFactory.acquireMarshaller(clazz, true).read(bytes);
             }
             case SERIALIZED: {
-                return objectSerializer.readSerializable(bytes);
+                return objectSerializer.readSerializable(bytes, expectedClass, object);
             }
             default:
                 BytesMarshaller<Object> m = bytesMarshallerFactory.getMarshaller((byte) type);
                 if (m == null)
                     throw new IllegalStateException("Unknown type " + (char) type);
-                return m.read(bytes);
+                return (T) m.read(bytes);
         }
+    }
+
+    private <T> T readCharSequence(Bytes bytes, T object) {
+        if (object instanceof StringBuilder) {
+            bytes.readUTFΔ(((StringBuilder) object));
+            return object;
+        } else {
+            return (T) bytes.readUTFΔ();
+        }
+    }
+
+    private <T> T readExternalizable(Bytes bytes, Class<T> expectedClass, T object) throws InstantiationException, IOException, ClassNotFoundException {
+        if (object == null)
+            object = (T) NativeBytes.UNSAFE.allocateInstance(expectedClass);
+        ((Externalizable) object).readExternal(bytes);
+        return object;
+    }
+
+    private <T> T readBytesMarshallable(Bytes bytes, Class<T> expectedClass, T object) throws InstantiationException {
+        if (object == null)
+            object = (T) NativeBytes.UNSAFE.allocateInstance(expectedClass);
+        ((BytesMarshallable) object).readMarshallable(bytes);
+        return object;
     }
 
     public static ObjectSerializer create(BytesMarshallerFactory bytesMarshallerFactory, ObjectSerializer instance) {

@@ -17,11 +17,27 @@
 package net.openhft.lang.io.serialization;
 
 import net.openhft.lang.io.Bytes;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 public interface ObjectSerializer {
-    void writeSerializable(Bytes bytes, Object object) throws IOException;
+    /**
+     * write an object
+     *
+     * @param bytes         to write to
+     * @param object        object to write
+     * @param expectedClass which will be provided on read, can be null
+     */
+    void writeSerializable(@NotNull Bytes bytes, Object object, Class expectedClass) throws IOException;
 
-    Object readSerializable(Bytes bytes) throws IOException, ClassNotFoundException;
+    /**
+     * Read an object
+     *
+     * @param bytes         to read
+     * @param expectedClass proved when writing, can be null
+     * @param object        to populate, can be null
+     * @return object read.
+     */
+    <T> T readSerializable(@NotNull Bytes bytes, Class<T> expectedClass, T object) throws IOException, ClassNotFoundException;
 }

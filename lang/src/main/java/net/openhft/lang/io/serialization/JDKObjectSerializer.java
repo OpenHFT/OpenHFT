@@ -17,6 +17,7 @@
 package net.openhft.lang.io.serialization;
 
 import net.openhft.lang.io.Bytes;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -26,12 +27,12 @@ public class JDKObjectSerializer implements ObjectSerializer {
     public static final JDKObjectSerializer INSTANCE = new JDKObjectSerializer();
 
     @Override
-    public void writeSerializable(Bytes bytes, Object object) throws IOException {
+    public void writeSerializable(Bytes bytes, Object object, Class expectedClass) throws IOException {
         new ObjectOutputStream(bytes.outputStream()).writeObject(object);
     }
 
     @Override
-    public Object readSerializable(Bytes bytes) throws IOException, ClassNotFoundException {
-        return new ObjectInputStream(bytes.inputStream()).readObject();
+    public <T> T readSerializable(@NotNull Bytes bytes, Class<T> expectedClass, T object) throws IOException, ClassNotFoundException {
+        return (T) new ObjectInputStream(bytes.inputStream()).readObject();
     }
 }
