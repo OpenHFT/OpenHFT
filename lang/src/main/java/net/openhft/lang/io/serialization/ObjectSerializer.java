@@ -20,8 +20,9 @@ import net.openhft.lang.io.Bytes;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.Serializable;
 
-public interface ObjectSerializer {
+public interface ObjectSerializer extends Serializable {
     /**
      * write an object
      *

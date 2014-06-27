@@ -80,10 +80,10 @@ public class DirectStore implements BytesStore {
 
     /**
      * Resizes this {@code DirectStore} to the {@code newSize}.
-     * <p/>
+     * 
      * <p>If {@code zeroOut} is {@code false}, the memory past the old size is not zeroed out
      * and will generally be garbage.
-     * <p/>
+     * 
      * <p>{@code DirectStore} don't keep track of the child {@code DirectBytes} instances,
      * so after the resize they might point to the wrong memory. Use at your own risk.
      *

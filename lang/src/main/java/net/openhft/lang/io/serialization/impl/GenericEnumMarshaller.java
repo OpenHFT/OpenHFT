@@ -71,6 +71,12 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
         return s == null ? null : valueOf(s);
     }
 
+    @Nullable
+    @Override
+    public E read(Bytes bytes, @Nullable E e) {
+        return read(bytes);
+    }
+
     private E valueOf(String s) {
         E e = map.get(s);
         if (e == null)

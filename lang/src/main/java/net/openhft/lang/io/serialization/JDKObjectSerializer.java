@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class JDKObjectSerializer implements ObjectSerializer {
-    public static final JDKObjectSerializer INSTANCE = new JDKObjectSerializer();
+public enum JDKObjectSerializer implements ObjectSerializer {
+    INSTANCE;
 
     @Override
     public void writeSerializable(Bytes bytes, Object object, Class expectedClass) throws IOException {

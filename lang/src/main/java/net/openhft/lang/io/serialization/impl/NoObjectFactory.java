@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Peter Lawrey
+ * Copyright 2014 Higher Frequency Trading
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,22 @@
 
 package net.openhft.lang.io.serialization.impl;
 
-import net.openhft.lang.io.Bytes;
-import net.openhft.lang.io.serialization.BytesMarshaller;
-import net.openhft.lang.model.constraints.Nullable;
+import net.openhft.lang.io.serialization.ObjectFactory;
 
 /**
- * Created with IntelliJ IDEA. User: peter.lawrey Date: 19/09/13 Time: 18:26 To change this template use File | Settings | File
- * Templates.
+ * Placeholder object factory which always throws {@code UnsupportedOperationException}.
  */
-public enum NoMarshaller implements BytesMarshaller<Void> {
+public enum NoObjectFactory implements ObjectFactory {
     INSTANCE;
 
+    /**
+     * Always throws {@code UnsupportedOperationException}.
+     *
+     * @return nothing
+     * @throws UnsupportedOperationException always
+     */
     @Override
-    public void write(Bytes bytes, Void aVoid) {
+    public Object create() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public Void read(Bytes bytes) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Nullable
-    @Override
-    public Void read(Bytes bytes, @Nullable Void aVoid) {
-        throw new UnsupportedOperationException();
-    }
-
-
 }

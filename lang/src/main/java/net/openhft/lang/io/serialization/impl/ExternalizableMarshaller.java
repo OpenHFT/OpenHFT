@@ -20,6 +20,7 @@ import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
+import net.openhft.lang.model.constraints.Nullable;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -28,11 +29,17 @@ import java.io.IOException;
  * @author peter.lawrey
  */
 public class ExternalizableMarshaller<E extends Externalizable> implements BytesMarshaller<E> {
+    private static final long serialVersionUID = 0L;
+
     @NotNull
     private final Class<E> classMarshaled;
 
     public ExternalizableMarshaller(@NotNull Class<E> classMarshaled) {
         this.classMarshaled = classMarshaled;
+    }
+
+    public final Class<E> marshaledClass() {
+        return classMarshaled;
     }
 
     @Override
@@ -46,13 +53,36 @@ public class ExternalizableMarshaller<E extends Externalizable> implements Bytes
 
     @Override
     public E read(Bytes bytes) {
-        E e;
+        return read(bytes, null);
+    }
+
+    @Nullable
+    @Override
+    public E read(Bytes bytes, @Nullable E e) {
         try {
-            e = (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
+            if (e == null)
+                e = getInstance();
             e.readExternal(bytes);
+            return e;
         } catch (Exception e2) {
             throw new IllegalStateException(e2);
         }
-        return e;
+    }
+
+    @SuppressWarnings("unchecked")
+    @NotNull
+    protected E getInstance() throws Exception {
+        return (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass() == getClass() &&
+                ((ExternalizableMarshaller) obj).classMarshaled == classMarshaled;
+    }
+
+    @Override
+    public int hashCode() {
+        return classMarshaled.hashCode();
     }
 }

@@ -71,6 +71,17 @@ public class DateMarshaller implements CompactBytesMarshaller<Date> {
     }
 
     @Nullable
+    @Override
+    public Date read(Bytes bytes, @Nullable Date date) {
+        if (date == null)
+            return read(bytes);
+        bytes.readUTFΔ(sb);
+        long time = parseLong(sb);
+        date.setTime(time);
+        return date;
+    }
+
+    @Nullable
     private Date lookupDate(long time) {
         int idx = hashFor(time);
         if (interner == null)

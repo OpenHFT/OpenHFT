@@ -28,7 +28,8 @@ import java.util.Map;
 /**
  * @author peter.lawrey
  */
-public class EnumBytesMarshaller<E extends Enum<E>> implements BytesMarshaller<E> {
+public class EnumBytesMarshaller<E extends Enum<E>> extends ImmutableMarshaller<E>
+        implements BytesMarshaller<E> {
     @SuppressWarnings("unchecked")
     private final E[] interner = (E[]) new Enum[1024];
     private final BitSet internerDup = new BitSet(1024);

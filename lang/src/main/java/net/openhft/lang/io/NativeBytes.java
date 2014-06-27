@@ -67,10 +67,11 @@ public class NativeBytes extends AbstractBytes {
     }
 
     /**
-     * @deprecated Use the constructor with ObjectSerializer
+     * @deprecated Use {@link #NativeBytes(ObjectSerializer, long, long, AtomicInteger)} instead
      */
     @Deprecated
-    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory, long startAddr, long capacityAddr, AtomicInteger refCount) {
+    public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory,
+                       long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(bytesMarshallerFactory, refCount);
         this.positionAddr =
                 this.startAddr = startAddr;
@@ -78,7 +79,8 @@ public class NativeBytes extends AbstractBytes {
                 this.capacityAddr = capacityAddr;
     }
 
-    public NativeBytes(ObjectSerializer objectSerializer, long startAddr, long capacityAddr, AtomicInteger refCount) {
+    public NativeBytes(ObjectSerializer objectSerializer,
+                       long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(objectSerializer, refCount);
         this.positionAddr =
                 this.startAddr = startAddr;

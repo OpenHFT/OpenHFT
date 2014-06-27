@@ -32,12 +32,12 @@ public interface BytesStore {
     /**
      * Slice a {@code Bytes} object with start address of
      * {@link #address() address}{@code + offset} and capacity of {@code length}.
-     * <p/>
+     * 
      * <p>If this {@code BytesStore} is {@code Bytes} itself rather than natural
      * {@code BytesStore} object, this method will offset the new bytes from the
      * bytes' start, not from bytes' position like
      * {@link Bytes#slice(long, long)}.
-     * <p/>
+     * 
      * <p>{@code offset} should be non-negative, {@code length} should be positive,
      * {@code offset + length} should be less or equal to {@link #size() size}.
      *

@@ -25,7 +25,8 @@ import net.openhft.lang.pool.StringInterner;
 /**
  * @author peter.lawrey
  */
-public class StringMarshaller implements CompactBytesMarshaller<String> {
+public class StringMarshaller extends ImmutableMarshaller<String>
+        implements CompactBytesMarshaller<String> {
     private final int size;
     private final StringBuilder reader = new StringBuilder(128);
     private StringInterner interner;
