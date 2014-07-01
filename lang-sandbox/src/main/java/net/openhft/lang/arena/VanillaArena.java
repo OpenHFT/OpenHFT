@@ -25,6 +25,11 @@ public class VanillaArena implements Arena {
     }
 
     @Override
+    public int getHeaderId(int n) {
+        return 0;
+    }
+
+    @Override
     public int allocate(long size) {
         return 0;
     }
