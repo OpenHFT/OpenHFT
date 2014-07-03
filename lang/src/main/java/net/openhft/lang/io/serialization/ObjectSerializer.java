@@ -17,7 +17,7 @@
 package net.openhft.lang.io.serialization;
 
 import net.openhft.lang.io.Bytes;
-import org.jetbrains.annotations.NotNull;
+import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.IOException;
 

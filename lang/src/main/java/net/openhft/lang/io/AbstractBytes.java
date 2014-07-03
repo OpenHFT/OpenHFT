@@ -2477,7 +2477,7 @@ public abstract class AbstractBytes implements Bytes {
      * @param buffer the buffer you wish to toString()
      * @return hex representation of the buffer, from example [0D ,OA, FF]
      */
-    public static String toHex(@org.jetbrains.annotations.NotNull final ByteBuffer buffer) {
+    public static String toHex(@NotNull final ByteBuffer buffer) {
 
         final ByteBuffer slice = buffer.slice();
         final StringBuilder builder = new StringBuilder("[");

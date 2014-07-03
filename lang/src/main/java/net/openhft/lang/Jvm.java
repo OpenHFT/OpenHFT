@@ -127,11 +127,7 @@ public enum Jvm {
             File file = new File("/proc/sys/kernel/pid_max");
             if (file.canRead())
                 try {
-                    final long n = new Scanner(file).nextLong();
-
-                    //  if the number of threads is not a power of 2 then we round up
-                    return (n & (n - 1)) == 0 ? n : 1L << -numberOfLeadingZeros(n);
-
+                    return Maths.nextPower2(new Scanner(file).nextLong(), 1);
                 } catch (FileNotFoundException e) {
                     LOG.error("", e);
                 }
