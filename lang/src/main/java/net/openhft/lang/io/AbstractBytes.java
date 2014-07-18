@@ -2042,7 +2042,9 @@ public abstract class AbstractBytes implements Bytes {
         try {
             do {
                 if (tryLockNanos8a(offset, id)) {
-                    LOGGER.warn(Thread.currentThread().getName() + ", to obtain a lock took " + (System.nanoTime() - start) / 1000000 / 1e3);
+                    long millis = (System.nanoTime() - start) / 1000000;
+                    if (millis > 100)
+                        LOGGER.warn(Thread.currentThread().getName() + ", to obtain a lock took " + millis / 1e3);
                     return true;
                 }
                 Thread.sleep(1);
