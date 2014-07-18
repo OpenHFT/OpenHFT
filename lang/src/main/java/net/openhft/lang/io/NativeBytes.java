@@ -22,6 +22,7 @@ import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Unsafe;
 
 import java.io.EOFException;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -549,4 +550,6 @@ public class NativeBytes extends AbstractBytes {
     public long positionAddr() {
         return positionAddr;
     }
+
+
 }

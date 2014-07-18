@@ -2500,4 +2500,8 @@ public abstract class AbstractBytes implements Bytes {
         long val = Double.doubleToRawLongBits(value);
         return compareAndSwapLong(offset, exp, val);
     }
+
+    public File file() {
+        return null;
+    }
 }
