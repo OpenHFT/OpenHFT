@@ -19,6 +19,8 @@ package net.openhft.lang.io;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 
+import java.io.File;
+
 public interface BytesStore {
     /**
      * Create a bytes whose content is the whole bytes store. Call of this
@@ -55,4 +57,6 @@ public interface BytesStore {
     void free();
 
     ObjectSerializer objectSerializer();
+
+    File file();
 }

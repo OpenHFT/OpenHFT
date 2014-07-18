@@ -53,6 +53,7 @@ public abstract class AbstractBytes implements Bytes {
     public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
     // extra 1 for decimal place.
     private static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
+    public static final int SLEEP_THRESHOLD = 20 * 1000 * 1000;
     private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
     private static final byte[] RADIX_PARSE = new byte[256];
 
@@ -2025,11 +2026,32 @@ public abstract class AbstractBytes implements Bytes {
                 return true;
         if (nanos <= 10000)
             return false;
-        long end = System.nanoTime() + nanos - 10000;
+        return tryLockNanosLong0(offset, nanos, id);
+    }
+
+    private boolean tryLockNanosLong0(long offset, long nanos, long id) {
+        long nanos0 = Math.min(nanos, SLEEP_THRESHOLD);
+        long start = System.nanoTime();
+        long end0 = start + nanos0 - 10000;
         do {
             if (tryLockNanos8a(offset, id))
                 return true;
-        } while (end > System.nanoTime() && !currentThread().isInterrupted());
+        } while (end0 > System.nanoTime() && !currentThread().isInterrupted());
+        long end = start + nanos - SLEEP_THRESHOLD;
+        LOGGER.trace(Thread.currentThread().getName() + ", waiting for lock");
+        try {
+            do {
+                if (tryLockNanos8a(offset, id)) {
+                    long millis = (System.nanoTime() - start) / 1000000;
+                    if (millis > 100)
+                        LOGGER.warn(Thread.currentThread().getName() + ", to obtain a lock took " + millis / 1e3);
+                    return true;
+                }
+                Thread.sleep(1);
+            } while (end > System.nanoTime());
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
         return false;
     }
 
@@ -2499,5 +2521,9 @@ public abstract class AbstractBytes implements Bytes {
         long exp = Double.doubleToRawLongBits(expected);
         long val = Double.doubleToRawLongBits(value);
         return compareAndSwapLong(offset, exp, val);
+    }
+
+    public File file() {
+        return null;
     }
 }

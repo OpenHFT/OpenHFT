@@ -29,7 +29,7 @@ Java-Lang 6.1 adds support for basic off heap data structures.  More collections
     // set data on dt
     array.recycle(dt); // recycle the reference (or discard it)
     
-    // create a ring buffer
+    // create a ring writeBuffer
     HugeQueue<DataType> queue = HugeCollections.newQueue(DataType.class, 10*1000*1000L);
     // give me a reference to an object to populate
     DataType dt2 = queue.offer();

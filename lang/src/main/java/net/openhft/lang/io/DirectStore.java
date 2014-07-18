@@ -21,6 +21,7 @@ import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Cleaner;
 
+import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -123,6 +124,15 @@ public class DirectStore implements BytesStore {
 
     public long size() {
         return size;
+    }
+
+    public static BytesStore allocateLazy(long sizeInBytes, ObjectSerializer objectSerializer) {
+        return new DirectStore(objectSerializer, sizeInBytes, false);
+    }
+
+    @Override
+    public File file() {
+        return null;
     }
 
     /**
