@@ -26,8 +26,6 @@ import java.lang.management.ManagementFactory;
 import java.util.Random;
 import java.util.Scanner;
 
-import static java.lang.Long.numberOfLeadingZeros;
-
 /**
  * @author peter.lawrey
  */
@@ -91,7 +89,8 @@ public enum Jvm {
     }
 
     public static long getUniqueTid(Thread thread) {
-        return ((long) getProcessId() << 32) | thread.getId();
+        // Assume 48 bit for 16 to 24-bit process id and 16 million threads from the start.
+        return ((long) getProcessId() << 24) | thread.getId();
     }
 
     private static final String OS = System.getProperty("os.name").toLowerCase();

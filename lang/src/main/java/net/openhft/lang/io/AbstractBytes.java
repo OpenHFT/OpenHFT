@@ -2060,9 +2060,16 @@ public abstract class AbstractBytes implements Bytes {
         if (compareAndSwapLong(offset, 0, firstValue))
             return true;
         long currentValue = readLong(offset);
-        if ((currentValue & (1L << 48) - 1) == id) {
+        long lockedId = currentValue & (1L << 48) - 1;
+        if (lockedId == 0) {
+            int count = (int) (currentValue >>> 48);
+            if (count != 0)
+                LOGGER.warn("Lock held by threadId 0 !?");
+            return compareAndSwapLong(offset, currentValue, firstValue);
+        }
+        if (lockedId == id) {
             if (currentValue >>> 48 == 65535)
-                throw new IllegalStateException("Reentred 65535 times without an unlock");
+                throw new IllegalStateException("Reentered 65535 times without an unlock");
             currentValue += 1L << 48;
             writeOrderedLong(offset, currentValue);
             return true;
