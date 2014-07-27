@@ -2043,8 +2043,12 @@ public abstract class AbstractBytes implements Bytes {
             do {
                 if (tryLockNanos8a(offset, id)) {
                     long millis = (System.nanoTime() - start) / 1000000;
-                    if (millis > 100)
-                        LOGGER.warn(Thread.currentThread().getName() + ", to obtain a lock took " + millis / 1e3);
+                    if (millis > 100) {
+                        LOGGER.warn(Thread.currentThread().getName() +
+                                        ", to obtain a lock took " +
+                                        millis / 1e3 + " seconds"
+                        );
+                    }
                     return true;
                 }
                 Thread.sleep(1);
@@ -2060,7 +2064,7 @@ public abstract class AbstractBytes implements Bytes {
         if (compareAndSwapLong(offset, 0, firstValue))
             return true;
         long currentValue = readLong(offset);
-        long lockedId = currentValue & (1L << 48) - 1;
+        long lockedId = currentValue & ((1L << 48) - 1);
         if (lockedId == 0) {
             int count = (int) (currentValue >>> 48);
             if (count != 0)
