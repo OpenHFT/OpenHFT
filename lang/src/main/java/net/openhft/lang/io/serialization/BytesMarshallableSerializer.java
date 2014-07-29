@@ -20,11 +20,14 @@ import net.openhft.lang.io.AbstractBytes;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.serialization.impl.NoMarshaller;
+import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.Externalizable;
 import java.io.IOException;
 
 public class BytesMarshallableSerializer implements ObjectSerializer {
+    private static final long serialVersionUID = 0L;
+
     private static final byte NULL = 'N';
     private static final byte ENUMED = 'E';
     private static final byte SERIALIZED = 'S';
@@ -83,7 +86,7 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
     }
 
     @Override
-    public <T> T readSerializable(@org.jetbrains.annotations.NotNull Bytes bytes, Class<T> expectedClass, T object) throws IOException, ClassNotFoundException {
+    public <T> T readSerializable(@NotNull Bytes bytes, Class<T> expectedClass, T object) throws IOException, ClassNotFoundException {
         if (expectedClass != null) {
             try {
                 if (BytesMarshallable.class.isAssignableFrom(expectedClass)) {

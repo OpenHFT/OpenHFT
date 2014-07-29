@@ -19,27 +19,40 @@ package net.openhft.lang.io.serialization;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.model.constraints.Nullable;
 
+import java.io.Serializable;
+
 /**
  * External marshaller for classes.
  *
  * @author peter.lawrey
  * @see BytesMarshallable
  */
-public interface BytesMarshaller<E> {
+public interface BytesMarshaller<E> extends Serializable {
     /**
-     * write the object out as bytes.
+     * Write the object out to the {@code bytes}.
      *
      * @param bytes to write to
-     * @param e     to write
+     * @param e     the object to write
      */
     void write(Bytes bytes, E e);
 
     /**
-     * Read bytes and obtain an object
+     * Reads and returns an object from {@code bytes}.
      *
      * @param bytes to read
-     * @return the object
+     * @return the read object
      */
     @Nullable
     E read(Bytes bytes);
+
+    /**
+     * Reads and returns an object from {@code bytes}, reusing the given object, if possible.
+     *
+     * @param bytes to read
+     * @param e     an object to reuse, if possible. {@code null} could be passed, in this case
+     *              a new object should be allocated anyway.
+     * @return the read object
+     */
+    @Nullable
+    E read(Bytes bytes, @Nullable E e);
 }

@@ -34,6 +34,7 @@ import java.util.Map;
  * @author peter.lawrey
  */
 public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
+    private static final long serialVersionUID = 0L;
 
     private Map<Class, BytesMarshaller> marshallerMap;
     private BytesMarshaller[] compactMarshallerMap;

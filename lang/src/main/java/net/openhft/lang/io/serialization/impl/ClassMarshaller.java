@@ -32,7 +32,8 @@ import java.util.Map;
 /**
  * @author peter.lawrey
  */
-public class ClassMarshaller implements CompactBytesMarshaller<Class> {
+public class ClassMarshaller extends ImmutableMarshaller<Class>
+        implements CompactBytesMarshaller<Class> {
     private static final int CACHE_SIZE = 1019;
     private static final Map<String, Class> SC_SHORT_NAME = new LinkedHashMap<String, Class>();
     private static final Map<Class, String> CS_SHORT_NAME = new LinkedHashMap<Class, String>();

@@ -21,16 +21,23 @@ import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
+import net.openhft.lang.model.constraints.Nullable;
 
 /**
  * @author peter.lawrey
  */
-public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements BytesMarshaller<E> {
+public class BytesMarshallableMarshaller<E extends BytesMarshallable>
+        implements BytesMarshaller<E> {
+    private static final long serialVersionUID = 0L;
     @NotNull
     private final Class<E> classMarshaled;
 
     public BytesMarshallableMarshaller(@NotNull Class<E> classMarshaled) {
         this.classMarshaled = classMarshaled;
+    }
+
+    public final Class<E> marshaledClass() {
+        return classMarshaled;
     }
 
     @Override
@@ -40,13 +47,37 @@ public class BytesMarshallableMarshaller<E extends BytesMarshallable> implements
 
     @Override
     public E read(@NotNull Bytes bytes) {
-        E e;
-        try {
-            e = (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
-        } catch (Exception e2) {
-            throw new IllegalStateException(e2);
+        return read(bytes, null);
+    }
+
+    @Nullable
+    @Override
+    public E read(Bytes bytes, @Nullable E e) {
+        if (e == null) {
+            try {
+                e = getInstance();
+            } catch (Exception e2) {
+                throw new IllegalStateException(e2);
+            }
         }
         e.readMarshallable(bytes);
         return e;
+    }
+
+    @SuppressWarnings("unchecked")
+    @NotNull
+    protected E getInstance() throws Exception {
+        return (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass() == getClass() &&
+                ((BytesMarshallableMarshaller) obj).classMarshaled == classMarshaled;
+    }
+
+    @Override
+    public int hashCode() {
+        return classMarshaled.hashCode();
     }
 }

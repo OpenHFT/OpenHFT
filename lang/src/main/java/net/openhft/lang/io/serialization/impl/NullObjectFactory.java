@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Peter Lawrey
+ * Copyright 2014 Higher Frequency Trading
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io.serialization;
+package net.openhft.lang.io.serialization.impl;
 
-import net.openhft.lang.io.Bytes;
-import net.openhft.lang.model.constraints.NotNull;
-
-import java.io.Serializable;
+import net.openhft.lang.io.serialization.ObjectFactory;
 
 /**
- * @author peter.lawrey
+ * Object factory which always returns {@code null}.
  */
-public interface BytesMarshallerFactory extends Serializable {
-    @NotNull
-    <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create);
+public enum NullObjectFactory implements ObjectFactory {
+    INSTANCE;
 
-    <E> BytesMarshaller<E> getMarshaller(byte code);
-
-    <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller);
+    /**
+     * Always returns {@code null}.
+     *
+     * @return {@code null}
+     */
+    @Override
+    public Object create() {
+        return null;
+    }
 }
