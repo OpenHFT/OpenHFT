@@ -80,4 +80,9 @@ public class BytesMarshallableMarshaller<E extends BytesMarshallable>
     public int hashCode() {
         return classMarshaled.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{classMarshaled=" + classMarshaled + "}";
+    }
 }

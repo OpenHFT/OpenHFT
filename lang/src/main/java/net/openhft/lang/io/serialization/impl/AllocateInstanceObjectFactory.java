@@ -28,6 +28,8 @@ import java.lang.reflect.Modifier;
  * @param <E> type of created objects
  */
 public final class AllocateInstanceObjectFactory<E> implements ObjectFactory<E> {
+    private static final long serialVersionUID = 0L;
+
     private final Class<E> eClass;
 
     public AllocateInstanceObjectFactory(Class<E> eClass) {
@@ -57,5 +59,10 @@ public final class AllocateInstanceObjectFactory<E> implements ObjectFactory<E> 
     @Override
     public int hashCode() {
         return eClass.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{eClass=" + eClass + "}";
     }
 }

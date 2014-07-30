@@ -85,4 +85,9 @@ public class ExternalizableMarshaller<E extends Externalizable> implements Bytes
     public int hashCode() {
         return classMarshaled.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{marshaledClass=" + classMarshaled + "}";
+    }
 }
