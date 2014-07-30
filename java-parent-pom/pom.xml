@@ -20,7 +20,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.1.1</version>
         <relativePath />
     </parent>
 
@@ -30,18 +30,6 @@
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
-
-    <dependencyManagement>
-        <dependencies>
-
-            <dependency>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.framework</artifactId>
-                <version>4.4.0</version>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
 
     <build>
 
@@ -53,7 +41,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.1</version>
                 </plugin>
-
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -144,33 +131,6 @@
         </plugins>
 
     </build>
-
-    <profiles>
-
-        <profile>
-            <id>felix</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>pax.exam.framework</name>
-                    <value>felix</value>
-                </property>
-            </activation>
-            <properties>
-                <pax.exam.framework>felix</pax.exam.framework>
-                <pax.exam.logging>none</pax.exam.logging>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.apache.felix.framework</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-    </profiles>
-
 
     <scm>
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
