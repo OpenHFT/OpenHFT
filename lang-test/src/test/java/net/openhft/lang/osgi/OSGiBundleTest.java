@@ -67,7 +67,6 @@ public class OSGiBundleTest extends OSGiTestBase {
     }
 
     @Test
-    @Ignore
     public void checkBundle() {
         Boolean bundleFound = false;
 
