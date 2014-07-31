@@ -34,6 +34,7 @@ import static org.ops4j.pax.exam.CoreOptions.*;
 /**
  * @author lburgazzoli
  */
+@Ignore
 @RunWith(PaxExam.class)
 public class OSGiBundleTest extends OSGiTestBase {
     @Inject
