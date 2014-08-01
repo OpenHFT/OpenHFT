@@ -43,7 +43,7 @@ public class VanillaMappedCache<T> implements Closeable {
         this(new LinkedHashMap<T, VanillaMappedBytes>(maximumCacheSize,1.0f,true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<T, VanillaMappedBytes> eldest) {
-                boolean removed = size() > maximumCacheSize;
+                boolean removed = size() >= maximumCacheSize;
                 if (removed && releaseOnRemove) {
                     eldest.getValue().release();
                 }
