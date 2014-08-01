@@ -16,17 +16,12 @@
 package net.openhft.lang.io;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VanillaMappedBlocks implements VanillaMappedResource {
-    private static final Logger LOG = LoggerFactory.getLogger(VanillaMappedBlocks.class);
-
     private final VanillaMappedFile mappedFile;
     private final List<VanillaMappedBytes> bytes;
     private final long blockSize;

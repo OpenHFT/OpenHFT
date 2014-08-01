@@ -16,15 +16,14 @@
 
 package net.openhft.lang;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
@@ -33,7 +32,9 @@ public enum Jvm {
     ;
     public static final String TMP = System.getProperty("java.io.tmpdir");
     private static final boolean IS64BIT = is64Bit0();
-    private static final Logger LOG = LoggerFactory.getLogger(Jvm.class);
+
+    // Switch to j.u.l
+    private static final Logger LOG = Logger.getLogger(Jvm.class.getName());
 
     public static boolean is64Bit() {
         return IS64BIT;
@@ -72,7 +73,7 @@ public enum Jvm {
             pid = ManagementFactory.getRuntimeMXBean().getName().split("@", 0)[0];
         if (pid == null) {
             int rpid = new Random().nextInt(1 << 16);
-            LoggerFactory.getLogger(Jvm.class).warn("Unable to determine PID, picked a random number={}", rpid);
+            LOG.log(Level.WARNING,"Unable to determine PID, picked a random number=" + rpid);
             return rpid;
         } else {
             return Integer.parseInt(pid);
@@ -128,7 +129,7 @@ public enum Jvm {
                 try {
                     return Maths.nextPower2(new Scanner(file).nextLong(), 1);
                 } catch (FileNotFoundException e) {
-                    LOG.error("", e);
+                    LOG.log(Level.WARNING, "", e);
                 }
         } else if (isMacOSX()) {
             return 1L << 24;

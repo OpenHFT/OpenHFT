@@ -203,8 +203,8 @@
                         </Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            !net.openhft.lang.io,
-                            *
+                            net.openhft.langosgi,
+                            net.openhft.langosgi.model
                         </Export-Package>
                         <Import-Package>
                             net.openhft.lang.io.serialization,
