@@ -20,13 +20,13 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
-        <version>1.0.1</version>
+        <version>1.1.1</version>
         <relativePath />
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang</artifactId>
-    <version>6.4.9-SNAPSHOT</version>
+    <version>6.4.10-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>OpenHFT/Java-Lang/lang</name>
     <description>Java Lang library for High Frequency Trading (Java 6+)</description>
