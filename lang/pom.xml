@@ -20,13 +20,13 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
-        <version>1.0.1</version>
+        <version>1.1.1</version>
         <relativePath />
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang</artifactId>
-    <version>6.4.17-SNAPSHOT</version>
+    <version>6.4.18-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>OpenHFT/Java-Lang/lang</name>
     <description>Java Lang library for High Frequency Trading (Java 6+)</description>
@@ -88,6 +88,20 @@
     <build>
 
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <configuration>
+                    <checkoutDirectory>${project.build.directory}/scmpublish/javadoc</checkoutDirectory>
+                    <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}
+                    </checkinComment>
+                    <content>${project.reporting.outputDirectory}</content>
+                    <skipDeletedFiles>true</skipDeletedFiles>
+                    <pubScmUrl>scm:git:git@github.com:OpenHFT/Java-Lang</pubScmUrl>
+                    <scmBranch>gh-pages</scmBranch>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.felix</groupId>
