@@ -2435,10 +2435,15 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String toString() {
-        char[] chars = new char[(int) remaining()];
+        long remaining = remaining();
+        if (remaining < 0 || remaining > 1L << 48)
+            return "invalid remaining: "+remaining();
+        if (remaining > 1 << 20)
+            remaining = 1 << 20;
+        char[] chars = new char[(int) remaining];
         long pos = position();
-        for (long i = pos; i < limit(); i++) {
-            chars[((int) (i - pos))] = (char) readUnsignedByte(i);
+        for (int i = 0; i < remaining; i++) {
+            chars[i] = (char) readUnsignedByte(i+pos);
         }
         return new String(chars);
     }
