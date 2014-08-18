@@ -284,10 +284,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
     private static String getUsing(String name, Method method) {
         Class<?> returnType = method.getReturnType();
-        if (method.getParameterCount() != 1)
+        if (method.getParameterTypes().length != 1)
             return null;
 
-        Class<?> parameter = method.getParameters()[0].getType();
+        Class<?> parameter = method.getParameterTypes()[0];
 
         if ((returnType == StringBuilder.class || returnType == void.class) && parameter ==
                 StringBuilder.class &&
@@ -475,8 +475,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                             getterAt != null ? getterAt.getReturnType() :
                                     volatileGetterAt != null ? volatileGetterAt.getReturnType() :
                                             unlock != null ? int.class :
-                                                    setter != null && setter.getParameters().length == 1 ?
-                                                            setter.getParameters()[0].getType() : null);
+                                                    setter != null && setter.getParameterTypes().length == 1 ?
+                                                            setter.getParameterTypes()[0] : null);
         }
 
         public void adder(Method method) {
