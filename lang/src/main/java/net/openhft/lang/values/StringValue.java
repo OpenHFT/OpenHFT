@@ -19,12 +19,15 @@ package net.openhft.lang.values;
 import net.openhft.lang.model.constraints.MaxSize;
 
 /**
- * User: peter.lawrey
- * Date: 10/10/13
- * Time: 07:13
+ * User: peter.lawrey Date: 10/10/13 Time: 07:13
  */
 public interface StringValue {
     String getValue();
 
     void setValue(@MaxSize CharSequence value);
+
+    /**
+     * We should add a getter for a String which takes a StringBuilder
+     */
+    StringBuilder getUsing(StringBuilder stringBuilder);
 }
