@@ -29,5 +29,5 @@ public interface StringValue {
     /**
      * We should add a getter for a String which takes a StringBuilder
      */
-    StringBuilder getUsing(StringBuilder stringBuilder);
+   //  StringBuilder getUsing(StringBuilder stringBuilder);
 }
