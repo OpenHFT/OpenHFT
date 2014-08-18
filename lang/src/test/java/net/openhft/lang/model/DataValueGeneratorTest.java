@@ -95,13 +95,14 @@ public class DataValueGeneratorTest {
         assertTrue(mi2.flag());
     }
 
+
     @Test
-    public void testGenerateNative() throws Exception {
-        String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterface.class);
+    public void testGenerateNativeWithGetUsing() throws Exception {
+        String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterfaceGetUsing.class);
         System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
-        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "$$Native", actual);
-        JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
+        Class aClass = cc.loadFromJava(JavaBeanInterfaceGetUsing.class.getName() + "$$Native", actual);
+        JavaBeanInterfaceGetUsing jbi = (JavaBeanInterfaceGetUsing) aClass.asSubclass(JavaBeanInterfaceGetUsing.class).newInstance();
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
         ((Byteable) jbi).bytes(bytes, 0L);
         jbi.setByte((byte) 1);
@@ -112,20 +113,38 @@ public class DataValueGeneratorTest {
         jbi.setFloat(5);
         jbi.setLong(6);
         jbi.setDouble(7);
-        jbi.setFlag(true);
-        assertEquals("", jbi.getString());
         jbi.setString("G'day");
-        assertEquals(1, jbi.getByte());
-        assertEquals('2', jbi.getChar());
-        assertEquals(3, jbi.getShort());
-        assertEquals(4, jbi.getInt());
-        assertEquals(4, jbi.getVolatileInt());
-        assertEquals(5.0, jbi.getFloat(), 0);
-        assertEquals(6, jbi.getLong());
-        assertEquals(7.0, jbi.getDouble(), 0.0);
-        assertTrue(jbi.getFlag());
-        assertEquals("G'day", jbi.getString());
-        assertEquals(42, ((Byteable) jbi).maxSize());
+        assertEquals("1", jbi.getUsingByte(new StringBuilder()).toString());
+        assertEquals("2", jbi.getUsingChar(new StringBuilder()).toString());
+        assertEquals("3", jbi.getUsingShort(new StringBuilder()).toString());
+        assertEquals("4", jbi.getUsingInt(new StringBuilder()).toString());
+        assertEquals("5.0", jbi.getUsingFloat(new StringBuilder()).toString());
+        assertEquals("6", jbi.getUsingLong(new StringBuilder()).toString());
+        assertEquals("7.0", jbi.getUsingDouble(new StringBuilder()).toString());
+        assertEquals("G'day", jbi.getUsingString(new StringBuilder()).toString());
+    }
+
+
+    @Test
+    public void testGenerateNativeWithGetUsingHeapInstance() {
+        DataValueGenerator dvg = new DataValueGenerator();
+        JavaBeanInterfaceGetUsingHeap si = dvg.heapInstance(JavaBeanInterfaceGetUsingHeap.class);
+        si.setByte((byte) 1);
+        si.setChar('2');
+        si.setShort((short) 3);
+        si.setInt(4);
+        si.setFloat(5);
+        si.setLong(6);
+        si.setDouble(7);
+        si.setString("G'day");
+        assertEquals("1", si.getUsingByte(new StringBuilder()).toString());
+        assertEquals("2", si.getUsingChar(new StringBuilder()).toString());
+        assertEquals("3", si.getUsingShort(new StringBuilder()).toString());
+        assertEquals("4", si.getUsingInt(new StringBuilder()).toString());
+        assertEquals("5.0", si.getUsingFloat(new StringBuilder()).toString());
+        assertEquals("6", si.getUsingLong(new StringBuilder()).toString());
+        assertEquals("7.0", si.getUsingDouble(new StringBuilder()).toString());
+        assertEquals("G'day", si.getUsingString(new StringBuilder()).toString());;
     }
 
 
@@ -144,6 +163,33 @@ public class DataValueGeneratorTest {
         assertEquals("Hello world £€", si2.getString());
         assertEquals("Hello world £€", si2.getText());
     }
+
+
+    @Test
+    public void testGetUsingStringFieldsWithStringBuilderHeapInstance() {
+        DataValueGenerator dvg = new DataValueGenerator();
+        GetUsingStringInterface si = dvg.heapInstance(GetUsingStringInterface.class);
+        si.setString("Hello world");
+        assertEquals("Hello world", si.getString());
+        StringBuilder builder = new StringBuilder();
+        si.getUsingString(builder);
+        assertEquals("Hello world", builder.toString());
+    }
+
+
+    @Test
+    public void testGetUsingStringFieldsWithStringBuilderNativeInstance() {
+        DataValueGenerator dvg = new DataValueGenerator();
+        GetUsingStringInterface si = dvg.nativeInstance(GetUsingStringInterface.class);
+        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
+        ((Byteable) si).bytes(bytes, 0L);
+        si.setString("Hello world");
+        assertEquals("Hello world", si.getString());
+        StringBuilder builder = new StringBuilder();
+        si.getUsingString(builder);
+        assertEquals("Hello world", builder.toString());
+    }
+
 
     @Test
     public void testNested() {

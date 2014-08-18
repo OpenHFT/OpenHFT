@@ -30,9 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * User: peter.lawrey
- * Date: 06/10/13private static final int VALUE
- * Time: 17:23
+ * User: peter.lawrey Date: 06/10/13private static final int VALUE Time: 17:23
  */
 public class DataValueModelImpl<T> implements DataValueModel<T> {
     private static final Map<Class, Integer> HEAP_SIZE_MAP = new HashMap<Class, Integer>();
@@ -49,7 +47,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         HEAP_SIZE_MAP.put(long.class, 64);
         HEAP_SIZE_MAP.put(double.class, 64);
     }
-
 
 
     private final Map<String, FieldModelImpl> fieldModelMap = new TreeMap<String, FieldModelImpl>();
@@ -103,11 +100,11 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         throw new IllegalArgumentException("void () not supported " + method);
 
                     String name2 = getGetter(name, returnType);
-                    if(isVolatileGetter(name2)) {
+                    if (isVolatileGetter(name2)) {
                         FieldModelImpl fm = acquireField(volatileGetterFieldName(name2));
                         fm.volatileGetter(method);
                         fm.setVolatile(true);
-                    }else {
+                    } else {
                         FieldModelImpl fm = acquireField(name2);
                         fm.getter(method);
                     }
@@ -115,6 +112,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     break;
                 }
                 case 1: {
+
+                    String name7 = getUsing(name, method);
+                    if (name7 != null) {
+                        FieldModelImpl fm = acquireField(name7);
+                        fm.getUsing(method);
+                        break;
+                    }
+
                     String name5 = getTryLockNanos(name);
                     if (name5 != null && returnType == boolean.class) {
                         FieldModelImpl fm = acquireField(name5);
@@ -138,11 +143,11 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
                     String name6 = getGetterAt(name, returnType);
                     if (name6 != null && parameterTypes[0] == int.class && returnType != void.class) {
-                        if(isVolatileGetter(name6)) {
+                        if (isVolatileGetter(name6)) {
                             FieldModelImpl fm = acquireField(volatileGetterFieldName(name6));
                             fm.volatileIndexedGetter(method);
                             fm.setVolatile(true);
-                        }else {
+                        } else {
                             FieldModelImpl fm = acquireField(name6);
                             fm.indexedGetter(method);
                         }
@@ -153,10 +158,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         throw new IllegalArgumentException("setter must be void " + method);
 
                     String name2 = getSetter(name);
-                    if(isOrderedSetter(name2)) {
+                    if (isOrderedSetter(name2)) {
                         FieldModelImpl fm = acquireField(orderedSetterFieldName(name2));
                         fm.orderedSetter(method);
-                    }else {
+                    } else {
                         FieldModelImpl fm = acquireField(name2);
                         fm.setter(method);
                     }
@@ -171,10 +176,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     }
                     String name3 = getSetterAt(name);
                     if (name3 != null && parameterTypes[0] == int.class && returnType == void.class) {
-                        if(isOrderedSetter(name3)) {
+                        if (isOrderedSetter(name3)) {
                             FieldModelImpl fm = acquireField(orderedSetterFieldName(name3));
                             fm.orderedIndexedSetter(method);
-                        }else {
+                        } else {
                             FieldModelImpl fm = acquireField(name3);
                             fm.indexedSetter(method);
                         }
@@ -189,10 +194,12 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         for (Map.Entry<String, FieldModelImpl> entry : fieldModelMap.entrySet()) {
             FieldModelImpl model = entry.getValue();
-            if (model.getter() == null || (model.setter() == null && model.getter().getReturnType().isPrimitive()))
+            if ((model.getter() == null && model.getUsing() == null) || (model.setter() == null &&
+                    model.getter().getReturnType()
+                            .isPrimitive()))
                 if (model.volatileGetter() == null || (model.orderedSetter() == null && model.volatileGetter().getReturnType().isPrimitive()))
-                     if (model.indexedGetter() == null || (model.indexedSetter() == null && model.indexedGetter().getReturnType().isPrimitive()))
-                         if (model.volatileIndexedGetter() == null || (model.orderedIndexedSetter() == null && model.volatileIndexedGetter().getReturnType().isPrimitive()))
+                    if (model.indexedGetter() == null || (model.indexedSetter() == null && model.indexedGetter().getReturnType().isPrimitive()))
+                        if (model.volatileIndexedGetter() == null || (model.orderedIndexedSetter() == null && model.volatileIndexedGetter().getReturnType().isPrimitive()))
                             if (model.busyLock() == null || model.unlock() == null)
                                 throw new IllegalArgumentException("Field " + entry.getKey() + " must have a getter & setter, or getAt & setAt, or busyLock & unlock.");
             if (model.indexedGetter() != null || model.indexedSetter() != null)
@@ -206,15 +213,15 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
     }
 
     private boolean isOrderedSetter(String name2) {
-        return name2.startsWith(ORDERED_SETTER_PREFIX) ? true :false;
+        return name2.startsWith(ORDERED_SETTER_PREFIX) ? true : false;
     }
 
     private boolean isVolatileGetter(String name2) {
-        return name2.startsWith(VOLATILE_GETTER_PREFIX) ? true :false;
+        return name2.startsWith(VOLATILE_GETTER_PREFIX) ? true : false;
     }
 
     private String volatileGetterFieldName(String name) {
-        name =  name.substring(VOLATILE_GETTER_PREFIX.length());
+        name = name.substring(VOLATILE_GETTER_PREFIX.length());
         return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
 
@@ -274,6 +281,23 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             return Character.toLowerCase(name.charAt(2)) + name.substring(3);
         return name;
     }
+
+    private static String getUsing(String name, Method method) {
+        Class<?> returnType = method.getReturnType();
+        if (method.getParameterCount() != 1)
+            return null;
+
+        Class<?> parameter = method.getParameters()[0].getType();
+
+        if ((returnType == StringBuilder.class || returnType == void.class) && parameter ==
+                StringBuilder.class &&
+                name.length() > "getUsing".length() && name.startsWith
+                ("getUsing") && Character.isUpperCase(name.charAt("getUsing".length())))
+            return Character.toLowerCase(name.charAt("getUsing".length())) + name.substring("getUsing"
+                    .length() + 1);
+        return null;
+    }
+
 
     private static String getGetterAt(String name, Class returnType) {
         final int len = 3;
@@ -357,6 +381,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private MaxSize indexSize;
         private Method adder;
         private Method atomicAdder;
+        private Method getUsing;
         private Method cas;
         private Method tryLockNanos;
         private Method tryLock;
@@ -418,7 +443,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
 
-
         public void volatileGetter(Method volatileGetter) {
             this.volatileGetter = volatileGetter;
         }
@@ -444,14 +468,15 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
 
-
         @Override
         public Class<T> type() {
             return (Class<T>) (getter != null ? getter.getReturnType() :
-                                         volatileGetter != null ? volatileGetter.getReturnType() :
-                                         getterAt != null ? getterAt.getReturnType() :
-                                         volatileGetterAt != null ? volatileGetterAt.getReturnType() :
-                            unlock != null ? int.class : null);
+                    volatileGetter != null ? volatileGetter.getReturnType() :
+                            getterAt != null ? getterAt.getReturnType() :
+                                    volatileGetterAt != null ? volatileGetterAt.getReturnType() :
+                                            unlock != null ? int.class :
+                                                    setter != null && setter.getParameters().length == 1 ?
+                                                            setter.getParameters()[0].getType() : null);
         }
 
         public void adder(Method method) {
@@ -512,6 +537,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         public void atomicAdder(Method method) {
             atomicAdder = method;
+        }
+
+        public void getUsing(Method method) {
+            getUsing = method;
         }
 
         public Method atomicAdder() {
@@ -624,6 +653,11 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         public Method orderedIndexedSetter() {
             return orderedSetterAt;
+        }
+
+        @Override
+        public Method getUsing() {
+            return getUsing;
         }
 
     }
