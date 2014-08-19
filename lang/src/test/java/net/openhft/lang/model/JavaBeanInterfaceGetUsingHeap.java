@@ -41,10 +41,9 @@ public interface JavaBeanInterfaceGetUsingHeap {
 
     StringBuilder getUsingChar(StringBuilder b);
 
-    void setInt(int i);
+    void setIntValue(int i);
 
-
-    StringBuilder getUsingInt(StringBuilder b);
+    StringBuilder getUsingIntValue(StringBuilder b);
 
     void setFloat(float f);
 

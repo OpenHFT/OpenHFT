@@ -25,15 +25,15 @@ import net.openhft.lang.model.constraints.MaxSize;
  */
 public interface GetUsingStringInterface {
 
-    void setString(@MaxSize(64) String s);
+    void setSomeStringField(@MaxSize(64) String s);
 
-    void setString2(@MaxSize(64) String s);
+    void setAnotherStringField(@MaxSize(64) String s);
 
-    String getString();
+    String getSomeStringField();
 
-    void getUsingString(StringBuilder builder);
+    void getUsingSomeStringField(StringBuilder builder);
 
-    StringBuilder getUsingString2(StringBuilder builder);
+    StringBuilder getUsingAnotherStringField(StringBuilder builder);
 
 }
 

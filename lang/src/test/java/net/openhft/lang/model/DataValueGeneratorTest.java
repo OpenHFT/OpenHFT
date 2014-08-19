@@ -132,7 +132,7 @@ public class DataValueGeneratorTest {
         si.setByte((byte) 1);
         si.setChar('2');
         si.setShort((short) 3);
-        si.setInt(4);
+        si.setIntValue(4);
         si.setFloat(5);
         si.setLong(6);
         si.setDouble(7);
@@ -140,7 +140,7 @@ public class DataValueGeneratorTest {
         assertEquals("1", si.getUsingByte(new StringBuilder()).toString());
         assertEquals("2", si.getUsingChar(new StringBuilder()).toString());
         assertEquals("3", si.getUsingShort(new StringBuilder()).toString());
-        assertEquals("4", si.getUsingInt(new StringBuilder()).toString());
+        assertEquals("4", si.getUsingIntValue(new StringBuilder()).toString());
         assertEquals("5.0", si.getUsingFloat(new StringBuilder()).toString());
         assertEquals("6", si.getUsingLong(new StringBuilder()).toString());
         assertEquals("7.0", si.getUsingDouble(new StringBuilder()).toString());
@@ -169,26 +169,21 @@ public class DataValueGeneratorTest {
     public void testGetUsingStringFieldsWithStringBuilderHeapInstance() {
         DataValueGenerator dvg = new DataValueGenerator();
         GetUsingStringInterface si = dvg.heapInstance(GetUsingStringInterface.class);
-        si.setString("Hello world");
-        assertEquals("Hello world", si.getString());
-        StringBuilder builder = new StringBuilder();
-        si.getUsingString(builder);
-        assertEquals("Hello world", builder.toString());
+        si.setSomeStringField("Hello world");
+        si.setAnotherStringField("Hello world 2");
+        assertEquals("Hello world", si.getSomeStringField());
+        {
+            StringBuilder builder = new StringBuilder();
+            si.getUsingSomeStringField(builder);
+            assertEquals("Hello world", builder.toString());
+        }
+        {
+            StringBuilder builder = new StringBuilder();
+            si.getUsingAnotherStringField(builder);
+            assertEquals("Hello world 2", builder.toString());
+        }
     }
 
-
-    @Test
-    public void testGetUsingStringFieldsWithStringBuilderNativeInstance() {
-        DataValueGenerator dvg = new DataValueGenerator();
-        GetUsingStringInterface si = dvg.nativeInstance(GetUsingStringInterface.class);
-        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
-        ((Byteable) si).bytes(bytes, 0L);
-        si.setString("Hello world");
-        assertEquals("Hello world", si.getString());
-        StringBuilder builder = new StringBuilder();
-        si.getUsingString(builder);
-        assertEquals("Hello world", builder.toString());
-    }
 
 
     @Test

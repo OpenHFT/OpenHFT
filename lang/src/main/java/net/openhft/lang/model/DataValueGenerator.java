@@ -224,6 +224,7 @@ public class DataValueGenerator {
 //        System.out.println(sb);
         return sb.toString();
     }
+
     private static String simpleName(Class<?> type) {
         String name = type.getName();
         return name.substring(name.lastIndexOf('.') + 1);
@@ -835,7 +836,7 @@ public class DataValueGenerator {
                     " ));\n");
         } else {
 
-            result.append("     _bytes.position(_offset + STRING);\n");
+            result.append("     _bytes.position(_offset + ").append(name.toUpperCase()).append(");\n");
             result.append("     _bytes.").append(read).append(bytesType(type)).append("(builder);\n");
         }
 
