@@ -105,22 +105,9 @@ public class DataValueGeneratorTest {
         JavaBeanInterfaceGetUsing jbi = (JavaBeanInterfaceGetUsing) aClass.asSubclass(JavaBeanInterfaceGetUsing.class).newInstance();
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
         ((Byteable) jbi).bytes(bytes, 0L);
-        jbi.setByte((byte) 1);
-        jbi.setChar('2');
-        jbi.setShort((short) 3);
-        jbi.setInt(4);
-        jbi.setOrderedInt(4);
-        jbi.setFloat(5);
-        jbi.setLong(6);
-        jbi.setDouble(7);
+
         jbi.setString("G'day");
-        assertEquals("1", jbi.getUsingByte(new StringBuilder()).toString());
-        assertEquals("2", jbi.getUsingChar(new StringBuilder()).toString());
-        assertEquals("3", jbi.getUsingShort(new StringBuilder()).toString());
-        assertEquals("4", jbi.getUsingInt(new StringBuilder()).toString());
-        assertEquals("5.0", jbi.getUsingFloat(new StringBuilder()).toString());
-        assertEquals("6", jbi.getUsingLong(new StringBuilder()).toString());
-        assertEquals("7.0", jbi.getUsingDouble(new StringBuilder()).toString());
+
         assertEquals("G'day", jbi.getUsingString(new StringBuilder()).toString());
     }
 
@@ -129,21 +116,9 @@ public class DataValueGeneratorTest {
     public void testGenerateNativeWithGetUsingHeapInstance() {
         DataValueGenerator dvg = new DataValueGenerator();
         JavaBeanInterfaceGetUsingHeap si = dvg.heapInstance(JavaBeanInterfaceGetUsingHeap.class);
-        si.setByte((byte) 1);
-        si.setChar('2');
-        si.setShort((short) 3);
-        si.setIntValue(4);
-        si.setFloat(5);
-        si.setLong(6);
-        si.setDouble(7);
+
         si.setString("G'day");
-        assertEquals("1", si.getUsingByte(new StringBuilder()).toString());
-        assertEquals("2", si.getUsingChar(new StringBuilder()).toString());
-        assertEquals("3", si.getUsingShort(new StringBuilder()).toString());
-        assertEquals("4", si.getUsingIntValue(new StringBuilder()).toString());
-        assertEquals("5.0", si.getUsingFloat(new StringBuilder()).toString());
-        assertEquals("6", si.getUsingLong(new StringBuilder()).toString());
-        assertEquals("7.0", si.getUsingDouble(new StringBuilder()).toString());
+
         assertEquals("G'day", si.getUsingString(new StringBuilder()).toString());;
     }
 

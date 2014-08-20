@@ -25,44 +25,7 @@ import net.openhft.lang.model.constraints.MaxSize;
  */
 public interface JavaBeanInterfaceGetUsingHeap {
 
-    void setByte(byte b);
-
-    byte getByte();
-
-    StringBuilder getUsingByte(StringBuilder b);
-
-    void setShort(short s);
-
-
-    StringBuilder getUsingShort(StringBuilder b);
-
-    void setChar(char ch);
-
-
-    StringBuilder getUsingChar(StringBuilder b);
-
-    void setIntValue(int i);
-
-    StringBuilder getUsingIntValue(StringBuilder b);
-
-    void setFloat(float f);
-
-
-    StringBuilder getUsingFloat(StringBuilder b);
-
-    void setLong(long l);
-
-
-    StringBuilder getUsingLong(StringBuilder b);
-
-
-    void setDouble(double d);
-
-    StringBuilder getUsingDouble(StringBuilder b);
-
-
     void setString(@MaxSize(8) String s);
-
 
     StringBuilder getUsingString(StringBuilder b);
 }

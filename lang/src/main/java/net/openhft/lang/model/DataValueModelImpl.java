@@ -194,9 +194,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         for (Map.Entry<String, FieldModelImpl> entry : fieldModelMap.entrySet()) {
             FieldModelImpl model = entry.getValue();
-            if ((model.getter() == null && model.getUsing() == null) || (model.setter() == null &&
-                    model.getter().getReturnType()
-                            .isPrimitive()))
+            if ((model.getter() == null && model.getUsing() == null) || (model.setter() == null && model
+                    .getter()
+                    .getReturnType()
+                    .isPrimitive()))
                 if (model.volatileGetter() == null || (model.orderedSetter() == null && model.volatileGetter().getReturnType().isPrimitive()))
                     if (model.indexedGetter() == null || (model.indexedSetter() == null && model.indexedGetter().getReturnType().isPrimitive()))
                         if (model.volatileIndexedGetter() == null || (model.orderedIndexedSetter() == null && model.volatileIndexedGetter().getReturnType().isPrimitive()))

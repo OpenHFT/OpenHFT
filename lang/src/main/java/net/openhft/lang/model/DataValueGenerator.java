@@ -253,6 +253,10 @@ public class DataValueGenerator {
                 count++;
             }
 
+
+            Bytes b;
+
+
             if (model.isArray()) {
                 String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
                 if (model.isVolatile()) nameWithUpper = "Volatile" + nameWithUpper;
@@ -274,7 +278,9 @@ public class DataValueGenerator {
                 "        return ");
         for (int i = 1; i < count; i++)
             sb.append('(');
-        sb.append(hashCode);
+
+        sb.append(count == 0 ? "0" : hashCode);
+
         CharSequence simpleName = simpleName(dvmodel.type()).replace('$', '.');
         sb.append(";\n")
                 .append("    }\n")
@@ -301,7 +307,6 @@ public class DataValueGenerator {
 
     private static Method getUsing(FieldModel model) {
         Method getUsing = model.getUsing();
-        if (getUsing == null) getUsing = model.indexedGetter();
         return getUsing;
     }
 
@@ -450,7 +455,7 @@ public class DataValueGenerator {
         final CharSequence returnType = method.getReturnType() == void.class ? "void" : normalize(method
                 .getReturnType());
 
-        if (method.getParameterTypes().length != 1)
+        if (!type.equals(String.class) || method.getParameterTypes().length != 1)
             return;
 
         if (!StringBuilder.class.equals(method.getParameterTypes()[0]))
@@ -820,7 +825,7 @@ public class DataValueGenerator {
         if (!StringBuilder.class.equals(method.getParameterTypes()[0]))
             return;
 
-        if (!type.isPrimitive() && type != String.class)
+        if (type != String.class)
             return;
 
         final CharSequence returnType = method.getReturnType() == void.class ? "void" : normalize(method
@@ -830,15 +835,8 @@ public class DataValueGenerator {
                 .getName())
                 .append("(StringBuilder builder){\n");
 
-        if (type.isPrimitive()) {
-            result.append("builder.append(_bytes.").append(read).append(bytesType(type)).append("(_offset " +
-                    "+" + bytesType(type).toUpperCase() +
-                    " ));\n");
-        } else {
-
-            result.append("     _bytes.position(_offset + ").append(name.toUpperCase()).append(");\n");
-            result.append("     _bytes.").append(read).append(bytesType(type)).append("(builder);\n");
-        }
+        result.append("     _bytes.position(_offset + ").append(name.toUpperCase()).append(");\n");
+        result.append("     _bytes.").append(read).append(bytesType(type)).append("(builder);\n");
 
         if (method.getReturnType() != void.class) {
             result.append("     return builder;\n");

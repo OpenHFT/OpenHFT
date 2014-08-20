@@ -25,49 +25,9 @@ import net.openhft.lang.model.constraints.MaxSize;
  */
 public interface JavaBeanInterfaceGetUsing {
 
-    void setByte(byte b);
-
-    byte getByte();
-
-    StringBuilder getUsingByte(StringBuilder b);
-
-    void setShort(short s);
-
-
-    StringBuilder getUsingShort(StringBuilder b);
-
-    void setChar(char ch);
-
-
-    StringBuilder getUsingChar(StringBuilder b);
-
-    void setInt(int i);
-
-    int getVolatileInt();
-
-    void setOrderedInt(int i);
-
-
-    StringBuilder getUsingInt(StringBuilder b);
-
-    void setFloat(float f);
-
-
-    StringBuilder getUsingFloat(StringBuilder b);
-
-    void setLong(long l);
-
-
-    StringBuilder getUsingLong(StringBuilder b);
-
-
-    void setDouble(double d);
-
-    StringBuilder getUsingDouble(StringBuilder b);
 
 
     void setString(@MaxSize(8) String s);
-
 
     StringBuilder getUsingString(StringBuilder b);
 }

@@ -33,19 +33,16 @@ public interface JavaBeanInterface {
 
     byte getByte();
 
-    StringBuilder getUsingByte(StringBuilder b);
 
     void setShort(short s);
 
     short getShort();
 
-    StringBuilder getUsingShort(StringBuilder b);
 
     void setChar(char ch);
 
     char getChar();
 
-    StringBuilder getUsingChar(StringBuilder b);
 
     void setInt(int i);
 
@@ -55,25 +52,20 @@ public interface JavaBeanInterface {
 
     int getInt();
 
-    StringBuilder getUsingInt(StringBuilder b);
 
     void setFloat(float f);
 
     float getFloat();
 
-    StringBuilder getUsingFloat(StringBuilder b);
 
     void setLong(long l);
 
     long getLong();
 
-    StringBuilder getUsingLong(StringBuilder b);
 
     long addAtomicLong(long toAdd);
 
     void setDouble(double d);
-
-    StringBuilder getUsingDouble(StringBuilder b);
 
     double getDouble();
 
