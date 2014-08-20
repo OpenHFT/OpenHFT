@@ -371,6 +371,50 @@ public class ATSDirectBitSet implements DirectBitSet {
         return NOT_FOUND;
     }
 
+    private class SetBits implements Bits {
+        private long byteIndex = 0;
+        private final long byteLength = longLength << 3;
+        private long bitIndex = 0;
+
+        @Override
+        public long next() {
+            long bitIndex = this.bitIndex;
+            if (bitIndex >= 0) {
+                long i = byteIndex;
+                long l = bytes.readVolatileLong(i) >>> bitIndex;
+                if (l != 0) {
+                    int trailingZeros = Long.numberOfTrailingZeros(l);
+                    long index = bitIndex + trailingZeros;
+                    if (((this.bitIndex = index + 1) & 63) == 0) {
+                        if ((byteIndex = i + 8) == byteLength)
+                            this.bitIndex = -1;
+                    }
+                    return index;
+                }
+                for (long lim = byteLength; (i += 8) < lim;) {
+                    if ((l = bytes.readLong(i)) != 0) {
+                        int trailingZeros = Long.numberOfTrailingZeros(l);
+                        long index = (i << 3) + trailingZeros;
+                        if (((this.bitIndex = index + 1) & 63) != 0) {
+                            byteIndex = i;
+                        } else {
+                            if ((byteIndex = i + 8) == lim)
+                                this.bitIndex = -1;
+                        }
+                        return index;
+                    }
+                }
+            }
+            this.bitIndex = -1;
+            return -1;
+        }
+    }
+
+    @Override
+    public Bits setBits() {
+        return new SetBits();
+    }
+
     @Override
     public long clearNextSetBit(long fromIndex) {
         if (fromIndex < 0)

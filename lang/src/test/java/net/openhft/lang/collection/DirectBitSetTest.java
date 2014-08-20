@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static net.openhft.lang.collection.DirectBitSet.Bits;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -169,6 +170,22 @@ public class DirectBitSetTest {
 
         bs.clear();
         assertEquals(-1, bs.nextSetBit(0L));
+    }
+
+    @Test
+    public void testSetBitsIteration() {
+        setIndices();
+        int order = 0;
+        Bits bits = bs.setBits();
+        long i;
+        while ((i = bits.next()) >= 0) {
+            assertEquals(INDICES[order], i);
+            order++;
+        }
+        assertEquals(-1, bits.next());
+
+        bs.clear();
+        assertEquals(-1, bs.setBits().next());
     }
 
     @Test

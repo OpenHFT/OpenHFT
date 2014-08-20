@@ -528,4 +528,32 @@ public interface DirectBitSet extends ReferenceCounted {
      * @throws java.lang.IllegalArgumentException if {@code numberOfBits <= 0}
      */
     long clearPreviousNContinuousSetBits(long fromIndex, int numberOfBits);
+
+    /**
+     * An iteration of bits in a bit set.
+     *
+     * <p>Usage idiom: <pre>{@code
+     * Bits bits = bitSet.setBits();
+     * for (long bit; (bit = bits.next()) >= 0;) {
+     *     // do something with the bit
+     * }}</pre>
+     */
+    interface Bits {
+        /**
+         * Returns index of the next bit in the iteration,
+         * or {@code -1} if there are no more bits.
+         *
+         * @return index of the next bit in the iteration,
+         * or {@code -1} if there are no more bits
+         */
+        long next();
+    }
+
+    /**
+     * Returns an iteration of <i>set</i> bits in <i>direct</i> order
+     * (from 0 to the end of the bit set).
+     *
+     * @return an iteration of <i>set</i> bits in <i>direct</i> order
+     */
+    Bits setBits();
 }

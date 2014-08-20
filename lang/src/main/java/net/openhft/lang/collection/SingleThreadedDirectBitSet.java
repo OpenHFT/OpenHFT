@@ -426,6 +426,39 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         return NOT_FOUND;
     }
 
+    private class SetBits implements Bits {
+        private long byteIndex = 0;
+        private final long byteLength = longLength << 3;
+        private long bitIndex = -1;
+        private long currentWord = bytes.readLong(0);
+
+        @Override
+        public long next() {
+            long l;
+            if ((l = currentWord) != 0) {
+                int trailingZeros = Long.numberOfTrailingZeros(l);
+                currentWord = (l >>> trailingZeros) >>> 1;
+                return bitIndex += trailingZeros + 1;
+            }
+            for (long i = byteIndex, lim = byteLength; (i += 8) < lim;) {
+                if ((l = bytes.readLong(i)) != 0) {
+                    byteIndex = i;
+                    int trailingZeros = Long.numberOfTrailingZeros(l);
+                    currentWord = (l >>> trailingZeros) >>> 1;
+                    return bitIndex = (i << 3) + trailingZeros;
+                }
+            }
+            currentWord = 0;
+            byteIndex = byteLength;
+            return -1;
+        }
+    }
+
+    @Override
+    public Bits setBits() {
+        return new SetBits();
+    }
+
     @Override
     public long clearNextSetBit(long fromIndex) {
         if (fromIndex < 0)
