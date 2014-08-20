@@ -95,37 +95,31 @@ public class DataValueGeneratorTest {
         assertTrue(mi2.flag());
     }
 
+
     @Test
-    public void testGenerateNative() throws Exception {
-        String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterface.class);
+    public void testGenerateNativeWithGetUsing() throws Exception {
+        String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterfaceGetUsing.class);
         System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
-        Class aClass = cc.loadFromJava(JavaBeanInterface.class.getName() + "$$Native", actual);
-        JavaBeanInterface jbi = (JavaBeanInterface) aClass.asSubclass(JavaBeanInterface.class).newInstance();
+        Class aClass = cc.loadFromJava(JavaBeanInterfaceGetUsing.class.getName() + "$$Native", actual);
+        JavaBeanInterfaceGetUsing jbi = (JavaBeanInterfaceGetUsing) aClass.asSubclass(JavaBeanInterfaceGetUsing.class).newInstance();
         Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
         ((Byteable) jbi).bytes(bytes, 0L);
-        jbi.setByte((byte) 1);
-        jbi.setChar('2');
-        jbi.setShort((short) 3);
-        jbi.setInt(4);
-        jbi.setOrderedInt(4);
-        jbi.setFloat(5);
-        jbi.setLong(6);
-        jbi.setDouble(7);
-        jbi.setFlag(true);
-        assertEquals("", jbi.getString());
+
         jbi.setString("G'day");
-        assertEquals(1, jbi.getByte());
-        assertEquals('2', jbi.getChar());
-        assertEquals(3, jbi.getShort());
-        assertEquals(4, jbi.getInt());
-        assertEquals(4, jbi.getVolatileInt());
-        assertEquals(5.0, jbi.getFloat(), 0);
-        assertEquals(6, jbi.getLong());
-        assertEquals(7.0, jbi.getDouble(), 0.0);
-        assertTrue(jbi.getFlag());
-        assertEquals("G'day", jbi.getString());
-        assertEquals(42, ((Byteable) jbi).maxSize());
+
+        assertEquals("G'day", jbi.getUsingString(new StringBuilder()).toString());
+    }
+
+
+    @Test
+    public void testGenerateNativeWithGetUsingHeapInstance() {
+        DataValueGenerator dvg = new DataValueGenerator();
+        JavaBeanInterfaceGetUsingHeap si = dvg.heapInstance(JavaBeanInterfaceGetUsingHeap.class);
+
+        si.setString("G'day");
+
+        assertEquals("G'day", si.getUsingString(new StringBuilder()).toString());;
     }
 
 
@@ -144,6 +138,28 @@ public class DataValueGeneratorTest {
         assertEquals("Hello world £€", si2.getString());
         assertEquals("Hello world £€", si2.getText());
     }
+
+
+    @Test
+    public void testGetUsingStringFieldsWithStringBuilderHeapInstance() {
+        DataValueGenerator dvg = new DataValueGenerator();
+        GetUsingStringInterface si = dvg.heapInstance(GetUsingStringInterface.class);
+        si.setSomeStringField("Hello world");
+        si.setAnotherStringField("Hello world 2");
+        assertEquals("Hello world", si.getSomeStringField());
+        {
+            StringBuilder builder = new StringBuilder();
+            si.getUsingSomeStringField(builder);
+            assertEquals("Hello world", builder.toString());
+        }
+        {
+            StringBuilder builder = new StringBuilder();
+            si.getUsingAnotherStringField(builder);
+            assertEquals("Hello world 2", builder.toString());
+        }
+    }
+
+
 
     @Test
     public void testNested() {

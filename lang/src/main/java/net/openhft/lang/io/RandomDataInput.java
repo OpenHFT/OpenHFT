@@ -728,7 +728,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     String readUTFΔ();
 
     /**
-     * The same as readUTFΔ() except an offset and maximum length is given.
+     * The same as readUTFΔ() except an offset is given.
      *
      * @param offset to read from
      * @return a Unicode string or <code>null</code> if <code>writeUTFΔ(null)</code> was called

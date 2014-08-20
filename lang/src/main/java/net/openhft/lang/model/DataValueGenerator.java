@@ -28,18 +28,9 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * User: peter.lawrey
- * Date: 06/10/13
- * Time: 19:17
- */
 public class DataValueGenerator {
     private static final Comparator<Class> COMPARATOR = new Comparator<Class>() {
         @Override
@@ -94,19 +85,20 @@ public class DataValueGenerator {
 
             Method setter = getSetter(model);
             Method getter = getGetter(model);
+            Method getUsing = getUsing(model);
 
             boolean bothVolatileAndPlain = false;
 
             final Method orderedSetter = getOrderedSetter(model);
             final Method volatileGetter = getVolatileGetter(model);
 
-            if(getter != null && volatileGetter != null){
+            if (getter != null && volatileGetter != null) {
                 bothVolatileAndPlain = true;
             }
-            if(setter == null && orderedSetter != null){
+            if (setter == null && orderedSetter != null) {
                 setter = orderedSetter;
             }
-            if(getter==null && volatileGetter!= null){
+            if (getter == null && volatileGetter != null) {
                 getter = volatileGetter;
             }
 
@@ -121,11 +113,14 @@ public class DataValueGenerator {
             if (getter != null)
                 methodHeapGet(getterSetters, getter, name, type, model);
 
+            if (getUsing != null && (type == String.class || type.isPrimitive()) && !model.isArray())
+                methodHeapGetUsingWithStringBuilder(getterSetters, getUsing, name, type, model);
+
             //In the case where there are both volatile and plain gets and sets they need to be written here
             //If there is just a volatile get and set it would have been written above.
-             if(bothVolatileAndPlain){
+            if (bothVolatileAndPlain) {
                 methodHeapGet(getterSetters, volatileGetter, name, type, model);
-                 methodHeapSet(getterSetters, orderedSetter, name, type, model);
+                methodHeapSet(getterSetters, orderedSetter, name, type, model);
             }
 
 
@@ -248,7 +243,7 @@ public class DataValueGenerator {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
             Method getter = getGetter(model);
-            if(getter==null)getter=getVolatileGetter(model);
+            if (getter == null) getter = getVolatileGetter(model);
 
             if (getter != null) {
                 String getterName = getter.getName();
@@ -258,9 +253,13 @@ public class DataValueGenerator {
                 count++;
             }
 
+
+            Bytes b;
+
+
             if (model.isArray()) {
                 String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-                if(model.isVolatile())nameWithUpper = "Volatile" + nameWithUpper;
+                if (model.isVolatile()) nameWithUpper = "Volatile" + nameWithUpper;
                 sb.append("\n    public long longHashCode_" + name + "() {\n" +
                         "        long hc = 0;\n" +
                         "        for (int i = 0; i < " + model.indexSize().value() + "; i++) {\n" +
@@ -279,7 +278,9 @@ public class DataValueGenerator {
                 "        return ");
         for (int i = 1; i < count; i++)
             sb.append('(');
-        sb.append(hashCode);
+
+        sb.append(count == 0 ? "0" : hashCode);
+
         CharSequence simpleName = simpleName(dvmodel.type()).replace('$', '.');
         sb.append(";\n")
                 .append("    }\n")
@@ -304,10 +305,15 @@ public class DataValueGenerator {
     }
 
 
+    private static Method getUsing(FieldModel model) {
+        Method getUsing = model.getUsing();
+        return getUsing;
+    }
+
     private static Method getGetter(FieldModel model) {
         Method getter = model.getter();
         if (getter == null) getter = model.indexedGetter();
-       return getter;
+        return getter;
     }
 
     private static Method getVolatileGetter(FieldModel model) {
@@ -325,7 +331,7 @@ public class DataValueGenerator {
 
     private static Method getOrderedSetter(FieldModel model) {
         Method setter = model.orderedSetter();
-        if (setter == null)setter = model.orderedIndexedSetter();
+        if (setter == null) setter = model.orderedIndexedSetter();
 
         return setter;
     }
@@ -443,9 +449,34 @@ public class DataValueGenerator {
         getterSetters.append("    }\n\n");
     }
 
+
+    private static void methodHeapGetUsingWithStringBuilder(StringBuilder result, Method method, String name, Class type, FieldModel model) {
+
+        final CharSequence returnType = method.getReturnType() == void.class ? "void" : normalize(method
+                .getReturnType());
+
+        if (!type.equals(String.class) || method.getParameterTypes().length != 1)
+            return;
+
+        if (!StringBuilder.class.equals(method.getParameterTypes()[0]))
+            return;
+
+        result.append("    public ").append(returnType).append(' ').append(method
+                .getName())
+                .append("(StringBuilder builder){\n");
+
+        result.append("        builder.append(_" + name + ");\n");
+
+        if (method.getReturnType() != void.class)
+            result.append("        return builder;\n");
+
+        result.append("    }\n\n");
+    }
+
+
     private static void heapFieldDeclarations(StringBuilder fieldDeclarations, Class type, String name, FieldModel model) {
         String vol = "";
-        if (model.isVolatile())vol = "volatile ";
+        if (model.isVolatile()) vol = "volatile ";
 
         if (!model.isArray()) {
             fieldDeclarations.append("    private ").append(vol).append(normalize(type)).append(" _").append(name).append(";\n");
@@ -583,12 +614,13 @@ public class DataValueGenerator {
             String NAME = "_offset + " + name.toUpperCase();
             final Method setter = getSetter(model);
             final Method getter = getGetter(model);
+            final Method getUsing = getUsing(model);
 
             final Method orderedSetter = getOrderedSetter(model);
             final Method volatileGetter = getVolatileGetter(model);
 
             final Method defaultSetter = setter != null ? setter : orderedSetter;
-            final Method defaultGetter = getter!= null ? getter : volatileGetter;
+            final Method defaultGetter = getter != null ? getter : volatileGetter;
 
             if (dvmodel.isScalar(type)) {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
@@ -597,6 +629,8 @@ public class DataValueGenerator {
                     methodSet(getterSetters, setter, type, NAME, model, false);
                 if (getter != null)
                     methodGet(getterSetters, getter, type, NAME, model, false);
+                if (getUsing != null)
+                    methodGetUsingWithStringBuilder(getterSetters, getUsing, type, false, name);
 
                 if (orderedSetter != null)
                     methodSet(getterSetters, orderedSetter, type, NAME, model, true);
@@ -741,7 +775,7 @@ public class DataValueGenerator {
     private void methodSet(StringBuilder getterSetters, Method setter, Class type, String NAME, FieldModel model, boolean isVolatile) {
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length - 1];
         String write = "write";
-        if(isVolatile) write = "writeOrdered";
+        if (isVolatile) write = "writeOrdered";
 
         if (!model.isArray()) {
             getterSetters.append("\n\n    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
@@ -762,7 +796,7 @@ public class DataValueGenerator {
 
     private void methodGet(StringBuilder getterSetters, Method getter, Class type, String NAME, FieldModel model, boolean isVolatile) {
         String read = "read";
-        if(isVolatile) read = "readVolatile";
+        if (isVolatile) read = "readVolatile";
 
         if (!model.isArray()) {
             getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("() {\n");
@@ -778,6 +812,39 @@ public class DataValueGenerator {
         }
         getterSetters.append("    }\n\n");
     }
+
+
+    private static void methodGetUsingWithStringBuilder(StringBuilder result, Method method, Class type, boolean isVolatile, String name) {
+
+        String read = "read";
+        if (isVolatile) read = "readVolatile";
+
+        if (method.getParameterTypes().length != 1)
+            return;
+
+        if (!StringBuilder.class.equals(method.getParameterTypes()[0]))
+            return;
+
+        if (type != String.class)
+            return;
+
+        final CharSequence returnType = method.getReturnType() == void.class ? "void" : normalize(method
+                .getReturnType());
+
+        result.append("    public ").append(returnType).append(' ').append(method
+                .getName())
+                .append("(StringBuilder builder){\n");
+
+        result.append("     _bytes.position(_offset + ").append(name.toUpperCase()).append(");\n");
+        result.append("     _bytes.").append(read).append(bytesType(type)).append("(builder);\n");
+
+        if (method.getReturnType() != void.class) {
+            result.append("     return builder;\n");
+        }
+        result.append("    }\n\n");
+
+    }
+
 
     private void methodNonScalarWriteMarshall(StringBuilder writeMarshal, String name, FieldModel model) {
         if (!model.isArray()) {

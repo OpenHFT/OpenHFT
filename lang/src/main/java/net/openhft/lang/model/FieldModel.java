@@ -46,6 +46,7 @@ public interface FieldModel<T> {
 
     Method orderedIndexedSetter();
 
+    Method getUsing();
 
     Method adder();
 

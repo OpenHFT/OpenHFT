@@ -26,8 +26,6 @@ import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
 import net.openhft.lang.pool.StringInterner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -38,6 +36,8 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
@@ -66,7 +66,7 @@ public abstract class AbstractBytes implements Bytes {
         INT_LOCK_MASK = 0xFFFFFF;
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBytes.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
     private static final byte[] Infinity = "Infinity".getBytes();
@@ -181,7 +181,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private static void warnIdLimit(long id) {
-        LOGGER.warn("High thread id may result in collisions id: {}", id);
+        LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
 
         ID_LIMIT_WARNED = true;
     }
@@ -2037,16 +2037,21 @@ public abstract class AbstractBytes implements Bytes {
             if (tryLockNanos8a(offset, id))
                 return true;
         } while (end0 > System.nanoTime() && !currentThread().isInterrupted());
+
         long end = start + nanos - SLEEP_THRESHOLD;
-        LOGGER.trace(Thread.currentThread().getName() + ", waiting for lock");
+        if(LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.log(Level.FINE, Thread.currentThread().getName() + ", waiting for lock");
+        }
+
         try {
             do {
                 if (tryLockNanos8a(offset, id)) {
                     long millis = (System.nanoTime() - start) / 1000000;
                     if (millis > 100) {
-                        LOGGER.warn(Thread.currentThread().getName() +
-                                        ", to obtain a lock took " +
-                                        millis / 1e3 + " seconds"
+                        LOGGER.log(Level.WARNING,
+                            Thread.currentThread().getName() +
+                            ", to obtain a lock took " +
+                            millis / 1e3 + " seconds"
                         );
                     }
                     return true;
@@ -2068,7 +2073,7 @@ public abstract class AbstractBytes implements Bytes {
         if (lockedId == 0) {
             int count = (int) (currentValue >>> 48);
             if (count != 0)
-                LOGGER.warn("Lock held by threadId 0 !?");
+                LOGGER.log(Level.WARNING, "Lock held by threadId 0 !?");
             return compareAndSwapLong(offset, currentValue, firstValue);
         }
         if (lockedId == id) {
@@ -2122,7 +2127,7 @@ public abstract class AbstractBytes implements Bytes {
             currentValue -= 1 << 24;
             writeOrderedInt(offset, (int) currentValue);
         } else if (currentValue == 0) {
-            LOGGER.warn("No thread holds this lock, threadId: {}", shortThreadId());
+            LOGGER.log(Level.WARNING, "No thread holds this lock, threadId: " + shortThreadId());
         } else {
             throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
@@ -2430,10 +2435,15 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String toString() {
-        char[] chars = new char[(int) remaining()];
+        long remaining = remaining();
+        if (remaining < 0 || remaining > 1L << 48)
+            return "invalid remaining: "+remaining();
+        if (remaining > 1 << 20)
+            remaining = 1 << 20;
+        char[] chars = new char[(int) remaining];
         long pos = position();
-        for (long i = pos; i < limit(); i++) {
-            chars[((int) (i - pos))] = (char) readUnsignedByte(i);
+        for (int i = 0; i < remaining; i++) {
+            chars[i] = (char) readUnsignedByte(i+pos);
         }
         return new String(chars);
     }

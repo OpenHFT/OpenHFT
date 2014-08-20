@@ -18,11 +18,6 @@ package net.openhft.lang.model;
 
 import net.openhft.lang.model.constraints.MaxSize;
 
-/**
- * User: peter.lawrey
- * Date: 06/10/13
- * Time: 16:59
- */
 public interface JavaBeanInterface {
     void busyLockRecord() throws InterruptedException;
 
@@ -38,13 +33,16 @@ public interface JavaBeanInterface {
 
     byte getByte();
 
+
     void setShort(short s);
 
     short getShort();
 
+
     void setChar(char ch);
 
     char getChar();
+
 
     void setInt(int i);
 
@@ -54,13 +52,16 @@ public interface JavaBeanInterface {
 
     int getInt();
 
+
     void setFloat(float f);
 
     float getFloat();
 
+
     void setLong(long l);
 
     long getLong();
+
 
     long addAtomicLong(long toAdd);
 
@@ -73,4 +74,6 @@ public interface JavaBeanInterface {
     void setString(@MaxSize(8) String s);
 
     String getString();
+
+    StringBuilder getUsingString(StringBuilder b);
 }

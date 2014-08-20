@@ -16,9 +16,6 @@
 package net.openhft.lang.io;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class VanillaMappedCache<T> implements Closeable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(VanillaMappedCache.class);
-
     private final boolean cleanOnClose;
     private final Map<T,VanillaMappedBytes> cache;
 
@@ -68,30 +63,25 @@ public class VanillaMappedCache<T> implements Closeable {
         return this.cache.get(key);
     }
 
-    public VanillaMappedBytes put(T key, File path, long size) {
+    public VanillaMappedBytes put(T key, File path, long size) throws IOException {
         return put(key,path,size,-1);
     }
 
-    public VanillaMappedBytes put(T key, File path, long size, long index) {
+    public VanillaMappedBytes put(T key, File path, long size, long index) throws IOException {
         VanillaMappedBytes data = this.cache.get(key);
 
-        try {
-            if(data != null) {
-                if (!data.unmapped()) {
-                    data.cleanup();
+        if(data != null) {
+            if (!data.unmapped()) {
+                data.cleanup();
 
-                    throw new IllegalStateException(
-                        "Buffer at " + data.index() + " has a count of " + + data.refCount()
-                    );
-                }
+                throw new IllegalStateException(
+                    "Buffer at " + data.index() + " has a count of " + + data.refCount()
+                );
             }
-
-            data = VanillaMappedFile.readWriteBytes(path,size,index);
-
-            this.cache.put(key,data);
-        } catch(IOException e) {
-            LOGGER.warn("",e);
         }
+
+        data = VanillaMappedFile.readWriteBytes(path,size,index);
+        this.cache.put(key,data);
 
         return data;
     }
