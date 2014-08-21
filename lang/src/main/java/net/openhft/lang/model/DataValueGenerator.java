@@ -113,8 +113,15 @@ public class DataValueGenerator {
             if (getter != null)
                 methodHeapGet(getterSetters, getter, name, type, model);
 
-            if (getUsing != null && (type == String.class || type.isPrimitive()) && !model.isArray())
+            if (getUsing != null && type == String.class && !model.isArray()) {
                 methodHeapGetUsingWithStringBuilder(getterSetters, getUsing, name, type, model);
+
+                // we have to add in the getter method as its required for the equals() and hashCode()
+                if (getter == null && volatileGetter == null) {
+                    String getterName = getterName(getUsing);
+                    methodHeapGet(getterSetters, name, type, getterName);
+                }
+            }
 
             //In the case where there are both volatile and plain gets and sets they need to be written here
             //If there is just a volatile get and set it would have been written above.
@@ -190,7 +197,8 @@ public class DataValueGenerator {
         for (Class aClass : imported) {
             sb.append("import ").append(normalize(aClass)).append(";\n");
         }
-        sb.append("\npublic class ").append(simpleName(dvmodel.type()))
+        String className = simpleName(dvmodel.type());
+        sb.append("\npublic class ").append(className)
                 .append("$$Heap implements ").append(dvmodel.type().getSimpleName())
                 .append(", BytesMarshallable, Copyable<").append(normalize(dvmodel.type())).append(">  {\n");
         sb.append(fieldDeclarations).append('\n');
@@ -238,18 +246,28 @@ public class DataValueGenerator {
         int count = 0;
         StringBuilder hashCode = new StringBuilder();
         StringBuilder equals = new StringBuilder();
+        StringBuilder equalsGetUsing = new StringBuilder();
+        StringBuilder toStringGetUsing = new StringBuilder();
+        StringBuilder getUsingEquals = new StringBuilder();
         StringBuilder toString = new StringBuilder();
         for (Map.Entry<String, FieldModel> entry : entries) {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
             Method getter = getGetter(model);
+            Method getUsing = getUsing(model);
+
             if (getter == null) getter = getVolatileGetter(model);
 
-            if (getter != null) {
-                String getterName = getter.getName();
+            if (getter != null || getUsing != null) {
+                String getterName = (getter == null) ? getterName(getUsing) : getter.getName();
                 methodLongHashCode(hashCode, getterName, model, count);
-                methodEquals(equals, getterName, model);
-                methodToString(toString, getterName, name, model);
+
+                if (getter != null)
+                    methodEquals(equals, getterName, model, simpleName(dvmodel.type()));
+                else {
+                    methodEqualsGetUsing(getUsingEquals, getUsing.getName());
+                    methodToStringGetUsing(toStringGetUsing, getUsing.getName(), name, model);
+                }
                 count++;
             }
 
@@ -279,7 +297,7 @@ public class DataValueGenerator {
         for (int i = 1; i < count; i++)
             sb.append('(');
 
-        sb.append(count == 0 ? "0" : hashCode);
+        sb.append(hashCode);
 
         CharSequence simpleName = simpleName(dvmodel.type()).replace('$', '.');
         sb.append(";\n")
@@ -291,6 +309,7 @@ public class DataValueGenerator {
                 .append("        ").append(simpleName).append(" that = (").append(simpleName).append(") o;\n")
                 .append("\n")
                 .append(equals)
+                .append(equalsGetUsing)
                 .append("        return true;\n")
                 .append("    }\n")
                 .append("\n");
@@ -299,6 +318,7 @@ public class DataValueGenerator {
                 .append("        StringBuilder sb = new StringBuilder();\n")
                 .append("        sb.append(\"").append(simpleName).append("{ \");\n")
                 .append(toString)
+                .append(toStringGetUsing)
                 .append("        sb.append(\" }\");\n")
                 .append("        return sb.toString();\n")
                 .append("    }\n");
@@ -391,7 +411,13 @@ public class DataValueGenerator {
         }
     }
 
-    private static void methodEquals(StringBuilder equals, String getterName, FieldModel model) {
+
+    private static void methodEqualsGetUsing(StringBuilder equals, String getterName) {
+        equals.append("        if(!isEqual(").append(getterName).append("(new StringBuilder()).toString(), that.").append(getterName).append("new StringBuilder().toString())) return false;\n");
+    }
+
+
+    private static void methodEquals(StringBuilder equals, String getterName, FieldModel model, String className) {
         if (!model.isArray()) {
             equals.append("        if(!isEqual(").append(getterName).append("(), that.").append(getterName).append("())) return false;\n");
         } else {
@@ -399,6 +425,13 @@ public class DataValueGenerator {
             equals.append("            if(!isEqual(").append(getterName).append("(i), that.").append(getterName).append("(i))) return false;\n");
             equals.append("        }\n");
         }
+    }
+
+
+    private static void methodToStringGetUsing(StringBuilder toString, String getterName, String name, FieldModel model) {
+
+        toString.append("            sb.append(\"").append(name).append("= \").append(").append(getterName).append("(new StringBuilder()));\n");
+
     }
 
     private static void methodToString(StringBuilder toString, String getterName, String name, FieldModel model) {
@@ -446,6 +479,14 @@ public class DataValueGenerator {
             getterSetters.append(boundsCheck(model.indexSize().value()));
             getterSetters.append("        return _").append(name).append("[i];\n");
         }
+        getterSetters.append("    }\n\n");
+    }
+
+
+    private static void methodHeapGet(StringBuilder getterSetters, String name, Class type, String getterName) {
+
+        getterSetters.append("    public ").append(normalize(type)).append(' ').append(getterName).append("() {\n");
+        getterSetters.append("        return _").append(name).append(";\n");
         getterSetters.append("    }\n\n");
     }
 
@@ -629,8 +670,15 @@ public class DataValueGenerator {
                     methodSet(getterSetters, setter, type, NAME, model, false);
                 if (getter != null)
                     methodGet(getterSetters, getter, type, NAME, model, false);
-                if (getUsing != null)
+                if (getUsing != null) {
                     methodGetUsingWithStringBuilder(getterSetters, getUsing, type, false, name);
+
+                    // we have to add in the getter method as its required for the equals() and hashCode()
+                    if (getter == null && volatileGetter == null) {
+                        String getterName = getterName(getUsing);
+                        methodGet(getterSetters, type, NAME, false, getterName);
+                    }
+                }
 
                 if (orderedSetter != null)
                     methodSet(getterSetters, orderedSetter, type, NAME, model, true);
@@ -764,6 +812,16 @@ public class DataValueGenerator {
         return sb.toString();
     }
 
+    /**
+     * gets the getter name based on the getUsing
+     */
+    private static String getterName(Method getUsingMethod) {
+        String name = getUsingMethod.getName();
+        if (!name.startsWith("getUsing"))
+            throw new IllegalArgumentException("expected the getUsingXX method to start with the text 'getUsing'.");
+        return "get" + name.substring("getUsing".length());
+    }
+
     public boolean isDumpCode() {
         return dumpCode;
     }
@@ -791,6 +849,15 @@ public class DataValueGenerator {
         if (CharSequence.class.isAssignableFrom(type))
             getterSetters.append(model.size().value()).append(", ");
         getterSetters.append("$);\n");
+        getterSetters.append("    }\n\n");
+    }
+
+
+    private void methodGet(StringBuilder getterSetters, Class type, String NAME, boolean isVolatile, String name) {
+        String read = "read";
+        if (isVolatile) read = "readVolatile";
+        getterSetters.append("    public ").append(normalize(type)).append(' ').append(name).append("() {\n");
+        getterSetters.append("        return _bytes.").append(read).append(bytesType(type)).append("(").append(NAME).append(");\n");
         getterSetters.append("    }\n\n");
     }
 
