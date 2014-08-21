@@ -189,4 +189,9 @@ public class DataValueGeneratorTest {
         assertEquals(nestedB1.hashCode(), nestedA.one().hashCode());
         assertEquals(nestedB2.hashCode(), nestedA.two().hashCode());
     }
+
+
 }
+
+
+
