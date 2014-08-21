@@ -278,6 +278,12 @@
                 <version>1.9.5</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value</artifactId>
+                <version>1.0-rc1</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
