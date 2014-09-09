@@ -29,8 +29,10 @@
         <module>Java-Thread-Affinity</module>
         <module>Java-Runtime-Compiler</module>
         <module>Java-Lang</module>
-        <module>Java-Chronicle</module>
         <module>HugeCollections</module>
         <module>SAXophone</module>
+        <module>Chronicle-Map</module>
+        <module>Chronicle-Queue</module>
+        <module>TransFIX</module>
     </modules>
 </project>
