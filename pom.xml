@@ -33,6 +33,7 @@
         <module>SAXophone</module>
         <module>Chronicle-Map</module>
         <module>Chronicle-Queue</module>
+        <module>Chronicle-Logger</module>
         <module>TransFIX</module>
     </modules>
 </project>
