@@ -85,21 +85,27 @@ public abstract class AbstractBytes implements Bytes {
     private static final int INT_MAX_VALUE = Integer.MIN_VALUE + 2;
     private static final long MAX_VALUE_DIVIDE_10 = Long.MAX_VALUE / 10;
     private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
+    private static final ThreadLocal<StringBuilder> utfReaderTL = new ThreadLocal<StringBuilder>();
+    private static final ThreadLocal<DateCache> dateCacheTL = new ThreadLocal<DateCache>();
     private static boolean ID_LIMIT_WARNED = false;
     final AtomicInteger refCount;
     protected boolean finished;
     private StringInterner stringInterner = null;
-    private BytesInputStream inputStream = null;
-    private BytesOutputStream outputStream = null;
-    private StringBuilder utfReader = null;
-    private SimpleDateFormat dateFormat = null;
-    private long lastDay = Long.MIN_VALUE;
-    @Nullable
-    private byte[] lastDateStr = null;
     private Thread currentThread;
     private int shortThreadId = Integer.MIN_VALUE;
     private boolean selfTerminating = false;
     ObjectSerializer objectSerializer;
+
+    static class DateCache {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        private long lastDay = Long.MIN_VALUE;
+        @Nullable
+        private byte[] lastDateStr = null;
+
+        DateCache() {
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        }
+    }
 
     AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
@@ -342,14 +348,17 @@ public abstract class AbstractBytes implements Bytes {
     @Nullable
     @Override
     public String readUTFΔ() {
-        if (readUTFΔ(acquireUtfReader()))
+        StringBuilder utfReader = acquireUtfReader();
+        if (readUTFΔ(utfReader))
             return utfReader.length() == 0 ? "" : stringInterner().intern(utfReader);
         return null;
     }
 
+    // locking at it temporarily changes position.
+    // todo write a version without changing the position.
     @Nullable
     @Override
-    public String readUTFΔ(long offset) throws IllegalStateException {
+    public synchronized String readUTFΔ(long offset) throws IllegalStateException {
         long position = position();
         try {
             position(offset);
@@ -361,8 +370,9 @@ public abstract class AbstractBytes implements Bytes {
 
     @NotNull
     private StringBuilder acquireUtfReader() {
+        StringBuilder utfReader = utfReaderTL.get();
         if (utfReader == null)
-            utfReader = new StringBuilder(128);
+            utfReaderTL.set(utfReader = new StringBuilder(128));
         else
             utfReader.setLength(0);
         return utfReader;
@@ -464,7 +474,8 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String parseUTF(@NotNull StopCharTester tester) {
-        parseUTF(acquireUtfReader(), tester);
+        StringBuilder utfReader = acquireUtfReader();
+        parseUTF(utfReader, tester);
         return stringInterner().intern(utfReader);
     }
 
@@ -567,7 +578,8 @@ public abstract class AbstractBytes implements Bytes {
     public String readUTF() {
         try {
             int len = readUnsignedShort();
-            readUTF0(acquireUtfReader(), len);
+            StringBuilder utfReader = acquireUtfReader();
+            readUTF0(utfReader, len);
             return utfReader.length() == 0 ? "" : stringInterner().intern(utfReader);
         } catch (IOException unexpected) {
             throw new AssertionError(unexpected);
@@ -792,22 +804,24 @@ public abstract class AbstractBytes implements Bytes {
         writeUTF0(str, strlen);
     }
 
+    // locking at it temporarily changes position.
+    // todo write a version without changing the position.
     @Override
-    public void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException {
+    public synchronized void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException {
         assert maxSize > 1;
-        if (s == null) {
-            position(offset);
-            writeStopBit(-1);
-            return;
-        }
-        long strlen = s.length();
-        long utflen = findUTFLength(s, strlen);
-        long totalSize = IOTools.stopBitLength(utflen) + utflen;
-        if (totalSize > maxSize)
-            throw new IllegalStateException("Attempted to write " + totalSize + " byte String, when only " + maxSize + " allowed");
         long position = position();
         try {
             position(offset);
+            if (s == null) {
+                writeStopBit(-1);
+                return;
+            }
+            long strlen = s.length();
+            long utflen = findUTFLength(s, strlen);
+            long totalSize = IOTools.stopBitLength(utflen) + utflen;
+            if (totalSize > maxSize)
+                throw new IllegalStateException("Attempted to write " + totalSize + " byte String, when only " + maxSize + " allowed");
+
             writeStopBit(utflen);
             writeUTF0(s, strlen);
         } finally {
@@ -1161,18 +1175,18 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public ByteStringAppender appendDateMillis(long timeInMS) {
-        if (dateFormat == null) {
-            dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        DateCache dateCache = dateCacheTL.get();
+        if (dateCache == null) {
+            dateCacheTL.set(dateCache = new DateCache());
         }
         long date = timeInMS / 86400000;
-        if (lastDay != date) {
-            lastDateStr = dateFormat.format(new Date(timeInMS)).getBytes(ISO_8859_1);
-            lastDay = date;
+        if (dateCache.lastDay != date) {
+            dateCache.lastDateStr = dateCache.dateFormat.format(new Date(timeInMS)).getBytes(ISO_8859_1);
+            dateCache.lastDay = date;
         } else {
-            assert lastDateStr != null;
+            assert dateCache.lastDateStr != null;
         }
-        write(lastDateStr);
+        write(dateCache.lastDateStr);
         return this;
     }
 
@@ -1704,17 +1718,13 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public InputStream inputStream() {
-        if (inputStream == null)
-            inputStream = new BytesInputStream();
-        return inputStream;
+        return new BytesInputStream();
     }
 
     @NotNull
     @Override
     public OutputStream outputStream() {
-        if (outputStream == null)
-            outputStream = new BytesOutputStream();
-        return outputStream;
+        return new BytesOutputStream();
     }
 
     @NotNull
@@ -2039,7 +2049,7 @@ public abstract class AbstractBytes implements Bytes {
         } while (end0 > System.nanoTime() && !currentThread().isInterrupted());
 
         long end = start + nanos - SLEEP_THRESHOLD;
-        if(LOGGER.isLoggable(Level.FINE)) {
+        if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(Level.FINE, Thread.currentThread().getName() + ", waiting for lock");
         }
 
@@ -2049,9 +2059,9 @@ public abstract class AbstractBytes implements Bytes {
                     long millis = (System.nanoTime() - start) / 1000000;
                     if (millis > 100) {
                         LOGGER.log(Level.WARNING,
-                            Thread.currentThread().getName() +
-                            ", to obtain a lock took " +
-                            millis / 1e3 + " seconds"
+                                Thread.currentThread().getName() +
+                                        ", to obtain a lock took " +
+                                        millis / 1e3 + " seconds"
                         );
                     }
                     return true;
@@ -2437,13 +2447,13 @@ public abstract class AbstractBytes implements Bytes {
     public String toString() {
         long remaining = remaining();
         if (remaining < 0 || remaining > 1L << 48)
-            return "invalid remaining: "+remaining();
+            return "invalid remaining: " + remaining();
         if (remaining > 1 << 20)
             remaining = 1 << 20;
         char[] chars = new char[(int) remaining];
         long pos = position();
         for (int i = 0; i < remaining; i++) {
-            chars[i] = (char) readUnsignedByte(i+pos);
+            chars[i] = (char) readUnsignedByte(i + pos);
         }
         return new String(chars);
     }
