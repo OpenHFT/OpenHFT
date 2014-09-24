@@ -396,16 +396,17 @@ public abstract class AbstractBytes implements Bytes {
         if (len == -1)
             return false;
         int utflen = (int) len;
-        readUTF0(appendable, utflen);
+        readUTF0(this, appendable, utflen);
         return true;
     }
 
-    private void readUTF0(@NotNull Appendable appendable, int utflen) throws IOException {
+    public static void readUTF0(Bytes bytes, @NotNull Appendable appendable, int utflen)
+            throws IOException {
         int count = 0;
         while (count < utflen) {
-            int c = readUnsignedByteOrThrow();
+            int c = bytes.readUnsignedByteOrThrow();
             if (c >= 128) {
-                position(position() - 1);
+                bytes.position(bytes.position() - 1);
                 break;
             } else if (c < 0) {
 
@@ -415,7 +416,7 @@ public abstract class AbstractBytes implements Bytes {
         }
 
         while (count < utflen) {
-            int c = readUnsignedByte();
+            int c = bytes.readUnsignedByte();
             switch (c >> 4) {
                 case 0:
                 case 1:
@@ -436,7 +437,7 @@ public abstract class AbstractBytes implements Bytes {
                     if (count > utflen)
                         throw new UTFDataFormatException(
                                 "malformed input: partial character at end");
-                    int char2 = readUnsignedByte();
+                    int char2 = bytes.readUnsignedByte();
                     if ((char2 & 0xC0) != 0x80)
                         throw new UTFDataFormatException(
                                 "malformed input around byte " + count);
@@ -451,8 +452,8 @@ public abstract class AbstractBytes implements Bytes {
                     if (count > utflen)
                         throw new UTFDataFormatException(
                                 "malformed input: partial character at end");
-                    int char2 = readUnsignedByte();
-                    int char3 = readUnsignedByte();
+                    int char2 = bytes.readUnsignedByte();
+                    int char3 = bytes.readUnsignedByte();
 
                     if (((char2 & 0xC0) != 0x80) || ((char3 & 0xC0) != 0x80))
                         throw new UTFDataFormatException(
@@ -579,7 +580,7 @@ public abstract class AbstractBytes implements Bytes {
         try {
             int len = readUnsignedShort();
             StringBuilder utfReader = acquireUtfReader();
-            readUTF0(utfReader, len);
+            readUTF0(this, utfReader, len);
             return utfReader.length() == 0 ? "" : stringInterner().intern(utfReader);
         } catch (IOException unexpected) {
             throw new AssertionError(unexpected);
@@ -786,10 +787,11 @@ public abstract class AbstractBytes implements Bytes {
     public void writeUTF(@NotNull String str) {
         long strlen = str.length();
         long utflen = findUTFLength(str, strlen);
+        checkUFTLength(utflen);
         if (utflen > 65535)
             throw new IllegalStateException("String too long " + utflen + " when encoded, max: 65535");
         writeUnsignedShort((int) utflen);
-        writeUTF0(str, strlen);
+        writeUTF0(this, str, strlen);
     }
 
     @Override
@@ -800,8 +802,9 @@ public abstract class AbstractBytes implements Bytes {
         }
         long strlen = str.length();
         long utflen = findUTFLength(str, strlen);
+        checkUFTLength(utflen);
         writeStopBit(utflen);
-        writeUTF0(str, strlen);
+        writeUTF0(this, str, strlen);
     }
 
     // locking at it temporarily changes position.
@@ -823,7 +826,7 @@ public abstract class AbstractBytes implements Bytes {
                 throw new IllegalStateException("Attempted to write " + totalSize + " byte String, when only " + maxSize + " allowed");
 
             writeStopBit(utflen);
-            writeUTF0(s, strlen);
+            writeUTF0(this, s, strlen);
         } finally {
             position(position);
         }
@@ -832,11 +835,11 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     public ByteStringAppender append(@NotNull CharSequence str) {
         long strlen = str.length();
-        writeUTF0(str, strlen);
+        writeUTF0(this, str, strlen);
         return this;
     }
 
-    private long findUTFLength(@NotNull CharSequence str, long strlen) {
+    public static long findUTFLength(@NotNull CharSequence str, long strlen) {
         long utflen = 0, c;/* use charAt instead of copying String to char array */
         for (int i = 0; i < strlen; i++) {
             c = str.charAt(i);
@@ -848,35 +851,37 @@ public abstract class AbstractBytes implements Bytes {
                 utflen += 2;
             }
         }
-
-        if (utflen > remaining())
-            throw new IllegalArgumentException(
-                    "encoded string too long: " + utflen + " bytes, remaining=" + remaining());
         return utflen;
     }
 
-    private void writeUTF0(@NotNull CharSequence str, long strlen) {
+    private void checkUFTLength(long utflen) {
+        if (utflen > remaining())
+            throw new IllegalArgumentException(
+                    "encoded string too long: " + utflen + " bytes, remaining=" + remaining());
+    }
+
+    public static void writeUTF0(Bytes bytes, @NotNull CharSequence str, long strlen) {
         int c;
         int i;
         for (i = 0; i < strlen; i++) {
             c = str.charAt(i);
             if (!((c >= 0x0000) && (c <= 0x007F)))
                 break;
-            write(c);
+            bytes.write(c);
         }
 
         for (; i < strlen; i++) {
             c = str.charAt(i);
             if ((c >= 0x0000) && (c <= 0x007F)) {
-                write(c);
+                bytes.write(c);
 
             } else if (c > 0x07FF) {
-                write((byte) (0xE0 | ((c >> 12) & 0x0F)));
-                write((byte) (0x80 | ((c >> 6) & 0x3F)));
-                write((byte) (0x80 | (c & 0x3F)));
+                bytes.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
+                bytes.write((byte) (0x80 | ((c >> 6) & 0x3F)));
+                bytes.write((byte) (0x80 | (c & 0x3F)));
             } else {
-                write((byte) (0xC0 | ((c >> 6) & 0x1F)));
-                write((byte) (0x80 | c & 0x3F));
+                bytes.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
+                bytes.write((byte) (0x80 | c & 0x3F));
             }
         }
     }
