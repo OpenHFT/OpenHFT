@@ -23,7 +23,7 @@ import net.openhft.lang.model.constraints.Nullable;
 /**
  * @author peter.lawrey
  */
-public class StringInterner {
+public class StringInterner implements CharSequenceInterner<String> {
     @NotNull
     private final String[] interner;
     private final int mask;
@@ -63,6 +63,7 @@ public class StringInterner {
         return interner[h] = s2;
     }*/
 
+    @Override
     @NotNull
     public String intern(@NotNull CharSequence cs) {
         long hash = 0;
