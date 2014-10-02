@@ -68,7 +68,7 @@ public class MappedStore implements BytesStore {
 
         try {
             RandomAccessFile raf = new RandomAccessFile(file, accesModeFor(mode));
-            if (raf.length() != this.size) {
+            if (raf.length() != this.size && !file.getAbsolutePath().startsWith("/dev/")) {
                 if (mode != FileChannel.MapMode.READ_WRITE) {
                     throw new IOException("Cannot resize file to " + size + " as mode is not READ_WRITE");
                 }

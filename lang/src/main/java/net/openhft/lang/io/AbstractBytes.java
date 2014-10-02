@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 @SuppressWarnings("MagicNumber")
 public abstract class AbstractBytes implements Bytes {
     public static final int END_OF_BUFFER = -1;
-    private static final long BUSY_LOCK_LIMIT = 10L * 1000 * 1000 * 1000;
+    private static final long BUSY_LOCK_LIMIT = 20L * 1000 * 1000 * 1000;
     private static final int INT_LOCK_MASK;
     private static final int UNSIGNED_BYTE_MASK = 0xFF;
     private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
@@ -1058,22 +1058,31 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeStopBit(long n) {
+        if ((n & ~0x7F) == 0) {
+            write((int) (n & 0x7f));
+            return;
+        }
+        writeStopBit0(n);
+    }
+
+    private void writeStopBit0(long n) {
         boolean neg = false;
         if (n < 0) {
             neg = true;
             n = ~n;
         }
+
         long n2;
         while ((n2 = n >>> 7) != 0) {
-            writeByte((byte) (0x80L | n));
+            write((byte) (0x80L | n));
             n = n2;
         }
         // final byte
         if (!neg) {
-            writeByte((byte) n);
+            write((byte) n);
         } else {
-            writeByte((byte) (0x80L | n));
-            writeByte(0);
+            write((byte) (0x80L | n));
+            write(0);
         }
     }
 
@@ -2062,7 +2071,7 @@ public abstract class AbstractBytes implements Bytes {
             do {
                 if (tryLockNanos8a(offset, id)) {
                     long millis = (System.nanoTime() - start) / 1000000;
-                    if (millis > 100) {
+                    if (millis > 200) {
                         LOGGER.log(Level.WARNING,
                                 Thread.currentThread().getName() +
                                         ", to obtain a lock took " +
