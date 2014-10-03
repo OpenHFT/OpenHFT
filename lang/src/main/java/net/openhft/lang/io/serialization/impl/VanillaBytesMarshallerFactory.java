@@ -16,7 +16,6 @@
 
 package net.openhft.lang.io.serialization.impl;
 
-import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
@@ -24,8 +23,6 @@ import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.Externalizable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,11 +30,11 @@ import java.util.Map;
 /**
  * @author peter.lawrey
  */
-public class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
-    private static final long serialVersionUID = 0L;
+public final class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
+    private static final long serialVersionUID = 1L;
 
-    private Map<Class, BytesMarshaller> marshallerMap;
-    private BytesMarshaller[] compactMarshallerMap;
+    private transient Map<Class, BytesMarshaller> marshallerMap;
+    private transient BytesMarshaller[] compactMarshallerMap;
 
     private void init() {
         marshallerMap = new LinkedHashMap<Class, BytesMarshaller>();
