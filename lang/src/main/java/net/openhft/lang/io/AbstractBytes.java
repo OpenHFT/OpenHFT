@@ -787,10 +787,10 @@ public abstract class AbstractBytes implements Bytes {
     public void writeUTF(@NotNull String str) {
         long strlen = str.length();
         long utflen = findUTFLength(str, strlen);
-        checkUFTLength(utflen);
         if (utflen > 65535)
             throw new IllegalStateException("String too long " + utflen + " when encoded, max: 65535");
         writeUnsignedShort((int) utflen);
+        checkUFTLength(utflen);
         writeUTF0(this, str, strlen);
     }
 
@@ -802,8 +802,8 @@ public abstract class AbstractBytes implements Bytes {
         }
         long strlen = str.length();
         long utflen = findUTFLength(str, strlen);
-        checkUFTLength(utflen);
         writeStopBit(utflen);
+        checkUFTLength(utflen);
         writeUTF0(this, str, strlen);
     }
 
