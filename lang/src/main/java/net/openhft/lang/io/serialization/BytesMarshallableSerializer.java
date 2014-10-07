@@ -70,7 +70,7 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
                 return;
             }
             bytes.writeByte(ENUMED);
-            bytes.writeEnum(clazz);
+            this.writeSerializable(bytes, clazz, Class.class);
             em.write(bytes, object);
             return;
         }
@@ -106,7 +106,7 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
             case NULL:
                 return null;
             case ENUMED: {
-                Class clazz = bytes.readEnum(Class.class);
+                Class clazz = this.readSerializable(bytes, Class.class, null);
                 assert clazz != null;
                 return (T) bytesMarshallerFactory.acquireMarshaller(clazz, true).read(bytes);
             }
