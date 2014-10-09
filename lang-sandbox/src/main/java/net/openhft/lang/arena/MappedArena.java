@@ -28,8 +28,6 @@ public class MappedArena implements Arena {
 
     /**
      * The lock consists of the reading/writing mode, writer count, writers waiting, reader count, readers waiting
-     *
-     * @return
      */
     public MappedArena(File file, long minSize, ObjectSerializer objectSerializer, Mode mode) throws IOException {
         this.mode = mode;
