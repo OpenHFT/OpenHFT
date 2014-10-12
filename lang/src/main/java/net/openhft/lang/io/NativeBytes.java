@@ -319,6 +319,8 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void write(byte[] bytes, int off, int len) {
+        if (off < 0 || off + len > bytes.length || len > remaining())
+            throw new IllegalArgumentException();
         UNSAFE.copyMemory(bytes, BYTES_OFFSET + off, null, positionAddr, len);
         positionAddr += len;
     }
