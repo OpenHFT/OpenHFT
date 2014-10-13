@@ -24,6 +24,10 @@ import net.openhft.lang.io.serialization.ObjectFactory;
 public enum NullObjectFactory implements ObjectFactory {
     INSTANCE;
 
+    public static <E> ObjectFactory<E> of() {
+        return INSTANCE;
+    }
+
     /**
      * Always returns {@code null}.
      *
