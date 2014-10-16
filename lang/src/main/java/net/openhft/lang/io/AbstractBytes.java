@@ -23,6 +23,8 @@ import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.JDKObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
+import net.openhft.lang.io.view.BytesInputStream;
+import net.openhft.lang.io.view.BytesOutputStream;
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
 import net.openhft.lang.pool.StringInterner;
@@ -1732,13 +1734,13 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public InputStream inputStream() {
-        return new BytesInputStream();
+        return new BytesInputStream(this);
     }
 
     @NotNull
     @Override
     public OutputStream outputStream() {
-        return new BytesOutputStream();
+        return new BytesOutputStream(this);
     }
 
     @NotNull
@@ -2385,75 +2387,6 @@ public abstract class AbstractBytes implements Bytes {
                 return false;
         }
         return true;
-    }
-
-    class BytesInputStream extends InputStream {
-        private long mark = 0;
-
-        @Override
-        public int available() {
-            return AbstractBytes.this.available();
-        }
-
-        @Override
-        public void close() {
-            finish();
-        }
-
-        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
-        @Override
-        public void mark(int readLimit) {
-            mark = position();
-        }
-
-        @Override
-        public boolean markSupported() {
-            return true;
-        }
-
-        @Override
-        public int read(@NotNull byte[] bytes, int off, int len) {
-            return AbstractBytes.this.read(bytes, off, len);
-        }
-
-        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
-        @Override
-        public void reset() {
-            position(mark);
-        }
-
-        @Override
-        public long skip(long n) {
-            return AbstractBytes.this.skip(n);
-        }
-
-        @Override
-        public int read() {
-            return AbstractBytes.this.read();
-        }
-    }
-
-    private class BytesOutputStream extends OutputStream {
-        @Override
-        public void close() {
-            finish();
-        }
-
-        @Override
-        public void write(@NotNull byte[] b) {
-            AbstractBytes.this.write(b);
-        }
-
-        @Override
-        public void write(@NotNull byte[] b, int off, int len) {
-            AbstractBytes.this.write(b, off, len);
-        }
-
-        @Override
-        public void write(int b) {
-            checkWrite(1);
-            writeUnsignedByte(b);
-        }
     }
 
     @NotNull
