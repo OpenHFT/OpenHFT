@@ -22,7 +22,8 @@ import net.openhft.lang.model.constraints.Nullable;
 import java.io.Serializable;
 
 /**
- * External marshaller for classes.
+ * External marshaller for classes. From design patterns point of view, this interface
+ * is marshalling <i>strategy</i>.
  *
  * @author peter.lawrey
  * @see BytesMarshallable

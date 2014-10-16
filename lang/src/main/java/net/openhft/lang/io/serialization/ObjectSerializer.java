@@ -19,9 +19,28 @@ package net.openhft.lang.io.serialization;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.model.constraints.NotNull;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 
+/**
+ * Abstracts serialization implementation, which at least should be able to serialize objects that
+ * Java built-in serialization is able serialize. In other words, {@code ObjectSerializer} abstracts
+ * Java serialization re-implementations and extensions. {@link Bytes} is used as core IO interface
+ * instead of {@link InputStream} + {@link OutputStream} pair, which Java built-in serialization
+ * use. However, note that {@code Bytes} could always be converted to these old interfaces by
+ * {@link Bytes#inputStream()} and {@link Bytes#outputStream()}, if needed.
+ *
+ * <p>The default fallback implementation is Java built-in serialization itself:
+ * {@link JDKObjectSerializer}.
+ *
+ * <p>Another provided implementation is {@link BytesMarshallableSerializer}, which basically
+ * extends built-in serialization with some improvements. For example, it could benefit if objects
+ * implement {@link BytesMarshallable} interface the same way as built-in serialization benefit
+ * if objects implement {@link Externalizable}. See {@link BytesMarshallableSerializer} docs for
+ * more information.
+ *
+ * <p>This interface is supposed to be implemented to plug such third-party serialization
+ * re-implementations, as Kryo, fast-serialization, etc.
+ */
 public interface ObjectSerializer extends Serializable {
     /**
      * write an object

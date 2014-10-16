@@ -25,6 +25,24 @@ import net.openhft.lang.model.constraints.NotNull;
 import java.io.Externalizable;
 import java.io.IOException;
 
+/**
+ * An extension of built-in Java serialization, featuring special treatment of {@link
+ * BytesMarshallable} objects, compact {@link String} encoding and support of pluggable custom
+ * serializers for arbitrary classes.
+ *
+ * <p>{@code BytesMarshallableSerializer} could benefit if objects (either top-level serialized or
+ * nested fields) implement {@link BytesMarshallable} interface the same way as built-in
+ * serialization benefit if objects implement {@link Externalizable} (of cause, {@code
+ * BytesMarshallableSerializer} supports {@code Externalizable} too).
+ *
+ * <p>{@link CharSequence}s, including {@code String}s (either top-level serialized or nested
+ * fields) are serialized in UTF-8 encoding.
+ *
+ * <p>Custom per-class serializers are held by {@link BytesMarshallerFactory}, which could be
+ * passed via constructor or static factory {@link #create create()} method.
+ *
+ * @see #create(BytesMarshallerFactory, ObjectSerializer)
+ */
 public class BytesMarshallableSerializer implements ObjectSerializer {
     private static final long serialVersionUID = 0L;
 
