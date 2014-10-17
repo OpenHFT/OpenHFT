@@ -18,6 +18,7 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.model.constraints.NotNull;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -51,5 +52,10 @@ public class DirectBytes extends NativeBytes {
     @Override
     protected void cleanup() {
         store.free();
+    }
+
+    @Override
+    public ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse) {
+        return sliceAsByteBuffer(toReuse, store);
     }
 }

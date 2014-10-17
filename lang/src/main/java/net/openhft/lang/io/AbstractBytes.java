@@ -25,9 +25,9 @@ import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.io.view.BytesInputStream;
 import net.openhft.lang.io.view.BytesOutputStream;
-import net.openhft.lang.model.constraints.NotNull;
-import net.openhft.lang.model.constraints.Nullable;
 import net.openhft.lang.pool.StringInterner;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -2440,6 +2440,11 @@ public abstract class AbstractBytes implements Bytes {
                 throw new AssertionError(e);
             }
         }
+    }
+
+    @Override
+    public ByteBuffer sliceAsByteBuffer(@Nullable ByteBuffer toReuse) {
+        throw new UnsupportedOperationException();
     }
 
     private void append(Appendable sb, long i) throws IOException {
