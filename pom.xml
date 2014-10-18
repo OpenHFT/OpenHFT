@@ -36,5 +36,6 @@
         <module>Chronicle-Logger</module>
         <module>Chronicle-Engine</module>
         <module>TransFIX</module>
+        <module>jpsg-maven-plugin</module>
     </modules>
 </project>
