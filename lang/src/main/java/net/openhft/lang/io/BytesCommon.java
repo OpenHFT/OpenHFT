@@ -205,6 +205,7 @@ public interface BytesCommon {
      * be reused and returned back from this method, otherwise a new {@code ByteBuffer} instance
      * is created and returned.
      *
+     * @param toReuse a {@code ByteBuffer} to reuse
      * @return a {@code ByteBuffer} view of this {@code Bytes}
      * @see #slice()
      * @see ByteBuffer#slice()

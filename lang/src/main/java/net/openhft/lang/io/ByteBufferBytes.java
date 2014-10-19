@@ -147,8 +147,7 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public int read(@NotNull byte[] bytes, int off, int len) {
-        if (len < 0 || off < 0 || off + len > bytes.length)
-            throw new IllegalArgumentException();
+        checkArrayOffs(bytes.length, off, len);
         long left = remaining();
         if (left <= 0) return -1;
         int len2 = (int) Math.min(left, len);
@@ -174,13 +173,22 @@ public class ByteBufferBytes extends AbstractBytes {
 
     @Override
     public void readFully(@NotNull byte[] b, int off, int len) {
-        if (len < 0 || off < 0 || off + len > b.length)
-            throw new IllegalArgumentException();
+        checkArrayOffs(b.length, off, len);
         long left = remaining();
         if (left < len)
             throw new IllegalStateException(new EOFException());
         for (int i = 0; i < len; i++)
             b[off + i] = readByte();
+    }
+
+    @Override
+    public void readFully(@org.jetbrains.annotations.NotNull char[] data, int off, int len) {
+        checkArrayOffs(data.length, off, len);
+        long left = remaining();
+        if (left < len * 2L)
+            throw new IllegalStateException(new EOFException());
+        for (int i = 0; i < len; i++)
+            data[off + i] = readChar();
     }
 
     @Override

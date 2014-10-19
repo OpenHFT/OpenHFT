@@ -287,6 +287,11 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
+    public void readFully(@NotNull char[] data) {
+        readFully(data, 0, data.length);
+    }
+
+    @Override
     public int skipBytes(int n) {
         return (int) skip(n);
     }
@@ -780,9 +785,14 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeChars(@NotNull String s) {
-        int len = s.length();
+        writeChars((CharSequence) s);
+    }
+
+    @Override
+    public void writeChars(@NotNull CharSequence cs) {
+        int len = cs.length();
         for (int i = 0; i < len; i++)
-            writeChar(s.charAt(i));
+            writeChar(cs.charAt(i));
     }
 
     @Override
@@ -903,6 +913,11 @@ public abstract class AbstractBytes implements Bytes {
         writeByte(offset, v);
     }
 
+    static void checkArrayOffs(int arrayLength, int off, int len) {
+        if (len < 0 || off < 0 || off + len > arrayLength || off + len < 0)
+            throw new IndexOutOfBoundsException();
+    }
+
     @Override
     public void write(long offset, @NotNull byte[] bytes) {
         checkWrite(bytes.length);
@@ -912,10 +927,25 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(byte[] bytes, int off, int len) {
+        checkArrayOffs(bytes.length, off, len);
         checkWrite(len);
 
         for (int i = 0; i < len; i++)
             write(bytes[off + i]);
+    }
+
+    @Override
+    public void write(@NotNull char[] data) {
+        write(data, 0, data.length);
+    }
+
+    @Override
+    public void write(@NotNull char[] data, int off, int len) {
+        checkArrayOffs(data.length, off, len);
+        checkWrite(len * 2);
+
+        for (int i = 0; i < len; i++)
+            writeChar(data[off + i]);
     }
 
     @Override
