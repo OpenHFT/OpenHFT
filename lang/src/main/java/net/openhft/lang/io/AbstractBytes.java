@@ -2571,4 +2571,177 @@ public abstract class AbstractBytes implements Bytes {
     public File file() {
         return null;
     }
+
+    // todo add tests before using in ChronicleMap
+    static final int RW_LOCK_LIMIT = 20;
+    static final long RW_READ_WAITING = 1L << 0;
+    static final long RW_READ_LOCKED = 1L << RW_LOCK_LIMIT;
+    static final long RW_WRITE_WAITING = 1L << 2 * RW_LOCK_LIMIT;
+    static final long RW_WRITE_LOCKED = 1L << 3 * RW_LOCK_LIMIT;
+    static final int RW_LOCK_MASK = (1 << RW_LOCK_LIMIT) - 1;
+
+    // read/write lock support.
+    // short path in a small method so it can be inlined.
+    boolean tryRWReadLock(long offset, long timeOutNS) {
+        long lock = readVolatileLong(offset);
+        int writersWaiting = rwWriteWaiting(lock);
+        int writersLocked = rwWriteLocked(lock);
+        // readers wait for waiting writers
+        if (writersLocked <= 0 && writersWaiting <= 0) {
+            // increment readers locked.
+            int readersLocked = rwReadLocked(lock);
+            if (readersLocked >= RW_LOCK_MASK)
+                throw new IllegalStateException("readersLocked has reached a limit of " + readersLocked);
+            if (compareAndSwapLong(offset, lock, lock + RW_READ_LOCKED))
+                return true;
+        }
+        return tryRWReadLock0(offset, timeOutNS);
+    }
+
+    private boolean tryRWReadLock0(long offset, long timeOutNS) {
+        // increment readers waiting.
+        for (; ; ) {
+            long lock = readVolatileLong(offset);
+            int readersWaiting = rwReadWaiting(lock);
+            if (readersWaiting >= RW_LOCK_MASK)
+                throw new IllegalStateException("readersWaiting has reached a limit of " + readersWaiting);
+            if (compareAndSwapLong(offset, lock, lock + RW_READ_WAITING))
+                break;
+        }
+        long end = System.nanoTime() + timeOutNS;
+        // wait for no write locks, nor waiting writes.
+        for (; ; ) {
+            long lock = readVolatileLong(offset);
+            int writersWaiting = rwWriteWaiting(lock);
+            int writersLocked = rwWriteLocked(lock);
+            if (writersLocked <= 0 && writersWaiting <= 0) {
+                // increment readers locked.
+                int readersLocked = rwReadLocked(lock);
+                if (readersLocked >= RW_LOCK_MASK)
+                    throw new IllegalStateException("readersLocked has reached a limit of " + readersLocked);
+                int readersWaiting = rwReadWaiting(lock);
+                if (readersWaiting <= 0)
+                    throw new IllegalStateException("readersWaiting has underflowed: " + readersWaiting);
+                // add to the readLock count and decrease the readWaiting count.
+                if (compareAndSwapLong(offset, lock, lock + RW_READ_LOCKED - RW_READ_WAITING))
+                    return true;
+
+            }
+            if (System.nanoTime() > end) {
+                // release waiting
+                for (; ; ) {
+                    int readersWaiting = rwReadWaiting(lock);
+                    if (readersWaiting <= 0)
+                        throw new IllegalStateException("readersWaiting has underflowed: " + readersWaiting);
+                    if (compareAndSwapLong(offset, lock, lock - RW_READ_WAITING))
+                        break;
+                    lock = readVolatileLong(offset);
+                }
+                return false;
+            }
+        }
+    }
+
+    boolean tryRWWriteLock(long offset, long timeOutNS) {
+        long lock = readVolatileLong(offset);
+        int readersLocked = rwReadLocked(lock);
+        int writersLocked = rwWriteLocked(lock);
+        // writers don't wait for waiting readers.
+        if (readersLocked <= 0 && writersLocked <= 0) {
+            if (compareAndSwapLong(offset, lock, lock + RW_WRITE_LOCKED))
+                return true;
+        }
+        return tryRWWriteLock0(offset, timeOutNS);
+
+    }
+
+    private boolean tryRWWriteLock0(long offset, long timeOutNS) {
+        for (; ; ) {
+            long lock = readVolatileLong(offset);
+            int writersWaiting = rwWriteWaiting(lock);
+            if (writersWaiting >= RW_LOCK_MASK)
+                throw new IllegalStateException("writersWaiting has reached a limit of " + writersWaiting);
+            if (compareAndSwapLong(offset, lock, lock + RW_WRITE_WAITING))
+                break;
+        }
+        long end = System.nanoTime() + timeOutNS;
+        // wait for no write locks.
+        for (; ; ) {
+            long lock = readVolatileLong(offset);
+            int readersLocked = rwReadLocked(lock);
+            int writersWaiting = rwWriteWaiting(lock);
+            int writersLocked = rwWriteLocked(lock);
+            if (readersLocked <= 0 && writersLocked <= 0) {
+                // increment readers locked.
+                if (writersWaiting <= 0)
+                    throw new IllegalStateException("writersWaiting has underflowed");
+                // add to the readLock count and decrease the readWaiting count.
+                if (compareAndSwapLong(offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
+                    return true;
+            }
+            if (System.nanoTime() > end) {
+                // release waiting
+                for (; ; ) {
+                    if (writersWaiting <= 0)
+                        throw new IllegalStateException("writersWaiting has underflowed");
+                    if (compareAndSwapLong(offset, lock, lock - RW_WRITE_WAITING))
+                        break;
+                    lock = readVolatileLong(offset);
+                    writersWaiting = rwWriteWaiting(lock);
+                }
+                return false;
+            }
+        }
+    }
+
+    void unlockRWReadLock(long offset) {
+        for (; ; ) {
+            long lock = readVolatileLong(offset);
+            int readersLocked = rwReadLocked(lock);
+            if (readersLocked <= 0)
+                throw new IllegalMonitorStateException("readerLock underflow");
+            if (compareAndSwapLong(offset, lock, lock - RW_READ_LOCKED))
+                return;
+        }
+    }
+
+    void unlockRWWriteLock(long offset) {
+        for (; ; ) {
+            long lock = readVolatileLong(offset);
+            int writersLocked = rwWriteLocked(lock);
+            if (writersLocked != 1)
+                throw new IllegalMonitorStateException("writersLock underflow " + writersLocked);
+            if (compareAndSwapLong(offset, lock, lock - RW_WRITE_LOCKED))
+                return;
+        }
+
+    }
+
+    String dumpRWLock(long offset) {
+        long lock = readVolatileLong(offset);
+        int readersWaiting = rwReadWaiting(lock);
+        int readersLocked = rwReadLocked(lock);
+        int writersWaiting = rwWriteWaiting(lock);
+        int writersLocked = rwWriteLocked(lock);
+        return "writerLocked: " + writersLocked
+                + ", writersWaiting: " + writersWaiting
+                + ", readersLocked: " + readersLocked
+                + ", readersWaiting: " + readersWaiting;
+    }
+
+    static int rwReadWaiting(long lock) {
+        return (int) (lock & RW_LOCK_MASK);
+    }
+
+    static int rwReadLocked(long lock) {
+        return (int) ((lock >>> RW_LOCK_LIMIT) & RW_LOCK_MASK);
+    }
+
+    static int rwWriteWaiting(long lock) {
+        return (int) ((lock >>> (2 * RW_LOCK_LIMIT)) & RW_LOCK_MASK);
+    }
+
+    static int rwWriteLocked(long lock) {
+        return (int) (lock >>> (3 * RW_LOCK_LIMIT));
+    }
 }
