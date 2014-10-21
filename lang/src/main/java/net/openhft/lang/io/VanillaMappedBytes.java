@@ -19,6 +19,7 @@ import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -87,5 +88,10 @@ public class VanillaMappedBytes extends NativeBytes {
 
     public void force() {
         this.buffer.force();
+    }
+
+    @Override
+    public ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse) {
+        return sliceAsByteBuffer(toReuse, buffer);
     }
 }

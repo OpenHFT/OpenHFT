@@ -18,12 +18,12 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.ObjectSerializer;
-import net.openhft.lang.model.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import java.io.EOFException;
-import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,6 +39,7 @@ public class NativeBytes extends AbstractBytes {
     public static final Unsafe UNSAFE;
     protected static final long NO_PAGE;
     static final int BYTES_OFFSET;
+    static final int CHARS_OFFSET;
 
     static {
         try {
@@ -47,6 +48,7 @@ public class NativeBytes extends AbstractBytes {
             theUnsafe.setAccessible(true);
             UNSAFE = (Unsafe) theUnsafe.get(null);
             BYTES_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);
+            CHARS_OFFSET = UNSAFE.arrayBaseOffset(char[].class);
 
         } catch (Exception e) {
             throw new AssertionError(e);
@@ -194,13 +196,24 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void readFully(@NotNull byte[] b, int off, int len) {
-        if (len < 0 || off < 0 || off + len > b.length)
-            throw new IllegalArgumentException();
+        checkArrayOffs(b.length, off, len);
         long left = remaining();
         if (left < len)
             throw new IllegalStateException(new EOFException());
         UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len);
         positionAddr += len;
+    }
+
+    @Override
+    public void readFully(@NotNull char[] data, int off, int len) {
+        checkArrayOffs(data.length, off, len);
+        long bytesOff = off * 2L;
+        long bytesLen = len * 2L;
+        long left = remaining();
+        if (left < bytesLen)
+            throw new IllegalStateException(new EOFException());
+        UNSAFE.copyMemory(null, positionAddr, data, BYTES_OFFSET + bytesOff, bytesLen);
+        positionAddr += bytesLen;
     }
 
     @Override
@@ -349,7 +362,7 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void writeInt(int v) {
-        UNSAFE.putInt(null, positionAddr, v);
+        UNSAFE.putInt(positionAddr, v);
         positionAddr += 4;
     }
 
@@ -555,5 +568,12 @@ public class NativeBytes extends AbstractBytes {
         return positionAddr;
     }
 
+    @Override
+    public ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse) {
+        return sliceAsByteBuffer(toReuse, null);
+    }
 
+    protected ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse, Object att) {
+        return ByteBufferReuse.INSTANCE.reuse(positionAddr, (int) remaining(), att, toReuse);
+    }
 }

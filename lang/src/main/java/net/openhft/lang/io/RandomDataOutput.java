@@ -16,8 +16,8 @@
 
 package net.openhft.lang.io;
 
-import net.openhft.lang.model.constraints.NotNull;
-import net.openhft.lang.model.constraints.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
@@ -136,6 +136,10 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     @Override
     void write(byte[] bytes, int off, int len);
+
+    void write(@NotNull char[] data);
+
+    void write(@NotNull char[] data, int off, int len);
 
     /**
      * Writes a <code>boolean</code> value to this output stream. If the argument <code>v</code> is <code>true</code>,
@@ -714,9 +718,18 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * bytes are actually written, high-order byte first, in exactly the manner of the <code>writeChar</code> method.
      *
      * @param s the string value to be written. Cannot be null.
+     * @see #writeChars(CharSequence)
      */
     @Override
     void writeChars(@NotNull String s);
+
+    /**
+     * Writes chars of the given {@code CharSequence} to the bytes, without encoding.
+     *
+     * @param cs the {@code CharSequence} to be written. Cannot be null.
+     * @see #writeChars(String)
+     */
+    void writeChars(@NotNull CharSequence cs);
 
     /**
      * Writes two bytes of length information to the output stream, followed by the <a

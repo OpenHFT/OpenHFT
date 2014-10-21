@@ -23,9 +23,11 @@ import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.JDKObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
-import net.openhft.lang.model.constraints.NotNull;
-import net.openhft.lang.model.constraints.Nullable;
+import net.openhft.lang.io.view.BytesInputStream;
+import net.openhft.lang.io.view.BytesOutputStream;
 import net.openhft.lang.pool.StringInterner;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -282,6 +284,11 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void readFully(@NotNull byte[] bytes) {
         readFully(bytes, 0, bytes.length);
+    }
+
+    @Override
+    public void readFully(@NotNull char[] data) {
+        readFully(data, 0, data.length);
     }
 
     @Override
@@ -778,9 +785,14 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeChars(@NotNull String s) {
-        int len = s.length();
+        writeChars((CharSequence) s);
+    }
+
+    @Override
+    public void writeChars(@NotNull CharSequence cs) {
+        int len = cs.length();
         for (int i = 0; i < len; i++)
-            writeChar(s.charAt(i));
+            writeChar(cs.charAt(i));
     }
 
     @Override
@@ -901,6 +913,11 @@ public abstract class AbstractBytes implements Bytes {
         writeByte(offset, v);
     }
 
+    static void checkArrayOffs(int arrayLength, int off, int len) {
+        if (len < 0 || off < 0 || off + len > arrayLength || off + len < 0)
+            throw new IndexOutOfBoundsException();
+    }
+
     @Override
     public void write(long offset, @NotNull byte[] bytes) {
         checkWrite(bytes.length);
@@ -910,10 +927,25 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(byte[] bytes, int off, int len) {
+        checkArrayOffs(bytes.length, off, len);
         checkWrite(len);
 
         for (int i = 0; i < len; i++)
             write(bytes[off + i]);
+    }
+
+    @Override
+    public void write(@NotNull char[] data) {
+        write(data, 0, data.length);
+    }
+
+    @Override
+    public void write(@NotNull char[] data, int off, int len) {
+        checkArrayOffs(data.length, off, len);
+        checkWrite(len * 2);
+
+        for (int i = 0; i < len; i++)
+            writeChar(data[off + i]);
     }
 
     @Override
@@ -1732,13 +1764,13 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public InputStream inputStream() {
-        return new BytesInputStream();
+        return new BytesInputStream(this);
     }
 
     @NotNull
     @Override
     public OutputStream outputStream() {
-        return new BytesOutputStream();
+        return new BytesOutputStream(this);
     }
 
     @NotNull
@@ -2387,75 +2419,6 @@ public abstract class AbstractBytes implements Bytes {
         return true;
     }
 
-    class BytesInputStream extends InputStream {
-        private long mark = 0;
-
-        @Override
-        public int available() {
-            return AbstractBytes.this.available();
-        }
-
-        @Override
-        public void close() {
-            finish();
-        }
-
-        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
-        @Override
-        public void mark(int readLimit) {
-            mark = position();
-        }
-
-        @Override
-        public boolean markSupported() {
-            return true;
-        }
-
-        @Override
-        public int read(@NotNull byte[] bytes, int off, int len) {
-            return AbstractBytes.this.read(bytes, off, len);
-        }
-
-        @SuppressWarnings("NonSynchronizedMethodOverridesSynchronizedMethod")
-        @Override
-        public void reset() {
-            position(mark);
-        }
-
-        @Override
-        public long skip(long n) {
-            return AbstractBytes.this.skip(n);
-        }
-
-        @Override
-        public int read() {
-            return AbstractBytes.this.read();
-        }
-    }
-
-    private class BytesOutputStream extends OutputStream {
-        @Override
-        public void close() {
-            finish();
-        }
-
-        @Override
-        public void write(@NotNull byte[] b) {
-            AbstractBytes.this.write(b);
-        }
-
-        @Override
-        public void write(@NotNull byte[] b, int off, int len) {
-            AbstractBytes.this.write(b, off, len);
-        }
-
-        @Override
-        public void write(int b) {
-            checkWrite(1);
-            writeUnsignedByte(b);
-        }
-    }
-
     @NotNull
     @Override
     public String toString() {
@@ -2507,6 +2470,11 @@ public abstract class AbstractBytes implements Bytes {
                 throw new AssertionError(e);
             }
         }
+    }
+
+    @Override
+    public ByteBuffer sliceAsByteBuffer(@Nullable ByteBuffer toReuse) {
+        throw new UnsupportedOperationException();
     }
 
     private void append(Appendable sb, long i) throws IOException {

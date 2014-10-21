@@ -16,8 +16,8 @@
 
 package net.openhft.lang.io;
 
-import net.openhft.lang.model.constraints.NotNull;
-import net.openhft.lang.model.constraints.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ObjectInput;
 import java.nio.ByteBuffer;
@@ -76,6 +76,10 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      */
     @Override
     void readFully(@NotNull byte[] bytes, int off, int len);
+
+    void readFully(@NotNull char[] data);
+
+    void readFully(@NotNull char[] data, int off, int len);
 
     /**
      * Makes an attempt to skip over <code>n</code> bytes of data from the input stream, discarding the skipped bytes.
