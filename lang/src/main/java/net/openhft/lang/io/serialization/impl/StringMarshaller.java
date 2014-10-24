@@ -52,8 +52,11 @@ public class StringMarshaller extends ImmutableMarshaller<String>
 
 
     private String builderToString() {
-        if (interner == null)
+        if (interner == null) {
+            if (size == 0)
+                return reader.toString();
             interner = new StringInterner(size);
+        }
         return interner.intern(reader);
     }
 

@@ -1096,6 +1096,11 @@ public abstract class AbstractBytes implements Bytes {
             write((int) (n & 0x7f));
             return;
         }
+        if ((n & ~0x3FFF) == 0) {
+            write((int) ((n & 0x7f) | 0x80));
+            write((int) (n >> 7));
+            return;
+        }
         writeStopBit0(n);
     }
 

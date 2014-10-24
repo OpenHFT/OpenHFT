@@ -420,7 +420,7 @@ public class NativeBytesTest {
 
     @Test
     public void testReadWriteStop() {
-        long[] longs = {Long.MIN_VALUE, Long.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE};
+        long[] longs = {Long.MIN_VALUE, Long.MAX_VALUE, 1<<14, (1<<14)-1, 1<<7, (1<<7)-1, Integer.MIN_VALUE, Integer.MAX_VALUE};
         for (long i : longs) {
             bytes.writeStopBit(i);
 //            System.out.println(i + " " + bytes.position());
