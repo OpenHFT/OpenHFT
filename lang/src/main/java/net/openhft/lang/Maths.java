@@ -95,8 +95,11 @@ public class Maths {
     }
 
     public static int nextPower2(int n, int min) {
+        if (!isPowerOf2(min))
+            throw new IllegalArgumentException();
         if (n < min) return min;
-        if ((n & (n - 1)) == 0) return n;
+        if (isPowerOf2(n))
+            return n;
         int i = min;
         while (i < n) {
             i *= 2;
@@ -106,8 +109,11 @@ public class Maths {
     }
 
     public static long nextPower2(long n, long min) {
+        if (!isPowerOf2(min))
+            throw new IllegalArgumentException();
         if (n < min) return min;
-        if ((n & (n - 1)) == 0) return n;
+        if (isPowerOf2(n))
+            return n;
         long i = min;
         while (i < n) {
             i *= 2;
@@ -116,6 +122,13 @@ public class Maths {
         return i;
     }
 
+    public static boolean isPowerOf2(int n) {
+        return (n & (n - 1)) == 0;
+    }
+
+    public static boolean isPowerOf2(long n) {
+        return (n & (n - 1L)) == 0L;
+    }
 
     public static int hash(int n) {
         n ^= (n >> 21) ^ (n >> 11);
