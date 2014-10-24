@@ -2550,7 +2550,7 @@ public abstract class AbstractBytes implements Bytes {
 
     // read/write lock support.
     // short path in a small method so it can be inlined.
-    boolean tryRWReadLock(long offset, long timeOutNS) {
+    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException {
         long lock = readVolatileLong(offset);
         int writersWaiting = rwWriteWaiting(lock);
         int writersLocked = rwWriteLocked(lock);
@@ -2566,7 +2566,7 @@ public abstract class AbstractBytes implements Bytes {
         return tryRWReadLock0(offset, timeOutNS);
     }
 
-    private boolean tryRWReadLock0(long offset, long timeOutNS) {
+    private boolean tryRWReadLock0(long offset, long timeOutNS) throws IllegalStateException {
         // increment readers waiting.
         for (; ; ) {
             long lock = readVolatileLong(offset);
@@ -2610,7 +2610,7 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    boolean tryRWWriteLock(long offset, long timeOutNS) {
+    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException {
         long lock = readVolatileLong(offset);
         int readersLocked = rwReadLocked(lock);
         int writersLocked = rwWriteLocked(lock);
@@ -2623,7 +2623,7 @@ public abstract class AbstractBytes implements Bytes {
 
     }
 
-    private boolean tryRWWriteLock0(long offset, long timeOutNS) {
+    private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException {
         for (; ; ) {
             long lock = readVolatileLong(offset);
             int writersWaiting = rwWriteWaiting(lock);
@@ -2662,7 +2662,7 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    void unlockRWReadLock(long offset) {
+    public void unlockRWReadLock(long offset) {
         for (; ; ) {
             long lock = readVolatileLong(offset);
             int readersLocked = rwReadLocked(lock);
@@ -2673,7 +2673,7 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    void unlockRWWriteLock(long offset) {
+    public void unlockRWWriteLock(long offset) {
         for (; ; ) {
             long lock = readVolatileLong(offset);
             int writersLocked = rwWriteLocked(lock);
