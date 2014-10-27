@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.Serializable;
 
 import static org.junit.Assert.*;
 
@@ -338,6 +339,37 @@ public class VanillaMappedFileTest {
 
         cache.close();
         assertEquals(0,buffer.refCount());
+    }
+
+    // *************************************************************************
+    //
+    // *************************************************************************
+
+    @Test
+    public void testX() throws Exception {
+        File path = newTempraryFile("vmc-x");
+        VanillaMappedBytes bytes = VanillaMappedFile.readWriteBytes(path,1024,0);
+
+        bytes.writeObject(new MessageKey("type", 123L));
+        bytes.flush();
+
+        bytes.position(0);
+        System.out.println("" + bytes.readObject(MessageKey.class));
+
+        bytes.close();
+    }
+
+    public static class MessageKey implements Serializable {
+        private String arg1;
+        private long arg2;
+        public MessageKey(String arg1, long arg2) {
+            this.arg1 = arg1;
+            this.arg2 = arg2;
+        }
+        @Override
+        public String toString() {
+            return "MessageKey{" + "arg1='" + arg1 + ", arg2=" + arg2 + "}";
+        }
     }
 }
 
