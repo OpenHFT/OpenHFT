@@ -714,6 +714,10 @@ public abstract class AbstractBytes implements Bytes {
         long l;
         if ((l = readByte()) >= 0)
             return l;
+        return readStopBit0(l);
+    }
+
+    private long readStopBit0(long l) {
         l &= 0x7FL;
         long b;
         int count = 7;
