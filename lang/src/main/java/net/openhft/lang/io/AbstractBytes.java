@@ -451,7 +451,7 @@ public abstract class AbstractBytes implements Bytes {
                     int char2 = bytes.readUnsignedByte();
                     if ((char2 & 0xC0) != 0x80)
                         throw new UTFDataFormatException(
-                                "malformed input around byte " + count);
+                                "malformed input around byte " + count + " was "+char2);
                     int c2 = (char) (((c & 0x1F) << 6) |
                             (char2 & 0x3F));
                     appendable.append((char) c2);
@@ -468,7 +468,7 @@ public abstract class AbstractBytes implements Bytes {
 
                     if (((char2 & 0xC0) != 0x80) || ((char3 & 0xC0) != 0x80))
                         throw new UTFDataFormatException(
-                                "malformed input around byte " + (count - 1));
+                                "malformed input around byte " + (count - 1) + " was "+char2+" "+char3);
                     int c3 = (char) (((c & 0x0F) << 12) |
                             ((char2 & 0x3F) << 6) |
                             (char3 & 0x3F));

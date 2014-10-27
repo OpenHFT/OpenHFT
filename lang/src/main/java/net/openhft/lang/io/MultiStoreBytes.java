@@ -19,6 +19,9 @@
 package net.openhft.lang.io;
 
 public class MultiStoreBytes extends NativeBytes {
+    private Bytes underlyingBytes;
+    private long underlyingOffset;
+
     public MultiStoreBytes() {
         super(NO_PAGE, NO_PAGE);
     }
@@ -27,8 +30,29 @@ public class MultiStoreBytes extends NativeBytes {
         if (offset < 0 || size < 0 || offset + size > store.size())
             throw new IllegalArgumentException("offset: " + offset + ", size: " + size + ", store.size: " + store.size());
         this.objectSerializer = store.objectSerializer();
+        assert checkSingleThread();
         startAddr = positionAddr = store.address() + offset;
         capacityAddr = limitAddr = startAddr + size;
+        underlyingBytes = null;
+        underlyingOffset = 0;
+    }
+
+    public void setBytesOffset(Bytes bytes, long offset) {
+        this.objectSerializer = bytes.objectSerializer();
+        assert checkSingleThread();
+        startAddr = positionAddr = bytes.address() + offset;
+        capacityAddr = limitAddr = startAddr + bytes.capacity();
+        underlyingBytes = bytes;
+        underlyingOffset = offset;
+    }
+
+    public Bytes underlyingBytes() {
+        if (underlyingBytes == null) throw new IllegalStateException();
+        return underlyingBytes;
+    }
+
+    public long underlyingOffset() {
+        return underlyingOffset;
     }
 }
 

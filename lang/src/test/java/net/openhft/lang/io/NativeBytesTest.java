@@ -430,7 +430,20 @@ public class NativeBytesTest {
         bytes.position(0);
         for (long i : longs)
             assertEquals(i, bytes.readStopBit());
+
+        for(long l = 1; l > 0; l += l) {
+            bytes.clear();
+            bytes.writeStopBit(l-1);
+            bytes.writeStopBit(l);
+            bytes.writeStopBit(l+1);
+            bytes.flip();
+            assertEquals(l-1, bytes.readStopBit());
+            assertEquals(l, bytes.readStopBit());
+            assertEquals(l+1, bytes.readStopBit());
+            assertEquals(0, bytes.remaining());
+        }
     }
+
 
     @Test
     public void testReadWriteChar() {
@@ -901,17 +914,13 @@ public class NativeBytesTest {
         bytes.writeLong(16);
         bytes.finish();
         bytes.flush();
-        bytes.writeLong(24);
         try {
+            bytes.writeLong(24);
             bytes.finish();
             fail();
         } catch (IndexOutOfBoundsException expected) {
         }
-        try {
-            bytes.flush();
-            fail();
-        } catch (IndexOutOfBoundsException expected) {
-        }
+
         bytes.clear();
         assertEquals(0, bytes.position());
         assertEquals(8, bytes.skip(8));

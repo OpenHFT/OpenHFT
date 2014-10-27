@@ -65,6 +65,7 @@ public class NativeBytes extends AbstractBytes {
 
     public NativeBytes(long startAddr, long capacityAddr) {
         super();
+        assert checkSingleThread();
         this.positionAddr =
                 this.startAddr = startAddr;
         this.limitAddr =
@@ -78,6 +79,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory,
                        long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(bytesMarshallerFactory, refCount);
+        assert checkSingleThread();
         this.positionAddr =
                 this.startAddr = startAddr;
         this.limitAddr =
@@ -87,6 +89,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes(ObjectSerializer objectSerializer,
                        long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(objectSerializer, refCount);
+        assert checkSingleThread();
         this.positionAddr =
                 this.startAddr = startAddr;
         this.limitAddr =
@@ -96,6 +99,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes(NativeBytes bytes) {
         super(bytes.objectSerializer(), new AtomicInteger(1));
         this.startAddr = bytes.startAddr;
+        assert checkSingleThread();
         this.positionAddr = bytes.positionAddr;
         this.limitAddr = bytes.limitAddr;
         this.capacityAddr = bytes.capacityAddr;
@@ -182,13 +186,15 @@ public class NativeBytes extends AbstractBytes {
         if (left <= 0) return -1;
         int len2 = (int) Math.min(len, left);
         UNSAFE.copyMemory(null, positionAddr, bytes, BYTES_OFFSET + off, len2);
-        positionAddr += len2;
+        addPosition(len2);
         return len2;
     }
 
     @Override
     public byte readByte() {
-        return UNSAFE.getByte(positionAddr++);
+        byte aByte = UNSAFE.getByte(positionAddr);
+        addPosition(1);
+        return aByte;
     }
 
     @Override
@@ -203,7 +209,7 @@ public class NativeBytes extends AbstractBytes {
         if (left < len)
             throw new IllegalStateException(new EOFException());
         UNSAFE.copyMemory(null, positionAddr, b, BYTES_OFFSET + off, len);
-        positionAddr += len;
+        addPosition(len);
     }
 
     @Override
@@ -215,13 +221,13 @@ public class NativeBytes extends AbstractBytes {
         if (left < bytesLen)
             throw new IllegalStateException(new EOFException());
         UNSAFE.copyMemory(null, positionAddr, data, BYTES_OFFSET + bytesOff, bytesLen);
-        positionAddr += bytesLen;
+        addPosition(bytesLen);
     }
 
     @Override
     public short readShort() {
         short s = UNSAFE.getShort(positionAddr);
-        positionAddr += 2;
+        addPosition(2);
         return s;
     }
 
@@ -233,7 +239,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public char readChar() {
         char ch = UNSAFE.getChar(positionAddr);
-        positionAddr += 2;
+        addPosition(2);
         return ch;
     }
 
@@ -245,7 +251,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public int readInt() {
         int i = UNSAFE.getInt(positionAddr);
-        positionAddr += 4;
+        addPosition(4);
         return i;
     }
 
@@ -257,7 +263,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public int readVolatileInt() {
         int i = UNSAFE.getIntVolatile(null, positionAddr);
-        positionAddr += 4;
+        addPosition(4);
         return i;
     }
 
@@ -269,7 +275,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public long readLong() {
         long l = UNSAFE.getLong(positionAddr);
-        positionAddr += 8;
+        addPosition(8);
         return l;
     }
 
@@ -281,7 +287,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public long readVolatileLong() {
         long l = UNSAFE.getLongVolatile(null, positionAddr);
-        positionAddr += 8;
+        addPosition(8);
         return l;
     }
 
@@ -293,7 +299,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public float readFloat() {
         float f = UNSAFE.getFloat(positionAddr);
-        positionAddr += 4;
+        addPosition(4);
         return f;
     }
 
@@ -305,7 +311,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public double readDouble() {
         double d = UNSAFE.getDouble(positionAddr);
-        positionAddr += 8;
+        addPosition(8);
         return d;
     }
 
@@ -316,7 +322,8 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void write(int b) {
-        UNSAFE.putByte(positionAddr++, (byte) b);
+        UNSAFE.putByte(positionAddr, (byte) b);
+        addPosition(1);
     }
 
     @Override
@@ -329,7 +336,7 @@ public class NativeBytes extends AbstractBytes {
         if (offset < 0 || offset + bytes.length > capacity())
             throw new IllegalArgumentException();
         UNSAFE.copyMemory(bytes, BYTES_OFFSET, null, startAddr + offset, bytes.length);
-        positionAddr += bytes.length;
+        addPosition(bytes.length);
     }
 
     @Override
@@ -337,13 +344,13 @@ public class NativeBytes extends AbstractBytes {
         if (off < 0 || off + len > bytes.length || len > remaining())
             throw new IllegalArgumentException();
         UNSAFE.copyMemory(bytes, BYTES_OFFSET + off, null, positionAddr, len);
-        positionAddr += len;
+        addPosition(len);
     }
 
     @Override
     public void writeShort(int v) {
         UNSAFE.putShort(positionAddr, (short) v);
-        positionAddr += 2;
+        addPosition(2);
     }
 
     @Override
@@ -354,7 +361,22 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeChar(int v) {
         UNSAFE.putChar(positionAddr, (char) v);
-        positionAddr += 2;
+        addPosition(2);
+    }
+
+    Thread singleThread = null;
+
+    boolean checkSingleThread() {
+        Thread t = Thread.currentThread();
+        if (singleThread == null)
+            singleThread = t;
+        if (singleThread != t)
+            throw new IllegalStateException("Altered by thread " + singleThread + " and " + t);
+        return true;
+    }
+
+    void addPosition(long delta) {
+        positionAddr(positionAddr() + delta);
     }
 
     @Override
@@ -365,7 +387,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeInt(int v) {
         UNSAFE.putInt(positionAddr, v);
-        positionAddr += 4;
+        addPosition(4);
     }
 
     @Override
@@ -376,7 +398,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeOrderedInt(int v) {
         UNSAFE.putOrderedInt(null, positionAddr, v);
-        positionAddr += 4;
+        addPosition(4);
     }
 
     @Override
@@ -392,7 +414,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeLong(long v) {
         UNSAFE.putLong(positionAddr, v);
-        positionAddr += 8;
+        addPosition(8);
     }
 
     @Override
@@ -403,7 +425,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeOrderedLong(long v) {
         UNSAFE.putOrderedLong(null, positionAddr, v);
-        positionAddr += 8;
+        addPosition(8);
     }
 
     @Override
@@ -419,7 +441,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeFloat(float v) {
         UNSAFE.putFloat(positionAddr, v);
-        positionAddr += 4;
+        addPosition(4);
     }
 
     @Override
@@ -430,7 +452,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeDouble(double v) {
         UNSAFE.putDouble(positionAddr, v);
-        positionAddr += 8;
+        addPosition(8);
     }
 
     @Override
@@ -441,6 +463,9 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void readObject(Object object, int start, int end) {
         int len = end - start;
+        if (positionAddr + len >= limitAddr)
+            throw new IndexOutOfBoundsException("Length out of bounds len: "+len);
+        assert checkSingleThread();
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(object, (long) start, UNSAFE.getLong(positionAddr));
             positionAddr += 8;
@@ -456,6 +481,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeObject(Object object, int start, int end) {
         int len = end - start;
+        assert checkSingleThread();
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(positionAddr, UNSAFE.getLong(object, (long) start));
             positionAddr += 8;
@@ -498,6 +524,18 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes position(long position) {
         if (position < 0 || position > limit())
             throw new IllegalArgumentException("position: " + position + " limit: " + limit());
+
+        assert checkSingleThread();
+        this.positionAddr = startAddr + position;
+        return this;
+    }
+
+    /*
+     * Same as position(long) except it doesn't check for thread safety.
+     */
+    public NativeBytes lazyPosition(long position) {
+        if (position < 0 || position > limit())
+            throw new IllegalArgumentException("position: " + position + " limit: " + limit());
         this.positionAddr = startAddr + position;
         return this;
     }
@@ -522,6 +560,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes limit(long limit) {
         if (limit < 0 || limit > capacity())
             throw new IllegalArgumentException("limit: " + limit + " capacity: " + capacity());
+        assert checkSingleThread();
         limitAddr = startAddr + limit;
         return this;
     }
@@ -560,11 +599,20 @@ public class NativeBytes extends AbstractBytes {
     }
 
     public void alignPositionAddr(int powerOf2) {
+        assert checkSingleThread();
         positionAddr = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
     }
 
     public void positionAddr(long positionAddr) {
+        assert positionChecks(positionAddr);
         this.positionAddr = positionAddr;
+    }
+
+    private boolean positionChecks(long positionAddr) {
+        if (positionAddr < startAddr || positionAddr > limitAddr)
+            throw new IndexOutOfBoundsException("position out of bounds.");
+        assert checkSingleThread();
+        return true;
     }
 
     public long positionAddr() {
