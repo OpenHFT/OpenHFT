@@ -31,7 +31,6 @@
         <module>Java-Thread-Affinity</module>
         <module>Java-Runtime-Compiler</module>
         <module>Java-Lang</module>
-        <!--<module>HugeCollections</module>-->
         <module>SAXophone</module>
         <module>Chronicle-Map</module>
         <module>Chronicle-Queue</module>
