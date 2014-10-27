@@ -30,8 +30,13 @@ import net.openhft.lang.pool.StringInterner;
 public class StringMarshaller extends ImmutableMarshaller<String>
         implements CompactBytesMarshaller<String> {
     private final int size;
-    private final StringBuilder reader = new StringBuilder(128);
-    private StringInterner interner;
+    private static final ThreadLocal<StringBuilder> reader = new ThreadLocal<StringBuilder>() {
+        @Override
+        protected StringBuilder initialValue() {
+            return new StringBuilder(128);
+        }
+    };
+    private transient StringInterner interner;
 
     public StringMarshaller(int size) {
         this.size = size;
@@ -45,13 +50,14 @@ public class StringMarshaller extends ImmutableMarshaller<String>
     @Nullable
     @Override
     public String read(@NotNull Bytes bytes) {
+        StringBuilder reader = StringMarshaller.reader.get();
         if (bytes.readUTFΔ(reader))
-            return builderToString();
+            return builderToString(reader);
         return null;
     }
 
 
-    private String builderToString() {
+    private String builderToString(StringBuilder reader) {
         if (interner == null) {
             if (size == 0)
                 return reader.toString();

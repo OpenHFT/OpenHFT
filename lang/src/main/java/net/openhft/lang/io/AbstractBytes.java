@@ -400,10 +400,12 @@ public abstract class AbstractBytes implements Bytes {
     @SuppressWarnings("MagicNumber")
     private boolean appendUTF0(@NotNull Appendable appendable) throws IOException {
         long len = readStopBit();
-        if (len < -1 || len > Integer.MAX_VALUE)
-            throw new StreamCorruptedException("UTF length invalid " + len);
         if (len == -1)
             return false;
+        else if (len == 0)
+            return true;
+        if (len < -1 || len > remaining())
+            throw new StreamCorruptedException("UTF length invalid " + len + " remaining: " + remaining());
         int utflen = (int) len;
         readUTF0(this, appendable, utflen);
         return true;
@@ -2595,8 +2597,10 @@ public abstract class AbstractBytes implements Bytes {
                 if (readersLocked >= RW_LOCK_MASK)
                     throw new IllegalStateException("readersLocked has reached a limit of " + readersLocked);
                 int readersWaiting = rwReadWaiting(lock);
-                if (readersWaiting <= 0)
-                    throw new IllegalStateException("readersWaiting has underflowed: " + readersWaiting);
+                if (readersWaiting <= 0) {
+                    System.err.println("readersWaiting has underflowed: " + readersWaiting);
+                    return false;
+                }
                 // add to the readLock count and decrease the readWaiting count.
                 if (compareAndSwapLong(offset, lock, lock + RW_READ_LOCKED - RW_READ_WAITING))
                     return true;
@@ -2606,8 +2610,10 @@ public abstract class AbstractBytes implements Bytes {
                 // release waiting
                 for (; ; ) {
                     int readersWaiting = rwReadWaiting(lock);
-                    if (readersWaiting <= 0)
-                        throw new IllegalStateException("readersWaiting has underflowed: " + readersWaiting);
+                    if (readersWaiting <= 0) {
+                        System.err.println("readersWaiting has underflowed: " + readersWaiting);
+                        return false;
+                    }
                     if (compareAndSwapLong(offset, lock, lock - RW_READ_WAITING))
                         break;
                     lock = readVolatileLong(offset);
@@ -2648,8 +2654,10 @@ public abstract class AbstractBytes implements Bytes {
             int writersLocked = rwWriteLocked(lock);
             if (readersLocked <= 0 && writersLocked <= 0) {
                 // increment readers locked.
-                if (writersWaiting <= 0)
-                    throw new IllegalStateException("writersWaiting has underflowed");
+                if (writersWaiting <= 0) {
+                    System.err.println("writersWaiting has underflowed");
+                    return false;
+                }
                 // add to the readLock count and decrease the readWaiting count.
                 if (compareAndSwapLong(offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
                     return true;
