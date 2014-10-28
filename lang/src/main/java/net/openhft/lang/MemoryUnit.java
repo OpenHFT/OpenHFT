@@ -47,28 +47,44 @@ public enum MemoryUnit {
      * Memory unit representing one bit.
      */
     BITS {
-        @Override public long toBits(long d)       { return d; }
-        @Override public long toBytes(long d)      { return d/(C1/C0); }
-        @Override public long toLongs(long d)      { return d/(C2/C0); }
-        @Override public long toCacheLines(long d) { return d/(C3/C0); }
-        @Override public long toKilobytes(long d)  { return d/(C4/C0); }
-        @Override public long toMegabytes(long d)  { return d/(C5/C0); }
-        @Override public long toGigabytes(long d)  { return d/(C6/C0); }
-        @Override public long convert(long d, MemoryUnit u) { return u.toBits(d); }
+        @Override public long toBits(long a)       { return a; }
+        @Override public long toBytes(long a)      { return a/(C1/C0); }
+        @Override public long toLongs(long a)      { return a/(C2/C0); }
+        @Override public long toCacheLines(long a) { return a/(C3/C0); }
+        @Override public long toKilobytes(long a)  { return a/(C4/C0); }
+        @Override public long toMegabytes(long a)  { return a/(C5/C0); }
+        @Override public long toGigabytes(long a)  { return a/(C6/C0); }
+        @Override public long convert(long a, MemoryUnit u) { return u.toBits(a); }
+
+        @Override long alignToBytes(long a)        { return y(a, C1/C0); }
+        @Override long alignToLongs(long a)        { return y(a, C2/C0); }
+        @Override long alignToCacheLines(long a)   { return y(a, C3/C0); }
+        @Override long alignToKilobytes(long a)    { return y(a, C4/C0); }
+        @Override long alignToMegaBytes(long a)    { return y(a, C5/C0); }
+        @Override long alignToGigabytes(long a)    { return y(a, C6/C0); }
+        @Override public long align(long a, MemoryUnit u) { return ise(u, this); }
     },
 
     /**
      * Memory unit representing one byte, i. e. 8 bits.
      */
     BYTES {
-        @Override public long toBits(long d)       { return x(d, C1/C0, MAX/(C1/C0)); }
-        @Override public long toBytes(long d)      { return d; }
-        @Override public long toLongs(long d)      { return d/(C2/C1); }
-        @Override public long toCacheLines(long d) { return d/(C3/C1); }
-        @Override public long toKilobytes(long d)  { return d/(C4/C1); }
-        @Override public long toMegabytes(long d)  { return d/(C5/C1); }
-        @Override public long toGigabytes(long d)  { return d/(C6/C1); }
-        @Override public long convert(long d, MemoryUnit u) { return u.toBytes(d); }
+        @Override public long toBits(long a)       { return x(a, C1/C0, MAX/(C1/C0)); }
+        @Override public long toBytes(long a)      { return a; }
+        @Override public long toLongs(long a)      { return a/(C2/C1); }
+        @Override public long toCacheLines(long a) { return a/(C3/C1); }
+        @Override public long toKilobytes(long a)  { return a/(C4/C1); }
+        @Override public long toMegabytes(long a)  { return a/(C5/C1); }
+        @Override public long toGigabytes(long a)  { return a/(C6/C1); }
+        @Override public long convert(long a, MemoryUnit u) { return u.toBytes(a); }
+
+        @Override long alignToBytes(long a)        { return ise(this, BYTES); }
+        @Override long alignToLongs(long a)        { return y(a, C2/C1); }
+        @Override long alignToCacheLines(long a)   { return y(a, C3/C1); }
+        @Override long alignToKilobytes(long a)    { return y(a, C4/C1); }
+        @Override long alignToMegaBytes(long a)    { return y(a, C5/C1); }
+        @Override long alignToGigabytes(long a)    { return y(a, C6/C1); }
+        @Override public long align(long a, MemoryUnit u) { return u.alignToBytes(a); }
     },
 
     /**
@@ -76,70 +92,110 @@ public enum MemoryUnit {
      * the width of Java's primitive {@code long} type.
      */
     LONGS {
-        @Override public long toBits(long d)       { return x(d, C2/C0, MAX/(C2/C0)); }
-        @Override public long toBytes(long d)      { return x(d, C2/C1, MAX/(C2/C1)); }
-        @Override public long toLongs(long d)      { return d; }
-        @Override public long toCacheLines(long d) { return d/(C3/C2); }
-        @Override public long toKilobytes(long d)  { return d/(C4/C2); }
-        @Override public long toMegabytes(long d)  { return d/(C5/C2); }
-        @Override public long toGigabytes(long d)  { return d/(C6/C2); }
-        @Override public long convert(long d, MemoryUnit u) { return u.toLongs(d); }
+        @Override public long toBits(long a)       { return x(a, C2/C0, MAX/(C2/C0)); }
+        @Override public long toBytes(long a)      { return x(a, C2/C1, MAX/(C2/C1)); }
+        @Override public long toLongs(long a)      { return a; }
+        @Override public long toCacheLines(long a) { return a/(C3/C2); }
+        @Override public long toKilobytes(long a)  { return a/(C4/C2); }
+        @Override public long toMegabytes(long a)  { return a/(C5/C2); }
+        @Override public long toGigabytes(long a)  { return a/(C6/C2); }
+        @Override public long convert(long a, MemoryUnit u) { return u.toLongs(a); }
+
+        @Override long alignToBytes(long a)        { return ise(this, BYTES); }
+        @Override long alignToLongs(long a)        { return ise(this, LONGS); }
+        @Override long alignToCacheLines(long a)   { return y(a, C3/C2); }
+        @Override long alignToKilobytes(long a)    { return y(a, C4/C2); }
+        @Override long alignToMegaBytes(long a)    { return y(a, C5/C2); }
+        @Override long alignToGigabytes(long a)    { return y(a, C6/C2); }
+        @Override public long align(long a, MemoryUnit u) { return u.alignToLongs(a); }
     },
 
     /**
      * Memory unit representing 64 bytes, i. e. most common CPU cache line size.
      */
     CACHE_LINES {
-        @Override public long toBits(long d)       { return x(d, C3/C0, MAX/(C3/C0)); }
-        @Override public long toBytes(long d)      { return x(d, C3/C1, MAX/(C3/C1)); }
-        @Override public long toLongs(long d)      { return x(d, C3/C2, MAX/(C3/C2)); }
-        @Override public long toCacheLines(long d) { return d; }
-        @Override public long toKilobytes(long d)  { return d/(C4/C3); }
-        @Override public long toMegabytes(long d)  { return d/(C5/C3); }
-        @Override public long toGigabytes(long d)  { return d/(C6/C3); }
-        @Override public long convert(long d, MemoryUnit u) { return u.toCacheLines(d); }
+        @Override public long toBits(long a)       { return x(a, C3/C0, MAX/(C3/C0)); }
+        @Override public long toBytes(long a)      { return x(a, C3/C1, MAX/(C3/C1)); }
+        @Override public long toLongs(long a)      { return x(a, C3/C2, MAX/(C3/C2)); }
+        @Override public long toCacheLines(long a) { return a; }
+        @Override public long toKilobytes(long a)  { return a/(C4/C3); }
+        @Override public long toMegabytes(long a)  { return a/(C5/C3); }
+        @Override public long toGigabytes(long a)  { return a/(C6/C3); }
+        @Override public long convert(long a, MemoryUnit u) { return u.toCacheLines(a); }
+
+        @Override long alignToBytes(long a)        { return ise(this, BYTES); }
+        @Override long alignToLongs(long a)        { return ise(this, LONGS); }
+        @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
+        @Override long alignToKilobytes(long a)    { return y(a, C4/C3); }
+        @Override long alignToMegaBytes(long a)    { return y(a, C5/C3); }
+        @Override long alignToGigabytes(long a)    { return y(a, C6/C3); }
+        @Override public long align(long a, MemoryUnit u) { return u.alignToCacheLines(a); }
     },
 
     /**
      * Memory unit representing 1024 bytes.
      */
     KILOBYTES {
-        @Override public long toBits(long d)       { return x(d, C4/C0, MAX/(C4/C0)); }
-        @Override public long toBytes(long d)      { return x(d, C4/C1, MAX/(C4/C1)); }
-        @Override public long toLongs(long d)      { return x(d, C4/C2, MAX/(C4/C2)); }
-        @Override public long toCacheLines(long d) { return x(d, C4/C3, MAX/(C4/C3)); }
-        @Override public long toKilobytes(long d)  { return d; }
-        @Override public long toMegabytes(long d)  { return d/(C5/C4); }
-        @Override public long toGigabytes(long d)  { return d/(C6/C4); }
-        @Override public long convert(long d, MemoryUnit u) { return u.toKilobytes(d); }
+        @Override public long toBits(long a)       { return x(a, C4/C0, MAX/(C4/C0)); }
+        @Override public long toBytes(long a)      { return x(a, C4/C1, MAX/(C4/C1)); }
+        @Override public long toLongs(long a)      { return x(a, C4/C2, MAX/(C4/C2)); }
+        @Override public long toCacheLines(long a) { return x(a, C4/C3, MAX/(C4/C3)); }
+        @Override public long toKilobytes(long a)  { return a; }
+        @Override public long toMegabytes(long a)  { return a/(C5/C4); }
+        @Override public long toGigabytes(long a)  { return a/(C6/C4); }
+        @Override public long convert(long a, MemoryUnit u) { return u.toKilobytes(a); }
+
+        @Override long alignToBytes(long a)        { return ise(this, BYTES); }
+        @Override long alignToLongs(long a)        { return ise(this, LONGS); }
+        @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
+        @Override long alignToKilobytes(long a)    { return ise(this, KILOBYTES); }
+        @Override long alignToMegaBytes(long a)    { return y(a, C5/C4); }
+        @Override long alignToGigabytes(long a)    { return y(a, C6/C4); }
+        @Override public long align(long a, MemoryUnit u) { return u.alignToKilobytes(a); }
     },
 
     /**
      * Memory unit representing 1024 kilobytes.
      */
     MEGABYTES {
-        @Override public long toBits(long d)       { return x(d, C5/C0, MAX/(C5/C0)); }
-        @Override public long toBytes(long d)      { return x(d, C5/C1, MAX/(C5/C1)); }
-        @Override public long toLongs(long d)      { return x(d, C5/C2, MAX/(C5/C2)); }
-        @Override public long toCacheLines(long d) { return x(d, C5/C3, MAX/(C5/C3)); }
-        @Override public long toKilobytes(long d)  { return x(d, C5/C4, MAX/(C5/C4)); }
-        @Override public long toMegabytes(long d)  { return d; }
-        @Override public long toGigabytes(long d)  { return d/(C6/C5); }
-        @Override public long convert(long d, MemoryUnit u) { return u.toMegabytes(d); }
+        @Override public long toBits(long a)       { return x(a, C5/C0, MAX/(C5/C0)); }
+        @Override public long toBytes(long a)      { return x(a, C5/C1, MAX/(C5/C1)); }
+        @Override public long toLongs(long a)      { return x(a, C5/C2, MAX/(C5/C2)); }
+        @Override public long toCacheLines(long a) { return x(a, C5/C3, MAX/(C5/C3)); }
+        @Override public long toKilobytes(long a)  { return x(a, C5/C4, MAX/(C5/C4)); }
+        @Override public long toMegabytes(long a)  { return a; }
+        @Override public long toGigabytes(long a)  { return a/(C6/C5); }
+        @Override public long convert(long a, MemoryUnit u) { return u.toMegabytes(a); }
+
+        @Override long alignToBytes(long a)        { return ise(this, BYTES); }
+        @Override long alignToLongs(long a)        { return ise(this, LONGS); }
+        @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
+        @Override long alignToKilobytes(long a)    { return ise(this, KILOBYTES); }
+        @Override long alignToMegaBytes(long a)    { return ise(this, MEGABYTES); }
+        @Override long alignToGigabytes(long a)    { return y(a, C6/C5); }
+        @Override public long align(long a, MemoryUnit u) { return u.alignToMegaBytes(a); }
     },
 
     /**
      * Memory unit representing 1024 megabytes.
      */
     GIGABYTES {
-        @Override public long toBits(long d)       { return x(d, C6/C0, MAX/(C6/C0)); }
-        @Override public long toBytes(long d)      { return x(d, C6/C1, MAX/(C6/C1)); }
-        @Override public long toLongs(long d)      { return x(d, C6/C2, MAX/(C6/C2)); }
-        @Override public long toCacheLines(long d) { return x(d, C6/C3, MAX/(C6/C3)); }
-        @Override public long toKilobytes(long d)  { return x(d, C6/C4, MAX/(C6/C4)); }
-        @Override public long toMegabytes(long d)  { return x(d, C6/C5, MAX/(C6/C5)); }
-        @Override public long toGigabytes(long d)  { return d; }
-        @Override public long convert(long d, MemoryUnit u) { return u.toGigabytes(d); }
+        @Override public long toBits(long a)       { return x(a, C6/C0, MAX/(C6/C0)); }
+        @Override public long toBytes(long a)      { return x(a, C6/C1, MAX/(C6/C1)); }
+        @Override public long toLongs(long a)      { return x(a, C6/C2, MAX/(C6/C2)); }
+        @Override public long toCacheLines(long a) { return x(a, C6/C3, MAX/(C6/C3)); }
+        @Override public long toKilobytes(long a)  { return x(a, C6/C4, MAX/(C6/C4)); }
+        @Override public long toMegabytes(long a)  { return x(a, C6/C5, MAX/(C6/C5)); }
+        @Override public long toGigabytes(long a)  { return a; }
+        @Override public long convert(long a, MemoryUnit u) { return u.toGigabytes(a); }
+
+        @Override long alignToBytes(long a)        { return ise(this, BYTES); }
+        @Override long alignToLongs(long a)        { return ise(this, LONGS); }
+        @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
+        @Override long alignToKilobytes(long a)    { return ise(this, KILOBYTES); }
+        @Override long alignToMegaBytes(long a)    { return ise(this, MEGABYTES); }
+        @Override long alignToGigabytes(long a)    { return ise(this, GIGABYTES); }
+        @Override public long align(long a, MemoryUnit u) { return u.alignToGigabytes(a); }
     };
 
     // Handy constants for conversion methods
@@ -157,10 +213,41 @@ public enum MemoryUnit {
      * Scale d by m, checking for overflow.
      * This has a short name to make above code more readable.
      */
-    static long x(long d, long m, long over) {
-        if (d >  over) return Long.MAX_VALUE;
-        if (d < -over) return Long.MIN_VALUE;
-        return d * m;
+    static long x(long a, long m, long over) {
+        if (a >  over) return Long.MAX_VALUE;
+        if (a < -over) return Long.MIN_VALUE;
+        return a * m;
+    }
+
+    static long y(long amount, long align) {
+        if (amount == 0L)
+            return 0L;
+        long mask = ~(align - 1L);
+        if (amount > 0L) {
+            long filled = amount + align - 1L;
+            if (filled > 0L) {
+                return filled & mask;
+            } else {
+                long maxAlignedLong = Long.MAX_VALUE & mask;
+                if (amount <= maxAlignedLong)
+                    return maxAlignedLong;
+            }
+        } else {
+            // amount is negative
+            long filled = amount - align + 1L;
+            if (filled < 0L) {
+                return filled & mask;
+            } else {
+                long minAlignedLong = Long.MIN_VALUE & mask;
+                if (amount >= minAlignedLong)
+                    return minAlignedLong;
+            }
+        }
+        throw new IllegalArgumentException("Couldn't align " + amount + " by " + align);
+    }
+
+    static long ise(MemoryUnit unitToAlign, MemoryUnit alignmentUnit) {
+        throw new IllegalStateException("Couldn't align " + unitToAlign + " by " + alignmentUnit);
     }
 
     // To maintain full signature compatibility with 1.5, and to improve the
@@ -188,6 +275,34 @@ public enum MemoryUnit {
      */
     public long convert(long sourceAmount, MemoryUnit sourceUnit) {
         throw new AbstractMethodError();
+    }
+
+    /**
+     * Aligns the given memory amount in the given unit to this unit. For example, aligning
+     * {@code 1000} bytes to kilobytes results in {@code 1024}. Negative values are aligned towards
+     * negative infinity: e. g. aligning {@code -5} longs to cache lines results in {@code -8}.
+     *
+     * @param amountToAlign the memory amount in the given {@code unit}
+     * @param unit the unit of the {@code amountToAlign} argument
+     * @return the aligned amount, still in the given unit
+     * @throws IllegalArgumentException if the given {@code unit} is finer than this unit,
+     * or if the aligned value overflows {@code long} bounds
+     */
+    public long align(long amountToAlign, MemoryUnit unit) {
+        throw new AbstractMethodError();
+    }
+
+    /**
+     * Equivalent to {@code convert(align(sourceAmount, sourceUnit), sourceUnit)}.
+     *
+     * @param sourceAmount the memory amount in the given {@code sourceUnit}
+     * @param sourceUnit the unit of the {@code sourceAmount} argument
+     * @return the saturated converted amount in this unit
+     * @throws IllegalArgumentException if the given {@code sourceUnit} is finer than this unit,
+     * or if the aligned value overflows {@code long} bounds
+     */
+    public long alignAndConvert(long sourceAmount, MemoryUnit sourceUnit) {
+        return convert(align(sourceAmount, sourceUnit), sourceUnit);
     }
 
     /**
@@ -271,4 +386,11 @@ public enum MemoryUnit {
     public long toGigabytes(long amount) {
         throw new AbstractMethodError();
     }
+
+    abstract long alignToBytes(long amount);
+    abstract long alignToLongs(long amount);
+    abstract long alignToCacheLines(long amount);
+    abstract long alignToKilobytes(long amount);
+    abstract long alignToMegaBytes(long amount);
+    abstract long alignToGigabytes(long amount);
 }
