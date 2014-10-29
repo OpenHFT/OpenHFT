@@ -24,6 +24,7 @@ import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.JDKObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
+import net.openhft.lang.io.serialization.impl.StringBuilderPool;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.io.view.BytesInputStream;
 import net.openhft.lang.io.view.BytesOutputStream;
@@ -89,7 +90,7 @@ public abstract class AbstractBytes implements Bytes {
     private static final int INT_MAX_VALUE = Integer.MIN_VALUE + 2;
     private static final long MAX_VALUE_DIVIDE_10 = Long.MAX_VALUE / 10;
     private static final byte[] RADIX = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes();
-    private static final ThreadLocal<StringBuilder> utfReaderTL = new ThreadLocal<StringBuilder>();
+    private static final StringBuilderPool sbp = new StringBuilderPool();
     private static final ThreadLocal<DateCache> dateCacheTL = new ThreadLocal<DateCache>();
     private static boolean ID_LIMIT_WARNED = false;
     final AtomicInteger refCount;
@@ -379,12 +380,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @NotNull
     private StringBuilder acquireUtfReader() {
-        StringBuilder utfReader = utfReaderTL.get();
-        if (utfReader == null)
-            utfReaderTL.set(utfReader = new StringBuilder(128));
-        else
-            utfReader.setLength(0);
-        return utfReader;
+        return sbp.acquireStringBuilder();
     }
 
     @Override

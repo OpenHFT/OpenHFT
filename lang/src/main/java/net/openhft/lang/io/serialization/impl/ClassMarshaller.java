@@ -51,12 +51,7 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
     }
 
     private final ClassLoader classLoader;
-    private static final ThreadLocal<StringBuilder> threadLocalClassName = new ThreadLocal<StringBuilder>() {
-        @Override
-        protected StringBuilder initialValue() {
-            return new StringBuilder(40);
-        }
-    };
+    private static final StringBuilderPool sbp = new StringBuilderPool();
     @Nullable
     @SuppressWarnings("unchecked")
     private WeakReference<Class>[] classWeakReference = null;
@@ -76,10 +71,9 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
     @Nullable
     @Override
     public Class read(@NotNull Bytes bytes) {
-        StringBuilder className = threadLocalClassName.get();
-        className.setLength(0);
-        bytes.readUTFΔ(className);
-        return load(className);
+        StringBuilder sb = sbp.acquireStringBuilder();
+        bytes.readUTFΔ(sb);
+        return load(sb);
     }
 
     @Nullable

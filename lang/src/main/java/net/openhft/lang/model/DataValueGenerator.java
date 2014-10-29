@@ -23,7 +23,6 @@ import net.openhft.lang.Compare;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -48,7 +47,6 @@ public class DataValueGenerator {
             return cmp == 0 ? o1.getKey().compareTo(o2.getKey()) : cmp;
         }
     };
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataValueGenerator.class);
     private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
     private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
     private boolean dumpCode = Boolean.getBoolean("dvg.dumpCode");
@@ -567,7 +565,7 @@ public class DataValueGenerator {
             try {
                 String actual = generateHeapObject(tClass);
                 if (dumpCode)
-                    LOGGER.info(actual);
+                    LoggerFactory.getLogger(DataValueGenerator.class).info(actual);
                 heapClass = CompilerUtils.CACHED_COMPILER.loadFromJava(classLoader, className, actual);
             } catch (ClassNotFoundException e) {
                 throw new AssertionError(e);
@@ -606,7 +604,7 @@ public class DataValueGenerator {
         }
         String actual = new DataValueGenerator().generateNativeObject(dvmodel);
         if (dumpCode)
-            LOGGER.info(actual);
+            LoggerFactory.getLogger(DataValueGenerator.class).info(actual);
         ClassLoader classLoader = tClass.getClassLoader();
         String className = tClass.getName() + "$$Native";
         try {

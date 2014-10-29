@@ -38,7 +38,7 @@ public class EnumBytesMarshaller<E extends Enum<E>> extends ImmutableMarshaller<
     private final Map<String, E> map = new LinkedHashMap<String, E>(64);
     private final E defaultValue;
     private final int mask;
-    private final StringBuilder reader = new StringBuilder();
+    private static final StringBuilderPool sbp = new StringBuilderPool();
 
     public EnumBytesMarshaller(@NotNull Class<E> classMarshaled, E defaultValue) {
         this.defaultValue = defaultValue;
@@ -77,17 +77,18 @@ public class EnumBytesMarshaller<E extends Enum<E>> extends ImmutableMarshaller<
 
     @Override
     public E read(@NotNull Bytes bytes) {
-        bytes.readUTFΔ(reader);
-        return builderToEnum();
+        StringBuilder sb = sbp.acquireStringBuilder();
+        bytes.readUTFΔ(sb);
+        return builderToEnum(sb);
     }
 
-    private E builderToEnum() {
-        int num = hashFor(reader);
+    private E builderToEnum(StringBuilder sb) {
+        int num = hashFor(sb);
         int idx = num & mask;
         E e = interner[idx];
         if (e != null) return e;
         if (!internerDup.get(idx)) return defaultValue;
-        e = map.get(reader.toString());
+        e = map.get(sb.toString());
         return e == null ? defaultValue : e;
     }
 }

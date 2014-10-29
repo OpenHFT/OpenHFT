@@ -30,7 +30,7 @@ import java.util.Date;
  */
 public class DateMarshaller implements CompactBytesMarshaller<Date> {
     private final int size1;
-    private final StringBuilder sb = new StringBuilder();
+    private static final StringBuilderPool sbp = new StringBuilderPool();
     @Nullable
     private Date[] interner = null;
 
@@ -67,6 +67,7 @@ public class DateMarshaller implements CompactBytesMarshaller<Date> {
     @Nullable
     @Override
     public Date read(@NotNull Bytes bytes) {
+        StringBuilder sb = sbp.acquireStringBuilder();
         bytes.readUTFΔ(sb);
         long time = parseLong(sb);
         return lookupDate(time);
@@ -77,6 +78,7 @@ public class DateMarshaller implements CompactBytesMarshaller<Date> {
     public Date read(Bytes bytes, @Nullable Date date) {
         if (date == null)
             return read(bytes);
+        StringBuilder sb = sbp.acquireStringBuilder();
         bytes.readUTFΔ(sb);
         long time = parseLong(sb);
         date.setTime(time);

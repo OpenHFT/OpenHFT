@@ -71,7 +71,7 @@ public class StringInterner implements CharSequenceInterner<String> {
         long hash = 0;
         for (int i = 0; i < cs.length(); i++)
             hash = 57 * hash + cs.charAt(i);
-        int h = Maths.hash(hash) & mask;
+        int h = (int) Maths.hash(hash) & mask;
         String s = interner[h];
         if (isEqual(s, cs))
             return s;
