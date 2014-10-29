@@ -44,26 +44,27 @@ public abstract class Provider<T> {
         @Override
         public T get(ThreadLocalCopies copies, T original) {
             if (copies.currentlyAccessed.compareAndSet(false, true)) {
-                Object id = original.stateIdentity();
-                int m = copies.mask;
-                Object[] tab = copies.table;
-                int i = System.identityHashCode(id) & m;
-                T copy;
-                while (true) {
-                    Object idInTable = tab[i];
-                    if (idInTable == id) {
-                        copy = (T) tab[i + 1];
-                        break;
-                    } else if (idInTable == null) {
-                        tab[i] = id;
-                        tab[i + 1] = copy = original.copy();
-                        copies.postInsert();
-                        break;
+                try {
+                    Object id = original.stateIdentity();
+                    int m = copies.mask;
+                    Object[] tab = copies.table;
+                    int i = System.identityHashCode(id) & m;
+                    while (true) {
+                        Object idInTable = tab[i];
+                        if (idInTable == id) {
+                            return (T) tab[i + 1];
+                        } else if (idInTable == null) {
+                            tab[i] = id;
+                            T copy;
+                            tab[i + 1] = copy = original.copy();
+                            copies.postInsert();
+                            return copy;
+                        }
+                        i = (i + 2) & m;
                     }
-                    i = (i + 2) & m;
+                } finally {
+                    copies.currentlyAccessed.set(false);
                 }
-                copies.currentlyAccessed.set(false);
-                return copy;
             } else {
                 throw new IllegalStateException(
                         "Concurrent or recursive access to ThreadLocalCopies is not allowed");
