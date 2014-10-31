@@ -2550,11 +2550,10 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     // todo add tests before using in ChronicleMap
-    static final int RW_LOCK_LIMIT = 20;
-    static final long RW_READ_WAITING = 1L << 0;
-    static final long RW_READ_LOCKED = 1L << RW_LOCK_LIMIT;
-    static final long RW_WRITE_WAITING = 1L << 2 * RW_LOCK_LIMIT;
-    static final long RW_WRITE_LOCKED = 1L << 3 * RW_LOCK_LIMIT;
+    static final int RW_LOCK_LIMIT = 30;
+    static final long RW_READ_LOCKED = 1L << 0;
+    static final long RW_WRITE_WAITING = 1L <<  RW_LOCK_LIMIT;
+    static final long RW_WRITE_LOCKED = 1L << 2 * RW_LOCK_LIMIT;
     static final int RW_LOCK_MASK = (1 << RW_LOCK_LIMIT) - 1;
 
     // read/write lock support.
@@ -2576,15 +2575,6 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private boolean tryRWReadLock0(long offset, long timeOutNS) throws IllegalStateException {
-        // increment readers waiting.
-        for (; ; ) {
-            long lock = readVolatileLong(offset);
-            int readersWaiting = rwReadWaiting(lock);
-            if (readersWaiting >= RW_LOCK_MASK)
-                throw new IllegalStateException("readersWaiting has reached a limit of " + readersWaiting);
-            if (compareAndSwapLong(offset, lock, lock + RW_READ_WAITING))
-                break;
-        }
         long end = System.nanoTime() + timeOutNS;
         // wait for no write locks, nor waiting writes.
         for (; ; ) {
@@ -2596,30 +2586,13 @@ public abstract class AbstractBytes implements Bytes {
                 int readersLocked = rwReadLocked(lock);
                 if (readersLocked >= RW_LOCK_MASK)
                     throw new IllegalStateException("readersLocked has reached a limit of " + readersLocked);
-                int readersWaiting = rwReadWaiting(lock);
-                if (readersWaiting <= 0) {
-                    System.err.println("readersWaiting has underflowed: " + readersWaiting);
-                    return false;
-                }
                 // add to the readLock count and decrease the readWaiting count.
-                if (compareAndSwapLong(offset, lock, lock + RW_READ_LOCKED - RW_READ_WAITING))
+                if (compareAndSwapLong(offset, lock, lock + RW_READ_LOCKED))
                     return true;
 
             }
-            if (System.nanoTime() > end) {
-                // release waiting
-                for (; ; ) {
-                    int readersWaiting = rwReadWaiting(lock);
-                    if (readersWaiting <= 0) {
-                        System.err.println("readersWaiting has underflowed: " + readersWaiting);
-                        return false;
-                    }
-                    if (compareAndSwapLong(offset, lock, lock - RW_READ_WAITING))
-                        break;
-                    lock = readVolatileLong(offset);
-                }
+            if (System.nanoTime() > end)
                 return false;
-            }
         }
     }
 
@@ -2702,29 +2675,23 @@ public abstract class AbstractBytes implements Bytes {
 
     String dumpRWLock(long offset) {
         long lock = readVolatileLong(offset);
-        int readersWaiting = rwReadWaiting(lock);
         int readersLocked = rwReadLocked(lock);
         int writersWaiting = rwWriteWaiting(lock);
         int writersLocked = rwWriteLocked(lock);
         return "writerLocked: " + writersLocked
                 + ", writersWaiting: " + writersWaiting
-                + ", readersLocked: " + readersLocked
-                + ", readersWaiting: " + readersWaiting;
-    }
-
-    static int rwReadWaiting(long lock) {
-        return (int) (lock & RW_LOCK_MASK);
+                + ", readersLocked: " + readersLocked;
     }
 
     static int rwReadLocked(long lock) {
-        return (int) ((lock >>> RW_LOCK_LIMIT) & RW_LOCK_MASK);
+        return (int) (lock & RW_LOCK_MASK);
     }
 
     static int rwWriteWaiting(long lock) {
-        return (int) ((lock >>> (2 * RW_LOCK_LIMIT)) & RW_LOCK_MASK);
+        return (int) ((lock >>> RW_LOCK_LIMIT) & RW_LOCK_MASK);
     }
 
     static int rwWriteLocked(long lock) {
-        return (int) (lock >>> (3 * RW_LOCK_LIMIT));
+        return (int) (lock >>> (2 * RW_LOCK_LIMIT));
     }
 }
