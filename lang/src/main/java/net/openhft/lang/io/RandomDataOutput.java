@@ -873,6 +873,16 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     Bytes zeroOut(long start, long end);
 
+    /**
+     * fill the Bytes with zeros, and clear the position, avoiding touching pages unnecessarily
+     *
+     * @param start first byte to zero out
+     * @param end the first byte after the last to zero out (exclusive bound)
+     * @param ifNotZero only set to zero after checking the value is not zero.
+     * @return this
+     */
+    Bytes zeroOut(long start, long end, boolean ifNotZero);
+
 
     /**
      * Check the end of the stream has not overflowed.  Otherwise this doesn't do anything.

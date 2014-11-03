@@ -179,6 +179,40 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
+    public Bytes zeroOut(long start, long end, boolean ifNotZero) {
+        return ifNotZero ? zeroOutDirty(start, end) : zeroOut(start, end);
+    }
+
+    private Bytes zeroOutDirty(long start, long end) {
+        if (start < 0 || end > limit())
+            throw new IllegalArgumentException("start: " + start + ", end: " + end);
+        if (start >= end)
+            return this;
+        // get unaligned leading bytes
+        while(start < end && (start & 7) != 0) {
+            byte b = UNSAFE.getByte(startAddr + start);
+            if (b != 0)
+                UNSAFE.putByte(startAddr + start, (byte) 0);
+            start++;
+        }
+        // check 64-bit aligned access
+        while(start < end-7) {
+            long l = UNSAFE.getLong(startAddr + start);
+            if (l != 0)
+                UNSAFE.putLong(startAddr + start, 0L);
+            start++;
+        }
+        // check unaligned tail
+        while(start < end) {
+            byte b = UNSAFE.getByte(startAddr + start);
+            if (b != 0)
+                UNSAFE.putByte(startAddr + start, (byte) 0);
+            start++;
+        }
+        return this;
+    }
+
+    @Override
     public int read(@NotNull byte[] bytes, int off, int len) {
         if (len < 0 || off < 0 || off + len > bytes.length)
             throw new IllegalArgumentException();

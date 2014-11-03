@@ -133,6 +133,12 @@ public class ByteBufferBytes extends AbstractBytes {
         return this;
     }
 
+    @Override
+    public Bytes zeroOut(long start, long end, boolean ifNotZero) {
+        // ByteBuffers are allocated in memory eagerly.
+        return zeroOut(start, end);
+    }
+
     public ByteBuffer buffer() {
         return buffer;
     }
