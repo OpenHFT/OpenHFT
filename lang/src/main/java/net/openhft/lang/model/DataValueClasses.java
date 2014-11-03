@@ -18,6 +18,8 @@
 
 package net.openhft.lang.model;
 
+import net.openhft.lang.io.DirectStore;
+
 import java.util.WeakHashMap;
 
 /**
@@ -36,6 +38,13 @@ public enum DataValueClasses {
     public static <T> T newDirectReference(Class<T> interfaceClass) {
         DataValueClassCache dataValueClassCache = acquireCache(interfaceClass);
         return dataValueClassCache.newDirectReference(interfaceClass);
+    }
+
+    public static <T> T newDirectInstance(Class<T> interfaceClass) {
+        T t = newDirectReference(interfaceClass);
+        Byteable b = (Byteable) t;
+        b.bytes(DirectStore.allocate(b.maxSize()).bytes(), 0);
+        return t;
     }
 
     public static <T> Class<T> heapClassFor(Class<T> interfaceClass) {
