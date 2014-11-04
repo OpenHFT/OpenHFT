@@ -13,8 +13,10 @@ public enum VanillaBytesHasher implements BytesHasher {
     }
 
     public long hash(Bytes bytes, long offset, long limit) {
-        if (limit - offset == 8)
-            return Maths.hash(bytes.readLong(offset));
+        return Maths.hash(limit - offset == 8 ? bytes.readLong(offset) : hash0(bytes, offset, limit));
+    }
+
+    private long hash0(Bytes bytes, long offset, long limit) {
         long h = 0;
         long i = offset;
         for (; i < limit - 7; i += 8)
@@ -23,6 +25,6 @@ public enum VanillaBytesHasher implements BytesHasher {
             h = SHORT_LEVEL_PRIME_MULTIPLE * h + bytes.readShort(i);
         if (i < limit)
             h = BYTE_LEVEL_PRIME_MULTIPLE * h + bytes.readByte(i);
-        return Maths.hash(h);
+        return h;
     }
 }
