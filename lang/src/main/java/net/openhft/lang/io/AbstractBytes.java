@@ -50,18 +50,22 @@ import java.util.logging.Logger;
 @SuppressWarnings("MagicNumber")
 public abstract class AbstractBytes implements Bytes {
     public static final int END_OF_BUFFER = -1;
+    public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
+    public static final int SLEEP_THRESHOLD = 20 * 1000 * 1000;
+    // todo add tests before using in ChronicleMap
+    static final int RW_LOCK_LIMIT = 30;
+    static final long RW_READ_LOCKED = 1L << 0;
+    static final long RW_WRITE_WAITING = 1L << RW_LOCK_LIMIT;
+    static final long RW_WRITE_LOCKED = 1L << 2 * RW_LOCK_LIMIT;
+    static final int RW_LOCK_MASK = (1 << RW_LOCK_LIMIT) - 1;
     private static final long BUSY_LOCK_LIMIT = 20L * 1000 * 1000 * 1000;
     private static final int INT_LOCK_MASK;
     private static final int UNSIGNED_BYTE_MASK = 0xFF;
     private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     private static final int USHORT_EXTENDED = UNSIGNED_SHORT_MASK;
-    public static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
     // extra 1 for decimal place.
     private static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
-    public static final int SLEEP_THRESHOLD = 20 * 1000 * 1000;
-    private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
     private static final byte[] RADIX_PARSE = new byte[256];
-
     static {
         Arrays.fill(RADIX_PARSE, (byte) -1);
         for (int i = 0; i < 10; i++)
@@ -70,7 +74,6 @@ public abstract class AbstractBytes implements Bytes {
             RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
         INT_LOCK_MASK = 0xFFFFFF;
     }
-
     private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
@@ -94,23 +97,13 @@ public abstract class AbstractBytes implements Bytes {
     private static final ThreadLocal<DateCache> dateCacheTL = new ThreadLocal<DateCache>();
     private static boolean ID_LIMIT_WARNED = false;
     final AtomicInteger refCount;
+    private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
     protected boolean finished;
+    ObjectSerializer objectSerializer;
     private StringInterner stringInterner = null;
     private Thread currentThread;
     private int shortThreadId = Integer.MIN_VALUE;
     private boolean selfTerminating = false;
-    ObjectSerializer objectSerializer;
-
-    static class DateCache {
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        private long lastDay = Long.MIN_VALUE;
-        @Nullable
-        private byte[] lastDateStr = null;
-
-        DateCache() {
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        }
-    }
 
     AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
@@ -197,6 +190,164 @@ public abstract class AbstractBytes implements Bytes {
         ID_LIMIT_WARNED = true;
     }
 
+    static int returnOrThrowEndOfBuffer(boolean selfTerminating) {
+        if (selfTerminating) return END_OF_BUFFER;
+        throw new BufferUnderflowException();
+    }
+
+    public static void readUTF0(Bytes bytes, @NotNull Appendable appendable, int utflen)
+            throws IOException {
+        int count = 0;
+        while (count < utflen) {
+            int c = bytes.readUnsignedByteOrThrow();
+            if (c >= 128) {
+                bytes.position(bytes.position() - 1);
+                break;
+            } else if (c < 0) {
+
+            }
+            count++;
+            appendable.append((char) c);
+        }
+
+        while (count < utflen) {
+            int c = bytes.readUnsignedByte();
+            switch (c >> 4) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                /* 0xxxxxxx */
+                    count++;
+                    appendable.append((char) c);
+                    break;
+                case 12:
+                case 13: {
+                /* 110x xxxx 10xx xxxx */
+                    count += 2;
+                    if (count > utflen)
+                        throw new UTFDataFormatException(
+                                "malformed input: partial character at end");
+                    int char2 = bytes.readUnsignedByte();
+                    if ((char2 & 0xC0) != 0x80)
+                        throw new UTFDataFormatException(
+                                "malformed input around byte " + count + " was " + char2);
+                    int c2 = (char) (((c & 0x1F) << 6) |
+                            (char2 & 0x3F));
+                    appendable.append((char) c2);
+                    break;
+                }
+                case 14: {
+                /* 1110 xxxx 10xx xxxx 10xx xxxx */
+                    count += 3;
+                    if (count > utflen)
+                        throw new UTFDataFormatException(
+                                "malformed input: partial character at end");
+                    int char2 = bytes.readUnsignedByte();
+                    int char3 = bytes.readUnsignedByte();
+
+                    if (((char2 & 0xC0) != 0x80) || ((char3 & 0xC0) != 0x80))
+                        throw new UTFDataFormatException(
+                                "malformed input around byte " + (count - 1) + " was " + char2 + " " + char3);
+                    int c3 = (char) (((c & 0x0F) << 12) |
+                            ((char2 & 0x3F) << 6) |
+                            (char3 & 0x3F));
+                    appendable.append((char) c3);
+                    break;
+                }
+                default:
+                /* 10xx xxxx, 1111 xxxx */
+                    throw new UTFDataFormatException(
+                            "malformed input around byte " + count);
+            }
+        }
+    }
+
+    public static long findUTFLength(@NotNull CharSequence str, long strlen) {
+        long utflen = 0, c;/* use charAt instead of copying String to char array */
+        for (int i = 0; i < strlen; i++) {
+            c = str.charAt(i);
+            if ((c >= 0x0000) && (c <= 0x007F)) {
+                utflen++;
+            } else if (c > 0x07FF) {
+                utflen += 3;
+            } else {
+                utflen += 2;
+            }
+        }
+        return utflen;
+    }
+
+    public static void writeUTF0(Bytes bytes, @NotNull CharSequence str, long strlen) {
+        int c;
+        int i;
+        for (i = 0; i < strlen; i++) {
+            c = str.charAt(i);
+            if (!((c >= 0x0000) && (c <= 0x007F)))
+                break;
+            bytes.write(c);
+        }
+
+        for (; i < strlen; i++) {
+            c = str.charAt(i);
+            if ((c >= 0x0000) && (c <= 0x007F)) {
+                bytes.write(c);
+
+            } else if (c > 0x07FF) {
+                bytes.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
+                bytes.write((byte) (0x80 | ((c >> 6) & 0x3F)));
+                bytes.write((byte) (0x80 | (c & 0x3F)));
+            } else {
+                bytes.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
+                bytes.write((byte) (0x80 | c & 0x3F));
+            }
+        }
+    }
+
+    static void checkArrayOffs(int arrayLength, int off, int len) {
+        if (len < 0 || off < 0 || off + len > arrayLength || off + len < 0)
+            throw new IndexOutOfBoundsException();
+    }
+
+    /**
+     * display the hex data of a byte buffer from the position() to the limit()
+     *
+     * @param buffer the buffer you wish to toString()
+     * @return hex representation of the buffer, from example [0D ,OA, FF]
+     */
+    public static String toHex(@NotNull final ByteBuffer buffer) {
+
+        final ByteBuffer slice = buffer.slice();
+        final StringBuilder builder = new StringBuilder("[");
+
+        while (slice.hasRemaining()) {
+            final byte b = slice.get();
+            builder.append(String.format("%02X ", b));
+            builder.append(",");
+        }
+
+        // remove the last comma
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    static int rwReadLocked(long lock) {
+        return (int) (lock & RW_LOCK_MASK);
+    }
+
+    static int rwWriteWaiting(long lock) {
+        return (int) ((lock >>> RW_LOCK_LIMIT) & RW_LOCK_MASK);
+    }
+
+    static int rwWriteLocked(long lock) {
+        return (int) (lock >>> (2 * RW_LOCK_LIMIT));
+    }
+
     @Override
     public long size() {
         return capacity();
@@ -248,13 +399,10 @@ public abstract class AbstractBytes implements Bytes {
         return readByteOrThrow(selfTerminating);
     }
 
+    // RandomDataOutput
+
     public int readByteOrThrow(boolean selfTerminating) throws BufferUnderflowException {
         return remaining() < 1 ? returnOrThrowEndOfBuffer(selfTerminating) : readUnsignedByte();
-    }
-
-    static int returnOrThrowEndOfBuffer(boolean selfTerminating) {
-        if (selfTerminating) return END_OF_BUFFER;
-        throw new BufferUnderflowException();
     }
 
     @Override
@@ -353,8 +501,6 @@ public abstract class AbstractBytes implements Bytes {
         return stringInterner().intern(input);
     }
 
-    // RandomDataOutput
-
     @Nullable
     @Override
     public String readUTFΔ() {
@@ -405,78 +551,6 @@ public abstract class AbstractBytes implements Bytes {
         int utflen = (int) len;
         readUTF0(this, appendable, utflen);
         return true;
-    }
-
-    public static void readUTF0(Bytes bytes, @NotNull Appendable appendable, int utflen)
-            throws IOException {
-        int count = 0;
-        while (count < utflen) {
-            int c = bytes.readUnsignedByteOrThrow();
-            if (c >= 128) {
-                bytes.position(bytes.position() - 1);
-                break;
-            } else if (c < 0) {
-
-            }
-            count++;
-            appendable.append((char) c);
-        }
-
-        while (count < utflen) {
-            int c = bytes.readUnsignedByte();
-            switch (c >> 4) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                /* 0xxxxxxx */
-                    count++;
-                    appendable.append((char) c);
-                    break;
-                case 12:
-                case 13: {
-                /* 110x xxxx 10xx xxxx */
-                    count += 2;
-                    if (count > utflen)
-                        throw new UTFDataFormatException(
-                                "malformed input: partial character at end");
-                    int char2 = bytes.readUnsignedByte();
-                    if ((char2 & 0xC0) != 0x80)
-                        throw new UTFDataFormatException(
-                                "malformed input around byte " + count + " was "+char2);
-                    int c2 = (char) (((c & 0x1F) << 6) |
-                            (char2 & 0x3F));
-                    appendable.append((char) c2);
-                    break;
-                }
-                case 14: {
-                /* 1110 xxxx 10xx xxxx 10xx xxxx */
-                    count += 3;
-                    if (count > utflen)
-                        throw new UTFDataFormatException(
-                                "malformed input: partial character at end");
-                    int char2 = bytes.readUnsignedByte();
-                    int char3 = bytes.readUnsignedByte();
-
-                    if (((char2 & 0xC0) != 0x80) || ((char3 & 0xC0) != 0x80))
-                        throw new UTFDataFormatException(
-                                "malformed input around byte " + (count - 1) + " was "+char2+" "+char3);
-                    int c3 = (char) (((c & 0x0F) << 12) |
-                            ((char2 & 0x3F) << 6) |
-                            (char3 & 0x3F));
-                    appendable.append((char) c3);
-                    break;
-                }
-                default:
-                /* 10xx xxxx, 1111 xxxx */
-                    throw new UTFDataFormatException(
-                            "malformed input around byte " + count);
-            }
-        }
     }
 
     @NotNull
@@ -855,51 +929,10 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
-    public static long findUTFLength(@NotNull CharSequence str, long strlen) {
-        long utflen = 0, c;/* use charAt instead of copying String to char array */
-        for (int i = 0; i < strlen; i++) {
-            c = str.charAt(i);
-            if ((c >= 0x0000) && (c <= 0x007F)) {
-                utflen++;
-            } else if (c > 0x07FF) {
-                utflen += 3;
-            } else {
-                utflen += 2;
-            }
-        }
-        return utflen;
-    }
-
     private void checkUFTLength(long utflen) {
         if (utflen > remaining())
             throw new IllegalArgumentException(
                     "encoded string too long: " + utflen + " bytes, remaining=" + remaining());
-    }
-
-    public static void writeUTF0(Bytes bytes, @NotNull CharSequence str, long strlen) {
-        int c;
-        int i;
-        for (i = 0; i < strlen; i++) {
-            c = str.charAt(i);
-            if (!((c >= 0x0000) && (c <= 0x007F)))
-                break;
-            bytes.write(c);
-        }
-
-        for (; i < strlen; i++) {
-            c = str.charAt(i);
-            if ((c >= 0x0000) && (c <= 0x007F)) {
-                bytes.write(c);
-
-            } else if (c > 0x07FF) {
-                bytes.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
-                bytes.write((byte) (0x80 | ((c >> 6) & 0x3F)));
-                bytes.write((byte) (0x80 | (c & 0x3F)));
-            } else {
-                bytes.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
-                bytes.write((byte) (0x80 | c & 0x3F));
-            }
-        }
     }
 
     @Override
@@ -915,11 +948,6 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeUnsignedByte(long offset, int v) {
         writeByte(offset, v);
-    }
-
-    static void checkArrayOffs(int arrayLength, int off, int len) {
-        if (len < 0 || off < 0 || off + len > arrayLength || off + len < 0)
-            throw new IndexOutOfBoundsException();
     }
 
     @Override
@@ -2003,7 +2031,7 @@ public abstract class AbstractBytes implements Bytes {
             return true;
         //The cas failed so get the value of the current lock
         int currentValue = readInt(offset);
-        //if the bottom 24 bytes match our thread id ... 
+        //if the bottom 24 bytes match our thread id ...
         // TODO but what if we're in a different process?
         if ((currentValue & INT_LOCK_MASK) == lowId) {
             //then if the counter in the top 8 bytes is 255, throw an exception
@@ -2514,30 +2542,6 @@ public abstract class AbstractBytes implements Bytes {
         return sb;
     }
 
-
-    /**
-     * display the hex data of a byte buffer from the position() to the limit()
-     *
-     * @param buffer the buffer you wish to toString()
-     * @return hex representation of the buffer, from example [0D ,OA, FF]
-     */
-    public static String toHex(@NotNull final ByteBuffer buffer) {
-
-        final ByteBuffer slice = buffer.slice();
-        final StringBuilder builder = new StringBuilder("[");
-
-        while (slice.hasRemaining()) {
-            final byte b = slice.get();
-            builder.append(String.format("%02X ", b));
-            builder.append(",");
-        }
-
-        // remove the last comma
-        builder.deleteCharAt(builder.length() - 1);
-        builder.append("]");
-        return builder.toString();
-    }
-
     @Override
     public boolean compareAndSwapDouble(long offset, double expected, double value) {
         long exp = Double.doubleToRawLongBits(expected);
@@ -2548,13 +2552,6 @@ public abstract class AbstractBytes implements Bytes {
     public File file() {
         return null;
     }
-
-    // todo add tests before using in ChronicleMap
-    static final int RW_LOCK_LIMIT = 30;
-    static final long RW_READ_LOCKED = 1L << 0;
-    static final long RW_WRITE_WAITING = 1L <<  RW_LOCK_LIMIT;
-    static final long RW_WRITE_LOCKED = 1L << 2 * RW_LOCK_LIMIT;
-    static final int RW_LOCK_MASK = (1 << RW_LOCK_LIMIT) - 1;
 
     // read/write lock support.
     // short path in a small method so it can be inlined.
@@ -2683,15 +2680,14 @@ public abstract class AbstractBytes implements Bytes {
                 + ", readersLocked: " + readersLocked;
     }
 
-    static int rwReadLocked(long lock) {
-        return (int) (lock & RW_LOCK_MASK);
-    }
+    static class DateCache {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        private long lastDay = Long.MIN_VALUE;
+        @Nullable
+        private byte[] lastDateStr = null;
 
-    static int rwWriteWaiting(long lock) {
-        return (int) ((lock >>> RW_LOCK_LIMIT) & RW_LOCK_MASK);
-    }
-
-    static int rwWriteLocked(long lock) {
-        return (int) (lock >>> (2 * RW_LOCK_LIMIT));
+        DateCache() {
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        }
     }
 }

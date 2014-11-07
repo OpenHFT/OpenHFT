@@ -28,27 +28,6 @@ import static org.junit.Assert.*;
  * @author peter.lawrey
  */
 public class DirectBytesTest {
-    @Test
-    public void testSimpleLock() {
-        DirectBytes bytes = new DirectStore(64).bytes();
-        bytes.writeLong(0, -1L);
-        assertFalse(bytes.tryLockLong(0));
-        bytes.writeLong(0, 0L);
-        assertTrue(bytes.tryLockLong(0));
-        long val1 = bytes.readLong(0);
-        assertTrue(bytes.tryLockLong(0));
-        bytes.unlockLong(0);
-        assertEquals(val1, bytes.readLong(0));
-        bytes.unlockLong(0);
-        assertEquals(0L, bytes.readLong(0));
-        try {
-            bytes.unlockLong(0);
-            fail();
-        } catch (IllegalMonitorStateException e) {
-            // expected.
-        }
-    }
-
     private static void manyToggles(@NotNull DirectStore store1, int lockCount, int from, int to) {
         long id = Thread.currentThread().getId();
         assertEquals(0, id >>> 24);
@@ -114,6 +93,27 @@ public class DirectBytesTest {
                 slice1.unlockLong(0L);
                 System.currentTimeMillis(); // small delay
             }
+        }
+    }
+
+    @Test
+    public void testSimpleLock() {
+        DirectBytes bytes = new DirectStore(64).bytes();
+        bytes.writeLong(0, -1L);
+        assertFalse(bytes.tryLockLong(0));
+        bytes.writeLong(0, 0L);
+        assertTrue(bytes.tryLockLong(0));
+        long val1 = bytes.readLong(0);
+        assertTrue(bytes.tryLockLong(0));
+        bytes.unlockLong(0);
+        assertEquals(val1, bytes.readLong(0));
+        bytes.unlockLong(0);
+        assertEquals(0L, bytes.readLong(0));
+        try {
+            bytes.unlockLong(0);
+            fail();
+        } catch (IllegalMonitorStateException e) {
+            // expected.
         }
     }
 
