@@ -18,7 +18,6 @@
 
 package net.openhft.lang.io;
 
-import net.openhft.lang.io.serialization.BytesMarshallerFactory;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.model.constraints.NotNull;
 import org.jetbrains.annotations.Nullable;
