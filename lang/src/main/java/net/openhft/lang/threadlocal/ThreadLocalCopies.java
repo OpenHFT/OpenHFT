@@ -33,7 +33,7 @@ public final class ThreadLocalCopies {
         return states.get();
     }
 
-    AtomicBoolean currentlyAccessed = new AtomicBoolean(false);
+    final AtomicBoolean currentlyAccessed = new AtomicBoolean(false);
     Object[] table;
     int size = 0, sizeLimit, mask;
 
