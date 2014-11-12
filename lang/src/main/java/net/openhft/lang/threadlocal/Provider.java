@@ -18,6 +18,8 @@
 
 package net.openhft.lang.threadlocal;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public abstract class Provider<T> {
 
     public static <T> Provider<T> of(Class<T> tClass) {
@@ -43,7 +45,9 @@ public abstract class Provider<T> {
 
         @Override
         public T get(ThreadLocalCopies copies, T original) {
-            if (copies.currentlyAccessed.compareAndSet(false, true)) {
+            // todo fix a rare NPE
+            AtomicBoolean currentlyAccessed = copies.currentlyAccessed;
+            if (currentlyAccessed.compareAndSet(false, true)) {
                 try {
                     Object id = original.stateIdentity();
                     int m = copies.mask;
@@ -63,7 +67,7 @@ public abstract class Provider<T> {
                         i = (i + 2) & m;
                     }
                 } finally {
-                    copies.currentlyAccessed.set(false);
+                    currentlyAccessed.set(false);
                 }
             } else {
                 throw new IllegalStateException(
