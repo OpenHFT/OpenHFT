@@ -52,7 +52,7 @@ public class ByteBufferBytes extends AbstractBytes {
         buffer.order(ByteOrder.nativeOrder());
         this.buffer = buffer;
         this.start = position = start;
-        this.capacity = limit = (capacity+start);
+        this.capacity = limit = (capacity + start);
     }
 
     @Override
