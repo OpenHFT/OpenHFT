@@ -131,15 +131,15 @@ public class Maths {
     }
 
     public static int hash(int n) {
-        n ^= (n >> 21) ^ (n >> 11);
-        n ^= (n >> 7) ^ (n >> 4);
+        n ^= (n >>> 21) - (n >>> 11);
+        n ^= (n >>> 7) + (n >>> 4);
         return n;
     }
 
-    public static int hash(long n) {
-        n ^= (n >> 43) ^ (n >> 21);
-        n ^= (n >> 15) ^ (n >> 7);
-        return (int) n;
+    public static long hash(long n) {
+        n ^= (n >>> 41) - (n >>> 21);
+        n ^= (n >>> 15) + (n >>> 7);
+        return n;
     }
 
     public static long hash(CharSequence cs) {

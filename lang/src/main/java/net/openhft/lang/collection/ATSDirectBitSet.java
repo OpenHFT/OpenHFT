@@ -29,6 +29,7 @@ public class ATSDirectBitSet implements DirectBitSet {
 
     public ATSDirectBitSet(Bytes bytes) {
         this.bytes = bytes;
+        assert (bytes.capacity() & 7) == 0;
         longLength = bytes.capacity() >> 3;
     }
 
@@ -393,7 +394,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                     }
                     return index;
                 }
-                for (long lim = byteLength; (i += 8) < lim;) {
+                for (long lim = byteLength; (i += 8) < lim; ) {
                     if ((l = bytes.readLong(i)) != 0) {
                         int trailingZeros = Long.numberOfTrailingZeros(l);
                         long index = (i << 3) + trailingZeros;
@@ -437,7 +438,8 @@ public class ATSDirectBitSet implements DirectBitSet {
                 break;
             }
         }
-        longLoop: for (long i = fromLongIndex + 1; i < longLength; i++) {
+        longLoop:
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
             long byteIndex = i << 3;
             while (true) {
                 long l = bytes.readLong(byteIndex);
@@ -510,7 +512,8 @@ public class ATSDirectBitSet implements DirectBitSet {
                 break;
             }
         }
-        longLoop: for (long i = fromLongIndex + 1; i < longLength; i++) {
+        longLoop:
+        for (long i = fromLongIndex + 1; i < longLength; i++) {
             long byteIndex = i << 3;
             while (true) {
                 long w = bytes.readLong(byteIndex);
@@ -595,7 +598,8 @@ public class ATSDirectBitSet implements DirectBitSet {
                 break;
             }
         }
-        longLoop: for (long i = fromLongIndex - 1; i >= 0; i--) {
+        longLoop:
+        for (long i = fromLongIndex - 1; i >= 0; i--) {
             long byteIndex = i << 3;
             while (true) {
                 long l = bytes.readLong(byteIndex);
@@ -679,7 +683,8 @@ public class ATSDirectBitSet implements DirectBitSet {
                 break;
             }
         }
-        longLoop: for (long i = fromLongIndex - 1; i >= 0; i--) {
+        longLoop:
+        for (long i = fromLongIndex - 1; i >= 0; i--) {
             long byteIndex = i << 3;
             while (true) {
                 long w = bytes.readLong(byteIndex);
@@ -778,7 +783,7 @@ public class ATSDirectBitSet implements DirectBitSet {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                            is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public long setNextNContinuousClearBits(long fromIndex, int numberOfBits) {
@@ -810,7 +815,8 @@ public class ATSDirectBitSet implements DirectBitSet {
         }
         // long loop
         while (true) {
-            continueLongLoop: {
+            continueLongLoop:
+            {
                 // (1)
                 if ((l & 1) != 0) {
                     long x = ~l;
@@ -878,7 +884,7 @@ public class ATSDirectBitSet implements DirectBitSet {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                            is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public long clearNextNContinuousSetBits(long fromIndex, int numberOfBits) {
@@ -910,7 +916,8 @@ public class ATSDirectBitSet implements DirectBitSet {
         }
         // long loop
         while (true) {
-            continueLongLoop: {
+            continueLongLoop:
+            {
                 if ((l & 1) == 0) {
                     if (l != 0) {
                         int trailingZeros = Long.numberOfTrailingZeros(l);
@@ -973,7 +980,7 @@ public class ATSDirectBitSet implements DirectBitSet {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                            is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public long setPreviousNContinuousClearBits(
@@ -1012,7 +1019,8 @@ public class ATSDirectBitSet implements DirectBitSet {
         }
         // long loop
         while (true) {
-            continueLongLoop: {
+            continueLongLoop:
+            {
                 if (l < 0) { // condition means the highest bit is one
                     long x = ~l;
                     if (x != 0) {
@@ -1072,7 +1080,7 @@ public class ATSDirectBitSet implements DirectBitSet {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws java.lang.IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                            is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public long clearPreviousNContinuousSetBits(
@@ -1111,7 +1119,8 @@ public class ATSDirectBitSet implements DirectBitSet {
         }
         // long loop
         while (true) {
-            continueLongLoop: {
+            continueLongLoop:
+            {
                 // condition means the highest bit is zero, but not all
                 if (l > 0) {
                     int leadingZeros = Long.numberOfLeadingZeros(l);

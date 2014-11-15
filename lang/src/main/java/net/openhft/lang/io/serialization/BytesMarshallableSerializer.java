@@ -128,7 +128,7 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
             case ENUMED: {
                 Class clazz = this.readSerializable(bytes, Class.class, null);
                 assert clazz != null;
-                return (T) bytesMarshallerFactory.acquireMarshaller(clazz, true).read(bytes);
+                return (T) bytesMarshallerFactory.acquireMarshaller(clazz, true).read(bytes, object);
             }
             case SERIALIZED: {
                 return objectSerializer.readSerializable(bytes, expectedClass, object);

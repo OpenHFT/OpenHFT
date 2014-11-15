@@ -51,7 +51,7 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
     }
 
     private final ClassLoader classLoader;
-    private final StringBuilder className = new StringBuilder(40);
+    private static final StringBuilderPool sbp = new StringBuilderPool();
     @Nullable
     @SuppressWarnings("unchecked")
     private WeakReference<Class>[] classWeakReference = null;
@@ -71,9 +71,9 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
     @Nullable
     @Override
     public Class read(@NotNull Bytes bytes) {
-        className.setLength(0);
-        bytes.readUTFΔ(className);
-        return load(className);
+        StringBuilder sb = sbp.acquireStringBuilder();
+        bytes.readUTFΔ(sb);
+        return load(sb);
     }
 
     @Nullable
@@ -106,3 +106,4 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
         return 'C' & 31; // control C
     }
 }
+    

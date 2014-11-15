@@ -16,22 +16,20 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io;
+package net.openhft.lang.io.serialization.impl;
 
 /**
- * @author peter.lawrey
+ * Created by peter on 29/10/14.
  */
-public interface StopCharTester {
-    /**
-     * Detect which byte stops the string to be parsed
-     *
-     * <p>This should be changed to support char instead.
-     *
-     * <p>Note: for safety reasons, you should stop on a 0 byte or throw an IllegalStateException.
-     *
-     * @param ch to test, 0 should return true or throw an exception.
-     * @return if this byte is a stop character.
-     * @throws IllegalStateException if an invalid character like 0 was detected.
-     */
-    boolean isStopChar(int ch) throws IllegalStateException;
+public class StringBuilderPool {
+    final ThreadLocal<StringBuilder> sbtl = new ThreadLocal<StringBuilder>();
+
+    public StringBuilder acquireStringBuilder() {
+        StringBuilder sb = sbtl.get();
+        if (sb == null) {
+            sbtl.set(sb = new StringBuilder(128));
+        }
+        sb.setLength(0);
+        return sb;
+    }
 }

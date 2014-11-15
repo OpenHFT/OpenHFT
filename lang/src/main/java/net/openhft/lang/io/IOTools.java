@@ -27,8 +27,10 @@ import sun.nio.ch.DirectBuffer;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Random;
 
 /**
  * @author peter.lawrey
@@ -75,7 +77,7 @@ public enum IOTools {
                     if (file.isDirectory()) {
                         deleteDir(file);
                     } else if (!file.delete()) {
-                        LoggerFactory.getLogger(IOTools.class).info("... unable to delete {}",file);
+                        LoggerFactory.getLogger(IOTools.class).info("... unable to delete {}", file);
                     }
 
         }
@@ -88,5 +90,19 @@ public enum IOTools {
             if (cl != null)
                 cl.clean();
         }
+    }
+
+    public static int freePort() {
+        int min = 48000, max = 65535;
+        Random rand = new Random();
+        for (int i = 0; i < 10; i++) {
+            int port = rand.nextInt(max - min + 1) + min;
+            try {
+                new Socket("localhost", port).close();
+            } catch (IOException e) {
+                return port;
+            }
+        }
+        throw new IllegalStateException("Unable to find a random free port");
     }
 }

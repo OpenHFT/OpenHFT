@@ -52,7 +52,7 @@ public class ByteBufferBytes extends AbstractBytes {
         buffer.order(ByteOrder.nativeOrder());
         this.buffer = buffer;
         this.start = position = start;
-        this.capacity = limit = (capacity+start);
+        this.capacity = limit = (capacity + start);
     }
 
     @Override
@@ -131,6 +131,12 @@ public class ByteBufferBytes extends AbstractBytes {
         for (; i < j; i++)
             buffer.put(i, (byte) 0);
         return this;
+    }
+
+    @Override
+    public Bytes zeroOut(long start, long end, boolean ifNotZero) {
+        // ByteBuffers are allocated in memory eagerly.
+        return zeroOut(start, end);
     }
 
     public ByteBuffer buffer() {
