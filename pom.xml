@@ -36,6 +36,7 @@
         <module>Chronicle-Queue</module>
         <module>Chronicle-Logger</module>
         <module>Chronicle-Engine</module>
+        <module>MyTests</module>
         <!--<module>TransFIX</module>-->
         <!--<module>jpsg-maven-plugin</module>-->
     </modules>
