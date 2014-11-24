@@ -66,6 +66,7 @@ public abstract class AbstractBytes implements Bytes {
     // extra 1 for decimal place.
     private static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
     private static final byte[] RADIX_PARSE = new byte[256];
+
     static {
         Arrays.fill(RADIX_PARSE, (byte) -1);
         for (int i = 0; i < 10; i++)
@@ -74,6 +75,7 @@ public abstract class AbstractBytes implements Bytes {
             RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
         INT_LOCK_MASK = 0xFFFFFF;
     }
+
     private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
@@ -326,6 +328,29 @@ public abstract class AbstractBytes implements Bytes {
 
         while (slice.hasRemaining()) {
             final byte b = slice.get();
+            builder.append(String.format("%02X ", b));
+            builder.append(",");
+        }
+
+        // remove the last comma
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    /**
+     * display the hex data of a byte buffer from the position() to the limit()
+     *
+     * @param buffer the buffer you wish to toString()
+     * @return hex representation of the buffer, from example [0D ,OA, FF]
+     */
+    public static String toHex(@NotNull final Bytes buffer) {
+
+        final Bytes slice = buffer.slice();
+        final StringBuilder builder = new StringBuilder("[");
+
+        while (slice.remaining() > 0) {
+            final byte b = slice.readByte();
             builder.append(String.format("%02X ", b));
             builder.append(",");
         }
