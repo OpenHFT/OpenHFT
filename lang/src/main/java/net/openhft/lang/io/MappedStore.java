@@ -20,7 +20,7 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
-import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
@@ -56,7 +56,7 @@ public class MappedStore implements BytesStore {
 
     @Deprecated
     public MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
-        this(file, mode, size, BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE));
+        this(file, mode, size, BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKZObjectSerializer.INSTANCE));
     }
 
     public MappedStore(File file, FileChannel.MapMode mode, long size, ObjectSerializer objectSerializer) throws IOException {

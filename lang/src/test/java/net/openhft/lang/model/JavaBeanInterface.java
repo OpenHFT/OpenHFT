@@ -20,7 +20,8 @@ package net.openhft.lang.model;
 
 import net.openhft.lang.model.constraints.MaxSize;
 
-public interface JavaBeanInterface {
+public interface
+        JavaBeanInterface {
     void busyLockRecord() throws InterruptedException;
 
     boolean tryLockRecord();

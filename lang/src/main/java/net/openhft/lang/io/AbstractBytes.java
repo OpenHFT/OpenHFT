@@ -22,7 +22,7 @@ import net.openhft.lang.Jvm;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
-import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.StringBuilderPool;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
@@ -112,7 +112,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory, AtomicInteger refCount) {
-        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE), refCount);
+        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKZObjectSerializer.INSTANCE), refCount);
     }
 
     AbstractBytes(ObjectSerializer objectSerializer, AtomicInteger refCount) {

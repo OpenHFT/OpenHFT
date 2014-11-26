@@ -20,7 +20,7 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
-import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
@@ -51,7 +51,7 @@ public class DirectStore implements BytesStore {
 
     @Deprecated
     public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size, boolean zeroOut) {
-        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE), size, zeroOut);
+        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKZObjectSerializer.INSTANCE), size, zeroOut);
     }
 
     public DirectStore(ObjectSerializer objectSerializer, long size, boolean zeroOut) {

@@ -59,8 +59,11 @@ public class MapMarshaller<K, V> implements CompactBytesMarshaller<Map<K, V>> {
 
     @Override
     public Map<K, V> read(Bytes bytes, @Nullable Map<K, V> kvMap) {
-        if (kvMap == null)
+        if (kvMap == null) {
             kvMap = new LinkedHashMap<K, V>();
+        } else {
+            kvMap.clear();
+        }
         int size = bytes.readInt();
         for (int i = 0; i < size; i++)
             kvMap.put(kBytesMarshaller.read(bytes), vBytesMarshaller.read(bytes));
