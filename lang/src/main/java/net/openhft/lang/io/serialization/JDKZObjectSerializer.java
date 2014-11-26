@@ -38,7 +38,8 @@ public enum JDKZObjectSerializer implements ObjectSerializer {
         ObjectOutputStream oos = new ObjectOutputStream(new DeflaterOutputStream(out));
         oos.writeObject(object);
         oos.close();
-        bytes.writeUnsignedInt(position, bytes.position() - position - 4);
+        long length = bytes.position() - position - 4;
+        bytes.writeUnsignedInt(position, length);
     }
 
     @Override
