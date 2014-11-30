@@ -62,6 +62,6 @@ public class StringMarshaller extends ImmutableMarshaller<String>
     }
 
     public byte code() {
-        return 'S' & 31;
+        return STRING_CODE;
     }
 }

@@ -20,7 +20,7 @@ public class SetMarshaller<E> extends CollectionMarshaller<E, Set<E>> implements
 
     @Override
     public byte code() {
-        return 'S' & 31;
+        return SET_CODE;
     }
 
     @Override

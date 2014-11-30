@@ -41,7 +41,7 @@ public class StringZMapMarshaller implements CompactBytesMarshaller<Map<String, 
 
     @Override
     public byte code() {
-        return 'Z' & 31;
+        return STRINGZ_CODE;
     }
 
     @Override
@@ -70,7 +70,9 @@ public class StringZMapMarshaller implements CompactBytesMarshaller<Map<String, 
 
     @Override
     public Map<String, String> read(Bytes bytes, @Nullable Map<String, String> kvMap) {
-        int size = (int) bytes.readStopBit();
+        long size = bytes.readStopBit();
+        if (size < 0 || size > Integer.MAX_VALUE)
+            throw new IllegalStateException("Invalid length: " + size);
 
         long length = bytes.readUnsignedInt();
         if (length < 16 || length > Integer.MAX_VALUE)

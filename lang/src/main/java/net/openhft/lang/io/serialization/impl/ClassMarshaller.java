@@ -103,7 +103,7 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
 
     @Override
     public byte code() {
-        return 'C' & 31; // control C
+        return CLASS_CODE; // control C
     }
 }
     

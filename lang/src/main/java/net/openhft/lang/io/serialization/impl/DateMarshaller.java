@@ -105,6 +105,6 @@ public class DateMarshaller implements CompactBytesMarshaller<Date> {
 
     @Override
     public byte code() {
-        return 'T' & 31; // Control T.
+        return DATE_CODE; // Control T.
     }
 }

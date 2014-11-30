@@ -40,7 +40,7 @@ public class MapMarshaller<K, V> implements CompactBytesMarshaller<Map<K, V>> {
 
     @Override
     public byte code() {
-        return 'M' & 31;
+        return MAP_CODE;
     }
 
     @Override

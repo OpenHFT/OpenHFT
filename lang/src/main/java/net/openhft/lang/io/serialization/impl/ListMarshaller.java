@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ListMarshaller<E> extends CollectionMarshaller<E, List<E>> implements CompactBytesMarshaller<List<E>> {
+
     ListMarshaller(BytesMarshaller<E> eBytesMarshaller) {
         super(eBytesMarshaller);
     }
@@ -19,7 +20,7 @@ public class ListMarshaller<E> extends CollectionMarshaller<E, List<E>> implemen
 
     @Override
     public byte code() {
-        return 'L' & 31;
+        return LIST_CODE;
     }
 
     @Override

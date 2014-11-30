@@ -1885,7 +1885,9 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public <E> void readList(@NotNull Collection<E> list, @NotNull Class<E> eClass) {
-        int len = (int) readStopBit();
+        long len = readStopBit();
+        if (len < 0 || len > Integer.MAX_VALUE)
+            throw new IllegalStateException("Invalid length: " + len);
         list.clear();
         for (int i = 0; i < len; i++) {
             @SuppressWarnings("unchecked")
@@ -1897,7 +1899,10 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     @NotNull
     public <K, V> Map<K, V> readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass) {
-        int len = (int) readStopBit();
+        long len = readStopBit();
+        if (len < 0 || len > Integer.MAX_VALUE)
+            throw new IllegalStateException("Invalid length: " + len);
+
         map.clear();
         for (int i = 0; i < len; i++)
             map.put(readEnum(kClass), readEnum(vClass));
