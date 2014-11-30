@@ -320,7 +320,6 @@ public abstract class AbstractBytes implements Bytes {
      * @return hex representation of the buffer, from example [0D ,OA, FF]
      */
     public static String toHex(@NotNull final ByteBuffer buffer) {
-
         final ByteBuffer slice = buffer.slice();
         final StringBuilder builder = new StringBuilder("[");
 
@@ -343,7 +342,6 @@ public abstract class AbstractBytes implements Bytes {
      * @return hex representation of the buffer, from example [0D ,OA, FF]
      */
     public static String toHex(@NotNull final Bytes buffer) {
-
         final Bytes slice = buffer.slice();
         final StringBuilder builder = new StringBuilder("[");
 

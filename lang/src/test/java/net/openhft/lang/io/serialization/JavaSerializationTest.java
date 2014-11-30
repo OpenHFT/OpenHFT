@@ -17,7 +17,6 @@ public class JavaSerializationTest {
     @Test
     @Ignore
     public void NullPointerException() {
-
         final Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate((int) 1024).order
                 (ByteOrder.nativeOrder()));
 

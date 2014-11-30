@@ -420,7 +420,6 @@ public class DataValueGenerator {
     }
 
     private static void methodToStringGetUsing(StringBuilder toString, String getterName, String name, FieldModel model) {
-
         toString.append("            sb.append(\"").append(name).append("= \").append(").append(getterName).append("(new StringBuilder()));\n");
     }
 
@@ -472,14 +471,12 @@ public class DataValueGenerator {
     }
 
     private static void methodHeapGet(StringBuilder getterSetters, String name, Class type, String getterName) {
-
         getterSetters.append("    public ").append(normalize(type)).append(' ').append(getterName).append("() {\n");
         getterSetters.append("        return _").append(name).append(";\n");
         getterSetters.append("    }\n\n");
     }
 
     private static void methodHeapGetUsingWithStringBuilder(StringBuilder result, Method method, String name, Class type, FieldModel model) {
-
         final CharSequence returnType = method.getReturnType() == void.class ? "void" : normalize(method
                 .getReturnType());
 
@@ -864,7 +861,6 @@ public class DataValueGenerator {
     }
 
     private static void methodGetUsingWithStringBuilder(StringBuilder result, Method method, Class type, boolean isVolatile, String name) {
-
         String read = "read";
         if (isVolatile) read = "readVolatile";
 
