@@ -51,7 +51,6 @@ public class NativeBytes extends AbstractBytes {
             UNSAFE = (Unsafe) theUnsafe.get(null);
             BYTES_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);
             CHARS_OFFSET = UNSAFE.arrayBaseOffset(char[].class);
-
         } catch (Exception e) {
             throw new AssertionError(e);
         }

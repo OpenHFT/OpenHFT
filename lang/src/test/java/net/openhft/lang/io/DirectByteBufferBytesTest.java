@@ -73,7 +73,6 @@ public class DirectByteBufferBytesTest {
         for (int i = (int) (bytes.capacity() - 1); i >= 0; i--) {
             assertEquals((byte) i, bytes.readByte(i));
         }
-
     }
 
     @Test
@@ -93,7 +92,6 @@ public class DirectByteBufferBytesTest {
         assertFalse(bytes.compareAndSwapLong(0, 0, 1));
         assertTrue(bytes.compareAndSwapLong(8, 0, 1));
         assertTrue(bytes.compareAndSwapLong(0, 1, 2));
-
     }
 
     @Test
@@ -288,7 +286,6 @@ public class DirectByteBufferBytesTest {
         bytes.position(10);
         bytes.stepBackAndSkipTo(CONTROL_STOP);
         assertEquals(13, bytes.position());
-
     }
 
     @Test
@@ -725,7 +722,6 @@ public class DirectByteBufferBytesTest {
         bytes.append(1.123456789);
         bytes.position(0);
         assertEquals(1.123456789, bytes.parseDouble(), 0);
-
     }
 
     @Test
@@ -737,7 +733,6 @@ public class DirectByteBufferBytesTest {
         assertEquals("qwertyuiop", bytes.parseUTF(SPACE_STOP));
         assertEquals(1.123456789, bytes.parseDouble(), 0);
         assertEquals(123456, bytes.parseLong());
-
     }
 
     @Test
@@ -747,7 +742,6 @@ public class DirectByteBufferBytesTest {
         bytes.position(0);
         assertEquals(1.235, bytes.parseDouble(), 0);
         assertEquals(2.123456789, bytes.parseDouble(), 0);
-
     }
 
     @Test
@@ -755,7 +749,6 @@ public class DirectByteBufferBytesTest {
         bytes.append(1.1234).append(' ');
         bytes.position(0);
         assertEquals(1.1234, bytes.parseDouble(), 0);
-
     }
 
     @Test

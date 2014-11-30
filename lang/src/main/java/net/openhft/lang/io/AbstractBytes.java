@@ -206,7 +206,6 @@ public abstract class AbstractBytes implements Bytes {
                 bytes.position(bytes.position() - 1);
                 break;
             } else if (c < 0) {
-
             }
             count++;
             appendable.append((char) c);
@@ -298,7 +297,6 @@ public abstract class AbstractBytes implements Bytes {
             c = str.charAt(i);
             if ((c >= 0x0000) && (c <= 0x007F)) {
                 bytes.write(c);
-
             } else if (c > 0x07FF) {
                 bytes.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
                 bytes.write((byte) (0x80 | ((c >> 6) & 0x3F)));
@@ -1131,17 +1129,13 @@ public abstract class AbstractBytes implements Bytes {
     public void writeCompactLong(long v) {
         if (v > INT_MAX_VALUE && v <= Integer.MAX_VALUE) {
             writeInt((int) v);
-
         } else if (v == Long.MIN_VALUE) {
             writeInt(INT_MIN_VALUE);
-
         } else if (v == Long.MAX_VALUE) {
             writeInt(INT_MAX_VALUE);
-
         } else {
             writeInt(INT_EXTENDED);
             writeLong(v);
-
         }
     }
 
@@ -1248,7 +1242,6 @@ public abstract class AbstractBytes implements Bytes {
         }
         if (num == 0) {
             writeByte('0');
-
         } else {
             appendLong0(num);
         }
@@ -1270,7 +1263,6 @@ public abstract class AbstractBytes implements Bytes {
         }
         if (num == 0) {
             writeByte('0');
-
         } else {
             while (num > 0) {
                 writeByte(RADIX[((int) (num % base))]);
@@ -1388,7 +1380,6 @@ public abstract class AbstractBytes implements Bytes {
                     }
                 }
                 return this;
-
             } else {
                 // faction.
                 writeByte('0');
@@ -2443,7 +2434,6 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeMarshallable(@NotNull Bytes out) {
         out.write(this, position(), remaining());
-
     }
 
     @Override
@@ -2562,7 +2552,6 @@ public abstract class AbstractBytes implements Bytes {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-
     }
 
     @Override
@@ -2616,7 +2605,6 @@ public abstract class AbstractBytes implements Bytes {
                 // add to the readLock count and decrease the readWaiting count.
                 if (compareAndSwapLong(offset, lock, lock + RW_READ_LOCKED))
                     return true;
-
             }
             if (System.nanoTime() > end)
                 return false;
@@ -2633,7 +2621,6 @@ public abstract class AbstractBytes implements Bytes {
                 return true;
         }
         return tryRWWriteLock0(offset, timeOutNS);
-
     }
 
     private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException {
@@ -2697,7 +2684,6 @@ public abstract class AbstractBytes implements Bytes {
             if (compareAndSwapLong(offset, lock, lock - RW_WRITE_LOCKED))
                 return;
         }
-
     }
 
     String dumpRWLock(long offset) {

@@ -88,22 +88,18 @@ public class MappedArena implements Arena {
 
     @Override
     public void free(int hash, int handle, int sizeInBlocks) {
-
     }
 
     @Override
     public void copyTo(Bytes bytes, int handle) {
-
     }
 
     @Override
     public void copyFrom(int handle, Bytes bytes) {
-
     }
 
     @Override
     public void setBytes(int handle, NativeBytes bytes) throws IllegalStateException {
-
     }
 
     @Override

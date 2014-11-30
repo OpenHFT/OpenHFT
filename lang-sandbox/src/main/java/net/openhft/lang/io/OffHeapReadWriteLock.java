@@ -80,7 +80,6 @@ public class OffHeapReadWriteLock {
                     if (tryLock()) return true;
                     Thread.yield();
                 } while (System.nanoTime() < end);
-
             } finally {
                 addWaitingReader(-1);
             }
@@ -109,7 +108,6 @@ public class OffHeapReadWriteLock {
                     return;
             }
         }
-
     }
 
     public String toString() {
@@ -161,7 +159,6 @@ public class OffHeapReadWriteLock {
                     if (tryLock()) return true;
                     Thread.yield();
                 } while (System.nanoTime() < end);
-
             } finally {
                 addWaitingWriter(-1);
             }

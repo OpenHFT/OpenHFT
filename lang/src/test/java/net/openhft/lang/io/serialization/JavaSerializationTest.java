@@ -28,7 +28,6 @@ public class JavaSerializationTest {
         NullPointerException actual = (NullPointerException)bytes.readObject();
 
         Assert.assertEquals(expected, actual);
-
     }
 
 }

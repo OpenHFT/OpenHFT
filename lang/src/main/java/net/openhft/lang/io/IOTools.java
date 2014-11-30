@@ -79,7 +79,6 @@ public enum IOTools {
                     } else if (!file.delete()) {
                         LoggerFactory.getLogger(IOTools.class).info("... unable to delete {}", file);
                     }
-
         }
         dir.delete();
     }

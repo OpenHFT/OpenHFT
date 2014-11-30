@@ -657,6 +657,5 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         public Method getUsing() {
             return getUsing;
         }
-
     }
 }

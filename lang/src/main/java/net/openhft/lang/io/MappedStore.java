@@ -183,7 +183,6 @@ public class MappedStore implements BytesStore {
                 if (channel.isOpen()) {
                     channel.close();
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }

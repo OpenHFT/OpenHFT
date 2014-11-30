@@ -37,6 +37,5 @@ public class JDKZObjectSerializerTest {
             assertEquals("hello world", JDKZObjectSerializer.INSTANCE.readSerializable(bytes, null, null));
             bytes.close();
         }
-
     }
 }
