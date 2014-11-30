@@ -22,7 +22,7 @@ import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
 
 /**
- * Created with IntelliJ IDEA. User: peter Date: 09/12/13 Time: 17:05 To change this template use File | Settings | File
+ * Created with IntelliJ IDEA. User: peter Date: 09/12/13 Time: 17:05
  * Templates.
  */
 public class CompactEnumBytesMarshaller<E> extends GenericEnumMarshaller<E> implements CompactBytesMarshaller<E> {

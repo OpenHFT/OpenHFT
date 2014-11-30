@@ -25,41 +25,34 @@ import net.openhft.lang.model.constraints.Nullable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.StreamCorruptedException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
  * Created by peter on 24/10/14.
  */
-public enum StringZMapMarshaller implements CompactBytesMarshaller<Map<String, String>> {
+public enum StringZMarshaller implements CompactBytesMarshaller<String> {
     INSTANCE;
-    private static final long NULL_SIZE = -1;
+    private static final int NULL_LENGTH = -1;
 
     @Override
     public byte code() {
-        return STRINGZ_MAP_CODE;
+        return STRINGZ_CODE;
     }
 
     @Override
-    public void write(Bytes bytes, Map<String, String> kvMap) {
-        if (kvMap == null) {
-            bytes.writeStopBit(NULL_SIZE);
+    public void write(Bytes bytes, String s) {
+        if (s == null) {
+            bytes.writeStopBit(NULL_LENGTH);
             return;
         }
-
-        bytes.writeStopBit(kvMap.size());
+        bytes.writeStopBit(s.length());
         long position = bytes.position();
         bytes.clear();
         bytes.position(position + 4);
         DataOutputStream dos = new DataOutputStream(new DeflaterOutputStream(bytes.outputStream()));
         try {
-            for (Map.Entry<String, String> entry : kvMap.entrySet()) {
-                dos.writeUTF(entry.getKey());
-                dos.writeUTF(entry.getValue());
-            }
+            dos.writeUTF(s);
             dos.close();
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -68,21 +61,22 @@ public enum StringZMapMarshaller implements CompactBytesMarshaller<Map<String, S
     }
 
     @Override
-    public Map<String, String> read(Bytes bytes) {
+    public String read(Bytes bytes) {
         return read(bytes, null);
     }
 
     @Override
-    public Map<String, String> read(Bytes bytes, @Nullable Map<String, String> kvMap) {
+    public String read(Bytes bytes, @Nullable String ignored) {
         long size = bytes.readStopBit();
-        if (size == NULL_SIZE)
+        if (size == NULL_LENGTH)
             return null;
         if (size < 0 || size > Integer.MAX_VALUE)
             throw new IllegalStateException("Invalid length: " + size);
 
+        // has to be fixed lenth field, not stop bit.
         long length = bytes.readUnsignedInt();
         if (length < 0 || length > Integer.MAX_VALUE)
-            throw new IllegalStateException(new StreamCorruptedException());
+            throw new IllegalStateException("Invalid length: " + length);
         long position = bytes.position();
         long end = position + length;
 
@@ -90,22 +84,14 @@ public enum StringZMapMarshaller implements CompactBytesMarshaller<Map<String, S
         bytes.limit(end);
 
         DataInputStream dis = new DataInputStream(new InflaterInputStream(bytes.inputStream()));
-        if (kvMap == null) {
-            kvMap = new LinkedHashMap<String, String>();
-        } else {
-            kvMap.clear();
-        }
+        String s;
         try {
-            for (int i = 0; i < size; i++) {
-                String key = dis.readUTF();
-                String value = dis.readUTF();
-                kvMap.put(key, value);
-            }
+            s = dis.readUTF();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
         bytes.position(end);
         bytes.limit(limit);
-        return kvMap;
+        return s;
     }
 }

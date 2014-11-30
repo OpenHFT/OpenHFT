@@ -6,7 +6,8 @@ import net.openhft.lang.model.constraints.Nullable;
 
 import java.nio.ByteBuffer;
 
-public class ByteBufferMarshaller implements CompactBytesMarshaller<ByteBuffer> {
+public enum ByteBufferMarshaller implements CompactBytesMarshaller<ByteBuffer> {
+    INSTANCE;
 
     @Override
     public byte code() {
@@ -37,6 +38,7 @@ public class ByteBufferMarshaller implements CompactBytesMarshaller<ByteBuffer> 
         }
         byteBuffer.limit((int) length);
         bytes.read(byteBuffer);
+        bytes.flip();
         return byteBuffer;
     }
 
