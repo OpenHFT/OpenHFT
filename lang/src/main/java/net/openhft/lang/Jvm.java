@@ -140,5 +140,4 @@ public enum Jvm {
         return 1L << 16;
     }
 
-
 }

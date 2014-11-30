@@ -88,7 +88,6 @@ public class MappedFileTest {
         }
         assertTrue("free3-free1: " + (free3 - free1), free3 > free1);
 
-
     }
 
     private void fill(MappedByteBuffer buffer) {

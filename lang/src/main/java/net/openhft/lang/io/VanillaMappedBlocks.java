@@ -17,7 +17,6 @@
  */
 package net.openhft.lang.io;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +57,6 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
     }
 
     protected VanillaMappedBytes acquire0(long index) throws IOException {
-
 
         if(this.mb1 != null) {
             this.mb1.release();

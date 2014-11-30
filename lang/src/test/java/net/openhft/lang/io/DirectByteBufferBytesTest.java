@@ -728,7 +728,6 @@ public class DirectByteBufferBytesTest {
 
     }
 
-
     @Test
     public void testAppendParseDoubleWithPadding() {
         bytes.append("qwertyuiop").append(' ');
@@ -741,7 +740,6 @@ public class DirectByteBufferBytesTest {
 
     }
 
-
     @Test
     public void testAppendParseDoubleWithPadding2() {
         bytes.append(1.2345, 3).append(' ');
@@ -751,7 +749,6 @@ public class DirectByteBufferBytesTest {
         assertEquals(2.123456789, bytes.parseDouble(), 0);
 
     }
-
 
     @Test
     public void testAppendParseDouble2() {

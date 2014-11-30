@@ -300,7 +300,6 @@ public class DirectBytesTest {
         store2.free();
     }
 
-
     @Test
     @Ignore
     public void benchmarkByteLargeArray() {

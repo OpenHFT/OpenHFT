@@ -50,7 +50,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         HEAP_SIZE_MAP.put(double.class, 64);
     }
 
-
     private final Map<String, FieldModelImpl> fieldModelMap = new TreeMap<String, FieldModelImpl>();
     private final Class<T> type;
     private final Map<Class, DataValueModel> nestedMap = new HashMap<Class, DataValueModel>();
@@ -301,7 +300,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         return null;
     }
 
-
     private static String getGetterAt(String name, Class returnType) {
         final int len = 3;
         final int len2 = 2;
@@ -424,7 +422,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             this.getter = getter;
         }
 
-
         public Method getter() {
             return getter;
         }
@@ -444,7 +441,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         public Method setter() {
             return setter;
         }
-
 
         public void volatileGetter(Method volatileGetter) {
             this.volatileGetter = volatileGetter;
@@ -469,7 +465,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         public Method orderedSetter() {
             return orderedSetter;
         }
-
 
         @Override
         public Class<T> type() {

@@ -589,7 +589,6 @@ public class NativeBytes extends AbstractBytes {
         return (limitAddr - startAddr);
     }
 
-
     @Override
     public NativeBytes limit(long limit) {
         if (limit < 0 || limit > capacity())

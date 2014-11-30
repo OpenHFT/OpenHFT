@@ -28,10 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static net.openhft.lang.collection.DirectBitSet.Bits;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class DirectBitSetTest {
@@ -851,7 +848,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetNegative() {
         bs.get(-1);
@@ -912,7 +908,6 @@ public class DirectBitSetTest {
         bs.getLong((bs.size() + 63) / 64);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextSetBit() {
         bs.nextSetBit(-1);
@@ -953,7 +948,6 @@ public class DirectBitSetTest {
         bs.previousClearLong(-2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearNextSetBit() {
         bs.clearNextSetBit(-1);
@@ -993,7 +987,6 @@ public class DirectBitSetTest {
     public void testIoobeSetPreviousNContinuousClearBit() {
         bs.setPreviousNContinuousClearBits(-2, 2);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeFromNegative() {
@@ -1039,7 +1032,6 @@ public class DirectBitSetTest {
     public void testIoobeFlipRangeToOverCapacity() {
         bs.flip(0, bs.size() + 1);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testIaeClearNextNContinuousSetBits() {

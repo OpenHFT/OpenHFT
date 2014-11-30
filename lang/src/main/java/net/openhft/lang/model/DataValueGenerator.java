@@ -102,7 +102,6 @@ public class DataValueGenerator {
                 getter = volatileGetter;
             }
 
-
             if (setter == null) {
                 if (getter != null)
                     copy.append("        ((Copyable) ").append(getter.getName()).append("()).copyFrom(from.").append(getter.getName()).append("());\n");
@@ -129,7 +128,6 @@ public class DataValueGenerator {
                 methodHeapGet(getterSetters, volatileGetter, name, type, model);
                 methodHeapSet(getterSetters, orderedSetter, name, type, model);
             }
-
 
             Method adder = model.adder();
             if (adder != null) {
@@ -271,9 +269,7 @@ public class DataValueGenerator {
                 count++;
             }
 
-
             Bytes b;
-
 
             if (model.isArray()) {
                 String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
@@ -323,7 +319,6 @@ public class DataValueGenerator {
                 .append("        return sb.toString();\n")
                 .append("    }\n");
     }
-
 
     private static Method getUsing(FieldModel model) {
         Method getUsing = model.getUsing();
@@ -411,11 +406,9 @@ public class DataValueGenerator {
         }
     }
 
-
     private static void methodEqualsGetUsing(StringBuilder equals, String getterName) {
         equals.append("        if(!isEqual(").append(getterName).append("(new StringBuilder()).toString(), that.").append(getterName).append("new StringBuilder().toString())) return false;\n");
     }
-
 
     private static void methodEquals(StringBuilder equals, String getterName, FieldModel model, String className) {
         if (!model.isArray()) {
@@ -426,7 +419,6 @@ public class DataValueGenerator {
             equals.append("        }\n");
         }
     }
-
 
     private static void methodToStringGetUsing(StringBuilder toString, String getterName, String name, FieldModel model) {
 
@@ -482,14 +474,12 @@ public class DataValueGenerator {
         getterSetters.append("    }\n\n");
     }
 
-
     private static void methodHeapGet(StringBuilder getterSetters, String name, Class type, String getterName) {
 
         getterSetters.append("    public ").append(normalize(type)).append(' ').append(getterName).append("() {\n");
         getterSetters.append("        return _").append(name).append(";\n");
         getterSetters.append("    }\n\n");
     }
-
 
     private static void methodHeapGetUsingWithStringBuilder(StringBuilder result, Method method, String name, Class type, FieldModel model) {
 
@@ -513,7 +503,6 @@ public class DataValueGenerator {
 
         result.append("    }\n\n");
     }
-
 
     private static void heapFieldDeclarations(StringBuilder fieldDeclarations, Class type, String name, FieldModel model) {
         String vol = "";
@@ -852,7 +841,6 @@ public class DataValueGenerator {
         getterSetters.append("    }\n\n");
     }
 
-
     private void methodGet(StringBuilder getterSetters, Class type, String NAME, boolean isVolatile, String name) {
         String read = "read";
         if (isVolatile) read = "readVolatile";
@@ -879,7 +867,6 @@ public class DataValueGenerator {
         }
         getterSetters.append("    }\n\n");
     }
-
 
     private static void methodGetUsingWithStringBuilder(StringBuilder result, Method method, Class type, boolean isVolatile, String name) {
 
@@ -912,7 +899,6 @@ public class DataValueGenerator {
 
     }
 
-
     private void methodNonScalarWriteMarshall(StringBuilder writeMarshal, String name, FieldModel model) {
         if (!model.isArray()) {
             writeMarshal.append("         _").append(name).append(".writeMarshallable(out);\n");
@@ -932,7 +918,6 @@ public class DataValueGenerator {
             readMarshal.append("            ").append(setter.getName()).append("(i, in.read").append(bytesType(type)).append("());\n");
             readMarshal.append("        }\n");
         }
-
 
     }
 

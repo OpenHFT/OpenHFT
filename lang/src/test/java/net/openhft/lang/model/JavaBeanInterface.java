@@ -35,16 +35,13 @@ public interface JavaBeanInterface {
 
     byte getByte();
 
-
     void setShort(short s);
 
     short getShort();
 
-
     void setChar(char ch);
 
     char getChar();
-
 
     void setInt(int i);
 
@@ -54,16 +51,13 @@ public interface JavaBeanInterface {
 
     int getInt();
 
-
     void setFloat(float f);
 
     float getFloat();
 
-
     void setLong(long l);
 
     long getLong();
-
 
     long addAtomicLong(long toAdd);
 

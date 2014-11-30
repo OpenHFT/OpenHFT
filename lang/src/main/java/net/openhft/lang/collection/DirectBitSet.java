@@ -180,7 +180,6 @@ public interface DirectBitSet extends ReferenceCounted {
      */
     boolean get(long bitIndex);
 
-
     /**
      * Synonym of {@link #get(long)}.
      *
@@ -200,7 +199,6 @@ public interface DirectBitSet extends ReferenceCounted {
      *                                   {@code (index < 0 || index >= size())}
      */
     boolean isClear(long bitIndex);
-
 
     /**
      * Returns the value of the long with the specified long index.

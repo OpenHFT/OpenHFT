@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 /**
  * {@code OutputStream} view of {@link Bytes}. Writing data to this stream pushes {@linkplain
  * Bytes#position() position} of the underlying {@code Bytes}. On attempt of writing bytes beyond

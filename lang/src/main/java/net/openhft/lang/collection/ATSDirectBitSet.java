@@ -162,7 +162,6 @@ public class ATSDirectBitSet implements DirectBitSet {
         }
     }
 
-
     @Override
     public DirectBitSet set(long bitIndex, boolean value) {
         return value ? set(bitIndex) : clear(bitIndex);
@@ -770,7 +769,6 @@ public class ATSDirectBitSet implements DirectBitSet {
             if (bytes.compareAndSwapLong(longIndex << 3, l, l2)) return this;
         }
     }
-
 
     private static long rightShiftOneFill(long l, long shift) {
         return (l >> shift) | ~((~0L) >>> shift);

@@ -86,7 +86,6 @@ public class DataValueGeneratorTest {
         bbb.position(0);
         mi2.readMarshallable(bbb);
 
-
         assertEquals(1, mi2.byte$());
         assertEquals('2', mi2.char$());
         assertEquals(3, mi2.short$());
@@ -96,7 +95,6 @@ public class DataValueGeneratorTest {
         assertEquals(7.0, mi2.double$(), 0.0);
         assertTrue(mi2.flag());
     }
-
 
     @Test
     public void testGenerateNativeWithGetUsing() throws Exception {
@@ -113,7 +111,6 @@ public class DataValueGeneratorTest {
         assertEquals("G'day", jbi.getUsingString(new StringBuilder()).toString());
     }
 
-
     @Test
     public void testGenerateNativeWithGetUsingHeapInstance() {
         DataValueGenerator dvg = new DataValueGenerator();
@@ -123,7 +120,6 @@ public class DataValueGeneratorTest {
 
         assertEquals("G'day", si.getUsingString(new StringBuilder()).toString());;
     }
-
 
     @Test
     public void testStringFields() {
@@ -140,7 +136,6 @@ public class DataValueGeneratorTest {
         assertEquals("Hello world £€", si2.getString());
         assertEquals("Hello world £€", si2.getText());
     }
-
 
     @Test
     public void testGetUsingStringFieldsWithStringBuilderHeapInstance() {
@@ -160,8 +155,6 @@ public class DataValueGeneratorTest {
             assertEquals("Hello world 2", builder.toString());
         }
     }
-
-
 
     @Test
     public void testNested() {
@@ -192,8 +185,5 @@ public class DataValueGeneratorTest {
         assertEquals(nestedB2.hashCode(), nestedA.two().hashCode());
     }
 
-
 }
-
-
 

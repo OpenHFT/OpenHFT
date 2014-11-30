@@ -32,7 +32,6 @@ import java.util.RandomAccess;
  */
 public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommon {
 
-
     /**
      * Copy from one Bytes to another, moves the position by length
      *
@@ -774,7 +773,6 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     void writeUTFΔ(@Nullable CharSequence s);
 
-
     /**
      * Write the same encoding as <code>writeUTF</code> with the following changes.  1) The length is stop bit encoded
      * i.e. one byte longer for short strings, but is not limited in length. 2) The string can be null.
@@ -882,7 +880,6 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @return this
      */
     Bytes zeroOut(long start, long end, boolean ifNotZero);
-
 
     /**
      * Check the end of the stream has not overflowed.  Otherwise this doesn't do anything.

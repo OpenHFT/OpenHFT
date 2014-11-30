@@ -58,5 +58,4 @@ class DataValueMetaModel {
         return filters.size();
     }
 
-
 }

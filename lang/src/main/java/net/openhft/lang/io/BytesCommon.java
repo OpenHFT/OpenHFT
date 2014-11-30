@@ -153,7 +153,6 @@ public interface BytesCommon {
      */
     Bytes load();
 
-
     /**
      * Write a portion of the Bytes to an Appendable for printing.
      *
@@ -189,7 +188,6 @@ public interface BytesCommon {
      * @see #slice(long, long)
      */
     Bytes slice();
-
 
     /**
      * Returns a {@code ByteBuffer} whose content is a shared subsequence of this bytes' content.

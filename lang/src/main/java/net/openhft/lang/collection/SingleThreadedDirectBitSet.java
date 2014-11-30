@@ -136,7 +136,6 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         return true;
     }
 
-
     @Override
     public DirectBitSet set(long bitIndex, boolean value) {
         return value ? set(bitIndex) : clear(bitIndex);
@@ -1192,7 +1191,6 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 // additions (3) and (4) together ensure that
                 // bitsFromFirstWord > 0, => no need in condition like (1)
                 l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
-
 
                 if (l != 0) {
                     int leadingZeros = Long.numberOfLeadingZeros(l);

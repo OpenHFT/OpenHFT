@@ -14,7 +14,6 @@ import java.nio.ByteOrder;
  */
 public class JavaSerializationTest {
 
-
     @Test
     @Ignore
     public void NullPointerException() {
@@ -31,6 +30,5 @@ public class JavaSerializationTest {
         Assert.assertEquals(expected, actual);
 
     }
-
 
 }
