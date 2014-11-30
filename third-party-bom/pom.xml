@@ -19,7 +19,6 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
@@ -35,7 +34,6 @@
     <description>This meta-project is used to generate a bill-of-materials POM that contains the other
         projects in a dependencyManagement section.
     </description>
-
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -257,7 +255,6 @@
                 <systemPath>${java.home}/../lib/tools.jar</systemPath>
             </dependency>
 
-
             <dependency>
                 <groupId>org.kohsuke.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
@@ -269,7 +266,6 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.3.1</version>
             </dependency>
-
 
             <dependency>
                 <groupId>org.mockito</groupId>
@@ -341,7 +337,6 @@
 
         </profile>
     </profiles>
-
 
     <distributionManagement>
         <snapshotRepository>
