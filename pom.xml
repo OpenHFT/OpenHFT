@@ -33,6 +33,7 @@
         <module>Java-Lang</module>
         <module>SAXophone</module>
         <module>Chronicle-Map</module>
+        <module>Chronicle-Map-Java8</module>
         <module>Chronicle-Queue</module>
         <module>Chronicle-Logger</module>
         <module>Chronicle-Engine</module>
