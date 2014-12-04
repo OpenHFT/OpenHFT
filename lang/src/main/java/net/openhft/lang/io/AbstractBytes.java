@@ -314,7 +314,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     /**
-     * display the hex data of a byte buffer from the position() to the limit()
+     * display the hex data of a {@link ByteBuffer}  from the position() to the limit()
      *
      * @param buffer the buffer you wish to toString()
      * @return hex representation of the buffer, from example [0D ,OA, FF]
@@ -336,7 +336,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     /**
-     * display the hex data of a byte buffer from the position() to the limit()
+     * display the hex data of {@link Bytes} from the position() to the limit()
      *
      * @param buffer the buffer you wish to toString()
      * @return hex representation of the buffer, from example [0D ,OA, FF]
@@ -355,6 +355,21 @@ public abstract class AbstractBytes implements Bytes {
         builder.deleteCharAt(builder.length() - 1);
         builder.append("]");
         return builder.toString();
+    }
+
+
+    /**
+     * display the hex data of a value
+     *
+     * @param value the buffer you wish to toString()
+     * @return hex representation of the buffer, from example [0D ,OA, FF]
+     */
+    public static String toHex(final long value) {
+
+        ByteBufferBytes buffer = new ByteBufferBytes(ByteBuffer.wrap(new byte[8]));
+        buffer.writeLong(value);
+        buffer.clear();
+        return toHex(buffer);
     }
 
     static int rwReadLocked(long lock) {
