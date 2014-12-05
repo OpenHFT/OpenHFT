@@ -519,6 +519,8 @@ public class ByteBufferBytes extends AbstractBytes {
     public ByteBufferBytes position(long position) {
         if (start + position > Integer.MAX_VALUE)
             throw new IndexOutOfBoundsException("Position to large");
+        if (position < 0)
+            throw new IndexOutOfBoundsException("Position to small");
         this.position = (int) (start + position);
         return this;
     }
