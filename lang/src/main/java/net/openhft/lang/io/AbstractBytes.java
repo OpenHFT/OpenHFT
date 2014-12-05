@@ -309,7 +309,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     static void checkArrayOffs(int arrayLength, int off, int len) {
-        if (len < 0 || off < 0 || off + len > arrayLength || off + len < 0)
+        if ((len | off) < 0 | ((off + len) & 0xffffffffL) > arrayLength)
             throw new IndexOutOfBoundsException();
     }
 
