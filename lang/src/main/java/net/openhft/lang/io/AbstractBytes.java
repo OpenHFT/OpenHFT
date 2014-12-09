@@ -2317,7 +2317,7 @@ public abstract class AbstractBytes implements Bytes {
     public short addShort(long offset, short s) {
         short s2 = readShort(offset);
         s2 += s;
-        writeByte(offset, s2);
+        writeShort(offset, s2);
         return s2;
     }
 
