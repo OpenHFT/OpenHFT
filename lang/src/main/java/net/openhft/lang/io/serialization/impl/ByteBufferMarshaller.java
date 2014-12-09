@@ -32,14 +32,17 @@ public enum ByteBufferMarshaller implements CompactBytesMarshaller<ByteBuffer> {
     @Override
     public ByteBuffer read(Bytes bytes, @Nullable ByteBuffer byteBuffer) {
         long length = bytes.readStopBit();
+        assert length <= Integer.MAX_VALUE;
         if (length < 0 || length > Integer.MAX_VALUE) {
             throw new IllegalStateException("Invalid length: " + length);
         }
         if (byteBuffer == null || byteBuffer.capacity() < length) {
             byteBuffer = newByteBuffer((int) length);
         } else {
-            byteBuffer.clear();
+            byteBuffer.position(0);
+            byteBuffer.limit((int) length);
         }
+
 
         bytes.read(byteBuffer);
         byteBuffer.flip();
