@@ -16,8 +16,12 @@ public enum ByteBufferMarshaller implements CompactBytesMarshaller<ByteBuffer> {
 
     @Override
     public void write(Bytes bytes, ByteBuffer byteBuffer) {
+        int position = byteBuffer.position();
         bytes.writeStopBit(byteBuffer.remaining());
         bytes.write(byteBuffer);
+
+        // reset the position back as we found it
+        byteBuffer.position(position);
     }
 
     @Override
@@ -36,9 +40,9 @@ public enum ByteBufferMarshaller implements CompactBytesMarshaller<ByteBuffer> {
         } else {
             byteBuffer.clear();
         }
-        byteBuffer.limit((int) length);
+
         bytes.read(byteBuffer);
-        bytes.flip();
+        byteBuffer.flip();
         return byteBuffer;
     }
 
