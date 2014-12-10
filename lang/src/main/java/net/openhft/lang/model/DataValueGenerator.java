@@ -799,7 +799,11 @@ public class DataValueGenerator {
     }
 
     public static void appendPackage(DataValueModel<?> dvmodel, StringBuilder sb) {
-        sb.append("package ").append(dvmodel.type().getPackage().getName()).append(";\n\n");
+        sb.append("package ").append(getPackage(dvmodel)).append(";\n\n");
+    }
+
+    public static String getPackage(DataValueModel<?> dvmodel) {
+        return dvmodel.type().getPackage().getName();
     }
 
     public static int fieldSize(FieldModel model) {
