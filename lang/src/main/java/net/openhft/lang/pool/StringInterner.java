@@ -26,7 +26,6 @@ import net.openhft.lang.model.constraints.Nullable;
  * @author peter.lawrey
  */
 public class StringInterner implements CharSequenceInterner<String> {
-    @NotNull
     private final String[] interner;
     private final int mask;
 
@@ -44,26 +43,6 @@ public class StringInterner implements CharSequenceInterner<String> {
                 return false;
         return true;
     }
-
-/*    private static boolean isEqual(@Nullable CharSequence s, @NotNull byte[] bytes, int off, int len) {
-        if (s == null) return false;
-        if (s.length() != len) return false;
-        for (int i = 0; i < len; i++)
-            if (s.charAt(i) != (bytes[off + i] & 0xFF))
-                return false;
-        return true;
-    }
-
-    @NotNull
-    public String intern(@NotNull byte[] bytes, int off, int len) {
-        long hash = NativeBytes.longHash(bytes, off, len);
-        int h = Maths.hash(hash) & mask;
-        String s = interner[h];
-        if (isEqual(s, bytes, off, len))
-            return s;
-        String s2 = new String(bytes, off, len, IOTools.ISO_8859_1);
-        return interner[h] = s2;
-    }*/
 
     @Override
     @NotNull
