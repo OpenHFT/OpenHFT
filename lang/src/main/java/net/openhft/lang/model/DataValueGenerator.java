@@ -578,6 +578,8 @@ public class DataValueGenerator {
     }
 
     public <T> Class acquireNativeClass(Class<T> tClass) {
+        if (!tClass.isInterface())
+            return tClass;
         Class nativeClass = nativeClassMap.get(tClass);
         if (nativeClass != null)
             return nativeClass;
