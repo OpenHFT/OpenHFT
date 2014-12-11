@@ -10,22 +10,22 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 
 public class SnappyStringMarshallerTest {
-    static final Bytes b = DirectStore.allocate(1024).bytes();
 
     @Test
     public void testWriteRead() {
-        testWriteRead("");
-        testWriteRead(null);
-        testWriteRead("Hello World");
-        testWriteRead(new String(new char[1000]));
-        byte[] bytes = new byte[960];
+        Bytes b = DirectStore.allocate(64 * 1024).bytes();
+        testWriteRead(b, "");
+        testWriteRead(b, null);
+        testWriteRead(b, "Hello World");
+        testWriteRead(b, new String(new char[1000000]));
+        byte[] bytes = new byte[64000];
         Random random = new Random();
         for (int i = 0; i < bytes.length; i++)
             bytes[i] = (byte) ('A' + random.nextInt(26));
-        testWriteRead(new String(bytes, StandardCharsets.ISO_8859_1));
+        testWriteRead(b, new String(bytes, StandardCharsets.ISO_8859_1));
     }
 
-    private void testWriteRead(String s) {
+    private void testWriteRead(Bytes b, String s) {
         b.clear();
         SnappyStringMarshaller.INSTANCE.write(b, s);
         b.writeInt(0x12345678);

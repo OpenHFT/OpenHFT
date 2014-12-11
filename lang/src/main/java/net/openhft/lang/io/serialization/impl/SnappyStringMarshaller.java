@@ -18,17 +18,16 @@
 
 package net.openhft.lang.io.serialization.impl;
 
+import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.Nullable;
-import org.xerial.snappy.SnappyFramedInputStream;
-import org.xerial.snappy.SnappyFramedOutputStream;
+import org.xerial.snappy.Snappy;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 
 /**
  * Created by peter on 24/10/14.
@@ -51,9 +50,31 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
         }
     }
 
+    private static final ThreadLocal<ThreadLocals> THREAD_LOCALS = new ThreadLocal<>();
+
+    static class ThreadLocals {
+        ByteBuffer decompressedByteBuffer = ByteBuffer.allocateDirect(32 * 1024);
+        Bytes decompressedBytes = new ByteBufferBytes(decompressedByteBuffer);
+        ByteBuffer compressedByteBuffer = ByteBuffer.allocateDirect(0);
+
+        public void clear() {
+            decompressedByteBuffer.clear();
+            decompressedBytes.clear();
+            compressedByteBuffer.clear();
+        }
+    }
+
     @Override
     public byte code() {
         return STRINGZ_CODE;
+    }
+
+    public ThreadLocals acquireThreadLocals() {
+        ThreadLocals threadLocals = THREAD_LOCALS.get();
+        if (threadLocals == null)
+            THREAD_LOCALS.set(threadLocals = new ThreadLocals());
+        threadLocals.clear();
+        return threadLocals;
     }
 
     @Override
@@ -61,37 +82,48 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
         if (s == null) {
             bytes.writeStopBit(NULL_LENGTH);
             return;
+        } else if (s.length() == 0) {
+            bytes.writeStopBit(0);
+            return;
         }
-        bytes.writeStopBit(s.length());
-        long position = bytes.position();
-        bytes.clear();
-        bytes.position(position + 4);
-        try {
-            DataOutputStream dos = new DataOutputStream(/*new BufferedOutputStream*/(new SnappyFramedOutputStream(bytes.outputStream())/*, 512*/));
-            dos.writeInt(s.length());
-            char[] chars = (char[]) VALUE.get(s);
-            for (int i = 0, len = s.length(); i < len; i++)
-                writeStopBit(dos, chars[i]);
-            dos.flush();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
-        bytes.writeUnsignedInt(position, bytes.position() - position - 4);
-    }
+        // write the total length.
+        int length = s.length();
+        bytes.writeStopBit(length);
 
-    private void writeStopBit(DataOutputStream dos, int i) throws IOException {
-        if (i < 128) {
-            dos.write(i);
-        } else if (i < 1 << 14) {
-            dos.write((i >>> 7) | 0x80);
-            dos.write(i & 0x7F);
-        } else {
-            dos.write((i >>> 14) | 0x80);
-            dos.write((i >>> 7) | 0x80);
-            dos.write(i & 0x7F);
+        ThreadLocals threadLocals = acquireThreadLocals();
+        // stream the portions of the string.
+        Bytes db = threadLocals.decompressedBytes;
+        ByteBuffer dbb = threadLocals.decompressedByteBuffer;
+        ByteBuffer cbb = bytes.sliceAsByteBuffer(threadLocals.compressedByteBuffer);
+
+        int position = 0;
+        while (position < length) {
+            // 3 is the longest encoding.
+            while (position < length && db.remaining() >= 3)
+                db.writeStopBit(s.charAt(position++));
+            dbb.position(0);
+            dbb.limit((int) db.position());
+            // portion copied now compress it.
+            int portionLengthPos = cbb.position();
+            cbb.putShort((short) 0);
+            int compressedLength;
+            try {
+                Snappy.compress(dbb, cbb);
+                compressedLength = cbb.remaining();
+                if (compressedLength >= 1 << 16)
+                    throw new AssertionError();
+                // unflip.
+                cbb.position(cbb.limit());
+                cbb.limit(cbb.capacity());
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
+            cbb.putShort(portionLengthPos, (short) compressedLength);
+            db.clear();
         }
+        // the end.
+        cbb.putShort((short) 0);
+        bytes.position(bytes.position() + cbb.position());
     }
 
     @Override
@@ -106,41 +138,36 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
             return null;
         if (size < 0 || size > Integer.MAX_VALUE)
             throw new IllegalStateException("Invalid length: " + size);
+        if (size == 0)
+            return "";
+        ThreadLocals threadLocals = acquireThreadLocals();
+        // stream the portions of the string.
+        Bytes db = threadLocals.decompressedBytes;
+        ByteBuffer dbb = threadLocals.decompressedByteBuffer;
+        ByteBuffer cbb = bytes.sliceAsByteBuffer(threadLocals.compressedByteBuffer);
 
-        // has to be fixed length field, not stop bit.
-        long length = bytes.readUnsignedInt();
-        if (length < 0 || length > Integer.MAX_VALUE)
-            throw new IllegalStateException("Invalid length: " + length);
-        long position = bytes.position();
-        long end = position + length;
-
-        long limit = bytes.limit();
-        bytes.limit(end);
-
-        String s;
-        try {
-            DataInputStream dis = new DataInputStream(/*new BufferedInputStream*/(new SnappyFramedInputStream(bytes.inputStream())/*, 512*/));
-            int len = dis.readInt();
-            char[] chars = new char[len];
-            for (int i = 0; i < len; i++)
-                chars[i] = readStopBit(dis);
-            s = (String) NEW_STRING.newInstance(chars, true);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        char[] chars = new char[(int) size];
+        int pos = 0;
+        for (int chunkLen; (chunkLen = cbb.getShort() & 0xFFFF) > 0; ) {
+            cbb.limit(cbb.position() + chunkLen);
+            dbb.clear();
+            try {
+                Snappy.uncompress(cbb, dbb);
+                cbb.position(cbb.limit());
+                cbb.limit(cbb.capacity());
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
+            db.position(0);
+            db.limit(dbb.limit());
+            while (db.remaining() > 0)
+                chars[pos++] = (char) db.readStopBit();
         }
-        bytes.position(end);
-        bytes.limit(limit);
-        return s;
-    }
-
-    private char readStopBit(DataInputStream dis) throws IOException {
-        int b0 = dis.read();
-        if (b0 < 128)
-            return (char) b0;
-        int b1 = dis.read();
-        if (b1 < 128)
-            return (char) (((b0 & 0x7f) << 7) | b1);
-        int b2 = dis.read();
-        return (char) (((b0 & 0x7f) << 14) | ((b1 & 0x7f) << 7) | b2);
+        bytes.position(bytes.position() + cbb.position());
+        try {
+            return (String) NEW_STRING.newInstance(chars, true);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
     }
 }

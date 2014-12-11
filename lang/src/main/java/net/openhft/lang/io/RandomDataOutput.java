@@ -637,7 +637,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * same time.
      *
      * @param offset to write to
-     * @param v value to write
+     * @param v      value to write
      */
     void writeOrderedFloat(long offset, float v);
 
@@ -694,7 +694,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * same time.
      *
      * @param offset to write to
-     * @param v value to write
+     * @param v      value to write
      */
     void writeOrderedDouble(long offset, double v);
 
@@ -770,8 +770,9 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * i.e. one byte longer for short strings, but is not limited in length. 2) The string can be null.
      *
      * @param s the string value to be written. Can be null.
+     * @throws IllegalArgumentException if there is not enough space left
      */
-    void writeUTFΔ(@Nullable CharSequence s);
+    void writeUTFΔ(@Nullable CharSequence s) throws IllegalArgumentException;
 
     /**
      * Write the same encoding as <code>writeUTF</code> with the following changes.  1) The length is stop bit encoded
@@ -809,7 +810,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * <p>This can be read by the <code>readList</code> method of <code>RandomInputStream</code> and the reader must know
      * the type of each element.  You can send the class first by using <code>writeEnum</code> of the element class
      *
-     * @param <E> the class of the list elements
+     * @param <E>  the class of the list elements
      * @param list to be written
      */
     <E> void writeList(@NotNull Collection<E> list);
@@ -840,7 +841,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * Write an object with the assumption that the objClass will be provided when the class is read.
      *
-     * @param <OBJ> the class of the object to write
+     * @param <OBJ>    the class of the object to write
      * @param objClass class to write
      * @param obj      to write
      */
@@ -866,7 +867,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * fill the Bytes with zeros, and clear the position.
      *
      * @param start first byte to zero out
-     * @param end the first byte after the last to zero out (exclusive bound)
+     * @param end   the first byte after the last to zero out (exclusive bound)
      * @return this
      */
     Bytes zeroOut(long start, long end);
@@ -874,8 +875,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     /**
      * fill the Bytes with zeros, and clear the position, avoiding touching pages unnecessarily
      *
-     * @param start first byte to zero out
-     * @param end the first byte after the last to zero out (exclusive bound)
+     * @param start     first byte to zero out
+     * @param end       the first byte after the last to zero out (exclusive bound)
      * @param ifNotZero only set to zero after checking the value is not zero.
      * @return this
      */

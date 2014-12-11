@@ -18,7 +18,10 @@
 
 package net.openhft.lang.io;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import sun.misc.Unsafe;
 
 import java.nio.ByteBuffer;
@@ -33,13 +36,12 @@ interface ByteBufferReuse {
     static class Inner extends Reuses implements Opcodes {
         private static ByteBufferReuse getReuse() {
             ClassWriter cw = new ClassWriter(0);
-            FieldVisitor fv;
             MethodVisitor mv;
 
             final String reuseImplClassName = "net/openhft/lang/io/ByteBufferReuseImpl";
             cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, reuseImplClassName, null,
                     "sun/reflect/MagicAccessorImpl",
-                    new String[] {"net/openhft/lang/io/ByteBufferReuse"});
+                    new String[]{"net/openhft/lang/io/ByteBufferReuse"});
 
             {
                 mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);

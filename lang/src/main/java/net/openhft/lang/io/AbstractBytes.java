@@ -103,8 +103,6 @@ public abstract class AbstractBytes implements Bytes {
     protected boolean finished;
     ObjectSerializer objectSerializer;
     private StringInterner stringInterner = null;
-    private Thread currentThread;
-    private int shortThreadId = Integer.MIN_VALUE;
     private boolean selfTerminating = false;
 
     AbstractBytes() {
@@ -921,7 +919,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUTFΔ(@Nullable CharSequence str) {
+    public void writeUTFΔ(@Nullable CharSequence str) throws IllegalArgumentException {
         if (str == null) {
             writeStopBit(-1);
             return;
@@ -965,7 +963,7 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
-    private void checkUFTLength(long utflen) {
+    private void checkUFTLength(long utflen) throws IllegalArgumentException {
         if (utflen > remaining())
             throw new IllegalArgumentException(
                     "encoded string too long: " + utflen + " bytes, remaining=" + remaining());
@@ -2114,7 +2112,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     int shortThreadId() {
-        return shortThreadId > 0 ? shortThreadId : shortThreadId0();
+        return shortThreadId0();
     }
 
     int shortThreadId0() {
@@ -2125,13 +2123,8 @@ public abstract class AbstractBytes implements Bytes {
         return tid;
     }
 
-    public void setCurrentThread() {
-        currentThread = Thread.currentThread();
-        shortThreadId = shortThreadId0();
-    }
-
     Thread currentThread() {
-        return currentThread == null ? Thread.currentThread() : currentThread;
+        return Thread.currentThread();
     }
 
     @Override

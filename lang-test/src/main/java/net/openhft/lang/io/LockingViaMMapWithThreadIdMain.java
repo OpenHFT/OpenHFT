@@ -55,7 +55,6 @@ public class LockingViaMMapWithThreadIdMain {
         AffinitySupport.setThreadId();
         AffinitySupport.setAffinity(toggleTo ? 1 << 3 : 1 << 2);
         ByteBufferBytes bytes = new ByteBufferBytes(mbb);
-        bytes.setCurrentThread();
 
         long start = 0;
         for (int i = -WARMUP / RECORDS; i < (RUNS + RECORDS - 1) / RECORDS; i++) {
