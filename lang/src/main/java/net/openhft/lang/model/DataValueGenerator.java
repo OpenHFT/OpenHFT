@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.openhft.lang.MemoryUnit.BYTES;
+import static net.openhft.lang.model.DataValueModelImpl.heapSize;
 
 public class DataValueGenerator {
     private static final Comparator<Class> COMPARATOR = new Comparator<Class>() {
@@ -46,13 +47,64 @@ public class DataValueGenerator {
         @Override
         public int compare(Map.Entry<String, FieldModel> o1, Map.Entry<String, FieldModel> o2) {
             // descending
-            int cmp = -Maths.compare(o1.getValue().heapSize(), o2.getValue().heapSize());
-            return cmp == 0 ? o1.getKey().compareTo(o2.getKey()) : cmp;
+            FieldModel model1 = o1.getValue();
+            FieldModel model2 = o2.getValue();
+            int cmp = -Maths.compare(model1.heapSize(), model2.heapSize());
+            if (cmp != 0)
+                return cmp;
+            Class firstPrimitiveFieldType1 = null;
+            if (!model1.type().isPrimitive() &&
+                    !CharSequence.class.isAssignableFrom(model1.type())) {
+                firstPrimitiveFieldType1 = firstPrimitiveFieldType(model1.type());
+            }
+            Class firstPrimitiveFieldType2 = null;
+            if (!model2.type().isPrimitive() &&
+                    !CharSequence.class.isAssignableFrom(model2.type())) {
+                firstPrimitiveFieldType2 = firstPrimitiveFieldType(model2.type());
+            }
+            if (firstPrimitiveFieldType1 != null && firstPrimitiveFieldType2 == null)
+                return -1;
+            if (firstPrimitiveFieldType1 == null && firstPrimitiveFieldType2 != null)
+                return 1;
+            if (firstPrimitiveFieldType1 != null && firstPrimitiveFieldType2 != null) {
+                return -Maths.compare(heapSize(firstPrimitiveFieldType1),
+                        heapSize(firstPrimitiveFieldType2));
+            }
+            return o1.getKey().compareTo(o2.getKey());
         }
     };
     private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
     private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
     private boolean dumpCode = Boolean.getBoolean("dvg.dumpCode");
+
+    public static Class firstPrimitiveFieldType(Class valueClass) {
+        try {
+            DataValueModel valueModel;
+            if (valueClass.isInterface()) {
+                valueModel = DataValueModels.acquireModel(valueClass);
+            } else {
+                String valueClassName = valueClass.getName();
+                String $$Native = "$$Native";
+                if (valueClassName.endsWith($$Native)) {
+                    valueClassName = valueClassName.substring(0,
+                            valueClassName.length() - $$Native.length());
+                    valueModel = DataValueModels.acquireModel(Class.forName(valueClassName));
+                } else {
+                    return null;
+                }
+            }
+            Map.Entry<String, FieldModel>[] fields =
+                    DataValueGenerator.heapSizeOrderedFields(valueModel);
+            if (fields.length == 0)
+                return null;
+            Class firstFieldType = fields[0].getValue().type();
+            if (firstFieldType.isPrimitive())
+                return firstFieldType;
+            return firstPrimitiveFieldType(firstFieldType);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public static String bytesType(Class type) {
         if (type.isPrimitive())
@@ -237,7 +289,7 @@ public class DataValueGenerator {
         return name.substring(name.lastIndexOf('.') + 1);
     }
 
-    private static CharSequence normalize(Class aClass) {
+    public static CharSequence normalize(Class aClass) {
         return aClass.getName().replace('$', '.');
     }
 
@@ -1022,7 +1074,8 @@ public class DataValueGenerator {
         Map.Entry<String, FieldModel>[] entries2 = heapSizeOrderedFields(dvmodel2);
         for (Map.Entry<String, ? extends FieldModel> entry2 : entries2) {
             FieldModel model2 = entry2.getValue();
-            offset += fieldSize(model2);
+            offset += dvmodel2.isScalar(model2.type()) ? fieldSize(model2)
+                    : computeNonScalarOffset(dvmodel2, model2.type());
         }
         return offset;
     }

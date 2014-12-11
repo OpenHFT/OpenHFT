@@ -18,6 +18,7 @@
 
 package net.openhft.lang.model;
 
+import net.openhft.lang.MemoryUnit;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.model.constraints.Digits;
 import net.openhft.lang.model.constraints.MaxSize;
@@ -30,6 +31,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import static net.openhft.lang.MemoryUnit.BITS;
+import static net.openhft.lang.MemoryUnit.BYTES;
 
 /**
  * User: peter.lawrey Date: 06/10/13private static final int VALUE Time: 17:23
@@ -48,6 +52,12 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         HEAP_SIZE_MAP.put(float.class, 32);
         HEAP_SIZE_MAP.put(long.class, 64);
         HEAP_SIZE_MAP.put(double.class, 64);
+    }
+
+    public static int heapSize(Class primitiveType) {
+        if (!primitiveType.isPrimitive())
+            throw new IllegalArgumentException();
+        return (int) BYTES.alignAndConvert(HEAP_SIZE_MAP.get(primitiveType), BITS);
     }
 
     private final Map<String, FieldModelImpl> fieldModelMap = new TreeMap<String, FieldModelImpl>();
@@ -270,7 +280,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
     private static String getSetterAt(String name) {
         final int len = 3;
         final int len2 = 2;
-        if (name.length() > len + len2 && name.startsWith("set") && Character.isUpperCase(name.charAt(len)) && name.endsWith("At"))
+        if (name.length() > len + len2 && name.startsWith("set") && Character.isUpperCase(
+                name.charAt(len)) && name.endsWith("At"))
             return Character.toLowerCase(name.charAt(len)) + name.substring(len + 1, name.length() - len2);
         return name;
     }
@@ -303,7 +314,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
     private static String getGetterAt(String name, Class returnType) {
         final int len = 3;
         final int len2 = 2;
-        if (name.length() > len + len2 && name.startsWith("get") && Character.isUpperCase(name.charAt(len)) && name.endsWith("At"))
+        if (name.length() > len + len2 && name.startsWith("get") && Character.isUpperCase(
+                name.charAt(len)) && name.endsWith("At"))
             return Character.toLowerCase(name.charAt(len)) + name.substring(4, name.length() - len2);
         return name;
     }
