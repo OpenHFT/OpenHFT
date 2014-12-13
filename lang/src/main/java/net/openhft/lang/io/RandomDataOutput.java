@@ -864,7 +864,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     Bytes zeroOut();
 
     /**
-     * fill the Bytes with zeros, and clear the position.
+     * fill the Bytes with zeros.
      *
      * @param start first byte to zero out
      * @param end   the first byte after the last to zero out (exclusive bound)
