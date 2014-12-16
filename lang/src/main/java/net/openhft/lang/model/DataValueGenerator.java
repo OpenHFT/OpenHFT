@@ -293,7 +293,9 @@ public class DataValueGenerator {
         return aClass.getName().replace('$', '.');
     }
 
-    private static void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel, Map.Entry<String, FieldModel>[] entries, boolean offHeap) {
+    private static void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel,
+                                              Map.Entry<String, FieldModel>[] entries,
+                                              boolean offHeap) {
         int count = 0;
         StringBuilder hashCode = new StringBuilder();
         StringBuilder equals = new StringBuilder();
@@ -313,9 +315,10 @@ public class DataValueGenerator {
                 String getterName = (getter == null) ? getterName(getUsing) : getter.getName();
                 methodLongHashCode(hashCode, getterName, model, count);
 
-                if (getter != null)
+                if (getter != null) {
                     methodEquals(equals, getterName, model, simpleName(dvmodel.type()));
-                else {
+                    methodToString(toString, getterName, name, model);
+                } else {
                     methodEqualsGetUsing(getUsingEquals, getUsing.getName());
                     methodToStringGetUsing(toStringGetUsing, getUsing.getName(), name, model);
                 }
