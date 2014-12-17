@@ -140,4 +140,42 @@ public enum Jvm {
         return 1L << 16;
     }
 
+    private static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
+    public static long freePhysicalMemoryOnWindowsInBytes() throws IOException {
+        if (!isWindows())
+            throw new IllegalStateException("Method freePhysicalMemoryOnWindowsInBytes() should " +
+                    "be called only on windows. Use Jvm.isWindows() to check the OS.");
+        Process pr = Runtime.getRuntime().exec("wmic OS get FreePhysicalMemory /Value");
+        try {
+            int result = pr.waitFor();
+            String output = convertStreamToString(pr.getInputStream());
+            if (result != 0) {
+                String errorOutput = convertStreamToString(pr.getErrorStream());
+                throw new IOException("Couldn't get free physical memory on windows. " +
+                        "Command \"wmic OS get FreePhysicalMemory /Value\" exited with " +
+                        result + " code, putput: \"" + output + "\", error output: \"" +
+                        errorOutput + "\"");
+            }
+            String[] parts = output.trim().split("=");
+            if (parts.length != 2) {
+                throw new IOException("Couldn't get free physical memory on windows. " +
+                        "Command \"wmic OS get FreePhysicalMemory /Value\" output has unexpected " +
+                        "format: \"" + output + "\"");
+            }
+            try {
+                return MemoryUnit.KILOBYTES.toBytes(Long.parseLong(parts[1]));
+            } catch (NumberFormatException e) {
+                throw new IOException("Couldn't get free physical memory on windows. " +
+                        "Command \"wmic OS get FreePhysicalMemory /Value\" output has unexpected " +
+                        "format: \"" + output + "\"", e);
+            }
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        }
+    }
+
 }
