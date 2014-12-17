@@ -1,6 +1,6 @@
 package net.openhft.lang.io.serialization;
 
-import junit.framework.Assert;
+ import org.junit.Assert;
 import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.Bytes;
 import org.junit.Ignore;
