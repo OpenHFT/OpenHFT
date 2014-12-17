@@ -47,6 +47,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
         } catch (NoSuchMethodException e) {
             try {
                 constructor = classMarshaled.getConstructor(String.class);
+                constructor.setAccessible(true);
             } catch (NoSuchMethodException e1) {
                 throw new IllegalArgumentException(classMarshaled + " doesn't have a valueOf(String) or a Constructor(String)");
             }
@@ -91,7 +92,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
                     map.put(s, e = invoke);
                 }
             } catch (Exception t) {
-                throw new AssertionError(t.getCause());
+                throw new AssertionError(t);
             }
         return e;
     }
