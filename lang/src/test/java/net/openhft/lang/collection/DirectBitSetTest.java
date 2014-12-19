@@ -602,7 +602,7 @@ public class DirectBitSetTest {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[] {3, 7, 13, 31, 33, 63, 65, 100, 127, 128, 129, 254, 255}) {
             bs.clear();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsClear(i * n, i * n + n);
@@ -612,12 +612,12 @@ public class DirectBitSetTest {
             }
         }
         long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64, 65, 100, 127, 128, 129}) {
             bs.setAll();
-            long from = lastBound - (n / 2);
+            long from = n <= 64 ? lastBound - (n / 2) : 30;
             long to = from + n;
             bs.clear(from, to);
-            assertEquals(from, bs.setNextNContinuousClearBits(0L, n));
+            assertEquals("" + n, from, bs.setNextNContinuousClearBits(0L, n));
             assertRangeIsSet(from, to);
 
             bs.clear(from, to);

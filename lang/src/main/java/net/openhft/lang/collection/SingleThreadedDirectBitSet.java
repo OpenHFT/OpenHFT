@@ -82,7 +82,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
 
     static void checkNumberOfBits(int numberOfBits) {
         if (numberOfBits <= 0 || numberOfBits > 64)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Illegal number of bits: " + numberOfBits);
     }
 
     static boolean checkNotFoundIndex(long fromIndex) {
@@ -649,6 +649,38 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         return NOT_FOUND;
     }
 
+
+    private long previousSetBit(long fromIndex, long inclusiveToIndex) {
+        long fromLongIndex = longWithThisBit(fromIndex);
+        long toLongIndex = longWithThisBit(inclusiveToIndex);
+        checkFromTo(inclusiveToIndex, fromIndex + 1, toLongIndex);
+        if (fromLongIndex >= longLength) {
+            // the same policy for this "index out of bounds" situation
+            // as in j.u.BitSet
+            fromLongIndex = longLength - 1;
+            fromIndex = size() - 1;
+        }
+        if (fromLongIndex != toLongIndex) {
+            // << ~fromIndex === << (63 - (fromIndex & 63))
+            long l = readLong(fromLongIndex) << ~fromIndex;
+            if (l != 0)
+                return fromIndex - numberOfLeadingZeros(l);
+            for (long i = fromLongIndex - 1; i > toLongIndex; i--) {
+                l = readLong(i);
+                if (l != 0)
+                    return lastBit(i) - numberOfLeadingZeros(l);
+            }
+            fromIndex = lastBit(toLongIndex);
+        }
+        long w = readLong(toLongIndex);
+        long mask = higherBitsIncludingThis(inclusiveToIndex) & lowerBitsIncludingThis(fromIndex);
+        long l = w & mask;
+        if (l != 0) {
+            return lastBit(toLongIndex) - numberOfLeadingZeros(l);
+        }
+        return NOT_FOUND;
+    }
+
     @Override
     public long clearPreviousSetBit(long fromIndex) {
         if (checkNotFoundIndex(fromIndex))
@@ -809,11 +841,12 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     /**
-     * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     * @throws IllegalArgumentException if {@code numberOfBits} is negative
      */
     @Override
     public long setNextNContinuousClearBits(long fromIndex, int numberOfBits) {
+        if (numberOfBits > 64)
+            return setNextManyContinuousClearBits(fromIndex, numberOfBits);
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
             return setNextClearBit(fromIndex);
@@ -910,6 +943,24 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     continue longLoop;
                 }
             }
+        }
+    }
+
+    private long setNextManyContinuousClearBits(long fromIndex, int numberOfBits) {
+        long size = size();
+        long testFromIndex = fromIndex;
+        while (true) {
+            long limit = fromIndex + numberOfBits;
+            if (limit > size)
+                return NOT_FOUND;
+            long needToBeZerosUntil = limit - 1;
+            long lastSetBit = previousSetBit(needToBeZerosUntil, testFromIndex);
+            if (lastSetBit == NOT_FOUND) {
+                set(fromIndex, limit);
+                return fromIndex;
+            }
+            fromIndex = lastSetBit + 1;
+            testFromIndex = limit;
         }
     }
 
