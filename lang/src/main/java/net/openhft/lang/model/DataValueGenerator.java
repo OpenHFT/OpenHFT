@@ -1077,10 +1077,14 @@ public class DataValueGenerator {
         Map.Entry<String, FieldModel>[] entries2 = heapSizeOrderedFields(dvmodel2);
         for (Map.Entry<String, ? extends FieldModel> entry2 : entries2) {
             FieldModel model2 = entry2.getValue();
-            int add = dvmodel2.isScalar(model2.type()) ? fieldSize(model2)
-                    : computeNonScalarOffset(dvmodel2, model2.type());
-            if (model2.isArray())
-                add *= model2.indexSize().value();
+            int add;
+            if (dvmodel2.isScalar(model2.type())) {
+                add = fieldSize(model2);
+            } else {
+                add = computeNonScalarOffset(dvmodel2, model2.type());
+                if (model2.isArray())
+                    add *= model2.indexSize().value();
+            }
             offset += add;
         }
         return offset;
