@@ -138,6 +138,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     @Override
     void write(byte[] bytes, int off, int len);
 
+    void write(long offset, byte[] bytes, int off, int len);
+
     void write(@NotNull char[] data);
 
     void write(@NotNull char[] data, int off, int len);

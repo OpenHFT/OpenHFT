@@ -868,9 +868,7 @@ public abstract class AbstractBytes implements Bytes {
     // // RandomOutputStream
     @Override
     public void write(@NotNull byte[] bytes) {
-        int length = bytes.length;
-        checkWrite(length);
-        write(bytes, 0, length);
+        write(bytes, 0, bytes.length);
     }
 
     private void checkWrite(int length) {
@@ -998,6 +996,15 @@ public abstract class AbstractBytes implements Bytes {
 
         for (int i = 0; i < len; i++)
             write(bytes[off + i]);
+    }
+
+    @Override
+    public void write(long offset, byte[] bytes, int off, int len) {
+        checkArrayOffs(bytes.length, off, len);
+        checkWrite(len);
+
+        for (int i = 0; i < len; i++)
+            writeByte(offset + i, bytes[off + i]);
     }
 
     @Override
