@@ -12,7 +12,7 @@ public class SetMarshaller<E> extends CollectionMarshaller<E, Set<E>> implements
     }
 
     public static <E> BytesMarshaller<Set<E>> of(BytesMarshaller<E> eBytesMarshaller) {
-        return new SetMarshaller<>(eBytesMarshaller);
+        return new SetMarshaller<E>(eBytesMarshaller);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class SetMarshaller<E> extends CollectionMarshaller<E, Set<E>> implements
 
     @Override
     Set<E> newCollection() {
-        return new LinkedHashSet<>();
+        return new LinkedHashSet<E>();
     }
 
     @Override
