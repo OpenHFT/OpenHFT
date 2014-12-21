@@ -60,7 +60,7 @@ public class PingPongMain {
     private static void startServer() throws IOException {
         ServerSocketChannel ssc = ServerSocketChannel.open();
         ssc.socket().setReuseAddress(true);
-        ssc.bind(new InetSocketAddress(PORT));
+        ssc.socket().bind(new InetSocketAddress(PORT));
 
         System.out.println("Listening for one connection on port " + PORT);
         SocketChannel sc = ssc.accept();

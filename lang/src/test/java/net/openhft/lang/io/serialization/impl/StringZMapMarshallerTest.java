@@ -31,7 +31,7 @@ public class StringZMapMarshallerTest {
     }
 
     public static <K, V> Map<K, V> mapOf(K k, V v, Object... keysAndValues) {
-        Map<K, V> ret = new LinkedHashMap<>();
+        Map<K, V> ret = new LinkedHashMap<K, V>();
         ret.put(k, v);
         for (int i = 0; i < keysAndValues.length - 1; i += 2) {
             Object key = keysAndValues[i];

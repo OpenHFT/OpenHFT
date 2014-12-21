@@ -2,9 +2,10 @@ package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.DirectStore;
+
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +23,7 @@ public class SnappyStringMarshallerTest {
         Random random = new Random();
         for (int i = 0; i < bytes.length; i++)
             bytes[i] = (byte) ('A' + random.nextInt(26));
-        testWriteRead(b, new String(bytes, StandardCharsets.ISO_8859_1));
+        testWriteRead(b, new String(bytes, Charset.forName("ISO-8859-1")));
     }
 
     private void testWriteRead(Bytes b, String s) {

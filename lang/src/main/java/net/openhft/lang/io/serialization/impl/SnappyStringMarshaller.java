@@ -22,11 +22,11 @@ import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.Nullable;
+
 import org.xerial.snappy.Snappy;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 /**
@@ -34,23 +34,26 @@ import java.nio.ByteBuffer;
  */
 public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequence> {
     INSTANCE;
-    private static final Constructor NEW_STRING;
-    private static final Field VALUE;
+    private static final StringFactory STRING_FACTORY = getStringFactory();
 
     private static final int NULL_LENGTH = -1;
 
-    static {
+    private static StringFactory getStringFactory() {
         try {
-            NEW_STRING = String.class.getDeclaredConstructor(char[].class, boolean.class);
-            NEW_STRING.setAccessible(true);
-            VALUE = String.class.getDeclaredField("value");
-            VALUE.setAccessible(true);
+            return new StringFactory17();
         } catch (Exception e) {
+            // do nothing
+        }
+
+        try {
+            return new StringFactory16();
+        } catch (Exception e) {
+            // no more alternatives
             throw new AssertionError(e);
         }
     }
 
-    private static final ThreadLocal<ThreadLocals> THREAD_LOCALS = new ThreadLocal<>();
+    private static final ThreadLocal<ThreadLocals> THREAD_LOCALS = new ThreadLocal<ThreadLocals>();
 
     static class ThreadLocals {
         ByteBuffer decompressedByteBuffer = ByteBuffer.allocateDirect(32 * 1024);
@@ -165,9 +168,42 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
         }
         bytes.position(bytes.position() + cbb.position());
         try {
-            return (String) NEW_STRING.newInstance(chars, true);
+            return STRING_FACTORY.fromChars(chars);
         } catch (Exception e) {
             throw new AssertionError(e);
+        }
+    }
+
+    private static abstract class StringFactory {
+        abstract String fromChars(char[] chars) throws Exception;
+    }
+
+    private static final class StringFactory16 extends StringFactory {
+        private final Constructor<String> constructor;
+
+        private StringFactory16() throws Exception {
+            constructor = String.class.getDeclaredConstructor(int.class,
+                    int.class, char[].class);
+            constructor.setAccessible(true);
+        }
+
+        @Override
+        String fromChars(char[] chars) throws Exception {
+            return constructor.newInstance(0, chars.length, chars);
+        }
+    }
+
+    private static final class StringFactory17 extends StringFactory {
+        private final Constructor<String> constructor;
+
+        private StringFactory17() throws Exception {
+            constructor = String.class.getDeclaredConstructor(char[].class, boolean.class);
+            constructor.setAccessible(true);
+        }
+
+        @Override
+        String fromChars(char[] chars) throws Exception {
+            return constructor.newInstance(chars, true);
         }
     }
 }

@@ -14,7 +14,7 @@ public class ListMarshaller<E> extends CollectionMarshaller<E, List<E>> implemen
     }
 
     public static <E> BytesMarshaller<List<E>> of(BytesMarshaller<E> eBytesMarshaller) {
-        return new ListMarshaller<>(eBytesMarshaller);
+        return new ListMarshaller<E>(eBytesMarshaller);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class ListMarshaller<E> extends CollectionMarshaller<E, List<E>> implemen
 
     @Override
     List<E> newCollection() {
-        return new ArrayList<>();
+        return new ArrayList<E>();
     }
 
     @Override
