@@ -190,13 +190,23 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void readFully(@org.jetbrains.annotations.NotNull char[] data, int off, int len) {
+    public void readFully(@NotNull char[] data, int off, int len) {
         checkArrayOffs(data.length, off, len);
         long left = remaining();
         if (left < len * 2L)
             throw new IllegalStateException(new EOFException());
         for (int i = 0; i < len; i++)
             data[off + i] = readChar();
+    }
+
+    @Override
+    public void readFully(long offset, byte[] bytes, int off, int len) {
+        checkArrayOffs(bytes.length, off, len);
+        long left = remaining();
+        if (left < len)
+            throw new IllegalStateException(new EOFException());
+        for (int i = 0; i < len; i++)
+            bytes[off + i] = readByte(offset + i);
     }
 
     @Override

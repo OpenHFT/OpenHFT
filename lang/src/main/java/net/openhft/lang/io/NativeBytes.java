@@ -246,6 +246,12 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
+    public void readFully(long offset, byte[] bytes, int off, int len) {
+        checkArrayOffs(bytes.length, off, len);
+        UNSAFE.copyMemory(null, startAddr + offset, bytes, BYTES_OFFSET + off, len);
+    }
+
+    @Override
     public void readFully(@NotNull char[] data, int off, int len) {
         checkArrayOffs(data.length, off, len);
         long bytesOff = off * 2L;
@@ -378,6 +384,13 @@ public class NativeBytes extends AbstractBytes {
             throw new IllegalArgumentException();
         UNSAFE.copyMemory(bytes, BYTES_OFFSET + off, null, positionAddr, len);
         addPosition(len);
+    }
+
+    @Override
+    public void write(long offset, byte[] bytes, int off, int len) {
+        if (offset < 0 || off + len > bytes.length || offset + len > capacity())
+            throw new IllegalArgumentException();
+        UNSAFE.copyMemory(bytes, BYTES_OFFSET + off, null, startAddr + offset, len);
     }
 
     @Override
