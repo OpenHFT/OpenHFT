@@ -125,7 +125,7 @@ interface ByteBufferReuse {
                 @Override
                 public Class<ByteBufferReuse> run() {
                     ClassLoader cl = MAGIC_CLASS_LOADER;
-                    return unsafe.defineClass(reuseImplClassName, impl, 0, impl.length, cl, null);
+                    return (Class<ByteBufferReuse>) unsafe.defineClass(reuseImplClassName, impl, 0, impl.length, cl, null);
                 }
             });
             try {
