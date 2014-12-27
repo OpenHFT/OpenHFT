@@ -121,15 +121,15 @@ interface ByteBufferReuse {
             final byte[] impl = cw.toByteArray();
 
             final Unsafe unsafe = NativeBytes.UNSAFE;
-            Class<ByteBufferReuse> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<ByteBufferReuse>>() {
+            Class clazz = AccessController.doPrivileged(new PrivilegedAction<Class>() {
                 @Override
-                public Class<ByteBufferReuse> run() {
+                public Class run() {
                     ClassLoader cl = MAGIC_CLASS_LOADER;
-                    return (Class<ByteBufferReuse>) unsafe.defineClass(reuseImplClassName, impl, 0, impl.length, cl, null);
+                    return unsafe.defineClass(reuseImplClassName, impl, 0, impl.length, cl, null);
                 }
             });
             try {
-                return clazz.newInstance();
+                return (ByteBufferReuse) clazz.newInstance();
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
