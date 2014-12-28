@@ -35,7 +35,7 @@ public class StringInterner implements CharSequenceInterner<String> {
         mask = n - 1;
     }
 
-    private static boolean isEqual(@Nullable CharSequence s, @NotNull CharSequence cs) {
+    public static boolean isEqual(@Nullable CharSequence s, @NotNull CharSequence cs) {
         if (s == null) return false;
         if (s.length() != cs.length()) return false;
         for (int i = 0; i < cs.length(); i++)
