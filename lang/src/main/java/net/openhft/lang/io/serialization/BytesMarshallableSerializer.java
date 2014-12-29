@@ -76,6 +76,9 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
             } else if (CharSequence.class.isAssignableFrom(expectedClass)) {
                 bytes.writeUTFΔ((CharSequence) object);
                 return;
+            } else if (Enum.class.isAssignableFrom(expectedClass)) {
+                bytes.writeUTFΔ(object.toString());
+                return;
             }
         }
         Class<?> clazz = object.getClass();
@@ -115,6 +118,8 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
                     return readExternalizable(bytes, expectedClass, object);
                 } else if (CharSequence.class.isAssignableFrom(expectedClass)) {
                     return readCharSequence(bytes, object);
+                } else if (Enum.class.isAssignableFrom(expectedClass)) {
+                    return (T) Enum.valueOf((Class<Enum>) expectedClass, (String) readCharSequence(bytes, null));
                 }
             } catch (InstantiationException e) {
                 throw new IOException("Unable to create " + expectedClass, e);
