@@ -361,12 +361,14 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void write(int b) {
+        assert positionChecks(positionAddr + 1L);
         UNSAFE.putByte(positionAddr, (byte) b);
-        addPosition(1);
+        positionAddr++;
     }
 
     @Override
     public void writeByte(long offset, int b) {
+        assert offsetChecks(offset, 1L);
         UNSAFE.putByte(startAddr + offset, (byte) b);
     }
 
@@ -395,19 +397,22 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void writeShort(int v) {
+        assert positionChecks(positionAddr + 2L);
         UNSAFE.putShort(positionAddr, (short) v);
-        addPosition(2);
+        positionAddr += 2L;
     }
 
     @Override
     public void writeShort(long offset, int v) {
+        assert offsetChecks(offset, 2L);
         UNSAFE.putShort(startAddr + offset, (short) v);
     }
 
     @Override
     public void writeChar(int v) {
+        assert positionChecks(positionAddr + 2L);
         UNSAFE.putChar(positionAddr, (char) v);
-        addPosition(2);
+        positionAddr += 2L;
     }
 
     Thread singleThread = null;
@@ -427,82 +432,97 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void writeChar(long offset, int v) {
+        assert offsetChecks(offset, 2L);
         UNSAFE.putChar(startAddr + offset, (char) v);
     }
 
     @Override
     public void writeInt(int v) {
+        assert positionChecks(positionAddr + 4L);
         UNSAFE.putInt(positionAddr, v);
-        addPosition(4);
+        positionAddr += 4L;
     }
 
     @Override
     public void writeInt(long offset, int v) {
+        assert offsetChecks(offset, 4L);
         UNSAFE.putInt(startAddr + offset, v);
     }
 
     @Override
     public void writeOrderedInt(int v) {
+        assert positionChecks(positionAddr + 4L);
         UNSAFE.putOrderedInt(null, positionAddr, v);
-        addPosition(4);
+        positionAddr += 4L;
     }
 
     @Override
     public void writeOrderedInt(long offset, int v) {
+        assert offsetChecks(offset, 4L);
         UNSAFE.putOrderedInt(null, startAddr + offset, v);
     }
 
     @Override
     public boolean compareAndSwapInt(long offset, int expected, int x) {
+        assert offsetChecks(offset, 4L);
         return UNSAFE.compareAndSwapInt(null, startAddr + offset, expected, x);
     }
 
     @Override
     public void writeLong(long v) {
+        assert positionChecks(positionAddr + 8L);
         UNSAFE.putLong(positionAddr, v);
-        addPosition(8);
+        positionAddr += 8L;
     }
 
     @Override
     public void writeLong(long offset, long v) {
+        assert offsetChecks(offset, 8L);
         UNSAFE.putLong(startAddr + offset, v);
     }
 
     @Override
     public void writeOrderedLong(long v) {
+        assert positionChecks(positionAddr + 8L);
         UNSAFE.putOrderedLong(null, positionAddr, v);
-        addPosition(8);
+        positionAddr += 8L;
     }
 
     @Override
     public void writeOrderedLong(long offset, long v) {
+        assert offsetChecks(offset, 8L);
         UNSAFE.putOrderedLong(null, startAddr + offset, v);
     }
 
     @Override
     public boolean compareAndSwapLong(long offset, long expected, long x) {
+        assert offsetChecks(offset, 8L);
         return UNSAFE.compareAndSwapLong(null, startAddr + offset, expected, x);
     }
 
     @Override
     public void writeFloat(float v) {
+        assert positionChecks(positionAddr + 4L);
         UNSAFE.putFloat(positionAddr, v);
-        addPosition(4);
+        positionAddr += 4L;
     }
 
     @Override
     public void writeFloat(long offset, float v) {
+        assert offsetChecks(offset, 4L);
         UNSAFE.putFloat(startAddr + offset, v);
     }
 
     @Override
     public void writeDouble(double v) {
+        assert positionChecks(positionAddr + 8L);
         UNSAFE.putDouble(positionAddr, v);
-        addPosition(8);
+        positionAddr += 8L;
     }
 
     @Override
     public void writeDouble(long offset, double v) {
+        assert offsetChecks(offset, 8L);
         UNSAFE.putDouble(startAddr + offset, v);
     }
 
@@ -657,6 +677,13 @@ public class NativeBytes extends AbstractBytes {
         if (positionAddr < startAddr || positionAddr > limitAddr)
             throw new IndexOutOfBoundsException("position out of bounds.");
         assert checkSingleThread();
+        return true;
+    }
+
+    private boolean offsetChecks(long offset, long len) {
+        if (offset < 0L || offset + len > capacity())
+            throw new IndexOutOfBoundsException("offset out of bounds: " + offset + ", len: " +
+                    len + ", capacity: " + capacity());
         return true;
     }
 
