@@ -1290,4 +1290,18 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SingleThreadedBitSet{");
+        sb.append("size=" + size());
+        sb.append(", cardinality=" + cardinality());
+        sb.append(", bits=[");
+        for (long i = 0L; i < longLength; i++) {
+            sb.append(Long.toBinaryString(readLong(i)));
+        }
+        sb.append("]}");
+        return sb.toString();
+    }
 }
