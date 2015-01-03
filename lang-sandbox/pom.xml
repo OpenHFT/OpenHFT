@@ -31,7 +31,7 @@
     <name>OpenHFT/Java-Lang/lang-sandbox</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang-sandbox</artifactId>
-    <version>6.4.19-SNAPSHOT</version>
+    <version>6.4.22-SNAPSHOT</version>
 
     <dependencyManagement>
         <dependencies>
