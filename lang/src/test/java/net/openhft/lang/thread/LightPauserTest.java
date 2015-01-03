@@ -8,7 +8,7 @@ import org.junit.Test;
 public class LightPauserTest {
     @Test
     public void testLightPauser() throws InterruptedException {
-        final LightPauser pauser = new LightPauser(1000, 100 * 1000);
+        final LightPauser pauser = new LightPauser(100 * 1000, 100 * 1000);
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -16,12 +16,11 @@ public class LightPauserTest {
                     pauser.pause();
             }
         };
-        pauser.setThread(thread);
         thread.start();
 
-        for (int t = 0; t < 10; t++) {
+        for (int t = 0; t < 3; t++) {
             long start = System.nanoTime();
-            int runs = 100000;
+            int runs = 10000000;
             for (int i = 0; i < runs; i++)
                 pauser.unpause();
             long time = System.nanoTime() - start;
