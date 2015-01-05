@@ -27,6 +27,7 @@ import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -35,7 +36,7 @@ import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MappedStore implements BytesStore {
+public class MappedStore implements BytesStore, Closeable {
 
     private static final int MAP_RO = 0;
     private static final int MAP_RW = 1;
@@ -104,6 +105,11 @@ public class MappedStore implements BytesStore {
     @Override
     public void free() {
         cleaner.clean();
+    }
+
+    @Override
+    public void close() {
+        free();
     }
 
     @NotNull
