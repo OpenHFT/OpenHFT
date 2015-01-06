@@ -62,7 +62,7 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return y(a, C3/C0); }
         @Override long alignToKilobytes(long a)    { return y(a, C4/C0); }
         @Override long alignToPages(long a)        { return y(a, C5/C0); }
-        @Override long alignToMegaBytes(long a)    { return y(a, C6/C0); }
+        @Override long alignToMegabytes(long a)    { return y(a, C6/C0); }
         @Override long alignToGigabytes(long a)    { return y(a, C7/C0); }
         @Override public long align(long a, MemoryUnit u) { return ise(u, this); }
     },
@@ -86,7 +86,7 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return y(a, C3/C1); }
         @Override long alignToKilobytes(long a)    { return y(a, C4/C1); }
         @Override long alignToPages(long a)        { return y(a, C5/C1); }
-        @Override long alignToMegaBytes(long a)    { return y(a, C6/C1); }
+        @Override long alignToMegabytes(long a)    { return y(a, C6/C1); }
         @Override long alignToGigabytes(long a)    { return y(a, C7/C1); }
         @Override public long align(long a, MemoryUnit u) { return u.alignToBytes(a); }
     },
@@ -111,7 +111,7 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return y(a, C3/C2); }
         @Override long alignToKilobytes(long a)    { return y(a, C4/C2); }
         @Override long alignToPages(long a)        { return y(a, C5/C2); }
-        @Override long alignToMegaBytes(long a)    { return y(a, C6/C2); }
+        @Override long alignToMegabytes(long a)    { return y(a, C6/C2); }
         @Override long alignToGigabytes(long a)    { return y(a, C7/C2); }
         @Override public long align(long a, MemoryUnit u) { return u.alignToLongs(a); }
     },
@@ -135,7 +135,7 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
         @Override long alignToKilobytes(long a)    { return y(a, C4/C3); }
         @Override long alignToPages(long a)        { return y(a, C5/C3); }
-        @Override long alignToMegaBytes(long a)    { return y(a, C6/C3); }
+        @Override long alignToMegabytes(long a)    { return y(a, C6/C3); }
         @Override long alignToGigabytes(long a)    { return y(a, C7/C3); }
         @Override public long align(long a, MemoryUnit u) { return u.alignToCacheLines(a); }
     },
@@ -159,7 +159,7 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
         @Override long alignToKilobytes(long a)    { return ise(this, KILOBYTES); }
         @Override long alignToPages(long a)        { return y(a, C5/C4); }
-        @Override long alignToMegaBytes(long a)    { return y(a, C6/C4); }
+        @Override long alignToMegabytes(long a)    { return y(a, C6/C4); }
         @Override long alignToGigabytes(long a)    { return y(a, C7/C4); }
         @Override public long align(long a, MemoryUnit u) { return u.alignToKilobytes(a); }
     },
@@ -183,7 +183,7 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
         @Override long alignToKilobytes(long a)    { return ise(this, KILOBYTES); }
         @Override long alignToPages(long a)        { return ise(this, PAGES); }
-        @Override long alignToMegaBytes(long a)    { return y(a, C6/C5); }
+        @Override long alignToMegabytes(long a)    { return y(a, C6/C5); }
         @Override long alignToGigabytes(long a)    { return y(a, C7/C5); }
         @Override public long align(long a, MemoryUnit u) { return u.alignToPages(a); }
     },
@@ -207,9 +207,9 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
         @Override long alignToKilobytes(long a)    { return ise(this, KILOBYTES); }
         @Override long alignToPages(long a)        { return ise(this, PAGES); }
-        @Override long alignToMegaBytes(long a)    { return ise(this, MEGABYTES); }
+        @Override long alignToMegabytes(long a)    { return ise(this, MEGABYTES); }
         @Override long alignToGigabytes(long a)    { return y(a, C7/C6); }
-        @Override public long align(long a, MemoryUnit u) { return u.alignToMegaBytes(a); }
+        @Override public long align(long a, MemoryUnit u) { return u.alignToMegabytes(a); }
     },
 
     /**
@@ -231,7 +231,7 @@ public enum MemoryUnit {
         @Override long alignToCacheLines(long a)   { return ise(this, CACHE_LINES); }
         @Override long alignToKilobytes(long a)    { return ise(this, KILOBYTES); }
         @Override long alignToPages(long a)        { return ise(this, PAGES); }
-        @Override long alignToMegaBytes(long a)    { return ise(this, MEGABYTES); }
+        @Override long alignToMegabytes(long a)    { return ise(this, MEGABYTES); }
         @Override long alignToGigabytes(long a)    { return ise(this, GIGABYTES); }
         @Override public long align(long a, MemoryUnit u) { return u.alignToGigabytes(a); }
     };
@@ -443,6 +443,6 @@ public enum MemoryUnit {
     abstract long alignToCacheLines(long amount);
     abstract long alignToKilobytes(long amount);
     abstract long alignToPages(long amount);
-    abstract long alignToMegaBytes(long amount);
+    abstract long alignToMegabytes(long amount);
     abstract long alignToGigabytes(long amount);
 }
