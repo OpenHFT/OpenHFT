@@ -1,11 +1,14 @@
 package net.openhft.lang.data;
 
+import net.openhft.lang.data.attic.EncodeMode;
+import net.openhft.lang.data.attic.RawWire;
 import net.openhft.lang.io.DirectBytes;
 import net.openhft.lang.io.DirectStore;
 import org.junit.Before;
 import org.junit.Test;
 
-import static net.openhft.lang.data.TestField.*;
+import static net.openhft.lang.data.TestField.BOOL1;
+import static net.openhft.lang.data.TestField.BOOL2;
 import static org.junit.Assert.assertEquals;
 
 public class RawWireTest {
