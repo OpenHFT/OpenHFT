@@ -878,12 +878,12 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeBoolean(boolean v) {
-        write(v ? -1 : 0);
+        write(v ? 'Y' : 0);
     }
 
     @Override
     public void writeBoolean(long offset, boolean v) {
-        writeByte(offset, v ? -1 : 0);
+        writeByte(offset, v ? 'Y' : 0);
     }
 
     @Override
@@ -2548,7 +2548,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private void append(Appendable sb, long i) throws IOException {
-        byte b = readByte(i);
+        int b = readUnsignedByte(i);
         if (b == 0)
             sb.append('\u0660');
         else if (b < 21)
