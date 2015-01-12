@@ -1,6 +1,5 @@
 package net.openhft.lang.data;
 
-import net.openhft.lang.data.attic.EncodeMode;
 import net.openhft.lang.data.attic.RawWire;
 import net.openhft.lang.io.DirectBytes;
 import net.openhft.lang.io.DirectStore;

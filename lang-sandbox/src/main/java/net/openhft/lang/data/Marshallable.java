@@ -1,4 +1,4 @@
-package net.openhft.lang.data.attic;
+package net.openhft.lang.data;
 
 import java.io.StreamCorruptedException;
 
@@ -17,7 +17,7 @@ public interface Marshallable {
      * Straight line ordered decoding.
      *
      * @param wire to read from in an ordered manner.
-     *             @throws java.io.StreamCorruptedException the stream wasn't ordered or formatted as expected.
+     * @throws java.io.StreamCorruptedException the stream wasn't ordered or formatted as expected.
      */
     public void readMarshallable(Wire wire) throws StreamCorruptedException;
 }

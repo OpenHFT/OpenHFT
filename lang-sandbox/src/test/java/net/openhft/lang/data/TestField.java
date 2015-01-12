@@ -1,8 +1,5 @@
 package net.openhft.lang.data;
 
-import net.openhft.lang.data.attic.EncodeMode;
-import net.openhft.lang.data.attic.WireKey;
-
 /**
  * Created by peter on 1/10/15.
  */

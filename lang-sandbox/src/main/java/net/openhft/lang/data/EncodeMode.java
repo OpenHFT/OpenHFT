@@ -1,4 +1,4 @@
-package net.openhft.lang.data.attic;
+package net.openhft.lang.data;
 
 /**
  * Created by peter on 1/10/15.
