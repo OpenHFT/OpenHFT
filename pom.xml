@@ -39,7 +39,7 @@
     <modules>
         <module>lang</module>
         <module>lang-test</module>
-        <module>lang-sandbox</module>
+        <!--<module>lang-sandbox</module>-->
     </modules>
 
 </project>
