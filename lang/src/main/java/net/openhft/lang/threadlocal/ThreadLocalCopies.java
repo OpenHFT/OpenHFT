@@ -29,7 +29,7 @@ public final class ThreadLocalCopies {
         }
     };
 
-    static ThreadLocalCopies get() {
+    public static ThreadLocalCopies get() {
         return states.get();
     }
 
@@ -37,7 +37,7 @@ public final class ThreadLocalCopies {
     Object[] table;
     int size = 0, sizeLimit, mask;
 
-    private ThreadLocalCopies() {
+    public ThreadLocalCopies() {
         init(32); // 16 entries
     }
 
