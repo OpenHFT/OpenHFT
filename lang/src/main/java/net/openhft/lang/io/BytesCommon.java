@@ -237,4 +237,6 @@ public interface BytesCommon {
 
     @NotNull
     String toDebugString();
+
+    String toDebugString(long limit);
 }

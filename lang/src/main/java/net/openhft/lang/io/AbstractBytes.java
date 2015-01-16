@@ -2508,10 +2508,16 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String toDebugString() {
+        return toDebugString(64);
+    }
+
+    @NotNull
+    @Override
+    public String toDebugString(long limit) {
         StringBuilder sb = new StringBuilder(200);
         sb.append("[pos: ").append(position()).append(", lim: ").append(limit()).append(", cap: ")
                 .append(capacity()).append(" ] ");
-        toString(sb, position() - 64, position(), position() + 64);
+        toString(sb, position() - limit, position(), position() + limit);
 
         return sb.toString();
     }
