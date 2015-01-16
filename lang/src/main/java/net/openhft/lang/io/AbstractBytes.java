@@ -1938,7 +1938,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public long skip(long n) {
-        if (n < 0)
+        if (n < -position())
             throw new IllegalArgumentException("Skip bytes out of range, was " + n);
         if (n > remaining())
             n = remaining();
