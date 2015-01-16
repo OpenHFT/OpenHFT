@@ -70,10 +70,16 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         return firstBit(longIndex) + 63;
     }
 
-    private final Bytes bytes;
-    private final long longLength;
+    private Bytes bytes;
+    private long longLength;
+
+    public SingleThreadedDirectBitSet() {}
 
     public SingleThreadedDirectBitSet(Bytes bytes) {
+        reuse(bytes);
+    }
+
+    public void reuse(Bytes bytes) {
         this.bytes = bytes;
         longLength = bytes.capacity() >> 3;
     }
