@@ -438,7 +438,7 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void writeInt(int v) {
-        positionChecks(positionAddr + 4L);
+//        positionChecks(positionAddr + 4L);
         UNSAFE.putInt(positionAddr, v);
         positionAddr += 4L;
     }
@@ -674,7 +674,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     void positionChecks(long positionAddr) {
-        assert actualPositionChecks(positionAddr);
+//        assert actualPositionChecks(positionAddr);
     }
 
     boolean actualPositionChecks(long positionAddr) {
@@ -685,7 +685,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     void offsetChecks(long offset, long len) {
-        assert actualOffsetChecks(offset, len);
+//        assert actualOffsetChecks(offset, len);
     }
 
     boolean actualOffsetChecks(long offset, long len) {

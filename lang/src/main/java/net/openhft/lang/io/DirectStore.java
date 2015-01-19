@@ -108,9 +108,12 @@ public class DirectStore implements BytesStore {
         size = newSize;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @NotNull
     public DirectBytes bytes() {
-        return new DirectBytes(this, refCount);
+        boolean debug = false;
+        assert debug = true;
+        return debug ? new BoundsCheckingDirectBytes(this, refCount) : new DirectBytes(this, refCount);
     }
 
     @NotNull
