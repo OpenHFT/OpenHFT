@@ -39,7 +39,7 @@ public class BigDecimalVsDoubleMain {
     static int count = 0;
 
     public static void main(String[] args) throws InterruptedException {
-        ByteBufferBytes x = new ByteBufferBytes(ByteBuffer.allocateDirect(16));
+        Bytes x = ByteBufferBytes.wrap(ByteBuffer.allocateDirect(16));
         x.writeUTFΔ("Hello World");
         System.out.println(x);
         int runs = 5000;

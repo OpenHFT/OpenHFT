@@ -41,10 +41,30 @@ public class ByteBufferBytes extends AbstractBytes {
     private int limit;
     private AtomicBoolean barrier;
 
+    public static Bytes wrap(ByteBuffer buffer) {
+        if (buffer instanceof DirectBuffer)
+            return new DirectByteBufferBytes(buffer);
+        return new ByteBufferBytes(buffer.slice());
+    }
+
+    public static Bytes wrap(ByteBuffer buffer, int start, int capacity) {
+        if (buffer instanceof DirectBuffer)
+            return new DirectByteBufferBytes(buffer, start, capacity);
+        return new ByteBufferBytes(buffer.slice(), start, capacity);
+    }
+
+    /**
+     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
+     */
+    @Deprecated
     public ByteBufferBytes(ByteBuffer buffer) {
         this(buffer, 0, buffer.capacity());
     }
 
+    /**
+     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
+     */
+    @Deprecated
     public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
         super(BytesMarshallableSerializer.create(new VanillaBytesMarshallerFactory(), JDKZObjectSerializer.INSTANCE), new AtomicInteger(1));
         // We should set order to native, because compare-and-swap operations
@@ -528,9 +548,9 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public ByteBufferBytes position(long position) {
         if (start + position > Integer.MAX_VALUE)
-            throw new IndexOutOfBoundsException("Position to large");
+            throw new IllegalArgumentException("Position to large");
         if (position < 0)
-            throw new IndexOutOfBoundsException("Position to small");
+            throw new IllegalArgumentException("Position to small");
         this.position = (int) (start + position);
         return this;
     }

@@ -43,13 +43,13 @@ import static org.junit.Assert.*;
  */
 public class DirectByteBufferBytesTest {
     public static final int SIZE = 128;
-    private ByteBufferBytes bytes;
+    private Bytes bytes;
     private ByteBuffer byteBuffer;
 
     @Before
     public void beforeTest() {
         byteBuffer = ByteBuffer.allocateDirect(SIZE).order(ByteOrder.nativeOrder());
-        bytes = new ByteBufferBytes(byteBuffer);
+        bytes = ByteBufferBytes.wrap(byteBuffer);
     }
 
     @Test
@@ -808,7 +808,7 @@ public class DirectByteBufferBytesTest {
 
     @Test
     public void testStream() throws IOException {
-        bytes = new ByteBufferBytes(ByteBuffer.allocateDirect(1000));
+        bytes = ByteBufferBytes.wrap(ByteBuffer.allocateDirect(1000));
         GZIPOutputStream out = new GZIPOutputStream(bytes.outputStream());
         out.write("Hello world\n".getBytes());
         out.close();
@@ -873,7 +873,7 @@ public class DirectByteBufferBytesTest {
     public void testWriteSerializable() {
         int capacity = 16 * 1024;
         byteBuffer = ByteBuffer.allocateDirect(capacity);
-        bytes = new ByteBufferBytes(byteBuffer);
+        bytes = ByteBufferBytes.wrap(byteBuffer);
         Calendar cal = Calendar.getInstance();
         bytes.writeObject(cal);
         Dummy d = new Dummy();

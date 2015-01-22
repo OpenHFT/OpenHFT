@@ -19,6 +19,7 @@
 package net.openhft.lang.io.examples;
 
 import net.openhft.lang.io.ByteBufferBytes;
+import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.StopCharTesters;
 
 import java.nio.ByteBuffer;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 public class ParserExampleMain {
     public static void main(String... ignored) {
         ByteBuffer wrap = ByteBuffer.allocate(1024);
-        ByteBufferBytes bufferBytes = new ByteBufferBytes(wrap);
+        Bytes bufferBytes = ByteBufferBytes.wrap(wrap);
         byte[] bytes = "BAC,12.32,12.54,12.56,232443".getBytes();
 
         int runs = 10000000;

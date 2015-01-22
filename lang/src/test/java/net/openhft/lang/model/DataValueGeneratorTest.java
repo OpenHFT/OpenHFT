@@ -78,7 +78,7 @@ public class DataValueGeneratorTest {
         assertEquals(7.0, mi.double$(), 0.0);
         assertTrue(mi.flag());
 
-        ByteBufferBytes bbb = new ByteBufferBytes(ByteBuffer.allocate(64));
+        Bytes bbb = ByteBufferBytes.wrap(ByteBuffer.allocate(64));
         mi.writeMarshallable(bbb);
         System.out.println("size: " + bbb.position());
 
@@ -103,7 +103,7 @@ public class DataValueGeneratorTest {
         CachedCompiler cc = new CachedCompiler(null, null);
         Class aClass = cc.loadFromJava(JavaBeanInterfaceGetUsing.class.getName() + "$$Native", actual);
         JavaBeanInterfaceGetUsing jbi = (JavaBeanInterfaceGetUsing) aClass.asSubclass(JavaBeanInterfaceGetUsing.class).newInstance();
-        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
+        Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(64));
         ((Byteable) jbi).bytes(bytes, 0L);
 
         jbi.setString("G'day");
@@ -129,7 +129,7 @@ public class DataValueGeneratorTest {
         assertEquals("Hello world", si.getString());
 
         StringInterface si2 = dvg.nativeInstance(StringInterface.class);
-        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
+        Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(192));
         ((Byteable) si2).bytes(bytes, 0L);
         si2.setString("Hello world £€");
         si2.setText("Hello world £€");
@@ -169,7 +169,7 @@ public class DataValueGeneratorTest {
 
 //        dvg.setDumpCode(true);
         NestedA nestedA = dvg.nativeInstance(NestedA.class);
-        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(192));
+        Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(192));
         ((Byteable) nestedA).bytes(bytes, 0L);
         nestedA.key("key");
         nestedA.one(nestedB1);

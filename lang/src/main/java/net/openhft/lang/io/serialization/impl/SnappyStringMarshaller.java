@@ -22,7 +22,6 @@ import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.Nullable;
-
 import org.xerial.snappy.Snappy;
 
 import java.io.IOException;
@@ -57,7 +56,7 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
 
     static class ThreadLocals {
         ByteBuffer decompressedByteBuffer = ByteBuffer.allocateDirect(32 * 1024);
-        Bytes decompressedBytes = new ByteBufferBytes(decompressedByteBuffer);
+        Bytes decompressedBytes = ByteBufferBytes.wrap(decompressedByteBuffer);
         ByteBuffer compressedByteBuffer = ByteBuffer.allocateDirect(0);
 
         public void clear() {

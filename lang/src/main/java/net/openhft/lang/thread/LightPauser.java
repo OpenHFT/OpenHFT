@@ -25,13 +25,21 @@ public class LightPauser implements Pauser {
 
     @Override
     public void pause() {
-        if (count++ < busyCount)
+        pause(parkPeriod);
+    }
+
+    public void pause(long maxPauseNS) {
+        if (count++ < busyCount || maxPauseNS < 10000)
             return;
         thread = Thread.currentThread();
         pausing.set(true);
-        LockSupport.parkNanos(parkPeriod);
+        doPause(maxPauseNS);
         pausing.set(false);
         reset();
+    }
+
+    protected void doPause(long maxPauseNS) {
+        LockSupport.parkNanos(Math.max(maxPauseNS, parkPeriod));
     }
 
     @Override

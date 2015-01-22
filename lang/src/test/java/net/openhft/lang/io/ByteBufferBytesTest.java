@@ -43,13 +43,13 @@ import static org.junit.Assert.*;
  */
 public class ByteBufferBytesTest {
     public static final int SIZE = 128;
-    private ByteBufferBytes bytes;
+    private Bytes bytes;
     private ByteBuffer byteBuffer;
 
     @Before
     public void beforeTest() {
         byteBuffer = ByteBuffer.allocate(SIZE).order(ByteOrder.nativeOrder());
-        bytes = new ByteBufferBytes(byteBuffer);
+        bytes = ByteBufferBytes.wrap(byteBuffer);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ByteBufferBytesTest {
 
     @Test
     public void testCAS() {
-        Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(100));
+        Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(100));
         bytes.compareAndSwapLong(0, 0L, 1L);
         assertEquals(1L, bytes.readLong(0));
     }
@@ -787,7 +787,7 @@ public class ByteBufferBytesTest {
 
     @Test
     public void testStream() throws IOException {
-        bytes = new ByteBufferBytes(ByteBuffer.allocate(1000));
+        bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(1000));
         GZIPOutputStream out = new GZIPOutputStream(bytes.outputStream());
         out.write("Hello world\n".getBytes());
         out.close();
@@ -852,7 +852,7 @@ public class ByteBufferBytesTest {
     public void testWriteSerializable() {
         int capacity = 16 * 1024;
         byteBuffer = ByteBuffer.allocateDirect(capacity);
-        bytes = new ByteBufferBytes(byteBuffer);
+        bytes = ByteBufferBytes.wrap(byteBuffer);
         Calendar cal = Calendar.getInstance();
         bytes.writeObject(cal);
         Dummy d = new Dummy();

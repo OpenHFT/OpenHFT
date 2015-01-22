@@ -39,8 +39,9 @@ public interface BytesCommon {
     /**
      * @param position to skip to
      * @return this bytes object back
+     * @throws java.lang.IllegalArgumentException if positions &lt; 0 || position &gt;= limit
      */
-    Bytes position(long position);
+    Bytes position(long position) throws IllegalArgumentException;
 
     /**
      * @return the current limit which must be &gt;= capacity()

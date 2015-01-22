@@ -188,21 +188,21 @@ public class NativeBytes extends AbstractBytes {
         if (start >= end)
             return this;
         // get unaligned leading bytes
-        while(start < end && (start & 7) != 0) {
+        while (start < end && (start & 7) != 0) {
             byte b = UNSAFE.getByte(startAddr + start);
             if (b != 0)
                 UNSAFE.putByte(startAddr + start, (byte) 0);
             start++;
         }
         // check 64-bit aligned access
-        while(start < end-7) {
+        while (start < end - 7) {
             long l = UNSAFE.getLong(startAddr + start);
             if (l != 0)
                 UNSAFE.putLong(startAddr + start, 0L);
             start++;
         }
         // check unaligned tail
-        while(start < end) {
+        while (start < end) {
             byte b = UNSAFE.getByte(startAddr + start);
             if (b != 0)
                 UNSAFE.putByte(startAddr + start, (byte) 0);
@@ -530,7 +530,7 @@ public class NativeBytes extends AbstractBytes {
     public void readObject(Object object, int start, int end) {
         int len = end - start;
         if (positionAddr + len >= limitAddr)
-            throw new IndexOutOfBoundsException("Length out of bounds len: "+len);
+            throw new IndexOutOfBoundsException("Length out of bounds len: " + len);
         assert checkSingleThread();
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(object, (long) start, UNSAFE.getLong(positionAddr));
@@ -589,21 +589,22 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public NativeBytes position(long position) {
         if (position < 0 || position > limit())
-            throw new IllegalArgumentException("position: " + position + " limit: " + limit());
+            throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
 
         assert checkSingleThread();
         this.positionAddr = startAddr + position;
         return this;
     }
 
-    /*
-     * Same as position(long) except it doesn't check for thread safety.
-     */
-    public NativeBytes lazyPosition(long position) {
-        if (position < 0 || position > limit())
-            throw new IllegalArgumentException("position: " + position + " limit: " + limit());
-        this.positionAddr = startAddr + position;
-        return this;
+    @Override
+    public void write(RandomDataInput bytes, long position, long length) {
+        if (length > remaining())
+            throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
+        if (bytes instanceof NativeBytes) {
+            UNSAFE.copyMemory(((NativeBytes) bytes).startAddr + position, positionAddr, length);
+        } else {
+            super.write(bytes, position, length);
+        }
     }
 
     @Override

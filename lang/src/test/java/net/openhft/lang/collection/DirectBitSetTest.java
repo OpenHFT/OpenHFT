@@ -38,12 +38,20 @@ public class DirectBitSetTest {
         int capacityInBytes = 256 / 8;
         return Arrays.asList(new Object[][]{
                 {
-                        new ATSDirectBitSet(new ByteBufferBytes(
+                        new ATSDirectBitSet(ByteBufferBytes.wrap(
                                 ByteBuffer.allocate(capacityInBytes)))
                 },
                 {
-                        new SingleThreadedDirectBitSet(new ByteBufferBytes(
+                        new SingleThreadedDirectBitSet(ByteBufferBytes.wrap(
                                 ByteBuffer.allocate(capacityInBytes)))
+                },
+                {
+                        new ATSDirectBitSet(ByteBufferBytes.wrap(
+                                ByteBuffer.allocateDirect(capacityInBytes)))
+                },
+                {
+                        new SingleThreadedDirectBitSet(ByteBufferBytes.wrap(
+                                ByteBuffer.allocateDirect(capacityInBytes)))
                 }
         });
     }

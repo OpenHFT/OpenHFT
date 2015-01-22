@@ -8,5 +8,7 @@ public interface Pauser {
 
     public void pause();
 
+    public void pause(long maxPauseNS);
+
     public void unpause();
 }

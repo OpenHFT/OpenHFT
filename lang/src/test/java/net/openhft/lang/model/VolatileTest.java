@@ -79,7 +79,7 @@ public class VolatileTest {
             CachedCompiler cc = new CachedCompiler(null, null);
             Class aClass = cc.loadFromJava(GoodInterface.class.getName() + "$$Native", actual);
             GoodInterface jbi = (GoodInterface) aClass.asSubclass(GoodInterface.class).newInstance();
-            Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
+            Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(64));
             ((Byteable) jbi).bytes(bytes, 0L);
 
             jbi.setOrderedY(5);
