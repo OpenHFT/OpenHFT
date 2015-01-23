@@ -1018,4 +1018,45 @@ public class DirectByteBufferBytesTest {
         bytes.writeByte(8);
         assertEquals("[pos: 8, lim: 32, cap: 32 ] ⒈⒉⒊⒋⒌⒍⒎⒏‖٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠٠", bytes.toDebugString());
     }
+
+    @Test
+    public void testResizeKeepData() {
+        DirectByteBufferBytes buffer = new DirectByteBufferBytes(16);
+        for (int i = 1; buffer.position() < buffer.capacity(); i++) {
+            buffer.writeInt(i);
+        }
+
+        buffer.resize(32, true, true).position(0L);
+        for(int i=1;i <= 8; i++) {
+            if(i <= 4 ) {
+                assertEquals(i, buffer.readInt());
+            } else {
+                assertEquals(0, buffer.readInt());
+            }
+        }
+    }
+
+    @Test
+    public void testResizeDeleteData() {
+        DirectByteBufferBytes buffer = new  DirectByteBufferBytes(16);
+        for (int i = 1; buffer.position() < buffer.capacity(); i++) {
+            buffer.writeInt(i);
+        }
+
+        buffer.resize(32, true, false).position(0L);
+
+        for(int i=1;i <= 8; i++) {
+            assertEquals(0, buffer.readInt());
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testResizeExceptionData() {
+        DirectByteBufferBytes buffer = new  DirectByteBufferBytes(16);
+        for (int i = 1; buffer.position() < buffer.capacity(); i++) {
+            buffer.writeInt(i);
+        }
+
+        buffer.resize(4, true, true);
+    }
 }
