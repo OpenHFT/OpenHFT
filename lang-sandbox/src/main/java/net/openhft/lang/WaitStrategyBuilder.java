@@ -17,7 +17,6 @@
  */
 package net.openhft.lang;
 
-
 import java.util.LinkedList;
 import java.util.List;
 

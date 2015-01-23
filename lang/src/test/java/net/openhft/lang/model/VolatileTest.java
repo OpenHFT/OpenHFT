@@ -22,15 +22,12 @@ import net.openhft.compiler.CachedCompiler;
 import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.model.constraints.MaxSize;
-import net.openhft.lang.values.IntValue;
-import net.openhft.lang.values.LongValue;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by daniel on 11/06/2014.
@@ -82,7 +79,7 @@ public class VolatileTest {
             CachedCompiler cc = new CachedCompiler(null, null);
             Class aClass = cc.loadFromJava(GoodInterface.class.getName() + "$$Native", actual);
             GoodInterface jbi = (GoodInterface) aClass.asSubclass(GoodInterface.class).newInstance();
-            Bytes bytes = new ByteBufferBytes(ByteBuffer.allocate(64));
+            Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(64));
             ((Byteable) jbi).bytes(bytes, 0L);
 
             jbi.setOrderedY(5);
@@ -100,7 +97,6 @@ public class VolatileTest {
             e.printStackTrace();
             assertFalse("Throws an IllegalArgumentException", true);
         }
-
     }
 
     public interface BadInterface1{

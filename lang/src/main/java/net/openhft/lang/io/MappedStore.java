@@ -20,13 +20,14 @@ package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
-import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -35,7 +36,7 @@ import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MappedStore implements BytesStore {
+public class MappedStore implements BytesStore, Closeable {
 
     private static final int MAP_RO = 0;
     private static final int MAP_RW = 1;
@@ -56,7 +57,7 @@ public class MappedStore implements BytesStore {
 
     @Deprecated
     public MappedStore(File file, FileChannel.MapMode mode, long size, BytesMarshallerFactory bytesMarshallerFactory) throws IOException {
-        this(file, mode, size, BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE));
+        this(file, mode, size, BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKZObjectSerializer.INSTANCE));
     }
 
     public MappedStore(File file, FileChannel.MapMode mode, long size, ObjectSerializer objectSerializer) throws IOException {
@@ -104,6 +105,11 @@ public class MappedStore implements BytesStore {
     @Override
     public void free() {
         cleaner.clean();
+    }
+
+    @Override
+    public void close() {
+        free();
     }
 
     @NotNull
@@ -183,7 +189,6 @@ public class MappedStore implements BytesStore {
                 if (channel.isOpen()) {
                     channel.close();
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }

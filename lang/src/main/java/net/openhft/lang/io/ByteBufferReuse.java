@@ -18,12 +18,17 @@
 
 package net.openhft.lang.io;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+
 import sun.misc.Unsafe;
 
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 
 interface ByteBufferReuse {
     static final ByteBufferReuse INSTANCE = Inner.getReuse();
@@ -33,13 +38,12 @@ interface ByteBufferReuse {
     static class Inner extends Reuses implements Opcodes {
         private static ByteBufferReuse getReuse() {
             ClassWriter cw = new ClassWriter(0);
-            FieldVisitor fv;
             MethodVisitor mv;
 
             final String reuseImplClassName = "net/openhft/lang/io/ByteBufferReuseImpl";
             cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, reuseImplClassName, null,
                     "sun/reflect/MagicAccessorImpl",
-                    new String[] {"net/openhft/lang/io/ByteBufferReuse"});
+                    new String[]{"net/openhft/lang/io/ByteBufferReuse"});
 
             {
                 mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
@@ -50,6 +54,8 @@ interface ByteBufferReuse {
                 mv.visitMaxs(1, 1);
                 mv.visitEnd();
             }
+
+            String attachedBufferFieldName = getAttachedBufferFieldName();
             {
                 mv = cw.visitMethod(ACC_PUBLIC, "reuse",
                         "(JILjava/lang/Object;Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;",
@@ -64,7 +70,7 @@ interface ByteBufferReuse {
                 mv.visitTypeInsn(CHECKCAST, directByteBuffer);
                 mv.visitVarInsn(ASTORE, 6);
                 mv.visitVarInsn(ALOAD, 6);
-                mv.visitFieldInsn(GETFIELD, directByteBuffer, "att", "Ljava/lang/Object;");
+                mv.visitFieldInsn(GETFIELD, directByteBuffer, attachedBufferFieldName, "Ljava/lang/Object;");
                 String settableAtt = "net/openhft/lang/io/SettableAtt";
                 mv.visitTypeInsn(INSTANCEOF, settableAtt);
                 mv.visitJumpInsn(IFEQ, l0);
@@ -84,7 +90,7 @@ interface ByteBufferReuse {
                 mv.visitVarInsn(ILOAD, 3);
                 mv.visitFieldInsn(PUTFIELD, directByteBuffer, "capacity", "I");
                 mv.visitVarInsn(ALOAD, 6);
-                mv.visitFieldInsn(GETFIELD, directByteBuffer, "att", "Ljava/lang/Object;");
+                mv.visitFieldInsn(GETFIELD, directByteBuffer, attachedBufferFieldName, "Ljava/lang/Object;");
                 mv.visitTypeInsn(CHECKCAST, settableAtt);
                 mv.visitVarInsn(ALOAD, 4);
                 mv.visitFieldInsn(PUTFIELD, settableAtt, "att", "Ljava/lang/Object;");
@@ -127,6 +133,28 @@ interface ByteBufferReuse {
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private static String getAttachedBufferFieldName() {
+            try {
+                Class<?> clazz = Class.forName("java.nio.DirectByteBuffer");
+                String[] possibleFieldNames = new String[] { "att",
+                        "viewedBuffer" };
+                for (String possibleFieldName : possibleFieldNames) {
+                    try {
+                        clazz.getDeclaredField(possibleFieldName);
+                        return possibleFieldName;
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
+
+                throw new RuntimeException(
+                        "Failed to find any of the possible field names on DirectByteBuffer: "
+                                + Arrays.toString(possibleFieldNames));
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

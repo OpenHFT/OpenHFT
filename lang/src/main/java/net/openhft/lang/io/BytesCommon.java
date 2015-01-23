@@ -39,8 +39,9 @@ public interface BytesCommon {
     /**
      * @param position to skip to
      * @return this bytes object back
+     * @throws java.lang.IllegalArgumentException if positions &lt; 0 || position &gt;= limit
      */
-    Bytes position(long position);
+    Bytes position(long position) throws IllegalArgumentException;
 
     /**
      * @return the current limit which must be &gt;= capacity()
@@ -153,7 +154,6 @@ public interface BytesCommon {
      */
     Bytes load();
 
-
     /**
      * Write a portion of the Bytes to an Appendable for printing.
      *
@@ -189,7 +189,6 @@ public interface BytesCommon {
      * @see #slice(long, long)
      */
     Bytes slice();
-
 
     /**
      * Returns a {@code ByteBuffer} whose content is a shared subsequence of this bytes' content.
@@ -239,4 +238,6 @@ public interface BytesCommon {
 
     @NotNull
     String toDebugString();
+
+    String toDebugString(long limit);
 }

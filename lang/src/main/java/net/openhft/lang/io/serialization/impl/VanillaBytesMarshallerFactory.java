@@ -25,9 +25,12 @@ import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.Externalizable;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static net.openhft.lang.io.serialization.CompactBytesMarshaller.*;
 
 /**
  * @author peter.lawrey
@@ -35,20 +38,21 @@ import java.util.Map;
 public final class VanillaBytesMarshallerFactory implements BytesMarshallerFactory {
     private static final long serialVersionUID = 1L;
 
-    private transient Map<Class, BytesMarshaller> marshallerMap;
-    private transient BytesMarshaller[] compactMarshallerMap;
+    private transient Map<Class<?>, BytesMarshaller<?>> marshallerMap;
+    private transient BytesMarshaller<?>[] compactMarshallerMap;
 
     private void init() {
-        marshallerMap = new LinkedHashMap<Class, BytesMarshaller>();
+        marshallerMap = new LinkedHashMap<Class<?>, BytesMarshaller<?>>();
         compactMarshallerMap = new BytesMarshaller[256];
-        BytesMarshaller stringMarshaller = new StringMarshaller(16 * 1024);
+        BytesMarshaller<String> stringMarshaller = new StringMarshaller(16 * 1024);
         addMarshaller(String.class, stringMarshaller);
-        addMarshaller(CharSequence.class, stringMarshaller);
+        addMarshaller(CharSequence.class, (BytesMarshaller)stringMarshaller);
         addMarshaller(Class.class, new ClassMarshaller(Thread.currentThread().getContextClassLoader()));
         addMarshaller(Date.class, new DateMarshaller(10191));
-        addMarshaller(Integer.class, new CompactEnumBytesMarshaller<Integer>(Integer.class, 10191, (byte) ('I' & 31)));
-        addMarshaller(Long.class, new CompactEnumBytesMarshaller<Long>(Long.class, 10191, (byte) ('L' & 31)));
-        addMarshaller(Double.class, new CompactEnumBytesMarshaller<Double>(Double.class, 10191, (byte) ('D' & 31)));
+        addMarshaller(Integer.class, new CompactEnumBytesMarshaller<Integer>(Integer.class, 10191, INT_CODE));
+        addMarshaller(Long.class, new CompactEnumBytesMarshaller<Long>(Long.class, 10191, LONG_CODE));
+        addMarshaller(Double.class, new CompactEnumBytesMarshaller<Double>(Double.class, 10191, DOUBLE_CODE));
+        addMarshaller(ByteBuffer.class, ByteBufferMarshaller.INSTANCE);
     }
 
     @NotNull
@@ -75,9 +79,10 @@ public final class VanillaBytesMarshallerFactory implements BytesMarshallerFacto
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E> BytesMarshaller<E> getMarshaller(byte code) {
         if (marshallerMap == null) init();
-        return compactMarshallerMap[code & 0xFF];
+        return (BytesMarshaller<E>) compactMarshallerMap[code & 0xFF];
     }
 
     public <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller) {

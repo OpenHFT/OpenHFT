@@ -43,13 +43,13 @@ import static org.junit.Assert.*;
  */
 public class DirectByteBufferBytesTest {
     public static final int SIZE = 128;
-    private ByteBufferBytes bytes;
+    private Bytes bytes;
     private ByteBuffer byteBuffer;
 
     @Before
     public void beforeTest() {
         byteBuffer = ByteBuffer.allocateDirect(SIZE).order(ByteOrder.nativeOrder());
-        bytes = new ByteBufferBytes(byteBuffer);
+        bytes = ByteBufferBytes.wrap(byteBuffer);
     }
 
     @Test
@@ -73,7 +73,6 @@ public class DirectByteBufferBytesTest {
         for (int i = (int) (bytes.capacity() - 1); i >= 0; i--) {
             assertEquals((byte) i, bytes.readByte(i));
         }
-
     }
 
     @Test
@@ -93,7 +92,6 @@ public class DirectByteBufferBytesTest {
         assertFalse(bytes.compareAndSwapLong(0, 0, 1));
         assertTrue(bytes.compareAndSwapLong(8, 0, 1));
         assertTrue(bytes.compareAndSwapLong(0, 1, 2));
-
     }
 
     @Test
@@ -288,7 +286,6 @@ public class DirectByteBufferBytesTest {
         bytes.position(10);
         bytes.stepBackAndSkipTo(CONTROL_STOP);
         assertEquals(13, bytes.position());
-
     }
 
     @Test
@@ -712,7 +709,6 @@ public class DirectByteBufferBytesTest {
 
     @Test
     public void testAppendParseDouble0() {
-
         bytes.append(1.123456789234, 7).append(' ');
         bytes.append(1.123456789234, 7).append(' ');
         bytes.position(0);
@@ -725,9 +721,7 @@ public class DirectByteBufferBytesTest {
         bytes.append(1.123456789);
         bytes.position(0);
         assertEquals(1.123456789, bytes.parseDouble(), 0);
-
     }
-
 
     @Test
     public void testAppendParseDoubleWithPadding() {
@@ -738,9 +732,7 @@ public class DirectByteBufferBytesTest {
         assertEquals("qwertyuiop", bytes.parseUTF(SPACE_STOP));
         assertEquals(1.123456789, bytes.parseDouble(), 0);
         assertEquals(123456, bytes.parseLong());
-
     }
-
 
     @Test
     public void testAppendParseDoubleWithPadding2() {
@@ -749,16 +741,13 @@ public class DirectByteBufferBytesTest {
         bytes.position(0);
         assertEquals(1.235, bytes.parseDouble(), 0);
         assertEquals(2.123456789, bytes.parseDouble(), 0);
-
     }
-
 
     @Test
     public void testAppendParseDouble2() {
         bytes.append(1.1234).append(' ');
         bytes.position(0);
         assertEquals(1.1234, bytes.parseDouble(), 0);
-
     }
 
     @Test
@@ -819,7 +808,7 @@ public class DirectByteBufferBytesTest {
 
     @Test
     public void testStream() throws IOException {
-        bytes = new ByteBufferBytes(ByteBuffer.allocateDirect(1000));
+        bytes = ByteBufferBytes.wrap(ByteBuffer.allocateDirect(1000));
         GZIPOutputStream out = new GZIPOutputStream(bytes.outputStream());
         out.write("Hello world\n".getBytes());
         out.close();
@@ -884,7 +873,7 @@ public class DirectByteBufferBytesTest {
     public void testWriteSerializable() {
         int capacity = 16 * 1024;
         byteBuffer = ByteBuffer.allocateDirect(capacity);
-        bytes = new ByteBufferBytes(byteBuffer);
+        bytes = ByteBufferBytes.wrap(byteBuffer);
         Calendar cal = Calendar.getInstance();
         bytes.writeObject(cal);
         Dummy d = new Dummy();

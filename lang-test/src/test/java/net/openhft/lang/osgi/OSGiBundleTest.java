@@ -32,7 +32,6 @@ import javax.inject.Inject;
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
-
 /**
  * @author lburgazzoli
  */

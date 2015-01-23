@@ -36,7 +36,6 @@ public class MappedFileTest {
             br.close();
             throw ioe;
         }
-
     }
 
     public static void delete(File file) throws IOException {
@@ -87,8 +86,6 @@ public class MappedFileTest {
             Thread.sleep(500);
         }
         assertTrue("free3-free1: " + (free3 - free1), free3 > free1);
-
-
     }
 
     private void fill(MappedByteBuffer buffer) {

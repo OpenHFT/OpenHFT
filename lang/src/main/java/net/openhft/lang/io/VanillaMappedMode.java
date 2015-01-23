@@ -19,7 +19,6 @@ package net.openhft.lang.io;
 
 import java.nio.channels.FileChannel;
 
-
 /**
  * Helper wrapper for mapeed access mode
  */

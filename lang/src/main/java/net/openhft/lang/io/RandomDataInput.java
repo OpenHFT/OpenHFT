@@ -43,10 +43,10 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * <li>An I/O error occurs, in which case an <code>IOException</code> other than <code>EOFException</code> is thrown.</li>
      * </ul>
      * <p>
-     * If <code>b</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. If <code>b.length</code>
-     * is zero, then no bytes are read. Otherwise, the first byte read is stored into element <code>b[0]</code>, the
-     * next one into <code>b[1]</code>, and so on. If an exception is thrown from this method, then it may be that some
-     * but not all bytes of <code>b</code> have been updated with data from the input stream.
+     * If <code>bytes</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. If <code>bytes.length</code>
+     * is zero, then no bytes are read. Otherwise, the first byte read is stored into element <code>bytes[0]</code>, the
+     * next one into <code>bytes[1]</code>, and so on. If an exception is thrown from this method, then it may be that some
+     * but not all bytes of <code>bytes</code> have been updated with data from the input stream.
      * </p>
      *
      * @param bytes the buffer into which the data is read.
@@ -65,11 +65,11 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * <li>An I/O error occurs, in which case an <code>IOException</code> other than <code>EOFException</code> is thrown. </li>
      * </ul>
      * <p>
-     * If <code>b</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. If <code>off</code> is
+     * If <code>bytes</code> is <code>null</code>, a <code>NullPointerException</code> is thrown. If <code>off</code> is
      * negative, or <code>len</code> is negative, or <code>off+len</code> is greater than the length of the array
-     * <code>b</code>, then an <code>IndexOutOfBoundsException</code> is thrown. If <code>len</code> is zero, then no
-     * bytes are read. Otherwise, the first byte read is stored into element <code>b[off]</code>, the next one into
-     * <code>b[off+1]</code>, and so on. The number of bytes read is, at most, equal to <code>len</code>.
+     * <code>bytes</code>, then an <code>IndexOutOfBoundsException</code> is thrown. If <code>len</code> is zero, then no
+     * bytes are read. Otherwise, the first byte read is stored into element <code>bytes[off]</code>, the next one into
+     * <code>bytes[off+1]</code>, and so on. The number of bytes read is, at most, equal to <code>len</code>.
      * </p>
      *
      * @param bytes the buffer into which the data is read.
@@ -78,6 +78,8 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      */
     @Override
     void readFully(@NotNull byte[] bytes, int off, int len);
+
+    void readFully(long offset, @NotNull byte[] bytes, int off, int len);
 
     void readFully(@NotNull char[] data);
 

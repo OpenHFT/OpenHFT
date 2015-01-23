@@ -54,8 +54,7 @@ public class LockingViaMMapWithThreadIdMain {
         // this way the getId() can be used across processes..
         AffinitySupport.setThreadId();
         AffinitySupport.setAffinity(toggleTo ? 1 << 3 : 1 << 2);
-        ByteBufferBytes bytes = new ByteBufferBytes(mbb);
-        bytes.setCurrentThread();
+        Bytes bytes = ByteBufferBytes.wrap(mbb);
 
         long start = 0;
         for (int i = -WARMUP / RECORDS; i < (RUNS + RECORDS - 1) / RECORDS; i++) {

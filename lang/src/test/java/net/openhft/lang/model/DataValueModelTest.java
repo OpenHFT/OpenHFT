@@ -69,7 +69,5 @@ public class DataValueModelTest {
                 " short=FieldModel{name='short', getter=public abstract short net.openhft.lang.model.HasArraysInterface.getShortAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setShortAt(int,short), indexSize= MaxSize(value=4)}\n" +
                 " string=FieldModel{name='string', getter=public abstract java.lang.String net.openhft.lang.model.HasArraysInterface.getStringAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setStringAt(int,java.lang.String), indexSize= MaxSize(value=4)}}"
                 , haim.fieldMap().toString().replaceAll("},", "}\n"));
-
-
     }
 }

@@ -47,8 +47,7 @@ public class LockingViaMMapMain {
         File tmpFile = new File(System.getProperty("java.io.tmpdir"), "lock-test.dat");
         FileChannel fc = new RandomAccessFile(tmpFile, "rw").getChannel();
         MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, 0, RECORDS * RECORD_SIZE);
-        ByteBufferBytes bytes = new ByteBufferBytes(mbb);
-        bytes.setCurrentThread();
+        Bytes bytes = ByteBufferBytes.wrap(mbb);
 
         long start = 0;
         for (int i = -WARMUP / RECORDS; i < (RUNS + RECORDS - 1) / RECORDS; i++) {

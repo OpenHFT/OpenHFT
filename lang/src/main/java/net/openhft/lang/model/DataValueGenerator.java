@@ -21,6 +21,7 @@ package net.openhft.lang.model;
 import net.openhft.compiler.CompilerUtils;
 import net.openhft.lang.Compare;
 import net.openhft.lang.Maths;
+import net.openhft.lang.MemoryUnit;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,9 @@ import java.io.ObjectOutput;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static net.openhft.lang.MemoryUnit.BYTES;
+import static net.openhft.lang.model.DataValueModelImpl.heapSize;
 
 public class DataValueGenerator {
     private static final Comparator<Class> COMPARATOR = new Comparator<Class>() {
@@ -43,15 +47,66 @@ public class DataValueGenerator {
         @Override
         public int compare(Map.Entry<String, FieldModel> o1, Map.Entry<String, FieldModel> o2) {
             // descending
-            int cmp = -Maths.compare(o1.getValue().heapSize(), o2.getValue().heapSize());
-            return cmp == 0 ? o1.getKey().compareTo(o2.getKey()) : cmp;
+            FieldModel model1 = o1.getValue();
+            FieldModel model2 = o2.getValue();
+            int cmp = -Maths.compare(model1.heapSize(), model2.heapSize());
+            if (cmp != 0)
+                return cmp;
+            Class firstPrimitiveFieldType1 = null;
+            if (!model1.type().isPrimitive() &&
+                    !CharSequence.class.isAssignableFrom(model1.type())) {
+                firstPrimitiveFieldType1 = firstPrimitiveFieldType(model1.type());
+            }
+            Class firstPrimitiveFieldType2 = null;
+            if (!model2.type().isPrimitive() &&
+                    !CharSequence.class.isAssignableFrom(model2.type())) {
+                firstPrimitiveFieldType2 = firstPrimitiveFieldType(model2.type());
+            }
+            if (firstPrimitiveFieldType1 != null && firstPrimitiveFieldType2 == null)
+                return -1;
+            if (firstPrimitiveFieldType1 == null && firstPrimitiveFieldType2 != null)
+                return 1;
+            if (firstPrimitiveFieldType1 != null && firstPrimitiveFieldType2 != null) {
+                return -Maths.compare(heapSize(firstPrimitiveFieldType1),
+                        heapSize(firstPrimitiveFieldType2));
+            }
+            return o1.getKey().compareTo(o2.getKey());
         }
     };
     private final Map<Class, Class> heapClassMap = new ConcurrentHashMap<Class, Class>();
     private final Map<Class, Class> nativeClassMap = new ConcurrentHashMap<Class, Class>();
     private boolean dumpCode = Boolean.getBoolean("dvg.dumpCode");
 
-    private static String bytesType(Class type) {
+    public static Class firstPrimitiveFieldType(Class valueClass) {
+        try {
+            DataValueModel valueModel;
+            if (valueClass.isInterface()) {
+                valueModel = DataValueModels.acquireModel(valueClass);
+            } else {
+                String valueClassName = valueClass.getName();
+                String $$Native = "$$Native";
+                if (valueClassName.endsWith($$Native)) {
+                    valueClassName = valueClassName.substring(0,
+                            valueClassName.length() - $$Native.length());
+                    valueModel = DataValueModels.acquireModel(Class.forName(valueClassName));
+                } else {
+                    return null;
+                }
+            }
+            Map.Entry<String, FieldModel>[] fields =
+                    DataValueGenerator.heapSizeOrderedFields(valueModel);
+            if (fields.length == 0)
+                return null;
+            Class firstFieldType = fields[0].getValue().type();
+            if (firstFieldType.isPrimitive())
+                return firstFieldType;
+            return firstPrimitiveFieldType(firstFieldType);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String bytesType(Class type) {
         if (type.isPrimitive())
             return Character.toUpperCase(type.getName().charAt(0)) + type.getName().substring(1);
         if (CharSequence.class.isAssignableFrom(type))
@@ -60,7 +115,7 @@ public class DataValueGenerator {
     }
 
     static String generateHeapObject(DataValueModel<?> dvmodel) {
-        SortedSet<Class> imported = new TreeSet<Class>(COMPARATOR);
+        SortedSet<Class> imported = newImported();
         imported.add(BytesMarshallable.class);
         imported.add(Bytes.class);
         imported.add(IOException.class);
@@ -72,14 +127,12 @@ public class DataValueGenerator {
         StringBuilder writeMarshal = new StringBuilder();
         StringBuilder readMarshal = new StringBuilder();
         StringBuilder copy = new StringBuilder();
-        Map<String, ? extends FieldModel> fieldMap = dvmodel.fieldMap();
-        Map.Entry<String, FieldModel>[] entries = fieldMap.entrySet().toArray(new Map.Entry[fieldMap.size()]);
-        Arrays.sort(entries, COMPARE_BY_HEAP_SIZE);
+        Map.Entry<String, FieldModel>[] entries = heapSizeOrderedFields(dvmodel);
         for (Map.Entry<String, ? extends FieldModel> entry : entries) {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
             Class type = model.type();
-            if (!type.isPrimitive() && !type.getPackage().getName().equals("java.lang"))
+            if (shouldImport(type))
                 imported.add(type);
             heapFieldDeclarations(fieldDeclarations, type, name, model);
 
@@ -101,7 +154,6 @@ public class DataValueGenerator {
             if (getter == null && volatileGetter != null) {
                 getter = volatileGetter;
             }
-
 
             if (setter == null) {
                 if (getter != null)
@@ -129,7 +181,6 @@ public class DataValueGenerator {
                 methodHeapGet(getterSetters, volatileGetter, name, type, model);
                 methodHeapSet(getterSetters, orderedSetter, name, type, model);
             }
-
 
             Method adder = model.adder();
             if (adder != null) {
@@ -192,7 +243,7 @@ public class DataValueGenerator {
             methodHeapReadMarshall(readMarshal, name, type, model);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("package ").append(dvmodel.type().getPackage().getName()).append(";\n\n");
+        appendPackage(dvmodel, sb);
         sb.append("import static ").append(Compare.class.getName()).append(".*;\n");
         for (Class aClass : imported) {
             sb.append("import ").append(normalize(aClass)).append(";\n");
@@ -233,16 +284,18 @@ public class DataValueGenerator {
         return sb.toString();
     }
 
-    private static String simpleName(Class<?> type) {
+    public static String simpleName(Class<?> type) {
         String name = type.getName();
         return name.substring(name.lastIndexOf('.') + 1);
     }
 
-    private static CharSequence normalize(Class aClass) {
+    public static CharSequence normalize(Class aClass) {
         return aClass.getName().replace('$', '.');
     }
 
-    private static void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel, Map.Entry<String, FieldModel>[] entries, boolean offHeap) {
+    private static void generateObjectMethods(StringBuilder sb, DataValueModel<?> dvmodel,
+                                              Map.Entry<String, FieldModel>[] entries,
+                                              boolean offHeap) {
         int count = 0;
         StringBuilder hashCode = new StringBuilder();
         StringBuilder equals = new StringBuilder();
@@ -262,18 +315,17 @@ public class DataValueGenerator {
                 String getterName = (getter == null) ? getterName(getUsing) : getter.getName();
                 methodLongHashCode(hashCode, getterName, model, count);
 
-                if (getter != null)
+                if (getter != null) {
                     methodEquals(equals, getterName, model, simpleName(dvmodel.type()));
-                else {
+                    methodToString(toString, getterName, name, model);
+                } else {
                     methodEqualsGetUsing(getUsingEquals, getUsing.getName());
                     methodToStringGetUsing(toStringGetUsing, getUsing.getName(), name, model);
                 }
                 count++;
             }
 
-
             Bytes b;
-
 
             if (model.isArray()) {
                 String nameWithUpper = Character.toUpperCase(name.charAt(0)) + name.substring(1);
@@ -324,32 +376,31 @@ public class DataValueGenerator {
                 .append("    }\n");
     }
 
-
     private static Method getUsing(FieldModel model) {
         Method getUsing = model.getUsing();
         return getUsing;
     }
 
-    private static Method getGetter(FieldModel model) {
+    public static Method getGetter(FieldModel model) {
         Method getter = model.getter();
         if (getter == null) getter = model.indexedGetter();
         return getter;
     }
 
-    private static Method getVolatileGetter(FieldModel model) {
+    public static Method getVolatileGetter(FieldModel model) {
         Method getter = model.volatileGetter();
         if (getter == null) getter = model.volatileIndexedGetter();
         return getter;
     }
 
-    private static Method getSetter(FieldModel model) {
+    public static Method getSetter(FieldModel model) {
         Method setter = model.setter();
         if (setter == null) setter = model.indexedSetter();
 
         return setter;
     }
 
-    private static Method getOrderedSetter(FieldModel model) {
+    public static Method getOrderedSetter(FieldModel model) {
         Method setter = model.orderedSetter();
         if (setter == null) setter = model.orderedIndexedSetter();
 
@@ -397,7 +448,6 @@ public class DataValueGenerator {
             readMarshal.append(");\n");
             readMarshal.append("        }\n");
         }
-
     }
 
     private static void methodLongHashCode(StringBuilder hashCode, String getterName, FieldModel model, int count) {
@@ -411,11 +461,9 @@ public class DataValueGenerator {
         }
     }
 
-
     private static void methodEqualsGetUsing(StringBuilder equals, String getterName) {
         equals.append("        if(!isEqual(").append(getterName).append("(new StringBuilder()).toString(), that.").append(getterName).append("new StringBuilder().toString())) return false;\n");
     }
-
 
     private static void methodEquals(StringBuilder equals, String getterName, FieldModel model, String className) {
         if (!model.isArray()) {
@@ -427,11 +475,8 @@ public class DataValueGenerator {
         }
     }
 
-
     private static void methodToStringGetUsing(StringBuilder toString, String getterName, String name, FieldModel model) {
-
         toString.append("            sb.append(\"").append(name).append("= \").append(").append(getterName).append("(new StringBuilder()));\n");
-
     }
 
     private static void methodToString(StringBuilder toString, String getterName, String name, FieldModel model) {
@@ -465,7 +510,6 @@ public class DataValueGenerator {
                 getterSetters.append("        _").append(name).append("[i] = $.toString();\n");
             else
                 getterSetters.append("        _").append(name).append("[i] = $;\n");
-
         }
         getterSetters.append("    }\n\n");
     }
@@ -482,17 +526,13 @@ public class DataValueGenerator {
         getterSetters.append("    }\n\n");
     }
 
-
     private static void methodHeapGet(StringBuilder getterSetters, String name, Class type, String getterName) {
-
         getterSetters.append("    public ").append(normalize(type)).append(' ').append(getterName).append("() {\n");
         getterSetters.append("        return _").append(name).append(";\n");
         getterSetters.append("    }\n\n");
     }
 
-
     private static void methodHeapGetUsingWithStringBuilder(StringBuilder result, Method method, String name, Class type, FieldModel model) {
-
         final CharSequence returnType = method.getReturnType() == void.class ? "void" : normalize(method
                 .getReturnType());
 
@@ -513,7 +553,6 @@ public class DataValueGenerator {
 
         result.append("    }\n\n");
     }
-
 
     private static void heapFieldDeclarations(StringBuilder fieldDeclarations, Class type, String name, FieldModel model) {
         String vol = "";
@@ -594,6 +633,8 @@ public class DataValueGenerator {
     }
 
     public <T> Class acquireNativeClass(Class<T> tClass) {
+        if (!tClass.isInterface())
+            return tClass;
         Class nativeClass = nativeClassMap.get(tClass);
         if (nativeClass != null)
             return nativeClass;
@@ -625,7 +666,7 @@ public class DataValueGenerator {
     }
 
     public String generateNativeObject(DataValueModel<?> dvmodel) {
-        SortedSet<Class> imported = new TreeSet<Class>(COMPARATOR);
+        SortedSet<Class> imported = newImported();
         imported.add(BytesMarshallable.class);
         imported.add(ObjectOutput.class);
         imported.add(ObjectInput.class);
@@ -642,15 +683,13 @@ public class DataValueGenerator {
         StringBuilder copy = new StringBuilder();
         StringBuilder nestedBytes = new StringBuilder();
 
-        Map<String, ? extends FieldModel> fieldMap = dvmodel.fieldMap();
-        Map.Entry<String, FieldModel>[] entries = fieldMap.entrySet().toArray(new Map.Entry[fieldMap.size()]);
-        Arrays.sort(entries, COMPARE_BY_HEAP_SIZE);
+        Map.Entry<String, FieldModel>[] entries = heapSizeOrderedFields(dvmodel);
         int offset = 0;
         for (Map.Entry<String, ? extends FieldModel> entry : entries) {
             String name = entry.getKey();
             FieldModel model = entry.getValue();
             Class type = model.type();
-            if (!type.isPrimitive() && !type.getPackage().getName().equals("java.lang"))
+            if (shouldImport(type))
                 imported.add(type);
             String NAME = "_offset + " + name.toUpperCase();
             final Method setter = getSetter(model);
@@ -740,7 +779,7 @@ public class DataValueGenerator {
                 methodWriteMarshall(writeMarshal, defaultGetter, defaultSetter, type, model);
                 methodReadMarshall(readMarshal, defaultGetter, defaultSetter, type, model);
 
-                offset += computeOffset((model.nativeSize() + 7) >> 3, model);
+                offset += fieldSize(model);
             } else {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
                 nonScalarFieldDeclaration(staticFieldDeclarations, type, name, model);
@@ -764,11 +803,9 @@ public class DataValueGenerator {
                 .append("    private Bytes _bytes;\n")
                 .append("    private long _offset;\n");
         StringBuilder sb = new StringBuilder();
-        sb.append("package ").append(dvmodel.type().getPackage().getName()).append(";\n\n");
+        appendPackage(dvmodel, sb);
         sb.append("import static ").append(Compare.class.getName()).append(".*;\n");
-        for (Class aClass : imported) {
-            sb.append("import ").append(aClass.getName().replace('$', '.')).append(";\n");
-        }
+        appendImported(imported, sb);
         sb.append("\npublic class ").append(simpleName(dvmodel.type()))
                 .append("$$Native implements ").append(simpleName(dvmodel.type()).replace('$', '.'))
                 .append(", BytesMarshallable, Byteable, Copyable<").append(normalize(dvmodel.type())).append("> {\n");
@@ -812,6 +849,41 @@ public class DataValueGenerator {
         return sb.toString();
     }
 
+    public static void appendImported(SortedSet<Class> imported, StringBuilder sb) {
+        for (Class aClass : imported) {
+            sb.append("import ").append(aClass.getName().replace('$', '.')).append(";\n");
+        }
+    }
+
+    public static void appendPackage(DataValueModel<?> dvmodel, StringBuilder sb) {
+        sb.append("package ").append(getPackage(dvmodel)).append(";\n\n");
+    }
+
+    public static String getPackage(DataValueModel<?> dvmodel) {
+        return dvmodel.type().getPackage().getName();
+    }
+
+    public static int fieldSize(FieldModel model) {
+        return computeOffset(
+                (int) BYTES.alignAndConvert((long) model.nativeSize(), MemoryUnit.BITS), model);
+    }
+
+    public static TreeSet<Class> newImported() {
+        return new TreeSet<Class>(COMPARATOR);
+    }
+
+    public static boolean shouldImport(Class type) {
+        return !type.isPrimitive() && !type.getPackage().getName().equals("java.lang");
+    }
+
+    public static Map.Entry<String, FieldModel>[] heapSizeOrderedFields(DataValueModel<?> dvmodel) {
+        Map<String, ? extends FieldModel> fieldMap = dvmodel.fieldMap();
+        Map.Entry<String, FieldModel>[] entries =
+                fieldMap.entrySet().toArray(new Map.Entry[fieldMap.size()]);
+        Arrays.sort(entries, COMPARE_BY_HEAP_SIZE);
+        return entries;
+    }
+
     /**
      * gets the getter name based on the getUsing
      */
@@ -852,7 +924,6 @@ public class DataValueGenerator {
         getterSetters.append("    }\n\n");
     }
 
-
     private void methodGet(StringBuilder getterSetters, Class type, String NAME, boolean isVolatile, String name) {
         String read = "read";
         if (isVolatile) read = "readVolatile";
@@ -868,21 +939,17 @@ public class DataValueGenerator {
         if (!model.isArray()) {
             getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("() {\n");
             getterSetters.append("        return _bytes.").append(read).append(bytesType(type)).append("(").append(NAME).append(");\n");
-
         } else {
             getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("(int i) {\n");
             getterSetters.append(boundsCheck(model.indexSize().value()));
             getterSetters.append("        return _bytes.").append(read).append(bytesType(type)).append("(").append(NAME);
             getterSetters.append(" + i * ").append((model.nativeSize() + 7) >> 3);
             getterSetters.append(");\n");
-
         }
         getterSetters.append("    }\n\n");
     }
 
-
     private static void methodGetUsingWithStringBuilder(StringBuilder result, Method method, Class type, boolean isVolatile, String name) {
-
         String read = "read";
         if (isVolatile) read = "readVolatile";
 
@@ -909,9 +976,7 @@ public class DataValueGenerator {
             result.append("     return builder;\n");
         }
         result.append("    }\n\n");
-
     }
-
 
     private void methodNonScalarWriteMarshall(StringBuilder writeMarshal, String name, FieldModel model) {
         if (!model.isArray()) {
@@ -932,8 +997,6 @@ public class DataValueGenerator {
             readMarshal.append("            ").append(setter.getName()).append("(i, in.read").append(bytesType(type)).append("());\n");
             readMarshal.append("        }\n");
         }
-
-
     }
 
     private void methodNonScalarReadMarshall(StringBuilder readMarshal, String name, FieldModel model) {
@@ -946,7 +1009,7 @@ public class DataValueGenerator {
         }
     }
 
-    private int computeOffset(int offset, FieldModel model) {
+    public static int computeOffset(int offset, FieldModel model) {
         if (model.indexSize() == null) {
             return offset;
         } else {
@@ -982,7 +1045,6 @@ public class DataValueGenerator {
                 getterSetters.append("        _").append(name).append("[i] = $.toString();\n");
             else
                 getterSetters.append("        _").append(name).append("[i].copyFrom($);\n");
-
         }
         getterSetters.append("    }\n\n");
     }
@@ -1009,15 +1071,21 @@ public class DataValueGenerator {
         }
     }
 
-    private int computeNonScalarOffset(DataValueModel dvmodel, Class type) {
+    public static int computeNonScalarOffset(DataValueModel dvmodel, Class type) {
         int offset = 0;
         DataValueModel dvmodel2 = dvmodel.nestedModel(type);
-        Map<String, ? extends FieldModel> fieldMap2 = dvmodel2.fieldMap();
-        Map.Entry<String, FieldModel>[] entries2 = fieldMap2.entrySet().toArray(new Map.Entry[fieldMap2.size()]);
-        Arrays.sort(entries2, COMPARE_BY_HEAP_SIZE);
+        Map.Entry<String, FieldModel>[] entries2 = heapSizeOrderedFields(dvmodel2);
         for (Map.Entry<String, ? extends FieldModel> entry2 : entries2) {
             FieldModel model2 = entry2.getValue();
-            offset += computeOffset((model2.nativeSize() + 7) >> 3, model2);
+            int add;
+            if (dvmodel2.isScalar(model2.type())) {
+                add = fieldSize(model2);
+            } else {
+                add = computeNonScalarOffset(dvmodel2, model2.type());
+                if (model2.isArray())
+                    add *= model2.indexSize().value();
+            }
+            offset += add;
         }
         return offset;
     }

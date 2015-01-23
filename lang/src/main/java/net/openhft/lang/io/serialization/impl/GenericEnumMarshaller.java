@@ -23,6 +23,7 @@ import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
 
+import java.io.ObjectStreamException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
@@ -32,14 +33,20 @@ import java.util.Map;
  * @author peter.lawrey
  */
 public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
+    private final int capacity;
     @Nullable
-    private final Constructor<E> constructor;
+    private transient final Constructor<E> constructor;
     @Nullable
-    private final Method valueOf;
+    private transient final Method valueOf;
     @NotNull
     private final Map<String, E> map;
 
+    //used by the read resolve method
+    private  final Class<E> classMarshaled;
+
     public GenericEnumMarshaller(@NotNull Class<E> classMarshaled, final int capacity) {
+        this.classMarshaled = classMarshaled;
+        this.capacity = capacity;
         Constructor<E> constructor = null;
         Method valueOf = null;
         try {
@@ -47,6 +54,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
         } catch (NoSuchMethodException e) {
             try {
                 constructor = classMarshaled.getConstructor(String.class);
+                constructor.setAccessible(true);
             } catch (NoSuchMethodException e1) {
                 throw new IllegalArgumentException(classMarshaled + " doesn't have a valueOf(String) or a Constructor(String)");
             }
@@ -60,6 +68,11 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
             }
         };
     }
+
+    private Object readResolve() throws ObjectStreamException {
+        return new GenericEnumMarshaller(classMarshaled, capacity);
+    }
+
 
     @Override
     public void write(@NotNull Bytes bytes, @Nullable E e) {
@@ -91,7 +104,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
                     map.put(s, e = invoke);
                 }
             } catch (Exception t) {
-                throw new AssertionError(t.getCause());
+                throw new AssertionError(t);
             }
         return e;
     }

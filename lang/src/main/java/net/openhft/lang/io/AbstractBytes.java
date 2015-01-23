@@ -22,7 +22,7 @@ import net.openhft.lang.Jvm;
 import net.openhft.lang.Maths;
 import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
 import net.openhft.lang.io.serialization.BytesMarshallerFactory;
-import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.StringBuilderPool;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
@@ -66,6 +66,7 @@ public abstract class AbstractBytes implements Bytes {
     // extra 1 for decimal place.
     private static final int MAX_NUMBER_LENGTH = 1 + (int) Math.ceil(Math.log10(Long.MAX_VALUE));
     private static final byte[] RADIX_PARSE = new byte[256];
+
     static {
         Arrays.fill(RADIX_PARSE, (byte) -1);
         for (int i = 0; i < 10; i++)
@@ -74,6 +75,7 @@ public abstract class AbstractBytes implements Bytes {
             RADIX_PARSE['A' + i] = RADIX_PARSE['a' + i] = (byte) (i + 10);
         INT_LOCK_MASK = 0xFFFFFF;
     }
+
     private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
@@ -101,8 +103,6 @@ public abstract class AbstractBytes implements Bytes {
     protected boolean finished;
     ObjectSerializer objectSerializer;
     private StringInterner stringInterner = null;
-    private Thread currentThread;
-    private int shortThreadId = Integer.MIN_VALUE;
     private boolean selfTerminating = false;
 
     AbstractBytes() {
@@ -110,7 +110,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     AbstractBytes(BytesMarshallerFactory bytesMarshallerFactory, AtomicInteger refCount) {
-        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKObjectSerializer.INSTANCE), refCount);
+        this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKZObjectSerializer.INSTANCE), refCount);
     }
 
     AbstractBytes(ObjectSerializer objectSerializer, AtomicInteger refCount) {
@@ -204,7 +204,6 @@ public abstract class AbstractBytes implements Bytes {
                 bytes.position(bytes.position() - 1);
                 break;
             } else if (c < 0) {
-
             }
             count++;
             appendable.append((char) c);
@@ -296,7 +295,6 @@ public abstract class AbstractBytes implements Bytes {
             c = str.charAt(i);
             if ((c >= 0x0000) && (c <= 0x007F)) {
                 bytes.write(c);
-
             } else if (c > 0x07FF) {
                 bytes.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
                 bytes.write((byte) (0x80 | ((c >> 6) & 0x3F)));
@@ -309,23 +307,22 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     static void checkArrayOffs(int arrayLength, int off, int len) {
-        if (len < 0 || off < 0 || off + len > arrayLength || off + len < 0)
+        if ((len | off) < 0 | ((off + len) & 0xffffffffL) > arrayLength)
             throw new IndexOutOfBoundsException();
     }
 
     /**
-     * display the hex data of a byte buffer from the position() to the limit()
+     * display the hex data of {@link Bytes} from the position() to the limit()
      *
      * @param buffer the buffer you wish to toString()
      * @return hex representation of the buffer, from example [0D ,OA, FF]
      */
-    public static String toHex(@NotNull final ByteBuffer buffer) {
-
-        final ByteBuffer slice = buffer.slice();
+    public static String toHex(@NotNull final Bytes buffer) {
+        final Bytes slice = buffer.slice();
         final StringBuilder builder = new StringBuilder("[");
 
-        while (slice.hasRemaining()) {
-            final byte b = slice.get();
+        while (slice.remaining() > 0) {
+            final byte b = slice.readByte();
             builder.append(String.format("%02X ", b));
             builder.append(",");
         }
@@ -834,9 +831,7 @@ public abstract class AbstractBytes implements Bytes {
     // // RandomOutputStream
     @Override
     public void write(@NotNull byte[] bytes) {
-        int length = bytes.length;
-        checkWrite(length);
-        write(bytes, 0, length);
+        write(bytes, 0, bytes.length);
     }
 
     private void checkWrite(int length) {
@@ -846,12 +841,12 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeBoolean(boolean v) {
-        write(v ? -1 : 0);
+        write(v ? 'Y' : 0);
     }
 
     @Override
     public void writeBoolean(long offset, boolean v) {
-        writeByte(offset, v ? -1 : 0);
+        writeByte(offset, v ? 'Y' : 0);
     }
 
     @Override
@@ -885,7 +880,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void writeUTFΔ(@Nullable CharSequence str) {
+    public void writeUTFΔ(@Nullable CharSequence str) throws IllegalArgumentException {
         if (str == null) {
             writeStopBit(-1);
             return;
@@ -929,7 +924,7 @@ public abstract class AbstractBytes implements Bytes {
         return this;
     }
 
-    private void checkUFTLength(long utflen) {
+    private void checkUFTLength(long utflen) throws IllegalArgumentException {
         if (utflen > remaining())
             throw new IllegalArgumentException(
                     "encoded string too long: " + utflen + " bytes, remaining=" + remaining());
@@ -964,6 +959,15 @@ public abstract class AbstractBytes implements Bytes {
 
         for (int i = 0; i < len; i++)
             write(bytes[off + i]);
+    }
+
+    @Override
+    public void write(long offset, byte[] bytes, int off, int len) {
+        checkArrayOffs(bytes.length, off, len);
+        checkWrite(len);
+
+        for (int i = 0; i < len; i++)
+            writeByte(offset + i, bytes[off + i]);
     }
 
     @Override
@@ -1106,17 +1110,13 @@ public abstract class AbstractBytes implements Bytes {
     public void writeCompactLong(long v) {
         if (v > INT_MAX_VALUE && v <= Integer.MAX_VALUE) {
             writeInt((int) v);
-
         } else if (v == Long.MIN_VALUE) {
             writeInt(INT_MIN_VALUE);
-
         } else if (v == Long.MAX_VALUE) {
             writeInt(INT_MAX_VALUE);
-
         } else {
             writeInt(INT_EXTENDED);
             writeLong(v);
-
         }
     }
 
@@ -1223,7 +1223,6 @@ public abstract class AbstractBytes implements Bytes {
         }
         if (num == 0) {
             writeByte('0');
-
         } else {
             appendLong0(num);
         }
@@ -1245,7 +1244,6 @@ public abstract class AbstractBytes implements Bytes {
         }
         if (num == 0) {
             writeByte('0');
-
         } else {
             while (num > 0) {
                 writeByte(RADIX[((int) (num % base))]);
@@ -1363,7 +1361,6 @@ public abstract class AbstractBytes implements Bytes {
                     }
                 }
                 return this;
-
             } else {
                 // faction.
                 writeByte('0');
@@ -1860,7 +1857,9 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public <E> void readList(@NotNull Collection<E> list, @NotNull Class<E> eClass) {
-        int len = (int) readStopBit();
+        long len = readStopBit();
+        if (len < 0 || len > Integer.MAX_VALUE)
+            throw new IllegalStateException("Invalid length: " + len);
         list.clear();
         for (int i = 0; i < len; i++) {
             @SuppressWarnings("unchecked")
@@ -1872,7 +1871,10 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     @NotNull
     public <K, V> Map<K, V> readMap(@NotNull Map<K, V> map, @NotNull Class<K> kClass, @NotNull Class<V> vClass) {
-        int len = (int) readStopBit();
+        long len = readStopBit();
+        if (len < 0 || len > Integer.MAX_VALUE)
+            throw new IllegalStateException("Invalid length: " + len);
+
         map.clear();
         for (int i = 0; i < len; i++)
             map.put(readEnum(kClass), readEnum(vClass));
@@ -1899,7 +1901,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public long skip(long n) {
-        if (n < 0)
+        if (n < -position())
             throw new IllegalArgumentException("Skip bytes out of range, was " + n);
         if (n > remaining())
             n = remaining();
@@ -2080,7 +2082,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     int shortThreadId() {
-        return shortThreadId > 0 ? shortThreadId : shortThreadId0();
+        return shortThreadId0();
     }
 
     int shortThreadId0() {
@@ -2091,13 +2093,8 @@ public abstract class AbstractBytes implements Bytes {
         return tid;
     }
 
-    public void setCurrentThread() {
-        currentThread = Thread.currentThread();
-        shortThreadId = shortThreadId0();
-    }
-
     Thread currentThread() {
-        return currentThread == null ? Thread.currentThread() : currentThread;
+        return Thread.currentThread();
     }
 
     @Override
@@ -2283,7 +2280,7 @@ public abstract class AbstractBytes implements Bytes {
     public short addShort(long offset, short s) {
         short s2 = readShort(offset);
         s2 += s;
-        writeByte(offset, s2);
+        writeShort(offset, s2);
         return s2;
     }
 
@@ -2413,12 +2410,14 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public void writeMarshallable(@NotNull Bytes out) {
         out.write(this, position(), remaining());
-
     }
 
     @Override
     public void write(RandomDataInput bytes) {
-        write(bytes, bytes.position(), bytes.remaining());
+        long toWrite = Math.min(remaining(), bytes.remaining());
+        write(bytes, bytes.position(), toWrite);
+        bytes.skip(toWrite);
+        skip(toWrite);
     }
 
     @Override
@@ -2475,10 +2474,16 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String toDebugString() {
+        return toDebugString(64);
+    }
+
+    @NotNull
+    @Override
+    public String toDebugString(long limit) {
         StringBuilder sb = new StringBuilder(200);
         sb.append("[pos: ").append(position()).append(", lim: ").append(limit()).append(", cap: ")
                 .append(capacity()).append(" ] ");
-        toString(sb, position() - 64, position(), position() + 64);
+        toString(sb, position() - limit, position(), position() + limit);
 
         return sb.toString();
     }
@@ -2515,7 +2520,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private void append(Appendable sb, long i) throws IOException {
-        byte b = readByte(i);
+        int b = readUnsignedByte(i);
         if (b == 0)
             sb.append('\u0660');
         else if (b < 21)
@@ -2532,7 +2537,6 @@ public abstract class AbstractBytes implements Bytes {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-
     }
 
     @Override
@@ -2586,7 +2590,6 @@ public abstract class AbstractBytes implements Bytes {
                 // add to the readLock count and decrease the readWaiting count.
                 if (compareAndSwapLong(offset, lock, lock + RW_READ_LOCKED))
                     return true;
-
             }
             if (System.nanoTime() > end)
                 return false;
@@ -2603,7 +2606,6 @@ public abstract class AbstractBytes implements Bytes {
                 return true;
         }
         return tryRWWriteLock0(offset, timeOutNS);
-
     }
 
     private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException {
@@ -2667,7 +2669,6 @@ public abstract class AbstractBytes implements Bytes {
             if (compareAndSwapLong(offset, lock, lock - RW_WRITE_LOCKED))
                 return;
         }
-
     }
 
     String dumpRWLock(long offset) {

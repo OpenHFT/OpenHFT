@@ -19,7 +19,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
-import net.openhft.lang.io.serialization.JDKObjectSerializer;
+import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.nio.ch.DirectBuffer;
@@ -41,12 +41,32 @@ public class ByteBufferBytes extends AbstractBytes {
     private int limit;
     private AtomicBoolean barrier;
 
+    public static Bytes wrap(ByteBuffer buffer) {
+        if (buffer instanceof DirectBuffer)
+            return new DirectByteBufferBytes(buffer);
+        return new ByteBufferBytes(buffer.slice());
+    }
+
+    public static Bytes wrap(ByteBuffer buffer, int start, int capacity) {
+        if (buffer instanceof DirectBuffer)
+            return new DirectByteBufferBytes(buffer, start, capacity);
+        return new ByteBufferBytes(buffer.slice(), start, capacity);
+    }
+
+    /**
+     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
+     */
+    @Deprecated
     public ByteBufferBytes(ByteBuffer buffer) {
         this(buffer, 0, buffer.capacity());
     }
 
+    /**
+     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
+     */
+    @Deprecated
     public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
-        super(BytesMarshallableSerializer.create(new VanillaBytesMarshallerFactory(), JDKObjectSerializer.INSTANCE), new AtomicInteger(1));
+        super(BytesMarshallableSerializer.create(new VanillaBytesMarshallerFactory(), JDKZObjectSerializer.INSTANCE), new AtomicInteger(1));
         // We should set order to native, because compare-and-swap operations
         // end up with native ops. Bytes interfaces handles only native order.
         buffer.order(ByteOrder.nativeOrder());
@@ -190,13 +210,23 @@ public class ByteBufferBytes extends AbstractBytes {
     }
 
     @Override
-    public void readFully(@org.jetbrains.annotations.NotNull char[] data, int off, int len) {
+    public void readFully(@NotNull char[] data, int off, int len) {
         checkArrayOffs(data.length, off, len);
         long left = remaining();
         if (left < len * 2L)
             throw new IllegalStateException(new EOFException());
         for (int i = 0; i < len; i++)
             data[off + i] = readChar();
+    }
+
+    @Override
+    public void readFully(long offset, byte[] bytes, int off, int len) {
+        checkArrayOffs(bytes.length, off, len);
+        long left = remaining();
+        if (left < len)
+            throw new IllegalStateException(new EOFException());
+        for (int i = 0; i < len; i++)
+            bytes[off + i] = readByte(offset + i);
     }
 
     @Override
@@ -518,7 +548,9 @@ public class ByteBufferBytes extends AbstractBytes {
     @Override
     public ByteBufferBytes position(long position) {
         if (start + position > Integer.MAX_VALUE)
-            throw new IndexOutOfBoundsException("Position to large");
+            throw new IllegalArgumentException("Position to large");
+        if (position < 0)
+            throw new IllegalArgumentException("Position to small");
         this.position = (int) (start + position);
         return this;
     }

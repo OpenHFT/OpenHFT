@@ -257,7 +257,7 @@ public class ObjectMarshallerTest {
         assertEquals(0, newM.transientShort);
     }
 
-    private ByteBufferBytes createByteStore() {
-        return new ByteBufferBytes(ByteBuffer.allocate(64));
+    private Bytes createByteStore() {
+        return ByteBufferBytes.wrap(ByteBuffer.allocate(64));
     }
 }

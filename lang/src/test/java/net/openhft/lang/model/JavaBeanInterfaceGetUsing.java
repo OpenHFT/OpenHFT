@@ -25,8 +25,6 @@ import net.openhft.lang.model.constraints.MaxSize;
  */
 public interface JavaBeanInterfaceGetUsing {
 
-
-
     void setString(@MaxSize(8) String s);
 
     StringBuilder getUsingString(StringBuilder b);

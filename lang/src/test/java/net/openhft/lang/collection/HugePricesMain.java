@@ -65,9 +65,7 @@ interface TimedQuote extends Quote {
     void setTimestamp(long price);
 }
 
-
 public class HugePricesMain {
-
 
     @Test
     public  void test() {

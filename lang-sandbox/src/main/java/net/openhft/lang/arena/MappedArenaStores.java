@@ -20,11 +20,7 @@ package net.openhft.lang.arena;
 
 import net.openhft.lang.io.BytesStore;
 import net.openhft.lang.io.DirectBytes;
-import net.openhft.lang.io.serialization.BytesMarshallableSerializer;
-import net.openhft.lang.io.serialization.BytesMarshallerFactory;
-import net.openhft.lang.io.serialization.JDKObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
-import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
@@ -220,7 +216,6 @@ public class MappedArenaStores implements Closeable {
                 if (channel.isOpen()) {
                     channel.close();
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }

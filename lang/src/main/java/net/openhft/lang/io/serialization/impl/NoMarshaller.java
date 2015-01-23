@@ -45,5 +45,4 @@ public enum NoMarshaller implements BytesMarshaller<Void> {
         throw new UnsupportedOperationException();
     }
 
-
 }

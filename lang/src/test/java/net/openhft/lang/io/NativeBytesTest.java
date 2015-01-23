@@ -75,7 +75,6 @@ public class NativeBytesTest {
         for (int i = (int) (bytes.capacity() - 1); i >= 0; i--) {
             assertEquals((byte) i, bytes.readByte(i));
         }
-
     }
 
     @Test
@@ -95,7 +94,6 @@ public class NativeBytesTest {
         assertFalse(bytes.compareAndSwapLong(0, 0, 1));
         assertTrue(bytes.compareAndSwapLong(8, 0, 1));
         assertTrue(bytes.compareAndSwapLong(0, 1, 2));
-
     }
 
     @Test
@@ -308,7 +306,6 @@ public class NativeBytesTest {
         bytes.position(10);
         bytes.stepBackAndSkipTo(CONTROL_STOP);
         assertEquals(13, bytes.position());
-
     }
 
     @Test
@@ -443,7 +440,6 @@ public class NativeBytesTest {
             assertEquals(0, bytes.remaining());
         }
     }
-
 
     @Test
     public void testReadWriteChar() {
@@ -756,7 +752,8 @@ public class NativeBytesTest {
     public void testWriteBytes() {
         bytes.write("Hello World\n".getBytes(), 0, 10);
         bytes.write("good bye\n".getBytes(), 4, 4);
-        bytes.write(4, "0 w".getBytes());
+        bytes.write(4, "0".getBytes());
+        bytes.write(5, " w".getBytes(), 0, 2);
         bytes.position(0);
         assertEquals("Hell0 worl bye", bytes.parseUTF(CONTROL_STOP));
     }

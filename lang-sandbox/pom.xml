@@ -31,7 +31,7 @@
     <name>OpenHFT/Java-Lang/lang-sandbox</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang-sandbox</artifactId>
-    <version>6.4.6-SNAPSHOT</version>
+    <version>6.5-SNAPSHOT</version>
 
     <dependencyManagement>
         <dependencies>
@@ -45,7 +45,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.4.13</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -80,5 +80,19 @@
         </dependency>
 
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

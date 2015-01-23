@@ -31,6 +31,7 @@ import java.io.Serializable;
  * @see BytesMarshallable
  */
 public interface BytesMarshaller<E> extends Serializable {
+
     /**
      * Write the object out to the {@code bytes}.
      *

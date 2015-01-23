@@ -17,7 +17,6 @@
  */
 package net.openhft.lang.io;
 
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -122,5 +121,4 @@ public class VanillaMappedCache<T> implements Closeable {
         }
     }
 }
-
 

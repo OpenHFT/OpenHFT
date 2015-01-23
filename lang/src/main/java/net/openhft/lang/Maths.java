@@ -149,7 +149,6 @@ public class Maths {
         return hash;
     }
 
-
     /**
      * Compares two {@code long} values numerically. The value returned is identical to what would be returned by:
      * <pre>

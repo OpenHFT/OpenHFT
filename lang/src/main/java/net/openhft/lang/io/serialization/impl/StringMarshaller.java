@@ -51,7 +51,6 @@ public class StringMarshaller extends ImmutableMarshaller<String>
         return null;
     }
 
-
     private String builderToString(StringBuilder reader) {
         if (interner == null) {
             if (size == 0)
@@ -62,6 +61,6 @@ public class StringMarshaller extends ImmutableMarshaller<String>
     }
 
     public byte code() {
-        return 'S' & 31;
+        return STRING_CODE;
     }
 }

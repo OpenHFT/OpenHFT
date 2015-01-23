@@ -40,8 +40,9 @@ public class MultiStoreBytes extends NativeBytes {
     public void setBytesOffset(Bytes bytes, long offset) {
         this.objectSerializer = bytes.objectSerializer();
         assert checkSingleThread();
-        startAddr = positionAddr = bytes.address() + offset;
-        capacityAddr = limitAddr = startAddr + bytes.capacity();
+        long bytesAddr = bytes.address();
+        startAddr = positionAddr = bytesAddr + offset;
+        capacityAddr = limitAddr = bytesAddr + bytes.capacity();
         underlyingBytes = bytes;
         underlyingOffset = offset;
     }

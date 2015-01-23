@@ -22,6 +22,19 @@ package net.openhft.lang.io.serialization;
  * A BytesMarshaller with a byte code for the class.
  */
 public interface CompactBytesMarshaller<E> extends BytesMarshaller<E> {
+    byte BYTE_BUFFER_CODE = 'B' & 31;
+    byte CLASS_CODE = 'C' & 31;
+    byte INT_CODE = 'I' & 31;
+    byte LONG_CODE = 'L' & 31;
+    byte DOUBLE_CODE = 'D' & 31;
+    byte DATE_CODE = 'T' & 31;
+    byte STRING_CODE = 'S' & 31;
+    byte STRINGZ_MAP_CODE = 'Y' & 31; // compressed string.
+    byte STRINGZ_CODE = 'Z' & 31; // compressed string.
+    byte LIST_CODE = '[';
+    byte SET_CODE = '[' & 31;
+    byte MAP_CODE = '{';
+
     /**
      * @return the code for this marshaller
      */

@@ -43,32 +43,41 @@ public abstract class Provider<T> {
 
         @Override
         public T get(ThreadLocalCopies copies, T original) {
-            if (copies.currentlyAccessed.compareAndSet(false, true)) {
-                try {
-                    Object id = original.stateIdentity();
-                    int m = copies.mask;
-                    Object[] tab = copies.table;
-                    int i = System.identityHashCode(id) & m;
-                    while (true) {
-                        Object idInTable = tab[i];
-                        if (idInTable == id) {
-                            return (T) tab[i + 1];
-                        } else if (idInTable == null) {
+            return get(copies, original, true);
+        }
+
+        private T get(ThreadLocalCopies copies, T original, boolean syncPut) {
+                Object id = original.stateIdentity();
+                int m = copies.mask;
+                Object[] tab = copies.table;
+                int i = System.identityHashCode(id) & m;
+                while (true) {
+                    Object idInTable = tab[i];
+                    if (idInTable == id) {
+                        return (T) tab[i + 1];
+                    } else if (idInTable == null) {
+                        if (syncPut) {
+                            if (copies.currentlyAccessed.compareAndSet(false, true)) {
+                                try {
+                                    return get(copies, original, false);
+                                } finally {
+                                    copies.currentlyAccessed.set(false);
+                                }
+                            } else {
+                                throw new IllegalStateException("Concurrent or recursive access " +
+                                        "to ThreadLocalCopies is not allowed");
+                            }
+                        } else {
+                            // actual put
                             tab[i] = id;
                             T copy;
                             tab[i + 1] = copy = original.copy();
                             copies.postInsert();
                             return copy;
                         }
-                        i = (i + 2) & m;
                     }
-                } finally {
-                    copies.currentlyAccessed.set(false);
+                    i = (i + 2) & m;
                 }
-            } else {
-                throw new IllegalStateException(
-                        "Concurrent or recursive access to ThreadLocalCopies is not allowed");
-            }
         }
     }
 

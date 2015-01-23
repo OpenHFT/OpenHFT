@@ -68,6 +68,5 @@ public class HugeQueueTest {
         long time = System.nanoTime() - start;
         double avg = time / 2.0 / tests;
         System.out.printf("Average time to access a JavaBeanInterface was %.1f ns%n", avg);
-
     }
 }

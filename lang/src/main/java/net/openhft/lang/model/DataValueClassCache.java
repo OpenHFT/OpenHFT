@@ -29,7 +29,7 @@ class DataValueClassCache {
             //noinspection ClassNewInstance
             return heapClassFor(interfaceClass).newInstance();
         } catch (Exception e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -38,7 +38,7 @@ class DataValueClassCache {
             //noinspection ClassNewInstance
             return directClassFor(interfaceClass).newInstance();
         } catch (Exception e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 

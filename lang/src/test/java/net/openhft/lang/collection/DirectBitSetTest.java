@@ -28,10 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static net.openhft.lang.collection.DirectBitSet.Bits;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class DirectBitSetTest {
@@ -41,12 +38,20 @@ public class DirectBitSetTest {
         int capacityInBytes = 256 / 8;
         return Arrays.asList(new Object[][]{
                 {
-                        new ATSDirectBitSet(new ByteBufferBytes(
+                        new ATSDirectBitSet(ByteBufferBytes.wrap(
                                 ByteBuffer.allocate(capacityInBytes)))
                 },
                 {
-                        new SingleThreadedDirectBitSet(new ByteBufferBytes(
+                        new SingleThreadedDirectBitSet(ByteBufferBytes.wrap(
                                 ByteBuffer.allocate(capacityInBytes)))
+                },
+                {
+                        new ATSDirectBitSet(ByteBufferBytes.wrap(
+                                ByteBuffer.allocateDirect(capacityInBytes)))
+                },
+                {
+                        new SingleThreadedDirectBitSet(ByteBufferBytes.wrap(
+                                ByteBuffer.allocateDirect(capacityInBytes)))
                 }
         });
     }
@@ -605,7 +610,7 @@ public class DirectBitSetTest {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[] {3, 7, 13, 31, 33, 63, 65, 100, 127, 128, 129, 254, 255}) {
             bs.clear();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsClear(i * n, i * n + n);
@@ -615,12 +620,12 @@ public class DirectBitSetTest {
             }
         }
         long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64, 65, 100, 127, 128, 129}) {
             bs.setAll();
-            long from = lastBound - (n / 2);
+            long from = n <= 64 ? lastBound - (n / 2) : 30;
             long to = from + n;
             bs.clear(from, to);
-            assertEquals(from, bs.setNextNContinuousClearBits(0L, n));
+            assertEquals("" + n, from, bs.setNextNContinuousClearBits(0L, n));
             assertRangeIsSet(from, to);
 
             bs.clear(from, to);
@@ -851,7 +856,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetNegative() {
         bs.get(-1);
@@ -912,7 +916,6 @@ public class DirectBitSetTest {
         bs.getLong((bs.size() + 63) / 64);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextSetBit() {
         bs.nextSetBit(-1);
@@ -953,7 +956,6 @@ public class DirectBitSetTest {
         bs.previousClearLong(-2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearNextSetBit() {
         bs.clearNextSetBit(-1);
@@ -993,7 +995,6 @@ public class DirectBitSetTest {
     public void testIoobeSetPreviousNContinuousClearBit() {
         bs.setPreviousNContinuousClearBits(-2, 2);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeFromNegative() {
@@ -1039,7 +1040,6 @@ public class DirectBitSetTest {
     public void testIoobeFlipRangeToOverCapacity() {
         bs.flip(0, bs.size() + 1);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testIaeClearNextNContinuousSetBits() {

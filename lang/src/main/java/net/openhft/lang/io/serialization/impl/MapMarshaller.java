@@ -33,14 +33,14 @@ public class MapMarshaller<K, V> implements CompactBytesMarshaller<Map<K, V>> {
     private final BytesMarshaller<K> kBytesMarshaller;
     private final BytesMarshaller<V> vBytesMarshaller;
 
-    public MapMarshaller(BytesMarshaller<K> kBytesMarshaller, BytesMarshaller<V> vBytesMarshaller) {
+    MapMarshaller(BytesMarshaller<K> kBytesMarshaller, BytesMarshaller<V> vBytesMarshaller) {
         this.kBytesMarshaller = kBytesMarshaller;
         this.vBytesMarshaller = vBytesMarshaller;
     }
 
     @Override
     public byte code() {
-        return 'M' & 31;
+        return MAP_CODE;
     }
 
     @Override
@@ -59,11 +59,18 @@ public class MapMarshaller<K, V> implements CompactBytesMarshaller<Map<K, V>> {
 
     @Override
     public Map<K, V> read(Bytes bytes, @Nullable Map<K, V> kvMap) {
-        if (kvMap == null)
+        if (kvMap == null) {
             kvMap = new LinkedHashMap<K, V>();
+        } else {
+            kvMap.clear();
+        }
         int size = bytes.readInt();
         for (int i = 0; i < size; i++)
             kvMap.put(kBytesMarshaller.read(bytes), vBytesMarshaller.read(bytes));
         return kvMap;
+    }
+
+    public static <K, V> BytesMarshaller<Map<K, V>> of(BytesMarshaller<K> keyMarshaller, BytesMarshaller<V> valueMarshaller) {
+        return new MapMarshaller<K, V>(keyMarshaller, valueMarshaller);
     }
 }

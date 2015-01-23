@@ -23,6 +23,7 @@ import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 import net.openhft.lang.model.constraints.NotNull;
 import net.openhft.lang.model.constraints.Nullable;
+import net.openhft.lang.pool.StringInterner;
 
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
@@ -85,15 +86,16 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
         WeakReference<Class> ref = classWeakReference[hash];
         if (ref != null) {
             Class clazz = ref.get();
-            if (clazz != null && clazz.getName().equals(name))
+            if (clazz != null && StringInterner.isEqual(clazz.getName(), name))
                 return clazz;
         }
         try {
 
-            Class<?> clazz = SC_SHORT_NAME.get(name.toString());
+            String className = name.toString();
+            Class<?> clazz = SC_SHORT_NAME.get(className);
             if (clazz != null)
                 return clazz;
-            clazz = classLoader.loadClass(name.toString());
+            clazz = classLoader.loadClass(className);
             classWeakReference[hash] = new WeakReference<Class>(clazz);
             return clazz;
         } catch (ClassNotFoundException e) {
@@ -103,7 +105,7 @@ public class ClassMarshaller extends ImmutableMarshaller<Class>
 
     @Override
     public byte code() {
-        return 'C' & 31; // control C
+        return CLASS_CODE; // control C
     }
 }
     
