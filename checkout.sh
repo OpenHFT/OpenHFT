@@ -7,6 +7,7 @@ git clone git@github.com:OpenHFT/Chronicle-Map-Java8.git
 git clone git@github.com:OpenHFT/Chronicle-Logger.git
 git clone git@github.com:OpenHFT/Chronicle-Engine.git
 git clone git@github.com:OpenHFT/Chronicle-Wire.git
+git clone git@github.com:OpenHFT/Chronicle-Network.git
 git clone git@github.com:OpenHFT/Java-Runtime-Compiler.git
 git clone git@github.com:OpenHFT/TransFIX.git
 git clone git@github.com:OpenHFT/SAXophone.git
