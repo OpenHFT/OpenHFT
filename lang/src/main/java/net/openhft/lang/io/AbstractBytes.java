@@ -2416,8 +2416,6 @@ public abstract class AbstractBytes implements Bytes {
     public void write(RandomDataInput bytes) {
         long toWrite = Math.min(remaining(), bytes.remaining());
         write(bytes, bytes.position(), toWrite);
-        bytes.skip(toWrite);
-        skip(toWrite);
     }
 
     @Override

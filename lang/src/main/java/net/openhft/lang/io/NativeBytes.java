@@ -611,6 +611,7 @@ public class NativeBytes extends AbstractBytes {
             throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
         if (bytes instanceof NativeBytes) {
             UNSAFE.copyMemory(((NativeBytes) bytes).startAddr + position, positionAddr, length);
+            skip(length);
         } else {
             super.write(bytes, position, length);
         }
