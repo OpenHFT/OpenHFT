@@ -2438,18 +2438,36 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
+    @Override
     public boolean startsWith(RandomDataInput input) {
-        long inputRemaining = input.remaining();
-        if (remaining() < inputRemaining) return false;
-        long pos = position(), inputPos = input.position();
-
-        int i = 0;
-        for (; i < inputRemaining - 3; i += 4) {
-            if (readInt(pos + i) != input.readInt(inputPos + i))
+        return compare(position(), input, input.position(), input.remaining());
+    }
+    
+    @Override
+    public boolean compare(long offset, RandomDataInput input, long inputOffset, long len) {
+        if (offset < 0 || inputOffset < 0 || len < 0)
+            throw new IndexOutOfBoundsException();
+        if (offset + len < 0 || offset + len > capacity() || inputOffset + len < 0 ||
+                inputOffset + len > input.capacity()) {
+            return false;
+        }
+        long i = 0L;
+        for (; i < len - 7L; i += 8L) {
+            if (readLong(offset + i) != input.readLong(inputOffset + i))
                 return false;
         }
-        for (; i < inputRemaining; i++) {
-            if (readByte(pos + i) != input.readByte(inputPos + i))
+        if (i < len - 3L) {
+            if (readInt(offset + i) != input.readInt(inputOffset + i))
+                return false;
+            i += 4L;
+        }
+        if (i < len - 1L) {
+            if (readChar(offset + i) != input.readChar(inputOffset + i))
+                return false;
+            i += 2L;
+        }
+        if (i < len) {
+            if (readByte(offset + i) != input.readByte(inputOffset + i))
                 return false;
         }
         return true;

@@ -560,22 +560,31 @@ public class NativeBytes extends AbstractBytes {
         }
     }
 
-    public boolean startsWith(RandomDataInput input) {
-        long inputRemaining = input.remaining();
-        if ((limitAddr - positionAddr) < inputRemaining) return false;
-        long pos = position(), inputPos = input.position();
-
-        int i = 0;
-        for (; i < inputRemaining - 7; i += 8) {
-            if (UNSAFE.getLong(startAddr + pos + i) != input.readLong(inputPos + i))
+    @Override
+    public boolean compare(long offset, RandomDataInput input, long inputOffset, long len) {
+        if (offset < 0 || inputOffset < 0 || len < 0)
+            throw new IndexOutOfBoundsException();
+        if (offset + len < 0 || offset + len > capacity() || inputOffset + len < 0 ||
+                inputOffset + len > input.capacity()) {
+            return false;
+        }
+        long i = 0L;
+        for (; i < len - 7L; i += 8L) {
+            if (UNSAFE.getLong(startAddr + offset + i) != input.readLong(inputOffset + i))
                 return false;
         }
-        for (; i < inputRemaining - 1; i += 2) {
-            if (UNSAFE.getShort(startAddr + pos + i) != input.readShort(inputPos + i))
+        if (i < len - 3L) {
+            if (UNSAFE.getInt(startAddr + offset + i) != input.readInt(inputOffset + i))
                 return false;
+            i += 4L;
         }
-        if (i < inputRemaining) {
-            if (UNSAFE.getByte(startAddr + pos + i) != input.readByte(inputPos + i))
+        if (i < len - 1L) {
+            if (UNSAFE.getChar(startAddr + offset + i) != input.readChar(inputOffset + i))
+                return false;
+            i += 2L;
+        }
+        if (i < len) {
+            if (UNSAFE.getByte(startAddr + offset + i) != input.readByte(inputOffset + i))
                 return false;
         }
         return true;
