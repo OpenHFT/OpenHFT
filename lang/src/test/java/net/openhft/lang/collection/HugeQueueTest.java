@@ -25,10 +25,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * User: peter.lawrey Date: 08/10/13 Time: 13:47
+ * User: peter.lawrey
+ * Date: 08/10/13
+ * Time: 13:47
  */
 public class HugeQueueTest {
-
     @Test
     public void testQueue() {
         // runs with a maximum heap size of 32 MB.

@@ -106,7 +106,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test
     public void testGetSetClearAndCardinality() {
         bs.clear();
@@ -145,7 +144,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test
     public void testGetLong() {
         setIndices();
@@ -154,7 +152,6 @@ public class DirectBitSetTest {
         long l1 = (1L << (100 - 64)) | (1L << (127 - 64));
         assertEquals(l1, bs.getLong(1));
     }
-
 
     @Test
     public void testFlip() {
@@ -167,7 +164,6 @@ public class DirectBitSetTest {
             assertEquals("At index " + i, false, bs.get(i));
         }
     }
-
 
     @Test
     public void testNextSetBit() {
@@ -182,7 +178,6 @@ public class DirectBitSetTest {
         bs.clear();
         assertEquals(-1, bs.nextSetBit(0L));
     }
-
 
     @Test
     public void testSetBitsIteration() {
@@ -199,7 +194,6 @@ public class DirectBitSetTest {
         bs.clear();
         assertEquals(-1, bs.setBits().next());
     }
-
 
     @Test
     public void testClearNextSetBit() {
@@ -219,7 +213,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearNextSetBit(0L));
     }
 
-
     @Test
     public void testClearNext1SetBit() {
         setIndices();
@@ -238,7 +231,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearNextNContinuousSetBits(0L, 1));
     }
 
-
     @Test
     public void testNextSetLong() {
         bs.clear();
@@ -256,7 +248,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextSetLong(0L));
     }
 
-
     @Test
     public void testNextClearBit() {
         setIndicesComplement();
@@ -270,7 +261,6 @@ public class DirectBitSetTest {
         bs.setAll();
         assertEquals(-1, bs.nextClearBit(0L));
     }
-
 
     @Test
     public void testSetNextClearBit() {
@@ -290,7 +280,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setNextClearBit(0L));
     }
 
-
     @Test
     public void testSetNext1ClearBit() {
         setIndicesComplement();
@@ -309,7 +298,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setNextNContinuousClearBits(0L, 1));
     }
 
-
     @Test
     public void testNextClearLong() {
         bs.setAll();
@@ -327,7 +315,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextClearLong(0L));
     }
 
-
     @Test
     public void testPreviousSetBit() {
         setIndices();
@@ -341,7 +328,6 @@ public class DirectBitSetTest {
         bs.clear();
         assertEquals(-1, bs.previousSetBit(bs.size()));
     }
-
 
     @Test
     public void testClearPreviousSetBit() {
@@ -359,7 +345,6 @@ public class DirectBitSetTest {
         assertEquals(0, bs.cardinality());
         assertEquals(-1, bs.clearPreviousSetBit(bs.size()));
     }
-
 
     @Test
     public void testClearPrevious1SetBit() {
@@ -379,7 +364,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearPreviousNContinuousSetBits(bs.size(), 1));
     }
 
-
     @Test
     public void testPreviousSetLong() {
         bs.clear();
@@ -397,7 +381,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousSetLong(bs.size() / 64));
     }
 
-
     @Test
     public void testPreviousClearBit() {
         setIndicesComplement();
@@ -411,7 +394,6 @@ public class DirectBitSetTest {
         bs.setAll();
         assertEquals(-1, bs.previousClearBit(bs.size()));
     }
-
 
     @Test
     public void testSetPreviousClearBit() {
@@ -429,7 +411,6 @@ public class DirectBitSetTest {
         assertEquals(bs.size(), bs.cardinality());
         assertEquals(-1, bs.setPreviousClearBit(bs.size()));
     }
-
 
     @Test
     public void testSetPrevious1ClearBit() {
@@ -449,7 +430,6 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setPreviousNContinuousClearBits(bs.size(), 1));
     }
 
-
     @Test
     public void testPreviousClearLong() {
         bs.setAll();
@@ -467,14 +447,12 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousClearLong(bs.size() / 64));
     }
 
-
     @Test
     public void testSetAll() {
         bs.clear();
         bs.setAll();
         assertEquals(bs.size(), bs.cardinality());
     }
-
 
     @Test
     public void testRangeOpsWithinLongCase() {
@@ -512,7 +490,6 @@ public class DirectBitSetTest {
         assertEquals(true, bs.get(0));
         assertEquals(1, bs.cardinality());
     }
-
 
     @Test
     public void testRangeOpsCrossLongCase() {
@@ -567,7 +544,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test
     public void testRangeOpsSpanLongCase() {
         bs.clear();
@@ -593,7 +569,6 @@ public class DirectBitSetTest {
     private String m(int n) {
         return "N: " + n + ", " + bs.getClass().getSimpleName();
     }
-
 
     @Test
     public void testSetNextNContinuousClearBitsWithinLongCase() {
@@ -629,7 +604,6 @@ public class DirectBitSetTest {
             assertEquals(cardinality + n, bs.cardinality());
         }
     }
-
 
     @Test
     public void testSetNextNContinuousClearBitsCrossLongCase() {
@@ -667,7 +641,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test
     public void testClearNextNContinuousSetBitsWithinLongCase() {
         long size = (bs.size() + 63) / 64 * 64;
@@ -703,7 +676,6 @@ public class DirectBitSetTest {
             assertEquals(cardinality - n, bs.cardinality());
         }
     }
-
 
     @Test
     public void testClearNextNContinuousSetBitsCrossLongCase() {
@@ -742,7 +714,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test
     public void testSetPreviousNContinuousClearBitsWithinLongCase() {
         long size = (bs.size() + 63) / 64 * 64;
@@ -777,7 +748,6 @@ public class DirectBitSetTest {
             assertEquals(cardinality + n, bs.cardinality());
         }
     }
-
 
     @Test
     public void testSetPreviousNContinuousClearBitsCrossLongCase() {
@@ -815,7 +785,6 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test
     public void testClearPreviousNContinuousSetBitsWithinLongCase() {
         long size = (bs.size() + 63) / 64 * 64;
@@ -850,7 +819,6 @@ public class DirectBitSetTest {
             assertEquals(cardinality - n, bs.cardinality());
         }
     }
-
 
     @Test
     public void testClearPreviousNContinuousSetBitsCrossLongCase() {
@@ -888,246 +856,205 @@ public class DirectBitSetTest {
         }
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetNegative() {
         bs.get(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetOverCapacity() {
         bs.get(bs.size());
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetNegative() {
         bs.set(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetOverCapacity() {
         bs.set(bs.size());
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetIfClearNegative() {
         bs.setIfClear(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetIfClearOverCapacity() {
         bs.setIfClear(bs.size());
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearIfSetNegative() {
         bs.clearIfSet(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearIfSetOverCapacity() {
         bs.clearIfSet(bs.size());
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipNegative() {
         bs.flip(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipOverCapacity() {
         bs.flip(bs.size());
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetLongNegative() {
         bs.getLong(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetLongOverCapacity() {
         bs.getLong((bs.size() + 63) / 64);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextSetBit() {
         bs.nextSetBit(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextSetLong() {
         bs.nextSetLong(-1);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextClearBit() {
         bs.nextClearBit(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextClearLong() {
         bs.nextClearLong(-1);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousSetBit() {
         bs.previousSetBit(-2);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousSetLong() {
         bs.previousSetLong(-2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousClearBit() {
         bs.previousClearBit(-2);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousClearLong() {
         bs.previousClearLong(-2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearNextSetBit() {
         bs.clearNextSetBit(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearNextNContinuousSetBits() {
         bs.clearNextNContinuousSetBits(-1, 2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetNextClearBit() {
         bs.setNextClearBit(-1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetNextNContinuousClearBits() {
         bs.setNextNContinuousClearBits(-1, 2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearPreviousSetBit() {
         bs.clearPreviousSetBit(-2);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearPreviousNContinuousSetBit() {
         bs.clearPreviousNContinuousSetBits(-2, 2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetPreviousClearBit() {
         bs.setPreviousClearBit(-2);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetPreviousNContinuousClearBit() {
         bs.setPreviousNContinuousClearBits(-2, 2);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeFromNegative() {
         bs.set(-1, 0);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeFromOverTo() {
         bs.set(1, 0);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeToOverCapacity() {
         bs.set(0, bs.size() + 1);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearRangeFromNegative() {
         bs.clear(-1, 0);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearRangeFromOverTo() {
         bs.clear(1, 0);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearRangeToOverCapacity() {
         bs.clear(0, bs.size() + 1);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipRangeFromNegative() {
         bs.flip(-1, 0);
     }
-
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipRangeFromOverTo() {
         bs.flip(1, 0);
     }
 
-
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipRangeToOverCapacity() {
         bs.flip(0, bs.size() + 1);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testIaeClearNextNContinuousSetBits() {
         bs.clearNextNContinuousSetBits(0, 0);
     }
 
-
     @Test(expected = IllegalArgumentException.class)
     public void testIaeSetNextNContinuousClearBits() {
         bs.setNextNContinuousClearBits(0, 0);
     }
 
-
     @Test(expected = IllegalArgumentException.class)
     public void testIaeClearPreviousNContinuousSetBits() {
         bs.clearPreviousNContinuousSetBits(bs.size(), 0);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testIaeSetPreviousNContinuousClearBits() {

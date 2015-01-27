@@ -24,7 +24,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * User: peter.lawrey Date: 08/10/13 Time: 08:30
+ * User: peter.lawrey
+ * Date: 08/10/13
+ * Time: 08:30
  */
 public class HugeArrayTest {
     static void assertEquals2(long a, long b) {
@@ -38,7 +40,6 @@ public class HugeArrayTest {
      * The second one is created on the fly due to freelist being empty.
      * There was a bug where acquire() was creating a heap object on freelist miss
      */
-
     @Test
     public void testGetTwoObjects() {
         HugeArray<JavaBeanInterface> array =
@@ -59,7 +60,6 @@ Recycle should use identity to know if it's putting the same object back in the 
     With lock: false, average time to access a JavaBeanInterface was 71.9 ns
     With lock: true, average time to access a JavaBeanInterface was 124.7 ns
      */
-
     @Test
     public void testHugeArray() throws InterruptedException {
         // runs with a maximum heap size of 32 MB.

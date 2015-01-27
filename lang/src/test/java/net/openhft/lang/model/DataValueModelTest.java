@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
  * User: peter.lawrey Date: 06/10/13 Time: 18:12
  */
 public class DataValueModelTest {
-    @org.junit.Ignore("TC")
     @Test
     public void testAcquire() {
         DataValueModel<MinimalInterface> midvm = DataValueModels.acquireModel(MinimalInterface.class);

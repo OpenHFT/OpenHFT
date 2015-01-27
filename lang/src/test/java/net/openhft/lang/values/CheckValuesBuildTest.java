@@ -27,7 +27,6 @@ import org.junit.Test;
  * Time: 11:38
  */
 public class CheckValuesBuildTest {
-    @org.junit.Ignore("TC")
     @Test
     public void testValuesCompile() throws ClassNotFoundException {
         DataValueGenerator dvg = new DataValueGenerator();

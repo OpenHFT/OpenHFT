@@ -67,7 +67,6 @@ interface TimedQuote extends Quote {
 
 public class HugePricesMain {
 
-
     @Test
     public void test() {
         int length = 1000;

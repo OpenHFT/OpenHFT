@@ -26,13 +26,11 @@ import org.junit.Test;
  * Time: 10:04
  */
 public class JvmTest {
-    @org.junit.Ignore("TC")
     @Test
     public void testIs64Bit() {
         System.out.println("is64 = " + Jvm.is64Bit());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testGetProcessId() {
         System.out.println("pid = " + Jvm.getProcessId());

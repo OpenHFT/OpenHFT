@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
  * Time: 19:14
  */
 public class RunningMinimumTest {
-    @org.junit.Ignore("TC")
     @Test
     public void testSample() throws Exception {
         for (int k = 0; k < 1000; k++) {
@@ -45,7 +44,6 @@ public class RunningMinimumTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testVanillaDiff() {
         VanillaDifferencer vd = new VanillaDifferencer();
