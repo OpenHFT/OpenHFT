@@ -13,7 +13,6 @@ import static org.junit.Assert.assertEquals;
 public class StringZMapMarshallerTest {
     static final Bytes b = DirectStore.allocate(1024).bytes();
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteRead() {
         testWriteRead(null);

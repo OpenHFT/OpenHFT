@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 
 public class SnappyStringMarshallerTest {
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteRead() {
         Bytes b = DirectStore.allocate(64 * 1024).bytes();

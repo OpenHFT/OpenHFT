@@ -32,7 +32,6 @@ import static org.junit.Assert.assertEquals;
  * User: peter.lawrey Date: 20/09/13 Time: 09:28
  */
 public class VanillaBytesMarshallerTest {
-    @org.junit.Ignore("TC")
     @Test
     public void testObjects() {
         DirectBytes bytes = new DirectStore(1024).bytes();
@@ -49,7 +48,6 @@ public class VanillaBytesMarshallerTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testMarshallable() {
         int capacity = 2 * 1024;
