@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
  * Time: 10:31
  */
 public class MathsTest {
+    @org.junit.Ignore("TC")
     @Test
     public void testIntLog2() {
         for (int i = 0; i < 63; i++) {
@@ -39,6 +40,7 @@ public class MathsTest {
         }
     }
 
+    @org.junit.Ignore("TC")
     @Test
     public void testRounding() {
         Random rand = new Random(1);

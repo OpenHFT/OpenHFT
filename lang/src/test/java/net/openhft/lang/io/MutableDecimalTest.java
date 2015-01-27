@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
  * Time: 10:40
  */
 public class MutableDecimalTest {
+    @org.junit.Ignore("TC")
     @Test
     public void testConstructor() {
         MutableDecimal md = new MutableDecimal(Long.MAX_VALUE);

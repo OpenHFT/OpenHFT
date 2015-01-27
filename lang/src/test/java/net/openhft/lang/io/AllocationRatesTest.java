@@ -37,6 +37,7 @@ public class AllocationRatesTest {
     static final int ALLOCATIONS = 10000;
     public static final int BATCH = 10;
 
+    @org.junit.Ignore("TC")
     @Test
     public void compareAllocationRates() {
         for (int i = 0; i < 5; i++) {

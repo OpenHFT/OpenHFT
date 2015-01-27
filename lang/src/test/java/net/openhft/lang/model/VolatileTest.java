@@ -33,6 +33,7 @@ import static org.junit.Assert.assertFalse;
  * Created by daniel on 11/06/2014.
  */
 public class VolatileTest {
+    @org.junit.Ignore("TC")
     @Test
     public void testGenerateJavaCode() throws Exception {
         DataValueGenerator dvg = new DataValueGenerator();

@@ -67,6 +67,7 @@ interface TimedQuote extends Quote {
 
 public class HugePricesMain {
 
+    @org.junit.Ignore("TC")
     @Test
     public  void test() {
         int length = 1000;

@@ -30,6 +30,7 @@ public class MappedStoreTest {
     //private static final long MS_SIZE = 3L << 30;
     private static final long MS_SIZE = 1024;
 
+    @org.junit.Ignore("TC")
     @Test
     public void testCreateSlice() throws Exception {
         File file = new File(System.getProperty("java.io.tmpdir") + "/MappedStoreTest-testCreateSlice" + System.nanoTime() + ".tmp");
@@ -49,6 +50,7 @@ public class MappedStoreTest {
         ms.free();
     }
 
+    @org.junit.Ignore("TC")
     @Test
     public void testOpenExistingFile() throws Exception {
         File file = getStoreFile("mapped-store-2.tmp");
@@ -79,7 +81,7 @@ public class MappedStoreTest {
     }
 
     /*
-    @Test
+    @org.junit.Ignore("TC") @Test
     public void testSliceSize() throws Exception {
         File file = getStoreFile("mapped-store");
 
