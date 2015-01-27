@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 public class JDKZObjectSerializerTest {
 
+    @org.junit.Ignore("TC")
     @Test
     public void testReadSerializable() throws Exception {
         {

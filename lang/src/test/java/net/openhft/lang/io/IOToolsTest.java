@@ -32,6 +32,7 @@ import static org.junit.Assert.assertEquals;
  * Time: 09:54
  */
 public class IOToolsTest {
+    @org.junit.Ignore("TC")
     @Test
     public void testClose() {
         final int[] count = {0};
