@@ -52,7 +52,6 @@ public class ByteBufferBytesTest {
         bytes = ByteBufferBytes.wrap(byteBuffer);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testLongHash() throws Exception {
         byte[] bytes = {1, 2, 3, 4, 5, 6, 7, 8};
@@ -64,7 +63,6 @@ public class ByteBufferBytesTest {
         assertFalse(h2 == h);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testCAS() {
         Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(100));
@@ -72,7 +70,6 @@ public class ByteBufferBytesTest {
         assertEquals(1L, bytes.readLong(0));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testRead() throws Exception {
         for (int i = 0; i < bytes.capacity(); i++)
@@ -85,7 +82,6 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadFully() throws Exception {
         for (int i = 0; i < bytes.capacity(); i++)
@@ -97,7 +93,6 @@ public class ByteBufferBytesTest {
             assertEquals((byte) i, bytes[i]);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testCompareAndSetLong() throws Exception {
         assertTrue(bytes.compareAndSwapLong(0, 0, 1));
@@ -106,7 +101,6 @@ public class ByteBufferBytesTest {
         assertTrue(bytes.compareAndSwapLong(0, 1, 2));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testPosition() throws Exception {
         for (int i = 0; i < bytes.capacity(); i++)
@@ -117,14 +111,12 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testCapacity() throws Exception {
         assertEquals(SIZE, bytes.capacity());
         assertEquals(10, new NativeBytes(0, 10).capacity());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testRemaining() throws Exception {
         assertEquals(SIZE, bytes.remaining());
@@ -132,13 +124,11 @@ public class ByteBufferBytesTest {
         assertEquals(SIZE - 10, bytes.remaining());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testByteOrder() throws Exception {
         assertEquals(ByteOrder.nativeOrder(), bytes.byteOrder());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testCheckEndOfBuffer() throws Exception {
         bytes.checkEndOfBuffer();
@@ -151,7 +141,6 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAppendDouble() {
         testAppendDouble0(-6.895305375646115E24);
@@ -188,7 +177,6 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAppendDouble2() {
 //        testAppendDouble0(-0.93879148954440506, 14);
@@ -222,7 +210,6 @@ public class ByteBufferBytesTest {
         assertEquals("'" + text + "' p: " + precision, d3, d2, 0);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteReadBytes() {
         byte[] bytes = "Hello World!".getBytes();
@@ -241,7 +228,6 @@ public class ByteBufferBytesTest {
         assertEquals(-1, this.bytes.read(bytes3));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteReadUTFΔ() {
         String[] words = "Hello,World!,Bye£€!".split(",");
@@ -268,7 +254,6 @@ public class ByteBufferBytesTest {
         assertEquals("", sb.toString());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteReadUTF() {
         String[] words = "Hello,World!,Bye£€!".split(",");
@@ -284,7 +269,6 @@ public class ByteBufferBytesTest {
         assertEquals("", bytes.readUTF());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAppendParseUTF() {
         String[] words = "Hello,World!,Bye£€!".split(",");
@@ -328,7 +312,6 @@ public class ByteBufferBytesTest {
         assertEquals(13, bytes.position());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteReadLines() {
         byte[] bytes = "Hello\nWorld!\r\nBye".getBytes();
@@ -339,7 +322,6 @@ public class ByteBufferBytesTest {
         assertTrue(this.bytes.readLine().startsWith("Bye"));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteReadByteBuffer() {
         byte[] bytes = "Hello\nWorld!\r\nBye".getBytes();
@@ -353,7 +335,6 @@ public class ByteBufferBytesTest {
         assertTrue(Arrays.equals(bytes, Arrays.copyOf(bytes2, bytes.length)));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteBoolean() {
         for (int i = 0; i < 32; i++)
@@ -368,7 +349,6 @@ public class ByteBufferBytesTest {
             assertEquals((i & 5) == 0, bytes.readBoolean(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteShort() {
         for (int i = 0; i < 32; i += 2)
@@ -383,7 +363,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readShort(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteCompactShort() {
         int[] ints = {Short.MIN_VALUE, Short.MAX_VALUE, -125, 0, 127, -10000, 10000};
@@ -398,7 +377,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readCompactShort());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteCompactInt() {
         int[] ints = {-10000000, Integer.MIN_VALUE, Integer.MAX_VALUE, Short.MIN_VALUE + 3, 0, Short.MAX_VALUE, 10000000};
@@ -413,7 +391,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readCompactInt());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteCompactLong() {
         long[] ints = {Long.MAX_VALUE, -100000000000L, Long.MIN_VALUE, Integer.MIN_VALUE + 3, 0, Integer.MAX_VALUE, 100000000000L};
@@ -428,7 +405,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readCompactLong());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteCompactDouble() {
         double[] doubles = {1, 1000, 1000000, -100000000, 0.1f, 0.1, 0.5, 0.51};
@@ -443,7 +419,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readCompactDouble(), 0.0);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteStop() {
         long[] longs = {Long.MIN_VALUE, Long.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE};
@@ -458,7 +433,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readStopBit());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteChar() {
         for (int i = 0; i < 32; i += 2)
@@ -473,7 +447,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readChar(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteUnsignedShort() {
         for (int i = 0; i < 32; i += 2)
@@ -488,7 +461,6 @@ public class ByteBufferBytesTest {
             assertEquals(~i & 0xFFFF, bytes.readUnsignedShort(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteInt() {
         for (int i = 0; i < 32; i += 4)
@@ -503,7 +475,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readInt(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteThreadeSafeInt() {
         for (int i = 0; i < 32; i += 4)
@@ -518,7 +489,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readVolatileInt(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteFloat() {
         for (int i = 0; i < 32; i += 4)
@@ -533,7 +503,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readFloat(i), 0);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteUnsignedInt() {
         for (int i = 0; i < 32; i += 4)
@@ -548,7 +517,6 @@ public class ByteBufferBytesTest {
             assertEquals(~i & 0xFFFFFFFFL, bytes.readUnsignedInt(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteInt24() {
         for (int i = 0; i < 30; i += 3)
@@ -577,7 +545,6 @@ public class ByteBufferBytesTest {
             assertEquals("i: " + i, ~i << 8 >> 8, bytes.readInt24(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteInt48() {
         for (long i = 0; i < 30; i += 6)
@@ -606,7 +573,6 @@ public class ByteBufferBytesTest {
             assertEquals("i: " + i, ~i << 16 >> 16, bytes.readInt48(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testDateTimes() {
         long now = System.currentTimeMillis();
@@ -624,7 +590,6 @@ public class ByteBufferBytesTest {
         assertEquals(asStr, bytes.parseUTF(SPACE_STOP));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteCompactUnsignedShort() {
         for (int i = 0; i < 64; i += 4)
@@ -637,7 +602,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readCompactUnsignedShort());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteCompactUnsignedInt() {
         for (int i = 0; i < 64; i += 4)
@@ -650,7 +614,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readCompactUnsignedInt());
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteLong() {
         for (long i = 0; i < 32; i += 8)
@@ -665,7 +628,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readLong(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteThreadSafeLong() {
         for (long i = 0; i < 32; i += 8)
@@ -680,7 +642,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readVolatileLong(i));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testReadWriteDouble() {
         for (long i = 0; i < 32; i += 8)
@@ -695,7 +656,6 @@ public class ByteBufferBytesTest {
             assertEquals(i, bytes.readDouble(i), 0);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAppendSubstring() {
         bytes.append("Hello World", 2, 7).append("\n");
@@ -703,7 +663,6 @@ public class ByteBufferBytesTest {
         assertEquals("Hello World".substring(2, 7), bytes.parseUTF(CONTROL_STOP));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteReadEnum() {
         bytes.append(BuySell.Buy).append("\t").append(BuySell.Sell);
@@ -713,7 +672,6 @@ public class ByteBufferBytesTest {
         assertEquals(null, bytes.parseEnum(BuySell.class, CONTROL_STOP));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAppendParse() {
         bytes.append(false).append(' ');
@@ -738,7 +696,6 @@ public class ByteBufferBytesTest {
         assertEquals(1.556, bytes.parseDouble(), 0);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testSelfTerminating() {
         bytes.limit(0);
@@ -772,7 +729,6 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteByteChar() throws UnsupportedEncodingException {
         bytes.writeBytes("Hello \u00ff\u01fe\u02fc\n");
@@ -785,7 +741,6 @@ public class ByteBufferBytesTest {
                 "\u0000", new String(bytes, "ISO-8859-1"));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteBytes() {
         bytes.write("Hello World\n".getBytes(), 0, 10);
@@ -795,7 +750,6 @@ public class ByteBufferBytesTest {
         assertEquals("Hell0 worl bye", bytes.parseUTF(CONTROL_STOP));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAppendIterable() {
         bytes.append(Arrays.asList(1, 2, 3, 4, 5), ";").append(' ');
@@ -804,7 +758,6 @@ public class ByteBufferBytesTest {
         assertEquals("1;2;3;4;5 2;4;5;13;21", bytes.parseUTF(CONTROL_STOP));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void readWriteMutableDecimal() {
         Random rand = new Random(2);
@@ -832,7 +785,6 @@ public class ByteBufferBytesTest {
             assertEquals("n: " + n + ", s: " + j + " t: " + text, md, md2);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testStream() throws IOException {
         bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(1000));
@@ -849,7 +801,6 @@ public class ByteBufferBytesTest {
         in.close();
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testStream2() throws IOException {
         OutputStream out = bytes.outputStream();
@@ -881,7 +832,6 @@ public class ByteBufferBytesTest {
         in.close();
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteObject() {
         for (Object o : new Object[]{BigDecimal.valueOf(-1.234), 10, 9.9, "string", new Date(), BigDecimal.valueOf(1.1)}) {
@@ -898,7 +848,6 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteSerializable() {
         int capacity = 16 * 1024;
@@ -915,7 +864,6 @@ public class ByteBufferBytesTest {
         assertEquals(d, d2);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAddAndGet() {
         for (int i = 0; i < 10; i++)
@@ -940,7 +888,6 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testErrors() {
         int capacity = 1024;
@@ -971,7 +918,6 @@ public class ByteBufferBytesTest {
         bytes.close();
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteList() {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4);
@@ -989,7 +935,6 @@ public class ByteBufferBytesTest {
         bytes.readList(words2, String.class);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testWriteMap() {
         Map<String, Integer> map = new LinkedHashMap<String, Integer>() {
@@ -1010,7 +955,6 @@ public class ByteBufferBytesTest {
         assertEquals(map, map2);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void unloadFailed() throws InterruptedException {
         bytes.busyLockInt(0);
@@ -1031,7 +975,6 @@ public class ByteBufferBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testToString() {
         NativeBytes bytes = new DirectStore(32).bytes();

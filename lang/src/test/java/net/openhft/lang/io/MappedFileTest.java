@@ -54,7 +54,6 @@ public class MappedFileTest {
             throw new IOException(msg);
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testUnmap() throws IOException, InterruptedException {
 

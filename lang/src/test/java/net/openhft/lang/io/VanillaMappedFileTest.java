@@ -30,11 +30,11 @@ public class VanillaMappedFileTest {
     public static String SEPARATOR = System.getProperty("file.separator");
     public static String BASEPATH  = TMPDIR + SEPARATOR + "vmf";
 
-    private static File newTemporaryFile(String name) {
-        return newTemporaryFile(name, true);
+    private static File newTempraryFile(String name) {
+        return newTempraryFile(name, true);
     }
 
-    private static File newTemporaryFile(String name, boolean delete) {
+    private static File newTempraryFile(String name, boolean delete) {
         File file = new File(
             BASEPATH,
             name);
@@ -69,8 +69,8 @@ public class VanillaMappedFileTest {
 
     @Test
     public void testCreate() throws Exception {
-        File f1 = newTemporaryFile("vmf-create-1");
-        File f2 = newTemporaryFile("vmf-create-2");
+        File f1 = newTempraryFile("vmf-create-1");
+        File f2 = newTempraryFile("vmf-create-2");
 
         VanillaMappedFile vmf1 = VanillaMappedFile.readWrite(f1);
         VanillaMappedFile vmf2 = VanillaMappedFile.readWrite(f2,128);
@@ -88,7 +88,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBytes() throws Exception {
         VanillaMappedFile vmf = VanillaMappedFile.readWrite(
-                newTemporaryFile("vmf-acquire-buffer"));
+                newTempraryFile("vmf-acquire-buffer"));
 
         assertTrue(new File(vmf.path()).exists());
 
@@ -112,7 +112,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBlocks1() throws Exception {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
-                newTemporaryFile("vmf-acquire-blocks-1"),
+                newTempraryFile("vmf-acquire-blocks-1"),
             128);
 
         assertTrue(new File(blocks.path()).exists());
@@ -146,7 +146,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBlocks2() throws Exception {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
-                newTemporaryFile("vmf-acquire-blocks-2"),
+                newTempraryFile("vmf-acquire-blocks-2"),
             64);
 
         assertTrue(new File(blocks.path()).exists());
@@ -167,7 +167,7 @@ public class VanillaMappedFileTest {
 
     @Test
     public void testAcquireOverlap() throws Exception {
-        File path = newTemporaryFile("vmf-acquire-overlap");
+        File path = newTempraryFile("vmf-acquire-overlap");
 
         VanillaMappedFile   vmf    = VanillaMappedFile.readWrite(path);
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(path,128);
@@ -209,7 +209,7 @@ public class VanillaMappedFileTest {
 
     @Test
     public void testReopen() throws Exception {
-        File file = newTemporaryFile("vmf-reopen");
+        File file = newTempraryFile("vmf-reopen");
 
         {
             VanillaMappedFile  vmf = VanillaMappedFile.readWrite(file);
@@ -249,8 +249,8 @@ public class VanillaMappedFileTest {
         assertEquals(cache.size(),0);
         assertNull(cache.get(1));
 
-        cache.put(1, newTemporaryFile("vmc-1-v1"), 64);
-        cache.put(2, newTemporaryFile("vmc-1-v2"), 128);
+        cache.put(1, newTempraryFile("vmc-1-v1"), 64);
+        cache.put(2, newTempraryFile("vmc-1-v2"), 128);
 
         assertEquals(cache.size(),2);
 
@@ -273,7 +273,7 @@ public class VanillaMappedFileTest {
         final int size = 5;
         VanillaMappedCache<Integer> cache = new VanillaMappedCache(size, true);
         for(int i=0;i<10;i++) {
-            cache.put(i, newTemporaryFile("vmc-2-v" + i), 8 * i, i);
+            cache.put(i, newTempraryFile("vmc-2-v" + i), 8 * i, i);
             if(i >= size) {
                 assertEquals(cache.size(), size - 1);
             }
@@ -301,7 +301,7 @@ public class VanillaMappedFileTest {
             long start = System.nanoTime();
             int maxRuns = 10000, runs;
             for (runs = 0; runs < maxRuns; runs++) {
-                file = newTemporaryFile("vmc-3-v" + runs, false);
+                file = newTempraryFile("vmc-3-v" + runs, false);
 
                 buffer = cache.put(runs, file, 256, runs);
                 buffer.writeLong(0, 0x12345678);
@@ -328,7 +328,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testMappedCache4() throws Exception {
         VanillaMappedCache<Integer> cache = new VanillaMappedCache(10000, true);
-        VanillaMappedBytes buffer = cache.put(1, newTemporaryFile("vmc-4"), 256, 1);
+        VanillaMappedBytes buffer = cache.put(1, newTempraryFile("vmc-4"), 256, 1);
 
         buffer.reserve();
         assertEquals(2,buffer.refCount());

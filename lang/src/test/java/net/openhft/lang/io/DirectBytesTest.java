@@ -96,7 +96,6 @@ public class DirectBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testSimpleLock() {
         DirectBytes bytes = new DirectStore(64).bytes();
@@ -118,7 +117,6 @@ public class DirectBytesTest {
         }
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testAllocate() throws Exception {
         long size = 1L << 24; // 31; don't overload cloud-bees
@@ -131,7 +129,6 @@ public class DirectBytesTest {
         store.free();
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testLocking() {
         if (Runtime.getRuntime().availableProcessors() < 2) {
@@ -156,7 +153,6 @@ public class DirectBytesTest {
         System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testLockingLong() {
         if (Runtime.getRuntime().availableProcessors() < 2) {
@@ -181,7 +177,6 @@ public class DirectBytesTest {
         System.out.printf("Contended lock rate was %,d per second%n", (int) (lockCount * 2 * 1e9 / time));
     }
 
-    @org.junit.Ignore("TC")
     @Test
     public void testLocking2() throws Exception {
         if (Runtime.getRuntime().availableProcessors() < 2) {
