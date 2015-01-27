@@ -21,6 +21,7 @@ package net.openhft.lang.io;
 import net.openhft.lang.Maths;
 import net.openhft.lang.thread.NamedThreadFactory;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import sun.nio.ch.DirectBuffer;
 
@@ -42,6 +43,7 @@ import static org.junit.Assert.*;
  * Created with IntelliJ IDEA. User: peter.lawrey Date: 17/09/13 Time: 16:09 To change this template use File | Settings | File
  * Templates.
  */
+@Ignore
 public class NativeBytesTest {
     public static final int SIZE = 128;
     private NativeBytes bytes;
