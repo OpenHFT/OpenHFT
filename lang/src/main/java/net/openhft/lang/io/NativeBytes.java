@@ -72,6 +72,13 @@ public class NativeBytes extends AbstractBytes {
     }
 
     /**
+     * This is needed if a Bytes is created in one thread and used in another.
+     */
+    public synchronized void clearThreadAssociation() {
+        singleThread = null;
+    }
+
+    /**
      * @deprecated Use {@link #NativeBytes(ObjectSerializer, long, long, AtomicInteger)} instead
      */
     @Deprecated
@@ -601,6 +608,21 @@ public class NativeBytes extends AbstractBytes {
             throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
 
         assert checkSingleThread();
+        this.positionAddr = startAddr + position;
+        return this;
+    }
+
+    /**
+     * Change the position acknowleging there is no thread safety assumptions. Best effort setting is fine. *
+     *
+     * @param position to set if we can.
+     * @return this
+     */
+    public NativeBytes lazyPosition(long position) {
+        if (position < 0 || position > limit())
+            throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
+
+        // assume we don't need to no check thread safety.
         this.positionAddr = startAddr + position;
         return this;
     }

@@ -21,7 +21,7 @@ import sun.nio.ch.DirectBuffer;
 
 import java.nio.ByteBuffer;
 
-public class DirectByteBufferBytes extends NativeBytes {
+public class DirectByteBufferBytes extends NativeBytes implements IByteBufferBytes {
     private final ByteBuffer buffer;
 
     public DirectByteBufferBytes(final ByteBuffer buffer) {
@@ -35,6 +35,10 @@ public class DirectByteBufferBytes extends NativeBytes {
         );
 
         this.buffer = buffer;
+    }
+
+    public ByteBuffer buffer() {
+        return buffer;
     }
 
     @Override

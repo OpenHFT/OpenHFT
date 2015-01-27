@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author peter.lawrey
  */
-public class ByteBufferBytes extends AbstractBytes {
+public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
     private final ByteBuffer buffer;
     private final int start;
     private final int capacity;
@@ -41,16 +41,24 @@ public class ByteBufferBytes extends AbstractBytes {
     private int limit;
     private AtomicBoolean barrier;
 
-    public static Bytes wrap(ByteBuffer buffer) {
+    public static IByteBufferBytes wrap(ByteBuffer buffer) {
         if (buffer instanceof DirectBuffer)
             return new DirectByteBufferBytes(buffer);
         return new ByteBufferBytes(buffer.slice());
     }
 
-    public static Bytes wrap(ByteBuffer buffer, int start, int capacity) {
+    public static IByteBufferBytes wrap(ByteBuffer buffer, int start, int capacity) {
         if (buffer instanceof DirectBuffer)
             return new DirectByteBufferBytes(buffer, start, capacity);
         return new ByteBufferBytes(buffer.slice(), start, capacity);
+    }
+
+    /**
+     * clearing the volatile singleThread is a write barrier.
+     */
+    @Override
+    public void clearThreadAssociation() {
+        singleThread = null;
     }
 
     /**
@@ -73,6 +81,23 @@ public class ByteBufferBytes extends AbstractBytes {
         this.buffer = buffer;
         this.start = position = start;
         this.capacity = limit = (capacity + start);
+        assert checkSingleThread();
+    }
+
+    volatile Thread singleThread = null;
+
+    boolean checkSingleThread() {
+        Thread t = Thread.currentThread();
+        if (singleThread != t)
+            setThreadOrThrowException(t);
+        return true;
+    }
+
+    private void setThreadOrThrowException(Thread t) {
+        if (singleThread == null)
+            singleThread = t;
+        else
+            throw new IllegalStateException("Altered by thread " + singleThread + " and " + t);
     }
 
     @Override
