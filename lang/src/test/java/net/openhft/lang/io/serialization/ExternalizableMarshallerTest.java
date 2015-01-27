@@ -36,7 +36,6 @@ import static org.junit.Assert.assertEquals;
  * Time: 09:28
  */
 public class ExternalizableMarshallerTest {
-    @org.junit.Ignore("TC")
     @Test
     public void testMarshallable() {
         int capacity = 2 * 1024;
