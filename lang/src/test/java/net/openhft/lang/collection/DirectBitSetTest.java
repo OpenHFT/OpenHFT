@@ -106,7 +106,7 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testGetSetClearAndCardinality() {
         bs.clear();
@@ -145,7 +145,7 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testGetLong() {
         setIndices();
@@ -155,7 +155,7 @@ public class DirectBitSetTest {
         assertEquals(l1, bs.getLong(1));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testFlip() {
         bs.clear();
@@ -168,7 +168,7 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testNextSetBit() {
         setIndices();
@@ -183,7 +183,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextSetBit(0L));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetBitsIteration() {
         setIndices();
@@ -200,14 +200,14 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setBits().next());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearNextSetBit() {
         setIndices();
         long cardinality = bs.cardinality();
         int order = 0;
         for (long i = bs.clearNextSetBit(0L); i >= 0;
-                i = bs.clearNextSetBit(i + 1)) {
+             i = bs.clearNextSetBit(i + 1)) {
             assertEquals(INDICES[order], i);
             assertFalse(bs.get(i));
             order++;
@@ -219,7 +219,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearNextSetBit(0L));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearNext1SetBit() {
         setIndices();
@@ -238,7 +238,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearNextNContinuousSetBits(0L, 1));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testNextSetLong() {
         bs.clear();
@@ -256,7 +256,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextSetLong(0L));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testNextClearBit() {
         setIndicesComplement();
@@ -271,7 +271,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextClearBit(0L));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetNextClearBit() {
         setIndicesComplement();
@@ -290,7 +290,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setNextClearBit(0L));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetNext1ClearBit() {
         setIndicesComplement();
@@ -309,7 +309,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setNextNContinuousClearBits(0L, 1));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testNextClearLong() {
         bs.setAll();
@@ -327,7 +327,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextClearLong(0L));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testPreviousSetBit() {
         setIndices();
@@ -342,7 +342,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousSetBit(bs.size()));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearPreviousSetBit() {
         setIndices();
@@ -360,14 +360,14 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearPreviousSetBit(bs.size()));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearPrevious1SetBit() {
         setIndices();
         long cardinality = bs.cardinality();
         int order = INDICES.length;
         for (long i = bs.size();
-                (i = bs.clearPreviousNContinuousSetBits(i - 1, 1)) >= 0; ) {
+             (i = bs.clearPreviousNContinuousSetBits(i - 1, 1)) >= 0; ) {
             order--;
             cardinality--;
             assertEquals(INDICES[order], i);
@@ -379,7 +379,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearPreviousNContinuousSetBits(bs.size(), 1));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testPreviousSetLong() {
         bs.clear();
@@ -397,7 +397,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousSetLong(bs.size() / 64));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testPreviousClearBit() {
         setIndicesComplement();
@@ -412,7 +412,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousClearBit(bs.size()));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetPreviousClearBit() {
         setIndicesComplement();
@@ -430,14 +430,14 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setPreviousClearBit(bs.size()));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetPrevious1ClearBit() {
         setIndicesComplement();
         long cardinality = bs.cardinality();
         int order = INDICES.length;
         for (long i = bs.size();
-                (i = bs.setPreviousNContinuousClearBits(i - 1, 1)) >= 0; ) {
+             (i = bs.setPreviousNContinuousClearBits(i - 1, 1)) >= 0; ) {
             order--;
             cardinality++;
             assertEquals(INDICES[order], i);
@@ -449,7 +449,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setPreviousNContinuousClearBits(bs.size(), 1));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testPreviousClearLong() {
         bs.setAll();
@@ -467,7 +467,7 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousClearLong(bs.size() / 64));
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetAll() {
         bs.clear();
@@ -475,7 +475,7 @@ public class DirectBitSetTest {
         assertEquals(bs.size(), bs.cardinality());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testRangeOpsWithinLongCase() {
         bs.clear();
@@ -513,7 +513,7 @@ public class DirectBitSetTest {
         assertEquals(1, bs.cardinality());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testRangeOpsCrossLongCase() {
         bs.clear();
@@ -567,7 +567,7 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testRangeOpsSpanLongCase() {
         bs.clear();
@@ -594,7 +594,7 @@ public class DirectBitSetTest {
         return "N: " + n + ", " + bs.getClass().getSimpleName();
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetNextNContinuousClearBitsWithinLongCase() {
         long size = (bs.size() + 63) / 64 * 64;
@@ -630,13 +630,13 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetNextNContinuousClearBitsCrossLongCase() {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63, 65, 100, 127, 128, 129, 254, 255}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63, 65, 100, 127, 128, 129, 254, 255}) {
             bs.clear();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsClear(i * n, i * n + n);
@@ -646,7 +646,7 @@ public class DirectBitSetTest {
             }
         }
         long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64, 65, 100, 127, 128, 129}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64, 65, 100, 127, 128, 129}) {
             bs.setAll();
             long from = n <= 64 ? lastBound - (n / 2) : 30;
             long to = from + n;
@@ -667,7 +667,7 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearNextNContinuousSetBitsWithinLongCase() {
         long size = (bs.size() + 63) / 64 * 64;
@@ -704,13 +704,13 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearNextNContinuousSetBitsCrossLongCase() {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63}) {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (int i = 0; i < size / n; i++) {
@@ -721,7 +721,7 @@ public class DirectBitSetTest {
             }
         }
         long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64}) {
             bs.clear();
             long from = lastBound - (n / 2);
             long to = from + n;
@@ -742,7 +742,7 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetPreviousNContinuousClearBitsWithinLongCase() {
         long size = (bs.size() + 63) / 64 * 64;
@@ -778,13 +778,13 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testSetPreviousNContinuousClearBitsCrossLongCase() {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63}) {
             bs.clear();
             long cardinality = 0;
             for (long from = size - n; from >= 0; from -= n) {
@@ -794,7 +794,7 @@ public class DirectBitSetTest {
                 assertEquals(cardinality += n, bs.cardinality());
             }
         }
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64}) {
             bs.setAll();
             long from = 64 - (n / 2);
             long to = from + n;
@@ -815,7 +815,7 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearPreviousNContinuousSetBitsWithinLongCase() {
         long size = (bs.size() + 63) / 64 * 64;
@@ -851,13 +851,13 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test
     public void testClearPreviousNContinuousSetBitsCrossLongCase() {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63}) {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (long from = size - n; from >= 0; from -= n) {
@@ -867,7 +867,7 @@ public class DirectBitSetTest {
                 assertEquals(cardinality -= n, bs.cardinality());
             }
         }
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64}) {
             bs.clear();
             long from = 64 - (n / 2);
             long to = from + n;
@@ -888,247 +888,247 @@ public class DirectBitSetTest {
         }
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetNegative() {
         bs.get(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetOverCapacity() {
         bs.get(bs.size());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetNegative() {
         bs.set(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetOverCapacity() {
         bs.set(bs.size());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetIfClearNegative() {
         bs.setIfClear(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetIfClearOverCapacity() {
         bs.setIfClear(bs.size());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearIfSetNegative() {
         bs.clearIfSet(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearIfSetOverCapacity() {
         bs.clearIfSet(bs.size());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipNegative() {
         bs.flip(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipOverCapacity() {
         bs.flip(bs.size());
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetLongNegative() {
         bs.getLong(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeGetLongOverCapacity() {
         bs.getLong((bs.size() + 63) / 64);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextSetBit() {
         bs.nextSetBit(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextSetLong() {
         bs.nextSetLong(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextClearBit() {
         bs.nextClearBit(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeNextClearLong() {
         bs.nextClearLong(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousSetBit() {
         bs.previousSetBit(-2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousSetLong() {
         bs.previousSetLong(-2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousClearBit() {
         bs.previousClearBit(-2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobePreviousClearLong() {
         bs.previousClearLong(-2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearNextSetBit() {
         bs.clearNextSetBit(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearNextNContinuousSetBits() {
         bs.clearNextNContinuousSetBits(-1, 2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetNextClearBit() {
         bs.setNextClearBit(-1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetNextNContinuousClearBits() {
         bs.setNextNContinuousClearBits(-1, 2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearPreviousSetBit() {
         bs.clearPreviousSetBit(-2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearPreviousNContinuousSetBit() {
         bs.clearPreviousNContinuousSetBits(-2, 2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetPreviousClearBit() {
         bs.setPreviousClearBit(-2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetPreviousNContinuousClearBit() {
         bs.setPreviousNContinuousClearBits(-2, 2);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeFromNegative() {
         bs.set(-1, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeFromOverTo() {
         bs.set(1, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeSetRangeToOverCapacity() {
         bs.set(0, bs.size() + 1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearRangeFromNegative() {
         bs.clear(-1, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearRangeFromOverTo() {
         bs.clear(1, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeClearRangeToOverCapacity() {
         bs.clear(0, bs.size() + 1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipRangeFromNegative() {
         bs.flip(-1, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipRangeFromOverTo() {
         bs.flip(1, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void testIoobeFlipRangeToOverCapacity() {
         bs.flip(0, bs.size() + 1);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IllegalArgumentException.class)
     public void testIaeClearNextNContinuousSetBits() {
         bs.clearNextNContinuousSetBits(0, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IllegalArgumentException.class)
     public void testIaeSetNextNContinuousClearBits() {
         bs.setNextNContinuousClearBits(0, 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IllegalArgumentException.class)
     public void testIaeClearPreviousNContinuousSetBits() {
         bs.clearPreviousNContinuousSetBits(bs.size(), 0);
     }
 
-    @org.junit.Ignore("TC")
+
     @Test(expected = IllegalArgumentException.class)
     public void testIaeSetPreviousNContinuousClearBits() {
         bs.setPreviousNContinuousClearBits(bs.size(), 0);
