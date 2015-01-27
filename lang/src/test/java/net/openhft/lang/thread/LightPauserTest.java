@@ -2,13 +2,16 @@ package net.openhft.lang.thread;
 
 import org.junit.Test;
 
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 /**
  * Created by peter on 11/12/14.
  */
 public class LightPauserTest {
     @Test
     public void testLightPauser() throws InterruptedException {
-        final LightPauser pauser = new LightPauser(100 * 1000, 100 * 1000);
+        final LightPauser pauser = new LightPauser(NANOSECONDS.convert(20, MICROSECONDS), NANOSECONDS.convert(200, MICROSECONDS));
         Thread thread = new Thread() {
             @Override
             public void run() {

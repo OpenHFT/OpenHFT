@@ -64,18 +64,11 @@ public class NativeBytes extends AbstractBytes {
 
     public NativeBytes(long startAddr, long capacityAddr) {
         super();
-        assert checkSingleThread();
+
         this.positionAddr =
                 this.startAddr = startAddr;
         this.limitAddr =
                 this.capacityAddr = capacityAddr;
-    }
-
-    /**
-     * This is needed if a Bytes is created in one thread and used in another.
-     */
-    public synchronized void clearThreadAssociation() {
-        singleThread = null;
     }
 
     /**
@@ -85,7 +78,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes(BytesMarshallerFactory bytesMarshallerFactory,
                        long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(bytesMarshallerFactory, refCount);
-        assert checkSingleThread();
+
         this.positionAddr =
                 this.startAddr = startAddr;
         this.limitAddr =
@@ -95,7 +88,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes(ObjectSerializer objectSerializer,
                        long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(objectSerializer, refCount);
-        assert checkSingleThread();
+
         this.positionAddr =
                 this.startAddr = startAddr;
         this.limitAddr =
@@ -105,7 +98,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes(NativeBytes bytes) {
         super(bytes.objectSerializer(), new AtomicInteger(1));
         this.startAddr = bytes.startAddr;
-        assert checkSingleThread();
+
         this.positionAddr = bytes.positionAddr;
         this.limitAddr = bytes.limitAddr;
         this.capacityAddr = bytes.capacityAddr;
@@ -420,17 +413,6 @@ public class NativeBytes extends AbstractBytes {
         positionChecks(positionAddr + 2L);
         UNSAFE.putChar(positionAddr, (char) v);
         positionAddr += 2L;
-    }
-
-    Thread singleThread = null;
-
-    boolean checkSingleThread() {
-        Thread t = Thread.currentThread();
-        if (singleThread == null)
-            singleThread = t;
-        if (singleThread != t)
-            throw new IllegalStateException("Altered by thread " + singleThread + " and " + t);
-        return true;
     }
 
     void addPosition(long delta) {

@@ -26,4 +26,9 @@ import net.openhft.lang.io.serialization.BytesMarshallable;
  */
 public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate, BytesStore,
         ByteStringAppender, ByteStringParser, CharSequence, BytesMarshallable, ReferenceCounted {
+
+    /**
+     * Needed if the buffer is created in one thread and used in another.
+     */
+    void clearThreadAssociation();
 }
