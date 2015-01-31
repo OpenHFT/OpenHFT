@@ -105,6 +105,7 @@ public abstract class AbstractBytes implements Bytes {
     private StringInterner stringInterner = null;
     private boolean selfTerminating = false;
 
+
     AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
     }
@@ -117,6 +118,32 @@ public abstract class AbstractBytes implements Bytes {
         this.finished = false;
         this.refCount = refCount;
         this.objectSerializer = objectSerializer;
+
+        assert checkSingleThread();
+    }
+
+    /**
+     * clearing the volatile singleThread is a write barrier.
+     */
+    @Override
+    public void clearThreadAssociation() {
+        singleThread = null;
+    }
+
+    volatile Thread singleThread = null;
+
+    boolean checkSingleThread() {
+        Thread t = Thread.currentThread();
+        if (singleThread != t)
+            setThreadOrThrowException(t);
+        return true;
+    }
+
+    private void setThreadOrThrowException(Thread t) {
+        if (singleThread == null)
+            singleThread = t;
+        else
+            throw new IllegalStateException("Altered by thread " + singleThread + " and " + t);
     }
 
     private static boolean equalsCaseIgnore(StringBuilder sb, String s) {

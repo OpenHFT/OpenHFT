@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MappedMemory implements ReferenceCounted {
     private final MappedByteBuffer buffer;
+    private final DirectByteBufferBytes bytes;
     private final long index;
     private final AtomicInteger refCount = new AtomicInteger(1);
     private volatile boolean unmapped = false;
@@ -33,6 +34,7 @@ public class MappedMemory implements ReferenceCounted {
     public MappedMemory(MappedByteBuffer buffer, long index) {
         this.buffer = buffer;
         this.index = index;
+        bytes = new DirectByteBufferBytes(buffer);
     }
 
     public long index() {
@@ -63,6 +65,10 @@ public class MappedMemory implements ReferenceCounted {
 
     public long address() {
         return ((DirectBuffer) buffer).address();
+    }
+
+    public Bytes bytes() {
+        return bytes;
     }
 
     public static void release(MappedMemory mapmem) {

@@ -201,7 +201,7 @@ public class DirectBitSetTest {
         long cardinality = bs.cardinality();
         int order = 0;
         for (long i = bs.clearNextSetBit(0L); i >= 0;
-                i = bs.clearNextSetBit(i + 1)) {
+             i = bs.clearNextSetBit(i + 1)) {
             assertEquals(INDICES[order], i);
             assertFalse(bs.get(i));
             order++;
@@ -352,7 +352,7 @@ public class DirectBitSetTest {
         long cardinality = bs.cardinality();
         int order = INDICES.length;
         for (long i = bs.size();
-                (i = bs.clearPreviousNContinuousSetBits(i - 1, 1)) >= 0; ) {
+             (i = bs.clearPreviousNContinuousSetBits(i - 1, 1)) >= 0; ) {
             order--;
             cardinality--;
             assertEquals(INDICES[order], i);
@@ -418,7 +418,7 @@ public class DirectBitSetTest {
         long cardinality = bs.cardinality();
         int order = INDICES.length;
         for (long i = bs.size();
-                (i = bs.setPreviousNContinuousClearBits(i - 1, 1)) >= 0; ) {
+             (i = bs.setPreviousNContinuousClearBits(i - 1, 1)) >= 0; ) {
             order--;
             cardinality++;
             assertEquals(INDICES[order], i);
@@ -610,7 +610,7 @@ public class DirectBitSetTest {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63, 65, 100, 127, 128, 129, 254, 255}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63, 65, 100, 127, 128, 129, 254, 255}) {
             bs.clear();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsClear(i * n, i * n + n);
@@ -620,7 +620,7 @@ public class DirectBitSetTest {
             }
         }
         long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64, 65, 100, 127, 128, 129}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64, 65, 100, 127, 128, 129}) {
             bs.setAll();
             long from = n <= 64 ? lastBound - (n / 2) : 30;
             long to = from + n;
@@ -682,7 +682,7 @@ public class DirectBitSetTest {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63}) {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (int i = 0; i < size / n; i++) {
@@ -693,7 +693,7 @@ public class DirectBitSetTest {
             }
         }
         long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64}) {
             bs.clear();
             long from = lastBound - (n / 2);
             long to = from + n;
@@ -754,7 +754,7 @@ public class DirectBitSetTest {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63}) {
             bs.clear();
             long cardinality = 0;
             for (long from = size - n; from >= 0; from -= n) {
@@ -764,7 +764,7 @@ public class DirectBitSetTest {
                 assertEquals(cardinality += n, bs.cardinality());
             }
         }
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64}) {
             bs.setAll();
             long from = 64 - (n / 2);
             long to = from + n;
@@ -825,7 +825,7 @@ public class DirectBitSetTest {
         if (bs instanceof ATSDirectBitSet)
             return;
         long size = bs.size();
-        for (int n : new int[] {3, 7, 13, 31, 33, 63}) {
+        for (int n : new int[]{3, 7, 13, 31, 33, 63}) {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (long from = size - n; from >= 0; from -= n) {
@@ -835,7 +835,7 @@ public class DirectBitSetTest {
                 assertEquals(cardinality -= n, bs.cardinality());
             }
         }
-        for (int n : new int[] {2, 3, 7, 13, 31, 33, 63, 64}) {
+        for (int n : new int[]{2, 3, 7, 13, 31, 33, 63, 64}) {
             bs.clear();
             long from = 64 - (n / 2);
             long to = from + n;

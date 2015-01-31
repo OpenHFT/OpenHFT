@@ -2,7 +2,6 @@ package net.openhft.lang.io.serialization.impl;
 
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.DirectStore;
-
 import org.junit.Test;
 
 import java.nio.charset.Charset;

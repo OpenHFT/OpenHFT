@@ -18,7 +18,6 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.MemoryUnit;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.model.constraints.Digits;
 import net.openhft.lang.model.constraints.MaxSize;
@@ -510,10 +509,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             Integer size = HEAP_SIZE_MAP.get(type());
             if (size != null)
                 return size;
-            MaxSize maxSize2 = size();
-            if (maxSize2 == null)
-                throw new AssertionError(type() + " without a @MaxSize not supported for native types");
-            return maxSize2.value() << 3;
+            return size().value() << 3;
         }
 
         @Override
@@ -528,6 +524,8 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         @Override
         public MaxSize size() {
+            if (maxSize == null)
+                throw new IllegalStateException("Field " + name + " is missing @MaxSize on the setter");
             return maxSize;
         }
 

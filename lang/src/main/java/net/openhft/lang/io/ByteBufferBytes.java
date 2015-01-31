@@ -54,14 +54,6 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
     }
 
     /**
-     * clearing the volatile singleThread is a write barrier.
-     */
-    @Override
-    public void clearThreadAssociation() {
-        singleThread = null;
-    }
-
-    /**
      * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
      */
     @Deprecated
@@ -81,23 +73,6 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         this.buffer = buffer;
         this.start = position = start;
         this.capacity = limit = (capacity + start);
-        assert checkSingleThread();
-    }
-
-    volatile Thread singleThread = null;
-
-    boolean checkSingleThread() {
-        Thread t = Thread.currentThread();
-        if (singleThread != t)
-            setThreadOrThrowException(t);
-        return true;
-    }
-
-    private void setThreadOrThrowException(Thread t) {
-        if (singleThread == null)
-            singleThread = t;
-        else
-            throw new IllegalStateException("Altered by thread " + singleThread + " and " + t);
     }
 
     @Override

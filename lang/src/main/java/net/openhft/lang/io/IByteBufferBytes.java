@@ -11,8 +11,4 @@ public interface IByteBufferBytes extends Bytes {
      */
     public ByteBuffer buffer();
 
-    /**
-     * Needed if the buffer is created in one thread and used in another.
-     */
-    void clearThreadAssociation();
 }

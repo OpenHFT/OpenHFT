@@ -34,23 +34,28 @@ import java.util.List;
  * This manages the full life cycle of a file and its mappings.
  */
 public class MappedFile {
-    private final FileChannel fileChannel;
-    private final String basePath;
+    private final String filename;
     private final long blockSize;
     private final long overlapSize;
+
+    private final FileChannel fileChannel;
     private final List<MappedMemory> maps = new ArrayList<MappedMemory>();
     // short list of the last two mappings.
     private volatile MappedMemory map0, map1;
 
-    public MappedFile(String basePath, long blockSize) throws FileNotFoundException {
-        this(basePath, blockSize, 0L);
+    public MappedFile(String filename, long blockSize) throws FileNotFoundException {
+        this(filename, blockSize, 0L);
     }
 
-    private MappedFile(String basePath, long blockSize, long overlapSize) throws FileNotFoundException {
-        this.basePath = basePath;
+    private MappedFile(String filename, long blockSize, long overlapSize) throws FileNotFoundException {
+        this.filename = filename;
         this.blockSize = blockSize;
         this.overlapSize = overlapSize;
-        fileChannel = new RandomAccessFile(basePath, "rw").getChannel();
+        fileChannel = new RandomAccessFile(filename, "rw").getChannel();
+    }
+
+    public String name() {
+        return filename;
     }
 
     public static MappedByteBuffer getMap(@NotNull FileChannel fileChannel, long start, int size) throws IOException {
@@ -84,10 +89,6 @@ public class MappedFile {
     }
 
     public MappedMemory acquire(long index) throws IOException {
-        return acquire(index, false);
-    }
-
-    public MappedMemory acquire(long index, boolean prefetch) throws IOException {
         MappedMemory map0 = this.map0, map1 = this.map1;
         if (map0 != null && map0.index() == index) {
             map0.reserve();
@@ -97,10 +98,10 @@ public class MappedFile {
             map1.reserve();
             return map1;
         }
-        return acquire0(index, prefetch);
+        return acquire0(index);
     }
 
-    private synchronized MappedMemory acquire0(long index, boolean prefetch) throws IOException {
+    private synchronized MappedMemory acquire0(long index) throws IOException {
         if (map1 != null)
             map1.release();
         map1 = map0;
@@ -133,7 +134,7 @@ public class MappedFile {
             }
         }
         if (count > 1) {
-            LoggerFactory.getLogger(MappedFile.class).info("{} memory mappings left unreleased, num= {}", basePath, count);
+            LoggerFactory.getLogger(MappedFile.class).info("{} memory mappings left unreleased, num= {}", filename, count);
         }
 
         maps.clear();
