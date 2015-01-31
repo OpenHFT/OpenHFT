@@ -756,7 +756,7 @@ public abstract class WrappedBytes<B extends Bytes> implements Bytes {
         return wrapped.parseBoolean(tester);
     }
 
-    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException {
+    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         return wrapped.tryRWReadLock(offset, timeOutNS);
     }
 
@@ -809,7 +809,7 @@ public abstract class WrappedBytes<B extends Bytes> implements Bytes {
         return wrapped.readByte();
     }
 
-    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException {
+    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         return wrapped.tryRWWriteLock(offset, timeOutNS);
     }
 
