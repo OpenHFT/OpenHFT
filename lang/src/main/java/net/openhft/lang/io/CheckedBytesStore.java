@@ -34,10 +34,16 @@ public class CheckedBytesStore implements BytesStore {
             }
         };
 
-        proxy = (Bytes) Proxy.newProxyInstance(
-                Bytes.class.getClassLoader(),
-                new Class[]{Bytes.class},
-                handler);
+        if (bytesStore.bytes() instanceof NativeBytesI)
+            proxy = (NativeBytesI) Proxy.newProxyInstance(
+                    NativeBytesI.class.getClassLoader(),
+                    new Class[]{NativeBytesI.class},
+                    handler);
+        else
+            proxy = (Bytes) Proxy.newProxyInstance(
+                    Bytes.class.getClassLoader(),
+                    new Class[]{Bytes.class},
+                    handler);
     }
 
     @Override
@@ -59,10 +65,16 @@ public class CheckedBytesStore implements BytesStore {
             }
         };
 
-        return (Bytes) Proxy.newProxyInstance(
-                Bytes.class.getClassLoader(),
-                new Class[]{Bytes.class},
-                handler);
+        if (bytesStore.bytes() instanceof NativeBytesI)
+            return (NativeBytesI) Proxy.newProxyInstance(
+                    NativeBytesI.class.getClassLoader(),
+                    new Class[]{NativeBytesI.class},
+                    handler);
+        else
+            return (Bytes) Proxy.newProxyInstance(
+                    Bytes.class.getClassLoader(),
+                    new Class[]{Bytes.class},
+                    handler);
     }
 
     @Override

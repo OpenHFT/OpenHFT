@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author peter.lawrey
  */
-public class NativeBytes extends AbstractBytes {
+public class NativeBytes extends AbstractBytes implements NativeBytesI {
     /**
      * *** Access the Unsafe class *****
      */
