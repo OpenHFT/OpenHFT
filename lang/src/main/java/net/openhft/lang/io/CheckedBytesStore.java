@@ -28,7 +28,7 @@ public class CheckedBytesStore implements BytesStore {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 if (isClosed.get())
-                    throw new IllegalStateException(Thread.currentThread().getName() + " calling " + method + " after the byteStore has been freed.");
+                    new IllegalStateException(Thread.currentThread().getName() + " calling " + method + " after the byteStore has been freed.").printStackTrace();
                 return method.invoke(bytesStore.bytes(), args);
 
             }
@@ -59,8 +59,10 @@ public class CheckedBytesStore implements BytesStore {
 
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                if (isClosed.get())
-                    throw new IllegalStateException(Thread.currentThread().getName() + " calling " + method + " after the byteStore has been freed.");
+                 if (isClosed.get()) {
+                    new IllegalStateException(Thread.currentThread().getName() + " calling " + method + " after the byteStore has been freed.").printStackTrace();
+                    System.exit(-1);
+                }
                 return method.invoke(bytes0, args);
             }
         };
@@ -79,23 +81,26 @@ public class CheckedBytesStore implements BytesStore {
 
     @Override
     public long address() {
-        if (isClosed.get())
-            throw new IllegalStateException(Thread.currentThread().getName() + " called after the byteStore has been freed.");
-
+        if (isClosed.get()) {
+            new IllegalStateException(Thread.currentThread().getName() + " called after the byteStore has been freed.").printStackTrace();
+            System.exit(-1);
+        }
         return bytesStore.address();
     }
 
     @Override
     public long size() {
-        if (isClosed.get())
-            throw new IllegalStateException(Thread.currentThread().getName() + " called after the byteStore has been freed.");
-
+        if (isClosed.get()) {
+            new IllegalStateException(Thread.currentThread().getName() + " called after the byteStore has been freed.").printStackTrace();
+            System.exit(-1);
+        }
         return bytesStore.size();
     }
 
     @Override
     public void free() {
         isClosed.set(true);
+        bytesStore.free();
     }
 
     @Override
