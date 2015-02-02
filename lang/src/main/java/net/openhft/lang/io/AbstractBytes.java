@@ -119,7 +119,7 @@ public abstract class AbstractBytes implements Bytes {
         this.refCount = refCount;
         this.objectSerializer = objectSerializer;
 
-        assert checkSingleThread();
+
     }
 
     /**
