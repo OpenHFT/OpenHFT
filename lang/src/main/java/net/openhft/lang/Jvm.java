@@ -178,4 +178,7 @@ public enum Jvm {
         }
     }
 
+    public static void checkInterrupted() {
+        if (Thread.currentThread().isInterrupted()) throw new InterruptedRuntimeException();
+    }
 }

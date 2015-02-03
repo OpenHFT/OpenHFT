@@ -168,4 +168,10 @@ public class Maths {
         long l = Double.doubleToRawLongBits(num);
         return (int) ((l >> 52) - 1023);
     }
+
+    public static int toInt(long l, String error) {
+        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
+            throw new IllegalStateException(String.format(error, l));
+        return (int) l;
+    }
 }
