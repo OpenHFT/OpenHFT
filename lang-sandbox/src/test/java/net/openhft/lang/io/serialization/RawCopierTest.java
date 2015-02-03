@@ -54,7 +54,7 @@ public class RawCopierTest {
 
     @Test
     public void testReadWrite() {
-        DirectStore ds = new DirectStore(null, 1024);
+        DirectStore ds = DirectStore.allocate(1024);
         DirectBytes db = ds.bytes();
         RawCopier<A> aRawCopier = RawCopier.copies(A.class);
         A a = new A();

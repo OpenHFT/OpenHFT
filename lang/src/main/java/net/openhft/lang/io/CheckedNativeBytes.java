@@ -47,6 +47,10 @@ public class CheckedNativeBytes implements Bytes, NativeBytesI {
         nativeBytes = new NativeBytes((NativeBytes) bytes);
     }
 
+    @Override
+    public void write(long offset, Bytes bytes) {
+        nativeBytes.write(offset, bytes);
+    }
 
     public void clearThreadAssociation() {
         checkNotClosed();

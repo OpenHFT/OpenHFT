@@ -144,6 +144,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     void write(long offset, byte[] bytes);
 
+    void write(long offset, Bytes bytes);
+
     /**
      * Writes <code>len</code> bytes from array <code>bytes</code>, in order,  to the output stream.  If
      * <code>bytes</code> is <code>null</code>, a <code>NullPointerException</code> is thrown.  If <code>off</code> is

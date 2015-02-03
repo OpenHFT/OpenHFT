@@ -861,7 +861,7 @@ public abstract class AbstractBytes implements Bytes {
         write(bytes, 0, bytes.length);
     }
 
-    private void checkWrite(int length) {
+    private void checkWrite(long length) {
         if (length > remaining())
             throw new IllegalStateException("Cannot write " + length + " only " + remaining() + " remaining");
     }
@@ -977,6 +977,17 @@ public abstract class AbstractBytes implements Bytes {
         checkWrite(bytes.length);
         for (int i = 0; i < bytes.length; i++)
             writeByte(offset + i, bytes[i]);
+    }
+
+    @Override
+    public void write(long offset, Bytes bytes) {
+        long length = bytes.remaining();
+        checkWrite(length);
+        long i;
+        for (i = 0; i < length - 7; i += 8)
+            writeLong(offset + i, bytes.readLong());
+        for (; i < length; i++)
+            writeByte(offset + i, bytes.readByte());
     }
 
     @Override

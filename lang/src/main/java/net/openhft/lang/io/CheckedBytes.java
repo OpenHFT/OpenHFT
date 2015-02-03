@@ -92,6 +92,10 @@ public class CheckedBytes implements Bytes {
         return bytes.readUnsignedByteOrThrow();
     }
 
+    @Override
+    public void write(long offset, Bytes bytes) {
+        bytes.write(offset, bytes);
+    }
 
     public Boolean parseBoolean(@NotNull StopCharTester tester) {
         checkNotClosed();

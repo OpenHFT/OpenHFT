@@ -520,7 +520,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
         int len = end - start;
         if (positionAddr + len >= limitAddr)
             throw new IndexOutOfBoundsException("Length out of bounds len: " + len);
-        
+
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(object, (long) start, UNSAFE.getLong(positionAddr));
             positionAddr += 8;
@@ -536,7 +536,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
     @Override
     public void writeObject(Object object, int start, int end) {
         int len = end - start;
-        
+
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(positionAddr, UNSAFE.getLong(object, (long) start));
             positionAddr += 8;
@@ -640,7 +640,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
     public NativeBytes limit(long limit) {
         if (limit < 0 || limit > capacity())
             throw new IllegalArgumentException("limit: " + limit + " capacity: " + capacity());
-        
+
         limitAddr = startAddr + limit;
         return this;
     }
@@ -679,7 +679,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
     }
 
     public void alignPositionAddr(int powerOf2) {
-        
+
         positionAddr = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
     }
 
@@ -693,9 +693,11 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
     }
 
     boolean actualPositionChecks(long positionAddr) {
-        if (positionAddr < startAddr || positionAddr > limitAddr)
-            throw new IndexOutOfBoundsException("position out of bounds.");
-        
+        if (positionAddr < startAddr)
+            throw new IndexOutOfBoundsException("position before the start by " + (startAddr - positionAddr) + " bytes");
+        if (positionAddr > limitAddr)
+            throw new IndexOutOfBoundsException("position after the limit by " + (positionAddr - limitAddr) + " bytes");
+
         return true;
     }
 
