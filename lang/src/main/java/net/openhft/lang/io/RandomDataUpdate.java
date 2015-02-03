@@ -182,7 +182,7 @@ public interface RandomDataUpdate {
      * @return if the lock could be obtained in time.
      * @throws java.lang.IllegalStateException if the monitor is in an illegal state
      */
-    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException;
+    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException;
 
     /**
      * Uses the 64-bit long at the offset as a non-reentrant read/write lock.
@@ -193,7 +193,7 @@ public interface RandomDataUpdate {
      * @return if the lock could be obtained in time.
      * @throws java.lang.IllegalStateException if the monitor is in an illegal state
      */
-    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException;
+    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException;
 
     /**
      * Uses the 64-bit long at the offset as a non-reentrant read/write lock.

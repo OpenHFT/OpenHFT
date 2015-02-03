@@ -119,7 +119,7 @@ public abstract class AbstractBytes implements Bytes {
         this.refCount = refCount;
         this.objectSerializer = objectSerializer;
 
-        assert checkSingleThread();
+
     }
 
     /**
@@ -2468,7 +2468,7 @@ public abstract class AbstractBytes implements Bytes {
     public boolean startsWith(RandomDataInput input) {
         return compare(position(), input, input.position(), input.remaining());
     }
-    
+
     @Override
     public boolean compare(long offset, RandomDataInput input, long inputOffset, long len) {
         if (offset < 0 || inputOffset < 0 || len < 0)
@@ -2603,7 +2603,7 @@ public abstract class AbstractBytes implements Bytes {
 
     // read/write lock support.
     // short path in a small method so it can be inlined.
-    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException {
+    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         long lock = readVolatileLong(offset);
         int writersWaiting = rwWriteWaiting(lock);
         int writersLocked = rwWriteLocked(lock);
@@ -2619,7 +2619,7 @@ public abstract class AbstractBytes implements Bytes {
         return tryRWReadLock0(offset, timeOutNS);
     }
 
-    private boolean tryRWReadLock0(long offset, long timeOutNS) throws IllegalStateException {
+    private boolean tryRWReadLock0(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         long end = System.nanoTime() + timeOutNS;
         // wait for no write locks, nor waiting writes.
         for (; ; ) {
@@ -2637,10 +2637,13 @@ public abstract class AbstractBytes implements Bytes {
             }
             if (System.nanoTime() > end)
                 return false;
+
+            if (currentThread().isInterrupted())
+                throw new InterruptedException("Unable to obtain lock, interrupted");
         }
     }
 
-    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException {
+    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         long lock = readVolatileLong(offset);
         int readersLocked = rwReadLocked(lock);
         int writersLocked = rwWriteLocked(lock);
@@ -2652,8 +2655,9 @@ public abstract class AbstractBytes implements Bytes {
         return tryRWWriteLock0(offset, timeOutNS);
     }
 
-    private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException {
+    private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         for (; ; ) {
+
             long lock = readVolatileLong(offset);
             int writersWaiting = rwWriteWaiting(lock);
             if (writersWaiting >= RW_LOCK_MASK)
@@ -2678,7 +2682,8 @@ public abstract class AbstractBytes implements Bytes {
                 if (compareAndSwapLong(offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
                     return true;
             }
-            if (System.nanoTime() > end) {
+            boolean interrupted = currentThread().isInterrupted();
+            if (interrupted || System.nanoTime() > end) {
                 // release waiting
                 for (; ; ) {
                     if (writersWaiting <= 0)
@@ -2688,8 +2693,11 @@ public abstract class AbstractBytes implements Bytes {
                     lock = readVolatileLong(offset);
                     writersWaiting = rwWriteWaiting(lock);
                 }
+                if (interrupted)
+                    throw new InterruptedException("Unable to obtain lock, interrupted");
                 return false;
             }
+
         }
     }
 

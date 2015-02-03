@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author peter.lawrey
  */
-public class NativeBytes extends AbstractBytes {
+public class NativeBytes extends AbstractBytes implements NativeBytesI {
     /**
      * *** Access the Unsafe class *****
      */
@@ -520,7 +520,7 @@ public class NativeBytes extends AbstractBytes {
         int len = end - start;
         if (positionAddr + len >= limitAddr)
             throw new IndexOutOfBoundsException("Length out of bounds len: " + len);
-        assert checkSingleThread();
+        
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(object, (long) start, UNSAFE.getLong(positionAddr));
             positionAddr += 8;
@@ -536,7 +536,7 @@ public class NativeBytes extends AbstractBytes {
     @Override
     public void writeObject(Object object, int start, int end) {
         int len = end - start;
-        assert checkSingleThread();
+        
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(positionAddr, UNSAFE.getLong(object, (long) start));
             positionAddr += 8;
@@ -589,7 +589,7 @@ public class NativeBytes extends AbstractBytes {
         if (position < 0 || position > limit())
             throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
 
-        assert checkSingleThread();
+
         this.positionAddr = startAddr + position;
         return this;
     }
@@ -640,7 +640,7 @@ public class NativeBytes extends AbstractBytes {
     public NativeBytes limit(long limit) {
         if (limit < 0 || limit > capacity())
             throw new IllegalArgumentException("limit: " + limit + " capacity: " + capacity());
-        assert checkSingleThread();
+        
         limitAddr = startAddr + limit;
         return this;
     }
@@ -679,7 +679,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     public void alignPositionAddr(int powerOf2) {
-        assert checkSingleThread();
+        
         positionAddr = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
     }
 
@@ -695,7 +695,7 @@ public class NativeBytes extends AbstractBytes {
     boolean actualPositionChecks(long positionAddr) {
         if (positionAddr < startAddr || positionAddr > limitAddr)
             throw new IndexOutOfBoundsException("position out of bounds.");
-        assert checkSingleThread();
+        
         return true;
     }
 
