@@ -481,7 +481,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     maxSize = (MaxSize) a;
             }
 
-            for (Annotation a : setter.getAnnotations()) {
+            for (Annotation a : orderedSetter.getAnnotations()) {
                 if (a instanceof Group)
                     group = (Group) a;
             }
