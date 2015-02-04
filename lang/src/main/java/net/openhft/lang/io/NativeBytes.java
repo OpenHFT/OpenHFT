@@ -69,6 +69,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
                 this.startAddr = startAddr;
         this.limitAddr =
                 this.capacityAddr = capacityAddr;
+        positionChecks(positionAddr);
     }
 
     /**
@@ -83,6 +84,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
                 this.startAddr = startAddr;
         this.limitAddr =
                 this.capacityAddr = capacityAddr;
+        positionChecks(positionAddr);
     }
 
     public NativeBytes(ObjectSerializer objectSerializer,
@@ -93,6 +95,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
                 this.startAddr = startAddr;
         this.limitAddr =
                 this.capacityAddr = capacityAddr;
+        positionChecks(positionAddr);
     }
 
     public NativeBytes(NativeBytes bytes) {
@@ -102,6 +105,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
         this.positionAddr = bytes.positionAddr;
         this.limitAddr = bytes.limitAddr;
         this.capacityAddr = bytes.capacityAddr;
+        positionChecks(positionAddr);
     }
 
     public static long longHash(byte[] bytes, int off, int len) {
@@ -361,9 +365,10 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
 
     @Override
     public void write(int b) {
-        positionChecks(positionAddr + 1L);
+
         UNSAFE.putByte(positionAddr, (byte) b);
-        positionAddr++;
+        incrementPositionAddr(1);
+
     }
 
     @Override
@@ -402,6 +407,12 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
         positionAddr += 2L;
     }
 
+
+    private long incrementPositionAddr(long value) {
+        positionAddr(positionAddr() + value);
+        return positionAddr();
+    }
+
     @Override
     public void writeShort(long offset, int v) {
         offsetChecks(offset, 2L);
@@ -427,7 +438,7 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
 
     @Override
     public void writeInt(int v) {
-//        positionChecks(positionAddr + 4L);
+        positionChecks(positionAddr + 4L);
         UNSAFE.putInt(positionAddr, v);
         positionAddr += 4L;
     }
@@ -523,12 +534,12 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
 
         for (; len >= 8; len -= 8) {
             UNSAFE.putLong(object, (long) start, UNSAFE.getLong(positionAddr));
-            positionAddr += 8;
+            incrementPositionAddr(8L);
             start += 8;
         }
         for (; len > 0; len--) {
             UNSAFE.putByte(object, (long) start, UNSAFE.getByte(positionAddr));
-            positionAddr++;
+            incrementPositionAddr(1L);
             start++;
         }
     }
@@ -538,11 +549,13 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
         int len = end - start;
 
         for (; len >= 8; len -= 8) {
+            positionChecks(positionAddr + 8L);
             UNSAFE.putLong(positionAddr, UNSAFE.getLong(object, (long) start));
             positionAddr += 8;
             start += 8;
         }
         for (; len > 0; len--) {
+            positionChecks(positionAddr + 1L);
             UNSAFE.putByte(positionAddr, UNSAFE.getByte(object, (long) start));
             positionAddr++;
             start++;
@@ -590,12 +603,13 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
             throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
 
 
-        this.positionAddr = startAddr + position;
+        positionAddr(startAddr + position);
         return this;
     }
 
     /**
-     * Change the position acknowleging there is no thread safety assumptions. Best effort setting is fine. *
+     * Change the position acknowleging there is no thread safety assumptions. Best effort setting
+     * is fine. *
      *
      * @param position to set if we can.
      * @return this
@@ -605,7 +619,8 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
             throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
 
         // assume we don't need to no check thread safety.
-        this.positionAddr = startAddr + position;
+
+        positionAddr(startAddr + position);
         return this;
     }
 
@@ -679,9 +694,10 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
     }
 
     public void alignPositionAddr(int powerOf2) {
-
-        positionAddr = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
+        long value = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
+        positionAddr(value);
     }
+
 
     public void positionAddr(long positionAddr) {
         positionChecks(positionAddr);
@@ -689,13 +705,13 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
     }
 
     void positionChecks(long positionAddr) {
-      assert actualPositionChecks(positionAddr);
+        assert actualPositionChecks(positionAddr);
     }
 
     boolean actualPositionChecks(long positionAddr) {
-        if (positionAddr > startAddr)
+        if (positionAddr < startAddr)
             throw new IndexOutOfBoundsException("position before the start by " + (startAddr - positionAddr) + " bytes");
-        if (positionAddr < limitAddr)
+        if (positionAddr > limitAddr)
             throw new IndexOutOfBoundsException("position after the limit by " + (positionAddr - limitAddr) + " bytes");
 
         return true;
