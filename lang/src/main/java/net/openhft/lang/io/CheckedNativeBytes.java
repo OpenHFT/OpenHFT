@@ -69,13 +69,21 @@ public class CheckedNativeBytes implements Bytes, NativeBytesI {
 
     void checkNotClosed() {
         if (isClosed) {
-            System.err.print("Thread " + Thread.currentThread().getName() + " performing processing " +
+            System.err.print("************* Thread " + Thread.currentThread().getName() + " " +
+                    "performing processing " +
                     "after free()");
             ThreadInfo[] threads = ManagementFactory.getThreadMXBean()
                     .dumpAllThreads(true, true);
             for (final ThreadInfo info : threads)
                 System.out.print(info);
 
+            System.err.flush();
+            System.out.flush();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.exit(-1);
         }
     }
