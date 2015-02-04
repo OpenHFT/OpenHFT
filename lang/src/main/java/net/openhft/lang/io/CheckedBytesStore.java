@@ -50,17 +50,27 @@ public class CheckedBytesStore implements BytesStore {
     @Override
     public long address() {
         if (isClosed.get()) {
-            new IllegalStateException(Thread.currentThread().getName() + " called after the byteStore has been freed.").printStackTrace();
-            System.exit(-1);
+            reportIssue();
         }
         return bytesStore.address();
+    }
+
+    private void reportIssue() {
+        new IllegalStateException(Thread.currentThread().getName() + " called after the byteStore has been freed.").printStackTrace();
+        System.err.flush();
+        System.out.flush();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.exit(-1);
     }
 
     @Override
     public long size() {
         if (isClosed.get()) {
-            new IllegalStateException(Thread.currentThread().getName() + " called after the byteStore has been freed.").printStackTrace();
-            System.exit(-1);
+            reportIssue();
         }
         return bytesStore.size();
     }
