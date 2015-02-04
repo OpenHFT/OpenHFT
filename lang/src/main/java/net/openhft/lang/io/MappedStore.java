@@ -189,7 +189,7 @@ public class MappedStore implements BytesStore, Closeable {
 
             boolean debug = false;
             assert debug = true;
-            createdHere = debug ? new Throwable("Created here") : null;
+            createdHere = debug ? new Throwable("Created here" + Long.toHexString(address) + " size: " + size) : null;
         }
 
         public void run() {
