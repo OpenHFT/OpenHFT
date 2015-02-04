@@ -689,20 +689,20 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
     }
 
     void positionChecks(long positionAddr) {
-//        assert actualPositionChecks(positionAddr);
+      assert actualPositionChecks(positionAddr);
     }
 
     boolean actualPositionChecks(long positionAddr) {
-        if (positionAddr < startAddr)
+        if (positionAddr > startAddr)
             throw new IndexOutOfBoundsException("position before the start by " + (startAddr - positionAddr) + " bytes");
-        if (positionAddr > limitAddr)
+        if (positionAddr < limitAddr)
             throw new IndexOutOfBoundsException("position after the limit by " + (positionAddr - limitAddr) + " bytes");
 
         return true;
     }
 
     void offsetChecks(long offset, long len) {
-//        assert actualOffsetChecks(offset, len);
+        assert actualOffsetChecks(offset, len);
     }
 
     boolean actualOffsetChecks(long offset, long len) {
