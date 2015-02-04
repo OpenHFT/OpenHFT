@@ -24,6 +24,8 @@ import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
@@ -167,6 +169,7 @@ public class MappedStore implements BytesStore, Closeable {
     }
 
     static class Unmapper implements Runnable {
+        private static final Logger LOGGER = LoggerFactory.getLogger(Unmapper.class);
         private final long size;
         private final FileChannel channel;
         private volatile long address;
@@ -181,6 +184,7 @@ public class MappedStore implements BytesStore, Closeable {
         public void run() {
             if (address == 0)
                 return;
+            LOGGER.warn("Unmapping " + Long.toHexString(address) + " size: " + Long.toHexString(size));
 
             try {
                 unmap0(address, size);
