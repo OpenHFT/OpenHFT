@@ -24,8 +24,6 @@ import net.openhft.lang.io.serialization.JDKZObjectSerializer;
 import net.openhft.lang.io.serialization.ObjectSerializer;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.misc.Cleaner;
 import sun.nio.ch.FileChannelImpl;
 
@@ -36,7 +34,6 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MappedStore implements BytesStore, Closeable {
@@ -44,7 +41,6 @@ public class MappedStore implements BytesStore, Closeable {
     private static final int MAP_RO = 0;
     private static final int MAP_RW = 1;
     private static final int MAP_PV = 2;
-    public static final AtomicBoolean unfriendlyClean = new AtomicBoolean();
 
     // retain to prevent GC.
     private final File file;
@@ -53,7 +49,6 @@ public class MappedStore implements BytesStore, Closeable {
     private final long address;
     private final AtomicInteger refCount = new AtomicInteger(1);
     private final long size;
-    private final AtomicBoolean friendlyClean = new AtomicBoolean();
     private ObjectSerializer objectSerializer;
 
     public MappedStore(File file, FileChannel.MapMode mode, long size) throws IOException {
@@ -86,7 +81,7 @@ public class MappedStore implements BytesStore, Closeable {
 
             this.fileChannel = raf.getChannel();
             this.address = map0(fileChannel, imodeFor(mode), 0L, size);
-            this.cleaner = Cleaner.create(this, new Unmapper(address, size, fileChannel, friendlyClean));
+            this.cleaner = Cleaner.create(this, new Unmapper(address, size, fileChannel));
         } catch (Exception e) {
             throw wrap(e);
         }
@@ -109,7 +104,6 @@ public class MappedStore implements BytesStore, Closeable {
 
     @Override
     public void free() {
-        friendlyClean.set(true);
         cleaner.clean();
     }
 
@@ -173,37 +167,21 @@ public class MappedStore implements BytesStore, Closeable {
     }
 
     static class Unmapper implements Runnable {
-        private static final Logger LOGGER = LoggerFactory.getLogger(Unmapper.class);
         private final long size;
         private final FileChannel channel;
-        private final Throwable createdHere;
-        private final AtomicBoolean friendlyClean;
         private volatile long address;
 
-        Unmapper(long address, long size, FileChannel channel, AtomicBoolean friendlyClean) {
-            this.friendlyClean = friendlyClean;
+        Unmapper(long address, long size, FileChannel channel) {
             assert (address != 0);
             this.address = address;
             this.size = size;
             this.channel = channel;
-
-            boolean debug = false;
-            assert debug = true;
-            createdHere = debug ? new Throwable("Created here" + Long.toHexString(address) + " size: " + size) : null;
         }
 
         public void run() {
             if (address == 0)
                 return;
-            if (friendlyClean.get()) {
-                LOGGER.info("Unmapping gracefully " + Long.toHexString(address) + " size: " + size, createdHere);
-                LOGGER.info("Cleaned up by " + Thread.currentThread(), new Throwable("Cleaned here"));
 
-            } else {
-                LOGGER.warn("Unmapping by CLEANER " + Long.toHexString(address) + " size: " + size, createdHere);
-                LOGGER.warn("Cleaned up by " + Thread.currentThread(), new Throwable("Cleaned here"));
-                unfriendlyClean.set(true);
-            }
             try {
                 unmap0(address, size);
                 address = 0;
