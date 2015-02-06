@@ -1471,8 +1471,26 @@ public abstract class AbstractBytes implements Bytes {
         int exp = 0;
         boolean negative = false;
         int decimalPlaces = Integer.MIN_VALUE;
+        int ch = readUnsignedByteOrThrow();
+        switch (ch) {
+            case 'N':
+                if (compareRest("aN"))
+                    return Double.NaN;
+                skip(-1);
+                return Double.NaN;
+            case 'I':
+                if (compareRest("nfinity"))
+                    return Double.POSITIVE_INFINITY;
+                skip(-1);
+                return Double.NaN;
+            case '-':
+                if (compareRest("Infinity"))
+                    return Double.NEGATIVE_INFINITY;
+                negative = true;
+                ch = readUnsignedByteOrThrow();
+                break;
+        }
         while (true) {
-            int ch = readUnsignedByteOrThrow();
             if (ch >= '0' && ch <= '9') {
                 while (value >= MAX_VALUE_DIVIDE_10) {
                     value >>>= 1;
@@ -1480,16 +1498,27 @@ public abstract class AbstractBytes implements Bytes {
                 }
                 value = value * 10 + (ch - '0');
                 decimalPlaces++;
-            } else if (ch == '-') {
-                negative = true;
             } else if (ch == '.') {
                 decimalPlaces = 0;
             } else {
                 break;
             }
+            ch = readUnsignedByteOrThrow();
         }
 
         return asDouble(value, exp, negative, decimalPlaces);
+    }
+
+    protected boolean compareRest(String s) {
+        if (s.length() > remaining())
+            return false;
+        long position = position();
+        for (int i = 0; i < s.length(); i++) {
+            if (readUnsignedByte(position + i) != s.charAt(i))
+                return false;
+        }
+        skip(s.length());
+        return true;
     }
 
     @NotNull
