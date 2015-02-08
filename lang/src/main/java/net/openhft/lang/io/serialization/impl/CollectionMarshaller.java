@@ -35,8 +35,10 @@ abstract class CollectionMarshaller<E, C extends Collection<E>> {
     public C read(Bytes bytes, @Nullable C c) {
         long length = bytes.readStopBit();
 
-        if (length == 0 && c != null)
+        if (length == 0 && c != null) {
+            c.clear();
             return c;
+        }
 
         if (length < NULL_LENGTH || length > Integer.MAX_VALUE)
             throw new IllegalStateException("Invalid length: " + length);
@@ -44,8 +46,8 @@ abstract class CollectionMarshaller<E, C extends Collection<E>> {
         if (length == NULL_LENGTH)
             return null;
 
-        if (c==null)
-            return newCollection();
+        if (c == null)
+            c = newCollection();
 
         return readCollection(bytes, c, (int) length);
     }
