@@ -68,7 +68,7 @@ interface TimedQuote extends Quote {
 public class HugePricesMain {
 
     @Test
-    public  void test() {
+    public void test() {
         int length = 1000;
         final HugeArray<Price> prices =
                 HugeCollections.newArray(Price.class, length);

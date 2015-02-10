@@ -18,6 +18,8 @@
 
 package net.openhft.lang;
 
+import net.openhft.lang.io.NativeBytes;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -178,4 +180,15 @@ public enum Jvm {
         }
     }
 
+    public static void checkInterrupted() {
+        if (Thread.currentThread().isInterrupted()) throw new InterruptedRuntimeException();
+    }
+
+    /**
+     * Utility method to support throwing checked exceptions out of the streams API
+     */
+    public static RuntimeException rethrow(Throwable t) {
+        NativeBytes.UNSAFE.throwException(t);
+        throw new AssertionError();
+    }
 }

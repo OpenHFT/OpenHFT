@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author peter.lawrey
  */
-public class ByteBufferBytes extends AbstractBytes {
+public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
     private final ByteBuffer buffer;
     private final int start;
     private final int capacity;
@@ -41,13 +41,13 @@ public class ByteBufferBytes extends AbstractBytes {
     private int limit;
     private AtomicBoolean barrier;
 
-    public static Bytes wrap(ByteBuffer buffer) {
+    public static IByteBufferBytes wrap(ByteBuffer buffer) {
         if (buffer instanceof DirectBuffer)
             return new DirectByteBufferBytes(buffer);
         return new ByteBufferBytes(buffer.slice());
     }
 
-    public static Bytes wrap(ByteBuffer buffer, int start, int capacity) {
+    public static IByteBufferBytes wrap(ByteBuffer buffer, int start, int capacity) {
         if (buffer instanceof DirectBuffer)
             return new DirectByteBufferBytes(buffer, start, capacity);
         return new ByteBufferBytes(buffer.slice(), start, capacity);

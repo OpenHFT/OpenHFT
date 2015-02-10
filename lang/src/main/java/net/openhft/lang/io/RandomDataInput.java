@@ -897,5 +897,7 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     @Override
     void close();
 
-    boolean startsWith(RandomDataInput keyBytes);
+    boolean startsWith(RandomDataInput input);
+    
+    boolean compare(long offset, RandomDataInput input, long inputOffset, long len);
 }

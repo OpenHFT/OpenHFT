@@ -18,6 +18,7 @@
 
 package net.openhft.lang.model;
 
+import net.openhft.lang.model.constraints.Group;
 import net.openhft.lang.model.constraints.Digits;
 import net.openhft.lang.model.constraints.MaxSize;
 import net.openhft.lang.model.constraints.Range;
@@ -82,7 +83,9 @@ public interface FieldModel<T> {
 
     boolean isArray();
 
+    public boolean isVolatile();
+
     public void setVolatile(boolean isVolatile);
 
-    public boolean isVolatile();
+    Group group();
 }

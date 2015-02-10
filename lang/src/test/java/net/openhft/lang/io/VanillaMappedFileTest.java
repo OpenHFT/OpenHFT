@@ -89,7 +89,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBytes() throws Exception {
         VanillaMappedFile vmf = VanillaMappedFile.readWrite(
-            newTempraryFile("vmf-acquire-buffer"));
+                newTempraryFile("vmf-acquire-buffer"));
 
         assertTrue(new File(vmf.path()).exists());
 
@@ -113,7 +113,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBlocks1() throws Exception {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
-            newTempraryFile("vmf-acquire-blocks-1"),
+                newTempraryFile("vmf-acquire-blocks-1"),
             128);
 
         assertTrue(new File(blocks.path()).exists());
@@ -147,7 +147,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testAcquireBlocks2() throws Exception {
         VanillaMappedBlocks blocks = VanillaMappedBlocks.readWrite(
-            newTempraryFile("vmf-acquire-blocks-2"),
+                newTempraryFile("vmf-acquire-blocks-2"),
             64);
 
         assertTrue(new File(blocks.path()).exists());
@@ -250,8 +250,8 @@ public class VanillaMappedFileTest {
         assertEquals(cache.size(),0);
         assertNull(cache.get(1));
 
-        cache.put(1,newTempraryFile("vmc-1-v1"), 64);
-        cache.put(2,newTempraryFile("vmc-1-v2"),128);
+        cache.put(1, newTempraryFile("vmc-1-v1"), 64);
+        cache.put(2, newTempraryFile("vmc-1-v2"), 128);
 
         assertEquals(cache.size(),2);
 
@@ -274,7 +274,7 @@ public class VanillaMappedFileTest {
         final int size = 5;
         VanillaMappedCache<Integer> cache = new VanillaMappedCache(size, true);
         for(int i=0;i<10;i++) {
-            cache.put(i,newTempraryFile("vmc-2-v" + i),8 * i,i);
+            cache.put(i, newTempraryFile("vmc-2-v" + i), 8 * i, i);
             if(i >= size) {
                 assertEquals(cache.size(), size - 1);
             }
@@ -329,7 +329,7 @@ public class VanillaMappedFileTest {
     @Test
     public void testMappedCache4() throws Exception {
         VanillaMappedCache<Integer> cache = new VanillaMappedCache(10000, true);
-        VanillaMappedBytes buffer = cache.put(1,newTempraryFile("vmc-4"),256,1);
+        VanillaMappedBytes buffer = cache.put(1, newTempraryFile("vmc-4"), 256, 1);
 
         buffer.reserve();
         assertEquals(2,buffer.refCount());

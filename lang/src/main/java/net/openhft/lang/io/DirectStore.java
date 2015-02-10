@@ -44,13 +44,11 @@ public class DirectStore implements BytesStore {
         this(new VanillaBytesMarshallerFactory(), size);
     }
 
-    @Deprecated
-    public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
+    private DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size) {
         this(bytesMarshallerFactory, size, true);
     }
 
-    @Deprecated
-    public DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size, boolean zeroOut) {
+    private DirectStore(BytesMarshallerFactory bytesMarshallerFactory, long size, boolean zeroOut) {
         this(BytesMarshallableSerializer.create(bytesMarshallerFactory, JDKZObjectSerializer.INSTANCE), size, zeroOut);
     }
 
@@ -86,12 +84,12 @@ public class DirectStore implements BytesStore {
 
     /**
      * Resizes this {@code DirectStore} to the {@code newSize}.
-     * 
-     * <p>If {@code zeroOut} is {@code false}, the memory past the old size is not zeroed out
-     * and will generally be garbage.
-     * 
-     * <p>{@code DirectStore} don't keep track of the child {@code DirectBytes} instances,
-     * so after the resize they might point to the wrong memory. Use at your own risk.
+     *
+     * <p>If {@code zeroOut} is {@code false}, the memory past the old size is not zeroed out and will generally be
+     * garbage.
+     *
+     * <p>{@code DirectStore} don't keep track of the child {@code DirectBytes} instances, so after the resize they
+     * might point to the wrong memory. Use at your own risk.
      *
      * @param newSize new size of this {@code DirectStore}
      * @param zeroOut if the memory past the old size should be zeroed out on increasing resize
@@ -144,9 +142,8 @@ public class DirectStore implements BytesStore {
     }
 
     /**
-     * Static nested class instead of anonymous because the latter would hold
-     * a strong reference to this DirectStore preventing it from becoming
-     * phantom-reachable.
+     * Static nested class instead of anonymous because the latter would hold a strong reference to this DirectStore
+     * preventing it from becoming phantom-reachable.
      */
     private static class Deallocator implements Runnable {
         private volatile long address;

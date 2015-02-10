@@ -16,19 +16,23 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.io;
+package net.openhft.lang.model.constraints;
 
-import net.openhft.lang.ReferenceCounted;
-import net.openhft.lang.io.serialization.BytesMarshallable;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * @author peter.lawrey
+ * Changes the serialization order fields.
+ * Multiple fields can be in the same group and these will be ordered with the smallest first.
+ * If you don't provided a group this is considered to be the top most group.
  */
-public interface Bytes extends RandomDataInput, RandomDataOutput, RandomDataUpdate, BytesStore,
-        ByteStringAppender, ByteStringParser, CharSequence, BytesMarshallable, ReferenceCounted {
-
-    /**
-     * Needed if the buffer is created in one thread and used in another.
-     */
-    void clearThreadAssociation();
+@Target(METHOD)
+@Retention(RUNTIME)
+@Documented
+public @interface Group {
+    int value() default Integer.MIN_VALUE;
 }

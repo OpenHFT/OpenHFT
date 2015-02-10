@@ -19,6 +19,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.Jvm;
+import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
@@ -30,6 +31,11 @@ public class MappedStoreTest {
     //private static final long MS_SIZE = 3L << 30;
     private static final long MS_SIZE = 1024;
 
+    @After
+    public void tearDown() {
+        System.gc();
+    }
+    
     @Test
     public void testCreateSlice() throws Exception {
         File file = new File(System.getProperty("java.io.tmpdir") + "/MappedStoreTest-testCreateSlice" + System.nanoTime() + ".tmp");

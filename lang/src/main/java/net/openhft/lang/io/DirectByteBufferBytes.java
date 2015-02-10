@@ -22,7 +22,7 @@ import sun.nio.ch.DirectBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class DirectByteBufferBytes extends NativeBytes {
+public class DirectByteBufferBytes extends NativeBytes implements IByteBufferBytes {
     private ByteBuffer buffer;
 
     public DirectByteBufferBytes(int capacity) {
@@ -43,17 +43,20 @@ public class DirectByteBufferBytes extends NativeBytes {
     }
 
     @Override
+    public ByteBuffer buffer() {
+        return buffer;
+    }
+
+    @Override
     public ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse) {
         return sliceAsByteBuffer(toReuse, buffer);
     }
 
     protected DirectByteBufferBytes resize(int newCapacity, boolean cleanup, boolean preserveData) {
         if(newCapacity != capacity()) {
-
-
-            ByteBuffer oldBuffer = this.buffer;
-            long oldAddress = this.startAddr;
-            long oldPosition = position();
+            final ByteBuffer oldBuffer = this.buffer;
+            final long oldAddress = this.startAddr;
+            final long oldPosition = position();
 
             if(preserveData && (oldPosition > newCapacity)) {
                 throw new IllegalArgumentException(

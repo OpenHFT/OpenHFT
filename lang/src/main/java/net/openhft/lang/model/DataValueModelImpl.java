@@ -18,8 +18,8 @@
 
 package net.openhft.lang.model;
 
-import net.openhft.lang.MemoryUnit;
 import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.model.constraints.Group;
 import net.openhft.lang.model.constraints.Digits;
 import net.openhft.lang.model.constraints.MaxSize;
 import net.openhft.lang.model.constraints.Range;
@@ -52,12 +52,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         HEAP_SIZE_MAP.put(float.class, 32);
         HEAP_SIZE_MAP.put(long.class, 64);
         HEAP_SIZE_MAP.put(double.class, 64);
-    }
-
-    public static int heapSize(Class primitiveType) {
-        if (!primitiveType.isPrimitive())
-            throw new IllegalArgumentException();
-        return (int) BYTES.alignAndConvert(HEAP_SIZE_MAP.get(primitiveType), BITS);
     }
 
     private final Map<String, FieldModelImpl> fieldModelMap = new TreeMap<String, FieldModelImpl>();
@@ -224,22 +218,10 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
     }
 
-    private boolean isOrderedSetter(String name2) {
-        return name2.startsWith(ORDERED_SETTER_PREFIX) ? true : false;
-    }
-
-    private boolean isVolatileGetter(String name2) {
-        return name2.startsWith(VOLATILE_GETTER_PREFIX) ? true : false;
-    }
-
-    private String volatileGetterFieldName(String name) {
-        name = name.substring(VOLATILE_GETTER_PREFIX.length());
-        return Character.toLowerCase(name.charAt(0)) + name.substring(1);
-    }
-
-    private String orderedSetterFieldName(String name) {
-        name = name.substring(ORDERED_SETTER_PREFIX.length());
-        return Character.toLowerCase(name.charAt(0)) + name.substring(1);
+    public static int heapSize(Class primitiveType) {
+        if (!primitiveType.isPrimitive())
+            throw new IllegalArgumentException();
+        return (int) BYTES.alignAndConvert(HEAP_SIZE_MAP.get(primitiveType), BITS);
     }
 
     private static String getCAS(String name) {
@@ -348,6 +330,24 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         return null;
     }
 
+    private boolean isOrderedSetter(String name2) {
+        return name2.startsWith(ORDERED_SETTER_PREFIX) ? true : false;
+    }
+
+    private boolean isVolatileGetter(String name2) {
+        return name2.startsWith(VOLATILE_GETTER_PREFIX) ? true : false;
+    }
+
+    private String volatileGetterFieldName(String name) {
+        name = name.substring(VOLATILE_GETTER_PREFIX.length());
+        return Character.toLowerCase(name.charAt(0)) + name.substring(1);
+    }
+
+    private String orderedSetterFieldName(String name) {
+        name = name.substring(ORDERED_SETTER_PREFIX.length());
+        return Character.toLowerCase(name.charAt(0)) + name.substring(1);
+    }
+
     private FieldModelImpl acquireField(String name) {
         FieldModelImpl fieldModelImpl = fieldModelMap.get(name);
         if (fieldModelImpl == null)
@@ -391,6 +391,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         private Digits digits;
         private Range range;
         private MaxSize maxSize;
+        private Group group;
         private MaxSize indexSize;
         private Method adder;
         private Method atomicAdder;
@@ -421,13 +422,13 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
         @Override
-        public void setVolatile(boolean isVolatile) {
-            this.isVolatile = isVolatile;
+        public boolean isVolatile() {
+            return isVolatile;
         }
 
         @Override
-        public boolean isVolatile() {
-            return isVolatile;
+        public void setVolatile(boolean isVolatile) {
+            this.isVolatile = isVolatile;
         }
 
         public void getter(Method getter) {
@@ -447,7 +448,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     range = (Range) a;
                 if (a instanceof MaxSize)
                     maxSize = (MaxSize) a;
+
             }
+
+            for (Annotation a : setter.getAnnotations()) {
+                if (a instanceof Group)
+                    group = (Group) a;
+            }
+
         }
 
         public Method setter() {
@@ -471,6 +479,11 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     range = (Range) a;
                 if (a instanceof MaxSize)
                     maxSize = (MaxSize) a;
+            }
+
+            for (Annotation a : orderedSetter.getAnnotations()) {
+                if (a instanceof Group)
+                    group = (Group) a;
             }
         }
 
@@ -510,10 +523,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
             Integer size = HEAP_SIZE_MAP.get(type());
             if (size != null)
                 return size;
-            MaxSize maxSize2 = size();
-            if (maxSize2 == null)
-                throw new AssertionError(type() + " without a @MaxSize not supported for native types");
-            return maxSize2.value() << 3;
+            return size().value() << 3;
         }
 
         @Override
@@ -528,7 +538,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
         @Override
         public MaxSize size() {
+            if (maxSize == null)
+                throw new IllegalStateException("Field " + name + " is missing @MaxSize on the setter");
             return maxSize;
+        }
+
+        @Override
+        public Group group() {
+            return group;
         }
 
         @Override

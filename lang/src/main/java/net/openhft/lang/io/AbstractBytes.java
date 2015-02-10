@@ -105,6 +105,7 @@ public abstract class AbstractBytes implements Bytes {
     private StringInterner stringInterner = null;
     private boolean selfTerminating = false;
 
+
     AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
     }
@@ -117,6 +118,32 @@ public abstract class AbstractBytes implements Bytes {
         this.finished = false;
         this.refCount = refCount;
         this.objectSerializer = objectSerializer;
+
+
+    }
+
+    /**
+     * clearing the volatile singleThread is a write barrier.
+     */
+    @Override
+    public void clearThreadAssociation() {
+        singleThread = null;
+    }
+
+    volatile Thread singleThread = null;
+
+    boolean checkSingleThread() {
+        Thread t = Thread.currentThread();
+        if (singleThread != t)
+            setThreadOrThrowException(t);
+        return true;
+    }
+
+    private void setThreadOrThrowException(Thread t) {
+        if (singleThread == null)
+            singleThread = t;
+        else
+            throw new IllegalStateException("Altered by thread " + singleThread + " and " + t);
     }
 
     private static boolean equalsCaseIgnore(StringBuilder sb, String s) {
@@ -834,7 +861,7 @@ public abstract class AbstractBytes implements Bytes {
         write(bytes, 0, bytes.length);
     }
 
-    private void checkWrite(int length) {
+    private void checkWrite(long length) {
         if (length > remaining())
             throw new IllegalStateException("Cannot write " + length + " only " + remaining() + " remaining");
     }
@@ -950,6 +977,17 @@ public abstract class AbstractBytes implements Bytes {
         checkWrite(bytes.length);
         for (int i = 0; i < bytes.length; i++)
             writeByte(offset + i, bytes[i]);
+    }
+
+    @Override
+    public void write(long offset, Bytes bytes) {
+        long length = bytes.remaining();
+        checkWrite(length);
+        long i;
+        for (i = 0; i < length - 7; i += 8)
+            writeLong(offset + i, bytes.readLong());
+        for (; i < length; i++)
+            writeByte(offset + i, bytes.readByte());
     }
 
     @Override
@@ -1433,8 +1471,26 @@ public abstract class AbstractBytes implements Bytes {
         int exp = 0;
         boolean negative = false;
         int decimalPlaces = Integer.MIN_VALUE;
+        int ch = readUnsignedByteOrThrow();
+        switch (ch) {
+            case 'N':
+                if (compareRest("aN"))
+                    return Double.NaN;
+                skip(-1);
+                return Double.NaN;
+            case 'I':
+                if (compareRest("nfinity"))
+                    return Double.POSITIVE_INFINITY;
+                skip(-1);
+                return Double.NaN;
+            case '-':
+                if (compareRest("Infinity"))
+                    return Double.NEGATIVE_INFINITY;
+                negative = true;
+                ch = readUnsignedByteOrThrow();
+                break;
+        }
         while (true) {
-            int ch = readUnsignedByteOrThrow();
             if (ch >= '0' && ch <= '9') {
                 while (value >= MAX_VALUE_DIVIDE_10) {
                     value >>>= 1;
@@ -1442,16 +1498,27 @@ public abstract class AbstractBytes implements Bytes {
                 }
                 value = value * 10 + (ch - '0');
                 decimalPlaces++;
-            } else if (ch == '-') {
-                negative = true;
             } else if (ch == '.') {
                 decimalPlaces = 0;
             } else {
                 break;
             }
+            ch = readUnsignedByteOrThrow();
         }
 
         return asDouble(value, exp, negative, decimalPlaces);
+    }
+
+    protected boolean compareRest(String s) {
+        if (s.length() > remaining())
+            return false;
+        long position = position();
+        for (int i = 0; i < s.length(); i++) {
+            if (readUnsignedByte(position + i) != s.charAt(i))
+                return false;
+        }
+        skip(s.length());
+        return true;
     }
 
     @NotNull
@@ -2414,10 +2481,9 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void write(RandomDataInput bytes) {
-        long toWrite = Math.min(remaining(), bytes.remaining());
+        long toWrite = bytes.remaining();
         write(bytes, bytes.position(), toWrite);
         bytes.skip(toWrite);
-        skip(toWrite);
     }
 
     @Override
@@ -2438,18 +2504,36 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
+    @Override
     public boolean startsWith(RandomDataInput input) {
-        long inputRemaining = input.remaining();
-        if (remaining() < inputRemaining) return false;
-        long pos = position(), inputPos = input.position();
+        return compare(position(), input, input.position(), input.remaining());
+    }
 
-        int i = 0;
-        for (; i < inputRemaining - 3; i += 4) {
-            if (readInt(pos + i) != input.readInt(inputPos + i))
+    @Override
+    public boolean compare(long offset, RandomDataInput input, long inputOffset, long len) {
+        if (offset < 0 || inputOffset < 0 || len < 0)
+            throw new IndexOutOfBoundsException();
+        if (offset + len < 0 || offset + len > capacity() || inputOffset + len < 0 ||
+                inputOffset + len > input.capacity()) {
+            return false;
+        }
+        long i = 0L;
+        for (; i < len - 7L; i += 8L) {
+            if (readLong(offset + i) != input.readLong(inputOffset + i))
                 return false;
         }
-        for (; i < inputRemaining; i++) {
-            if (readByte(pos + i) != input.readByte(inputPos + i))
+        if (i < len - 3L) {
+            if (readInt(offset + i) != input.readInt(inputOffset + i))
+                return false;
+            i += 4L;
+        }
+        if (i < len - 1L) {
+            if (readChar(offset + i) != input.readChar(inputOffset + i))
+                return false;
+            i += 2L;
+        }
+        if (i < len) {
+            if (readByte(offset + i) != input.readByte(inputOffset + i))
                 return false;
         }
         return true;
@@ -2559,7 +2643,7 @@ public abstract class AbstractBytes implements Bytes {
 
     // read/write lock support.
     // short path in a small method so it can be inlined.
-    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException {
+    public boolean tryRWReadLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         long lock = readVolatileLong(offset);
         int writersWaiting = rwWriteWaiting(lock);
         int writersLocked = rwWriteLocked(lock);
@@ -2575,7 +2659,7 @@ public abstract class AbstractBytes implements Bytes {
         return tryRWReadLock0(offset, timeOutNS);
     }
 
-    private boolean tryRWReadLock0(long offset, long timeOutNS) throws IllegalStateException {
+    private boolean tryRWReadLock0(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         long end = System.nanoTime() + timeOutNS;
         // wait for no write locks, nor waiting writes.
         for (; ; ) {
@@ -2593,10 +2677,13 @@ public abstract class AbstractBytes implements Bytes {
             }
             if (System.nanoTime() > end)
                 return false;
+
+            if (currentThread().isInterrupted())
+                throw new InterruptedException("Unable to obtain lock, interrupted");
         }
     }
 
-    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException {
+    public boolean tryRWWriteLock(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         long lock = readVolatileLong(offset);
         int readersLocked = rwReadLocked(lock);
         int writersLocked = rwWriteLocked(lock);
@@ -2608,8 +2695,9 @@ public abstract class AbstractBytes implements Bytes {
         return tryRWWriteLock0(offset, timeOutNS);
     }
 
-    private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException {
+    private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         for (; ; ) {
+
             long lock = readVolatileLong(offset);
             int writersWaiting = rwWriteWaiting(lock);
             if (writersWaiting >= RW_LOCK_MASK)
@@ -2634,7 +2722,8 @@ public abstract class AbstractBytes implements Bytes {
                 if (compareAndSwapLong(offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
                     return true;
             }
-            if (System.nanoTime() > end) {
+            boolean interrupted = currentThread().isInterrupted();
+            if (interrupted || System.nanoTime() > end) {
                 // release waiting
                 for (; ; ) {
                     if (writersWaiting <= 0)
@@ -2644,8 +2733,11 @@ public abstract class AbstractBytes implements Bytes {
                     lock = readVolatileLong(offset);
                     writersWaiting = rwWriteWaiting(lock);
                 }
+                if (interrupted)
+                    throw new InterruptedException("Unable to obtain lock, interrupted");
                 return false;
             }
+
         }
     }
 

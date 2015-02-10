@@ -7,29 +7,42 @@ import java.util.concurrent.locks.LockSupport;
  * Created by peter on 11/12/14.
  */
 public class LightPauser implements Pauser {
+    public static final long NO_BUSY_PERIOD = -1;
+    public static final long NO_PAUSE_PERIOD = -1;
     private final AtomicBoolean pausing = new AtomicBoolean();
-    private final int busyCount;
-    private final long parkPeriod;
+    private final long busyPeriodNS;
+    private final long parkPeriodNS;
     private int count;
+    private long pauseStart = 0;
     private volatile Thread thread;
 
-    public LightPauser(int busyCount, long parkPeriod) {
-        this.busyCount = busyCount;
-        this.parkPeriod = parkPeriod;
+    public LightPauser(long busyPeriodNS, long parkPeriodNS) {
+        this.busyPeriodNS = busyPeriodNS;
+        this.parkPeriodNS = parkPeriodNS;
     }
 
     @Override
     public void reset() {
-        count = 0;
+        pauseStart = count = 0;
     }
 
     @Override
     public void pause() {
-        pause(parkPeriod);
+        pause(parkPeriodNS);
     }
 
     public void pause(long maxPauseNS) {
-        if (count++ < busyCount || maxPauseNS < 10000)
+        if (busyPeriodNS > 0) {
+            if (count++ < 1000)
+                return;
+            if (pauseStart == 0) {
+                pauseStart = System.nanoTime();
+                return;
+            }
+            if (System.nanoTime() < pauseStart + busyPeriodNS)
+                return;
+        }
+        if (maxPauseNS < 10000)
             return;
         thread = Thread.currentThread();
         pausing.set(true);
@@ -39,7 +52,7 @@ public class LightPauser implements Pauser {
     }
 
     protected void doPause(long maxPauseNS) {
-        LockSupport.parkNanos(Math.max(maxPauseNS, parkPeriod));
+        LockSupport.parkNanos(Math.max(maxPauseNS, parkPeriodNS));
     }
 
     @Override

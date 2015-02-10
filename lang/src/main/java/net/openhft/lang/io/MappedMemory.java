@@ -19,13 +19,16 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.ReferenceCounted;
+import net.openhft.lang.io.serialization.ObjectSerializer;
 import sun.nio.ch.DirectBuffer;
 
+import java.io.File;
 import java.nio.MappedByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MappedMemory implements ReferenceCounted {
+public class MappedMemory implements ReferenceCounted, BytesStore {
     private final MappedByteBuffer buffer;
+    private final DirectByteBufferBytes bytes;
     private final long index;
     private final AtomicInteger refCount = new AtomicInteger(1);
     private volatile boolean unmapped = false;
@@ -33,6 +36,7 @@ public class MappedMemory implements ReferenceCounted {
     public MappedMemory(MappedByteBuffer buffer, long index) {
         this.buffer = buffer;
         this.index = index;
+        bytes = new DirectByteBufferBytes(buffer);
     }
 
     public long index() {
@@ -63,6 +67,35 @@ public class MappedMemory implements ReferenceCounted {
 
     public long address() {
         return ((DirectBuffer) buffer).address();
+    }
+
+    @Override
+    public long size() {
+        return bytes.capacity();
+    }
+
+    @Override
+    public void free() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ObjectSerializer objectSerializer() {
+        return null;
+    }
+
+    @Override
+    public File file() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Bytes bytes() {
+        return bytes;
+    }
+
+    @Override
+    public Bytes bytes(long offset, long length) {
+        throw new UnsupportedOperationException();
     }
 
     public static void release(MappedMemory mapmem) {

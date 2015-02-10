@@ -33,14 +33,35 @@ import java.util.RandomAccess;
 public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommon {
 
     /**
-     * Copy from one Bytes to another, moves the position by length
+     * Copies the contents of a RandomDataInput from the position to the limit.
      *
+     * <p> This method transfers the bytes remaining in the given source
+     * buffer into this buffer.  If there are more bytes remaining in the
+     * source buffer than in this buffer, that is, if
+     * <tt>src.remaining()</tt>&nbsp;<tt>&gt;</tt>&nbsp;<tt>remaining()</tt>,
+     * then no bytes are transferred and a {@link
+     * java.nio.BufferOverflowException} is thrown.
+     *
+     * <p> Otherwise, this method copies
+     * <i>n</i>&nbsp;=&nbsp;<tt>src.remaining()</tt> bytes from the given
+     * buffer into this buffer, starting at each buffer's current position.
+     * The positions of both buffers are then incremented by <i>n</i>.
+     *
+     * <p> In other words, an invocation of this method of the form
+     * <tt>dst.write(src)</tt> has exactly the same effect as the loop
+     *
+     * <pre>
+     *     while (src.hasRemaining())
+     *         dst.writeByte(src.readByte()); 
+     *  </pre> 
+
      * @param bytes to copy
      */
     void write(RandomDataInput bytes);
 
     /**
-     * Copy from one Bytes to another, moves the position by length
+     * Copy from one Bytes to another, moves the position of "this" RandomDataOutput by the length.  
+     * The position of the RandomDataInput is not used or altered.
      *
      * @param bytes    to copy
      * @param position to copy from
@@ -122,6 +143,8 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param bytes  the data.
      */
     void write(long offset, byte[] bytes);
+
+    void write(long offset, Bytes bytes);
 
     /**
      * Writes <code>len</code> bytes from array <code>bytes</code>, in order,  to the output stream.  If
@@ -788,7 +811,27 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
     void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException;
 
     /**
-     * Copies the contents of a ByteBuffer from the potision ot the limit.
+     * Copies the contents of a ByteBuffer from the position to the limit.
+     *
+     * <p> This method transfers the bytes remaining in the given source
+     * buffer into this buffer.  If there are more bytes remaining in the
+     * source buffer than in this buffer, that is, if
+     * <tt>src.remaining()</tt>&nbsp;<tt>&gt;</tt>&nbsp;<tt>remaining()</tt>,
+     * then no bytes are transferred and a {@link
+     * java.nio.BufferOverflowException} is thrown.
+     *
+     * <p> Otherwise, this method copies
+     * <i>n</i>&nbsp;=&nbsp;<tt>src.remaining()</tt> bytes from the given
+     * buffer into this buffer, starting at each buffer's current position.
+     * The positions of both buffers are then incremented by <i>n</i>.
+     *
+     * <p> In other words, an invocation of this method of the form
+     * <tt>dst.write(src)</tt> has exactly the same effect as the loop
+     *
+     * <pre>
+     *     while (src.hasRemaining())
+     *         dst.writeByte(src.get()); 
+     *  </pre> 
      *
      * @param bb to copy.
      */

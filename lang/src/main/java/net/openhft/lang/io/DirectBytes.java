@@ -43,7 +43,7 @@ public class DirectBytes extends NativeBytes {
     public void positionAndSize(long offset, long size) {
         if (offset < 0 || size < 0 || offset + size > store.size())
             throw new IllegalArgumentException();
-        assert checkSingleThread();
+
         startAddr = positionAddr = store.address() + offset;
         capacityAddr = limitAddr = startAddr + size;
     }

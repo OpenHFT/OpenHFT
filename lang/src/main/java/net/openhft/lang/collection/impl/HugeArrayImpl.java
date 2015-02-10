@@ -45,7 +45,7 @@ public class HugeArrayImpl<T> implements HugeArray<T> {
 
         T ref = DataValueClasses.newDirectReference(tClass);
         size = ((Byteable) ref).maxSize();
-        store = new DirectStore(null, length * size);
+        store = DirectStore.allocate(length * size);
         ((Byteable) ref).bytes(store.bytes(), 0L);
         recycle(ref);
     }
