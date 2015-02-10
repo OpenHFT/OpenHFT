@@ -66,7 +66,7 @@ public class BytesOutputStream extends OutputStream {
 
     @Override
     public void close() {
-        bytes.finish();
+        // Don't close as we may want to continue'
     }
 
     private void checkNotClosed() throws IOException {
