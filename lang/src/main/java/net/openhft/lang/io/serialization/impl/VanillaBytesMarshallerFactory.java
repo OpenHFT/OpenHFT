@@ -44,6 +44,7 @@ public final class VanillaBytesMarshallerFactory implements BytesMarshallerFacto
     private void init() {
         marshallerMap = new LinkedHashMap<Class<?>, BytesMarshaller<?>>();
         compactMarshallerMap = new BytesMarshaller[256];
+
         BytesMarshaller<String> stringMarshaller = new StringMarshaller(16 * 1024);
         addMarshaller(String.class, stringMarshaller);
         addMarshaller(CharSequence.class, (BytesMarshaller)stringMarshaller);
@@ -59,36 +60,50 @@ public final class VanillaBytesMarshallerFactory implements BytesMarshallerFacto
     @SuppressWarnings("unchecked")
     @Override
     public <E> BytesMarshaller<E> acquireMarshaller(@NotNull Class<E> eClass, boolean create) {
-        if (marshallerMap == null) init();
+        if (marshallerMap == null) {
+            init();
+        }
+
         BytesMarshaller em = marshallerMap.get(eClass);
-        if (em == null)
-            if (eClass.isEnum())
+        if (em == null) {
+            if (eClass.isEnum()) {
                 marshallerMap.put(eClass, em = new EnumBytesMarshaller(eClass, null));
-            else if (BytesMarshallable.class.isAssignableFrom(eClass))
+            } else if (BytesMarshallable.class.isAssignableFrom(eClass)) {
                 marshallerMap.put(eClass, em = new BytesMarshallableMarshaller((Class) eClass));
-            else if (Externalizable.class.isAssignableFrom(eClass))
+            } else if (Externalizable.class.isAssignableFrom(eClass)) {
                 marshallerMap.put(eClass, em = new ExternalizableMarshaller((Class) eClass));
-            else {
+            } else if (Throwable.class.isAssignableFrom(eClass)) {
+                marshallerMap.put(eClass, em = NoMarshaller.INSTANCE);
+            } else {
                 try {
                     marshallerMap.put(eClass, em = new GenericEnumMarshaller<E>(eClass, 1000));
                 } catch (Exception e) {
                     marshallerMap.put(eClass, em = NoMarshaller.INSTANCE);
                 }
             }
+        }
+
         return em;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <E> BytesMarshaller<E> getMarshaller(byte code) {
-        if (marshallerMap == null) init();
+        if (marshallerMap == null) {
+            init();
+        }
+
         return (BytesMarshaller<E>) compactMarshallerMap[code & 0xFF];
     }
 
     public <E> void addMarshaller(Class<E> eClass, BytesMarshaller<E> marshaller) {
-        if (marshallerMap == null) init();
+        if (marshallerMap == null) {
+            init();
+        }
+
         marshallerMap.put(eClass, marshaller);
-        if (marshaller instanceof CompactBytesMarshaller)
+        if (marshaller instanceof CompactBytesMarshaller) {
             compactMarshallerMap[((CompactBytesMarshaller) marshaller).code()] = marshaller;
+        }
     }
 }

@@ -20,9 +20,14 @@ package net.openhft.lang.io;
 import sun.nio.ch.DirectBuffer;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class DirectByteBufferBytes extends NativeBytes implements IByteBufferBytes {
-    private final ByteBuffer buffer;
+    private ByteBuffer buffer;
+
+    public DirectByteBufferBytes(int capacity) {
+        this(ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder()), 0, capacity);
+    }
 
     public DirectByteBufferBytes(final ByteBuffer buffer) {
         this(buffer, 0, buffer.capacity());
@@ -37,6 +42,7 @@ public class DirectByteBufferBytes extends NativeBytes implements IByteBufferByt
         this.buffer = buffer;
     }
 
+    @Override
     public ByteBuffer buffer() {
         return buffer;
     }
@@ -44,5 +50,37 @@ public class DirectByteBufferBytes extends NativeBytes implements IByteBufferByt
     @Override
     public ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse) {
         return sliceAsByteBuffer(toReuse, buffer);
+    }
+
+    protected DirectByteBufferBytes resize(int newCapacity, boolean cleanup, boolean preserveData) {
+        if(newCapacity != capacity()) {
+            final ByteBuffer oldBuffer = this.buffer;
+            final long oldAddress = this.startAddr;
+            final long oldPosition = position();
+
+            if(preserveData && (oldPosition > newCapacity)) {
+                throw new IllegalArgumentException(
+                        "Capacity can't be less than currently used data (size=" + oldPosition
+                                + ", capacity=" + newCapacity + ")"
+                );
+            }
+
+            this.buffer = ByteBuffer.allocateDirect(newCapacity).order(ByteOrder.nativeOrder());
+            this.startAddr = ((DirectBuffer) buffer).address();
+            this.positionAddr = this.startAddr;
+            this.capacityAddr = this.startAddr + newCapacity;
+            this.limitAddr = this.capacityAddr;
+
+            if (preserveData && (oldPosition > 0)) {
+                UNSAFE.copyMemory(oldAddress, this.startAddr, Math.min(newCapacity, oldPosition));
+                this.positionAddr = this.startAddr + Math.min(newCapacity, oldPosition);
+            }
+
+            if(cleanup) {
+                IOTools.clean(oldBuffer);
+            }
+        }
+
+        return this;
     }
 }
