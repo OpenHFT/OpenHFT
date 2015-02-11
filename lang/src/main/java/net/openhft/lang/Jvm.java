@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +36,20 @@ import java.util.logging.Logger;
  */
 public enum Jvm {
     ;
+
+    static {
+        boolean success = false;
+        try {
+
+            Field vm_supports_long_cas = AtomicLong.class.getDeclaredField("VM_SUPPORTS_LONG_CAS");
+            vm_supports_long_cas.setAccessible(true);
+            success = (Boolean) vm_supports_long_cas.get(null);
+        } catch (Exception e) {
+            // do nothing
+        }
+        VM_SUPPORTS_LONG_CAS = success;
+    }
+
     public static final String TMP = System.getProperty("java.io.tmpdir");
     private static final boolean IS64BIT = is64Bit0();
 
@@ -58,6 +74,9 @@ public enum Jvm {
         return systemProp != null && systemProp.contains("_64");
     }
 
+    private final static boolean VM_SUPPORTS_LONG_CAS;
+
+
     private static final int PROCESS_ID = getProcessId0();
 
     public static int getProcessId() {
@@ -77,11 +96,15 @@ public enum Jvm {
             pid = ManagementFactory.getRuntimeMXBean().getName().split("@", 0)[0];
         if (pid == null) {
             int rpid = new Random().nextInt(1 << 16);
-            LOG.log(Level.WARNING,"Unable to determine PID, picked a random number=" + rpid);
+            LOG.log(Level.WARNING, "Unable to determine PID, picked a random number=" + rpid);
             return rpid;
         } else {
             return Integer.parseInt(pid);
         }
+    }
+
+    public static boolean vmSupportsCS8() {
+        return VM_SUPPORTS_LONG_CAS;
     }
 
     /**
@@ -183,6 +206,7 @@ public enum Jvm {
     public static void checkInterrupted() {
         if (Thread.currentThread().isInterrupted()) throw new InterruptedRuntimeException();
     }
+
 
     /**
      * Utility method to support throwing checked exceptions out of the streams API
