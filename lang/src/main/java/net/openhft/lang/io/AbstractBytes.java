@@ -1978,6 +1978,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void close() {
+
         if (!isFinished())
             finish();
     }

@@ -998,5 +998,4 @@ public abstract class WrappedBytes<B extends Bytes> implements Bytes {
     public void write(long offset, Bytes bytes) {
         wrapped.write(offset, bytes);
     }
-
 }
