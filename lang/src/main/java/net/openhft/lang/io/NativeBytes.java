@@ -653,8 +653,9 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
 
     @Override
     public NativeBytes limit(long limit) {
-        if (limit < 0 || limit > capacity())
+        if (limit < 0 || limit > capacity()) {
             throw new IllegalArgumentException("limit: " + limit + " capacity: " + capacity());
+        }
 
         limitAddr = startAddr + limit;
         return this;
@@ -668,8 +669,10 @@ public class NativeBytes extends AbstractBytes implements NativeBytesI {
 
     @Override
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
-        if (position() > capacity())
-            throw new IndexOutOfBoundsException("position is beyond the end of the buffer " + position() + " > " + capacity());
+        if (position() > limit()) {
+            throw new IndexOutOfBoundsException(
+                "position is beyond the end of the buffer " + position() + " > " + limit());
+        }
     }
 
     public long startAddr() {

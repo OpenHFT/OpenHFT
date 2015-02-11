@@ -42,14 +42,18 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
     private AtomicBoolean barrier;
 
     public static IByteBufferBytes wrap(ByteBuffer buffer) {
-        if (buffer instanceof DirectBuffer)
+        if (buffer instanceof DirectBuffer) {
             return new DirectByteBufferBytes(buffer);
+        }
+
         return new ByteBufferBytes(buffer.slice());
     }
 
     public static IByteBufferBytes wrap(ByteBuffer buffer, int start, int capacity) {
-        if (buffer instanceof DirectBuffer)
+        if (buffer instanceof DirectBuffer) {
             return new DirectByteBufferBytes(buffer, start, capacity);
+        }
+
         return new ByteBufferBytes(buffer.slice(), start, capacity);
     }
 
@@ -551,6 +555,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
             throw new IllegalArgumentException("Position to large");
         if (position < 0)
             throw new IllegalArgumentException("Position to small");
+
         this.position = (int) (start + position);
         return this;
     }
@@ -584,8 +589,9 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
 
     @Override
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
-        if (position < start || position > capacity)
+        if (position < start || position > limit()) {
             throw new IndexOutOfBoundsException();
+        }
     }
 
     @Override

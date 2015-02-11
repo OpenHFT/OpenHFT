@@ -346,7 +346,7 @@ public class VanillaMappedFileTest {
     // *************************************************************************
 
     @Test
-    public void testX() throws Exception {
+    public void testMessageKeySerialization() throws Exception {
         File path = newTempraryFile("vmc-x");
         VanillaMappedBytes bytes = VanillaMappedFile.readWriteBytes(path,1024,0);
 
