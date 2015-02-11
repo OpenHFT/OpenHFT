@@ -103,7 +103,7 @@ public enum Jvm {
         }
     }
 
-    public static boolean VMSupportsCS8() {
+    public static boolean vmSupportsCS8() {
         return VM_SUPPORTS_LONG_CAS;
     }
 
