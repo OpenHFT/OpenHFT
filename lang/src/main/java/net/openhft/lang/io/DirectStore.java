@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author peter.lawrey
  */
-public class DirectStore implements BytesStore {
+public class DirectStore implements BytesStore, AutoCloseable {
     private final ObjectSerializer objectSerializer;
     private final Cleaner cleaner;
     private final Deallocator deallocator;
@@ -85,11 +85,11 @@ public class DirectStore implements BytesStore {
     /**
      * Resizes this {@code DirectStore} to the {@code newSize}.
      *
-     * <p>If {@code zeroOut} is {@code false}, the memory past the old size is not zeroed out and will generally be
-     * garbage.
+     * <p>If {@code zeroOut} is {@code false}, the memory past the old size is not zeroed out and
+     * will generally be garbage.
      *
-     * <p>{@code DirectStore} don't keep track of the child {@code DirectBytes} instances, so after the resize they
-     * might point to the wrong memory. Use at your own risk.
+     * <p>{@code DirectStore} don't keep track of the child {@code DirectBytes} instances, so after
+     * the resize they might point to the wrong memory. Use at your own risk.
      *
      * @param newSize new size of this {@code DirectStore}
      * @param zeroOut if the memory past the old size should be zeroed out on increasing resize
@@ -142,8 +142,18 @@ public class DirectStore implements BytesStore {
     }
 
     /**
-     * Static nested class instead of anonymous because the latter would hold a strong reference to this DirectStore
-     * preventing it from becoming phantom-reachable.
+     * calls free
+     *
+     * @throws Exception
+     */
+    @Override
+    public void close() throws Exception {
+        free();
+    }
+
+    /**
+     * Static nested class instead of anonymous because the latter would hold a strong reference to
+     * this DirectStore preventing it from becoming phantom-reachable.
      */
     private static class Deallocator implements Runnable {
         private volatile long address;
