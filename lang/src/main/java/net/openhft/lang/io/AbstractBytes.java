@@ -842,7 +842,12 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void read(@NotNull ByteBuffer bb) {
-        int len = (int) Math.min(bb.remaining(), remaining());
+        read(bb, bb.remaining());
+    }
+
+    @Override
+    public void read(@NotNull ByteBuffer bb, int length) {
+        int len = (int) Math.min(length, remaining());
         if (bb.order() == byteOrder()) {
             while (len >= 8) {
                 bb.putLong(readLong());

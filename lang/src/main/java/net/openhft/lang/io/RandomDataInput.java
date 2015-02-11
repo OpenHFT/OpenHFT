@@ -762,6 +762,15 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
     void read(@NotNull ByteBuffer bb);
 
     /**
+     * Copy bytes into a ByteBuffer to the minimum of the length in the ByteBuffer or the
+     * Excerpt.
+     *
+     * @param bb to copy into
+     * @param length number of bytes to copy
+     */
+    void read(@NotNull ByteBuffer bb, int length);
+
+    /**
      * Read a String with <code>readUTFΔ</code> which is converted to an enumerable type. i.e. where there is a one to
      * one mapping between an object and it's toString().
      *

@@ -237,6 +237,10 @@ public abstract class WrappedBytes<B extends Bytes> implements Bytes {
         wrapped.read(bb);
     }
 
+    public void read(@NotNull ByteBuffer bb, int length) {
+        wrapped.read(bb, length);
+    }
+
     @NotNull
     public ByteStringAppender append(long l, int base) {
         return wrapped.append(l, base);
