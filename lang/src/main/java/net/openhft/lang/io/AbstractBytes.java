@@ -350,7 +350,7 @@ public abstract class AbstractBytes implements Bytes {
 
         while (slice.remaining() > 0) {
             final byte b = slice.readByte();
-            builder.append(String.format("%02X ", b));
+            builder.append(((char) b) + "(" + String.format("%02X ", b).trim() + ")");
             builder.append(",");
         }
 
@@ -359,6 +359,25 @@ public abstract class AbstractBytes implements Bytes {
         builder.append("]");
         return builder.toString();
     }
+
+    /**
+     * display the hex data of {@link Bytes} from the position() to the limit()
+     *
+     * @param buffer the buffer you wish to toString()
+     * @return hex representation of the buffer, from example [0D ,OA, FF]
+     */
+    public static String toString(@NotNull final Bytes buffer) {
+        final Bytes slice = buffer.slice();
+        final StringBuilder builder = new StringBuilder("");
+
+        while (slice.remaining() > 0) {
+            final byte b = slice.readByte();
+            builder.append((char) b);
+
+        }
+        return builder.toString();
+    }
+
 
     static int rwReadLocked(long lock) {
         return (int) (lock & RW_LOCK_MASK);
