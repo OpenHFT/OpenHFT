@@ -147,7 +147,7 @@ public class DirectStore implements BytesStore, AutoCloseable {
      * @throws Exception
      */
     @Override
-    public void close() throws Exception {
+    public void close()   {
         free();
     }
 
