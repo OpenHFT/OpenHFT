@@ -40,6 +40,7 @@ public class Maths {
      * precision of double.
      *
      * @param d value to round
+     * @return rounded value
      */
     public static double round2(double d) {
         final double factor = 1e2;

@@ -210,6 +210,8 @@ public enum Jvm {
 
     /**
      * Utility method to support throwing checked exceptions out of the streams API
+     * @param t the exception to rethrow
+     * @return the exception
      */
     public static RuntimeException rethrow(Throwable t) {
         NativeBytes.UNSAFE.throwException(t);
