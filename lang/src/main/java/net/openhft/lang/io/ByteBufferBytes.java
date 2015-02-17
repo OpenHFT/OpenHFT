@@ -41,6 +41,32 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
     private int limit;
     private AtomicBoolean barrier;
 
+    /**
+     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
+     */
+    @Deprecated
+    public ByteBufferBytes(ByteBuffer buffer) {
+        this(buffer, 0, buffer.capacity());
+    }
+
+    /**
+     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
+     *
+     * @param buffer the buffer to populate
+     * @param start  start of buffer
+     *               * @param capacity len of buffer
+     */
+    @Deprecated
+    public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
+        super(BytesMarshallableSerializer.create(new VanillaBytesMarshallerFactory(), JDKZObjectSerializer.INSTANCE), new AtomicInteger(1));
+        // We should set order to native, because compare-and-swap operations
+        // end up with native ops. Bytes interfaces handles only native order.
+        buffer.order(ByteOrder.nativeOrder());
+        this.buffer = buffer;
+        this.start = position = start;
+        this.capacity = limit = (capacity + start);
+    }
+
     public static IByteBufferBytes wrap(ByteBuffer buffer) {
         if (buffer instanceof DirectBuffer) {
             return new DirectByteBufferBytes(buffer);
@@ -55,28 +81,6 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         }
 
         return new ByteBufferBytes(buffer.slice(), start, capacity);
-    }
-
-    /**
-     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
-     */
-    @Deprecated
-    public ByteBufferBytes(ByteBuffer buffer) {
-        this(buffer, 0, buffer.capacity());
-    }
-
-    /**
-     * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
-     */
-    @Deprecated
-    public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
-        super(BytesMarshallableSerializer.create(new VanillaBytesMarshallerFactory(), JDKZObjectSerializer.INSTANCE), new AtomicInteger(1));
-        // We should set order to native, because compare-and-swap operations
-        // end up with native ops. Bytes interfaces handles only native order.
-        buffer.order(ByteOrder.nativeOrder());
-        this.buffer = buffer;
-        this.start = position = start;
-        this.capacity = limit = (capacity + start);
     }
 
     @Override
