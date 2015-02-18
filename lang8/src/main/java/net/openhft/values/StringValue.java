@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.values;
+package net.openhft.values;
 
 import net.openhft.lang.model.constraints.MaxSize;
 
@@ -31,6 +31,7 @@ public interface StringValue {
 
     /**
      * a getter for a String which takes a StringBuilder
+     *
      * @param stringBuilder the builder to return
      * @return a StringBuilder containing the value
      */

@@ -16,23 +16,15 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.values;
-
-import net.openhft.lang.model.constraints.MaxSize;
+package net.openhft.values;
 
 /**
- * User: peter.lawrey Date: 10/10/13 Time: 07:13
+ * User: peter.lawrey
+ * Date: 10/10/13
+ * Time: 07:17
  */
-public interface StringValue {
+public interface CharValue {
+    char getValue();
 
-    String getValue();
-
-    void setValue(@MaxSize CharSequence value);
-
-    /**
-     * a getter for a String which takes a StringBuilder
-     * @param stringBuilder the builder to return
-     * @return a StringBuilder containing the value
-     */
-    StringBuilder getUsingValue(StringBuilder stringBuilder);
+    void setValue(char value);
 }

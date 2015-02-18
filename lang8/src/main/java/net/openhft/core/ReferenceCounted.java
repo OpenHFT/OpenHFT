@@ -16,23 +16,12 @@
  * limitations under the License.
  */
 
-package net.openhft.lang.values;
+package net.openhft.core;
 
-import net.openhft.lang.model.constraints.MaxSize;
+public interface ReferenceCounted {
+    void reserve();
 
-/**
- * User: peter.lawrey Date: 10/10/13 Time: 07:13
- */
-public interface StringValue {
+    void release();
 
-    String getValue();
-
-    void setValue(@MaxSize CharSequence value);
-
-    /**
-     * a getter for a String which takes a StringBuilder
-     * @param stringBuilder the builder to return
-     * @return a StringBuilder containing the value
-     */
-    StringBuilder getUsingValue(StringBuilder stringBuilder);
+    int refCount();
 }

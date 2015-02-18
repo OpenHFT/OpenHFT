@@ -345,6 +345,9 @@ public abstract class AbstractBytes implements Bytes {
      * @return hex representation of the buffer, from example [0D ,OA, FF]
      */
     public static String toHex(@NotNull final Bytes buffer) {
+        if (buffer.remaining() ==0)
+            return "";
+
         final Bytes slice = buffer.slice();
         final StringBuilder builder = new StringBuilder("[");
 
@@ -361,7 +364,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     /**
-     * display the hex data of {@link Bytes} from the position() to the limit()
+     * display the buffer as a string
      *
      * @param buffer the buffer you wish to toString()
      * @return hex representation of the buffer, from example [0D ,OA, FF]

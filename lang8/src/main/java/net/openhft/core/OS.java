@@ -1,60 +1,24 @@
-/*
- * Copyright 2014 Higher Frequency Trading
- *
- * http://www.higherfrequencytrading.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package net.openhft.lang;
-
-import net.openhft.lang.io.NativeBytes;
+package net.openhft.core;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author peter.lawrey
- */
-public enum Jvm {
-    ;
-
-    static {
-        boolean success = false;
-        try {
-
-            Field vm_supports_long_cas = AtomicLong.class.getDeclaredField("VM_SUPPORTS_LONG_CAS");
-            vm_supports_long_cas.setAccessible(true);
-            success = (Boolean) vm_supports_long_cas.get(null);
-        } catch (Exception e) {
-            // do nothing
-        }
-        VM_SUPPORTS_LONG_CAS = success;
+public class OS {
+    public static Memory memory() {
+        return UnsafeMemory.INSTANCE;
     }
 
     public static final String TMP = System.getProperty("java.io.tmpdir");
     private static final boolean IS64BIT = is64Bit0();
 
     // Switch to j.u.l
-    private static final Logger LOG = Logger.getLogger(Jvm.class.getName());
+    private static final Logger LOG = Logger.getLogger(OS.class.getName());
 
     public static boolean is64Bit() {
         return IS64BIT;
@@ -73,9 +37,6 @@ public enum Jvm {
         systemProp = System.getProperty("java.vm.version");
         return systemProp != null && systemProp.contains("_64");
     }
-
-    private final static boolean VM_SUPPORTS_LONG_CAS;
-
 
     private static final int PROCESS_ID = getProcessId0();
 
@@ -101,10 +62,6 @@ public enum Jvm {
         } else {
             return Integer.parseInt(pid);
         }
-    }
-
-    public static boolean vmSupportsCS8() {
-        return VM_SUPPORTS_LONG_CAS;
     }
 
     /**
@@ -134,20 +91,6 @@ public enum Jvm {
     public static boolean isLinux() {
         return OS.startsWith("linux");
     }
-
-    public static boolean isUnix() {
-        return OS.contains("nix") ||
-                OS.contains("nux") ||
-                OS.contains("aix") ||
-                OS.contains("bsd") ||
-                OS.contains("hpux");
-    }
-
-    public static boolean isSolaris() {
-        return OS.startsWith("sun");
-    }
-
-    public static final int PID_BITS = Maths.intLog2(getPidMax());
 
     public static long getPidMax() {
         if (isLinux()) {
@@ -192,7 +135,7 @@ public enum Jvm {
                         "format: \"" + output + "\"");
             }
             try {
-                return MemoryUnit.KILOBYTES.toBytes(Long.parseLong(parts[1]));
+                return Long.parseLong(parts[1]) * 1024;
             } catch (NumberFormatException e) {
                 throw new IOException("Couldn't get free physical memory on windows. " +
                         "Command \"wmic OS get FreePhysicalMemory /Value\" output has unexpected " +
@@ -201,20 +144,5 @@ public enum Jvm {
         } catch (InterruptedException e) {
             throw new IOException(e);
         }
-    }
-
-    public static void checkInterrupted() {
-        if (Thread.currentThread().isInterrupted()) throw new InterruptedRuntimeException();
-    }
-
-
-    /**
-     * Utility method to support throwing checked exceptions out of the streams API
-     * @param t the exception to rethrow
-     * @return the exception
-     */
-    public static RuntimeException rethrow(Throwable t) {
-        NativeBytes.UNSAFE.throwException(t);
-        throw new AssertionError();
     }
 }
