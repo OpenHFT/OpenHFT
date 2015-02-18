@@ -10,7 +10,7 @@ public interface Bytes extends BytesStore<Bytes>, StreamingDataInput<Bytes>, Str
     /**
      * Perform a set of actions with a temporary bounds mode.
      */
-    default Bytes with(long length, Consumer<Bytes> bytesConsumer) {
+    default Bytes withLength(long length, Consumer<Bytes> bytesConsumer) {
         if (length > remaining())
             throw new BufferUnderflowException();
         long limit0 = limit();
@@ -58,7 +58,7 @@ public interface Bytes extends BytesStore<Bytes>, StreamingDataInput<Bytes>, Str
         int length = readUnsignedByte() - 1;
         if (length < 0)
             throw new IllegalStateException("Unset length");
-        return with(length, reader);
+        return withLength(length, reader);
     }
 
     int readUnsignedByte();
