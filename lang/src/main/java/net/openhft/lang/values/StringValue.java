@@ -31,6 +31,8 @@ public interface StringValue {
 
     /**
      * a getter for a String which takes a StringBuilder
+     * @param stringBuilder the builder to return
+     * @return a StringBuilder containing the value
      */
     StringBuilder getUsingValue(StringBuilder stringBuilder);
 }

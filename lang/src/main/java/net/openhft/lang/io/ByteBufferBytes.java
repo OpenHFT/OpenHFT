@@ -41,18 +41,6 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
     private int limit;
     private AtomicBoolean barrier;
 
-    public static IByteBufferBytes wrap(ByteBuffer buffer) {
-        if (buffer instanceof DirectBuffer)
-            return new DirectByteBufferBytes(buffer);
-        return new ByteBufferBytes(buffer.slice());
-    }
-
-    public static IByteBufferBytes wrap(ByteBuffer buffer, int start, int capacity) {
-        if (buffer instanceof DirectBuffer)
-            return new DirectByteBufferBytes(buffer, start, capacity);
-        return new ByteBufferBytes(buffer.slice(), start, capacity);
-    }
-
     /**
      * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
      */
@@ -63,6 +51,10 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
 
     /**
      * Use the ByteBufferBytes.wrap(ByteBuffer) as DirectByteBuffer more efficient
+     *
+     * @param buffer the buffer to populate
+     * @param start  start of buffer
+     *               * @param capacity len of buffer
      */
     @Deprecated
     public ByteBufferBytes(ByteBuffer buffer, int start, int capacity) {
@@ -73,6 +65,22 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         this.buffer = buffer;
         this.start = position = start;
         this.capacity = limit = (capacity + start);
+    }
+
+    public static IByteBufferBytes wrap(ByteBuffer buffer) {
+        if (buffer instanceof DirectBuffer) {
+            return new DirectByteBufferBytes(buffer);
+        }
+
+        return new ByteBufferBytes(buffer.slice());
+    }
+
+    public static IByteBufferBytes wrap(ByteBuffer buffer, int start, int capacity) {
+        if (buffer instanceof DirectBuffer) {
+            return new DirectByteBufferBytes(buffer, start, capacity);
+        }
+
+        return new ByteBufferBytes(buffer.slice(), start, capacity);
     }
 
     @Override
@@ -551,6 +559,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
             throw new IllegalArgumentException("Position to large");
         if (position < 0)
             throw new IllegalArgumentException("Position to small");
+
         this.position = (int) (start + position);
         return this;
     }
@@ -584,8 +593,9 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
 
     @Override
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
-        if (position < start || position > capacity)
+        if (position < start || position > limit()) {
             throw new IndexOutOfBoundsException();
+        }
     }
 
     @Override

@@ -60,6 +60,8 @@ public interface ObjectSerializer extends Serializable {
      * @param expectedClass proved when writing, can be null
      * @param object        to populate, can be null
      * @return object read.
+     * @throws IOException if it not possible to serialize the object
+     * @throws ClassNotFoundException if the expectedClass can not be created
      */
     <T> T readSerializable(@NotNull Bytes bytes, Class<T> expectedClass, T object) throws IOException, ClassNotFoundException;
 }

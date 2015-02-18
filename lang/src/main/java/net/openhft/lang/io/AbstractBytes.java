@@ -345,12 +345,15 @@ public abstract class AbstractBytes implements Bytes {
      * @return hex representation of the buffer, from example [0D ,OA, FF]
      */
     public static String toHex(@NotNull final Bytes buffer) {
+        if (buffer.remaining() ==0)
+            return "";
+
         final Bytes slice = buffer.slice();
         final StringBuilder builder = new StringBuilder("[");
 
         while (slice.remaining() > 0) {
             final byte b = slice.readByte();
-            builder.append(String.format("%02X ", b));
+            builder.append(((char) b) + "(" + String.format("%02X ", b).trim() + ")");
             builder.append(",");
         }
 
@@ -359,6 +362,25 @@ public abstract class AbstractBytes implements Bytes {
         builder.append("]");
         return builder.toString();
     }
+
+    /**
+     * display the buffer as a string
+     *
+     * @param buffer the buffer you wish to toString()
+     * @return hex representation of the buffer, from example [0D ,OA, FF]
+     */
+    public static String toString(@NotNull final Bytes buffer) {
+        final Bytes slice = buffer.slice();
+        final StringBuilder builder = new StringBuilder("");
+
+        while (slice.remaining() > 0) {
+            final byte b = slice.readByte();
+            builder.append((char) b);
+
+        }
+        return builder.toString();
+    }
+
 
     static int rwReadLocked(long lock) {
         return (int) (lock & RW_LOCK_MASK);
@@ -842,7 +864,12 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void read(@NotNull ByteBuffer bb) {
-        int len = (int) Math.min(bb.remaining(), remaining());
+        read(bb, bb.remaining());
+    }
+
+    @Override
+    public void read(@NotNull ByteBuffer bb, int length) {
+        int len = (int) Math.min(length, remaining());
         if (bb.order() == byteOrder()) {
             while (len >= 8) {
                 bb.putLong(readLong());
