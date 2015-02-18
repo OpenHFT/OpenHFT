@@ -148,4 +148,8 @@ public class MappedFile {
             return 0;
         }
     }
+
+    public long blockSize() {
+        return blockSize;
+    }
 }
