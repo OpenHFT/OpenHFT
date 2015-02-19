@@ -70,8 +70,9 @@ public class MappedFileTest {
         fill(map1.buffer().force());
         long free1 = dir.getFreeSpace();
 
-        map1.release();
-        map0.release();
+        mfile.release(map1);
+        mfile.release(map0);
+
         mfile.close();
 
 //        printMappings();
