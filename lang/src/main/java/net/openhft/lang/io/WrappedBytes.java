@@ -498,8 +498,8 @@ public abstract class WrappedBytes<B extends Bytes> implements Bytes {
         return wrapped.readCompactInt();
     }
 
-    public void release() {
-        wrapped.release();
+    public boolean release() {
+        return wrapped.release();
     }
 
     public boolean readBoolean(long offset) {

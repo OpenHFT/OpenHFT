@@ -30,7 +30,7 @@ public class MappedMemory implements ReferenceCounted, BytesStore {
     private final MappedByteBuffer buffer;
     private final DirectByteBufferBytes bytes;
     private final long index;
-    private final AtomicInteger refCount = new AtomicInteger(1);
+    private final AtomicInteger refCount = new AtomicInteger(0);
     private volatile boolean unmapped = false;
 
     public MappedMemory(MappedByteBuffer buffer, long index) {
@@ -49,11 +49,15 @@ public class MappedMemory implements ReferenceCounted, BytesStore {
         refCount.incrementAndGet();
     }
 
+    /**
+     * @return true if release cause the ref count to drop to zero and the resource was freed
+     */
     @Override
-    public void release() {
+    public boolean release() {
         if (unmapped) throw new IllegalStateException();
-        if (refCount.decrementAndGet() > 0) return;
+        if (refCount.decrementAndGet() > 0) return false;
         close();
+        return true;
     }
 
     @Override

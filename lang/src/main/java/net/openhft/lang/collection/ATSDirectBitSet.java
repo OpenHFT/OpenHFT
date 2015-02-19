@@ -51,8 +51,8 @@ public class ATSDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public void release() {
-        bytes.release();
+    public boolean release() {
+        return bytes.release();
     }
 
     @Override

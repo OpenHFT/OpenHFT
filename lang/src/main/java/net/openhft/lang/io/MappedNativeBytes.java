@@ -39,7 +39,7 @@ public class MappedNativeBytes extends AbstractBytes {
      */
     @NotNull
     @SuppressWarnings("ALL")
-    public final ChronicleUnsafe chronicleUnsafe;
+    public final ThreadLocal<ChronicleUnsafe> threadLocal = new ThreadLocal();
 
     static final int BYTES_OFFSET;
     static final int CHARS_OFFSET;
@@ -58,39 +58,44 @@ public class MappedNativeBytes extends AbstractBytes {
 
     }
 
+    private final boolean isSingleThreaded;
+
     protected long start;
     protected long position;
     protected long limit;
     protected long capacity;
+    private final MappedFile mappedFile;
+    private final ChronicleUnsafe chronicleUnsafe;
 
-    public MappedNativeBytes(@NotNull final ChronicleUnsafe chronicleUnsafe) {
-        super();
-
-        this.chronicleUnsafe = chronicleUnsafe;
+    public MappedNativeBytes(@NotNull final MappedFile mappedFile, boolean isSingleThreaded) {
+        this.isSingleThreaded = isSingleThreaded;
+        this.mappedFile = mappedFile;
         this.start = 0;
         this.position = start;
         this.limit = this.capacity = Long.MAX_VALUE;
-        positionChecks(position);
+        this.chronicleUnsafe = (isSingleThreaded) ? new ChronicleUnsafe(mappedFile) : null;
     }
 
-    public MappedNativeBytes(@NotNull ObjectSerializer objectSerializer,
+    public MappedNativeBytes(ObjectSerializer objectSerializer,
                              long sliceStart,
                              long capacity,
                              @NotNull AtomicInteger refCount,
-                             @NotNull ChronicleUnsafe chronicleUnsafe) {
-        this.chronicleUnsafe = chronicleUnsafe;
+                             @NotNull MappedFile mappedFile,
+                             boolean singleThreaded) {
+        this.isSingleThreaded = singleThreaded;
         this.objectSerializer = objectSerializer;
         this.start = sliceStart;
         this.position = 0;
         this.capacity = capacity;
         this.refCount.set(refCount.get());
-
+        this.mappedFile = mappedFile;
+        this.chronicleUnsafe = (isSingleThreaded) ? new ChronicleUnsafe(mappedFile) : null;
     }
 
 
     @Override
     public MappedNativeBytes slice() {
-        return new MappedNativeBytes(objectSerializer(), position, limit, refCount, chronicleUnsafe);
+        return new MappedNativeBytes(objectSerializer(), position, limit, refCount, mappedFile, isSingleThreaded);
     }
 
     @Override
@@ -99,7 +104,7 @@ public class MappedNativeBytes extends AbstractBytes {
         assert sliceStart >= start && sliceStart < capacity;
         long sliceEnd = sliceStart + length;
         assert sliceEnd > sliceStart && sliceEnd <= capacity;
-        return new MappedNativeBytes(objectSerializer(), sliceStart, sliceEnd, refCount, chronicleUnsafe);
+        return new MappedNativeBytes(objectSerializer(), sliceStart, sliceEnd, refCount, mappedFile, isSingleThreaded);
     }
 
     @Override
@@ -112,12 +117,12 @@ public class MappedNativeBytes extends AbstractBytes {
             throw new IndexOutOfBoundsException();
         if (start == end)
             return "";
-        return new MappedNativeBytes(objectSerializer(), subStart, subEnd, refCount, chronicleUnsafe);
+        return new MappedNativeBytes(objectSerializer(), subStart, subEnd, refCount, mappedFile, isSingleThreaded);
     }
 
     @Override
     public MappedNativeBytes bytes() {
-        return new MappedNativeBytes(objectSerializer(), start, capacity, refCount, chronicleUnsafe);
+        return new MappedNativeBytes(objectSerializer(), start, capacity, refCount, mappedFile, isSingleThreaded);
     }
 
     @Override
@@ -126,7 +131,7 @@ public class MappedNativeBytes extends AbstractBytes {
         assert sliceStart >= start && sliceStart < capacity;
         long sliceEnd = sliceStart + length;
         assert sliceEnd > sliceStart && sliceEnd <= capacity;
-        return new MappedNativeBytes(objectSerializer(), sliceStart, sliceEnd, refCount, chronicleUnsafe);
+        return new MappedNativeBytes(objectSerializer(), sliceStart, sliceEnd, refCount, mappedFile, isSingleThreaded);
     }
 
     @Override
@@ -137,7 +142,7 @@ public class MappedNativeBytes extends AbstractBytes {
     @Override
     public Bytes zeroOut() {
         clear();
-        chronicleUnsafe.setMemory(start, capacity(), (byte) 0);
+        getChronicleUnsafe().setMemory(start, capacity(), (byte) 0);
         return this;
     }
 
@@ -147,7 +152,7 @@ public class MappedNativeBytes extends AbstractBytes {
             throw new IllegalArgumentException("start: " + start + ", end: " + end);
         if (start >= end)
             return this;
-        chronicleUnsafe.setMemory(this.start + start, end - start, (byte) 0);
+        getChronicleUnsafe().setMemory(this.start + start, end - start, (byte) 0);
         return this;
     }
 
@@ -162,24 +167,25 @@ public class MappedNativeBytes extends AbstractBytes {
         if (start >= end)
             return this;
         // get unaligned leading bytes
+        ChronicleUnsafe unsafe = getChronicleUnsafe();
         while (start < end && (start & 7) != 0) {
-            byte b = chronicleUnsafe.getByte(this.start + start);
+            byte b = unsafe.getByte(this.start + start);
             if (b != 0)
-                chronicleUnsafe.putByte(this.start + start, (byte) 0);
+                unsafe.putByte(this.start + start, (byte) 0);
             start++;
         }
         // check 64-bit aligned access
         while (start < end - 7) {
-            long l = chronicleUnsafe.getLong(this.start + start);
+            long l = unsafe.getLong(this.start + start);
             if (l != 0)
-                chronicleUnsafe.putLong(this.start + start, 0L);
+                unsafe.putLong(this.start + start, 0L);
             start++;
         }
         // check unaligned tail
         while (start < end) {
-            byte b = chronicleUnsafe.getByte(this.start + start);
+            byte b = unsafe.getByte(this.start + start);
             if (b != 0)
-                chronicleUnsafe.putByte(this.start + start, (byte) 0);
+                unsafe.putByte(this.start + start, (byte) 0);
             start++;
         }
         return this;
@@ -192,21 +198,21 @@ public class MappedNativeBytes extends AbstractBytes {
         long left = remaining();
         if (left <= 0) return -1;
         int len2 = (int) Math.min(len, left);
-        chronicleUnsafe.copyMemory(null, position, bytes, BYTES_OFFSET + off, len2);
+        getChronicleUnsafe().copyMemory(null, position, bytes, BYTES_OFFSET + off, len2);
         addPosition(len2);
         return len2;
     }
 
     @Override
     public byte readByte() {
-        byte aByte = chronicleUnsafe.getByte(position);
+        byte aByte = getChronicleUnsafe().getByte(position);
         addPosition(1);
         return aByte;
     }
 
     @Override
     public byte readByte(long offset) {
-        return chronicleUnsafe.getByte(start + offset);
+        return getChronicleUnsafe().getByte(start + offset);
     }
 
     @Override
@@ -215,14 +221,14 @@ public class MappedNativeBytes extends AbstractBytes {
         long left = remaining();
         if (left < len)
             throw new IllegalStateException(new EOFException());
-        chronicleUnsafe.copyMemory(null, position, b, BYTES_OFFSET + off, len);
+        getChronicleUnsafe().copyMemory(null, position, b, BYTES_OFFSET + off, len);
         addPosition(len);
     }
 
     @Override
     public void readFully(long offset, byte[] bytes, int off, int len) {
         checkArrayOffs(bytes.length, off, len);
-        chronicleUnsafe.copyMemory(null, start + offset, bytes, BYTES_OFFSET + off, len);
+        getChronicleUnsafe().copyMemory(null, start + offset, bytes, BYTES_OFFSET + off, len);
     }
 
     @Override
@@ -233,110 +239,110 @@ public class MappedNativeBytes extends AbstractBytes {
         long left = remaining();
         if (left < bytesLen)
             throw new IllegalStateException(new EOFException());
-        chronicleUnsafe.copyMemory(null, position, data, BYTES_OFFSET + bytesOff, bytesLen);
+        getChronicleUnsafe().copyMemory(null, position, data, BYTES_OFFSET + bytesOff, bytesLen);
         addPosition(bytesLen);
     }
 
     @Override
     public short readShort() {
-        short s = chronicleUnsafe.getShort(position);
+        short s = getChronicleUnsafe().getShort(position);
         addPosition(2);
         return s;
     }
 
     @Override
     public short readShort(long offset) {
-        return chronicleUnsafe.getShort(start + offset);
+        return getChronicleUnsafe().getShort(start + offset);
     }
 
     @Override
     public char readChar() {
-        char ch = chronicleUnsafe.getChar(position);
+        char ch = getChronicleUnsafe().getChar(position);
         addPosition(2);
         return ch;
     }
 
     @Override
     public char readChar(long offset) {
-        return chronicleUnsafe.getChar(start + offset);
+        return getChronicleUnsafe().getChar(start + offset);
     }
 
     @Override
     public int readInt() {
-        int i = chronicleUnsafe.getInt(position);
+        int i = getChronicleUnsafe().getInt(position);
         addPosition(4);
         return i;
     }
 
     @Override
     public int readInt(long offset) {
-        return chronicleUnsafe.getInt(start + offset);
+        return getChronicleUnsafe().getInt(start + offset);
     }
 
     @Override
     public int readVolatileInt() {
-        int i = chronicleUnsafe.getIntVolatile(null, position);
+        int i = getChronicleUnsafe().getIntVolatile(null, position);
         addPosition(4);
         return i;
     }
 
     @Override
     public int readVolatileInt(long offset) {
-        return chronicleUnsafe.getIntVolatile(null, start + offset);
+        return getChronicleUnsafe().getIntVolatile(null, start + offset);
     }
 
     @Override
     public long readLong() {
-        long l = chronicleUnsafe.getLong(position);
+        long l = getChronicleUnsafe().getLong(position);
         addPosition(8);
         return l;
     }
 
     @Override
     public long readLong(long offset) {
-        return chronicleUnsafe.getLong(start + offset);
+        return getChronicleUnsafe().getLong(start + offset);
     }
 
     @Override
     public long readVolatileLong() {
-        long l = chronicleUnsafe.getLongVolatile(null, position);
+        long l = getChronicleUnsafe().getLongVolatile(null, position);
         addPosition(8);
         return l;
     }
 
     @Override
     public long readVolatileLong(long offset) {
-        return chronicleUnsafe.getLongVolatile(null, start + offset);
+        return getChronicleUnsafe().getLongVolatile(null, start + offset);
     }
 
     @Override
     public float readFloat() {
-        float f = chronicleUnsafe.getFloat(position);
+        float f = getChronicleUnsafe().getFloat(position);
         addPosition(4);
         return f;
     }
 
     @Override
     public float readFloat(long offset) {
-        return chronicleUnsafe.getFloat(start + offset);
+        return getChronicleUnsafe().getFloat(start + offset);
     }
 
     @Override
     public double readDouble() {
-        double d = chronicleUnsafe.getDouble(position);
+        double d = getChronicleUnsafe().getDouble(position);
         addPosition(8);
         return d;
     }
 
     @Override
     public double readDouble(long offset) {
-        return chronicleUnsafe.getDouble(start + offset);
+        return getChronicleUnsafe().getDouble(start + offset);
     }
 
     @Override
     public void write(int b) {
 
-        chronicleUnsafe.putByte(position, (byte) b);
+        getChronicleUnsafe().putByte(position, (byte) b);
         incrementPositionAddr(1);
 
     }
@@ -344,14 +350,14 @@ public class MappedNativeBytes extends AbstractBytes {
     @Override
     public void writeByte(long offset, int b) {
         offsetChecks(offset, 1L);
-        chronicleUnsafe.putByte(start + offset, (byte) b);
+        getChronicleUnsafe().putByte(start + offset, (byte) b);
     }
 
     @Override
     public void write(long offset, @NotNull byte[] bytes) {
         if (offset < 0 || offset + bytes.length > capacity())
             throw new IllegalArgumentException();
-        chronicleUnsafe.copyMemory(bytes, BYTES_OFFSET, null, start + offset, bytes.length);
+        getChronicleUnsafe().copyMemory(bytes, BYTES_OFFSET, null, start + offset, bytes.length);
         addPosition(bytes.length);
     }
 
@@ -359,7 +365,7 @@ public class MappedNativeBytes extends AbstractBytes {
     public void write(byte[] bytes, int off, int len) {
         if (off < 0 || off + len > bytes.length || len > remaining())
             throw new IllegalArgumentException();
-        chronicleUnsafe.copyMemory(bytes, BYTES_OFFSET + off, null, position, len);
+        getChronicleUnsafe().copyMemory(bytes, BYTES_OFFSET + off, null, position, len);
         addPosition(len);
     }
 
@@ -367,13 +373,13 @@ public class MappedNativeBytes extends AbstractBytes {
     public void write(long offset, byte[] bytes, int off, int len) {
         if (offset < 0 || off + len > bytes.length || offset + len > capacity())
             throw new IllegalArgumentException();
-        chronicleUnsafe.copyMemory(bytes, BYTES_OFFSET + off, null, start + offset, len);
+        getChronicleUnsafe().copyMemory(bytes, BYTES_OFFSET + off, null, start + offset, len);
     }
 
     @Override
     public void writeShort(int v) {
         positionChecks(position + 2L);
-        chronicleUnsafe.putShort(position, (short) v);
+        getChronicleUnsafe().putShort(position, (short) v);
         position += 2L;
     }
 
@@ -386,13 +392,13 @@ public class MappedNativeBytes extends AbstractBytes {
     @Override
     public void writeShort(long offset, int v) {
         offsetChecks(offset, 2L);
-        chronicleUnsafe.putShort(start + offset, (short) v);
+        getChronicleUnsafe().putShort(start + offset, (short) v);
     }
 
     @Override
     public void writeChar(int v) {
         positionChecks(position + 2L);
-        chronicleUnsafe.putChar(position, (char) v);
+        getChronicleUnsafe().putChar(position, (char) v);
         position += 2L;
     }
 
@@ -403,97 +409,97 @@ public class MappedNativeBytes extends AbstractBytes {
     @Override
     public void writeChar(long offset, int v) {
         offsetChecks(offset, 2L);
-        chronicleUnsafe.putChar(start + offset, (char) v);
+        getChronicleUnsafe().putChar(start + offset, (char) v);
     }
 
     @Override
     public void writeInt(int v) {
         positionChecks(position + 4L);
-        chronicleUnsafe.putInt(position, v);
+        getChronicleUnsafe().putInt(position, v);
         position += 4L;
     }
 
     @Override
     public void writeInt(long offset, int v) {
         offsetChecks(offset, 4L);
-        chronicleUnsafe.putInt(start + offset, v);
+        getChronicleUnsafe().putInt(start + offset, v);
     }
 
     @Override
     public void writeOrderedInt(int v) {
         positionChecks(position + 4L);
-        chronicleUnsafe.putOrderedInt(null, position, v);
+        getChronicleUnsafe().putOrderedInt(null, position, v);
         position += 4L;
     }
 
     @Override
     public void writeOrderedInt(long offset, int v) {
         offsetChecks(offset, 4L);
-        chronicleUnsafe.putOrderedInt(null, start + offset, v);
+        getChronicleUnsafe().putOrderedInt(null, start + offset, v);
     }
 
     @Override
     public boolean compareAndSwapInt(long offset, int expected, int x) {
         offsetChecks(offset, 4L);
-        return chronicleUnsafe.compareAndSwapInt(null, start + offset, expected, x);
+        return getChronicleUnsafe().compareAndSwapInt(null, start + offset, expected, x);
     }
 
     @Override
     public void writeLong(long v) {
         positionChecks(position + 8L);
-        chronicleUnsafe.putLong(position, v);
+        getChronicleUnsafe().putLong(position, v);
         position += 8L;
     }
 
     @Override
     public void writeLong(long offset, long v) {
         offsetChecks(offset, 8L);
-        chronicleUnsafe.putLong(start + offset, v);
+        getChronicleUnsafe().putLong(start + offset, v);
     }
 
     @Override
     public void writeOrderedLong(long v) {
         positionChecks(position + 8L);
-        chronicleUnsafe.putOrderedLong(null, position, v);
+        getChronicleUnsafe().putOrderedLong(null, position, v);
         position += 8L;
     }
 
     @Override
     public void writeOrderedLong(long offset, long v) {
         offsetChecks(offset, 8L);
-        chronicleUnsafe.putOrderedLong(null, start + offset, v);
+        getChronicleUnsafe().putOrderedLong(null, start + offset, v);
     }
 
     @Override
     public boolean compareAndSwapLong(long offset, long expected, long x) {
         offsetChecks(offset, 8L);
-        return chronicleUnsafe.compareAndSwapLong(null, start + offset, expected, x);
+        return getChronicleUnsafe().compareAndSwapLong(null, start + offset, expected, x);
     }
 
     @Override
     public void writeFloat(float v) {
         positionChecks(position + 4L);
-        chronicleUnsafe.putFloat(position, v);
+        getChronicleUnsafe().putFloat(position, v);
         position += 4L;
     }
 
     @Override
     public void writeFloat(long offset, float v) {
         offsetChecks(offset, 4L);
-        chronicleUnsafe.putFloat(start + offset, v);
+        getChronicleUnsafe().putFloat(start + offset, v);
     }
 
     @Override
     public void writeDouble(double v) {
         positionChecks(position + 8L);
-        chronicleUnsafe.putDouble(position, v);
+        getChronicleUnsafe().putDouble(position, v);
         position += 8L;
     }
 
     @Override
     public void writeDouble(long offset, double v) {
         offsetChecks(offset, 8L);
-        chronicleUnsafe.putDouble(start + offset, v);
+        getChronicleUnsafe().putDouble(start + offset, v);
     }
 
     @Override
@@ -502,13 +508,14 @@ public class MappedNativeBytes extends AbstractBytes {
         if (position + len >= limit)
             throw new IndexOutOfBoundsException("Length out of bounds len: " + len);
 
+        ChronicleUnsafe unsafe = getChronicleUnsafe();
         for (; len >= 8; len -= 8) {
-            chronicleUnsafe.putLong(object, (long) start, chronicleUnsafe.getLong(position));
+            unsafe.putLong(object, (long) start, unsafe.getLong(position));
             incrementPositionAddr(8L);
             start += 8;
         }
         for (; len > 0; len--) {
-            chronicleUnsafe.putByte(object, (long) start, chronicleUnsafe.getByte(position));
+            unsafe.putByte(object, (long) start, unsafe.getByte(position));
             incrementPositionAddr(1L);
             start++;
         }
@@ -518,15 +525,16 @@ public class MappedNativeBytes extends AbstractBytes {
     public void writeObject(Object object, int start, int end) {
         int len = end - start;
 
+        ChronicleUnsafe unsafe = getChronicleUnsafe();
         for (; len >= 8; len -= 8) {
             positionChecks(position + 8L);
-            chronicleUnsafe.putLong(position, chronicleUnsafe.getLong(object, (long) start));
+            unsafe.putLong(position, unsafe.getLong(object, (long) start));
             position += 8;
             start += 8;
         }
         for (; len > 0; len--) {
             positionChecks(position + 1L);
-            chronicleUnsafe.putByte(position, chronicleUnsafe.getByte(object, (long) start));
+            unsafe.putByte(position, unsafe.getByte(object, (long) start));
             position++;
             start++;
         }
@@ -541,22 +549,23 @@ public class MappedNativeBytes extends AbstractBytes {
             return false;
         }
         long i = 0L;
+        ChronicleUnsafe unsafe = getChronicleUnsafe();
         for (; i < len - 7L; i += 8L) {
-            if (chronicleUnsafe.getLong(start + offset + i) != input.readLong(inputOffset + i))
+            if (unsafe.getLong(start + offset + i) != input.readLong(inputOffset + i))
                 return false;
         }
         if (i < len - 3L) {
-            if (chronicleUnsafe.getInt(start + offset + i) != input.readInt(inputOffset + i))
+            if (unsafe.getInt(start + offset + i) != input.readInt(inputOffset + i))
                 return false;
             i += 4L;
         }
         if (i < len - 1L) {
-            if (chronicleUnsafe.getChar(start + offset + i) != input.readChar(inputOffset + i))
+            if (unsafe.getChar(start + offset + i) != input.readChar(inputOffset + i))
                 return false;
             i += 2L;
         }
         if (i < len) {
-            if (chronicleUnsafe.getByte(start + offset + i) != input.readByte(inputOffset + i))
+            if (unsafe.getByte(start + offset + i) != input.readByte(inputOffset + i))
                 return false;
         }
         return true;
@@ -599,7 +608,7 @@ public class MappedNativeBytes extends AbstractBytes {
         if (length > remaining())
             throw new IllegalArgumentException("Attempt to write " + length + " bytes with " + remaining() + " remaining");
         if (bytes instanceof MappedNativeBytes) {
-            chronicleUnsafe.copyMemory(((MappedNativeBytes) bytes).start + position, this.position, length);
+            getChronicleUnsafe().copyMemory(((MappedNativeBytes) bytes).start + position, this.position, length);
             skip(length);
         } else {
             super.write(bytes, position, length);
@@ -660,9 +669,10 @@ public class MappedNativeBytes extends AbstractBytes {
 
     @Override
     public Bytes load() {
-        int pageSize = chronicleUnsafe.pageSize();
+        ChronicleUnsafe unsafe = getChronicleUnsafe();
+        int pageSize = unsafe.pageSize();
         for (long addr = start; addr < capacity; addr += pageSize)
-            chronicleUnsafe.getByte(addr);
+            unsafe.getByte(addr);
         return this;
     }
 
@@ -712,5 +722,19 @@ public class MappedNativeBytes extends AbstractBytes {
 
     protected ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse, Object att) {
         return ByteBufferReuse.INSTANCE.reuse(position, (int) remaining(), att, toReuse);
+    }
+
+    @NotNull
+    public ChronicleUnsafe getChronicleUnsafe() {
+       if (isSingleThreaded)
+            return chronicleUnsafe;
+
+        ChronicleUnsafe chronicleUnsafe = threadLocal.get();
+        if (chronicleUnsafe == null) {
+            chronicleUnsafe = new ChronicleUnsafe(mappedFile);
+            threadLocal.set(chronicleUnsafe);
+        }
+
+        return chronicleUnsafe;
     }
 }

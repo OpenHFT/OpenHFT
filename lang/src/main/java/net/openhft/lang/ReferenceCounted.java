@@ -21,7 +21,7 @@ package net.openhft.lang;
 public interface ReferenceCounted {
     void reserve();
 
-    void release();
+    boolean release();
 
     int refCount();
 }

@@ -83,9 +83,9 @@ public class CheckedBytes implements Bytes {
         bytes.reserve();
     }
 
-    public void release() {
+    public boolean release() {
         checkNotClosed();
-        bytes.release();
+        return bytes.release();
     }
 
 

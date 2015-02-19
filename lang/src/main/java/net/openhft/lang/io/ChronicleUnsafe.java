@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 public class ChronicleUnsafe {
 
     private final MappedFile mappedFile;
-    private volatile MappedMemory[] mappedMemory = new MappedMemory[1];
+    private MappedMemory[] mappedMemory = new MappedMemory[1];
 
     public static final Unsafe UNSAFE;
 
@@ -34,14 +34,14 @@ public class ChronicleUnsafe {
     private long offset;
     private final long mask;
     private long last = -1;
-
+    private int index = 0;
 
     /**
      * @param mappedFile a until that able to map block of memory to a file
-     * @param blockSize  this must be a power of 2
      * @throws IllegalStateException if the block size is not a power of 2
      */
-    public ChronicleUnsafe(@NotNull MappedFile mappedFile, long blockSize) {
+    public ChronicleUnsafe(@NotNull MappedFile mappedFile) {
+        long blockSize = mappedFile.blockSize();
 
         if (((blockSize & -blockSize) != blockSize))
             throw new IllegalStateException("the block size has to be a power of 2");
@@ -59,27 +59,36 @@ public class ChronicleUnsafe {
         if ((mask & address ^ this.last) == 0)
             return address + offset;
 
-        int chunk = (int) ((address / chunkSize));
-        long remainder = address - (((long) chunk) * chunkSize);
+        int index = (int) ((address / chunkSize));
+        long remainder = address - (((long) index) * chunkSize);
 
         // resize the chunks if required
-        if (chunk >= mappedMemory.length) {
-            MappedMemory[] newMm = new MappedMemory[chunk + 1];
+        if (index >= mappedMemory.length) {
+            MappedMemory[] newMm = new MappedMemory[index + 1];
             System.arraycopy(mappedMemory, 0, newMm, 0, mappedMemory.length);
             mappedMemory = newMm;
         }
 
-        if (mappedMemory[chunk] == null) {
+        if (mappedMemory[index] == null) {
             try {
-                mappedMemory[chunk] = mappedFile.acquire(chunk);
+                mappedMemory[index] = mappedFile.acquire(index);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        long address1 = mappedMemory[chunk].bytes().address();
+        // index == 0 is the header, so we wont reference count the header
+        if (this.index != 0) {
+            mappedFile.release(mappedMemory[this.index]);
+            mappedMemory[this.index] = null;
+        }
+
+        this.index = index;
+
+        long address1 = mappedMemory[index].bytes().address();
         long result = address1 + remainder;
         this.offset = result - address;
+        this.index = index;
         this.last = mask & address;
         return result;
     }

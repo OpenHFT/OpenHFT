@@ -411,11 +411,13 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @Override
-    public void release() {
+    public boolean release() {
         if (refCount.get() < 1) throw new IllegalStateException();
-        if (refCount.decrementAndGet() > 0) return;
+        if (refCount.decrementAndGet() > 0) return false;
         cleanup();
+        return true;
     }
+
 
     protected abstract void cleanup();
 

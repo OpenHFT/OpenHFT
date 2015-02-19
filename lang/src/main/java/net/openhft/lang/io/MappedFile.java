@@ -101,6 +101,23 @@ public class MappedFile {
         return acquire0(index);
     }
 
+    /**
+     * gets the mapping at a given index, or returns null, if it does not exist, or
+     * IndexOutOfBoundsException if the index is out of range
+     *
+     * @param index
+     * @return the mapping at this {@code index}
+     * @throws IndexOutOfBoundsException if the index is out of range
+     */
+    public MappedMemory getMap(double index) throws IOException {
+        for (MappedMemory m : maps) {
+            if (m.index() == index)
+                return m;
+        }
+        return null;
+    }
+
+
     private synchronized MappedMemory acquire0(long index) throws IOException {
         if (map1 != null)
             map1.release();
@@ -151,5 +168,16 @@ public class MappedFile {
 
     public long blockSize() {
         return blockSize;
+    }
+
+    public void release(MappedMemory mappedMemory) {
+
+        if (mappedMemory.release()) {
+            if (map0 == mappedMemory)
+                map0 = null;
+            if (map1 == mappedMemory)
+                map1 = null;
+        }
+
     }
 }

@@ -60,10 +60,11 @@ public class VanillaMappedBytes extends NativeBytes {
     }
 
     @Override
-    public void release() {
+    public boolean release() {
         if(!unmapped()) {
-            super.release();
+           return super.release();
         }
+        return false;
     }
 
     @Override

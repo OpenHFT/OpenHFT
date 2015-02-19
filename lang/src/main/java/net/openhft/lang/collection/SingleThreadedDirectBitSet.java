@@ -73,7 +73,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     private Bytes bytes;
     private long longLength;
 
-    public SingleThreadedDirectBitSet() {}
+    public SingleThreadedDirectBitSet() {
+    }
 
     public SingleThreadedDirectBitSet(Bytes bytes) {
         reuse(bytes);
@@ -125,8 +126,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     @Override
-    public void release() {
-        bytes.release();
+    public boolean release() {
+        return bytes.release();
     }
 
     @Override
@@ -347,16 +348,16 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     /**
-     * Checks if each bit from the specified {@code fromIndex} (inclusive)
-     * to the specified {@code exclusiveToIndex} is set to {@code true}.
+     * Checks if each bit from the specified {@code fromIndex} (inclusive) to the specified {@code
+     * exclusiveToIndex} is set to {@code true}.
      *
-     * @param fromIndex index of the first bit to check
+     * @param fromIndex        index of the first bit to check
      * @param exclusiveToIndex index after the last bit to check
-     * @return {@code true} if all bits in the specified range are
-     *         set to {@code true}, {@code false} otherwise
-     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
-     *         or {@code fromIndex} is larger than {@code toIndex},
-     *         or {@code exclusiveToIndex} is larger or equal to {@code size()}
+     * @return {@code true} if all bits in the specified range are set to {@code true}, {@code
+     * false} otherwise
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative, or {@code fromIndex} is
+     *                                   larger than {@code toIndex}, or {@code exclusiveToIndex} is
+     *                                   larger or equal to {@code size()}
      */
     public boolean allSet(long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
@@ -395,16 +396,16 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     /**
-     * Checks if each bit from the specified {@code fromIndex} (inclusive)
-     * to the specified {@code exclusiveToIndex} is set to {@code false}.
+     * Checks if each bit from the specified {@code fromIndex} (inclusive) to the specified {@code
+     * exclusiveToIndex} is set to {@code false}.
      *
-     * @param fromIndex index of the first bit to check
+     * @param fromIndex        index of the first bit to check
      * @param exclusiveToIndex index after the last bit to check
-     * @return {@code true} if all bits in the specified range are
-     *         set to {@code false}, {@code false} otherwise
-     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
-     *         or {@code fromIndex} is larger than {@code toIndex},
-     *         or {@code exclusiveToIndex} is larger or equal to {@code size()}
+     * @return {@code true} if all bits in the specified range are set to {@code false}, {@code
+     * false} otherwise
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is negative, or {@code fromIndex} is
+     *                                   larger than {@code toIndex}, or {@code exclusiveToIndex} is
+     *                                   larger or equal to {@code size()}
      */
     public boolean allClear(long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
@@ -505,7 +506,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                 currentWord = (l >>> trailingZeros) >>> 1;
                 return bitIndex += trailingZeros + 1;
             }
-            for (long i = byteIndex, lim = byteLength; (i += 8) < lim;) {
+            for (long i = byteIndex, lim = byteLength; (i += 8) < lim; ) {
                 if ((l = bytes.readLong(i)) != 0) {
                     byteIndex = i;
                     int trailingZeros = numberOfTrailingZeros(l);
@@ -868,7 +869,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         int bitsFromFirstWord = 64 - (((int) bitIndex) & 63);
         long byteIndex2 = firstByte(longIndex2);
         long w1, w2 = bytes.readLong(byteIndex2);
-        longLoop: while (true) {
+        longLoop:
+        while (true) {
             w1 = w2;
             byteIndex2 += 8;
             if (++longIndex2 < longLength) {
@@ -971,8 +973,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     /**
-     * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     * @throws IllegalArgumentException if {@code numberOfBits} is out of range {@code 0 <
+     *                                  numberOfBits && numberOfBits <= 64}
      */
     @Override
     public long clearNextNContinuousSetBits(long fromIndex, int numberOfBits) {
@@ -991,7 +993,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         int bitsFromFirstWord = 64 - (((int) bitIndex) & 63);
         long byteIndex2 = firstByte(longIndex2);
         long w1, w2 = bytes.readLong(byteIndex2);
-        longLoop: while (true) {
+        longLoop:
+        while (true) {
             w1 = w2;
             byteIndex2 += 8;
             if (++longIndex2 < longLength) {
@@ -1074,8 +1077,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     /**
-     * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     * @throws IllegalArgumentException if {@code numberOfBits} is out of range {@code 0 <
+     *                                  numberOfBits && numberOfBits <= 64}
      */
     @Override
     public long setPreviousNContinuousClearBits(
@@ -1099,7 +1102,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         long lowByteIndex = firstByte(lowLongIndex);
         // low word, high word
         long hw, lw = bytes.readLong(lowByteIndex);
-        longLoop: while (true) {
+        longLoop:
+        while (true) {
             hw = lw;
             lowByteIndex -= 8;
             if (--lowLongIndex >= 0) {
@@ -1188,8 +1192,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
     }
 
     /**
-     * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     * @throws IllegalArgumentException if {@code numberOfBits} is out of range {@code 0 <
+     *                                  numberOfBits && numberOfBits <= 64}
      */
     @Override
     public long clearPreviousNContinuousSetBits(
@@ -1213,7 +1217,8 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         long lowByteIndex = firstByte(lowLongIndex);
         // low word, high word
         long hw, lw = bytes.readLong(lowByteIndex);
-        longLoop: while (true) {
+        longLoop:
+        while (true) {
             hw = lw;
             lowByteIndex -= 8;
             if (--lowLongIndex >= 0) {
