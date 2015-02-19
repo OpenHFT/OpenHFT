@@ -1,31 +1,14 @@
 package net.openhft.bytes;
 
-import net.openhft.core.Memory;
-
-import java.nio.BufferUnderflowException;
 import java.util.function.Consumer;
 
 public interface Bytes extends BytesStore<Bytes>, StreamingDataInput<Bytes>, StreamingDataOutput<Bytes> {
 
-    /**
-     * Perform a set of actions with a temporary bounds mode.
-     */
-    default Bytes withLength(long length, Consumer<Bytes> bytesConsumer) {
-        if (length > remaining())
-            throw new BufferUnderflowException();
-        long limit0 = limit();
-        long limit = position() + length;
-        try {
-            limit(limit);
-            bytesConsumer.accept(this);
-        } finally {
-            position(limit);
-            limit(limit0);
-        }
-        return this;
+    default long remaining() {
+        return limit() - position();
     }
 
-    long remaining();
+    ;
 
     long position();
 
@@ -44,17 +27,15 @@ public interface Bytes extends BytesStore<Bytes>, StreamingDataInput<Bytes>, Str
         if (length >= 1 << 8)
             throw new IllegalStateException("Cannot have an 8-bit length of " + length);
         writeUnsignedByte(position, (short) length);
-        memory().storeFence();
+        storeFence();
 
         return this;
     }
 
     void writeUnsignedByte(int i);
 
-    Memory memory();
-
     default Bytes readLength8(Consumer<Bytes> reader) {
-        memory().loadFence();
+        loadFence();
         int length = readUnsignedByte() - 1;
         if (length < 0)
             throw new IllegalStateException("Unset length");

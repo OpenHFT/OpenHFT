@@ -18,8 +18,6 @@
 
 package net.openhft.values;
 
-import net.openhft.lang.model.constraints.MaxSize;
-
 /**
  * User: peter.lawrey Date: 10/10/13 Time: 07:13
  */
@@ -27,7 +25,7 @@ public interface StringValue {
 
     String getValue();
 
-    void setValue(@MaxSize CharSequence value);
+    void setValue(@MaxBytes CharSequence value);
 
     /**
      * a getter for a String which takes a StringBuilder
