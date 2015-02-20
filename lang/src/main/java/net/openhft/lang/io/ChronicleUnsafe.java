@@ -13,8 +13,7 @@ import java.lang.reflect.Field;
 public class ChronicleUnsafe {
 
     private final MappedFile mappedFile;
-    private MappedMemory[] mappedMemory = new MappedMemory[1];
-
+    private MappedMemory mappedMemory = null;
     public static final Unsafe UNSAFE;
 
     static {
@@ -27,14 +26,12 @@ public class ChronicleUnsafe {
         } catch (Exception e) {
             throw new AssertionError(e);
         }
-
     }
 
     private long chunkSize;
     private long offset;
     private final long mask;
     private long last = -1;
-    private int index = 0;
 
     /**
      * @param mappedFile a until that able to map block of memory to a file
@@ -62,33 +59,18 @@ public class ChronicleUnsafe {
         int index = (int) ((address / chunkSize));
         long remainder = address - (((long) index) * chunkSize);
 
-        // resize the chunks if required
-        if (index >= mappedMemory.length) {
-            MappedMemory[] newMm = new MappedMemory[index + 1];
-            System.arraycopy(mappedMemory, 0, newMm, 0, mappedMemory.length);
-            mappedMemory = newMm;
-        }
-
-        if (mappedMemory[index] == null) {
-            try {
-                mappedMemory[index] = mappedFile.acquire(index);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
         // index == 0 is the header, so we wont reference count the header
-        if (this.index != 0) {
-            mappedFile.release(mappedMemory[this.index]);
-            mappedMemory[this.index] = null;
+        if (mappedMemory != null && mappedMemory.index() != 0)
+            mappedFile.release(mappedMemory);
+
+        try {
+            this.mappedMemory = mappedFile.acquire(index);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        this.index = index;
-
-        long address1 = mappedMemory[index].bytes().address();
-        long result = address1 + remainder;
+        long result = mappedMemory.bytes().address() + remainder;
         this.offset = result - address;
-        this.index = index;
         this.last = mask & address;
         return result;
     }
@@ -99,7 +81,7 @@ public class ChronicleUnsafe {
         int chunk = (int) ((address / chunkSize));
         long remainder = address - (((long) chunk) * chunkSize);
 
-        return mappedMemory[chunk].bytes().capacity() - remainder;
+        return mappedMemory.bytes().capacity() - remainder;
 
     }
 
