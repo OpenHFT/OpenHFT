@@ -11,7 +11,11 @@ public interface StreamingDataInput<S extends StreamingDataInput<S>> extends Str
 
     Bytes underflowMode(UnderflowMode underflowMode);
 
-    ObjectInput objectInput();
+    default ObjectInput objectInput() {
+        throw new UnsupportedOperationException();
+    }
 
-    InputStream inputStream();
+    default InputStream inputStream() {
+        throw new UnsupportedOperationException();
+    }
 }

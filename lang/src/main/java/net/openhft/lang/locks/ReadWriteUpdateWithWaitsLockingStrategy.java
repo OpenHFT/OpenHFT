@@ -1,7 +1,5 @@
 /*
- * Copyright 2014 Higher Frequency Trading
- *
- * http://www.higherfrequencytrading.com
+ * Copyright 2014 Higher Frequency Trading http://www.higherfrequencytrading.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +14,14 @@
  * limitations under the License.
  */
 
-package net.openhft.core;
+package net.openhft.lang.locks;
 
-public interface ReferenceCounted {
-    static void release(ReferenceCounted rc) {
-        if (rc != null)
-            rc.release();
-    }
+import net.openhft.lang.io.Bytes;
 
-    void reserve();
+public interface ReadWriteUpdateWithWaitsLockingStrategy
+        extends ReadWriteUpdateLockingStrategy, ReadWriteWithWaitsLockingStrategy {
 
-    void release();
+    boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(long address);
 
-    int refCount();
+    boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(Bytes bytes, long offset);
 }

@@ -1,5 +1,8 @@
 package net.openhft.bytes;
 
+import java.nio.BufferUnderflowException;
+import java.util.function.Consumer;
+
 public interface StreamingCommon<S extends StreamingCommon<S>> extends RandomCommon<S> {
     /**
      * @return the number of bytes between the position and the limit.
@@ -15,4 +18,22 @@ public interface StreamingCommon<S extends StreamingCommon<S>> extends RandomCom
     S limit(long limit);
 
     S clear();
+
+    /**
+     * Perform a set of actions with a temporary bounds mode.
+     */
+    default S withLength(long length, Consumer<S> bytesConsumer) {
+        if (length > remaining())
+            throw new BufferUnderflowException();
+        long limit0 = limit();
+        long limit = position() + length;
+        try {
+            limit(limit);
+            bytesConsumer.accept((S) this);
+        } finally {
+            position(limit);
+            limit(limit0);
+        }
+        return (S) this;
+    }
 }

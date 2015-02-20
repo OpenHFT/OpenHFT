@@ -9,7 +9,11 @@ import java.io.OutputStream;
  * The use of this instance is single threaded, though the use of the data
  */
 public interface StreamingDataOutput<S extends StreamingDataOutput<S>> extends StreamingCommon<S> {
-    public ObjectOutput objectStream();
+    default public ObjectOutput objectStream() {
+        throw new UnsupportedOperationException();
+    }
 
-    public OutputStream outputStream();
+    default public OutputStream outputStream() {
+        throw new UnsupportedOperationException();
+    }
 }

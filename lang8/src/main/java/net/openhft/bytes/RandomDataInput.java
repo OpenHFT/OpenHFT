@@ -5,4 +5,5 @@ package net.openhft.bytes;
  * The thread safety of the underlying data depends on how the methods are used.
  */
 public interface RandomDataInput {
+    int readUnsignedByte(long position);
 }
