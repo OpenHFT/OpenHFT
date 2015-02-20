@@ -18,4 +18,30 @@ public interface StreamingDataInput<S extends StreamingDataInput<S>> extends Str
     default InputStream inputStream() {
         throw new UnsupportedOperationException();
     }
+
+    void readUTFΔ(StringBuilder sb);
+
+    long readStopBit();
+
+    byte readByte();
+
+    int readUnsignedByte();
+
+    short readShort();
+
+    int readUnsignedShort();
+
+    int readInt();
+
+    long readUnsignedInt();
+
+    long readLong();
+
+    float readFloat();
+
+    double readDouble();
+
+    int peakVolatileInt();
+
+    String readUTFΔ();
 }

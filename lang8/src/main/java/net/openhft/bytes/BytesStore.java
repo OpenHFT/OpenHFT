@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 /**
  * A reference to some bytes with fixed extents.  Only offset access within the capacity is possible.
  */
-public interface BytesStore<B extends BytesStore<B>> extends RandomDataInput, RandomDataOutput, ReferenceCounted {
+public interface BytesStore<B extends BytesStore<B>> extends RandomDataInput, RandomDataOutput<B>, ReferenceCounted {
 
     default Bytes bytes() {
         return new BytesStoreBytes(this);

@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HeapBytesStore implements BytesStore {
+public class HeapBytesStore implements BytesStore<HeapBytesStore> {
     private static final AtomicBoolean MEMORY_BARRIER = new AtomicBoolean();
     private final AtomicInteger refCount = new AtomicInteger();
     private final Object underlyingObject, additional;
@@ -60,10 +60,16 @@ public class HeapBytesStore implements BytesStore {
     }
 
     @Override
-    public void writeUnsignedByte(long position, int i) {
-        if (position >= 0 && position < capacity)
-            UnsafeMemory.INSTANCE.writeByte(underlyingObject, dataOffset + position, (byte) i);
-        else
+    public HeapBytesStore writeByte(long offset, byte b) {
+        if (offset < 0 || offset >= capacity) {
             throw new BufferOverflowException();
+        }
+        UnsafeMemory.INSTANCE.writeByte(underlyingObject, dataOffset + offset, b);
+        return this;
+    }
+
+    @Override
+    public HeapBytesStore writeOrderedInt(long offset, int i) {
+        throw new UnsupportedOperationException();
     }
 }

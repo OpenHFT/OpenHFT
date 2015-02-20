@@ -87,10 +87,11 @@ public class BytesStoreBytes implements Bytes {
     }
 
     @Override
-    public void writeUnsignedByte(int i) {
+    public Bytes writeUnsignedByte(int i) {
         if (position >= writeLimit)
-            throw new BufferOverflowException();
-        bytesStore.writeUnsignedByte(position++, i);
+            bufferOverflowOnWrite();
+        bytesStore.writeByte(position++, (byte) i);
+        return this;
     }
 
     @Override
@@ -128,10 +129,181 @@ public class BytesStoreBytes implements Bytes {
     }
 
     @Override
-    public void writeUnsignedByte(long position, int i) {
-        if (position >= start() && position < capacity())
-            bytesStore.writeUnsignedByte(offset + position, i);
-        else
-            throw new BufferOverflowException();
+    public Bytes writeByte(long offset, byte i) {
+        bytesStore.writeByte(this.offset + offset, i);
+        return this;
+    }
+
+    @Override
+    public Bytes writeOrderedInt(long offset, int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void readUTFΔ(StringBuilder sb) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long readStopBit() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public byte readByte() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public short readShort() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int readUnsignedShort() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int readInt() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long readUnsignedInt() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long readLong() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public float readFloat() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double readDouble() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int peakVolatileInt() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String readUTFΔ() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes writeUnsignedInt(long i) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes writeInt(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes writeByte(byte i8) {
+        bytesStore.writeByte(writeMove(position, 1), i8);
+        return this;
+    }
+
+    private long writeMove(long position, int adding) {
+        if (position + adding > limit)
+            return bufferOverflowOnWrite();
+        position += adding;
+        return position - adding;
+    }
+
+    private long bufferOverflowOnWrite() {
+        throw new BufferOverflowException();
+    }
+
+    @Override
+    public Bytes writeShort(short i16) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes writeUnsignedShort(int u16) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes writeLong(long i64) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes writeFloat(float f) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes writeDouble(double d) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes write(Bytes bytes) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes skip(long bytesToSkip) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes flip() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toDebugString(long capacity) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes append(char ch) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public Bytes append(long value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes append(float f) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Bytes append(double d) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void parseUTF(CharSequence sb, StopCharTester stopCharTester) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long parseLong() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double parseDouble() {
+        throw new UnsupportedOperationException();
     }
 }

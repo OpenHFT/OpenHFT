@@ -2,13 +2,9 @@ package net.openhft.bytes;
 
 import java.util.function.Consumer;
 
-public interface Bytes extends BytesStore<Bytes>, StreamingDataInput<Bytes>, StreamingDataOutput<Bytes> {
-
-    default long remaining() {
-        return limit() - position();
-    }
-
-    ;
+public interface Bytes extends BytesStore<Bytes>,
+        StreamingDataInput<Bytes>, StreamingDataOutput<Bytes>,
+        ByteStringParser, ByteStringAppender<Bytes> {
 
     long position();
 
@@ -26,13 +22,12 @@ public interface Bytes extends BytesStore<Bytes>, StreamingDataInput<Bytes>, Str
         long length = position() - position;
         if (length >= 1 << 8)
             throw new IllegalStateException("Cannot have an 8-bit length of " + length);
-        writeUnsignedByte(position, (short) length);
+        writeByte(position, (short) length);
         storeFence();
 
         return this;
     }
 
-    void writeUnsignedByte(int i);
 
     default Bytes readLength8(Consumer<Bytes> reader) {
         loadFence();
@@ -41,8 +36,6 @@ public interface Bytes extends BytesStore<Bytes>, StreamingDataInput<Bytes>, Str
             throw new IllegalStateException("Unset length");
         return withLength(length, reader);
     }
-
-    int readUnsignedByte();
 
 /*
     Bytes writeLength16(Consumer<Bytes> writer);

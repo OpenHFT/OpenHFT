@@ -36,4 +36,14 @@ public interface StreamingCommon<S extends StreamingCommon<S>> extends RandomCom
         }
         return (S) this;
     }
+
+    S skip(long bytesToSkip);
+
+    S flip();
+
+    String toDebugString(long capacity);
+
+    default String toDebugString() {
+        return toDebugString(128);
+    }
 }
