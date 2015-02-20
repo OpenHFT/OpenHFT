@@ -34,12 +34,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * is left to ChronicleUnsafe, rather than being part of this class.
  */
 public class MappedNativeBytes extends AbstractBytes {
-    /**
-     * *** Access the Unsafe class *****
-     */
+
     @NotNull
-    @SuppressWarnings("ALL")
-    public final ThreadLocal<ChronicleUnsafe> threadLocal = new ThreadLocal();
+    public final ThreadLocal<ChronicleUnsafe> threadLocal = new ThreadLocal<ChronicleUnsafe>();
 
     static final int BYTES_OFFSET;
     static final int CHARS_OFFSET;
@@ -724,9 +721,12 @@ public class MappedNativeBytes extends AbstractBytes {
         return ByteBufferReuse.INSTANCE.reuse(position, (int) remaining(), att, toReuse);
     }
 
+
+    // todo :  we should move this lookup further up the stack, so that it can be done, just ONCE, for example once by a single threaded appender
+    // todo : hence the constructor should be give then instance of chronicleUnsafe to use
     @NotNull
     public ChronicleUnsafe getChronicleUnsafe() {
-       if (isSingleThreaded)
+        if (isSingleThreaded)
             return chronicleUnsafe;
 
         ChronicleUnsafe chronicleUnsafe = threadLocal.get();
