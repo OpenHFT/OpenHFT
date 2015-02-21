@@ -102,19 +102,22 @@ public class MappedFile {
     }
 
     /**
-     * gets the mapping at a given index, or returns null, if it does not exist, or
-     * IndexOutOfBoundsException if the index is out of range
+     * gets the refCount a given index, or returns 0, if the there is no mapping for this index
      *
      * @param index
      * @return the mapping at this {@code index}
      * @throws IndexOutOfBoundsException if the index is out of range
      */
-    public MappedMemory getMap(double index) throws IOException {
-        for (MappedMemory m : maps) {
-            if (m.index() == index)
-                return m;
+    public int getRefCount(long index) throws IOException {
+        try {
+            for (MappedMemory m : maps) {
+                if (m.index() == index)
+                    return m.refCount();
+            }
+        } catch (Exception e) {
+            return 0;
         }
-        return null;
+        return 0;
     }
 
 
