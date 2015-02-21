@@ -2,6 +2,66 @@ package net.openhft.chronicle.core;
 
 public enum Maths {
     ;
+    /**
+     * Numbers larger than this are whole numbers due to representation error.
+     */
+    private static final double WHOLE_NUMBER = 1L << 53;
+
+    /**
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
+     *
+     * @param d value to round
+     * @return rounded value
+     */
+    public static double round2(double d) {
+        final double factor = 1e2;
+        return d > WHOLE_NUMBER || d < -WHOLE_NUMBER ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
+    }
+
+    /**
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
+     *
+     * @param d value to round
+     * @return rounded value
+     */
+    public static double round4(double d) {
+        final double factor = 1e4;
+        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
+    }
+
+    /**
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
+     *
+     * @param d value to round
+     * @return rounded value
+     */
+    public static double round6(double d) {
+        final double factor = 1e6;
+        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
+    }
+
+    /**
+     * Performs a round which is accurate to within 1 ulp. i.e. for values very close to 0.5 it might be rounded up or
+     * down. This is a pragmatic choice for performance reasons as it is assumed you are not working on the edge of the
+     * precision of double.
+     *
+     * @param d value to round
+     * @return rounded value
+     */
+    public static double round8(double d) {
+        final double factor = 1e8;
+        return d > Long.MAX_VALUE / factor || d < -Long.MAX_VALUE / factor ? d :
+                (long) (d < 0 ? d * factor - 0.5 : d * factor + 0.5) / factor;
+    }
 
     public static int nextPower2(int n, int min) {
         return (int) Math.min(1 << 30, nextPower2((long) n, (long) min));
@@ -42,6 +102,12 @@ public enum Maths {
         for (int i = 0; i < cs.length(); i++)
             hash = hash * 131 + cs.charAt(i);
         return hash;
+    }
+
+
+    public static int intLog2(long num) {
+        long l = Double.doubleToRawLongBits((double) num);
+        return (int) ((l >> 52) - 1023L);
     }
 
     public static int toInt32(long x, String msg) {
