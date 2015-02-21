@@ -31,8 +31,8 @@
     <artifactId>lang</artifactId>
     <version>8.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <name>OpenHFT/Java-Lang/lang</name>
-    <description>Java Lang library for High Frequency Trading (Java 6+)</description>
+    <name>OpenHFT/Java-Lang/lang v8</name>
+    <description>Java Lang library for High Frequency Trading (Java 8+)</description>
 
     <dependencyManagement>
         <dependencies>

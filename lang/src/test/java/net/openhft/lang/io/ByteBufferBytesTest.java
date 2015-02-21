@@ -38,8 +38,7 @@ import static net.openhft.lang.io.StopCharTesters.*;
 import static org.junit.Assert.*;
 
 /**
- * Created with IntelliJ IDEA. User: peter.lawrey Date: 17/09/13 Time: 16:09 To change this template use File | Settings | File
- * Templates.
+ * User: peter.lawrey
  */
 public class ByteBufferBytesTest {
     public static final int SIZE = 128;
