@@ -15,7 +15,13 @@ public class MappedFileTest {
         tmp.deleteOnExit();
         MappedFile mf = MappedFile.of(tmp.getName(), 4 << 10, 0);
         assertEquals("refCount: 1", mf.referenceCounts());
+
         BytesStore bs = mf.acquire(5 << 10);
+        assertEquals(4 << 10, bs.start());
+        Bytes bytes = bs.bytes();
+        assertEquals(4 << 10, bytes.start());
+        assertEquals(0L, bs.readLong(5 << 10));
+        assertEquals(0L, bytes.readLong(5 << 10));
         assertEquals(2, mf.refCount());
         assertEquals(2, bs.refCount());
         assertEquals("refCount: 2, 0, 2", mf.referenceCounts());

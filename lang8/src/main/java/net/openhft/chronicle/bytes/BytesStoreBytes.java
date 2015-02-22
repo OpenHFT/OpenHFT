@@ -39,6 +39,11 @@ public class BytesStoreBytes implements Bytes {
     }
 
     @Override
+    public long start() {
+        return bytesStore.start();
+    }
+
+    @Override
     public long position() {
         return position;
     }

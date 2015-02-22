@@ -72,7 +72,7 @@ public class MappedFile implements ReferenceCounted {
             }
             long mappedSize = chunkSize + overlapSize;
             long address = OS.map(fileChannel, FileChannel.MapMode.READ_WRITE, chunk * chunkSize, mappedSize);
-            MappedByteStore mbs2 = new MappedByteStore(this, address, mappedSize);
+            MappedByteStore mbs2 = new MappedByteStore(this, chunk * chunkSize, address, mappedSize);
             stores.set(chunk, new WeakReference<>(mbs2));
             mbs2.reserve();
             return mbs2;
