@@ -32,5 +32,8 @@ public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrat
     boolean tryUpgradeReadToWriteLockAndDeregisterWait(long address);
     boolean tryUpgradeReadToWriteLockAndDeregisterWait(Bytes bytes, long offset);
 
+    void resetKeepingWaits(long address);
+    void resetKeepingWaits(Bytes bytes, long offset);
+
     int waitCount(long state);
 }

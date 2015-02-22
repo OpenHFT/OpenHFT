@@ -220,6 +220,16 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     @Override
+    public void resetKeepingWaits(long address) {
+        putCountWord(address, 0);
+    }
+
+    @Override
+    public void resetKeepingWaits(Bytes bytes, long offset) {
+        putCountWord(bytes, offset, 0);
+    }
+
+    @Override
     public boolean tryReadLock(long address) {
         long lockWord = getLockWord(address);
         int countWord = countWord(lockWord);

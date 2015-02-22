@@ -227,6 +227,26 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
     }
 
     @Override
+    public void resetKeepingWaits(long address) {
+        while (true) {
+            long lock = readVolatileLong(address);
+            long onlyWaits = lock & ((long) RW_LOCK_MASK) << RW_LOCK_LIMIT;
+            if (compareAndSwapLong(address, lock, onlyWaits))
+                return;
+        }
+    }
+
+    @Override
+    public void resetKeepingWaits(Bytes bytes, long offset) {
+        while (true) {
+            long lock = readVolatileLong(bytes, offset);
+            long onlyWaits = lock & ((long) RW_LOCK_MASK) << RW_LOCK_LIMIT;
+            if (compareAndSwapLong(bytes, offset, lock, onlyWaits))
+                return;
+        }
+    }
+
+    @Override
     public void registerWait(long address) {
         for (; ; ) {
             long lock = readVolatileLong(address);
