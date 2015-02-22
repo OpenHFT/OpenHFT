@@ -16,14 +16,9 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
-import java.nio.ByteOrder;
-
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.ByteOrder.nativeOrder;
 import static net.openhft.lang.io.AbstractBytes.UNSIGNED_INT_MASK;
-import static net.openhft.lang.io.NativeBytes.UNSAFE;
 
 public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         extends AbstractReadWriteLockingStrategy
@@ -41,16 +36,8 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     static final long COUNT_WORD_OFFSET = 0L;
     static final long WAIT_WORD_OFFSET = COUNT_WORD_OFFSET + 4L;
 
-    private static int countWordShift(ByteOrder order) {
-        return order == LITTLE_ENDIAN ? 0 : 32;
-    }
-
-    private static int waitWordShift(ByteOrder order) {
-        return order == LITTLE_ENDIAN ? 32 : 0;
-    }
-
-    static final int COUNT_WORD_SHIFT = countWordShift(nativeOrder());
-    static final int WAIT_WORD_SHIFT = waitWordShift(nativeOrder());
+    static final int COUNT_WORD_SHIFT = nativeOrder() == LITTLE_ENDIAN ? 0 : 32;
+    static final int WAIT_WORD_SHIFT = nativeOrder() == LITTLE_ENDIAN ? 32 : 0;
 
     static final int READ_BITS = 30;
     static final int MAX_READ = (1 << READ_BITS) - 1;
@@ -63,27 +50,13 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     static final int MAX_WAIT = Integer.MAX_VALUE;
     static final int WAIT_PARTY = 1;
 
-    private static long getLockWord(long address) {
-        return UNSAFE.getLongVolatile(null, address);
+    private static <T> long getLockWord(NativeAtomicAccess<T> access, T t, long offset) {
+        return access.getLongVolatile(t, offset);
     }
 
-    private static long getLockWord(Bytes bytes, long offset) {
-        long lockWord = bytes.readVolatileLong(offset);
-        if (bytes.byteOrder() != nativeOrder())
-            lockWord = Long.reverseBytes(lockWord);
-        return lockWord;
-    }
-
-    private static boolean casLockWord(long address, long expected, long x) {
-        return UNSAFE.compareAndSwapLong(null, address, expected, x);
-    }
-
-    private static boolean casLockWord(Bytes bytes, long offset, long expected, long x) {
-        if (bytes.byteOrder() != nativeOrder()) {
-            expected = Long.reverseBytes(expected);
-            x = Long.reverseBytes(x);
-        }
-        return bytes.compareAndSwapLong(offset, expected, x);
+    private static <T> boolean casLockWord(
+            NativeAtomicAccess<T> access, T t, long offset, long expected, long x) {
+        return access.compareAndSwapLong(t, offset, expected, x);
     }
 
     private static int countWord(long lockWord) {
@@ -99,37 +72,18 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
                 ((((long) waitWord) & UNSIGNED_INT_MASK) << WAIT_WORD_SHIFT);
     }
 
-    private static int getCountWord(long address) {
-        return UNSAFE.getIntVolatile(null, address + COUNT_WORD_OFFSET);
+    private static <T> int getCountWord(NativeAtomicAccess<T> access, T t, long offset) {
+        return access.getIntVolatile(t, offset + COUNT_WORD_OFFSET);
     }
 
-    private static int getCountWord(Bytes bytes, long offset) {
-        int countWord = bytes.readVolatileInt(offset + COUNT_WORD_OFFSET);
-        if (bytes.byteOrder() != nativeOrder())
-            countWord = Integer.reverseBytes(countWord);
-        return countWord;
+    private static <T> boolean casCountWord(
+            NativeAtomicAccess<T> access, T t, long offset, int expected, int x) {
+        return access.compareAndSwapInt(t, offset + COUNT_WORD_OFFSET, expected, x);
     }
 
-    private static boolean casCountWord(long address, int expected, int x) {
-        return UNSAFE.compareAndSwapInt(null, address + COUNT_WORD_OFFSET, expected, x);
-    }
-
-    private static boolean casCountWord(Bytes bytes, long offset, int expected, int x) {
-        if (bytes.byteOrder() != nativeOrder()) {
-            expected = Integer.reverseBytes(expected);
-            x = Integer.reverseBytes(x);
-        }
-        return bytes.compareAndSwapInt(offset + COUNT_WORD_OFFSET, expected, x);
-    }
-
-    private static void putCountWord(long address, int countWord) {
-        UNSAFE.putOrderedInt(null, address + COUNT_WORD_OFFSET, countWord);
-    }
-
-    private static void putCountWord(Bytes bytes, long offset, int countWord) {
-        if (bytes.byteOrder() != nativeOrder())
-            countWord = Integer.reverseBytes(countWord);
-        bytes.writeOrderedInt(offset + COUNT_WORD_OFFSET, countWord);
+    private static <T> void putCountWord(
+            NativeAtomicAccess<T> access, T t, long offset, int countWord) {
+        access.putOrderedInt(t, offset + COUNT_WORD_OFFSET, countWord);
     }
 
 
@@ -167,27 +121,13 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         }
     }
 
-    private static int getWaitWord(long address) {
-        return UNSAFE.getIntVolatile(null, address + WAIT_WORD_OFFSET);
+    private static <T> int getWaitWord(NativeAtomicAccess<T> access, T t, long offset) {
+        return access.getIntVolatile(t, offset + WAIT_WORD_OFFSET);
     }
 
-    private static int getWaitWord(Bytes bytes, long offset) {
-        int waitWord = bytes.readVolatileInt(offset + WAIT_WORD_OFFSET);
-        if (bytes.byteOrder() != nativeOrder())
-            waitWord = Integer.reverseBytes(waitWord);
-        return waitWord;
-    }
-
-    private static boolean casWaitWord(long address, int expected, int x) {
-        return UNSAFE.compareAndSwapInt(null, address + WAIT_WORD_OFFSET, expected, x);
-    }
-
-    private static boolean casWaitWord(Bytes bytes, long offset, int expected, int x) {
-        if (bytes.byteOrder() != nativeOrder()) {
-            expected = Integer.reverseBytes(expected);
-            x = Integer.reverseBytes(x);
-        }
-        return bytes.compareAndSwapInt(offset + WAIT_WORD_OFFSET, expected, x);
+    private static <T> boolean casWaitWord(
+            NativeAtomicAccess<T> access, T t, long offset, int expected, int x) {
+        return access.compareAndSwapInt(t, offset + WAIT_WORD_OFFSET, expected, x);
     }
 
     private static void checkWaitWordForIncrement(int waitWord) {
@@ -210,210 +150,111 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     @Override
-    public void reset(long address) {
-        UNSAFE.putOrderedLong(null, address, 0L);
+    public <T> void reset(NativeAtomicAccess<T> access, T t, long offset) {
+        access.putOrderedLong(t, offset, 0L);
     }
 
     @Override
-    public void reset(Bytes bytes, long offset) {
-        bytes.writeOrderedLong(offset, 0L);
+    public <T> void resetKeepingWaits(NativeAtomicAccess<T> access, T t, long offset) {
+        putCountWord(access, t, offset, 0);
     }
 
     @Override
-    public void resetKeepingWaits(long address) {
-        putCountWord(address, 0);
-    }
-
-    @Override
-    public void resetKeepingWaits(Bytes bytes, long offset) {
-        putCountWord(bytes, offset, 0);
-    }
-
-    @Override
-    public boolean tryReadLock(long address) {
-        long lockWord = getLockWord(address);
+    public <T> boolean tryReadLock(NativeAtomicAccess<T> access, T t, long offset) {
+        long lockWord = getLockWord(access, t, offset);
         int countWord = countWord(lockWord);
         if (!writeLocked(countWord) && waitWord(lockWord) == 0) {
             checkReadCountForIncrement(countWord);
-            if (casCountWord(address, countWord, countWord + READ_PARTY))
+            if (casCountWord(access, t, offset, countWord, countWord + READ_PARTY))
                 return true;
         }
         return false;
     }
 
     @Override
-    public boolean tryReadLock(Bytes bytes, long offset) {
-        long lockWord = getLockWord(bytes, offset);
-        int countWord = countWord(lockWord);
-        if (!writeLocked(countWord) && waitWord(lockWord) == 0) {
-            checkReadCountForIncrement(countWord);
-            if (casCountWord(bytes, offset, countWord, countWord + READ_PARTY))
-                return true;
-        }
-        return false;
-    }
-
-    @Override
-         public boolean tryUpgradeReadToUpdateLock(long address) {
-        int countWord = getCountWord(address);
+    public <T> boolean tryUpgradeReadToUpdateLock(NativeAtomicAccess<T> access, T t, long offset) {
+        int countWord = getCountWord(access, t, offset);
         checkReadLocked(countWord);
         return !updateLocked(countWord) &&
-                casCountWord(address, countWord, countWord - READ_PARTY + UPDATE_PARTY);
+                casCountWord(access, t, offset, countWord, countWord - READ_PARTY + UPDATE_PARTY);
     }
 
     @Override
-    public boolean tryUpgradeReadToUpdateLock(Bytes bytes, long offset) {
-        int countWord = getCountWord(bytes, offset);
-        checkReadLocked(countWord);
-        return !updateLocked(countWord) &&
-                casCountWord(bytes, offset, countWord, countWord - READ_PARTY + UPDATE_PARTY);
-    }
-
-    @Override
-    public boolean tryUpgradeReadToWriteLock(long address) {
-        int countWord = getCountWord(address);
+    public <T> boolean tryUpgradeReadToWriteLock(NativeAtomicAccess<T> access, T t, long offset) {
+        int countWord = getCountWord(access, t, offset);
         checkReadLocked(countWord);
         return countWord == READ_PARTY &&
-                casCountWord(address, READ_PARTY, WRITE_LOCKED_COUNT_WORD);
+                casCountWord(access, t, offset, READ_PARTY, WRITE_LOCKED_COUNT_WORD);
     }
 
     @Override
-    public boolean tryUpgradeReadToWriteLock(Bytes bytes, long offset) {
-        int countWord = getCountWord(bytes, offset);
+    public <T> boolean tryUpgradeReadToWriteLockAndDeregisterWait(
+            NativeAtomicAccess<T> access, T t, long offset) {
+        long lockWord = getLockWord(access, t, offset);
+        int countWord = countWord(lockWord);
         checkReadLocked(countWord);
         return countWord == READ_PARTY &&
-                casCountWord(bytes, offset, READ_PARTY, WRITE_LOCKED_COUNT_WORD);
+                tryWriteLockAndDeregisterWait0(access, t, offset, lockWord);
     }
 
-    @Override
-    public boolean tryUpgradeReadToWriteLockAndDeregisterWait(long address) {
-        long lockWord = getLockWord(address);
-        int countWord = countWord(lockWord);
-        checkReadLocked(countWord);
-        return countWord == READ_PARTY && tryWriteLockAndDeregisterWait0(address, lockWord);
-    }
-
-    @Override
-    public boolean tryUpgradeReadToWriteLockAndDeregisterWait(Bytes bytes, long offset) {
-        long lockWord = getLockWord(bytes, offset);
-        int countWord = countWord(lockWord);
-        checkReadLocked(countWord);
-        return countWord == READ_PARTY && tryWriteLockAndDeregisterWait0(bytes, offset, lockWord);
-    }
-
-    private static boolean tryWriteLockAndDeregisterWait0(long address, long lockWord) {
+    private static <T> boolean tryWriteLockAndDeregisterWait0(
+            NativeAtomicAccess<T> access, T t, long offset, long lockWord) {
         int waitWord = waitWord(lockWord);
         checkWaitWordForDecrement(waitWord);
-        return casLockWord(address, lockWord,
-                lockWord(WRITE_LOCKED_COUNT_WORD, waitWord - WAIT_PARTY));
-    }
-
-    private static boolean tryWriteLockAndDeregisterWait0(Bytes bytes, long offset, long lockWord) {
-        int waitWord = waitWord(lockWord);
-        checkWaitWordForDecrement(waitWord);
-        return casLockWord(bytes, offset, lockWord,
+        return casLockWord(access, t, offset, lockWord,
                 lockWord(WRITE_LOCKED_COUNT_WORD, waitWord - WAIT_PARTY));
     }
 
     @Override
-    public boolean tryUpdateLock(long address) {
-        long lockWord = getLockWord(address);
+    public <T> boolean tryUpdateLock(NativeAtomicAccess<T> access, T t, long offset) {
+        long lockWord = getLockWord(access, t, offset);
         int countWord = countWord(lockWord);
         if (!updateLocked(countWord) && !writeLocked(countWord) && waitWord(lockWord) == 0) {
-            if (casCountWord(address, countWord, countWord + UPDATE_PARTY))
+            if (casCountWord(access, t, offset, countWord, countWord + UPDATE_PARTY))
                 return true;
         }
         return false;
     }
 
     @Override
-    public boolean tryUpdateLock(Bytes bytes, long offset) {
-        long lockWord = getLockWord(bytes, offset);
+    public <T> boolean tryWriteLock(NativeAtomicAccess<T> access, T t, long offset) {
+        return getCountWord(access, t, offset) == 0 &&
+                casCountWord(access, t, offset, 0, WRITE_LOCKED_COUNT_WORD);
+    }
+
+    @Override
+    public <T> boolean tryWriteLockAndDeregisterWait(
+            NativeAtomicAccess<T> access, T t, long offset) {
+        long lockWord = getLockWord(access, t, offset);
         int countWord = countWord(lockWord);
-        if (!updateLocked(countWord) && !writeLocked(countWord) && waitWord(lockWord) == 0) {
-            if (casCountWord(bytes, offset, countWord, countWord + UPDATE_PARTY))
-                return true;
-        }
-        return false;
+        return countWord == 0 && tryWriteLockAndDeregisterWait0(access, t, offset, lockWord);
     }
 
     @Override
-    public boolean tryWriteLock(long address) {
-        return getCountWord(address) == 0 && casCountWord(address, 0, WRITE_LOCKED_COUNT_WORD);
-    }
-
-    @Override
-    public boolean tryWriteLock(Bytes bytes, long offset) {
-        return getCountWord(bytes, offset) == 0 &&
-                casCountWord(bytes, offset, 0, WRITE_LOCKED_COUNT_WORD);
-    }
-
-    @Override
-    public boolean tryWriteLockAndDeregisterWait(long address) {
-        long lockWord = getLockWord(address);
-        int countWord = countWord(lockWord);
-        return countWord == 0 && tryWriteLockAndDeregisterWait0(address, lockWord);
-    }
-
-    @Override
-    public boolean tryWriteLockAndDeregisterWait(Bytes bytes, long offset) {
-        long lockWord = getLockWord(bytes, offset);
-        int countWord = countWord(lockWord);
-        return countWord == 0 && tryWriteLockAndDeregisterWait0(bytes, offset, lockWord);
-    }
-
-    @Override
-    public void registerWait(long address) {
+    public <T> void registerWait(NativeAtomicAccess<T> access, T t, long offset) {
         while (true) {
-            int waitWord = getWaitWord(address);
+            int waitWord = getWaitWord(access, t, offset);
             checkWaitWordForIncrement(waitWord);
-            if (casWaitWord(address, waitWord, waitWord + WAIT_PARTY))
+            if (casWaitWord(access, t, offset, waitWord, waitWord + WAIT_PARTY))
                 return;
         }
     }
 
     @Override
-    public void registerWait(Bytes bytes, long offset) {
+    public <T> void deregisterWait(NativeAtomicAccess<T> access, T t, long offset) {
         while (true) {
-            int waitWord = getWaitWord(bytes, offset);
-            checkWaitWordForIncrement(waitWord);
-            if (casWaitWord(bytes, offset, waitWord, waitWord + WAIT_PARTY))
-                return;
-        }
-    }
-
-    @Override
-    public void deregisterWait(long address) {
-        while (true) {
-            int waitWord = getWaitWord(address);
+            int waitWord = getWaitWord(access, t, offset);
             checkWaitWordForDecrement(waitWord);
-            if (casWaitWord(address, waitWord, waitWord - WAIT_PARTY))
+            if (casWaitWord(access, t, offset, waitWord, waitWord - WAIT_PARTY))
                 return;
         }
     }
 
     @Override
-    public void deregisterWait(Bytes bytes, long offset) {
-        while (true) {
-            int waitWord = getWaitWord(bytes, offset);
-            checkWaitWordForDecrement(waitWord);
-            if (casWaitWord(bytes, offset, waitWord, waitWord - WAIT_PARTY))
-                return;
-        }
-    }
-
-    @Override
-    public boolean tryUpgradeUpdateToWriteLock(long address) {
-        int countWord = getCountWord(address);
+    public <T> boolean tryUpgradeUpdateToWriteLock(NativeAtomicAccess<T> access, T t, long offset) {
+        int countWord = getCountWord(access, t, offset);
         return checkExclusiveUpdateLocked(countWord) &&
-                casCountWord(address, countWord, WRITE_LOCKED_COUNT_WORD);
-    }
-
-    @Override
-    public boolean tryUpgradeUpdateToWriteLock(Bytes bytes, long offset) {
-        int countWord = getCountWord(bytes, offset);
-        return checkExclusiveUpdateLocked(countWord) &&
-                casCountWord(bytes, offset, countWord, WRITE_LOCKED_COUNT_WORD);
+                casCountWord(access, t, offset, countWord, WRITE_LOCKED_COUNT_WORD);
     }
 
     private static boolean checkExclusiveUpdateLocked(int countWord) {
@@ -422,115 +263,61 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     @Override
-    public boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(long address) {
-        long lockWord = getLockWord(address);
+    public <T> boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(
+            NativeAtomicAccess<T> access, T t, long offset) {
+        long lockWord = getLockWord(access, t, offset);
         int countWord = countWord(lockWord);
         return checkExclusiveUpdateLocked(countWord) &&
-                tryWriteLockAndDeregisterWait0(address, lockWord);
+                tryWriteLockAndDeregisterWait0(access, t, offset, lockWord);
     }
 
     @Override
-    public boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(Bytes bytes, long offset) {
-        long lockWord = getLockWord(bytes, offset);
-        int countWord = countWord(lockWord);
-        return checkExclusiveUpdateLocked(countWord) &&
-                tryWriteLockAndDeregisterWait0(bytes, offset, lockWord);
-    }
-
-    @Override
-    public void readUnlock(long address) {
+    public <T> void readUnlock(NativeAtomicAccess<T> access, T t, long offset) {
         while (true) {
-            int countWord = getCountWord(address);
+            int countWord = getCountWord(access, t, offset);
             checkReadLocked(countWord);
-            if (casCountWord(address, countWord, countWord - READ_PARTY))
+            if (casCountWord(access, t, offset, countWord, countWord - READ_PARTY))
                 return;
         }
     }
 
     @Override
-    public void readUnlock(Bytes bytes, long offset) {
+    public <T> void updateUnlock(NativeAtomicAccess<T> access, T t, long offset) {
         while (true) {
-            int countWord = getCountWord(bytes, offset);
-            checkReadLocked(countWord);
-            if (casCountWord(bytes, offset, countWord, countWord - READ_PARTY))
-                return;
-        }
-    }
-
-    @Override
-    public void updateUnlock(long address) {
-        while (true) {
-            int countWord = getCountWord(address);
+            int countWord = getCountWord(access, t, offset);
             checkUpdateLocked(countWord);
-            if (casCountWord(address, countWord, countWord - UPDATE_PARTY)) {
+            if (casCountWord(access, t, offset, countWord, countWord - UPDATE_PARTY)) {
                 return;
             }
         }
     }
 
     @Override
-    public void updateUnlock(Bytes bytes, long offset) {
+    public <T> void downgradeUpdateToReadLock(NativeAtomicAccess<T> access, T t, long offset) {
         while (true) {
-            int countWord = getCountWord(bytes, offset);
-            checkUpdateLocked(countWord);
-            if (casCountWord(bytes, offset, countWord, countWord - UPDATE_PARTY)) {
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void downgradeUpdateToReadLock(long address) {
-        while (true) {
-            int countWord = getCountWord(address);
+            int countWord = getCountWord(access, t, offset);
             checkUpdateLocked(countWord);
             checkReadCountForIncrement(countWord);
-            if (casCountWord(address, countWord, countWord - UPDATE_PARTY + READ_PARTY)) {
+            if (casCountWord(access, t, offset, countWord, countWord - UPDATE_PARTY + READ_PARTY)) {
                 return;
             }
         }
     }
 
     @Override
-    public void downgradeUpdateToReadLock(Bytes bytes, long offset) {
-        while (true) {
-            int countWord = getCountWord(bytes, offset);
-            checkUpdateLocked(countWord);
-            checkReadCountForIncrement(countWord);
-            if (casCountWord(bytes, offset, countWord, countWord - UPDATE_PARTY + READ_PARTY)) {
-                return;
-            }
-        }
+    public <T> void writeUnlock(NativeAtomicAccess<T> access, T t, long offset) {
+        checkWriteLockedAndPut(access, t, offset, 0);
+    }
+
+    private static <T> void checkWriteLockedAndPut(
+            NativeAtomicAccess<T> access, T t, long offset, int countWord) {
+        checkWriteLocked(getCountWord(access, t, offset));
+        putCountWord(access, t, offset, countWord);
     }
 
     @Override
-    public void writeUnlock(long address) {
-        checkWriteLockedAndPut(address, 0);
-    }
-
-    private static void checkWriteLockedAndPut(long address, int countWord) {
-        checkWriteLocked(getCountWord(address));
-        putCountWord(address, countWord);
-    }
-
-    @Override
-    public void writeUnlock(Bytes bytes, long offset) {
-        checkWriteLockedAndPut(bytes, offset, 0);
-    }
-
-    private static void checkWriteLockedAndPut(Bytes bytes, long offset, int countWord) {
-        checkWriteLocked(getCountWord(bytes, offset));
-        putCountWord(bytes, offset, countWord);
-    }
-
-    @Override
-    public void downgradeWriteToUpdateLock(long address) {
-        checkWriteLockedAndPut(address, UPDATE_PARTY);
-    }
-
-    @Override
-    public void downgradeWriteToUpdateLock(Bytes bytes, long offset) {
-        checkWriteLockedAndPut(bytes, offset, UPDATE_PARTY);
+    public <T> void downgradeWriteToUpdateLock(NativeAtomicAccess<T> access, T t, long offset) {
+        checkWriteLockedAndPut(access, t, offset, UPDATE_PARTY);
     }
 
     @Override
@@ -539,23 +326,13 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     @Override
-    public void downgradeWriteToReadLock(long address) {
-        checkWriteLockedAndPut(address, READ_PARTY);
+    public <T> void downgradeWriteToReadLock(NativeAtomicAccess<T> access, T t, long offset) {
+        checkWriteLockedAndPut(access, t, offset, READ_PARTY);
     }
 
     @Override
-    public void downgradeWriteToReadLock(Bytes bytes, long offset) {
-        checkWriteLockedAndPut(bytes, offset, READ_PARTY);
-    }
-
-    @Override
-    public long getState(long address) {
-        return getLockWord(address);
-    }
-
-    @Override
-    public long getState(Bytes bytes, long offset) {
-        return getLockWord(bytes, offset);
+    public <T> long getState(NativeAtomicAccess<T> access, T t, long offset) {
+        return getLockWord(access, t, offset);
     }
 
     @Override

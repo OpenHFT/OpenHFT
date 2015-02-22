@@ -16,8 +16,6 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
 /**
  * Logic of read-write-update lock state transitions.
  *
@@ -27,23 +25,17 @@ import net.openhft.lang.io.Bytes;
  */
 public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy {
 
-    boolean tryUpdateLock(long address);
-    boolean tryUpdateLock(Bytes bytes, long offset);
+    <T> boolean tryUpdateLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    boolean tryUpgradeReadToUpdateLock(long address);
-    boolean tryUpgradeReadToUpdateLock(Bytes bytes, long offset);
+    <T> boolean tryUpgradeReadToUpdateLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    boolean tryUpgradeUpdateToWriteLock(long address);
-    boolean tryUpgradeUpdateToWriteLock(Bytes bytes, long offset);
+    <T> boolean tryUpgradeUpdateToWriteLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void updateUnlock(long address);
-    void updateUnlock(Bytes bytes, long offset);
+    <T> void updateUnlock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void downgradeUpdateToReadLock(long address);
-    void downgradeUpdateToReadLock(Bytes bytes, long offset);
+    <T> void downgradeUpdateToReadLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void downgradeWriteToUpdateLock(long address);
-    void downgradeWriteToUpdateLock(Bytes bytes, long offset);
+    <T> void downgradeWriteToUpdateLock(NativeAtomicAccess<T> access, T t, long offset);
 
     boolean isUpdateLocked(long state);
 }

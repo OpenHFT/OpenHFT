@@ -16,12 +16,9 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
 public interface ReadWriteUpdateWithWaitsLockingStrategy
         extends ReadWriteUpdateLockingStrategy, ReadWriteWithWaitsLockingStrategy {
 
-    boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(long address);
-
-    boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(Bytes bytes, long offset);
+    <T> boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(
+            NativeAtomicAccess<T> access, T t, long offset);
 }

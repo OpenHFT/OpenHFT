@@ -16,11 +16,6 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
-import static java.nio.ByteOrder.nativeOrder;
-import static net.openhft.lang.io.NativeBytes.UNSAFE;
-
 public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractReadWriteLockingStrategy
         implements ReadWriteWithWaitsLockingStrategy {
 
@@ -35,7 +30,7 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
 
 
     static final int RW_LOCK_LIMIT = 30;
-    static final long RW_READ_LOCKED = 1L << 0;
+    static final long RW_READ_LOCKED = 1L;
     static final long RW_WRITE_WAITING = 1L << RW_LOCK_LIMIT;
     static final long RW_WRITE_LOCKED = 1L << 2 * RW_LOCK_LIMIT;
     static final int RW_LOCK_MASK = (1 << RW_LOCK_LIMIT) - 1;
@@ -53,32 +48,17 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
         return (int) (lock >>> (2 * RW_LOCK_LIMIT));
     }
 
-    static long readVolatileLong(long address) {
-        return UNSAFE.getLongVolatile(null, address);
+    static <T> long read(NativeAtomicAccess<T> access, T t, long offset) {
+        return access.getLongVolatile(t, offset);
     }
 
-    static long readVolatileLong(Bytes bytes, long offset) {
-        long lock = bytes.readVolatileLong(offset);
-        if (bytes.byteOrder() != nativeOrder())
-            lock = Long.reverseBytes(lock);
-        return lock;
-    }
-
-    static boolean compareAndSwapLong(long address, long expected, long x) {
-        return UNSAFE.compareAndSwapLong(null, address, expected, x);
-    }
-
-    static boolean compareAndSwapLong(Bytes bytes, long offset, long expected, long x) {
-        if (bytes.byteOrder() != nativeOrder()) {
-            expected = Long.reverseBytes(expected);
-            x = Long.reverseBytes(x);
-        }
-        return bytes.compareAndSwapLong(offset, expected, x);
+    static <T> boolean cas(NativeAtomicAccess<T> access, T t, long offset, long expected, long x) {
+        return access.compareAndSwapLong(t, offset, expected, x);
     }
 
     @Override
-    public boolean tryReadLock(long address) {
-        long lock = readVolatileLong(address);
+    public <T> boolean tryReadLock(NativeAtomicAccess<T> access, T t, long offset) {
+        long lock = read(access, t, offset);
         int writersWaiting = rwWriteWaiting(lock);
         int writersLocked = rwWriteLocked(lock);
         // readers wait for waiting writers
@@ -88,121 +68,56 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
             if (readersLocked >= RW_LOCK_MASK)
                 throw new IllegalMonitorStateException("readersLocked has reached a limit of " +
                         readersLocked);
-            if (compareAndSwapLong(address, lock, lock + RW_READ_LOCKED))
+            if (cas(access, t, offset, lock, lock + RW_READ_LOCKED))
                 return true;
         }
         return false;
     }
 
     @Override
-    public boolean tryReadLock(Bytes bytes, long offset) {
-        long lock = readVolatileLong(bytes, offset);
-        int writersWaiting = rwWriteWaiting(lock);
-        int writersLocked = rwWriteLocked(lock);
-        // readers wait for waiting writers
-        if (writersLocked <= 0 && writersWaiting <= 0) {
-            // increment readers locked.
-            int readersLocked = rwReadLocked(lock);
-            if (readersLocked >= RW_LOCK_MASK)
-                throw new IllegalMonitorStateException("readersLocked has reached a limit of " +
-                        readersLocked);
-            if (compareAndSwapLong(bytes, offset, lock, lock + RW_READ_LOCKED))
-                return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean tryWriteLock(long address) {
-        long lock = readVolatileLong(address);
+    public <T> boolean tryWriteLock(NativeAtomicAccess<T> access, T t, long offset) {
+        long lock = read(access, t, offset);
         int readersLocked = rwReadLocked(lock);
         int writersLocked = rwWriteLocked(lock);
         // writers don't wait for waiting readers.
         if (readersLocked <= 0 && writersLocked <= 0) {
-            if (compareAndSwapLong(address, lock, lock + RW_WRITE_LOCKED))
+            if (cas(access, t, offset, lock, lock + RW_WRITE_LOCKED))
                 return true;
         }
         return false;
     }
 
     @Override
-    public boolean tryWriteLock(Bytes bytes, long offset) {
-        long lock = readVolatileLong(bytes, offset);
-        int readersLocked = rwReadLocked(lock);
-        int writersLocked = rwWriteLocked(lock);
-        // writers don't wait for waiting readers.
-        if (readersLocked <= 0 && writersLocked <= 0) {
-            if (compareAndSwapLong(bytes, offset, lock, lock + RW_WRITE_LOCKED))
-                return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean tryUpgradeReadToWriteLock(long address) {
+    public <T> boolean tryUpgradeReadToWriteLock(NativeAtomicAccess<T> access, T t, long offset) {
         throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public boolean tryUpgradeReadToWriteLock(Bytes bytes, long offset) {
-        throw new UnsupportedOperationException("not implemented yet");
-    }
-
-    @Override
-    public void readUnlock(long address) {
+    public <T> void readUnlock(NativeAtomicAccess<T> access, T t, long offset) {
         for (; ; ) {
-            long lock = readVolatileLong(address);
+            long lock = read(access, t, offset);
             int readersLocked = rwReadLocked(lock);
             if (readersLocked <= 0)
                 throw new IllegalMonitorStateException("readerLock underflow");
-            if (compareAndSwapLong(address, lock, lock - RW_READ_LOCKED))
+            if (cas(access, t, offset, lock, lock - RW_READ_LOCKED))
                 return;
         }
     }
 
     @Override
-    public void readUnlock(Bytes bytes, long offset) {
+    public <T> void writeUnlock(NativeAtomicAccess<T> access, T t, long offset) {
         for (; ; ) {
-            long lock = readVolatileLong(bytes, offset);
-            int readersLocked = rwReadLocked(lock);
-            if (readersLocked <= 0)
-                throw new IllegalMonitorStateException("readerLock underflow");
-            if (compareAndSwapLong(bytes, offset, lock, lock - RW_READ_LOCKED))
-                return;
-        }
-    }
-
-    @Override
-    public void writeUnlock(long address) {
-        for (; ; ) {
-            long lock = readVolatileLong(address);
+            long lock = read(access, t, offset);
             int writersLocked = rwWriteLocked(lock);
             if (writersLocked != 1)
                 throw new IllegalMonitorStateException("writersLock underflow " + writersLocked);
-            if (compareAndSwapLong(address, lock, lock - RW_WRITE_LOCKED))
+            if (cas(access, t, offset, lock, lock - RW_WRITE_LOCKED))
                 return;
         }
     }
 
     @Override
-    public void writeUnlock(Bytes bytes, long offset) {
-        for (; ; ) {
-            long lock = readVolatileLong(bytes, offset);
-            int writersLocked = rwWriteLocked(lock);
-            if (writersLocked != 1)
-                throw new IllegalMonitorStateException("writersLock underflow " + writersLocked);
-            if (compareAndSwapLong(bytes, offset, lock, lock - RW_WRITE_LOCKED))
-                return;
-        }
-    }
-
-    @Override
-    public void downgradeWriteToReadLock(long address) {
-        throw new UnsupportedOperationException("not implemented yet");
-    }
-
-    @Override
-    public void downgradeWriteToReadLock(Bytes bytes, long offset) {
+    public <T> void downgradeWriteToReadLock(NativeAtomicAccess<T> access, T t, long offset) {
         throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -217,88 +132,49 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
     }
 
     @Override
-    public void reset(long address) {
-        UNSAFE.putOrderedLong(null, address, 0L);
+    public <T> void reset(NativeAtomicAccess<T> access, T t, long offset) {
+        access.putOrderedLong(t, offset, 0L);
     }
 
     @Override
-    public void reset(Bytes bytes, long offset) {
-        bytes.writeOrderedLong(offset, 0L);
-    }
-
-    @Override
-    public void resetKeepingWaits(long address) {
+    public <T> void resetKeepingWaits(NativeAtomicAccess<T> access, T t, long offset) {
         while (true) {
-            long lock = readVolatileLong(address);
+            long lock = read(access, t, offset);
             long onlyWaits = lock & ((long) RW_LOCK_MASK) << RW_LOCK_LIMIT;
-            if (compareAndSwapLong(address, lock, onlyWaits))
+            if (cas(access, t, offset, lock, onlyWaits))
                 return;
         }
     }
 
     @Override
-    public void resetKeepingWaits(Bytes bytes, long offset) {
-        while (true) {
-            long lock = readVolatileLong(bytes, offset);
-            long onlyWaits = lock & ((long) RW_LOCK_MASK) << RW_LOCK_LIMIT;
-            if (compareAndSwapLong(bytes, offset, lock, onlyWaits))
-                return;
-        }
-    }
-
-    @Override
-    public void registerWait(long address) {
+    public <T> void registerWait(NativeAtomicAccess<T> access, T t, long offset) {
         for (; ; ) {
-            long lock = readVolatileLong(address);
+            long lock = read(access, t, offset);
             int writersWaiting = rwWriteWaiting(lock);
             if (writersWaiting >= RW_LOCK_MASK)
                 throw new IllegalMonitorStateException("writersWaiting has reached a limit of " +
                         writersWaiting);
-            if (compareAndSwapLong(address, lock, lock + RW_WRITE_WAITING))
+            if (cas(access, t, offset, lock, lock + RW_WRITE_WAITING))
                 break;
         }
     }
 
     @Override
-    public void registerWait(Bytes bytes, long offset) {
+    public <T> void deregisterWait(NativeAtomicAccess<T> access, T t, long offset) {
         for (; ; ) {
-            long lock = readVolatileLong(bytes, offset);
-            int writersWaiting = rwWriteWaiting(lock);
-            if (writersWaiting >= RW_LOCK_MASK)
-                throw new IllegalMonitorStateException("writersWaiting has reached a limit of " +
-                        writersWaiting);
-            if (compareAndSwapLong(bytes, offset, lock, lock + RW_WRITE_WAITING))
-                break;
-        }
-    }
-
-    @Override
-    public void deregisterWait(long address) {
-        for (; ; ) {
-            long lock = readVolatileLong(address);
+            long lock = read(access, t, offset);
             int writersWaiting = rwWriteWaiting(lock);
             if (writersWaiting <= 0)
                 throw new IllegalMonitorStateException("writersWaiting has underflowed");
-            if (compareAndSwapLong(address, lock, lock - RW_WRITE_WAITING))
+            if (cas(access, t, offset, lock, lock - RW_WRITE_WAITING))
                 break;
         }
     }
 
     @Override
-    public void deregisterWait(Bytes bytes, long offset) {
-        for (; ; ) {
-            long lock = readVolatileLong(bytes, offset);
-            int writersWaiting = rwWriteWaiting(lock);
-            if (writersWaiting <= 0)
-                throw new IllegalMonitorStateException("writersWaiting has underflowed");
-            if (compareAndSwapLong(bytes, offset, lock, lock - RW_WRITE_WAITING))
-                break;
-        }
-    }
-
-    @Override
-    public boolean tryWriteLockAndDeregisterWait(long address) {
-        long lock = readVolatileLong(address);
+    public <T> boolean tryWriteLockAndDeregisterWait(
+            NativeAtomicAccess<T> access, T t, long offset) {
+        long lock = read(access, t, offset);
         int readersLocked = rwReadLocked(lock);
         int writersWaiting = rwWriteWaiting(lock);
         int writersLocked = rwWriteLocked(lock);
@@ -307,36 +183,15 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
             if (writersWaiting <= 0)
                 throw new IllegalMonitorStateException("writersWaiting has underflowed");
             // add to the readLock count and decrease the readWaiting count.
-            if (compareAndSwapLong(address, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
+            if (cas(access, t, offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
                 return true;
         }
         return false;
     }
 
     @Override
-    public boolean tryWriteLockAndDeregisterWait(Bytes bytes, long offset) {
-        long lock = readVolatileLong(bytes, offset);
-        int readersLocked = rwReadLocked(lock);
-        int writersWaiting = rwWriteWaiting(lock);
-        int writersLocked = rwWriteLocked(lock);
-        if (readersLocked <= 0 && writersLocked <= 0) {
-            // increment readers locked.
-            if (writersWaiting <= 0)
-                throw new IllegalMonitorStateException("writersWaiting has underflowed");
-            // add to the readLock count and decrease the readWaiting count.
-            if (compareAndSwapLong(bytes, offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
-                return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean tryUpgradeReadToWriteLockAndDeregisterWait(long address) {
-        throw new UnsupportedOperationException("not implemented yet");
-    }
-
-    @Override
-    public boolean tryUpgradeReadToWriteLockAndDeregisterWait(Bytes bytes, long offset) {
+    public <T> boolean tryUpgradeReadToWriteLockAndDeregisterWait(
+            NativeAtomicAccess<T> access, T t, long offset) {
         throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -346,13 +201,8 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
     }
 
     @Override
-    public long getState(long address) {
-        return readVolatileLong(address);
-    }
-
-    @Override
-    public long getState(Bytes bytes, long offset) {
-        return readVolatileLong(bytes, offset);
+    public <T> long getState(NativeAtomicAccess<T> access, T t, long offset) {
+        return read(access, t, offset);
     }
 
     @Override

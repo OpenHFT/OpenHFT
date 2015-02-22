@@ -53,13 +53,37 @@ public class LockingStrategyTest {
     ExecutorService e1, e2;
     ByteBuffer buffer;
     Bytes bytes;
-    long address;
+    long offset;
     LockingStrategy lockingStrategy;
     AccessMethod accessMethod;
+    NativeAtomicAccess access;
+    Object accessObj;
 
     public LockingStrategyTest(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
         this.lockingStrategy = lockingStrategy;
         this.accessMethod = accessMethod;
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        e1 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>());
+        e2 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>());
+
+        buffer = ByteBuffer.allocateDirect(8);
+        bytes = new ByteBufferBytes(buffer);
+        offset = accessMethod == ADDRESS ? ((DirectBuffer) buffer).address() : 0L;
+        accessObj = accessMethod == BYTES_WITH_OFFSET ? bytes : null;
+        access = accessMethod == ADDRESS ? NativeAtomicAccess.unsafe() :
+                NativeAtomicAccess.toBytes();
+        rwls().reset();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        e1.shutdown();
+        e2.shutdown();
     }
 
     Callable<Boolean> tryReadLockTask = new Callable<Boolean>() {
@@ -75,50 +99,44 @@ public class LockingStrategyTest {
             return (ReadWriteLockingStrategy) lockingStrategy;
         }
 
-        boolean a() {
-            return accessMethod == ADDRESS;
-        }
-
         @Override
         public boolean tryReadLock() {
-            return a() ? rwls().tryReadLock(address) : rwls().tryReadLock(bytes, 0L);
+            return rwls().tryReadLock(access, accessObj, offset);
         }
 
         @Override
         public boolean tryWriteLock() {
-            return a() ? rwls().tryWriteLock(address) : rwls().tryWriteLock(bytes, 0L);
+            return rwls().tryWriteLock(access, accessObj, offset);
         }
 
         @Override
         public boolean tryUpgradeReadToWriteLock() {
-            return a() ? rwls().tryUpgradeReadToWriteLock(address) :
-                    rwls().tryUpgradeReadToWriteLock(bytes, 0L);
+            return rwls().tryUpgradeReadToWriteLock(access, accessObj, offset);
         }
 
         @Override
         public void readUnlock() {
-            if (a()) rwls().readUnlock(address); else rwls().readUnlock(bytes, 0L);
+            rwls().readUnlock(access, accessObj, offset);
         }
 
         @Override
         public void writeUnlock() {
-            if (a()) rwls().writeUnlock(address); else rwls().writeUnlock(bytes, 0L);
+            rwls().writeUnlock(access, accessObj, offset);
         }
 
         @Override
         public void downgradeWriteToReadLock() {
-            if (a()) rwls().downgradeWriteToReadLock(address);
-            else rwls().downgradeWriteToReadLock(bytes, 0L);
+            rwls().downgradeWriteToReadLock(access, accessObj, offset);
         }
 
         @Override
         public void reset() {
-            if (a()) rwls().reset(address); else rwls().reset(bytes, 0L);
+            rwls().reset(access, accessObj, offset);
         }
 
         @Override
         public long getState() {
-            return a() ? rwls().getState(address) : rwls().getState(bytes, 0L);
+            return rwls().getState(access, accessObj, offset);
         }
 
         @Override
@@ -141,36 +159,32 @@ public class LockingStrategyTest {
 
         @Override
         public boolean tryUpdateLock() {
-            return a() ? rwuls().tryUpdateLock(address) : rwuls().tryUpdateLock(bytes, 0L);
+            return rwuls().tryUpdateLock(access, accessObj, offset);
         }
 
         @Override
         public boolean tryUpgradeReadToUpdateLock() {
-            return a() ? rwuls().tryUpgradeReadToUpdateLock(address) :
-                    rwuls().tryUpgradeReadToUpdateLock(bytes, 0L);
+            return rwuls().tryUpgradeReadToUpdateLock(access, accessObj, offset);
         }
 
         @Override
         public boolean tryUpgradeUpdateToWriteLock() {
-            return a() ? rwuls().tryUpgradeUpdateToWriteLock(address) :
-                    rwuls().tryUpgradeUpdateToWriteLock(bytes, 0L);
+            return rwuls().tryUpgradeUpdateToWriteLock(access, accessObj, offset);
         }
 
         @Override
         public void updateUnlock() {
-            if (a()) rwuls().updateUnlock(address); else rwuls().updateUnlock(bytes, 0L);
+            rwuls().updateUnlock(access, accessObj, offset);
         }
 
         @Override
         public void downgradeUpdateToReadLock() {
-            if (a()) rwuls().downgradeUpdateToReadLock(address);
-            else rwuls().downgradeUpdateToReadLock(bytes, 0L);
+            rwuls().downgradeUpdateToReadLock(access, accessObj, offset);
         }
 
         @Override
         public void downgradeWriteToUpdateLock() {
-            if (a()) rwuls().downgradeWriteToUpdateLock(address);
-            else rwuls().downgradeWriteToUpdateLock(bytes, 0L);
+            rwuls().downgradeWriteToUpdateLock(access, accessObj, offset);
         }
 
         @Override
@@ -220,24 +234,6 @@ public class LockingStrategyTest {
     };
 
 
-    @Before
-    public void setUp() throws Exception {
-        e1 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>());
-        e2 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>());
-
-        buffer = ByteBuffer.allocateDirect(8);
-        bytes = new ByteBufferBytes(buffer);
-        address = ((DirectBuffer) buffer).address();
-        rwls().reset();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        e1.shutdown();
-        e2.shutdown();
-    }
 
     @Test
     public void testUpdateLockIsExclusive() throws Exception {

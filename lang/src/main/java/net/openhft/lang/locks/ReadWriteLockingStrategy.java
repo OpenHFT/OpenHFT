@@ -16,27 +16,19 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
 public interface ReadWriteLockingStrategy extends LockingStrategy {
 
-    boolean tryReadLock(long address);
-    boolean tryReadLock(Bytes bytes, long offset);
+    <T> boolean tryReadLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    boolean tryWriteLock(long address);
-    boolean tryWriteLock(Bytes bytes, long offset);
+    <T> boolean tryWriteLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    boolean tryUpgradeReadToWriteLock(long address);
-    boolean tryUpgradeReadToWriteLock(Bytes bytes, long offset);
+    <T> boolean tryUpgradeReadToWriteLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void readUnlock(long address);
-    void readUnlock(Bytes bytes, long offset);
+    <T> void readUnlock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void writeUnlock(long address);
-    void writeUnlock(Bytes bytes, long offset);
+    <T> void writeUnlock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void downgradeWriteToReadLock(long address);
-    void downgradeWriteToReadLock(Bytes bytes, long offset);
+    <T> void downgradeWriteToReadLock(NativeAtomicAccess<T> access, T t, long offset);
 
     boolean isReadLocked(long state);
 
