@@ -351,6 +351,13 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
     }
 
     @Override
+    public String toString(long state) {
+        return "[read locks = " + readLockCount(state) +
+                ", write locked = " + isWriteLocked(state) +
+                ", waits = " + waitCount(state) + "]";
+    }
+
+    @Override
     public int sizeInBytes() {
         return 8;
     }

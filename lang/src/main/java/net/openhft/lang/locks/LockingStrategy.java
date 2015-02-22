@@ -38,5 +38,7 @@ public interface LockingStrategy {
 
     int lockCount(long state);
 
+    String toString(long state);
+
     int sizeInBytes();
 }
