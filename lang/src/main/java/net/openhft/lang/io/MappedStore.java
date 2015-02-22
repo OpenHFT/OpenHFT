@@ -87,41 +87,6 @@ public class MappedStore implements BytesStore, Closeable {
         }
     }
 
-    @Override
-    public ObjectSerializer objectSerializer() {
-        return objectSerializer;
-    }
-
-    @Override
-    public long address() {
-        return address;
-    }
-
-    @Override
-    public long size() {
-        return size;
-    }
-
-    @Override
-    public void free() {
-        cleaner.clean();
-    }
-
-    @Override
-    public void close() {
-        free();
-    }
-
-    @NotNull
-    public DirectBytes bytes() {
-        return new DirectBytes(this, refCount);
-    }
-
-    @NotNull
-    public DirectBytes bytes(long offset, long length) {
-        return new DirectBytes(this, refCount, offset, length);
-    }
-
     private static long map0(FileChannel fileChannel, int imode, long start, long size) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method map0 = fileChannel.getClass().getDeclaredMethod("map0", int.class, long.class, long.class);
         map0.setAccessible(true);
@@ -160,6 +125,41 @@ public class MappedStore implements BytesStore, Closeable {
             imode = MAP_PV;
         assert (imode >= 0);
         return imode;
+    }
+
+    @Override
+    public ObjectSerializer objectSerializer() {
+        return objectSerializer;
+    }
+
+    @Override
+    public long address() {
+        return address;
+    }
+
+    @Override
+    public long size() {
+        return size;
+    }
+
+    @Override
+    public void free() {
+        cleaner.clean();
+    }
+
+    @Override
+    public void close() {
+        free();
+    }
+
+    @NotNull
+    public DirectBytes bytes() {
+        return new DirectBytes(this, refCount);
+    }
+
+    @NotNull
+    public DirectBytes bytes(long offset, long length) {
+        return new DirectBytes(this, refCount, offset, length);
     }
 
     public File file() {

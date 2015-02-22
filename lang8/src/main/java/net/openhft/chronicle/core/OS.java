@@ -1,24 +1,34 @@
 package net.openhft.chronicle.core;
 
+import sun.misc.Cleaner;
+import sun.nio.ch.FileChannelImpl;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class OS {
+    public static final String TMP = System.getProperty("java.io.tmpdir");
+    private static final int MAP_RO = 0;
+    private static final int MAP_RW = 1;
+    private static final int MAP_PV = 2;
+    private static final boolean IS64BIT = is64Bit0();
+    // Switch to j.u.l
+    private static final Logger LOG = Logger.getLogger(OS.class.getName());
+    private static final int PROCESS_ID = getProcessId0();
+    private static final String OS = System.getProperty("os.name").toLowerCase();
+
     public static Memory memory() {
         return UnsafeMemory.MEMORY;
     }
-
-    public static final String TMP = System.getProperty("java.io.tmpdir");
-    private static final boolean IS64BIT = is64Bit0();
-
-    // Switch to j.u.l
-    private static final Logger LOG = Logger.getLogger(OS.class.getName());
 
     public static boolean is64Bit() {
         return IS64BIT;
@@ -37,8 +47,6 @@ public class OS {
         systemProp = System.getProperty("java.vm.version");
         return systemProp != null && systemProp.contains("_64");
     }
-
-    private static final int PROCESS_ID = getProcessId0();
 
     public static int getProcessId() {
         return PROCESS_ID;
@@ -78,8 +86,6 @@ public class OS {
         return ((long) getProcessId() << 24) | thread.getId();
     }
 
-    private static final String OS = System.getProperty("os.name").toLowerCase();
-
     public static boolean isWindows() {
         return OS.startsWith("win");
     }
@@ -117,7 +123,7 @@ public class OS {
         if (!isWindows())
             throw new IllegalStateException("Method freePhysicalMemoryOnWindowsInBytes() should " +
                     "be called only on windows. Use Jvm.isWindows() to check the OS.");
-        Process pr = Runtime.getRuntime().exec("wmic OS get FreePhysicalMemory /Value");
+        Process pr = Runtime.getRuntime().exec("wmic OS get FreePhysicalMemory /Value < NUL");
         try {
             int result = pr.waitFor();
             String output = convertStreamToString(pr.getInputStream());
@@ -135,7 +141,7 @@ public class OS {
                         "format: \"" + output + "\"");
             }
             try {
-                return Long.parseLong(parts[1]) * 1024;
+                return Long.parseLong(parts[1]) * 1024; // KiB => bytes.
             } catch (NumberFormatException e) {
                 throw new IOException("Couldn't get free physical memory on windows. " +
                         "Command \"wmic OS get FreePhysicalMemory /Value\" output has unexpected " +
@@ -145,4 +151,84 @@ public class OS {
             throw new IOException(e);
         }
     }
+
+    public static long map(FileChannel fileChannel, FileChannel.MapMode mode, long start, long size) throws IOException {
+        try {
+            return map0(fileChannel, imodeFor(mode), start, size);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new AssertionError(e);
+        } catch (InvocationTargetException e) {
+            throw wrap(e);
+        }
+    }
+
+    private static long map0(FileChannel fileChannel, int imode, long start, long size) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method map0 = fileChannel.getClass().getDeclaredMethod("map0", int.class, long.class, long.class);
+        map0.setAccessible(true);
+        return (Long) map0.invoke(fileChannel, imode, start, size);
+    }
+
+    public static void unmap(long address, long size) throws IOException {
+        try {
+            Method unmap0 = FileChannelImpl.class.getDeclaredMethod("unmap0", long.class, long.class);
+            unmap0.setAccessible(true);
+            unmap0.invoke(null, address, size);
+        } catch (Exception e) {
+            throw wrap(e);
+        }
+    }
+
+    private static IOException wrap(Throwable e) {
+        if (e instanceof InvocationTargetException)
+            e = e.getCause();
+        if (e instanceof IOException)
+            return (IOException) e;
+        return new IOException(e);
+    }
+
+    private static int imodeFor(FileChannel.MapMode mode) {
+        int imode = -1;
+        if (mode == FileChannel.MapMode.READ_ONLY)
+            imode = MAP_RO;
+        else if (mode == FileChannel.MapMode.READ_WRITE)
+            imode = MAP_RW;
+        else if (mode == FileChannel.MapMode.PRIVATE)
+            imode = MAP_PV;
+        assert (imode >= 0);
+        return imode;
+    }
+
+    public static Cleaner cleanerFor(ReferenceCounted owner, long address, long size) {
+        return Cleaner.create(owner, new Unmapper(address, size, owner));
+    }
+
+
+    static class Unmapper implements Runnable {
+        private final long size;
+        private final ReferenceCounted owner;
+        private volatile long address;
+
+        Unmapper(long address, long size, ReferenceCounted owner) {
+            owner.reserve();
+            this.owner = owner;
+            assert (address != 0);
+            this.address = address;
+            this.size = size;
+        }
+
+        public void run() {
+            if (address == 0)
+                return;
+
+            try {
+                unmap(address, size);
+                address = 0;
+
+                owner.release();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
