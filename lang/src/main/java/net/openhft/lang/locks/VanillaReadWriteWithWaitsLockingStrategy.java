@@ -27,7 +27,7 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
     private static final ReadWriteWithWaitsLockingStrategy INSTANCE =
             new VanillaReadWriteWithWaitsLockingStrategy();
 
-    public ReadWriteWithWaitsLockingStrategy instance() {
+    public static ReadWriteWithWaitsLockingStrategy instance() {
         return INSTANCE;
     }
 

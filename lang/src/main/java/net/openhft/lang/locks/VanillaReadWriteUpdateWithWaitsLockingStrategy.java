@@ -32,7 +32,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     private static final ReadWriteUpdateWithWaitsLockingStrategy INSTANCE =
             new VanillaReadWriteUpdateWithWaitsLockingStrategy();
 
-    public ReadWriteUpdateWithWaitsLockingStrategy instance() {
+    public static ReadWriteUpdateWithWaitsLockingStrategy instance() {
         return INSTANCE;
     }
 
@@ -57,10 +57,8 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     static final int READ_MASK = MAX_READ;
     static final int READ_PARTY = 1;
 
-    static final int UPDATE_BIT = 1 << READ_BITS;
-    static final int UPDATE_PARTY = READ_PARTY | UPDATE_BIT;
-    static final int WRITE_BIT = UPDATE_BIT << 1;
-    static final int WRITE_LOCKED_COUNT_WORD = UPDATE_PARTY | WRITE_BIT;
+    static final int UPDATE_PARTY = 1 << READ_BITS;
+    static final int WRITE_LOCKED_COUNT_WORD = UPDATE_PARTY << 1;
 
     static final int MAX_WAIT = Integer.MAX_VALUE;
     static final int WAIT_PARTY = 1;
@@ -145,11 +143,11 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     private static boolean updateLocked(int countWord) {
-        return (countWord & UPDATE_BIT) != 0;
+        return (countWord & UPDATE_PARTY) != 0;
     }
 
     private static void checkUpdateLocked(int countWord) {
-        if (countWord < UPDATE_PARTY) // i. e. if update bit is not set, or write bit is set
+        if (!updateLocked(countWord))
             throw new IllegalMonitorStateException("Expected update lock");
     }
 
@@ -158,7 +156,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     private static void checkReadLocked(int countWord) {
-        if (countWord <= 0) // i. e. if read count == 0 or write bit (actually sign bit) is set
+        if (readCount(countWord) <= 0)
             throw new IllegalMonitorStateException("Expected read lock");
     }
 
@@ -311,8 +309,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     public boolean tryUpdateLock(long address) {
         long lockWord = getLockWord(address);
         int countWord = countWord(lockWord);
-        if (!updateLocked(countWord) && waitWord(lockWord) == 0) {
-            checkReadCountForIncrement(countWord);
+        if (!updateLocked(countWord) && !writeLocked(countWord) && waitWord(lockWord) == 0) {
             if (casCountWord(address, countWord, countWord + UPDATE_PARTY))
                 return true;
         }
@@ -323,8 +320,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     public boolean tryUpdateLock(Bytes bytes, long offset) {
         long lockWord = getLockWord(bytes, offset);
         int countWord = countWord(lockWord);
-        if (!updateLocked(countWord) && waitWord(lockWord) == 0) {
-            checkReadCountForIncrement(countWord);
+        if (!updateLocked(countWord) && !writeLocked(countWord) && waitWord(lockWord) == 0) {
             if (casCountWord(bytes, offset, countWord, countWord + UPDATE_PARTY))
                 return true;
         }
@@ -478,7 +474,8 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         while (true) {
             int countWord = getCountWord(address);
             checkUpdateLocked(countWord);
-            if (casCountWord(address, countWord, countWord ^ UPDATE_BIT)) {
+            checkReadCountForIncrement(countWord);
+            if (casCountWord(address, countWord, countWord - UPDATE_PARTY + READ_PARTY)) {
                 return;
             }
         }
@@ -489,7 +486,8 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         while (true) {
             int countWord = getCountWord(bytes, offset);
             checkUpdateLocked(countWord);
-            if (casCountWord(bytes, offset, countWord, countWord ^ UPDATE_BIT)) {
+            checkReadCountForIncrement(countWord);
+            if (casCountWord(bytes, offset, countWord, countWord - UPDATE_PARTY + READ_PARTY)) {
                 return;
             }
         }

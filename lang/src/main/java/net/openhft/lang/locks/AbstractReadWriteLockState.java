@@ -16,20 +16,15 @@
 
 package net.openhft.lang.locks;
 
-public interface ReadWriteUpdateLockState extends ReadWriteLockState {
-
-    boolean tryUpdateLock();
-
-    boolean tryUpgradeReadToUpdateLock();
-
-    boolean tryUpgradeUpdateToWriteLock();
-
-    void updateUnlock();
-
-    void downgradeUpdateToReadLock();
-
-    void downgradeWriteToUpdateLock();
+public abstract class AbstractReadWriteLockState implements ReadWriteLockState {
 
     @Override
-    ReadWriteUpdateLockingStrategy lockingStrategy();
+    public boolean tryLock() {
+        return tryWriteLock();
+    }
+
+    @Override
+    public void unlock() {
+        writeUnlock();
+    }
 }
