@@ -12,8 +12,8 @@ import java.util.function.Consumer;
 public interface BytesStore<B extends BytesStore<B>> extends RandomDataInput<B>, RandomDataOutput<B>, ReferenceCounted {
     static BytesStore wrap(ByteBuffer bb) {
         return bb.isDirect()
-                ? new NativeStore(bb)
-                : new HeapBytesStore(bb);
+                ? NativeStore.wrap(bb)
+                : HeapBytesStore.wrap(bb);
     }
 
     default Bytes bytes() {

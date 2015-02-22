@@ -1,53 +1,56 @@
 package net.openhft.chronicle.bytes;
 
+import net.openhft.chronicle.core.ReferenceCounter;
 import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 
 public class NativeStore implements BytesStore<NativeStore> {
     private static final long MEMORY_MAPPED_SIZE = 128 << 10;
     private final Cleaner cleaner;
-    private final Deallocator deallocator;
-    private final AtomicInteger refCount = new AtomicInteger(1);
-    private final Object obj;
-    private long address, capacity;
+    private final ReferenceCounter refCount = ReferenceCounter.onReleased(this::performRelease);
 
-    NativeStore(ByteBuffer bb) {
-        obj = bb;
+    private volatile Object underlyingObject;
+
+    private long address;
+    private long capacity;
+
+    private NativeStore(ByteBuffer bb) {
+        underlyingObject = bb;
         this.address = ((DirectBuffer) bb).address();
         this.capacity = bb.capacity();
         cleaner = null;
-        deallocator = null;
     }
 
-    private NativeStore(long capacity, boolean zeroOut) {
-        this(MEMORY.allocate(capacity), capacity, zeroOut);
+    static NativeStore wrap(ByteBuffer bb) {
+        return new NativeStore(bb);
     }
 
-    private NativeStore(long address, long capacity, boolean zeroOut) {
+    protected NativeStore(long address, long capacity, Runnable deallocator) {
         this.address = address;
         this.capacity = capacity;
-        //        System.out.println("old value " + Integer.toHexString(NativeBytes.UNSAFE.getInt(null, address)));
+        cleaner = Cleaner.create(this, deallocator);
+        underlyingObject = null;
+    }
+
+    public static NativeStore of(long capacity) {
+        return of(capacity, true);
+    }
+    public static NativeStore ofLazy(long capacity) {
+        return of(capacity, false);
+    }
+
+    private static NativeStore of(long capacity, boolean zeroOut) {
+        long address = MEMORY.allocate(capacity);
         if (zeroOut || capacity < MEMORY_MAPPED_SIZE) {
             MEMORY.setMemory(address, capacity, (byte) 0);
             MEMORY.storeFence();
         }
-
-        deallocator = new Deallocator(address);
-        cleaner = Cleaner.create(this, deallocator);
-        obj = null;
-    }
-
-    public static NativeStore of(long capacity) {
-        return new NativeStore(capacity, true);
-    }
-
-    public static NativeStore ofLazy(long capacity) {
-        return new NativeStore(capacity, false);
+        Deallocator deallocator = new Deallocator(address);
+        return new NativeStore(address, capacity, deallocator);
     }
 
     @Override
@@ -67,21 +70,16 @@ public class NativeStore implements BytesStore<NativeStore> {
 
     @Override
     public void reserve() {
-        refCount.incrementAndGet();
+        refCount.reserve();
     }
-
 
     @Override
     public void release() {
-        int value = refCount.decrementAndGet();
-        if (value < 0)
-            throw new IllegalStateException();
-        if (value == 0)
-            cleaner.clean();
+        refCount.release();
     }
 
     @Override
-    public int refCount() {
+    public long refCount() {
         return refCount.get();
     }
 
@@ -187,6 +185,10 @@ public class NativeStore implements BytesStore<NativeStore> {
             MEMORY.copyMemory(bytes.array(), offset, address + offsetInRDO, length);
         }
         return this;
+    }
+
+    protected void performRelease() {
+        cleaner.clean();
     }
 
     static class Deallocator implements Runnable {

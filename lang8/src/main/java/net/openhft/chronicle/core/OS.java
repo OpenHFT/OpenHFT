@@ -203,12 +203,12 @@ public class OS {
     }
 
 
-    static class Unmapper implements Runnable {
+    public static class Unmapper implements Runnable {
         private final long size;
         private final ReferenceCounted owner;
         private volatile long address;
 
-        Unmapper(long address, long size, ReferenceCounted owner) {
+        public Unmapper(long address, long size, ReferenceCounted owner) {
             owner.reserve();
             this.owner = owner;
             assert (address != 0);

@@ -18,15 +18,40 @@
 
 package net.openhft.chronicle.core;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
+
 public interface ReferenceCounted {
     static void release(ReferenceCounted rc) {
         if (rc != null)
             rc.release();
     }
 
-    void reserve();
+    static void releaseAll(List<WeakReference<ReferenceCounted>> refCounts) {
+        for (WeakReference<? extends ReferenceCounted> refCountRef : refCounts) {
+            if (refCountRef == null)
+                continue;
+            ReferenceCounted refCounted = refCountRef.get();
+            if (refCounted != null) {
+                refCounted.release();
+            }
+        }
+    }
 
-    void release();
+    void reserve() throws IllegalStateException;
 
-    int refCount();
+    void release() throws IllegalStateException;
+
+    long refCount();
+
+    default boolean tryReserve() {
+        try {
+            if (refCount() > 0) {
+                reserve();
+                return true;
+            }
+        } catch (IllegalStateException ignored) {
+        }
+        return false;
+    }
 }

@@ -85,7 +85,7 @@ public class BytesStoreBytes implements Bytes {
     }
 
     @Override
-    public int refCount() {
+    public long refCount() {
         return bytesStore.refCount();
     }
 

@@ -6,21 +6,25 @@ import sun.nio.ch.DirectBuffer;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 
 public class HeapBytesStore implements BytesStore<HeapBytesStore> {
     private static final AtomicBoolean MEMORY_BARRIER = new AtomicBoolean();
-    private final AtomicInteger refCount = new AtomicInteger();
+    private final AtomicLong refCount = new AtomicLong(1);
     private final Object underlyingObject, retainedObject;
     private final int dataOffset, capacity;
 
-    public HeapBytesStore(ByteBuffer byteBuffer) {
+    private HeapBytesStore(ByteBuffer byteBuffer) {
         this.retainedObject = byteBuffer;
         this.underlyingObject = byteBuffer.array();
         this.dataOffset = Unsafe.ARRAY_BYTE_BASE_OFFSET;
         this.capacity = byteBuffer.capacity();
+    }
+
+    static HeapBytesStore wrap(ByteBuffer bb) {
+        return new HeapBytesStore(bb);
     }
 
     @Override
@@ -44,7 +48,7 @@ public class HeapBytesStore implements BytesStore<HeapBytesStore> {
     }
 
     @Override
-    public int refCount() {
+    public long refCount() {
         return refCount.get();
     }
 
