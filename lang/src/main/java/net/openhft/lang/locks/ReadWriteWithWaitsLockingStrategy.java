@@ -16,21 +16,18 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
 public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrategy {
 
-    void registerWait(long address);
-    void registerWait(Bytes bytes, long offset);
+    <T> void registerWait(NativeAtomicAccess<T> access, T t, long offset);
 
-    void deregisterWait(long address);
-    void deregisterWait(Bytes bytes, long offset);
+    <T> void deregisterWait(NativeAtomicAccess<T> access, T t, long offset);
 
-    boolean tryWriteLockAndDeregisterWait(long address);
-    boolean tryWriteLockAndDeregisterWait(Bytes bytes, long offset);
+    <T> boolean tryWriteLockAndDeregisterWait(NativeAtomicAccess<T> access, T t, long offset);
 
-    boolean tryUpgradeReadToWriteLockAndDeregisterWait(long address);
-    boolean tryUpgradeReadToWriteLockAndDeregisterWait(Bytes bytes, long offset);
+    <T> boolean tryUpgradeReadToWriteLockAndDeregisterWait(
+            NativeAtomicAccess<T> access, T t, long offset);
+
+    <T> void resetKeepingWaits(NativeAtomicAccess<T> access, T t, long offset);
 
     int waitCount(long state);
 }

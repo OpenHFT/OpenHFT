@@ -16,23 +16,9 @@
 
 package net.openhft.lang.locks;
 
-public interface ReadWriteLockingStrategy extends LockingStrategy {
+public interface AcquisitionStrategy<S extends LockingStrategy, E extends Exception> {
 
-    <T> boolean tryReadLock(NativeAtomicAccess<T> access, T t, long offset);
-
-    <T> boolean tryWriteLock(NativeAtomicAccess<T> access, T t, long offset);
-
-    <T> boolean tryUpgradeReadToWriteLock(NativeAtomicAccess<T> access, T t, long offset);
-
-    <T> void readUnlock(NativeAtomicAccess<T> access, T t, long offset);
-
-    <T> void writeUnlock(NativeAtomicAccess<T> access, T t, long offset);
-
-    <T> void downgradeWriteToReadLock(NativeAtomicAccess<T> access, T t, long offset);
-
-    boolean isReadLocked(long state);
-
-    boolean isWriteLocked(long state);
-
-    int readLockCount(long state);
+    <T> boolean acquire(
+            TryAcquireOperation<? super S> operation, S strategy,
+            NativeAtomicAccess<T> access, T t, long offset) throws E;
 }

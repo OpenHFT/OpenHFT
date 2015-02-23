@@ -16,27 +16,23 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
 public interface LockingStrategy {
 
-    boolean tryLock(long address);
-    boolean tryLock(Bytes bytes, long offset);
+    <T> boolean tryLock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void unlock(long address);
-    void unlock(Bytes bytes, long offset);
+    <T> void unlock(NativeAtomicAccess<T> access, T t, long offset);
 
-    void reset(long address);
-    void reset(Bytes bytes, long offset);
+    <T> void reset(NativeAtomicAccess<T> access, T t, long offset);
 
     long resetState();
 
-    long getState(long address);
-    long getState(Bytes bytes, long offset);
+    <T> long getState(NativeAtomicAccess<T> access, T t, long offset);
 
     boolean isLocked(long state);
 
     int lockCount(long state);
+
+    String toString(long state);
 
     int sizeInBytes();
 }

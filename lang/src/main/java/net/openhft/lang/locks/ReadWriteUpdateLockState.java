@@ -30,8 +30,6 @@ public interface ReadWriteUpdateLockState extends ReadWriteLockState {
 
     void downgradeWriteToUpdateLock();
 
-    boolean isUpdateLocked(long state);
-
     @Override
     ReadWriteUpdateLockingStrategy lockingStrategy();
 }

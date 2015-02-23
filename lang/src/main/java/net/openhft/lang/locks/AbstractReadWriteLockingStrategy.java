@@ -16,28 +16,16 @@
 
 package net.openhft.lang.locks;
 
-import net.openhft.lang.io.Bytes;
-
 public abstract class AbstractReadWriteLockingStrategy implements ReadWriteLockingStrategy {
 
     @Override
-    public boolean tryLock(long address) {
-        return tryWriteLock(address);
+    public <T> boolean tryLock(NativeAtomicAccess<T> access, T t, long offset) {
+        return tryWriteLock(access, t, offset);
     }
 
     @Override
-    public boolean tryLock(Bytes bytes, long offset) {
-        return tryWriteLock(bytes, offset);
-    }
-
-    @Override
-    public void unlock(long address) {
-        writeUnlock(address);
-    }
-
-    @Override
-    public void unlock(Bytes bytes, long offset) {
-        writeUnlock(bytes, offset);
+    public <T> void unlock(NativeAtomicAccess<T> access, T t, long offset) {
+        writeUnlock(access, t, offset);
     }
 
     @Override
