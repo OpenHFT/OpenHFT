@@ -1,6 +1,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.ObjectSerializer;
+import net.openhft.lang.model.Byteable;
 import net.openhft.lang.model.constraints.NotNull;
 
 import java.io.File;
@@ -110,6 +111,10 @@ public abstract class WrappedBytes<B extends Bytes> implements Bytes {
 
     public void write(RandomDataInput in, long position, long length) {
         wrapped.write(in, position, length);
+    }
+
+    public void write(Byteable byteable) {
+        wrapped.write(byteable);
     }
 
     public void writeOrderedInt(int v) {

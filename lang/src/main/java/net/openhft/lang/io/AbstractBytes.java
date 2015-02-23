@@ -28,6 +28,7 @@ import net.openhft.lang.io.serialization.impl.StringBuilderPool;
 import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.io.view.BytesInputStream;
 import net.openhft.lang.io.view.BytesOutputStream;
+import net.openhft.lang.model.Byteable;
 import net.openhft.lang.pool.StringInterner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2532,6 +2533,14 @@ public abstract class AbstractBytes implements Bytes {
             position++;
             length--;
         }
+    }
+    @Override
+    public void write(@NotNull Byteable byteable) {
+        if(byteable.bytes() == null) {
+            throw new IllegalArgumentException("Attempt to write an unitialized Byteable object");
+        }
+        
+        write(byteable.bytes(), byteable.offset(), byteable.maxSize());
     }
 
     @Override
