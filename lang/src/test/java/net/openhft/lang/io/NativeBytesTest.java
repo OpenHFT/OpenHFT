@@ -19,6 +19,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.Maths;
+import net.openhft.lang.model.Byteable;
 import net.openhft.lang.thread.NamedThreadFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static net.openhft.lang.io.StopCharTesters.*;
+import static net.openhft.lang.model.DataValueClasses.newDirectInstance;
+import static net.openhft.lang.model.DataValueClasses.newDirectReference;
 import static org.junit.Assert.*;
 
 /**
@@ -840,6 +843,43 @@ public class NativeBytesTest {
     }
 
     @Test
+    public void testWriteByteable() {
+        final DummyByteable db1w = newDirectInstance(DummyByteable.class);
+        final DummyByteable db2w = newDirectInstance(DummyByteable.class);
+        final DummyByteable db1r = newDirectReference(DummyByteable.class);
+        final DummyByteable db2r = newDirectReference(DummyByteable.class);
+
+        db1w.setField1(1);
+        db1w.setField2(2);
+        db1w.setField3(3);
+
+        db2w.setField1(4);
+        db2w.setField2(5);
+        db2w.setField3(6);
+
+        bytes.write(db1w);
+        bytes.write(db2w);
+
+        assertEquals(32, bytes.position());
+
+        db1r.bytes(bytes, 0);
+        db2r.bytes(bytes, db1w.maxSize());
+
+        assertEquals(1, db1r.getField1());
+        assertEquals(2, db1r.getField2());
+        assertEquals(3, db1r.getField3());
+        assertEquals(4, db2r.getField1());
+        assertEquals(5, db2r.getField2());
+        assertEquals(6, db2r.getField3());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWriteByteableException() {
+        DummyByteable byteable = newDirectReference(DummyByteable.class);
+        bytes.write(byteable);
+    }
+
+    @Test
     public void testWriteObject() {
         for (Object o : new Object[]{10, 9.9, "string", new Date(), BigDecimal.valueOf(1.1)}) {
             bytes.position(0);
@@ -894,6 +934,15 @@ public class NativeBytesTest {
         public boolean equals(Object obj) {
             return obj instanceof Dummy;
         }
+    }
+
+    static interface DummyByteable extends Byteable {
+        public void setField1(long field);
+        public long getField1();
+        public void setField2(int field);
+        public int getField2();
+        public void setField3(int field);
+        public int getField3();
     }
 
     @Test
