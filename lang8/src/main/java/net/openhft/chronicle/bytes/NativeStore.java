@@ -210,8 +210,8 @@ public class NativeStore implements BytesStore<NativeStore> {
         public void run() {
             if (address == 0)
                 return;
-            MEMORY.freeMemory(address);
             address = 0;
+            MEMORY.freeMemory(address);
         }
     }
 }

@@ -52,10 +52,10 @@ public class ChronicleUnsafe {
     }
 
     public long toAddress(long address) {
+        return (mask & address ^ this.last) == 0 ? address + offset : toAddress0(address);
+    }
 
-        if ((mask & address ^ this.last) == 0)
-            return address + offset;
-
+    public long toAddress0(long address) {
         int index = (int) ((address / chunkSize));
         long remainder = address - (((long) index) * chunkSize);
 

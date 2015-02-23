@@ -23,7 +23,7 @@ public interface Bytes extends BytesStore<Bytes>,
         long length = position() - position;
         if (length >= 1 << 8)
             throw new IllegalStateException("Cannot have an 8-bit length of " + length);
-        writeByte(position, (short) length);
+        writeUnsignedByte(position, (short) length);
         storeFence();
 
         return this;
