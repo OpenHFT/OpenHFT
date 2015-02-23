@@ -22,7 +22,7 @@ public class MappedFile implements ReferenceCounted {
     private final FileChannel fileChannel;
     private final long chunkSize;
     private final long overlapSize;
-    private final List<WeakReference<MappedByteStore>> stores = new ArrayList<>();
+    private final List<WeakReference<MappedBytesStore>> stores = new ArrayList<>();
     private final AtomicBoolean closed = new AtomicBoolean();
 
     public MappedFile(RandomAccessFile raf, long chunkSize, long overlapSize) {
@@ -44,7 +44,7 @@ public class MappedFile implements ReferenceCounted {
         return new MappedFile(new RandomAccessFile(filename, "rw"), chunkSize, overlapSize);
     }
 
-    public BytesStore acquire(long position) throws IOException {
+    public MappedBytesStore acquire(long position) throws IOException {
         if (closed.get())
             throw new IOException("Closed");
         int chunk = (int) (position / chunkSize);
@@ -52,9 +52,9 @@ public class MappedFile implements ReferenceCounted {
             while (stores.size() <= chunk) {
                 stores.add(null);
             }
-            WeakReference<MappedByteStore> mbsRef = stores.get(chunk);
+            WeakReference<MappedBytesStore> mbsRef = stores.get(chunk);
             if (mbsRef != null) {
-                MappedByteStore mbs = mbsRef.get();
+                MappedBytesStore mbs = mbsRef.get();
                 if (mbs != null && mbs.tryReserve()) {
                     return mbs;
                 }
@@ -72,7 +72,7 @@ public class MappedFile implements ReferenceCounted {
             }
             long mappedSize = chunkSize + overlapSize;
             long address = OS.map(fileChannel, FileChannel.MapMode.READ_WRITE, chunk * chunkSize, mappedSize);
-            MappedByteStore mbs2 = new MappedByteStore(this, chunk * chunkSize, address, mappedSize);
+            MappedBytesStore mbs2 = new MappedBytesStore(this, chunk * chunkSize, address, mappedSize, chunkSize);
             stores.set(chunk, new WeakReference<>(mbs2));
             mbs2.reserve();
             return mbs2;
@@ -105,10 +105,10 @@ public class MappedFile implements ReferenceCounted {
 
     void performRelease() {
         for (int i = 0; i < stores.size(); i++) {
-            WeakReference<MappedByteStore> storeRef = stores.get(i);
+            WeakReference<MappedBytesStore> storeRef = stores.get(i);
             if (storeRef == null)
                 continue;
-            MappedByteStore mbs = storeRef.get();
+            MappedBytesStore mbs = storeRef.get();
             if (mbs != null) {
                 long count = mbs.refCount();
                 if (count > 0) {
@@ -129,10 +129,10 @@ public class MappedFile implements ReferenceCounted {
     public String referenceCounts() {
         StringBuilder sb = new StringBuilder();
         sb.append("refCount: ").append(refCount());
-        for (WeakReference<MappedByteStore> store : stores) {
+        for (WeakReference<MappedBytesStore> store : stores) {
             long count = 0;
             if (store != null) {
-                MappedByteStore mbs = store.get();
+                MappedBytesStore mbs = store.get();
                 if (mbs != null)
                     count = mbs.refCount();
             }

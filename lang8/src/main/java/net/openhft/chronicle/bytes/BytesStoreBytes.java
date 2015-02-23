@@ -7,17 +7,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BytesStoreBytes implements Bytes {
     private static final AtomicBoolean MEMORY_BARRIER = new AtomicBoolean();
-    protected final BytesStore bytesStore;
+    protected BytesStore bytesStore;
     private long offset, position, limit, capacity;
+
+    public BytesStoreBytes() {
+    }
 
     public BytesStoreBytes(BytesStore bytesStore) {
         this(bytesStore, 0, bytesStore.capacity());
+        bytesStore.reserve();
     }
 
     public BytesStoreBytes(BytesStore bytesStore, long offset, long capacity) {
         this.bytesStore = bytesStore;
         this.offset = offset;
         this.capacity = capacity;
+        assert offset + capacity <= bytesStore.capacity();
+        clear();
+    }
+
+    public void setBytesStore(BytesStore bytesStore) {
+        if (this.bytesStore != null)
+            this.bytesStore.release();
+        this.bytesStore = bytesStore;
+        this.offset = 0;
+        this.capacity = bytesStore.capacity();
         assert offset + capacity <= bytesStore.capacity();
         clear();
     }
@@ -96,12 +110,15 @@ public class BytesStoreBytes implements Bytes {
 
     @Override
     public void reserve() {
-        bytesStore.reserve();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void release() {
-        bytesStore.release();
+        if (bytesStore != null) {
+            bytesStore.release();
+            bytesStore = null;
+        }
     }
 
     @Override
@@ -377,5 +394,12 @@ public class BytesStoreBytes implements Bytes {
     @Override
     public boolean compareAndSwapLong(long offset, long expected, long value) {
         return bytesStore.compareAndSwapLong(this.offset + offset, expected, value);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (bytesStore != null)
+            bytesStore.release();
     }
 }

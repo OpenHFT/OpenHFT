@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class MappedFileTest {
 
@@ -16,17 +16,37 @@ public class MappedFileTest {
         MappedFile mf = MappedFile.of(tmp.getName(), 4 << 10, 0);
         assertEquals("refCount: 1", mf.referenceCounts());
 
-        BytesStore bs = mf.acquire(5 << 10);
+        MappedBytesStore bs = mf.acquire(5 << 10);
         assertEquals(4 << 10, bs.start());
         Bytes bytes = bs.bytes();
         assertEquals(4 << 10, bytes.start());
         assertEquals(0L, bs.readLong(5 << 10));
         assertEquals(0L, bytes.readLong(5 << 10));
+        assertFalse(bs.inStore(3 << 10));
+        assertFalse(bs.inStore((4 << 10) - 1));
+        assertTrue(bs.inStore(4 << 10));
+        assertTrue(bs.inStore((8 << 10) - 1));
+        assertFalse(bs.inStore(8 << 10));
+        try {
+            bytes.readLong(3 << 10);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        try {
+            bytes.readLong(9 << 10);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
         assertEquals(2, mf.refCount());
-        assertEquals(2, bs.refCount());
-        assertEquals("refCount: 2, 0, 2", mf.referenceCounts());
+        assertEquals(3, bs.refCount());
+        assertEquals("refCount: 2, 0, 3", mf.referenceCounts());
 
         BytesStore bs2 = mf.acquire(5 << 10);
+        assertEquals(4, bs2.refCount());
+        assertEquals("refCount: 2, 0, 4", mf.referenceCounts());
+        bytes.release();
         assertEquals(3, bs2.refCount());
         assertEquals("refCount: 2, 0, 3", mf.referenceCounts());
 
