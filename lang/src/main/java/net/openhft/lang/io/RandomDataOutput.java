@@ -18,6 +18,7 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.model.Byteable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,6 +69,14 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      * @param length   to copy
      */
     void write(RandomDataInput bytes, long position, long length);
+
+
+    /**
+     * Copies the contents of a Byteable from the offset for maxSize bytes, moves the position of "this" RandomDataOutput by the maxSize
+     *
+     * @param byteable to copy
+     */
+    void write(@NotNull Byteable byteable);
 
     /**
      * Writes to the output stream the eight low-order bits of the argument <code>b</code>. The 24 high-order  bits of

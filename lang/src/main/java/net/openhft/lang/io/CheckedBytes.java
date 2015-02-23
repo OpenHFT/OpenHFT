@@ -18,6 +18,7 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.io.serialization.ObjectSerializer;
+import net.openhft.lang.model.Byteable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -861,6 +862,11 @@ public class CheckedBytes implements Bytes {
     public void write(RandomDataInput bytes) {
         checkNotClosed();
         this.bytes.write(bytes);
+    }
+
+    public void write(Byteable byteable) {
+        checkNotClosed();
+        this.bytes.write(byteable);
     }
 
 
