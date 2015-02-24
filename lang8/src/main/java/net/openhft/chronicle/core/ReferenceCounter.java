@@ -44,4 +44,9 @@ public class ReferenceCounter {
     public String toString() {
         return Long.toString(value.get());
     }
+
+    public void releaseAll() {
+        if (value.get() > 0)
+            onRelease.run();
+    }
 }

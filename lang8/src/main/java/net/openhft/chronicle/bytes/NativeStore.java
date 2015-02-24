@@ -36,10 +36,11 @@ public class NativeStore implements BytesStore<NativeStore> {
         underlyingObject = null;
     }
 
-    public static NativeStore of(long capacity) {
+    public static NativeStore nativeStore(long capacity) {
         return of(capacity, true);
     }
-    public static NativeStore ofLazy(long capacity) {
+
+    public static NativeStore lazyNativeStore(long capacity) {
         return of(capacity, false);
     }
 

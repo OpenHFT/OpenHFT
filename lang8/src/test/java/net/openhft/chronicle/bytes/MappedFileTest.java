@@ -13,10 +13,10 @@ public class MappedFileTest {
     public void testReferenceCounts() throws IOException {
         File tmp = File.createTempFile("testReferenceCounts", ".bin");
         tmp.deleteOnExit();
-        MappedFile mf = MappedFile.of(tmp.getName(), 4 << 10, 0);
+        MappedFile mf = MappedFile.mappedFile(tmp.getName(), 4 << 10, 0);
         assertEquals("refCount: 1", mf.referenceCounts());
 
-        MappedBytesStore bs = mf.acquire(5 << 10);
+        MappedBytesStore bs = mf.acquireByteStore(5 << 10);
         assertEquals(4 << 10, bs.start());
         Bytes bytes = bs.bytes();
         assertEquals(4 << 10, bytes.start());
@@ -43,7 +43,7 @@ public class MappedFileTest {
         assertEquals(3, bs.refCount());
         assertEquals("refCount: 2, 0, 3", mf.referenceCounts());
 
-        BytesStore bs2 = mf.acquire(5 << 10);
+        BytesStore bs2 = mf.acquireByteStore(5 << 10);
         assertEquals(4, bs2.refCount());
         assertEquals("refCount: 2, 0, 4", mf.referenceCounts());
         bytes.release();

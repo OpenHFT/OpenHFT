@@ -82,4 +82,6 @@ public interface Memory {
     boolean compareAndSwapLong(long address, long expected, long value);
 
     boolean compareAndSwapLong(Object underlyingObject, long offset, long expected, long value);
+
+    long pageSize();
 }

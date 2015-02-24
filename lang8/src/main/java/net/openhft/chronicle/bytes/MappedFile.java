@@ -24,27 +24,26 @@ public class MappedFile implements ReferenceCounted {
     private final long overlapSize;
     private final List<WeakReference<MappedBytesStore>> stores = new ArrayList<>();
     private final AtomicBoolean closed = new AtomicBoolean();
+    private final ThreadLocal<WeakReference<Bytes>> threadLocalBytes = new ThreadLocal<>();
+    private final long capacity;
 
-    public MappedFile(RandomAccessFile raf, long chunkSize, long overlapSize) {
+    MappedFile(RandomAccessFile raf, long chunkSize, long overlapSize) {
         this.raf = raf;
         this.fileChannel = raf.getChannel();
         this.chunkSize = chunkSize;
         this.overlapSize = overlapSize;
+        capacity = 1L << 40;
     }
 
-    public static MappedFile of(String filename) throws FileNotFoundException {
-        return of(filename, 64 << 20);
+    public static MappedFile mappedFile(String filename, long chunkSize) throws FileNotFoundException {
+        return mappedFile(filename, chunkSize, OS.pageSize());
     }
 
-    public static MappedFile of(String filename, long chunkSize) throws FileNotFoundException {
-        return of(filename, chunkSize, chunkSize / 4);
-    }
-
-    public static MappedFile of(String filename, long chunkSize, long overlapSize) throws FileNotFoundException {
+    public static MappedFile mappedFile(String filename, long chunkSize, long overlapSize) throws FileNotFoundException {
         return new MappedFile(new RandomAccessFile(filename, "rw"), chunkSize, overlapSize);
     }
 
-    public MappedBytesStore acquire(long position) throws IOException {
+    public MappedBytesStore acquireByteStore(long position) throws IOException {
         if (closed.get())
             throw new IOException("Closed");
         int chunk = (int) (position / chunkSize);
@@ -77,6 +76,17 @@ public class MappedFile implements ReferenceCounted {
             mbs2.reserve();
             return mbs2;
         }
+    }
+
+    /**
+     * Convenience method so you don't need to release the BytesStore
+     */
+
+    public Bytes acquireBytes(long position) throws IOException {
+        MappedBytesStore mbs = acquireByteStore(position);
+        Bytes bytes = mbs.bytes();
+        mbs.release();
+        return bytes;
     }
 
     @Override
@@ -139,5 +149,25 @@ public class MappedFile implements ReferenceCounted {
             sb.append(", ").append(count);
         }
         return sb.toString();
+    }
+
+    public Bytes bytes() {
+        return new MappedBytes(this);
+    }
+
+    public Bytes bytesThreadLocal() {
+        WeakReference<Bytes> bytesRef = threadLocalBytes.get();
+        if (bytesRef != null) {
+            Bytes bytes = bytesRef.get();
+            if (bytes != null)
+                return bytes;
+        }
+        Bytes bytes = bytes();
+        threadLocalBytes.set(new WeakReference<>(bytes));
+        return bytes;
+    }
+
+    public long capacity() {
+        return capacity;
     }
 }

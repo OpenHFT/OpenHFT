@@ -75,7 +75,7 @@ public class AllocationRatesTest {
         for (int i = 0; i < ALLOCATIONS; i += BATCH) {
             NativeStore[] ds = new NativeStore[BATCH];
             for (int j = 0; j < BATCH; j++)
-                ds[j] = NativeStore.ofLazy(BUFFER_SIZE);
+                ds[j] = NativeStore.lazyNativeStore(BUFFER_SIZE);
             for (int j = 0; j < BATCH; j++) {
                 ds[j].release();
                 assertEquals(0, ds[j].refCount());

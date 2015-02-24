@@ -54,7 +54,28 @@ public interface BytesStore<B extends BytesStore<B>> extends RandomDataInput<B>,
         return this;
     }
 
+    /**
+     * Use this test to determine if an offset is considered safe.
+     */
+    default boolean inStore(long offset) {
+        long offset2 = offset - start();
+        return offset2 >= 0 && offset2 < safeCapacity();
+    }
+
+    default long safeCapacity() {
+        return capacity();
+    }
+
     void storeFence();
 
     void loadFence();
+
+
+    default void copyTo(BytesStore store) {
+        Bytes b1 = bytes();
+        Bytes b2 = store.bytes();
+        b2.write(b1);
+        b2.release();
+        b1.release();
+    }
 }

@@ -30,6 +30,10 @@ public class OS {
         return UnsafeMemory.MEMORY;
     }
 
+    public static long pageSize() {
+        return memory().pageSize();
+    }
+
     public static boolean is64Bit() {
         return IS64BIT;
     }
