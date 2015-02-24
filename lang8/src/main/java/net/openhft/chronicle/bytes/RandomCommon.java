@@ -5,13 +5,13 @@ public interface RandomCommon<S extends RandomCommon<S>> {
      * @return the highest offset or position allowed for this buffer.
      */
     default long limit() {
-        return capacity();
+        return maximumLimit();
     }
 
     /**
      * @return the highest limit allowed for this buffer.
      */
-    long capacity();
+    long maximumLimit();
 
     boolean compareAndSwapInt(long offset, int expected, int value);
 

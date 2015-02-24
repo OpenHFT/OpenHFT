@@ -56,9 +56,9 @@ Both classes provide functionality:
 ####Example
     ByteBuffer byteBuffer = ByteBuffer.allocate(SIZE);
     ByteBufferBytes bytes = new ByteBufferBytes(byteBuffer);
-    for (long i = 0; i < bytes.capacity(); i++)
+    for (long i = 0; i < bytes.maximumLimit(); i++)
         bytes.writeLong(i);
-    for (long i = bytes.capacity()-8; i >= 0; i -= 8) {
+    for (long i = bytes.maximumLimit()-8; i >= 0; i -= 8) {
         int j = bytes.readLong(i);
         assert i ==  j;
     }

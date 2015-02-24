@@ -30,7 +30,7 @@ public class OS {
         return UnsafeMemory.MEMORY;
     }
 
-    public static long pageSize() {
+    public static int pageSize() {
         return memory().pageSize();
     }
 
@@ -81,14 +81,14 @@ public class OS {
      *
      * @return a unique tid of up to 48 bits.
      */
-    public static long getUniqueTid() {
+/*    public static long getUniqueTid() {
         return getUniqueTid(Thread.currentThread());
     }
 
     public static long getUniqueTid(Thread thread) {
         // Assume 48 bit for 16 to 24-bit process id and 16 million threads from the start.
         return ((long) getProcessId() << 24) | thread.getId();
-    }
+    }*/
 
     public static boolean isWindows() {
         return OS.startsWith("win");

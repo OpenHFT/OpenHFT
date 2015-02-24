@@ -25,7 +25,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -60,24 +59,24 @@ public class ByteStoreTest {
 
     @Test
     public void testRead() throws Exception {
-        for (int i = 0; i < bytes.capacity(); i++)
+        for (int i = 0; i < bytes.maximumLimit(); i++)
             bytes.writeByte(i, i);
         bytes.position(0);
-        for (int i = 0; i < bytes.capacity(); i++)
+        for (int i = 0; i < bytes.maximumLimit(); i++)
             assertEquals((byte) i, bytes.readByte());
-        for (int i = (int) (bytes.capacity() - 1); i >= 0; i--) {
+        for (int i = (int) (bytes.maximumLimit() - 1); i >= 0; i--) {
             assertEquals((byte) i, bytes.readByte(i));
         }
     }
 
     @Test
     public void testReadFully() throws Exception {
-        for (int i = 0; i < bytes.capacity(); i++)
+        for (int i = 0; i < bytes.maximumLimit(); i++)
             bytes.writeByte((byte) i);
         bytes.position(0);
-        byte[] bytes = new byte[(int) this.bytes.capacity()];
+        byte[] bytes = new byte[(int) this.bytes.maximumLimit()];
         this.bytes.read(bytes);
-        for (int i = 0; i < this.bytes.capacity(); i++)
+        for (int i = 0; i < this.bytes.maximumLimit(); i++)
             assertEquals((byte) i, bytes[i]);
     }
 
@@ -91,9 +90,9 @@ public class ByteStoreTest {
 
     @Test
     public void testPosition() throws Exception {
-        for (int i = 0; i < bytes.capacity(); i++)
+        for (int i = 0; i < bytes.maximumLimit(); i++)
             bytes.writeByte((byte) i);
-        for (int i = (int) (bytes.capacity() - 1); i >= 0; i--) {
+        for (int i = (int) (bytes.maximumLimit() - 1); i >= 0; i--) {
             bytes.position(i);
             assertEquals((byte) i, bytes.readByte());
         }
@@ -101,8 +100,8 @@ public class ByteStoreTest {
 
     @Test
     public void testCapacity() throws Exception {
-        assertEquals(SIZE, bytes.capacity());
-        assertEquals(10, NativeStore.nativeStore(10).capacity());
+        assertEquals(SIZE, bytes.maximumLimit());
+        assertEquals(10, NativeStore.nativeStore(10).maximumLimit());
     }
 
     @Test
@@ -135,22 +134,11 @@ public class ByteStoreTest {
         double d2 = bytes.parseDouble();
         assertEquals(d, d2, 0);
 
-/*        bytes.selfTerminating(true);
         bytes.clear();
         bytes.append(d);
         bytes.flip();
         double d3 = bytes.parseDouble();
         assertEquals(d, d3, 0);
-
-        bytes.selfTerminating(false);*/
-        bytes.clear();
-        bytes.append(d);
-        bytes.flip();
-        try {
-            fail("got " + bytes.parseDouble());
-        } catch (BufferUnderflowException expected) {
-            // expected
-        }
     }
 
 /*    @Test

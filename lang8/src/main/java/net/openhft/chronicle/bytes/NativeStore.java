@@ -15,13 +15,13 @@ public class NativeStore implements BytesStore<NativeStore> {
 
     private volatile Object underlyingObject;
 
-    private long address;
-    private long capacity;
+    protected long address;
+    private long maximumLimit;
 
     private NativeStore(ByteBuffer bb) {
         underlyingObject = bb;
         this.address = ((DirectBuffer) bb).address();
-        this.capacity = bb.capacity();
+        this.maximumLimit = bb.capacity();
         cleaner = null;
     }
 
@@ -29,9 +29,9 @@ public class NativeStore implements BytesStore<NativeStore> {
         return new NativeStore(bb);
     }
 
-    protected NativeStore(long address, long capacity, Runnable deallocator) {
+    protected NativeStore(long address, long maximumLimit, Runnable deallocator) {
         this.address = address;
-        this.capacity = capacity;
+        this.maximumLimit = maximumLimit;
         cleaner = Cleaner.create(this, deallocator);
         underlyingObject = null;
     }
@@ -55,8 +55,8 @@ public class NativeStore implements BytesStore<NativeStore> {
     }
 
     @Override
-    public long capacity() {
-        return capacity;
+    public long maximumLimit() {
+        return maximumLimit;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class NativeStore implements BytesStore<NativeStore> {
 
     private long translate(long offset) {
         long offset2 = offset - start();
-        if (offset2 < 0 || offset2 >= capacity())
+        if (offset2 < 0 || offset2 >= maximumLimit())
             throw new IllegalArgumentException("Offset out of bounds");
         return offset2;
     }

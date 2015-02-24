@@ -53,7 +53,7 @@ public class HeapBytesStore implements BytesStore<HeapBytesStore> {
     }
 
     @Override
-    public long capacity() {
+    public long maximumLimit() {
         return capacity;
     }
 

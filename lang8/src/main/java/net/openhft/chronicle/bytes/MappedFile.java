@@ -1,9 +1,11 @@
 package net.openhft.chronicle.bytes;
 
+import net.openhft.chronicle.core.Maths;
 import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.core.ReferenceCounted;
 import net.openhft.chronicle.core.ReferenceCounter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -30,8 +32,8 @@ public class MappedFile implements ReferenceCounted {
     MappedFile(RandomAccessFile raf, long chunkSize, long overlapSize) {
         this.raf = raf;
         this.fileChannel = raf.getChannel();
-        this.chunkSize = chunkSize;
-        this.overlapSize = overlapSize;
+        this.chunkSize = Maths.nextPower2(chunkSize, OS.pageSize());
+        this.overlapSize = overlapSize == 0 ? 0 : Maths.nextPower2(overlapSize, OS.pageSize());
         capacity = 1L << 40;
     }
 
@@ -40,7 +42,11 @@ public class MappedFile implements ReferenceCounted {
     }
 
     public static MappedFile mappedFile(String filename, long chunkSize, long overlapSize) throws FileNotFoundException {
-        return new MappedFile(new RandomAccessFile(filename, "rw"), chunkSize, overlapSize);
+        return mappedFile(new File(filename), chunkSize, overlapSize);
+    }
+
+    public static MappedFile mappedFile(File file, long chunkSize, long overlapSize) throws FileNotFoundException {
+        return new MappedFile(new RandomAccessFile(file, "rw"), chunkSize, overlapSize);
     }
 
     public MappedBytesStore acquireByteStore(long position) throws IOException {

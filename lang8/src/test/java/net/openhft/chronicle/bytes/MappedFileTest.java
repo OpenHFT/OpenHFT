@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 
 import static org.junit.Assert.*;
 
@@ -30,13 +32,13 @@ public class MappedFileTest {
         try {
             bytes.readLong(3 << 10);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (BufferUnderflowException e) {
             // expected
         }
         try {
             bytes.readLong(9 << 10);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (BufferOverflowException e) {
             // expected
         }
         assertEquals(2, mf.refCount());

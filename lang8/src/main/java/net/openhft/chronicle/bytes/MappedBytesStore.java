@@ -5,12 +5,12 @@ import net.openhft.chronicle.core.ReferenceCounted;
 
 public class MappedBytesStore extends NativeStore {
     private final long start;
-    private final long safeCapacity;
+    private final long safeLimit;
 
     protected MappedBytesStore(ReferenceCounted owner, long start, long address, long capacity, long safeCapacity) {
-        super(address, capacity, new OS.Unmapper(address, capacity, owner));
+        super(address, start + capacity, new OS.Unmapper(address, capacity, owner));
         this.start = start;
-        this.safeCapacity = safeCapacity;
+        this.safeLimit = start + safeCapacity;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class MappedBytesStore extends NativeStore {
     }
 
     @Override
-    public long safeCapacity() {
-        return safeCapacity;
+    public long safeLimit() {
+        return safeLimit;
     }
 }

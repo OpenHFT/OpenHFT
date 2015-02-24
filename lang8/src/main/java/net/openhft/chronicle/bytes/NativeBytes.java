@@ -23,7 +23,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    protected long checkOffset(long offset) {
+    protected long checkOffset(long offset, int adding) {
         if (!bytesStore.inStore(offset)) {
             resize(offset);
         }
@@ -35,7 +35,7 @@ public class NativeBytes extends AbstractBytes {
             throw new IllegalArgumentException();
         // grow by 50% rounded up to the next pages size
         long ps = OS.pageSize();
-        long size = (Math.max(offset, bytesStore.capacity() * 3 / 2) + ps - 1) & ~(ps - 1);
+        long size = (Math.max(offset, bytesStore.maximumLimit() * 3 / 2) + ps) & ~(ps - 1);
         NativeStore store = NativeStore.lazyNativeStore(size);
         bytesStore.copyTo(store);
         bytesStore.release();
@@ -43,7 +43,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     @Override
-    public long capacity() {
+    public long maximumLimit() {
         return 1L << 40;
     }
 }

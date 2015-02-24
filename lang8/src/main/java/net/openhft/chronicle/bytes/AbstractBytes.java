@@ -11,7 +11,7 @@ public abstract class AbstractBytes implements Bytes {
     private static final AtomicBoolean MEMORY_BARRIER = new AtomicBoolean();
     private final ReferenceCounter refCount = ReferenceCounter.onReleased(this::performRelease);
 
-    private void performRelease() {
+    protected void performRelease() {
         this.bytesStore.release();
         this.bytesStore = NoBytesStore.NO_BYTES_STORE;
     }
@@ -21,6 +21,7 @@ public abstract class AbstractBytes implements Bytes {
 
     public AbstractBytes(BytesStore bytesStore) {
         this.bytesStore = bytesStore;
+        bytesStore.reserve();
         clear();
     }
 
@@ -35,14 +36,19 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     public Bytes clear() {
-        position = 0;
-        limit = capacity();
+        position = start();
+        limit = maximumLimit();
         return this;
     }
 
     @Override
     public long start() {
         return bytesStore.start();
+    }
+
+    @Override
+    public long maximumLimit() {
+        return bytesStore.maximumLimit();
     }
 
     @Override
@@ -67,7 +73,7 @@ public abstract class AbstractBytes implements Bytes {
     @Override
     public Bytes limit(long limit) {
         if (limit < start()) throw new BufferUnderflowException();
-        if (limit >= capacity())
+        if (limit >= maximumLimit())
             throw new BufferOverflowException();
         this.limit = limit;
         return this;
@@ -95,83 +101,83 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public Bytes writeByte(long offset, byte i) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 1);
         bytesStore.writeByte(offset2, i);
         return this;
     }
 
     @Override
     public byte readByte(long offset) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 1);
         return bytesStore.readByte(offset2);
     }
 
     @Override
     public Bytes writeShort(long offset, short i) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 2);
         bytesStore.writeShort(offset2, i);
         return this;
     }
 
     @Override
     public short readShort(long offset) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 2);
         return bytesStore.readShort(offset2);
     }
 
     @Override
     public Bytes writeInt(long offset, int i) {
-        bytesStore.writeInt(checkOffset(offset), i);
+        bytesStore.writeInt(checkOffset(offset, 4), i);
         return this;
     }
 
     @Override
     public Bytes writeOrderedInt(long offset, int i) {
-        bytesStore.writeOrderedInt(checkOffset(offset), i);
+        bytesStore.writeOrderedInt(checkOffset(offset, 4), i);
         return this;
     }
 
     @Override
     public int readInt(long offset) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 4);
         return bytesStore.readInt(offset2);
     }
 
     @Override
     public Bytes writeLong(long offset, long i) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 8);
         bytesStore.writeLong(offset2, i);
         return this;
     }
 
     @Override
     public long readLong(long offset) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 8);
         return bytesStore.readLong(offset2);
     }
 
     @Override
     public float readFloat(long offset) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 4);
         return bytesStore.readFloat(offset2);
     }
 
     @Override
     public double readDouble(long offset) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 8);
         return bytesStore.readDouble(offset2);
     }
 
     @Override
     public Bytes writeFloat(long offset, float d) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 4);
         bytesStore.writeFloat(offset2, d);
         return this;
     }
 
     @Override
     public Bytes writeDouble(long offset, double d) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 8);
         bytesStore.writeDouble(offset2, d);
         return this;
     }
@@ -214,22 +220,18 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int peakVolatileInt() {
-        long offset = checkOffset(position);
+        long offset = checkOffset(position, 4);
         return bytesStore.readVolatileInt(offset);
     }
 
-    protected long writeOffsetPositionMoved(long adding) {
-        long offset = checkOffset(position);
-        if (position + adding > limit)
-            return bufferOverflowOnWrite();
+    protected long writeOffsetPositionMoved(int adding) {
+        long offset = checkOffset(position, adding);
         position += adding;
         return offset;
     }
 
-    protected long readOffsetPositionMoved(long adding) {
-        long offset = checkOffset(position);
-        if (position + adding > limit)
-            return bufferUnderflowOnRead();
+    protected long readOffsetPositionMoved(int adding) {
+        long offset = checkOffset(position, adding);
         position += adding;
         return offset;
     }
@@ -286,12 +288,17 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public Bytes write(Bytes bytes) {
-        throw new UnsupportedOperationException();
+        while (bytes.remaining() > 7 && remaining() > 7)
+            writeLong(bytes.readLong());
+        while (bytes.remaining() > 0 && remaining() > 0)
+            writeByte(bytes.readByte());
+        return this;
     }
 
     @Override
     public Bytes skip(long bytesToSkip) {
-        readOffsetPositionMoved(bytesToSkip);
+        position += bytesToSkip;
+        readOffsetPositionMoved(0);
         return this;
     }
 
@@ -303,7 +310,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     public String toString() {
-        return BytesUtil.toString(this);
+        return remaining() > 1 << 30 ? "[Bytes too large]" : BytesUtil.toString(this);
     }
 
     @Override
@@ -315,21 +322,21 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public Bytes write(long offsetInRDO, byte[] bytes, int offset, int length) {
-        long offsetInRDO1 = checkOffset(offsetInRDO);
+        long offsetInRDO1 = checkOffset(offsetInRDO, length);
         bytesStore.write(offsetInRDO1, bytes, offset, length);
         return this;
     }
 
     @Override
     public Bytes write(long offsetInRDO, ByteBuffer bytes, int offset, int length) {
-        long offsetInRDO1 = checkOffset(offsetInRDO);
+        long offsetInRDO1 = checkOffset(offsetInRDO, length);
         bytesStore.write(offsetInRDO1, bytes, offset, length);
         return this;
     }
 
     @Override
     public Bytes writeOrderedLong(long offset, long i) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 8);
         bytesStore.writeOrderedLong(offset2, i);
         return this;
     }
@@ -381,19 +388,19 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public boolean compareAndSwapInt(long offset, int expected, int value) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 4);
         return bytesStore.compareAndSwapInt(offset2, expected, value);
     }
 
     @Override
     public boolean compareAndSwapLong(long offset, long expected, long value) {
-        long offset2 = checkOffset(offset);
+        long offset2 = checkOffset(offset, 8);
         return bytesStore.compareAndSwapLong(offset2, expected, value);
     }
 
-    protected long checkOffset(long offset) {
+    protected long checkOffset(long offset, int adding) {
         if (offset < start()) throw new BufferUnderflowException();
-        if (offset > capacity()) throw new BufferOverflowException();
+        if (offset + adding > maximumLimit()) throw new BufferOverflowException();
         return offset;
     }
 

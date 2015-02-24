@@ -39,13 +39,13 @@ public interface BytesStore<B extends BytesStore<B>> extends RandomDataInput<B>,
         return 0L;
     }
 
-    long capacity();
+    long maximumLimit();
 
     /**
      * Perform a set of actions with a temporary bounds mode.
      */
     default BytesStore with(long position, long length, Consumer<Bytes> bytesConsumer) {
-        if (position + length > capacity())
+        if (position + length > maximumLimit())
             throw new BufferUnderflowException();
         BytesStoreBytes bsb = new BytesStoreBytes(this);
         bsb.position(position);
@@ -58,12 +58,11 @@ public interface BytesStore<B extends BytesStore<B>> extends RandomDataInput<B>,
      * Use this test to determine if an offset is considered safe.
      */
     default boolean inStore(long offset) {
-        long offset2 = offset - start();
-        return offset2 >= 0 && offset2 < safeCapacity();
+        return start() <= offset && offset < safeLimit();
     }
 
-    default long safeCapacity() {
-        return capacity();
+    default long safeLimit() {
+        return maximumLimit();
     }
 
     void storeFence();

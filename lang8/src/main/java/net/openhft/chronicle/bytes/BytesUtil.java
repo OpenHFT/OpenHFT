@@ -188,7 +188,7 @@ public enum BytesUtil {
     public static <IN extends RandomDataInput & StreamingCommon> String toDebugString(IN bytes, long maxLength) {
         StringBuilder sb = new StringBuilder(200);
         sb.append("[pos: ").append(bytes.position()).append(", lim: ").append(bytes.limit()).append(", cap: ")
-                .append(bytes.capacity()).append(" ] ");
+                .append(bytes.maximumLimit()).append(" ] ");
         toString(bytes, sb, bytes.position() - maxLength, bytes.position(), bytes.position() + maxLength);
 
         return sb.toString();
@@ -197,7 +197,6 @@ public enum BytesUtil {
     public static <IN extends RandomDataInput & StreamingCommon> String toString(IN bytes) {
         StringBuilder sb = new StringBuilder(200);
         toString(bytes, sb);
-
         return sb.toString();
     }
 

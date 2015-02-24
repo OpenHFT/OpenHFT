@@ -210,7 +210,7 @@ public enum UnsafeMemory implements Memory {
     }
 
     @Override
-    public long pageSize() {
+    public int pageSize() {
         return UNSAFE.pageSize();
     }
 
@@ -227,9 +227,11 @@ public enum UnsafeMemory implements Memory {
 
     @Override
     public long allocate(long capacity) {
+        if (capacity <= 0)
+            throw new IllegalArgumentException("Invalid capacity: " + capacity);
         long address = UNSAFE.allocateMemory(capacity);
         if (address == 0)
-            throw new OutOfMemoryError("Not enough free native memory");
+            throw new OutOfMemoryError("Not enough free native memory, capacity attempted: " + capacity / 1024 + " KiB");
         return address;
     }
 
