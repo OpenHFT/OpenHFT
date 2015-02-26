@@ -66,6 +66,12 @@ public class BytesOutputStream extends OutputStream {
 
     @Override
     public void close() {
+        try {
+            super.close();
+        } catch (IOException e) {
+            // never happens.
+            throw new AssertionError(e);
+        }
         // Don't close as we may want to continue'
     }
 
