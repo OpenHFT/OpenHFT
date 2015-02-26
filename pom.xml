@@ -24,6 +24,7 @@
     <artifactId>OpenHFT</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>third-party-bom</module>
         <module>root-parent-pom</module>
