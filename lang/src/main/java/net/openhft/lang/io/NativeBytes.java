@@ -671,7 +671,7 @@ public class NativeBytes extends AbstractBytes {
     public void checkEndOfBuffer() throws IndexOutOfBoundsException {
         if (position() > limit()) {
             throw new IndexOutOfBoundsException(
-                "position is beyond the end of the buffer " + position() + " > " + limit());
+                    "position is beyond the end of the buffer " + position() + " > " + limit());
         }
     }
 
@@ -742,5 +742,13 @@ public class NativeBytes extends AbstractBytes {
 
     protected ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse, Object att) {
         return ByteBufferReuse.INSTANCE.reuse(positionAddr, (int) remaining(), att, toReuse);
+    }
+
+    public void address(long address) {
+        this.positionAddr = this.startAddr = address;
+    }
+
+    public void capacity(long capacity) {
+        this.limitAddr = this.capacityAddr = capacity;
     }
 }
