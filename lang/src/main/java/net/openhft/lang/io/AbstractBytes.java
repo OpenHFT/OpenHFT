@@ -969,6 +969,7 @@ public abstract class AbstractBytes implements Bytes {
 
             writeStopBit(utflen);
             writeUTF0(this, s, strlen);
+            zeroOut(position(), position + maxSize);
         } finally {
             position(position);
         }
