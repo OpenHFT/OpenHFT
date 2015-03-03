@@ -744,11 +744,11 @@ public class NativeBytes extends AbstractBytes {
         return ByteBufferReuse.INSTANCE.reuse(positionAddr, (int) remaining(), att, toReuse);
     }
 
-    public void address(long address) {
+    void address(long address) {
         this.positionAddr = this.startAddr = address;
     }
 
-    public void capacity(long capacity) {
+    void capacity(long capacity) {
         this.limitAddr = this.capacityAddr = capacity;
     }
 }
