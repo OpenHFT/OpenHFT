@@ -419,30 +419,59 @@ public class DataValueGenerator {
         return setter;
     }
 
-    private static void methodCopy(StringBuilder copy, Method getter, Method setter, FieldModel model) {
+    private static void methodCopy(
+            StringBuilder copy, Method getter, Method setter, FieldModel model) {
         if (!model.isArray()) {
             if (model.setter() != null && getter != null) {
                 copy.append("        ").append(setter.getName());
                 copy.append("(from.").append(getter.getName()).append("());\n");
             }
         } else {
-            copy.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){");
-            copy.append("\n            ").append(setter.getName()).append("(i, from.").append(getter.getName()).append("(i));\n");
+            copy.append("        for (int i = 0; i < ").append(model.indexSize().value())
+                    .append("; i++){");
+            copy.append("\n            ").append(setter.getName()).append("(i, from.")
+                    .append(getter.getName()).append("(i));\n");
             copy.append("        }\n");
         }
     }
 
-    private static void methodWriteMarshall(StringBuilder writeMarshal, Method getter, Method setter, Class type, FieldModel model) {
+    private static void methodWriteMarshall(StringBuilder writeMarshal, Method getter,
+                                            Method setter, Class type, FieldModel model) {
         if (!model.isArray()) {
-            if (getter != null && setter != null)
+            if (getter != null && setter != null) {
+                writeMarshal.append("        {\n");
+                saveCharSequencePosition(writeMarshal, type, "out");
                 writeMarshal.append("        out.write").append(bytesType(type)).append("(")
                         .append(getter.getName()).append("());\n");
+                zeroOutRemainingCharSequenceBytesAndUpdatePosition(
+                        writeMarshal, model, type, "out");
+                writeMarshal.append("        }\n");
+            }
             // otherwise skip.
         } else {
-            writeMarshal.append("        for (int i = 0; i < ").append(model.indexSize().value()).append("; i++){\n");
+            writeMarshal.append("        for (int i = 0; i < ")
+                    .append(model.indexSize().value()).append("; i++){\n");
+            saveCharSequencePosition(writeMarshal, type, "out");
             writeMarshal.append("            out.write").append(bytesType(type)).append("(")
                     .append(getter.getName()).append("(i));\n");
+            zeroOutRemainingCharSequenceBytesAndUpdatePosition(
+                    writeMarshal, model, type, "out");
             writeMarshal.append("        }\n");
+        }
+    }
+
+    private static void saveCharSequencePosition(StringBuilder write, Class type, String bytes) {
+        if (CharSequence.class.isAssignableFrom(type))
+            write.append("            long pos = " + bytes + ".position();\n");
+    }
+
+    private static void zeroOutRemainingCharSequenceBytesAndUpdatePosition(
+            StringBuilder write, FieldModel model, Class type, String bytes) {
+        if (CharSequence.class.isAssignableFrom(type)) {
+            write.append("            long newPos = pos + ").append(fieldSize(model))
+                    .append(";\n");
+            write.append("            " + bytes + ".zeroOut(" + bytes +  ".position(), newPos);\n");
+            write.append("            " + bytes + ".position(newPos);\n");
         }
     }
 
