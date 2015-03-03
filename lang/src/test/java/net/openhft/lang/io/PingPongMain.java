@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 /**
- * Created by peter on 21/11/14.
+ * Created by peter.lawrey on 21/11/14.
  */
 public class PingPongMain {
     public static final int PORT = Integer.getInteger("port", 8181);

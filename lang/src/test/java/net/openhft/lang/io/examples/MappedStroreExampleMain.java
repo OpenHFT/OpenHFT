@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
- * Created by peter on 14/07/14.
+ * Created by peter.lawrey on 14/07/14.
  */
 public class MappedStroreExampleMain {
     public static void main(String[] args) throws IOException {

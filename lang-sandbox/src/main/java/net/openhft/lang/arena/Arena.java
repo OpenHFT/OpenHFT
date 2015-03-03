@@ -23,7 +23,7 @@ import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.OffHeapLock;
 
 /**
- * Created by peter on 20/06/14.
+ * Created by peter.lawrey on 20/06/14.
  */
 public interface Arena {
     enum Mode {

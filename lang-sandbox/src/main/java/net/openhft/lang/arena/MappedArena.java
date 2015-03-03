@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
- * Created by peter on 22/06/14.
+ * Created by peter.lawrey on 22/06/14.
  */
 public class MappedArena implements Arena {
     static final byte[] MAGIC = "Arena001".getBytes();

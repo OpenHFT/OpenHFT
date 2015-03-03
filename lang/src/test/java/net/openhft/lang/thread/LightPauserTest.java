@@ -3,7 +3,7 @@ package net.openhft.lang.thread;
 import org.junit.Test;
 
 /**
- * Created by peter on 11/12/14.
+ * Created by peter.lawrey on 11/12/14.
  */
 public class LightPauserTest {
     @Test

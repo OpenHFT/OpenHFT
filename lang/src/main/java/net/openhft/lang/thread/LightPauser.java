@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * Created by peter on 11/12/14.
+ * Created by peter.lawrey on 11/12/14.
  */
 public class LightPauser implements Pauser {
     public static final long NO_BUSY_PERIOD = -1;

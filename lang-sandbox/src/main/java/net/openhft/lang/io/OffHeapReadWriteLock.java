@@ -21,7 +21,7 @@ package net.openhft.lang.io;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by peter on 03/08/14.
+ * Created by peter.lawrey on 03/08/14.
  */
 public class OffHeapReadWriteLock {
     private final Bytes bytes;

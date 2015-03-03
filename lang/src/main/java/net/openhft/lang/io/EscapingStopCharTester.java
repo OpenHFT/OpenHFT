@@ -1,7 +1,7 @@
 package net.openhft.lang.io;
 
 /**
- * Created by peter on 16/01/15.
+ * Created by peter.lawrey on 16/01/15.
  */
 public class EscapingStopCharTester implements StopCharTester {
     private final StopCharTester sct;

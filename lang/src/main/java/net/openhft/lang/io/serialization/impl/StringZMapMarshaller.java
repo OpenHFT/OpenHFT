@@ -32,7 +32,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
- * Created by peter on 24/10/14.
+ * Created by peter.lawrey on 24/10/14.
  */
 public enum StringZMapMarshaller implements CompactBytesMarshaller<Map<String, String>> {
     INSTANCE;

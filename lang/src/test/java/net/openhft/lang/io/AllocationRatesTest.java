@@ -23,7 +23,7 @@ import org.junit.Test;
 import java.nio.ByteBuffer;
 
 /**
- * User: peter Date: 24/12/13 Time: 19:43
+ * User: peter.lawrey Date: 24/12/13 Time: 19:43
  */
 /*
 buffers 128 KB took an average of 18,441 ns for heap ByteBuffer, 33,683 ns for direct ByteBuffer and 1,761 for DirectStore

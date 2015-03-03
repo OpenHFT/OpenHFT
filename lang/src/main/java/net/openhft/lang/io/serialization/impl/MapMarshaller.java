@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Created by peter on 24/10/14.
+ * Created by peter.lawrey on 24/10/14.
  */
 public class MapMarshaller<K, V> implements CompactBytesMarshaller<Map<K, V>> {
     private final BytesMarshaller<K> kBytesMarshaller;

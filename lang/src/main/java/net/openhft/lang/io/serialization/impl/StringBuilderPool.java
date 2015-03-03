@@ -19,7 +19,7 @@
 package net.openhft.lang.io.serialization.impl;
 
 /**
- * Created by peter on 29/10/14.
+ * Created by peter.lawrey on 29/10/14.
  */
 public class StringBuilderPool {
     final ThreadLocal<StringBuilder> sbtl = new ThreadLocal<StringBuilder>();

@@ -1,7 +1,7 @@
 package net.openhft.lang.thread;
 
 /**
- * Created by peter on 11/12/14.
+ * Created by peter.lawrey on 11/12/14.
  */
 public enum BusyPauser implements Pauser {
     INSTANCE;
