@@ -1,4 +1,5 @@
 #!/bin/sh
+git clone git@github.com:OpenHFT/RFC.git
 git clone git@github.com:OpenHFT/Java-Thread-Affinity.git
 git clone git@github.com:OpenHFT/Java-Lang.git
 git clone git@github.com:OpenHFT/Chronicle-Core.git
