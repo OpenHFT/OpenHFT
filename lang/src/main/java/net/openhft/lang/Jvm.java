@@ -53,9 +53,6 @@ public enum Jvm {
     public static final String TMP = System.getProperty("java.io.tmpdir");
     private static final boolean IS64BIT = is64Bit0();
 
-    // Switch to j.u.l
-    private static final Logger LOG = Logger.getLogger(Jvm.class.getName());
-
     public static boolean is64Bit() {
         return IS64BIT;
     }
@@ -87,16 +84,20 @@ public enum Jvm {
         String pid = null;
         final File self = new File("/proc/self");
         try {
-            if (self.exists())
+            if (self.exists()) {
                 pid = self.getCanonicalFile().getName();
+            }
         } catch (IOException ignored) {
-            // ignored
         }
-        if (pid == null)
+
+        if (pid == null) {
             pid = ManagementFactory.getRuntimeMXBean().getName().split("@", 0)[0];
+        }
+
         if (pid == null) {
             int rpid = new Random().nextInt(1 << 16);
-            LOG.log(Level.WARNING, "Unable to determine PID, picked a random number=" + rpid);
+            LoggerHolder.LOGGER.log(Level.WARNING, "Unable to determine PID, picked a random number=" + rpid);
+
             return rpid;
         } else {
             return Integer.parseInt(pid);
@@ -137,10 +138,11 @@ public enum Jvm {
 
     public static boolean isUnix() {
         return OS.contains("nix") ||
-                OS.contains("nux") ||
-                OS.contains("aix") ||
-                OS.contains("bsd") ||
-                OS.contains("hpux");
+               OS.contains("nux") ||
+               OS.contains("aix") ||
+               OS.contains("bsd") ||
+               OS.contains("sun") ||
+               OS.contains("hpux");
     }
 
     public static boolean isSolaris() {
@@ -152,15 +154,17 @@ public enum Jvm {
     public static long getPidMax() {
         if (isLinux()) {
             File file = new File("/proc/sys/kernel/pid_max");
-            if (file.canRead())
+            if (file.canRead()) {
                 try {
                     return Maths.nextPower2(new Scanner(file).nextLong(), 1);
                 } catch (FileNotFoundException e) {
-                    LOG.log(Level.WARNING, "", e);
+                    LoggerHolder.LOGGER.log(Level.WARNING, "", e);
                 }
+            }
         } else if (isMacOSX()) {
             return 1L << 24;
         }
+
         // the default.
         return 1L << 16;
     }
@@ -171,9 +175,11 @@ public enum Jvm {
     }
 
     public static long freePhysicalMemoryOnWindowsInBytes() throws IOException {
-        if (!isWindows())
+        if (!isWindows()) {
             throw new IllegalStateException("Method freePhysicalMemoryOnWindowsInBytes() should " +
-                    "be called only on windows. Use Jvm.isWindows() to check the OS.");
+                "be called only on windows. Use Jvm.isWindows() to check the OS.");
+        }
+
         Process pr = Runtime.getRuntime().exec("wmic OS get FreePhysicalMemory /Value");
         try {
             int result = pr.waitFor();
@@ -216,5 +222,9 @@ public enum Jvm {
     public static RuntimeException rethrow(Throwable t) {
         NativeBytes.UNSAFE.throwException(t);
         throw new AssertionError();
+    }
+
+    static class LoggerHolder {
+        public static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
     }
 }

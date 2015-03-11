@@ -44,6 +44,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 
 /**
  * @author peter.lawrey
@@ -77,7 +79,7 @@ public abstract class AbstractBytes implements Bytes {
         INT_LOCK_MASK = 0xFFFFFF;
     }
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
+    //private static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
     private static final byte[] MIN_VALUE_TEXT = ("" + Long.MIN_VALUE).getBytes();
     private static final byte[] Infinity = "Infinity".getBytes();
@@ -213,7 +215,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     private static void warnIdLimit(long id) {
-        LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
+        LoggerHolder.LOGGER.log(Level.WARNING, "High thread id may result in collisions id: " + id);
 
         ID_LIMIT_WARNED = true;
     }
@@ -2228,8 +2230,8 @@ public abstract class AbstractBytes implements Bytes {
         } while (end0 > System.nanoTime() && !currentThread().isInterrupted());
 
         long end = start + nanos - SLEEP_THRESHOLD;
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.log(Level.FINE, Thread.currentThread().getName() + ", waiting for lock");
+        if (LoggerHolder.LOGGER.isLoggable(Level.FINE)) {
+            LoggerHolder.LOGGER.log(Level.FINE, Thread.currentThread().getName() + ", waiting for lock");
         }
 
         try {
@@ -2237,7 +2239,7 @@ public abstract class AbstractBytes implements Bytes {
                 if (tryLockNanos8a(offset, id)) {
                     long millis = (System.nanoTime() - start) / 1000000;
                     if (millis > 200) {
-                        LOGGER.log(Level.WARNING,
+                        LoggerHolder.LOGGER.log(Level.WARNING,
                                 Thread.currentThread().getName() +
                                         ", to obtain a lock took " +
                                         millis / 1e3 + " seconds"
@@ -2262,7 +2264,7 @@ public abstract class AbstractBytes implements Bytes {
         if (lockedId == 0) {
             int count = (int) (currentValue >>> 48);
             if (count != 0)
-                LOGGER.log(Level.WARNING, "Lock held by threadId 0 !?");
+                LoggerHolder.LOGGER.log(Level.WARNING, "Lock held by threadId 0 !?");
             return compareAndSwapLong(offset, currentValue, firstValue);
         }
         if (lockedId == id) {
@@ -2316,7 +2318,7 @@ public abstract class AbstractBytes implements Bytes {
             currentValue -= 1 << 24;
             writeOrderedInt(offset, (int) currentValue);
         } else if (currentValue == 0) {
-            LOGGER.log(Level.WARNING, "No thread holds this lock, threadId: " + shortThreadId());
+            LoggerHolder.LOGGER.log(Level.WARNING, "No thread holds this lock, threadId: " + shortThreadId());
         } else {
             throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
@@ -2822,5 +2824,9 @@ public abstract class AbstractBytes implements Bytes {
         DateCache() {
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         }
+    }
+
+    static class LoggerHolder {
+        public static final Logger LOGGER = Logger.getLogger(AbstractBytes.class.getName());
     }
 }
