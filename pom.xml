@@ -43,6 +43,7 @@
 
         <!-- new -->
         <module>Chronicle-Core</module>
+        <module>Chronicle-Network</module>
         <module>Chronicle-Bytes</module>
         <module>Chronicle-Wire</module>
         <module>Chronicle-Values</module>
