@@ -38,14 +38,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <pax.exam.version>4.1.0</pax.exam.version>
-        <pax.url.version>2.2.0</pax.url.version>
+        <pax.exam.version>4.4.0</pax.exam.version>
+        <pax.url.version>2.4.0</pax.url.version>
         <logback.version>1.1.2</logback.version>
         <osgi.version>5.0.0</osgi.version>
-        <slf4j.version>1.7.6</slf4j.version>
+        <slf4j.version>1.7.10</slf4j.version>
         <jna.version>4.1.0</jna.version>
-        <jmh.version>1.3.3</jmh.version>
-        <log4j2.version>2.1</log4j2.version>
+        <jmh.version>1.6.3</jmh.version>
+        <log4j2.version>2.2</log4j2.version>
+        <felix.framework.version>4.6.1</felix.framework.version>
     </properties>
 
     <dependencyManagement>
@@ -87,17 +88,6 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.17</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jul-to-slf4j</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
@@ -147,15 +137,61 @@
                 <version>1</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.cal10n</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.cal10n</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.cal10n</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.cal10n</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${slf4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.cal10n</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -207,7 +243,7 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.framework</artifactId>
-                <version>4.4.1</version>
+                <version>${felix.framework.version}</version>
             </dependency>
 
             <dependency>
