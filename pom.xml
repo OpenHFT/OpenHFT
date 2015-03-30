@@ -24,19 +24,32 @@
     <artifactId>OpenHFT</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>third-party-bom</module>
         <module>root-parent-pom</module>
         <module>java-parent-pom</module>
+        <!-- heritage -->
         <module>Java-Thread-Affinity</module>
         <module>Java-Runtime-Compiler</module>
+
+        <!-- stable -->
         <module>Java-Lang</module>
         <module>SAXophone</module>
         <module>Chronicle-Map</module>
         <module>Chronicle-Map-Java8</module>
-        <module>Chronicle-Queue</module>
         <module>Chronicle-Logger</module>
-        <module>Chronicle-Engine</module>
+        <!--<module>Chronicle-Engine</module>-->
+
+        <!-- new -->
+        <module>Chronicle-Core</module>
+        <module>Chronicle-Network</module>
+        <module>Chronicle-Bytes</module>
+        <module>Chronicle-Algorithms</module>
+        <module>Chronicle-Wire</module>
+        <module>Chronicle-Values</module>
+        <module>Chronicle-Threads</module>
+        <module>Chronicle-Queue</module>
         <!--<module>TransFIX</module>-->
         <!--<module>jpsg-maven-plugin</module>-->
     </modules>
