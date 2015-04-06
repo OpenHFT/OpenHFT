@@ -24,5 +24,9 @@ OpenHFT recommends;
 
 [![YourKit](http://www.red-soft.biz/files/downloads/partners_logo/YourKit_index_logo.gif)](http://www.yourkit.com/overview/)
 
+
+[![Teamcity](https://www.jetbrains.com/teamcity/)
+
+
 Other commercial profilers can be used.  VisualVM creates too much noise to be useful at this level.
 
