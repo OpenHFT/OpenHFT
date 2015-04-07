@@ -22,9 +22,9 @@ OpenHFT recommends:
 
 [![Teamcity](https://www.jetbrains.com/teamcity/docs/logo_teamcity.png)](http://www.jetbrains.com/teamcity/)
 
-[![IntelliJ](http://www.jetbrains.com/img/logos/logo_intellij_idea.png)](http://www.jetbrains.com/idea/)
+   [![IntelliJ](http://www.jetbrains.com/img/logos/logo_intellij_idea.png)](http://www.jetbrains.com/idea/)
 
-[![YourKit](http://www.red-soft.biz/files/downloads/partners_logo/YourKit_index_logo.gif)](http://www.yourkit.com/overview/)
+   [![YourKit](http://www.red-soft.biz/files/downloads/partners_logo/YourKit_index_logo.gif)](http://www.yourkit.com/overview/)
 
 
 
