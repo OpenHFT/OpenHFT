@@ -23,13 +23,11 @@
 
             <!--  dependencies listed in build order -->
 
-
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
                 <version>2.2</version>
             </dependency>
-
 
             <dependency>
                 <groupId>net.openhft</groupId>
@@ -64,25 +62,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-logger</artifactId>
-                <version>1.0.4-SNAPSHOT</version>
+                <version>1.1.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
                 <version>6.6.1</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-map</artifactId>
-                <version>3.0.0-alpha-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-queue</artifactId>
-                <version>4.0.0-alpha-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -96,9 +82,6 @@
                 <artifactId>saxophone</artifactId>
                 <version>1.0.3</version>
             </dependency>
-
-
-
 
         </dependencies>
     </dependencyManagement>
