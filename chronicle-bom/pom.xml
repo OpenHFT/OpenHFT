@@ -73,6 +73,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>compiler</artifactId>
+                <version>2.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle</artifactId>
                 <version>3.4.1</version>
             </dependency>
