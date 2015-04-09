@@ -37,6 +37,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-values</artifactId>
+                <version>1.0.0-alpha-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
                 <version>1.0.0-alpha</version>
             </dependency>
@@ -44,13 +50,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.0-alpha</version>
+                <version>1.0.1-alpha-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.0.1-alpha</version>
+                <version>1.0.2-alpha-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -88,6 +94,8 @@
                 <artifactId>saxophone</artifactId>
                 <version>1.0.3</version>
             </dependency>
+
+
 
         </dependencies>
     </dependencyManagement>
