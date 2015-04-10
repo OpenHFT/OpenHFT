@@ -50,12 +50,6 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-network</artifactId>
-                <version>1.0.1-alpha-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
                 <version>1.0.2-alpha-SNAPSHOT</version>
             </dependency>
@@ -64,6 +58,12 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
                 <version>1.0.2-alpha-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-network</artifactId>
+                <version>1.0.1-alpha-SNAPSHOT</version>
             </dependency>
 
             <dependency>
