@@ -19,7 +19,7 @@ Java Runtime Compiler - Wrapper for the Java Compiler API to support in memory c
 Tools
 =====
 
-#### OpenHFT recommends
+#### OpenHFT Recommends
 
 ---
 
