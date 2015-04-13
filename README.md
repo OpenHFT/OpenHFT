@@ -18,9 +18,11 @@ Java Runtime Compiler - Wrapper for the Java Compiler API to support in memory c
 
 Tools
 =====
+
 #### OpenHFT recommends
 
 ---
+
 [![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com/)
  
 YourKit supports open source projects with its full-featured Java Profiler.
@@ -29,8 +31,11 @@ and <a href="https://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profi
 innovative and intelligent tools for profiling Java and .NET applications.
 
 ---
+
 [![Teamcity](https://www.jetbrains.com/teamcity/docs/logo_teamcity.png)](http://www.jetbrains.com/teamcity/)
+
 ---
+
 [![IntelliJ](http://www.jetbrains.com/img/logos/logo_intellij_idea.png)](http://www.jetbrains.com/idea/)
 
 ---
