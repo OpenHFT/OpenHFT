@@ -19,6 +19,8 @@ Java Runtime Compiler - Wrapper for the Java Compiler API to support in memory c
 Tools
 =====
 OpenHFT recommends:
+
+
  [![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com/)
  
  [![Teamcity](https://www.jetbrains.com/teamcity/docs/logo_teamcity.png)](http://www.jetbrains.com/teamcity/)
