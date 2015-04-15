@@ -21,7 +21,6 @@
     <dependencyManagement>
         <dependencies>
 
-
             <!--  dependencies listed in build order -->
 
             <dependency>
@@ -33,7 +32,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.0.0-alpha</version>
+                <version>1.0.1-alpha-SNAPSHOT</version>
             </dependency>
 
             <dependency>
