@@ -67,7 +67,7 @@ public class DataValueModelTest {
                 " int=FieldModel{name='int', getter=public abstract int net.openhft.lang.model.HasArraysInterface.getIntAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setIntAt(int,int), indexSize= MaxSize(value=4)}\n" +
                 " long=FieldModel{name='long', getter=public abstract long net.openhft.lang.model.HasArraysInterface.getLongAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setLongAt(int,long), indexSize= MaxSize(value=4)}\n" +
                 " short=FieldModel{name='short', getter=public abstract short net.openhft.lang.model.HasArraysInterface.getShortAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setShortAt(int,short), indexSize= MaxSize(value=4)}\n" +
-                " string=FieldModel{name='string', getter=public abstract java.lang.String net.openhft.lang.model.HasArraysInterface.getStringAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setStringAt(int,java.lang.String), indexSize= MaxSize(value=4)}}"
+                " string=FieldModel{name='string', getter=public abstract java.lang.String net.openhft.lang.model.HasArraysInterface.getStringAt(int), setter=public abstract void net.openhft.lang.model.HasArraysInterface.setStringAt(int,java.lang.String), size= @net.openhft.lang.model.constraints.MaxSize(value=8), indexSize= MaxSize(value=4)}}"
                 , haim.fieldMap().toString().replaceAll("},", "}\n"));
     }
 }
