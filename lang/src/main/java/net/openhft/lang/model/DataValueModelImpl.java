@@ -652,13 +652,24 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
 
         public void indexAnnotations(Method method) {
-            for (Annotation a : method.getParameterAnnotations()[0]) {
+            Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+            for (Annotation a : parameterAnnotations[0]) {
 //                if (a instanceof Digits)
 //                    digits = (Digits) a;
 //                if (a instanceof Range)
 //                    range = (Range) a;
                 if (a instanceof MaxSize)
                     indexSize = (MaxSize) a;
+            }
+            if( parameterAnnotations.length > 1 ) {
+                for (Annotation a : parameterAnnotations[1]) {
+                    if (a instanceof Digits)
+                        digits = (Digits) a;
+                    if (a instanceof Range)
+                        range = (Range) a;
+                    if (a instanceof MaxSize)
+                        maxSize = (MaxSize) a;
+                }
             }
         }
 

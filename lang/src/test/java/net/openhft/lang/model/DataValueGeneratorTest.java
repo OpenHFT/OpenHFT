@@ -112,6 +112,21 @@ public class DataValueGeneratorTest {
     }
 
     @Test
+    public void testGenerateNativeWithHasArrays() throws Exception {
+        String actual = new DataValueGenerator().generateNativeObject(HasArraysInterface.class);
+        System.out.println(actual);
+        CachedCompiler cc = new CachedCompiler(null, null);
+        Class aClass = cc.loadFromJava(HasArraysInterface.class.getName() + "$$Native", actual);
+        HasArraysInterface hai = (HasArraysInterface) aClass.asSubclass(HasArraysInterface.class).newInstance();
+        Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(152));
+        ((Byteable) hai).bytes(bytes, 0L);
+
+        hai.setStringAt(0, "G'day");
+
+        assertEquals("G'day", hai.getStringAt(0));
+    }
+
+    @Test
     public void testGenerateNativeWithGetUsingHeapInstance() {
         DataValueGenerator dvg = new DataValueGenerator();
         JavaBeanInterfaceGetUsingHeap si = dvg.heapInstance(JavaBeanInterfaceGetUsingHeap.class);
@@ -184,6 +199,5 @@ public class DataValueGeneratorTest {
         assertEquals(nestedB1.hashCode(), nestedA.one().hashCode());
         assertEquals(nestedB2.hashCode(), nestedA.two().hashCode());
     }
-
 }
 
