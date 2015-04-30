@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -35,8 +36,17 @@ import java.util.zip.InflaterInputStream;
  * Created by peter.lawrey on 24/10/14.
  */
 public enum StringZMapMarshaller implements CompactBytesMarshaller<Map<String, String>> {
-    INSTANCE;
+    FAST(Deflater.BEST_SPEED),
+    COMPACT(Deflater.BEST_COMPRESSION),
+    INSTANCE(Deflater.DEFAULT_STRATEGY);
+
+    private final int level;
+
     private static final long NULL_SIZE = -1;
+
+    StringZMapMarshaller(int level) {
+        this.level = level;
+    }
 
     @Override
     public byte code() {
@@ -54,7 +64,8 @@ public enum StringZMapMarshaller implements CompactBytesMarshaller<Map<String, S
         long position = bytes.position();
         bytes.clear();
         bytes.position(position + 4);
-        DataOutputStream dos = new DataOutputStream(new DeflaterOutputStream(bytes.outputStream()));
+        DataOutputStream dos = new DataOutputStream(
+                new DeflaterOutputStream(bytes.outputStream(), new Deflater(level)));
         try {
             for (Map.Entry<String, String> entry : kvMap.entrySet()) {
                 dos.writeUTF(entry.getKey());
