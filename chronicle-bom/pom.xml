@@ -22,6 +22,7 @@
 
             <!--  dependencies listed in build order -->
 
+
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
@@ -37,7 +38,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>1.0.0-alpha-SNAPSHOT</version>
+                <version>1.0.0-alpha</version>
             </dependency>
 
             <dependency>
@@ -55,13 +56,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.0.4-alpha-SNAPSHOT</version>
+                <version>1.0.4-alpha</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.1-alpha-SNAPSHOT</version>
+                <version>1.0.1-alpha</version>
             </dependency>
 
             <dependency>
@@ -92,6 +93,12 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>saxophone</artifactId>
                 <version>1.0.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-map</artifactId>
+                <version>3.0.0-alpha</version>
             </dependency>
 
 
