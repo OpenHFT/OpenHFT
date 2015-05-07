@@ -101,7 +101,6 @@
                 <version>3.0.1-alpha-SNAPSHOT</version>
             </dependency>
 
-
         </dependencies>
     </dependencyManagement>
 
