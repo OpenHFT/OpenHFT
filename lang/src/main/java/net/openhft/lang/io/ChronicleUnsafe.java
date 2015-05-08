@@ -90,11 +90,11 @@ public class ChronicleUnsafe {
     }
 
     public int pageSize() {
-        throw new UnsupportedOperationException("todo");
+        throw new UnsupportedOperationException("todo (pageSize)");
     }
 
     public long allocateMemory(int aVoid) {
-        throw new UnsupportedOperationException("todo");
+        throw new UnsupportedOperationException("todo (allocateMemory)");
     }
 
     public long getLong(byte[] bytes, long address) {
@@ -135,7 +135,7 @@ public class ChronicleUnsafe {
     }
 
     public void copyMemory(Object o, long positionAddr, Object bytes, long i, long len2) {
-        throw new UnsupportedOperationException("todo");
+        throw new UnsupportedOperationException("todo (copyMemory)");
     }
 
     public short getShort(long address) {
@@ -215,6 +215,6 @@ public class ChronicleUnsafe {
     }
 
     public void copyMemory(long l, long positionAddr, long length) {
-        throw new UnsupportedOperationException("todo");
+        throw new UnsupportedOperationException("todo (copyMemory)");
     }
 }
