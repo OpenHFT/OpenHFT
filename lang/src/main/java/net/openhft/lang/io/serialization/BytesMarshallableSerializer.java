@@ -22,7 +22,10 @@ import net.openhft.lang.io.AbstractBytes;
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.NativeBytes;
 import net.openhft.lang.io.serialization.impl.NoMarshaller;
+import net.openhft.lang.io.serialization.impl.StringBuilderPool;
+import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.model.constraints.NotNull;
+import net.openhft.lang.pool.EnumInterner;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -51,6 +54,7 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
     private static final byte NULL = 'N';
     private static final byte ENUMED = 'E';
     private static final byte SERIALIZED = 'S';
+    private static final StringBuilderPool SBP = new StringBuilderPool();
 
     private final BytesMarshallerFactory bytesMarshallerFactory;
     private final ObjectSerializer objectSerializer;
@@ -77,10 +81,14 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
                 bytes.writeUTFΔ((CharSequence) object);
                 return;
             } else if (Enum.class.isAssignableFrom(expectedClass)) {
-                bytes.writeUTFΔ(object.toString());
+                bytes.write8bitText(object.toString());
                 return;
             }
         }
+        writeSerializable2(bytes, object);
+    }
+
+    private void writeSerializable2(Bytes bytes, Object object) throws IOException {
         Class<?> clazz = object.getClass();
         BytesMarshaller em = bytesMarshallerFactory.acquireMarshaller(clazz, false);
         if (em == NoMarshaller.INSTANCE && autoGenerateMarshaller(object))
@@ -119,7 +127,9 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
                 } else if (CharSequence.class.isAssignableFrom(expectedClass)) {
                     return readCharSequence(bytes, object);
                 } else if (Enum.class.isAssignableFrom(expectedClass)) {
-                    return (T) Enum.valueOf((Class<Enum>) expectedClass, (String) readCharSequence(bytes, null));
+                    StringBuilder sb = SBP.acquireStringBuilder();
+                    bytes.read8bitText(sb);
+                    return (T) EnumInterner.intern((Class<Enum>) expectedClass, sb);
                 }
             } catch (InstantiationException e) {
                 throw new IOException("Unable to create " + expectedClass, e);
@@ -167,6 +177,10 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
             object = (T) NativeBytes.UNSAFE.allocateInstance(expectedClass);
         ((BytesMarshallable) object).readMarshallable(bytes);
         return object;
+    }
+
+    public static ObjectSerializer create() {
+        return create(new VanillaBytesMarshallerFactory(), JDKZObjectSerializer.INSTANCE);
     }
 
     public static ObjectSerializer create(BytesMarshallerFactory bytesMarshallerFactory, ObjectSerializer instance) {

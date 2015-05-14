@@ -30,7 +30,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>Java-Lang</artifactId>
-    <version>6.5-SNAPSHOT</version>
+    <version>6.6.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Java Lang Parent</name>

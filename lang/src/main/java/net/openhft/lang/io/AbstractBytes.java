@@ -29,11 +29,13 @@ import net.openhft.lang.io.serialization.impl.VanillaBytesMarshallerFactory;
 import net.openhft.lang.io.view.BytesInputStream;
 import net.openhft.lang.io.view.BytesOutputStream;
 import net.openhft.lang.model.Byteable;
+import net.openhft.lang.pool.EnumInterner;
 import net.openhft.lang.pool.StringInterner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -104,7 +106,7 @@ public abstract class AbstractBytes implements Bytes {
     final AtomicInteger refCount;
     private final byte[] numberBuffer = new byte[MAX_NUMBER_LENGTH];
     protected boolean finished;
-    ObjectSerializer objectSerializer;
+    private ObjectSerializer objectSerializer;
     private StringInterner stringInterner = null;
     private boolean selfTerminating = false;
 
@@ -120,9 +122,13 @@ public abstract class AbstractBytes implements Bytes {
     AbstractBytes(ObjectSerializer objectSerializer, AtomicInteger refCount) {
         this.finished = false;
         this.refCount = refCount;
+        setObjectSerializer(objectSerializer);
+    }
+
+    protected void setObjectSerializer(ObjectSerializer objectSerializer) {
+        if (objectSerializer != null && !(objectSerializer instanceof BytesMarshallableSerializer))
+            Thread.yield();
         this.objectSerializer = objectSerializer;
-
-
     }
 
     /**
@@ -296,16 +302,51 @@ public abstract class AbstractBytes implements Bytes {
         }
     }
 
-    public static long findUTFLength(@NotNull CharSequence str, long strlen) {
-        long utflen = 0, c;/* use charAt instead of copying String to char array */
+    public static long findUTFLength(@NotNull CharSequence str) {
+        if (str instanceof String)
+            return findUTFLength((String) str);
+        int strlen = str.length();
+        long utflen = strlen;
+
         for (int i = 0; i < strlen; i++) {
-            c = str.charAt(i);
-            if ((c >= 0x0000) && (c <= 0x007F)) {
-                utflen++;
-            } else if (c > 0x07FF) {
-                utflen += 3;
-            } else {
-                utflen += 2;
+            char c = str.charAt(i);
+            if ((c > 0x007F)) {
+                if (c > 0x07FF) {
+                    utflen += 2;
+                } else {
+                    utflen += 1;
+                }
+            }
+        }
+        return utflen;
+    }
+
+    static final Field VALUE;
+
+    static {
+        try {
+            VALUE = String.class.getDeclaredField("value");
+            VALUE.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    public static long findUTFLength(@NotNull String str) {
+        char[] chars;
+        try {
+            chars = (char[]) VALUE.get(str);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+        long utflen = chars.length;
+        for (char c : chars) {
+            if ((c > 0x007F)) {
+                if (c > 0x07FF) {
+                    utflen += 2;
+                } else {
+                    utflen += 1;
+                }
             }
         }
         return utflen;
@@ -341,6 +382,36 @@ public abstract class AbstractBytes implements Bytes {
             throw new IndexOutOfBoundsException();
     }
 
+    @Override
+    public boolean read8bitText(@NotNull StringBuilder stringBuilder) throws StreamCorruptedException {
+        long len = readStopBit();
+        if (len < 1) {
+            stringBuilder.setLength(0);
+            if (len == -1)
+                return false;
+            if (len == 0)
+                return true;
+            throw new StreamCorruptedException("UTF length invalid " + len + " remaining: " + remaining());
+        }
+        if (len > remaining() || len > Integer.MAX_VALUE)
+            throw new StreamCorruptedException("UTF length invalid " + len + " remaining: " + remaining());
+        int ilen = (int) len;
+        for (int i = 0; i < ilen; i++)
+            stringBuilder.append((char) readUnsignedByte());
+        return true;
+    }
+
+    @Override
+    public void write8bitText(@Nullable CharSequence s) {
+        if (s == null) {
+            writeStopBit(-1);
+            return;
+        }
+        writeStopBit(s.length());
+        for (int i = 0; i < s.length(); i++)
+            writeUnsignedByte(s.charAt(i));
+    }
+
     /**
      * display the hex data of {@link Bytes} from the position() to the limit()
      *
@@ -348,7 +419,7 @@ public abstract class AbstractBytes implements Bytes {
      * @return hex representation of the buffer, from example [0D ,OA, FF]
      */
     public static String toHex(@NotNull final Bytes buffer) {
-        if (buffer.remaining() ==0)
+        if (buffer.remaining() == 0)
             return "";
 
         final Bytes slice = buffer.slice();
@@ -458,7 +529,7 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public Boolean parseBoolean(@NotNull StopCharTester tester) {
-        StringBuilder sb = acquireUtfReader();
+        StringBuilder sb = acquireStringBuilder();
         parseUTF(sb, tester);
         if (sb.length() == 0)
             return null;
@@ -531,7 +602,7 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String readLine() {
-        StringBuilder input = acquireUtfReader();
+        StringBuilder input = acquireStringBuilder();
         EOL:
         while (position() < capacity()) {
             int c = readUnsignedByteOrThrow();
@@ -555,7 +626,7 @@ public abstract class AbstractBytes implements Bytes {
     @Nullable
     @Override
     public String readUTFΔ() {
-        StringBuilder utfReader = acquireUtfReader();
+        StringBuilder utfReader = acquireStringBuilder();
         if (readUTFΔ(utfReader))
             return utfReader.length() == 0 ? "" : stringInterner().intern(utfReader);
         return null;
@@ -576,7 +647,7 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     @NotNull
-    private StringBuilder acquireUtfReader() {
+    private StringBuilder acquireStringBuilder() {
         return sbp.acquireStringBuilder();
     }
 
@@ -607,7 +678,7 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public String parseUTF(@NotNull StopCharTester tester) {
-        StringBuilder utfReader = acquireUtfReader();
+        StringBuilder utfReader = acquireStringBuilder();
         parseUTF(utfReader, tester);
         return stringInterner().intern(utfReader);
     }
@@ -711,7 +782,7 @@ public abstract class AbstractBytes implements Bytes {
     public String readUTF() {
         try {
             int len = readUnsignedShort();
-            StringBuilder utfReader = acquireUtfReader();
+            StringBuilder utfReader = acquireStringBuilder();
             readUTF0(this, utfReader, len);
             return utfReader.length() == 0 ? "" : stringInterner().intern(utfReader);
         } catch (IOException unexpected) {
@@ -929,13 +1000,12 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void writeUTF(@NotNull String str) {
-        long strlen = str.length();
-        long utflen = findUTFLength(str, strlen);
+        long utflen = findUTFLength(str);
         if (utflen > 65535)
             throw new IllegalStateException("String too long " + utflen + " when encoded, max: 65535");
         writeUnsignedShort((int) utflen);
         checkUFTLength(utflen);
-        writeUTF0(this, str, strlen);
+        writeUTF0(this, str, (long) str.length());
     }
 
     @Override
@@ -944,11 +1014,10 @@ public abstract class AbstractBytes implements Bytes {
             writeStopBit(-1);
             return;
         }
-        long strlen = str.length();
-        long utflen = findUTFLength(str, strlen);
+        long utflen = findUTFLength(str);
         writeStopBit(utflen);
         checkUFTLength(utflen);
-        writeUTF0(this, str, strlen);
+        writeUTF0(this, str, (long) str.length());
     }
 
     // locking at it temporarily changes position.
@@ -963,14 +1032,13 @@ public abstract class AbstractBytes implements Bytes {
                 writeStopBit(-1);
                 return;
             }
-            long strlen = s.length();
-            long utflen = findUTFLength(s, strlen);
+            long utflen = findUTFLength(s);
             long totalSize = IOTools.stopBitLength(utflen) + utflen;
             if (totalSize > maxSize)
                 throw new IllegalStateException("Attempted to write " + totalSize + " byte String, when only " + maxSize + " allowed");
 
             writeStopBit(utflen);
-            writeUTF0(this, s, strlen);
+            writeUTF0(this, s, (long) s.length());
             zeroOut(position(), offset + maxSize);
         } finally {
             position(position);
@@ -1889,7 +1957,7 @@ public abstract class AbstractBytes implements Bytes {
     @NotNull
     @Override
     public ByteStringAppender append(@NotNull MutableDecimal md) {
-        StringBuilder sb = acquireUtfReader();
+        StringBuilder sb = acquireStringBuilder();
         md.toString(sb);
         append(sb);
         return this;
@@ -1916,18 +1984,32 @@ public abstract class AbstractBytes implements Bytes {
     @SuppressWarnings("unchecked")
     @Override
     public <E> void writeEnum(@Nullable E e) {
-        Class aClass;
-        if (e == null || e instanceof CharSequence)
-            aClass = String.class;
-        else
-            aClass = (Class) e.getClass();
+        if (e instanceof Enum) {
+            write8bitText(e.toString());
+            return;
+        }
+        Class aClass = e == null || e instanceof CharSequence
+                ? String.class
+                : (Class) e.getClass();
         writeInstance(aClass, e);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <E> E readEnum(@NotNull Class<E> eClass) {
+        if (Enum.class.isAssignableFrom(eClass))
+            return (E) readEnum2((Class<Enum>) (Class) eClass);
         return readInstance(eClass, null);
+    }
+
+    private <E extends Enum<E>> E readEnum2(Class<E> eClass) {
+        try {
+            StringBuilder sb = acquireStringBuilder();
+            read8bitText(sb);
+            return EnumInterner.intern(eClass, sb);
+        } catch (StreamCorruptedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1936,7 +2018,7 @@ public abstract class AbstractBytes implements Bytes {
         String text = parseUTF(tester);
         if (text.isEmpty())
             return null;
-        return Enum.valueOf(eClass, text);
+        return EnumInterner.intern(eClass, text);
     }
 
     @Override
@@ -2537,12 +2619,13 @@ public abstract class AbstractBytes implements Bytes {
             length--;
         }
     }
+
     @Override
     public void write(@NotNull Byteable byteable) {
-        if(byteable.bytes() == null) {
+        if (byteable.bytes() == null) {
             throw new IllegalArgumentException("Attempt to write an unitialized Byteable object");
         }
-        
+
         write(byteable.bytes(), byteable.offset(), byteable.maxSize());
     }
 

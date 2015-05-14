@@ -29,7 +29,7 @@ public class MultiStoreBytes extends NativeBytes {
     public void storePositionAndSize(BytesStore store, long offset, long size) {
         if (offset < 0 || size < 0 || offset + size > store.size())
             throw new IllegalArgumentException("offset: " + offset + ", size: " + size + ", store.size: " + store.size());
-        this.objectSerializer = store.objectSerializer();
+        setObjectSerializer(store.objectSerializer());
 
         startAddr = positionAddr = store.address() + offset;
         capacityAddr = limitAddr = startAddr + size;
@@ -38,7 +38,7 @@ public class MultiStoreBytes extends NativeBytes {
     }
 
     public void setBytesOffset(Bytes bytes, long offset) {
-        this.objectSerializer = bytes.objectSerializer();
+        setObjectSerializer(bytes.objectSerializer());
 
         long bytesAddr = bytes.address();
         startAddr = positionAddr = bytesAddr + offset;

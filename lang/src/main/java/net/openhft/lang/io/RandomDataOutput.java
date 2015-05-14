@@ -819,6 +819,7 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     void writeUTFΔ(long offset, int maxSize, @Nullable CharSequence s) throws IllegalStateException;
 
+    void write8bitText(@Nullable CharSequence s);
     /**
      * Copies the contents of a ByteBuffer from the position to the limit.
      *

@@ -80,7 +80,7 @@ public class MappedNativeBytes extends AbstractBytes {
                              @NotNull MappedFile mappedFile,
                              boolean singleThreaded) {
         this.isSingleThreaded = singleThreaded;
-        this.objectSerializer = objectSerializer;
+        setObjectSerializer(objectSerializer);
         this.start = sliceStart;
         this.position = 0;
         this.capacity = capacity;

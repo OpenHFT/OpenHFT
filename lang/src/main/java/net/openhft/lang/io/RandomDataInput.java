@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ObjectInput;
+import java.io.StreamCorruptedException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Map;
@@ -752,6 +753,9 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
      * @return <code>true</code> if there was a String, or <code>false</code> if it was <code>null</code>
      */
     boolean readUTFΔ(@NotNull StringBuilder stringBuilder);
+
+    boolean read8bitText(@NotNull StringBuilder stringBuilder) throws StreamCorruptedException;
+
 
     /**
      * Copy bytes into a ByteBuffer to the minimum of the length <code>remaining()</code> in the ByteBuffer or the
