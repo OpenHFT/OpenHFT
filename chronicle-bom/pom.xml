@@ -97,6 +97,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-algorithms</artifactId>
+                <version>1.0.0-alpha-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
                 <version>3.0.3-alpha-SNAPSHOT</version>
             </dependency>
