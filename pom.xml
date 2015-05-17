@@ -36,7 +36,7 @@
         <!--<module>Java-Runtime-Compiler</module>-->
 
         <!-- stable -->
-        <!--<module>Java-Lang</module>-->
+        <module>Java-Lang</module>
         <!--<module>SAXophone</module>-->
         <module>Chronicle-Map</module>
         <!--<module>Chronicle-Map-Java8</module>-->
