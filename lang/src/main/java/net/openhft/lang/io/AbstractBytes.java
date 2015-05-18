@@ -2572,7 +2572,12 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public int length() {
-        return (int) Math.min(Integer.MAX_VALUE, remaining());
+        if (position() == 0)
+            return (int) Math.min(limit(), Integer.MAX_VALUE);
+        else if (position() == limit() || limit() == capacity())
+            return (int) Math.min(position(), Integer.MAX_VALUE);
+        else
+            throw new IllegalStateException();
     }
 
     @Override
