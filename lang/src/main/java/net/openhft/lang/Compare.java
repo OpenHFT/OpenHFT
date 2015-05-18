@@ -169,6 +169,8 @@ public abstract class Compare {
     }
 
     public static long calcLongHashCode(CharSequence s) {
+        if (s == null)
+            return NULL_HASHCODE;
         long hash = 0;
         for (int i = 0, len = s.length(); i < len; i++) {
             hash = 57 * hash + s.charAt(i);
