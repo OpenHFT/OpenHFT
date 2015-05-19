@@ -138,11 +138,11 @@ public enum Jvm {
 
     public static boolean isUnix() {
         return OS.contains("nix") ||
-               OS.contains("nux") ||
-               OS.contains("aix") ||
-               OS.contains("bsd") ||
-               OS.contains("sun") ||
-               OS.contains("hpux");
+                OS.contains("nux") ||
+                OS.contains("aix") ||
+                OS.contains("bsd") ||
+                OS.contains("sun") ||
+                OS.contains("hpux");
     }
 
     public static boolean isSolaris() {
@@ -177,7 +177,7 @@ public enum Jvm {
     public static long freePhysicalMemoryOnWindowsInBytes() throws IOException {
         if (!isWindows()) {
             throw new IllegalStateException("Method freePhysicalMemoryOnWindowsInBytes() should " +
-                "be called only on windows. Use Jvm.isWindows() to check the OS.");
+                    "be called only on windows. Use Jvm.isWindows() to check the OS.");
         }
 
         Process pr = Runtime.getRuntime().exec("wmic OS get FreePhysicalMemory /Value");
@@ -216,6 +216,7 @@ public enum Jvm {
 
     /**
      * Utility method to support throwing checked exceptions out of the streams API
+     *
      * @param t the exception to rethrow
      * @return the exception
      */
@@ -226,5 +227,25 @@ public enum Jvm {
 
     static class LoggerHolder {
         public static final Logger LOGGER = Logger.getLogger(Jvm.class.getName());
+    }
+
+    public static void trimStackTrace(StringBuilder sb, StackTraceElement... stes) {
+        int first = 0;
+        for (; first < stes.length; first++)
+            if (!isInternal(stes[first].getClassName()))
+                break;
+        if (first > 0) first--;
+        if (first > 0) first--;
+        int last = stes.length - 1;
+        for (; first < last; last--)
+            if (!isInternal(stes[last].getClassName()))
+                break;
+        if (last < stes.length - 1) last++;
+        for (int i = first; i <= last; i++)
+            sb.append("\n\tat ").append(stes[i]);
+    }
+
+    private static boolean isInternal(String className) {
+        return className.startsWith("jdk.") || className.startsWith("sun.") || className.startsWith("java.");
     }
 }
