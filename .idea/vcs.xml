@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Algorithms" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Bytes" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Core" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Engine" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Enterprise" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Logger" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Map" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Map-Java8" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Network" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Queue" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Threads" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Values" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chronicle-Wire" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Java-Lang" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Java-Runtime-Compiler" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Java-Thread-Affinity" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/MUFG" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/RFC" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SAXophone" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/TransFIX" vcs="Git" />
+  </component>
+</project>

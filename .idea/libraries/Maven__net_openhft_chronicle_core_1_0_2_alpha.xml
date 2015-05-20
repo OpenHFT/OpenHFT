@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: net.openhft:chronicle-core:1.0.2-alpha">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/openhft/chronicle-core/1.0.2-alpha/chronicle-core-1.0.2-alpha.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/net/openhft/chronicle-core/1.0.2-alpha/chronicle-core-1.0.2-alpha-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/openhft/chronicle-core/1.0.2-alpha/chronicle-core-1.0.2-alpha-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

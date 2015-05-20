@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <option name="DEFAULT_COMPILER" value="Javac" />
+    <resourceExtensions />
+    <wildcardResourcePatterns>
+      <entry name="!?*.java" />
+      <entry name="!?*.form" />
+      <entry name="!?*.class" />
+      <entry name="!?*.groovy" />
+      <entry name="!?*.scala" />
+      <entry name="!?*.flex" />
+      <entry name="!?*.kt" />
+      <entry name="!?*.clj" />
+      <entry name="!?*.aj" />
+    </wildcardResourcePatterns>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-network" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-network" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-engine" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-engine" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-bytes" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-bytes" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-wire" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-wire" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-threads" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-threads" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-core" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-core" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-values" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-values" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-queue" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-queue" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-algorithms" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-algorithms" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-map" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-map" />
+      </profile>
+      <profile default="false" name="Annotation profile for examples" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="examples" />
+      </profile>
+      <profile default="false" name="Annotation profile for lang-test" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="lang-test" />
+      </profile>
+      <profile default="false" name="Annotation profile for lang" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="lang" />
+      </profile>
+      <profile default="false" name="Annotation profile for chronicle-enterprise" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="chronicle-enterprise" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="affinity" target="1.7" />
+      <module name="affinity-test" target="1.7" />
+      <module name="chronicle" target="1.7" />
+      <module name="chronicle-algorithms" target="1.8" />
+      <module name="chronicle-bom" target="1.5" />
+      <module name="chronicle-bytes" target="1.8" />
+      <module name="chronicle-core" target="1.8" />
+      <module name="chronicle-demo" target="1.7" />
+      <module name="chronicle-engine" target="1.8" />
+      <module name="chronicle-enterprise" target="1.8" />
+      <module name="chronicle-logger" target="1.7" />
+      <module name="chronicle-logger-jcl" target="1.7" />
+      <module name="chronicle-logger-jul" target="1.7" />
+      <module name="chronicle-logger-log4j-1" target="1.7" />
+      <module name="chronicle-logger-log4j-2" target="1.5" />
+      <module name="chronicle-logger-logback" target="1.7" />
+      <module name="chronicle-logger-parent" target="1.5" />
+      <module name="chronicle-logger-slf4j" target="1.7" />
+      <module name="chronicle-logger-tools" target="1.7" />
+      <module name="chronicle-map" target="1.8" />
+      <module name="chronicle-map-java8" target="1.8" />
+      <module name="chronicle-network" target="1.8" />
+      <module name="chronicle-queue" target="1.8" />
+      <module name="Chronicle-Queue" target="1.5" />
+      <module name="chronicle-test" target="1.7" />
+      <module name="chronicle-threads" target="1.8" />
+      <module name="chronicle-values" target="1.8" />
+      <module name="chronicle-wire" target="1.8" />
+      <module name="compiler" target="1.6" />
+      <module name="examples" target="1.8" />
+      <module name="Java-Lang" target="1.5" />
+      <module name="java-parent-pom" target="1.5" />
+      <module name="Java-Runtime-Compiler" target="1.5" />
+      <module name="Java-Thread-Affinity" target="1.5" />
+      <module name="lang" target="1.6" />
+      <module name="lang-test" target="1.6" />
+      <module name="OpenHFT" target="1.5" />
+      <module name="root-parent-pom" target="1.5" />
+      <module name="saxophone" target="1.6" />
+      <module name="SAXophone" target="1.5" />
+      <module name="saxophone-sandbox" target="1.6" />
+      <module name="third-party-bom" target="1.5" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

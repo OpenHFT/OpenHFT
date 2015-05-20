@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Java-Lang/Java-Lang.iml" filepath="$PROJECT_DIR$/Java-Lang/Java-Lang.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OpenHFT.iml" filepath="$PROJECT_DIR$/OpenHFT.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Algorithms/chronicle-algorithms.iml" filepath="$PROJECT_DIR$/Chronicle-Algorithms/chronicle-algorithms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chronicle-bom/chronicle-bom.iml" filepath="$PROJECT_DIR$/chronicle-bom/chronicle-bom.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Bytes/chronicle-bytes.iml" filepath="$PROJECT_DIR$/Chronicle-Bytes/chronicle-bytes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Core/chronicle-core.iml" filepath="$PROJECT_DIR$/Chronicle-Core/chronicle-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Engine/chronicle-engine.iml" filepath="$PROJECT_DIR$/Chronicle-Engine/chronicle-engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Enterprise/chronicle-enterprise.iml" filepath="$PROJECT_DIR$/Chronicle-Enterprise/chronicle-enterprise.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Map/chronicle-map.iml" filepath="$PROJECT_DIR$/Chronicle-Map/chronicle-map.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Network/chronicle-network.iml" filepath="$PROJECT_DIR$/Chronicle-Network/chronicle-network.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Queue/chronicle-queue/chronicle-queue.iml" filepath="$PROJECT_DIR$/Chronicle-Queue/chronicle-queue/chronicle-queue.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Threads/chronicle-threads.iml" filepath="$PROJECT_DIR$/Chronicle-Threads/chronicle-threads.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Values/chronicle-values.iml" filepath="$PROJECT_DIR$/Chronicle-Values/chronicle-values.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chronicle-Wire/chronicle-wire.iml" filepath="$PROJECT_DIR$/Chronicle-Wire/chronicle-wire.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MUFG/examples.iml" filepath="$PROJECT_DIR$/MUFG/examples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-parent-pom/java-parent-pom.iml" filepath="$PROJECT_DIR$/java-parent-pom/java-parent-pom.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Java-Lang/lang/lang.iml" filepath="$PROJECT_DIR$/Java-Lang/lang/lang.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Java-Lang/lang-test/lang-test.iml" filepath="$PROJECT_DIR$/Java-Lang/lang-test/lang-test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/root-parent-pom/root-parent-pom.iml" filepath="$PROJECT_DIR$/root-parent-pom/root-parent-pom.iml" />
+      <module fileurl="file://$PROJECT_DIR$/third-party-bom/third-party-bom.iml" filepath="$PROJECT_DIR$/third-party-bom/third-party-bom.iml" />
+    </modules>
+  </component>
+</project>
