@@ -39,9 +39,9 @@ public enum DataValueModels {
     }
 
     public static <T> DataValueModel<T> acquireModel(Class<T> tClass) {
-        if (!tClass.isInterface() || tClass == CharSequence.class)
+        if (!tClass.isInterface() || tClass.getClassLoader() == null)
             throw new IllegalArgumentException(tClass + " not supported");
-        DataValueModel<T> model = null;
+        DataValueModel<T> model;
         try {
             model = getModel(tClass);
             if (model == null) {

@@ -90,6 +90,8 @@ public class DataValueGenerator {
     private boolean dumpCode = Boolean.getBoolean("dvg.dumpCode");
 
     public static Class firstPrimitiveFieldType(Class valueClass) {
+        if (valueClass.getClassLoader() == null)
+            return null;
         try {
             DataValueModel valueModel;
             if (valueClass.isInterface()) {
