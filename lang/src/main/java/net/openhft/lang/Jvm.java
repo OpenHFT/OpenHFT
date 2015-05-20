@@ -230,22 +230,32 @@ public enum Jvm {
     }
 
     public static void trimStackTrace(StringBuilder sb, StackTraceElement... stes) {
+        int first = trimFirst(stes);
+        int last = trimLast(first, stes);
+        for (int i = first; i <= last; i++)
+            sb.append("\n\tat ").append(stes[i]);
+    }
+
+    private static int trimFirst(StackTraceElement[] stes) {
         int first = 0;
         for (; first < stes.length; first++)
             if (!isInternal(stes[first].getClassName()))
                 break;
         if (first > 0) first--;
         if (first > 0) first--;
+        return first;
+    }
+
+    private static int trimLast(int first, StackTraceElement[] stes) {
         int last = stes.length - 1;
         for (; first < last; last--)
             if (!isInternal(stes[last].getClassName()))
                 break;
         if (last < stes.length - 1) last++;
-        for (int i = first; i <= last; i++)
-            sb.append("\n\tat ").append(stes[i]);
+        return last;
     }
 
-    private static boolean isInternal(String className) {
+    public static boolean isInternal(String className) {
         return className.startsWith("jdk.") || className.startsWith("sun.") || className.startsWith("java.");
     }
 }
