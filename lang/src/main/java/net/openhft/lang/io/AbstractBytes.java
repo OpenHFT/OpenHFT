@@ -126,8 +126,6 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     protected void setObjectSerializer(ObjectSerializer objectSerializer) {
-        if (objectSerializer != null && !(objectSerializer instanceof BytesMarshallableSerializer))
-            Thread.yield();
         this.objectSerializer = objectSerializer;
     }
 

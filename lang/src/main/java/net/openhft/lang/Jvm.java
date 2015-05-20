@@ -188,7 +188,7 @@ public enum Jvm {
                 String errorOutput = convertStreamToString(pr.getErrorStream());
                 throw new IOException("Couldn't get free physical memory on windows. " +
                         "Command \"wmic OS get FreePhysicalMemory /Value\" exited with " +
-                        result + " code, putput: \"" + output + "\", error output: \"" +
+                        result + " code, output: \"" + output + "\", error output: \"" +
                         errorOutput + "\"");
             }
             String[] parts = output.trim().split("=");
