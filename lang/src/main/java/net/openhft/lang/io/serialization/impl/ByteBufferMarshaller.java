@@ -38,11 +38,11 @@ public enum ByteBufferMarshaller implements CompactBytesMarshaller<ByteBuffer> {
         }
         if (byteBuffer == null || byteBuffer.capacity() < length) {
             byteBuffer = newByteBuffer((int) length);
+
         } else {
             byteBuffer.position(0);
             byteBuffer.limit((int) length);
         }
-
 
         bytes.read(byteBuffer);
         byteBuffer.flip();

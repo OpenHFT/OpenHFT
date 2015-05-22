@@ -448,7 +448,6 @@ public abstract class WrappedBytes<B extends Bytes> implements Bytes {
         return wrapped.addAndGetInt(offset, delta);
     }
 
-
     public long addUnsignedInt(long offset, long i) {
         return wrapped.addUnsignedInt(offset, i);
     }

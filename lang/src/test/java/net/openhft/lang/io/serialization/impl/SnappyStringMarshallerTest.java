@@ -34,5 +34,4 @@ public class SnappyStringMarshallerTest {
         assertEquals(0x12345678, b.readInt());
         assertEquals(s, s2);
     }
-
 }

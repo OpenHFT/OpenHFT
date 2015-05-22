@@ -76,6 +76,7 @@ public enum IOTools {
                 for (File file : files)
                     if (file.isDirectory()) {
                         deleteDir(file);
+
                     } else if (!file.delete()) {
                         LoggerFactory.getLogger(IOTools.class).info("... unable to delete {}", file);
                     }

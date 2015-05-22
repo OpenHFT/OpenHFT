@@ -31,6 +31,7 @@ final class DirectSerializationFilter {
         for (Field f : fields) {
             if (checkEligible(f)) {
                 eligibleFields.add(f);
+
             } else {
                 break;
             }

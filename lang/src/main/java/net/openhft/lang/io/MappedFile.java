@@ -120,7 +120,6 @@ public class MappedFile {
         return 0;
     }
 
-
     private synchronized MappedMemory acquire0(long index) throws IOException {
         if (map1 != null)
             map1.release();
@@ -174,7 +173,6 @@ public class MappedFile {
     }
 
     public void release(MappedMemory mappedMemory) {
-
         if (mappedMemory.release()) {
             if (map0 == mappedMemory)
                 map0 = null;

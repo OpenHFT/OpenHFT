@@ -132,6 +132,7 @@ public class WaitStrategyBuilder {
         public void await(int counter) {
             if(counter < this.limit) {
                 this.waiter1.await();
+
             } else {
                 this.waiter2.await();
             }
@@ -157,8 +158,10 @@ public class WaitStrategyBuilder {
         public void await(int counter) {
             if(counter < this.limit1) {
                 this.waiter1.await();
+
             } else if(counter < this.limit2) {
                 this.waiter2.await();
+
             } else {
                 this.waiter3.await();
             }

@@ -1030,6 +1030,7 @@ public class DirectByteBufferBytesTest {
         for(int i=1;i <= 8; i++) {
             if(i <= 4 ) {
                 assertEquals(i, buffer.readInt());
+
             } else {
                 assertEquals(0, buffer.readInt());
             }

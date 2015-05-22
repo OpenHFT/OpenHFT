@@ -408,6 +408,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         long index = (i << 3) + trailingZeros;
                         if (((this.bitIndex = index + 1) & 63) != 0) {
                             byteIndex = i;
+
                         } else {
                             if ((byteIndex = i + 8) == lim)
                                 this.bitIndex = -1;
@@ -442,6 +443,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 long mask = singleBit(indexOfSetBit);
                 if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
                     return indexOfSetBit;
+
             } else {
                 break;
             }
@@ -456,6 +458,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                     long mask = singleBit(indexOfSetBit);
                     if (bytes.compareAndSwapLong(byteIndex, l, l ^ mask))
                         return indexOfSetBit;
+
                 } else {
                     continue longLoop;
                 }
@@ -515,6 +518,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 long mask = singleBit(indexOfClearBit);
                 if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
                     return indexOfClearBit;
+
             } else {
                 break;
             }
@@ -530,6 +534,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                     long mask = singleBit(indexOfClearBit);
                     if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask))
                         return indexOfClearBit;
+
                 } else {
                     continue longLoop;
                 }
@@ -594,6 +599,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 long mask = singleBit(indexOfSetBit);
                 if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
                     return indexOfSetBit;
+
             } else {
                 break;
             }
@@ -608,6 +614,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                     long mask = singleBit(indexOfSetBit);
                     if (bytes.compareAndSwapLong(byteIndex, l, l ^ mask))
                         return indexOfSetBit;
+
                 } else {
                     continue longLoop;
                 }
@@ -669,6 +676,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                 long mask = singleBit(indexOfClearBit);
                 if (bytes.compareAndSwapLong(fromByteIndex, w, w ^ mask))
                     return indexOfClearBit;
+
             } else {
                 break;
             }
@@ -684,6 +692,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                     long mask = singleBit(indexOfClearBit);
                     if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask))
                         return indexOfClearBit;
+
                 } else {
                     continue longLoop;
                 }
@@ -791,6 +800,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             byteIndex += 8;
             bitIndex = firstBit(longIndex);
             l = w = bytes.readVolatileLong(byteIndex);
+
         } else {
             if (longIndex >= longLength)
                 return NOT_FOUND;
@@ -812,6 +822,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                             break continueLongLoop;
                         // (2)
                         l = rightShiftOneFill(l, trailingOnes);
+
                     } else {
                         // all bits are ones, go to the next long
                         break continueLongLoop;
@@ -824,6 +835,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         long mask = nTrailingOnes << bitIndex;
                         if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
                             return bitIndex;
+
                         } else {
                             w = bytes.readLong(byteIndex);
                             l = rightShiftOneFill(w, bitIndex);
@@ -847,6 +859,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         // at (2) or (3), => garanteed highest bit is 1 =>
                         // "natural" one-filling
                         l >>= trailingOnes;
+
                     } else {
                         // zeros in this long exhausted, go to the next long
                         break continueLongLoop;
@@ -891,6 +904,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             byteIndex += 8;
             bitIndex = firstBit(longIndex);
             l = w = bytes.readVolatileLong(byteIndex);
+
         } else {
             if (longIndex >= longLength)
                 return NOT_FOUND;
@@ -909,6 +923,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         if ((bitIndex & 63) > n64Complement)
                             break continueLongLoop;
                         l >>>= trailingZeros;
+
                     } else {
                         // all bits are zeros, go to the next long
                         break continueLongLoop;
@@ -921,6 +936,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         long mask = nTrailingOnes << bitIndex;
                         if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
                             return bitIndex;
+
                         } else {
                             w = bytes.readLong(byteIndex);
                             l = w >>> bitIndex;
@@ -938,6 +954,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         if ((bitIndex & 63) > n64Complement)
                             break continueLongLoop;
                         l >>>= trailingZeros;
+
                     } else {
                         // ones in this long exhausted, go to the next long
                         break continueLongLoop;
@@ -991,6 +1008,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             byteIndex -= 8;
             bitIndex = lastBit(longIndex);
             l = w = bytes.readVolatileLong(byteIndex);
+
         } else {
             w = bytes.readVolatileLong(byteIndex);
             // left shift by ~bitIndex === left shift by (63 - (bitIndex & 63))
@@ -1008,6 +1026,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         if ((bitIndex & 63) < numberOfBitsMinusOne)
                             break continueLongLoop;
                         l = leftShiftOneFill(l, leadingOnes);
+
                     } else {
                         // all bits are ones, go to the next long
                         break continueLongLoop;
@@ -1021,6 +1040,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         long mask = nLeadingOnes >>> ~bitIndex;
                         if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
                             return bitIndex - numberOfBitsMinusOne;
+
                         } else {
                             w = bytes.readLong(byteIndex);
                             l = leftShiftOneFill(w, ~bitIndex);
@@ -1038,6 +1058,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         if ((bitIndex & 63) < numberOfBitsMinusOne)
                             break continueLongLoop;
                         l = leftShiftOneFill(l, leadingOnes);
+
                     } else {
                         // zeros in this long exhausted, go to the next long
                         break continueLongLoop;
@@ -1087,6 +1108,7 @@ public class ATSDirectBitSet implements DirectBitSet {
             byteIndex -= 8;
             bitIndex = lastBit(longIndex);
             l = w = bytes.readVolatileLong(byteIndex);
+
         } else {
             w = bytes.readVolatileLong(byteIndex);
             // << ~bitIndex === << (63 - (bitIndex & 63))
@@ -1103,6 +1125,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                     if ((bitIndex & 63) < numberOfBitsMinusOne)
                         break continueLongLoop;
                     l <<= leadingZeros;
+
                 } else if (l == 0) {
                     // all bits are zeros, go to the next long
                     break continueLongLoop;
@@ -1115,6 +1138,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         long mask = nLeadingOnes >>> ~bitIndex;
                         if (bytes.compareAndSwapLong(byteIndex, w, w ^ mask)) {
                             return bitIndex - numberOfBitsMinusOne;
+
                         } else {
                             w = bytes.readLong(byteIndex);
                             l = w << ~bitIndex;
@@ -1131,6 +1155,7 @@ public class ATSDirectBitSet implements DirectBitSet {
                         if ((bitIndex & 63) < numberOfBitsMinusOne)
                             break continueLongLoop;
                         l <<= leadingZeros;
+
                     } else {
                         // ones in this long exhausted, go to the next long
                         break continueLongLoop;

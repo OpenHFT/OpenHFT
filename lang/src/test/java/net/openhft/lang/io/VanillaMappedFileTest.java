@@ -284,6 +284,7 @@ public class VanillaMappedFileTest {
             if(i >= 6) {
                 assertNotNull(cache.get(i));
                 assertEquals(cache.get(i).index(),i);
+
             } else {
                 assertNull(cache.get(i));
             }

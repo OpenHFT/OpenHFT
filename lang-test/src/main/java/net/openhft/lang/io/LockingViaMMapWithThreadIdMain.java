@@ -20,7 +20,6 @@ package net.openhft.lang.io;
 
 import net.openhft.affinity.AffinitySupport;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -70,6 +69,7 @@ public class LockingViaMMapWithThreadIdMain {
                     if (t == 0)
                         if (i >= 0) {
                             throw new AssertionError("Didn't toggle in time !??");
+
                         } else {
                             Thread.sleep(200);
                         }

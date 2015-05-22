@@ -70,7 +70,6 @@ public interface RandomDataOutput extends ObjectOutput, RandomAccess, BytesCommo
      */
     void write(RandomDataInput bytes, long position, long length);
 
-
     /**
      * Copies the contents of a Byteable from the offset for maxSize bytes, moves the position of "this" RandomDataOutput by the maxSize
      *

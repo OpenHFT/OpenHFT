@@ -46,6 +46,7 @@ final class ObjectMarshallers {
             if (hasIneligibleFields(fields, eligibleFields)) {
                 WarnAboutIneligibleFields.apply(clazz, fields, eligibleFields);
                 serializationMetadata = DirectSerializationMetadata.extractMetadataForPartialCopy(eligibleFields);
+
             } else {
                 serializationMetadata = DirectSerializationMetadata.extractMetadata(eligibleFields);
             }
@@ -80,6 +81,7 @@ final class ObjectMarshallers {
                     sb.append('\t');
                     sb.append(field.getName());
                     first = false;
+
                 } else {
                     sb.append("\n\t");
                     sb.append(field.getName());

@@ -86,7 +86,6 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         access.putOrderedInt(t, offset + COUNT_WORD_OFFSET, countWord);
     }
 
-
     private static boolean writeLocked(int countWord) {
         return countWord == WRITE_LOCKED_COUNT_WORD;
     }
@@ -361,6 +360,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         int lockCount = readCount(countWord);
         if (lockCount > 0) {
             return lockCount + (updateLocked(countWord) ? 1 : 0);
+
         } else {
             return writeLocked(countWord) ? 1 : 0;
         }

@@ -74,5 +74,4 @@ public class OffHeapReadWriteLockTest {
         assertTrue(ohrwl.readLock().tryLock());
         ohrwl.readLock().addWaitingReader(-1);
     }
-
 }

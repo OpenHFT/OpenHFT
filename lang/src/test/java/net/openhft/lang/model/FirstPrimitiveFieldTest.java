@@ -38,7 +38,6 @@ public class FirstPrimitiveFieldTest {
     }
 }
 
-
 interface FiveLongValues {
     void setValueAt(@MaxSize(5) int i, long v);
     long getValueAt(int i);

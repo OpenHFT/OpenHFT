@@ -4,7 +4,8 @@ import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshaller;
 import net.openhft.lang.io.serialization.CompactBytesMarshaller;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class SetMarshaller<E> extends CollectionMarshaller<E, Set<E>> implements CompactBytesMarshaller<Set<E>> {
     SetMarshaller(BytesMarshaller<E> eBytesMarshaller) {
@@ -27,7 +28,6 @@ public class SetMarshaller<E> extends CollectionMarshaller<E, Set<E>> implements
 
     @Override
     Set<E> readCollection(Bytes bytes, Set<E> es, int length) {
-
         es.clear();
 
         for (int i = 0; i < length; i++) {

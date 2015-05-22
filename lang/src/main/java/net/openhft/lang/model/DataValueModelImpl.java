@@ -19,8 +19,8 @@
 package net.openhft.lang.model;
 
 import net.openhft.lang.io.serialization.BytesMarshallable;
-import net.openhft.lang.model.constraints.Group;
 import net.openhft.lang.model.constraints.Digits;
+import net.openhft.lang.model.constraints.Group;
 import net.openhft.lang.model.constraints.MaxSize;
 import net.openhft.lang.model.constraints.Range;
 
@@ -109,6 +109,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         FieldModelImpl fm = acquireField(volatileGetterFieldName(name2));
                         fm.volatileGetter(method);
                         fm.setVolatile(true);
+
                     } else {
                         FieldModelImpl fm = acquireField(name2);
                         fm.getter(method);
@@ -116,6 +117,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
                     break;
                 }
+
                 case 1: {
 
                     String name7 = getUsing(name, method);
@@ -152,6 +154,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                             FieldModelImpl fm = acquireField(volatileGetterFieldName(name6));
                             fm.volatileIndexedGetter(method);
                             fm.setVolatile(true);
+
                         } else {
                             FieldModelImpl fm = acquireField(name6);
                             fm.indexedGetter(method);
@@ -166,12 +169,14 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     if (isOrderedSetter(name2)) {
                         FieldModelImpl fm = acquireField(orderedSetterFieldName(name2));
                         fm.orderedSetter(method);
+
                     } else {
                         FieldModelImpl fm = acquireField(name2);
                         fm.setter(method);
                     }
                     break;
                 }
+
                 case 2: {
                     String name2 = getCAS(name);
                     if (name2 != null && returnType == boolean.class) {
@@ -184,6 +189,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         if (isOrderedSetter(name3)) {
                             FieldModelImpl fm = acquireField(orderedSetterFieldName(name3));
                             fm.orderedIndexedSetter(method);
+
                         } else {
                             FieldModelImpl fm = acquireField(name3);
                             fm.indexedSetter(method);
@@ -191,6 +197,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                         break;
                     }
                 }
+
                 default: {
                     throw new IllegalArgumentException("method not supported " + method);
                 }
@@ -448,7 +455,6 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     range = (Range) a;
                 if (a instanceof MaxSize)
                     maxSize = (MaxSize) a;
-
             }
 
             for (Annotation a : setter.getAnnotations()) {

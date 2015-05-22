@@ -74,12 +74,15 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
             if (BytesMarshallable.class.isAssignableFrom(expectedClass)) {
                 ((BytesMarshallable) object).writeMarshallable(bytes);
                 return;
+
             } else if (Externalizable.class.isAssignableFrom(expectedClass)) {
                 ((Externalizable) object).writeExternal(bytes);
                 return;
+
             } else if (CharSequence.class.isAssignableFrom(expectedClass)) {
                 bytes.writeUTFΔ((CharSequence) object);
                 return;
+
             } else if (Enum.class.isAssignableFrom(expectedClass)) {
                 bytes.write8bitText(object.toString());
                 return;
@@ -122,10 +125,13 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
             try {
                 if (BytesMarshallable.class.isAssignableFrom(expectedClass)) {
                     return readBytesMarshallable(bytes, expectedClass, object);
+
                 } else if (Externalizable.class.isAssignableFrom(expectedClass)) {
                     return readExternalizable(bytes, expectedClass, object);
+
                 } else if (CharSequence.class.isAssignableFrom(expectedClass)) {
                     return readCharSequence(bytes, object);
+
                 } else if (Enum.class.isAssignableFrom(expectedClass)) {
                     StringBuilder sb = SBP.acquireStringBuilder();
                     bytes.read8bitText(sb);
@@ -145,9 +151,11 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
                 assert clazz != null;
                 return (T) bytesMarshallerFactory.acquireMarshaller(clazz, true).read(bytes, object);
             }
+
             case SERIALIZED: {
                 return objectSerializer.readSerializable(bytes, expectedClass, object);
             }
+
             default:
                 BytesMarshaller<Object> m = bytesMarshallerFactory.getMarshaller((byte) type);
                 if (m == null)
@@ -160,6 +168,7 @@ public class BytesMarshallableSerializer implements ObjectSerializer {
         if (object instanceof StringBuilder) {
             bytes.readUTFΔ(((StringBuilder) object));
             return object;
+
         } else {
             return (T) bytes.readUTFΔ();
         }

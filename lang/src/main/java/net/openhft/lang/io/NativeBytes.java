@@ -365,10 +365,8 @@ public class NativeBytes extends AbstractBytes {
 
     @Override
     public void write(int b) {
-
         UNSAFE.putByte(positionAddr, (byte) b);
         incrementPositionAddr(1);
-
     }
 
     @Override
@@ -406,7 +404,6 @@ public class NativeBytes extends AbstractBytes {
         UNSAFE.putShort(positionAddr, (short) v);
         positionAddr += 2L;
     }
-
 
     private long incrementPositionAddr(long value) {
         positionAddr(positionAddr() + value);
@@ -602,7 +599,6 @@ public class NativeBytes extends AbstractBytes {
         if (position < 0 || position > limit())
             throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
 
-
         positionAddr(startAddr + position);
         return this;
     }
@@ -631,6 +627,7 @@ public class NativeBytes extends AbstractBytes {
         if (bytes instanceof NativeBytes) {
             UNSAFE.copyMemory(((NativeBytes) bytes).startAddr + position, positionAddr, length);
             skip(length);
+
         } else {
             super.write(bytes, position, length);
         }
@@ -700,7 +697,6 @@ public class NativeBytes extends AbstractBytes {
         long value = (positionAddr + powerOf2 - 1) & ~(powerOf2 - 1);
         positionAddr(value);
     }
-
 
     public void positionAddr(long positionAddr) {
         positionChecks(positionAddr);

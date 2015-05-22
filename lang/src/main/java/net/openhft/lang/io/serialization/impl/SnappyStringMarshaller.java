@@ -84,6 +84,7 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
         if (s == null) {
             bytes.writeStopBit(NULL_LENGTH);
             return;
+
         } else if (s.length() == 0) {
             bytes.writeStopBit(0);
             return;

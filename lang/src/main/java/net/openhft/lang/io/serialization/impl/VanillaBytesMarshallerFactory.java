@@ -68,12 +68,16 @@ public final class VanillaBytesMarshallerFactory implements BytesMarshallerFacto
         if (em == null) {
             if (eClass.isEnum()) {
                 marshallerMap.put(eClass, em = new EnumBytesMarshaller(eClass, null));
+
             } else if (BytesMarshallable.class.isAssignableFrom(eClass)) {
                 marshallerMap.put(eClass, em = new BytesMarshallableMarshaller((Class) eClass));
+
             } else if (Externalizable.class.isAssignableFrom(eClass)) {
                 marshallerMap.put(eClass, em = new ExternalizableMarshaller((Class) eClass));
+
             } else if (Throwable.class.isAssignableFrom(eClass)) {
                 marshallerMap.put(eClass, em = NoMarshaller.INSTANCE);
+
             } else {
                 try {
                     marshallerMap.put(eClass, em = new GenericEnumMarshaller<E>(eClass, 1000));

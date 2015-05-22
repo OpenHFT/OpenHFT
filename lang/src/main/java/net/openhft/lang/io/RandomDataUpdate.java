@@ -212,5 +212,4 @@ public interface RandomDataUpdate {
      * @throws java.lang.IllegalStateException if the monitor is in an illegal state
      */
     public void unlockRWWriteLock(long offset) throws IllegalStateException;
-
 }

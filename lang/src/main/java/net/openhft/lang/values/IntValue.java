@@ -45,5 +45,4 @@ public interface IntValue {
     void busyLockValue() throws InterruptedException, IllegalStateException;
 
     void unlockValue() throws IllegalMonitorStateException;
-
 }

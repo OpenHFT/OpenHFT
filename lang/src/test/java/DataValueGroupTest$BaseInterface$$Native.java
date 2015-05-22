@@ -1,21 +1,19 @@
 package net.openhft.lang;
 
-import static net.openhft.lang.Compare.*;
-
 import net.openhft.lang.io.Bytes;
 import net.openhft.lang.io.serialization.BytesMarshallable;
 import net.openhft.lang.model.Byteable;
 import net.openhft.lang.model.Copyable;
 
+import static net.openhft.lang.Compare.calcLongHashCode;
+import static net.openhft.lang.Compare.isEqual;
+
 public class DataValueGroupTest$BaseInterface$$Native implements GroupTest.BaseInterface, BytesMarshallable, Byteable, Copyable<GroupTest.BaseInterface> {
     private static final int INT = 0;
     private static final int STR = 4;
 
-
     private Bytes _bytes;
     private long _offset;
-
-
 
     public void setInt(int $) {
         _bytes.writeInt(_offset + INT, $);
@@ -24,8 +22,6 @@ public class DataValueGroupTest$BaseInterface$$Native implements GroupTest.BaseI
     public int getInt() {
         return _bytes.readInt(_offset + INT);
     }
-
-
 
     public void setStr(java.lang.String $) {
         _bytes.writeUTFΔ(_offset + STR, 15, $);

@@ -37,5 +37,4 @@ public interface NestedA {
     void two(NestedB one);
 
     NestedB two();
-
 }

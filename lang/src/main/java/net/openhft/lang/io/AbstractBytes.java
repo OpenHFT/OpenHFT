@@ -110,7 +110,6 @@ public abstract class AbstractBytes implements Bytes {
     private StringInterner stringInterner = null;
     private boolean selfTerminating = false;
 
-
     AbstractBytes() {
         this(new VanillaBytesMarshallerFactory(), new AtomicInteger(1));
     }
@@ -237,6 +236,7 @@ public abstract class AbstractBytes implements Bytes {
             if (c >= 128) {
                 bytes.position(bytes.position() - 1);
                 break;
+
             } else if (c < 0) {
             }
             count++;
@@ -258,6 +258,7 @@ public abstract class AbstractBytes implements Bytes {
                     count++;
                     appendable.append((char) c);
                     break;
+
                 case 12:
                 case 13: {
                 /* 110x xxxx 10xx xxxx */
@@ -274,6 +275,7 @@ public abstract class AbstractBytes implements Bytes {
                     appendable.append((char) c2);
                     break;
                 }
+
                 case 14: {
                 /* 1110 xxxx 10xx xxxx 10xx xxxx */
                     count += 3;
@@ -292,6 +294,7 @@ public abstract class AbstractBytes implements Bytes {
                     appendable.append((char) c3);
                     break;
                 }
+
                 default:
                 /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
@@ -311,6 +314,7 @@ public abstract class AbstractBytes implements Bytes {
             if ((c > 0x007F)) {
                 if (c > 0x07FF) {
                     utflen += 2;
+
                 } else {
                     utflen += 1;
                 }
@@ -342,6 +346,7 @@ public abstract class AbstractBytes implements Bytes {
             if ((c > 0x007F)) {
                 if (c > 0x07FF) {
                     utflen += 2;
+
                 } else {
                     utflen += 1;
                 }
@@ -364,10 +369,12 @@ public abstract class AbstractBytes implements Bytes {
             c = str.charAt(i);
             if ((c >= 0x0000) && (c <= 0x007F)) {
                 bytes.write(c);
+
             } else if (c > 0x07FF) {
                 bytes.write((byte) (0xE0 | ((c >> 12) & 0x0F)));
                 bytes.write((byte) (0x80 | ((c >> 6) & 0x3F)));
                 bytes.write((byte) (0x80 | (c & 0x3F)));
+
             } else {
                 bytes.write((byte) (0xC0 | ((c >> 6) & 0x1F)));
                 bytes.write((byte) (0x80 | c & 0x3F));
@@ -448,11 +455,9 @@ public abstract class AbstractBytes implements Bytes {
         while (slice.remaining() > 0) {
             final byte b = slice.readByte();
             builder.append((char) b);
-
         }
         return builder.toString();
     }
-
 
     static int rwReadLocked(long lock) {
         return (int) (lock & RW_LOCK_MASK);
@@ -489,7 +494,6 @@ public abstract class AbstractBytes implements Bytes {
         cleanup();
         return true;
     }
-
 
     protected abstract void cleanup();
 
@@ -719,6 +723,7 @@ public abstract class AbstractBytes implements Bytes {
                         return;
                     appendable.append((char) c);
                     break;
+
                 case 12:
                 case 13: {
                 /* 110x xxxx 10xx xxxx */
@@ -733,6 +738,7 @@ public abstract class AbstractBytes implements Bytes {
                     appendable.append((char) c2);
                     break;
                 }
+
                 case 14: {
                 /* 1110 xxxx 10xx xxxx 10xx xxxx */
 
@@ -750,6 +756,7 @@ public abstract class AbstractBytes implements Bytes {
                     appendable.append((char) c3);
                     break;
                 }
+
                 default:
                 /* 10xx xxxx, 1111 xxxx */
                     throw new UTFDataFormatException(
@@ -920,6 +927,7 @@ public abstract class AbstractBytes implements Bytes {
                 throw new IllegalStateException(
                         "Cannot read more than 9 stop bits of positive value");
             return l | (b << count);
+
         } else {
             if (count > 63)
                 throw new IllegalStateException(
@@ -1140,6 +1148,7 @@ public abstract class AbstractBytes implements Bytes {
                 case Short.MIN_VALUE:
                     writeByte(BYTE_MIN_VALUE);
                     break;
+
                 case Short.MAX_VALUE:
                     writeByte(BYTE_MAX_VALUE);
                     break;
@@ -1154,6 +1163,7 @@ public abstract class AbstractBytes implements Bytes {
     public void writeCompactUnsignedShort(int v) {
         if (v >= 0 && v < USHORT_EXTENDED) {
             writeByte(v);
+
         } else {
             writeUnsignedShort(USHORT_EXTENDED);
             writeUnsignedShort(v);
@@ -1165,6 +1175,7 @@ public abstract class AbstractBytes implements Bytes {
         if (byteOrder() == ByteOrder.BIG_ENDIAN) {
             writeUnsignedByte(v >>> 16);
             writeUnsignedShort(v);
+
         } else {
             writeUnsignedByte(v);
             writeUnsignedShort(v >>> 8);
@@ -1176,6 +1187,7 @@ public abstract class AbstractBytes implements Bytes {
         if (byteOrder() == ByteOrder.BIG_ENDIAN) {
             writeUnsignedByte(offset, v >>> 16);
             writeUnsignedShort(offset + 1, v);
+
         } else {
             writeUnsignedByte(offset, v);
             writeUnsignedShort(offset + 1, v >>> 8);
@@ -1201,6 +1213,7 @@ public abstract class AbstractBytes implements Bytes {
                 case Integer.MIN_VALUE:
                     writeShort(SHORT_MIN_VALUE);
                     break;
+
                 case Integer.MAX_VALUE:
                     writeShort(SHORT_MAX_VALUE);
                     break;
@@ -1215,6 +1228,7 @@ public abstract class AbstractBytes implements Bytes {
     public void writeCompactUnsignedInt(long v) {
         if (v >= 0 && v < USHORT_EXTENDED) {
             writeShort((int) v);
+
         } else {
             writeShort(USHORT_EXTENDED);
             writeUnsignedInt(v);
@@ -1226,6 +1240,7 @@ public abstract class AbstractBytes implements Bytes {
         if (byteOrder() == ByteOrder.BIG_ENDIAN) {
             writeUnsignedShort((int) (v >>> 32));
             writeUnsignedInt(v);
+
         } else {
             writeUnsignedShort((int) v);
             writeUnsignedInt(v >>> 16);
@@ -1237,6 +1252,7 @@ public abstract class AbstractBytes implements Bytes {
         if (byteOrder() == ByteOrder.BIG_ENDIAN) {
             writeUnsignedShort(offset, (int) (v >>> 32));
             writeUnsignedInt(offset + 2, v);
+
         } else {
             writeUnsignedShort(offset, (int) v);
             writeUnsignedInt(offset + 2, v >>> 16);
@@ -1247,10 +1263,13 @@ public abstract class AbstractBytes implements Bytes {
     public void writeCompactLong(long v) {
         if (v > INT_MAX_VALUE && v <= Integer.MAX_VALUE) {
             writeInt((int) v);
+
         } else if (v == Long.MIN_VALUE) {
             writeInt(INT_MIN_VALUE);
+
         } else if (v == Long.MAX_VALUE) {
             writeInt(INT_MAX_VALUE);
+
         } else {
             writeInt(INT_EXTENDED);
             writeLong(v);
@@ -1286,6 +1305,7 @@ public abstract class AbstractBytes implements Bytes {
         // final byte
         if (!neg) {
             write((byte) n);
+
         } else {
             write((byte) (0x80L | n));
             write(0);
@@ -1297,6 +1317,7 @@ public abstract class AbstractBytes implements Bytes {
         float f = (float) v;
         if (f == v) {
             writeFloat(f);
+
         } else {
             writeFloat(Float.NaN);
             writeDouble(v);
@@ -1360,6 +1381,7 @@ public abstract class AbstractBytes implements Bytes {
         }
         if (num == 0) {
             writeByte('0');
+
         } else {
             appendLong0(num);
         }
@@ -1381,6 +1403,7 @@ public abstract class AbstractBytes implements Bytes {
         }
         if (num == 0) {
             writeByte('0');
+
         } else {
             while (num > 0) {
                 writeByte(RADIX[((int) (num % base))]);
@@ -1401,6 +1424,7 @@ public abstract class AbstractBytes implements Bytes {
         if (dateCache.lastDay != date) {
             dateCache.lastDateStr = dateCache.dateFormat.format(new Date(timeInMS)).getBytes(ISO_8859_1);
             dateCache.lastDay = date;
+
         } else {
             assert dateCache.lastDateStr != null;
         }
@@ -1456,13 +1480,16 @@ public abstract class AbstractBytes implements Bytes {
         if (exp == 0 && mantissa == 0) {
             writeByte('0');
             return this;
+
         } else if (exp == 2047) {
             if (mantissa == 0) {
                 write(Infinity);
+
             } else {
                 write(NaN);
             }
             return this;
+
         } else if (exp > 0) {
             mantissa += 1L << 52;
         }
@@ -1498,6 +1525,7 @@ public abstract class AbstractBytes implements Bytes {
                     }
                 }
                 return this;
+
             } else {
                 // faction.
                 writeByte('0');
@@ -1597,8 +1625,10 @@ public abstract class AbstractBytes implements Bytes {
                 }
                 value = value * 10 + (ch - '0');
                 decimalPlaces++;
+
             } else if (ch == '.') {
                 decimalPlaces = 0;
+
             } else {
                 break;
             }
@@ -1659,10 +1689,13 @@ public abstract class AbstractBytes implements Bytes {
             if ((b - ('0' + Integer.MIN_VALUE)) <= 9 + Integer.MIN_VALUE) {
                 num = num * 10 + b - '0';
                 scale++;
+
             } else if (b == '.') {
                 scale = 0;
+
             } else if (b == '-') {
                 negative = true;
+
             } else {
                 break;
             }
@@ -1701,6 +1734,7 @@ public abstract class AbstractBytes implements Bytes {
             byte rp = RADIX_PARSE[b];
             if (rp >= 0 && rp < base) {
                 num = num * base + rp;
+
             } else if (b == '-')
                 negative = true;
             else
@@ -2091,7 +2125,6 @@ public abstract class AbstractBytes implements Bytes {
 
     @Override
     public void close() {
-
         if (!isFinished())
             finish();
     }
@@ -2397,8 +2430,10 @@ public abstract class AbstractBytes implements Bytes {
         if (holderId == lowId) {
             currentValue -= 1 << 24;
             writeOrderedInt(offset, (int) currentValue);
+
         } else if (currentValue == 0) {
             LoggerHolder.LOGGER.log(Level.WARNING, "No thread holds this lock, threadId: " + shortThreadId());
+
         } else {
             throw new IllegalMonitorStateException("Thread " + holderId + " holds this lock, " + (currentValue >>> 24) + " times");
         }
@@ -2410,8 +2445,10 @@ public abstract class AbstractBytes implements Bytes {
         if (holderId == id) {
             currentValue -= 1L << 48;
             writeOrderedLong(offset, currentValue);
+
         } else if (currentValue == 0) {
             throw new IllegalMonitorStateException("No thread holds this lock");
+
         } else {
             throw new IllegalMonitorStateException("Process " + ((currentValue >>> 32) & 0xFFFF)
                     + " thread " + (holderId & (-1L >>> 32))
@@ -2825,7 +2862,6 @@ public abstract class AbstractBytes implements Bytes {
 
     private boolean tryRWWriteLock0(long offset, long timeOutNS) throws IllegalStateException, InterruptedException {
         for (; ; ) {
-
             long lock = readVolatileLong(offset);
             int writersWaiting = rwWriteWaiting(lock);
             if (writersWaiting >= RW_LOCK_MASK)

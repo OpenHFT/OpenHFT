@@ -102,6 +102,7 @@ public class VanillaMappedCache<T> implements Closeable {
                 entry.getValue().cleanup();
                 entry.getValue().close();
                 it.remove();
+
             } else  if(entry.getValue().unmapped()) {
                 entry.getValue().close();
                 it.remove();

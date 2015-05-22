@@ -380,6 +380,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                         return false;
                 }
                 return true;
+
             } else {
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     if (~readLong(i) != 0L)
@@ -428,6 +429,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                         return false;
                 }
                 return true;
+
             } else {
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     if (readLong(i) != 0L)
@@ -656,7 +658,6 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
         return NOT_FOUND;
     }
 
-
     private long previousSetBit(long fromIndex, long inclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toLongIndex = longWithThisBit(inclusiveToIndex);
@@ -875,8 +876,10 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             byteIndex2 += 8;
             if (++longIndex2 < longLength) {
                 w2 = bytes.readLong(byteIndex2);
+
             } else if (longIndex2 == longLength) {
                 w2 = ALL_ONES;
+
             } else {
                 return NOT_FOUND;
             }
@@ -884,6 +887,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             // (1)
             if (bitsFromFirstWord != 64) {
                 l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
             } else {
                 // special case, because if bitsFromFirstWord is 64
                 // w2 shift is overflowed
@@ -901,6 +905,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                         continue; // long loop
                     }
                     l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
                 } else {
                     // all bits are ones, skip a whole word,
                     // bitsFromFirstWord not changed
@@ -944,6 +949,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     }
                     // same as (5)
                     l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
                 } else {
                     // all bits are ones, skip a whole word,
                     // bitsFromFirstWord not changed
@@ -999,8 +1005,10 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             byteIndex2 += 8;
             if (++longIndex2 < longLength) {
                 w2 = bytes.readLong(byteIndex2);
+
             } else if (longIndex2 == longLength) {
                 w2 = 0L;
+
             } else {
                 return NOT_FOUND;
             }
@@ -1008,6 +1016,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             // (1)
             if (bitsFromFirstWord != 64) {
                 l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
             } else {
                 // special case, because if bitsFromFirstWord is 64
                 // w2 shift is overflowed
@@ -1024,6 +1033,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                         continue; // long loop
                     }
                     l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
                 } else {
                     // all bits are zeros, skip a whole word,
                     // bitsFromFirstWord not changed
@@ -1066,6 +1076,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     }
                     // same as (5)
                     l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+
                 } else {
                     // all bits are zeros, skip a whole word,
                     // bitsFromFirstWord not changed
@@ -1108,14 +1119,17 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             lowByteIndex -= 8;
             if (--lowLongIndex >= 0) {
                 lw = bytes.readLong(lowByteIndex);
+
             } else if (lowLongIndex == -1) {
                 lw = ALL_ONES;
+
             } else {
                 return NOT_FOUND;
             }
             long l;
             if (bitsFromLowWord != 0) { // (1)
                 l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
             } else {
                 // all bits from high word, special case needed because
                 // higherBitBound is multiple of 64 and lw not shifted away
@@ -1134,6 +1148,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                         continue; // long loop
                     }
                     l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
                 } else {
                     // all bits are ones, skip a whole word,
                     // bitsFromLowWord not changed
@@ -1181,6 +1196,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     }
                     // same as (5)
                     l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
                 } else {
                     // all bits are ones, skip a whole word,
                     // bitsFromLowWord not changed
@@ -1223,14 +1239,17 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
             lowByteIndex -= 8;
             if (--lowLongIndex >= 0) {
                 lw = bytes.readLong(lowByteIndex);
+
             } else if (lowLongIndex == -1) {
                 lw = 0L;
+
             } else {
                 return NOT_FOUND;
             }
             long l;
             if (bitsFromLowWord != 0) { // (1)
                 l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
             } else {
                 // all bits from high word, special case needed because
                 // higherBitBound is multiple of 64 and lw not shifted away
@@ -1247,6 +1266,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     continue; // long loop
                 }
                 l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
             } else if (l == 0) {
                 // all bits are zeros, skip a whole word,
                 // bitsFromLowWord not changed
@@ -1292,6 +1312,7 @@ public class SingleThreadedDirectBitSet implements DirectBitSet {
                     }
                     // same as (5)
                     l = (lw >>> higherBitBound) | (hw << bitsFromLowWord);
+
                 } else {
                     // all bits are zeros, skip a whole word,
                     // bitsFromLowWord not changed

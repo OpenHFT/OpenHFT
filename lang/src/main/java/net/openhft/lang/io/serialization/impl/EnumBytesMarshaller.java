@@ -52,6 +52,7 @@ public class EnumBytesMarshaller<E extends Enum<E>> extends ImmutableMarshaller<
                     //noinspection UnqualifiedFieldAccess,AssignmentToNull
                     interner[idx] = null;
                     internerDup.set(idx);
+
                 } else {
                     interner[idx] = e;
                 }

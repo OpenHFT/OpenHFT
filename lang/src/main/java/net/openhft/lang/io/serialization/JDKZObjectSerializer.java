@@ -55,6 +55,7 @@ public enum JDKZObjectSerializer implements ObjectSerializer {
         switch (magic) {
             case 0xEDAC:
                 break;
+
             case 0x9c78:
                 in = new InflaterInputStream(in);
                 break;

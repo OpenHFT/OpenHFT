@@ -391,6 +391,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         if (position + 2 <= capacity) {
             buffer.putShort(position, (short) v);
             position += 2;
+
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -410,6 +411,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         if (position + 2 <= capacity) {
             buffer.putChar(position, (char) v);
             position += 2;
+
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -429,6 +431,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         if (position + 4 <= capacity) {
             buffer.putInt(position, v);
             position += 4;
+
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -467,6 +470,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         if (position + 8 <= capacity) {
             buffer.putLong(position, v);
             position += 8;
+
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -505,6 +509,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         if (position + 4 <= capacity) {
             buffer.putFloat(position, v);
             position += 4;
+
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -524,6 +529,7 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
         if (position + 8 <= capacity) {
             buffer.putDouble(position, v);
             position += 8;
+
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -614,5 +620,4 @@ public class ByteBufferBytes extends AbstractBytes implements IByteBufferBytes {
     public void alignPositionAddr(int powerOf2) {
         position = (position + powerOf2 - 1) & ~(powerOf2 - 1);
     }
-
 }

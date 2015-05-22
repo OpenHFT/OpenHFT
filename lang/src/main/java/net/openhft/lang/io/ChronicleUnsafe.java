@@ -1,6 +1,5 @@
 package net.openhft.lang.io;
 
-
 import net.openhft.lang.model.constraints.NotNull;
 import sun.misc.Unsafe;
 
@@ -22,7 +21,6 @@ public class ChronicleUnsafe {
             Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
             UNSAFE = (Unsafe) theUnsafe.get(null);
-
         } catch (Exception e) {
             throw new AssertionError(e);
         }
@@ -75,14 +73,11 @@ public class ChronicleUnsafe {
         return result;
     }
 
-
     public long toRemainingInChunk(long address) {
-
         int chunk = (int) ((address / chunkSize));
         long remainder = address - (((long) chunk) * chunkSize);
 
         return mappedMemory.bytes().capacity() - remainder;
-
     }
 
     public int arrayBaseOffset(Class<?> aClass) {

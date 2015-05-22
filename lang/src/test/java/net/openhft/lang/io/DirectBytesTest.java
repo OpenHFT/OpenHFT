@@ -52,6 +52,7 @@ public class DirectBytesTest {
                 int toggle1 = slice1.readInt(4);
                 if (toggle1 == from) {
                     slice1.writeInt(4L, to);
+
                 } else {
                     // noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
                     i--;
@@ -86,6 +87,7 @@ public class DirectBytesTest {
                 long toggle1 = slice1.readLong(8);
                 if (toggle1 == from) {
                     slice1.writeLong(8L, to);
+
                 } else {
                     // noinspection AssignmentToForLoopParameter,AssignmentToForLoopParameter
                     i--;
@@ -213,6 +215,7 @@ public class DirectBytesTest {
                             slice1.writeInt(4, 0);
                             // if (i % 10000== 0)
                             // System.out.println("t: " + i);
+
                         } else {
                             // noinspection AssignmentToForLoopParameter
                             i--;
@@ -222,6 +225,7 @@ public class DirectBytesTest {
                             slice2.writeInt(4, 0);
                             // if (i % 10000== 0)
                             // System.out.println("t: " + i);
+
                         } else {
                             // noinspection AssignmentToForLoopParameter
                             i--;
@@ -268,6 +272,7 @@ public class DirectBytesTest {
                 slice1.writeInt(4, 1);
                 // if (i % 10000== 0)
                 // System.out.println("t: " + i);
+
             } else {
                 // noinspection AssignmentToForLoopParameter
                 i--;
@@ -277,6 +282,7 @@ public class DirectBytesTest {
                 slice2.writeInt(4, 1);
                 // if (i % 10000== 0)
                 // System.out.println("t: " + i);
+
             } else {
                 // noinspection AssignmentToForLoopParameter
                 i--;

@@ -17,10 +17,11 @@
 
 package net.openhft.lang.locks;
 
-
 import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.Bytes;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import sun.nio.ch.DirectBuffer;
@@ -232,8 +233,6 @@ public class LockingStrategyTest {
             rwls().writeUnlock();
         }
     };
-
-
 
     @Test
     public void testUpdateLockIsExclusive() throws Exception {

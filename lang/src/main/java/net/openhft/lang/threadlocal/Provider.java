@@ -55,6 +55,7 @@ public abstract class Provider<T> {
                     Object idInTable = tab[i];
                     if (idInTable == id) {
                         return (T) tab[i + 1];
+
                     } else if (idInTable == null) {
                         if (syncPut) {
                             if (copies.currentlyAccessed.compareAndSet(false, true)) {

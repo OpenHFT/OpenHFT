@@ -51,5 +51,4 @@ public interface NestAll {
     UnsignedIntValue getUI();
 
     UnsignedShortValue getUS();
-
 }

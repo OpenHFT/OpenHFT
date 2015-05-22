@@ -266,6 +266,7 @@ public enum MemoryUnit {
             long filled = amount + align - 1L;
             if (filled > 0L) {
                 return filled & mask;
+
             } else {
                 long maxAlignedLong = Long.MAX_VALUE & mask;
                 if (amount <= maxAlignedLong)
@@ -276,6 +277,7 @@ public enum MemoryUnit {
             long filled = amount - align + 1L;
             if (filled < 0L) {
                 return filled & mask;
+
             } else {
                 long minAlignedLong = Long.MIN_VALUE & mask;
                 if (amount >= minAlignedLong)

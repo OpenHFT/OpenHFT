@@ -28,13 +28,11 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
 
     private VanillaReadWriteWithWaitsLockingStrategy() {}
 
-
     static final int RW_LOCK_LIMIT = 30;
     static final long RW_READ_LOCKED = 1L;
     static final long RW_WRITE_WAITING = 1L << RW_LOCK_LIMIT;
     static final long RW_WRITE_LOCKED = 1L << 2 * RW_LOCK_LIMIT;
     static final int RW_LOCK_MASK = (1 << RW_LOCK_LIMIT) - 1;
-
 
     static int rwReadLocked(long lock) {
         return (int) (lock & RW_LOCK_MASK);

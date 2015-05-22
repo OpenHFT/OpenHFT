@@ -113,6 +113,7 @@ public class VanillaMappedFile implements VanillaMappedResource {
     private static IOException wrap(Throwable throwable) {
         if(throwable instanceof InvocationTargetException) {
             throwable = throwable.getCause();
+
         } else if(throwable instanceof IOException) {
             return (IOException)throwable;
         }

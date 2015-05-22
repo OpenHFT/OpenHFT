@@ -134,6 +134,7 @@ public class MutableDecimal extends Number implements Comparable<MutableDecimal>
             if (digit < 0) {
                 digit = 8;
                 v = (v >>> 1) / 5;
+
             } else {
                 v /= 10;
             }

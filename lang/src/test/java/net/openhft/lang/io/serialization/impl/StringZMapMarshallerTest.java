@@ -40,5 +40,4 @@ public class StringZMapMarshallerTest {
         }
         return ret;
     }
-
 }

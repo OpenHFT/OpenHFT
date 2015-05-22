@@ -62,6 +62,7 @@ public class LockingViaFileLockMain {
                     if (t == 0)
                         if (i >= 0) {
                             throw new AssertionError("Didn't toggle in time !??");
+
                         } else {
                             System.out.println("waiting");
                             t = 99999;

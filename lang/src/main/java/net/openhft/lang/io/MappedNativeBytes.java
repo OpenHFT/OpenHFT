@@ -89,7 +89,6 @@ public class MappedNativeBytes extends AbstractBytes {
         this.chronicleUnsafe = (isSingleThreaded) ? new ChronicleUnsafe(mappedFile) : null;
     }
 
-
     @Override
     public MappedNativeBytes slice() {
         return new MappedNativeBytes(objectSerializer(), position, limit, refCount, mappedFile, isSingleThreaded);
@@ -338,10 +337,8 @@ public class MappedNativeBytes extends AbstractBytes {
 
     @Override
     public void write(int b) {
-
         getChronicleUnsafe().putByte(position, (byte) b);
         incrementPositionAddr(1);
-
     }
 
     @Override
@@ -379,7 +376,6 @@ public class MappedNativeBytes extends AbstractBytes {
         getChronicleUnsafe().putShort(position, (short) v);
         position += 2L;
     }
-
 
     private long incrementPositionAddr(long value) {
         positionAddr(positionAddr() + value);
@@ -578,7 +574,6 @@ public class MappedNativeBytes extends AbstractBytes {
         if (position < 0 || position > limit())
             throw new IndexOutOfBoundsException("position: " + position + " limit: " + limit());
 
-
         positionAddr(start + position);
         return this;
     }
@@ -607,6 +602,7 @@ public class MappedNativeBytes extends AbstractBytes {
         if (bytes instanceof MappedNativeBytes) {
             getChronicleUnsafe().copyMemory(((MappedNativeBytes) bytes).start + position, this.position, length);
             skip(length);
+
         } else {
             super.write(bytes, position, length);
         }
@@ -678,7 +674,6 @@ public class MappedNativeBytes extends AbstractBytes {
         positionAddr(value);
     }
 
-
     public void positionAddr(long positionAddr) {
         positionChecks(positionAddr);
         this.position = positionAddr;
@@ -720,7 +715,6 @@ public class MappedNativeBytes extends AbstractBytes {
     protected ByteBuffer sliceAsByteBuffer(ByteBuffer toReuse, Object att) {
         return ByteBufferReuse.INSTANCE.reuse(position, (int) remaining(), att, toReuse);
     }
-
 
     // todo :  we should move this lookup further up the stack, so that it can be done, just ONCE, for example once by a single threaded appender
     // todo : hence the constructor should be give then instance of chronicleUnsafe to use

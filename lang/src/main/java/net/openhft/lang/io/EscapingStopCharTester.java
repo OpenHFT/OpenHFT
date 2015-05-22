@@ -27,5 +27,4 @@ public class EscapingStopCharTester implements StopCharTester {
         }
         return sct.isStopChar(ch);
     }
-
 }

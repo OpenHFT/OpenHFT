@@ -10,5 +10,4 @@ public interface IByteBufferBytes extends Bytes {
      * Obtain the underlying ByteBuffer
      */
     public ByteBuffer buffer();
-
 }

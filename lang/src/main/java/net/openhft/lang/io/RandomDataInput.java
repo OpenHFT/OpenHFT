@@ -756,7 +756,6 @@ public interface RandomDataInput extends ObjectInput, RandomAccess, BytesCommon 
 
     boolean read8bitText(@NotNull StringBuilder stringBuilder) throws StreamCorruptedException;
 
-
     /**
      * Copy bytes into a ByteBuffer to the minimum of the length <code>remaining()</code> in the ByteBuffer or the
      * Excerpt.

@@ -1,6 +1,5 @@
 package net.openhft.lang;
 
-
 import net.openhft.lang.io.ByteBufferBytes;
 import net.openhft.lang.io.IByteBufferBytes;
 import net.openhft.lang.model.Byteable;
@@ -19,7 +18,6 @@ public class GroupTest {
 
     @Test
     public void test() {
-
         IByteBufferBytes byteBufferBytes = ByteBufferBytes.wrap(ByteBuffer.allocate(1024));
 
         {
@@ -32,7 +30,6 @@ public class GroupTest {
 
             Assert.assertEquals(1, baseInterface.getInt());
             Assert.assertEquals("Hello World", baseInterface.getStr());
-
         }
         {
             ExtInterface extInterface = DataValueClasses.newDirectReference(ExtInterface.class);
@@ -48,7 +45,6 @@ public class GroupTest {
             Assert.assertEquals(2, extInterface.getInt());
         }
     }
-
 
     @Test
     public void test2() {
@@ -78,7 +74,6 @@ public class GroupTest {
         }
     }
 
-
     public interface BaseInterface {
 
         String getStr();
@@ -88,7 +83,6 @@ public class GroupTest {
         int getInt();
 
         void setInt(int i);
-
     }
 
     public interface ExtInterface extends BaseInterface {
@@ -97,6 +91,5 @@ public class GroupTest {
 
         @Group(1)
         void setInt2(int i);
-
     }
 }

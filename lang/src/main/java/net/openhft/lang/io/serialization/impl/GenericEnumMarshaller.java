@@ -73,7 +73,6 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
         return new GenericEnumMarshaller(classMarshaled, capacity);
     }
 
-
     @Override
     public void write(@NotNull Bytes bytes, @Nullable E e) {
         bytes.writeUTFΔ(e == null ? null : e.toString());
@@ -98,6 +97,7 @@ public class GenericEnumMarshaller<E> implements BytesMarshaller<E> {
             try {
                 if (constructor != null) {
                     map.put(s, e = constructor.newInstance(s));
+
                 } else {
                     @SuppressWarnings("unchecked")
                     E invoke = (E) valueOf.invoke(null, s);

@@ -73,7 +73,6 @@ public enum Jvm {
 
     private final static boolean VM_SUPPORTS_LONG_CAS;
 
-
     private static final int PROCESS_ID = getProcessId0();
 
     public static int getProcessId() {
@@ -99,6 +98,7 @@ public enum Jvm {
             LoggerHolder.LOGGER.log(Level.WARNING, "Unable to determine PID, picked a random number=" + rpid);
 
             return rpid;
+
         } else {
             return Integer.parseInt(pid);
         }
@@ -212,7 +212,6 @@ public enum Jvm {
     public static void checkInterrupted() {
         if (Thread.currentThread().isInterrupted()) throw new InterruptedRuntimeException();
     }
-
 
     /**
      * Utility method to support throwing checked exceptions out of the streams API

@@ -28,5 +28,4 @@ public class JavaSerializationTest {
 
         Assert.assertEquals(expected, actual);
     }
-
 }

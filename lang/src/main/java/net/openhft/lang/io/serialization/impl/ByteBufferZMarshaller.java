@@ -53,6 +53,7 @@ public enum ByteBufferZMarshaller implements CompactBytesMarshaller<ByteBuffer> 
         }
         if (byteBuffer == null || byteBuffer.capacity() < length) {
             byteBuffer = newByteBuffer((int) length);
+
         } else {
             byteBuffer.clear();
         }

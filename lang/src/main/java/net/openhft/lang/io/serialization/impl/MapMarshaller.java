@@ -61,6 +61,7 @@ public class MapMarshaller<K, V> implements CompactBytesMarshaller<Map<K, V>> {
     public Map<K, V> read(Bytes bytes, @Nullable Map<K, V> kvMap) {
         if (kvMap == null) {
             kvMap = new LinkedHashMap<K, V>();
+
         } else {
             kvMap.clear();
         }

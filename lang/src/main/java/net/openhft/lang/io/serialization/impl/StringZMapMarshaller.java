@@ -103,6 +103,7 @@ public enum StringZMapMarshaller implements CompactBytesMarshaller<Map<String, S
         DataInputStream dis = new DataInputStream(new InflaterInputStream(bytes.inputStream()));
         if (kvMap == null) {
             kvMap = new LinkedHashMap<String, String>();
+
         } else {
             kvMap.clear();
         }
