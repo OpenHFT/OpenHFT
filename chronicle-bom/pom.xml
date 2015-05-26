@@ -36,12 +36,6 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-values</artifactId>
-                <version>1.0.0-alpha</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
                 <version>1.0.2-alpha-SNAPSHOT</version>
             </dependency>
@@ -80,6 +74,12 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
                 <version>2.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-values</artifactId>
+                <version>1.0.0-alpha</version>
             </dependency>
 
             <dependency>
