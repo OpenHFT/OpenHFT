@@ -323,6 +323,24 @@ public abstract class AbstractBytes implements Bytes {
         return utflen;
     }
 
+
+    public static long findUTFLength(@NotNull CharSequence str, long strlen) {
+        long utflen = 0L;
+
+        for(int i = 0; (long)i < strlen; ++i) {
+            long c = (long)str.charAt(i);
+            if(c >= 0L && c <= 127L) {
+                ++utflen;
+            } else if(c > 2047L) {
+                utflen += 3L;
+            } else {
+                utflen += 2L;
+            }
+        }
+
+        return utflen;
+    }
+
     static final Field VALUE;
 
     static {
