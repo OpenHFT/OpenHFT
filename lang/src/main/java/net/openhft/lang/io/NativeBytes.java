@@ -72,6 +72,10 @@ public class NativeBytes extends AbstractBytes {
         positionChecks(positionAddr);
     }
 
+    public static NativeBytes wrap(long address, long capacity) {
+        return new NativeBytes(address, address + capacity);
+    }
+
     /**
      * @deprecated Use {@link #NativeBytes(ObjectSerializer, long, long, AtomicInteger)} instead
      */
