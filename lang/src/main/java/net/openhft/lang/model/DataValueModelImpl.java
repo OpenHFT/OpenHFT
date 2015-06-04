@@ -61,7 +61,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
     public DataValueModelImpl(Class<T> type) {
         this.type = type;
-        if (!type.isInterface() && !type.isEnum())
+        if (!type.isInterface())
             throw new IllegalArgumentException("type must be an interface, was " + type);
 
         Method[] methods = type.getMethods();
