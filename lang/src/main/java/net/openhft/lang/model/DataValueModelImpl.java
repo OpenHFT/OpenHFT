@@ -27,6 +27,7 @@ import net.openhft.lang.model.constraints.Range;
 import java.io.Externalizable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
     public DataValueModelImpl(Class<T> type) {
         this.type = type;
-        if (!type.isInterface())
+        if (!type.isInterface() && !type.isEnum())
             throw new IllegalArgumentException("type must be an interface, was " + type);
 
         Method[] methods = type.getMethods();
@@ -72,6 +73,11 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                     || declaringClass == Copyable.class
                     || declaringClass == Byteable.class)
                 continue;
+
+            // ignore the default or static methods
+            if(isMethodDefault(method) || Modifier.isStatic(method.getModifiers()))
+                continue;
+
             String name = method.getName();
             Class<?>[] parameterTypes = method.getParameterTypes();
             final Class<?> returnType = method.getReturnType();
@@ -225,6 +231,11 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
     }
 
+    public boolean isMethodDefault(Method method)
+    {
+        return ((method.getModifiers() & (Modifier.ABSTRACT | Modifier.PUBLIC | Modifier.STATIC)) ==
+                Modifier.PUBLIC) && method.getDeclaringClass().isInterface();
+    }
     public static int heapSize(Class primitiveType) {
         if (!primitiveType.isPrimitive())
             throw new IllegalArgumentException();
