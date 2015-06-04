@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.0.10-alpha</version>
+                <version>1.0.11-alpha-SNAPSHOT</version>
             </dependency>
 
             <dependency>
