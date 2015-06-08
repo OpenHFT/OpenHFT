@@ -482,7 +482,11 @@ public class DataValueGenerator {
     }
 
     private static void methodHeapReadMarshall(StringBuilder readMarshal, String name, Class type, FieldModel model) {
-        if (!model.isArray()) {
+
+        if(model.type() == Date.class){
+            readMarshal.append("        _").append(name).append(" = new Date(in.readLong());\n");
+        }
+        else if (!model.isArray()) {
             readMarshal.append("        _").append(name).append(" = in.read").append(bytesType(type)).append("(");
             if ("Object".equals(bytesType(type)))
                 readMarshal.append(normalize(type)).append(".class");
@@ -937,7 +941,8 @@ public class DataValueGenerator {
                 methodWriteMarshall(writeMarshal, defaultGetter, defaultSetter, type, model);
                 methodReadMarshall(readMarshal, defaultGetter, defaultSetter, type, model);
 
-                offset += fieldSize(model);
+                if(!Enum.class.isAssignableFrom(type))
+                    offset += fieldSize(model);
 
             } else {
                 staticFieldDeclarations.append("    private static final int ").append(name.toUpperCase()).append(" = ").append(offset).append(";\n");
@@ -1021,8 +1026,13 @@ public class DataValueGenerator {
         Class<?> setterType = setter.getParameterTypes()[setter.getParameterTypes().length - 1];
         String write = "write";
         if (isVolatile) write = "writeOrdered";
-
-        if (!model.isArray()) {
+        if (model.type() == Date.class) {
+            getterSetters.append("\n\n    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
+            getterSetters.append("        _bytes.").append(write).append("Long").append("(").append(NAME).append(", ");
+        } else if(Enum.class.isAssignableFrom(type)){
+            getterSetters.append("\n\n    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
+            getterSetters.append("        _bytes.").append(write).append("Enum").append("(");
+        } else if (!model.isArray()) {
             getterSetters.append("\n\n    public void ").append(setter.getName()).append('(').append(normalize(setterType)).append(" $) {\n");
             getterSetters.append("        _bytes.").append(write).append(bytesType(type)).append("(").append(NAME).append(", ");
 
@@ -1036,10 +1046,14 @@ public class DataValueGenerator {
 
         if (CharSequence.class.isAssignableFrom(type))
             getterSetters.append(model.size().value()).append(", ");
-        getterSetters.append("$);\n");
+
+        if (model.type() == Date.class) {
+            getterSetters.append("$.getTime());\n");
+        } else {
+            getterSetters.append("$);\n");
+        }
         getterSetters.append("    }\n\n");
     }
-
     private void methodGet(StringBuilder getterSetters, Class type, String NAME, boolean isVolatile, String name) {
         String read = "read";
         if (isVolatile) read = "readVolatile";
@@ -1052,7 +1066,14 @@ public class DataValueGenerator {
         String read = "read";
         if (isVolatile) read = "readVolatile";
 
-        if (!model.isArray()) {
+        if(model.type() == Date.class){
+            getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("() {\n");
+            getterSetters.append("        return new Date( _bytes.").append(read).append("Long").append("(").append(NAME).append("));\n");
+        } else if (Enum.class.isAssignableFrom(model.type())) {
+            getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("() {\n");
+            //getterSetters.append("        return _bytes.").append(read).append("Enum").append("(").append(NAME).append(");\n");
+            getterSetters.append("        return _bytes.").append(read).append("Enum").append("(").append(type.getName()).append(".class);\n");
+        } else if (!model.isArray()) {
             getterSetters.append("    public ").append(normalize(type)).append(' ').append(getter.getName()).append("() {\n");
             getterSetters.append("        return _bytes.").append(read).append(bytesType(type)).append("(").append(NAME).append(");\n");
 
@@ -1078,7 +1099,13 @@ public class DataValueGenerator {
     }
 
     private void methodReadMarshall(StringBuilder readMarshal, Method getter, Method setter, Class type, FieldModel model) {
-        if (!model.isArray()) {
+        if(model.type() == Date.class){
+            if (getter != null && setter != null)
+                readMarshal.append("        ").append(setter.getName()).append("((Date)in.read").append(bytesType(type)).append("());\n");
+        } else if (Enum.class.isAssignableFrom(model.type())) {
+            if (getter != null && setter != null)
+                readMarshal.append("        ").append(setter.getName()).append("((" + type.getName() + ")in.read").append(bytesType(type)).append("());\n");
+        } else if (!model.isArray()) {
             if (getter != null && setter != null)
                 readMarshal.append("        ").append(setter.getName()).append("(in.read").append(bytesType(type)).append("());\n");
 
