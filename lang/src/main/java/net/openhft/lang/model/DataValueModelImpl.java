@@ -28,10 +28,7 @@ import java.io.Externalizable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import static net.openhft.lang.MemoryUnit.BITS;
 import static net.openhft.lang.MemoryUnit.BYTES;
@@ -53,6 +50,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         HEAP_SIZE_MAP.put(float.class, 32);
         HEAP_SIZE_MAP.put(long.class, 64);
         HEAP_SIZE_MAP.put(double.class, 64);
+        HEAP_SIZE_MAP.put(Date.class, 64);
     }
 
     private final Map<String, FieldModelImpl> fieldModelMap = new TreeMap<String, FieldModelImpl>();
@@ -61,6 +59,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
 
     public DataValueModelImpl(Class<T> type) {
         this.type = type;
+
         if (!type.isInterface())
             throw new IllegalArgumentException("type must be an interface, was " + type);
 
@@ -75,7 +74,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                 continue;
 
             // ignore the default or static methods
-            if(isMethodDefault(method) || Modifier.isStatic(method.getModifiers()))
+            if(isMethodDefaultOrStatic(method))
                 continue;
 
             String name = method.getName();
@@ -231,9 +230,9 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
         }
     }
 
-    public boolean isMethodDefault(Method method)
+    public boolean isMethodDefaultOrStatic(Method method)
     {
-        return ((method.getModifiers() & (Modifier.ABSTRACT | Modifier.PUBLIC | Modifier.STATIC)) ==
+        return ((method.getModifiers() & (Modifier.ABSTRACT | Modifier.PUBLIC)) ==
                 Modifier.PUBLIC) && method.getDeclaringClass().isInterface();
     }
     public static int heapSize(Class primitiveType) {
@@ -380,7 +379,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
     }
 
     public boolean isScalar(Class type) {
-        return type.isPrimitive() || CharSequence.class.isAssignableFrom(type);
+        return type.isPrimitive() || CharSequence.class.isAssignableFrom(type) || Enum.class.isAssignableFrom(type) || Date.class == type;
     }
 
     @Override

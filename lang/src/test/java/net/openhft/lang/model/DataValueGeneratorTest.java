@@ -24,6 +24,7 @@ import net.openhft.lang.io.Bytes;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,6 +46,7 @@ public class DataValueGeneratorTest {
         jbi.setLong(6);
         jbi.setDouble(7);
         jbi.setFlag(true);
+
         assertEquals(1, jbi.getByte());
         assertEquals('2', jbi.getChar());
         assertEquals(3, jbi.getShort());
@@ -199,5 +201,43 @@ public class DataValueGeneratorTest {
         assertEquals(nestedB1.hashCode(), nestedA.one().hashCode());
         assertEquals(nestedB2.hashCode(), nestedA.two().hashCode());
     }
+
+    @Test
+    public void testGenerateInterfaceWithEnumOnHeap() throws Exception {
+        DataValueGenerator dvg = new DataValueGenerator();
+        //dvg.setDumpCode(true);
+        JavaBeanInterfaceGetMyEnum jbie = dvg.heapInstance(JavaBeanInterfaceGetMyEnum.class);
+        jbie.setMyEnum(MyEnum.B);
+    }
+
+    @Test
+    public void testGenerateInterfaceWithEnumNativeInstance() throws Exception {
+        DataValueGenerator dvg = new DataValueGenerator();
+        //dvg.setDumpCode(true);
+        JavaBeanInterfaceGetMyEnum jbie = dvg.nativeInstance(JavaBeanInterfaceGetMyEnum.class);
+        Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(64));
+        ((Byteable) jbie).bytes(bytes, 0L);
+        jbie.setMyEnum(MyEnum.C);
+    }
+
+    @Test
+    public void testGenerateInterfaceWithDateOnHeap() throws Exception {
+        DataValueGenerator dvg = new DataValueGenerator();
+        //dvg.setDumpCode(true);
+        JavaBeanInterfaceGetDate jbid = dvg.heapInstance(JavaBeanInterfaceGetDate.class);
+        jbid.setDate(new Date());
+    }
+
+    @Test
+    public void testGenerateInterfaceWithDateNativeInstace() throws Exception {
+        DataValueGenerator dvg = new DataValueGenerator();
+        //dvg.setDumpCode(true);
+        JavaBeanInterfaceGetDate jbid = dvg.nativeInstance(JavaBeanInterfaceGetDate.class);
+        Bytes bytes = ByteBufferBytes.wrap(ByteBuffer.allocate(64));
+        ((Byteable) jbid).bytes(bytes, 0L);
+        jbid.setDate(new Date());
+        assertEquals(new Date(), jbid.getDate());
+    }
+
 }
 
