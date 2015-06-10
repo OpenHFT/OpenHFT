@@ -187,6 +187,7 @@ public class MappedStore implements BytesStore, Closeable {
                 address = 0;
 
                 if (channel.isOpen()) {
+                    channel.force(true);
                     channel.close();
                 }
             } catch (IOException e) {
