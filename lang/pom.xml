@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>lang</artifactId>
-    <version>6.6.8-SNAPSHOT</version>
+    <version>6.6.8</version>
     <packaging>bundle</packaging>
     <name>OpenHFT/Java-Lang/lang</name>
     <description>Java Lang library for High Frequency Trading (Java 6+)</description>
@@ -192,7 +192,7 @@
         <url>scm:git:git@github.com:OpenHFT/Java-Lang.git</url>
         <connection>scm:git:git@github.com:OpenHFT/Java-Lang.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/Java-Lang.git</developerConnection>
-        <tag>master</tag>
+        <tag>lang-6.6.8</tag>
     </scm>
 
 </project>
