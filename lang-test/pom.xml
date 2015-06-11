@@ -166,6 +166,8 @@
                 <configuration>
                     <systemPropertyVariables>
                         <main.basedir>${project.basedir}</main.basedir>
+                        <project.build.directory>${project.build.directory}</project.build.directory>
+
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
