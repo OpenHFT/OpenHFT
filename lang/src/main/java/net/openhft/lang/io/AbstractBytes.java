@@ -323,7 +323,6 @@ public abstract class AbstractBytes implements Bytes {
         return utflen;
     }
 
-
     public static long findUTFLength(@NotNull CharSequence str, long strlen) {
         long utflen = 0L;
 
@@ -2919,7 +2918,6 @@ public abstract class AbstractBytes implements Bytes {
                     throw new InterruptedException("Unable to obtain lock, interrupted");
                 return false;
             }
-
         }
     }
 

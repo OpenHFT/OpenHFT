@@ -52,9 +52,7 @@ public class MappedNativeBytes extends AbstractBytes {
         } catch (Exception e) {
             throw new AssertionError(e);
         }
-
     }
-
     private final boolean isSingleThreaded;
 
     protected long start;

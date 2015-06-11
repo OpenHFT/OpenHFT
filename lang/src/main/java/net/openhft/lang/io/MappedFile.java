@@ -179,6 +179,5 @@ public class MappedFile {
             if (map1 == mappedMemory)
                 map1 = null;
         }
-
     }
 }

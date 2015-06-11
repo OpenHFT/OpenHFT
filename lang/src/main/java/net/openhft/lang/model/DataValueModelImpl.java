@@ -471,9 +471,7 @@ public class DataValueModelImpl<T> implements DataValueModel<T> {
                 if (a instanceof Group)
                     group = (Group) a;
             }
-
         }
-
         public Method setter() {
             return setter;
         }

@@ -238,6 +238,4 @@ public class DataValueGeneratorTest {
         jbid.setDate(new Date());
         assertEquals(new Date(), jbid.getDate());
     }
-
 }
-

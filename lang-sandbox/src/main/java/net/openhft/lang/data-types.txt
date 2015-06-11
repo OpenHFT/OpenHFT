@@ -14,7 +14,6 @@ type {text-type}
 define_alias {text-ref} {data}
 alias {text-ref}
 
-
 need to recognise
 - nested sequences
 - nested mappings

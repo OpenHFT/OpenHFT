@@ -5,6 +5,11 @@
 
 package net.openhft.lang.io;
 
+import net.openhft.lang.io.serialization.ObjectSerializer;
+import net.openhft.lang.model.Byteable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,15 +22,6 @@ import java.nio.ByteOrder;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import net.openhft.lang.io.ByteStringAppender;
-import net.openhft.lang.io.Bytes;
-import net.openhft.lang.io.MutableDecimal;
-import net.openhft.lang.io.RandomDataInput;
-import net.openhft.lang.io.StopCharTester;
-import net.openhft.lang.io.serialization.ObjectSerializer;
-import net.openhft.lang.model.Byteable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class CheckedBytes implements Bytes {
     private final Bytes bytes;
@@ -60,9 +56,7 @@ public class CheckedBytes implements Bytes {
 
             System.exit(-1);
         }
-
     }
-
     public void free() {
         this.isClosed = true;
         this.bytes.free();
