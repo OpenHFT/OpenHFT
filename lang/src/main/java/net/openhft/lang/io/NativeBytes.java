@@ -22,7 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -120,6 +122,23 @@ public class NativeBytes extends AbstractBytes {
         return hash;
     }
 
+    // optimised to reduce overhead.
+    public void readUTF0(@NotNull Appendable appendable, int utflen)
+            throws IOException {
+        int count = 0;
+        if (utflen > remaining())
+            throw new BufferUnderflowException();
+        while (count < utflen) {
+            int c = UNSAFE.getByte(positionAddr++) & 0xFF;
+            if (c >= 128) {
+                positionAddr--;
+                readUTF2(this, appendable, utflen, count);
+                break;
+            }
+            count++;
+            appendable.append((char) c);
+        }
+    }
     @Override
     public NativeBytes slice() {
         return new NativeBytes(objectSerializer(), positionAddr, limitAddr, refCount);

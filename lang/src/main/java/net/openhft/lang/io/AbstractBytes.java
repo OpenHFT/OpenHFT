@@ -226,21 +226,23 @@ public abstract class AbstractBytes implements Bytes {
         throw new BufferUnderflowException();
     }
 
-    public static void readUTF0(Bytes bytes, @NotNull Appendable appendable, int utflen)
+    public void readUTF0(@NotNull Appendable appendable, int utflen)
             throws IOException {
         int count = 0;
-        while (count < utflen) {
-            int c = bytes.readUnsignedByteOrThrow();
-            if (c >= 128) {
-                bytes.position(bytes.position() - 1);
-                break;
 
-            } else if (c < 0) {
+        while (count < utflen) {
+            int c = readUnsignedByteOrThrow();
+            if (c >= 128) {
+                position(position() - 1);
+                readUTF2(this, appendable, utflen, count);
+                break;
             }
             count++;
             appendable.append((char) c);
         }
+    }
 
+    public static void readUTF2(Bytes bytes, @NotNull Appendable appendable, int utflen, int count) throws IOException {
         while (count < utflen) {
             int c = bytes.readUnsignedByte();
             switch (c >> 4) {
@@ -688,7 +690,7 @@ public abstract class AbstractBytes implements Bytes {
         if (len < -1 || len > remaining())
             throw new StreamCorruptedException("UTF length invalid " + len + " remaining: " + remaining());
         int utflen = (int) len;
-        readUTF0(this, appendable, utflen);
+        readUTF0(appendable, utflen);
         return true;
     }
 
@@ -715,13 +717,16 @@ public abstract class AbstractBytes implements Bytes {
             int c = readUnsignedByteOrThrow();
             if (c >= 128) {
                 position(position() - 1);
+                readUTF2(appendable, tester);
                 break;
             }
             if (tester.isStopChar(c))
                 return;
             appendable.append((char) c);
         }
+    }
 
+    private void readUTF2(@NotNull Appendable appendable, @NotNull StopCharTester tester) throws IOException {
         while (true) {
             int c = readUnsignedByteOrThrow();
             switch (c >> 4) {
@@ -803,7 +808,7 @@ public abstract class AbstractBytes implements Bytes {
         try {
             int len = readUnsignedShort();
             StringBuilder utfReader = acquireStringBuilder();
-            readUTF0(this, utfReader, len);
+            readUTF0(utfReader, len);
             return utfReader.length() == 0 ? "" : stringInterner().intern(utfReader);
         } catch (IOException unexpected) {
             throw new AssertionError(unexpected);
