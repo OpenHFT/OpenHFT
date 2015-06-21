@@ -50,7 +50,7 @@
         <module>SAXophone</module>
         <module>Chronicle-Map</module>
         <!--<module>Chronicle-Map-Java8</module>-->
-        <module>Chronicle-Logger</module>
+        <!--<module>Chronicle-Logger</module>-->
         <module>Chronicle-Engine</module>
         <module>TransFIX</module>
     </modules>
