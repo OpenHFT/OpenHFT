@@ -62,7 +62,7 @@ public class VanillaMappedBlocks implements VanillaMappedResource {
 
         this.mb1 = this.mb0;
         this.mb0 = this.mappedFile.bytes(index * this.blockSize, this.blockSize, index);
-        this.mb0.reserve();;
+        this.mb0.reserve();
 
         bytes.add(this.mb0);
 

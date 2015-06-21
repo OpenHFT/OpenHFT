@@ -133,7 +133,7 @@ public class DataValueGeneratorTest {
 
         si.setString("G'day");
 
-        assertEquals("G'day", si.getUsingString(new StringBuilder()).toString());;
+        assertEquals("G'day", si.getUsingString(new StringBuilder()).toString());
     }
 
     @Test

@@ -28,11 +28,11 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 
 interface ByteBufferReuse {
-    static final ByteBufferReuse INSTANCE = Inner.getReuse();
+    ByteBufferReuse INSTANCE = Inner.getReuse();
 
     ByteBuffer reuse(long addr, int cap, Object att, ByteBuffer toReuse);
 
-    static class Inner extends Reuses implements Opcodes {
+    class Inner extends Reuses implements Opcodes {
         private static ByteBufferReuse getReuse() {
             ClassWriter cw = new ClassWriter(0);
             MethodVisitor mv;

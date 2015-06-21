@@ -934,13 +934,18 @@ public class NativeBytesTest {
         }
     }
 
-    static interface DummyByteable extends Byteable {
-        public void setField1(long field);
-        public long getField1();
-        public void setField2(int field);
-        public int getField2();
-        public void setField3(int field);
-        public int getField3();
+    interface DummyByteable extends Byteable {
+        void setField1(long field);
+
+        long getField1();
+
+        void setField2(int field);
+
+        int getField2();
+
+        void setField3(int field);
+
+        int getField3();
     }
 
     @Test

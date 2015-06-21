@@ -81,9 +81,9 @@ public interface FieldModel<T> {
 
     boolean isArray();
 
-    public boolean isVolatile();
+    boolean isVolatile();
 
-    public void setVolatile(boolean isVolatile);
+    void setVolatile(boolean isVolatile);
 
     Group group();
 }

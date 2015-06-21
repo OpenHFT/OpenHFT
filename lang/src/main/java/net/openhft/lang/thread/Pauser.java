@@ -20,11 +20,11 @@ package net.openhft.lang.thread;
  * Created by peter.lawrey on 11/12/14.
  */
 public interface Pauser {
-    public void reset();
+    void reset();
 
-    public void pause();
+    void pause();
 
-    public void pause(long maxPauseNS);
+    void pause(long maxPauseNS);
 
-    public void unpause();
+    void unpause();
 }

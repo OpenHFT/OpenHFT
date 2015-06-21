@@ -73,9 +73,8 @@ public class ExternalizableMarshallerTest {
 
             MockExternalizable that = (MockExternalizable) o;
 
-            if (number != that.number) return false;
+            return number == that.number;
 
-            return true;
         }
     }
 }

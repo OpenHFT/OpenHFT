@@ -98,22 +98,29 @@ public class VolatileTest {
     }
 
     public interface BadInterface1{
-        public int getX();
-        public void setOrderedX(int x);
+        int getX();
+
+        void setOrderedX(int x);
     }
 
     public interface BadInterface2{
-        public int getVolatileX();
-        public void setX(int x);
+        int getVolatileX();
+
+        void setX(int x);
     }
 
     public interface GoodInterface{
-        public int getX();
-        public void setX(int x);
-        public int getVolatileY();
-        public void setOrderedY(int y);
-        public int getY();
-        public void setY(int y);
+        int getX();
+
+        void setX(int x);
+
+        int getVolatileY();
+
+        void setOrderedY(int y);
+
+        int getY();
+
+        void setY(int y);
 
         void setOrderedIntAt(@MaxSize(4) int idx, int i);
         int getVolatileIntAt(int idx);

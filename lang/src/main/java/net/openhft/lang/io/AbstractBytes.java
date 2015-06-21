@@ -2209,7 +2209,7 @@ public abstract class AbstractBytes implements Bytes {
     @SuppressWarnings("unchecked")
     public <T> T readInstance(@NotNull Class<T> objClass, T obj) {
         try {
-            return objectSerializer.<T>readSerializable(this, objClass, obj);
+            return objectSerializer.readSerializable(this, objClass, obj);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -2278,7 +2278,7 @@ public abstract class AbstractBytes implements Bytes {
             //and store it - no other threads can successfully write at this point
             //because their cas will fail (the value is not 0), so no update concurrency
             //conflict, but we do want other threads to read the value we write
-            writeOrderedInt(offset, (int) currentValue);
+            writeOrderedInt(offset, currentValue);
             //we've got the lock - and incremented it, so return true
             return true;
         }

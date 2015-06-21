@@ -71,9 +71,8 @@ public class ByteMarshallableMarshallerTest {
 
             MockBytesMarshallable that = (MockBytesMarshallable) o;
 
-            if (number != that.number) return false;
+            return number == that.number;
 
-            return true;
         }
     }
 }

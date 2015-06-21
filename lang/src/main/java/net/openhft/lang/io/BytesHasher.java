@@ -23,7 +23,7 @@ public interface BytesHasher {
      * @param bytes to hash
      * @return 64-bit hash
      */
-    public long hash(Bytes bytes);
+    long hash(Bytes bytes);
 
     /**
      * Provide a 64-bit hash for the bytes between offset and limit
@@ -33,5 +33,5 @@ public interface BytesHasher {
      * @param limit  the end exclusive
      * @return 64-bit hash.
      */
-    public long hash(Bytes bytes, long offset, long limit);
+    long hash(Bytes bytes, long offset, long limit);
 }

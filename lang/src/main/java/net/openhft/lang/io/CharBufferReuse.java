@@ -27,11 +27,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 interface CharBufferReuse {
-    static final CharBufferReuse INSTANCE = Inner.getReuse();
+    CharBufferReuse INSTANCE = Inner.getReuse();
 
     CharBuffer reuse(CharSequence cs, CharBuffer toReuse);
 
-    static class Inner extends Reuses implements Opcodes {
+    class Inner extends Reuses implements Opcodes {
         private static CharBufferReuse getReuse() {
             ClassWriter cw = new ClassWriter(0);
             MethodVisitor mv;

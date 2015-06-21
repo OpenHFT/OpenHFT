@@ -96,8 +96,7 @@ public class DataValueGroupTest$BaseInterface$$Native implements GroupTest.BaseI
         GroupTest.BaseInterface that = (GroupTest.BaseInterface) o;
 
         if(!isEqual(getInt(), that.getInt())) return false;
-        if(!isEqual(getStr(), that.getStr())) return false;
-        return true;
+        return isEqual(getStr(), that.getStr());
     }
 
     public String toString() {

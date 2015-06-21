@@ -18,7 +18,9 @@ package net.openhft.lang.io;
 import java.io.IOException;
 
 public interface VanillaMappedResource {
-    public String path();
-    public long size();
-    public void close() throws IOException;
+    String path();
+
+    long size();
+
+    void close() throws IOException;
 }
