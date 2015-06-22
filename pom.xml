@@ -48,7 +48,7 @@
         <module>Chronicle-Threads</module>
         <!--<module>Chronicle-Queue/chronicle-queue</module>-->
         <module>SAXophone</module>
-        <module>Chronicle-Map</module>
+        <!--<module>Chronicle-Map</module>-->
         <!--<module>Chronicle-Map-Java8</module>-->
         <!--<module>Chronicle-Logger</module>-->
         <module>Chronicle-Engine</module>
