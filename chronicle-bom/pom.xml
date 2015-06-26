@@ -98,13 +98,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
-                <version>1.0.2-alpha</version>
+                <version>1.0.2-alpha-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>2.1.12-SNAPSHOT</version>
+                <version>2.1.14-SNAPSHOT</version>
             </dependency>
 
             <dependency>
