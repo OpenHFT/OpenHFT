@@ -173,20 +173,20 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
     }
 
     private static abstract class StringFactory {
-        abstract String fromChars(char[] chars) throws Exception;
+        abstract String fromChars(char[] chars)  ;
     }
 
     private static final class StringFactory16 extends StringFactory {
         private final Constructor<String> constructor;
 
-        private StringFactory16() throws Exception {
+        private StringFactory16()   {
             constructor = String.class.getDeclaredConstructor(int.class,
                     int.class, char[].class);
             constructor.setAccessible(true);
         }
 
         @Override
-        String fromChars(char[] chars) throws Exception {
+        String fromChars(char[] chars)   {
             return constructor.newInstance(0, chars.length, chars);
         }
     }
@@ -194,13 +194,13 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
     private static final class StringFactory17 extends StringFactory {
         private final Constructor<String> constructor;
 
-        private StringFactory17() throws Exception {
+        private StringFactory17()   {
             constructor = String.class.getDeclaredConstructor(char[].class, boolean.class);
             constructor.setAccessible(true);
         }
 
         @Override
-        String fromChars(char[] chars) throws Exception {
+        String fromChars(char[] chars)   {
             return constructor.newInstance(chars, true);
         }
     }

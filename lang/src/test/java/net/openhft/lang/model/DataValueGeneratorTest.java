@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class DataValueGeneratorTest {
     @Test
-    public void testGenerateJavaCode() throws Exception {
+    public void testGenerateJavaCode()   {
         DataValueGenerator dvg = new DataValueGenerator();
         //dvg.setDumpCode(true);
         JavaBeanInterface jbi = dvg.heapInstance(JavaBeanInterface.class);
@@ -56,7 +56,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateJavaCode2() throws Exception {
+    public void testGenerateJavaCode2()   {
         DataValueGenerator dvg = new DataValueGenerator();
         MinimalInterface mi = dvg.heapInstance(MinimalInterface.class);
 
@@ -97,7 +97,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateNativeWithGetUsing() throws Exception {
+    public void testGenerateNativeWithGetUsing()   {
         String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterfaceGetUsing.class);
         System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
@@ -112,7 +112,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateNativeWithHasArrays() throws Exception {
+    public void testGenerateNativeWithHasArrays()   {
         String actual = new DataValueGenerator().generateNativeObject(HasArraysInterface.class);
         System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
@@ -201,7 +201,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateInterfaceWithEnumOnHeap() throws Exception {
+    public void testGenerateInterfaceWithEnumOnHeap()   {
         DataValueGenerator dvg = new DataValueGenerator();
         //dvg.setDumpCode(true);
         JavaBeanInterfaceGetMyEnum jbie = dvg.heapInstance(JavaBeanInterfaceGetMyEnum.class);
@@ -209,7 +209,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateInterfaceWithEnumNativeInstance() throws Exception {
+    public void testGenerateInterfaceWithEnumNativeInstance()   {
         DataValueGenerator dvg = new DataValueGenerator();
         //dvg.setDumpCode(true);
         JavaBeanInterfaceGetMyEnum jbie = dvg.nativeInstance(JavaBeanInterfaceGetMyEnum.class);
@@ -219,7 +219,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateInterfaceWithDateOnHeap() throws Exception {
+    public void testGenerateInterfaceWithDateOnHeap()   {
         DataValueGenerator dvg = new DataValueGenerator();
         //dvg.setDumpCode(true);
         JavaBeanInterfaceGetDate jbid = dvg.heapInstance(JavaBeanInterfaceGetDate.class);
@@ -227,7 +227,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateInterfaceWithDateNativeInstace() throws Exception {
+    public void testGenerateInterfaceWithDateNativeInstace()   {
         DataValueGenerator dvg = new DataValueGenerator();
         //dvg.setDumpCode(true);
         JavaBeanInterfaceGetDate jbid = dvg.nativeInstance(JavaBeanInterfaceGetDate.class);

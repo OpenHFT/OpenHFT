@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class RunningMinimumTest {
     @Test
-    public void testSample() throws Exception {
+    public void testSample()   {
         for (int k = 0; k < 1000; k++) {
             for (long delta : new long[]{0, Integer.MIN_VALUE, Integer.MAX_VALUE}) {
                 RunningMinimum rm = new RunningMinimum(50 * 1000);

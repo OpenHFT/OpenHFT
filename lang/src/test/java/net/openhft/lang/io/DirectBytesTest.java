@@ -118,7 +118,7 @@ public class DirectBytesTest {
     }
 
     @Test
-    public void testAllocate() throws Exception {
+    public void testAllocate()   {
         long size = 1L << 24; // 31; don't overload cloud-bees
         DirectStore store = DirectStore.allocate(size);
         assertEquals(size, store.size());
@@ -178,7 +178,7 @@ public class DirectBytesTest {
     }
 
     @Test
-    public void testLocking2() throws Exception {
+    public void testLocking2()   {
         if (Runtime.getRuntime().availableProcessors() < 2) {
             System.err.println("Test requires 2 CPUs, skipping");
             return;

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -32,6 +33,8 @@ import java.util.logging.Logger;
  */
 public enum Jvm {
     ;
+
+    public static String TMP = System.getProperty("java.io.tmpdir");
 
     private static final boolean IS64BIT = is64Bit0();
 
@@ -233,4 +236,5 @@ public enum Jvm {
     public static boolean isInternal(String className) {
         return className.startsWith("jdk.") || className.startsWith("sun.") || className.startsWith("java.");
     }
+
 }

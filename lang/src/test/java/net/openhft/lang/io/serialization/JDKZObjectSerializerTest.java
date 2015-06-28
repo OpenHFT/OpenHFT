@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 public class JDKZObjectSerializerTest {
 
     @Test
-    public void testReadSerializable() throws Exception {
+    public void testReadSerializable()   {
         {
             DirectBytes bytes = DirectStore.allocate(1024).bytes();
             bytes.writeInt(0);

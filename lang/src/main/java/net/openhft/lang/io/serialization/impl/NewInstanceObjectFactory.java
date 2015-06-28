@@ -40,7 +40,7 @@ public final class NewInstanceObjectFactory<E> implements ObjectFactory<E> {
     }
 
     @Override
-    public E create() throws Exception {
+    public E create()   {
         return eClass.newInstance();
     }
 

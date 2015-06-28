@@ -56,7 +56,7 @@ public class NativeBytesTest {
     }
 
     @Test
-    public void testLongHash() throws Exception {
+    public void testLongHash()   {
         byte[] bytes = {1, 2, 3, 4, 5, 6, 7, 8};
         long h = NativeBytes.longHash(bytes, 0, bytes.length);
         assertFalse(h == 0);
@@ -67,7 +67,7 @@ public class NativeBytesTest {
     }
 
     @Test
-    public void testRead() throws Exception {
+    public void testRead()   {
         for (int i = 0; i < bytes.capacity(); i++)
             bytes.writeByte(i, i);
         bytes.position(0);
@@ -79,7 +79,7 @@ public class NativeBytesTest {
     }
 
     @Test
-    public void testReadFully() throws Exception {
+    public void testReadFully()   {
         for (int i = 0; i < bytes.capacity(); i++)
             bytes.write(i);
         bytes.position(0);
@@ -90,7 +90,7 @@ public class NativeBytesTest {
     }
 
     @Test
-    public void testCompareAndSetLong() throws Exception {
+    public void testCompareAndSetLong()   {
         assertTrue(bytes.compareAndSwapLong(0, 0, 1));
         assertFalse(bytes.compareAndSwapLong(0, 0, 1));
         assertTrue(bytes.compareAndSwapLong(8, 0, 1));
@@ -98,7 +98,7 @@ public class NativeBytesTest {
     }
 
     @Test
-    public void testPosition() throws Exception {
+    public void testPosition()   {
         for (int i = 0; i < bytes.capacity(); i++)
             bytes.write(i);
         for (int i = (int) (bytes.capacity() - 1); i >= 0; i--) {
@@ -108,25 +108,25 @@ public class NativeBytesTest {
     }
 
     @Test
-    public void testCapacity() throws Exception {
+    public void testCapacity()   {
         assertEquals(SIZE, bytes.capacity());
         assertEquals(10, new NativeBytes(0, 10).capacity());
     }
 
     @Test
-    public void testRemaining() throws Exception {
+    public void testRemaining()   {
         assertEquals(SIZE, bytes.remaining());
         bytes.position(10);
         assertEquals(SIZE - 10, bytes.remaining());
     }
 
     @Test
-    public void testByteOrder() throws Exception {
+    public void testByteOrder()   {
         assertEquals(ByteOrder.nativeOrder(), bytes.byteOrder());
     }
 
     @Test
-    public void testCheckEndOfBuffer() throws Exception {
+    public void testCheckEndOfBuffer()   {
         bytes.checkEndOfBuffer();
 
         try {
@@ -1021,7 +1021,7 @@ public class NativeBytesTest {
         ExecutorService es = Executors.newSingleThreadExecutor(new NamedThreadFactory("unloadFailed"));
         Future<Void> future = es.submit(new Callable<Void>() {
             @Override
-            public Void call() throws Exception {
+            public Void call()   {
                 bytes.unlockInt(0);
                 return null;
             }

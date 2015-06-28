@@ -19,5 +19,5 @@ package net.openhft.lang.io.serialization;
 import java.io.Serializable;
 
 public interface ObjectFactory<E> extends Serializable {
-    E create() throws Exception;
+    E create()  ;
 }
