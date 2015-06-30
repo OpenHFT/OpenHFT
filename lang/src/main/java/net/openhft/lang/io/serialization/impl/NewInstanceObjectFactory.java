@@ -40,7 +40,7 @@ public final class NewInstanceObjectFactory<E> implements ObjectFactory<E> {
     }
 
     @Override
-    public E create()   {
+    public E create() throws IllegalAccessException, InstantiationException {
         return eClass.newInstance();
     }
 

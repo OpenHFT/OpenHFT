@@ -178,7 +178,7 @@ public class DirectBytesTest {
     }
 
     @Test
-    public void testLocking2()   {
+    public void testLocking2() throws InterruptedException {
         if (Runtime.getRuntime().availableProcessors() < 2) {
             System.err.println("Test requires 2 CPUs, skipping");
             return;

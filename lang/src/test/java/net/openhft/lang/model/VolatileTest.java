@@ -32,7 +32,7 @@ import static org.junit.Assert.assertFalse;
  */
 public class VolatileTest {
     @Test
-    public void testGenerateJavaCode()   {
+    public void testGenerateJavaCode() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         DataValueGenerator dvg = new DataValueGenerator();
        // dvg.setDumpCode(true);
 

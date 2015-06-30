@@ -24,6 +24,7 @@ import org.xerial.snappy.Snappy;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 
 /**
@@ -173,20 +174,20 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
     }
 
     private static abstract class StringFactory {
-        abstract String fromChars(char[] chars)  ;
+        abstract String fromChars(char[] chars) throws IllegalAccessException, InvocationTargetException, InstantiationException;
     }
 
     private static final class StringFactory16 extends StringFactory {
         private final Constructor<String> constructor;
 
-        private StringFactory16()   {
+        private StringFactory16() throws NoSuchMethodException {
             constructor = String.class.getDeclaredConstructor(int.class,
                     int.class, char[].class);
             constructor.setAccessible(true);
         }
 
         @Override
-        String fromChars(char[] chars)   {
+        String fromChars(char[] chars) throws IllegalAccessException, InvocationTargetException, InstantiationException {
             return constructor.newInstance(0, chars.length, chars);
         }
     }
@@ -194,13 +195,13 @@ public enum SnappyStringMarshaller implements CompactBytesMarshaller<CharSequenc
     private static final class StringFactory17 extends StringFactory {
         private final Constructor<String> constructor;
 
-        private StringFactory17()   {
+        private StringFactory17() throws NoSuchMethodException {
             constructor = String.class.getDeclaredConstructor(char[].class, boolean.class);
             constructor.setAccessible(true);
         }
 
         @Override
-        String fromChars(char[] chars)   {
+        String fromChars(char[] chars) throws IllegalAccessException, InvocationTargetException, InstantiationException {
             return constructor.newInstance(chars, true);
         }
     }

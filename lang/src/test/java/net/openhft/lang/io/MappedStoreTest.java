@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 import static org.junit.Assert.assertEquals;
@@ -33,9 +34,9 @@ public class MappedStoreTest {
     public void tearDown() {
         System.gc();
     }
-    
+
     @Test
-    public void testCreateSlice()   {
+    public void testCreateSlice() throws IOException {
         File file = new File(System.getProperty("java.io.tmpdir") + "/MappedStoreTest-testCreateSlice" + System.nanoTime() + ".tmp");
         file.deleteOnExit();
         long size = Jvm.is64Bit() ? 3L << 30 : 256 << 20;
@@ -54,7 +55,7 @@ public class MappedStoreTest {
     }
 
     @Test
-    public void testOpenExistingFile()   {
+    public void testOpenExistingFile() throws IOException {
         File file = getStoreFile("mapped-store-2.tmp");
 
         {

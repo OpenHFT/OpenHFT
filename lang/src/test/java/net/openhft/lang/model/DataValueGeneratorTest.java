@@ -97,7 +97,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateNativeWithGetUsing()   {
+    public void testGenerateNativeWithGetUsing() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         String actual = new DataValueGenerator().generateNativeObject(JavaBeanInterfaceGetUsing.class);
         System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);
@@ -112,7 +112,7 @@ public class DataValueGeneratorTest {
     }
 
     @Test
-    public void testGenerateNativeWithHasArrays()   {
+    public void testGenerateNativeWithHasArrays() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         String actual = new DataValueGenerator().generateNativeObject(HasArraysInterface.class);
         System.out.println(actual);
         CachedCompiler cc = new CachedCompiler(null, null);

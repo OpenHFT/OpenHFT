@@ -20,6 +20,7 @@ import net.openhft.lang.io.DirectBytes;
 import net.openhft.lang.io.DirectStore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.zip.DeflaterOutputStream;
 
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 public class JDKZObjectSerializerTest {
 
     @Test
-    public void testReadSerializable()   {
+    public void testReadSerializable() throws IOException, ClassNotFoundException {
         {
             DirectBytes bytes = DirectStore.allocate(1024).bytes();
             bytes.writeInt(0);

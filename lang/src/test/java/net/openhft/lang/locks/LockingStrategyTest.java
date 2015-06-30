@@ -234,7 +234,7 @@ public class LockingStrategyTest {
     };
 
     @Test
-    public void testUpdateLockIsExclusive()   {
+    public void testUpdateLockIsExclusive() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -254,7 +254,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testUpdateLockAllowsOtherReaders()   {
+    public void testUpdateLockAllowsOtherReaders() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -271,7 +271,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testUpdateLockBlocksOtherWriters()   {
+    public void testUpdateLockBlocksOtherWriters() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -291,7 +291,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testWriteLockBlocksOtherReaders()   {
+    public void testWriteLockBlocksOtherReaders() throws ExecutionException, InterruptedException {
         assumeReadWriteLock();
 
         // Acquire the write lock in thread 1...
@@ -311,7 +311,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testUpdateLockUpgradeToWriteLock()   {
+    public void testUpdateLockUpgradeToWriteLock() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...

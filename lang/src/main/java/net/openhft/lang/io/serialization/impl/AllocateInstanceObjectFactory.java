@@ -46,7 +46,7 @@ public final class AllocateInstanceObjectFactory<E> implements ObjectFactory<E> 
 
     @SuppressWarnings("unchecked")
     @Override
-    public E create()   {
+    public E create() throws InstantiationException {
         return (E) NativeBytes.UNSAFE.allocateInstance(eClass);
     }
 
