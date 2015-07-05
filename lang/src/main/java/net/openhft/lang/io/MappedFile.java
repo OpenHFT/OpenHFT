@@ -71,17 +71,13 @@ public class MappedFile {
                 if (e.getMessage() == null || !e.getMessage().endsWith("user-mapped section open")) {
                     throw e;
                 }
-                if (i < 10)
-                    //noinspection CallToThreadYield
-                    Thread.yield();
-                else
-                    try {
-                        //noinspection BusyWait
-                        Thread.sleep(1);
-                    } catch (InterruptedException ignored) {
-                        Thread.currentThread().interrupt();
-                        throw e;
-                    }
+                try {
+                    //noinspection BusyWait
+                    Thread.sleep(1);
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
             }
         }
     }
