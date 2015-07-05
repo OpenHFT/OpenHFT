@@ -17,6 +17,9 @@
 package net.openhft.lang.io;
 
 import net.openhft.lang.Maths;
+import net.openhft.lang.io.serialization.BytesMarshallable;
+import net.openhft.lang.model.DataValueClasses;
+import net.openhft.lang.model.constraints.MaxSize;
 import net.openhft.lang.thread.NamedThreadFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -874,6 +877,49 @@ public class ByteBufferBytesTest {
         assertEquals(11 * 11, bytes.readInt(4L));
     }
 
+    @Test
+    public void testReadWriteMarshallable() {
+        // generate a class for this interface.
+        // you can use any hand written BytesMarshallable
+        MyMarshallable mm = DataValueClasses.newInstance(MyMarshallable.class);
+
+        mm.setNum(5);
+        mm.setBig(3.1415);
+        mm.setText("Hello World");
+
+        // write to a byte[]
+        ByteBuffer byteBuffer = ByteBuffer.allocate(128);
+        IByteBufferBytes bbb = ByteBufferBytes.wrap(byteBuffer);
+        mm.writeMarshallable(bbb);
+
+        // how much data was written.
+        int len = (int) bbb.position();
+        byte[] bytes = byteBuffer.array();
+
+        // deserialize from a byte[]
+        MyMarshallable mm2 = DataValueClasses.newInstance(MyMarshallable.class);
+        IByteBufferBytes bbb2 = ByteBufferBytes.wrap(ByteBuffer.wrap(bytes));
+        bbb2.limit(len);
+        mm2.readMarshallable(bbb2);
+
+        assertEquals(5, mm.getNum());
+        assertEquals(3.1415, mm.getBig(), 0.0);
+        assertEquals("Hello World", mm.getText());
+    }
+
+    interface MyMarshallable extends BytesMarshallable {
+        int getNum();
+
+        void setNum(int num);
+
+        double getBig();
+
+        void setBig(double d);
+
+        String getText();
+
+        void setText(@MaxSize(16) String text);
+    }
     enum BuySell {
         Buy, Sell
     }
