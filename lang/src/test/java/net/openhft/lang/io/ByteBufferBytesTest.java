@@ -902,9 +902,9 @@ public class ByteBufferBytesTest {
         bbb2.limit(len);
         mm2.readMarshallable(bbb2);
 
-        assertEquals(5, mm.getNum());
-        assertEquals(3.1415, mm.getBig(), 0.0);
-        assertEquals("Hello World", mm.getText());
+        assertEquals(5, mm2.getNum());
+        assertEquals(3.1415, mm2.getBig(), 0.0);
+        assertEquals("Hello World", mm2.getText());
     }
 
     interface MyMarshallable extends BytesMarshallable {
@@ -920,6 +920,7 @@ public class ByteBufferBytesTest {
 
         void setText(@MaxSize(16) String text);
     }
+
     enum BuySell {
         Buy, Sell
     }
