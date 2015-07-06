@@ -71,7 +71,7 @@ public class ExternalizableMarshaller<E extends Externalizable> implements Bytes
 
     @SuppressWarnings("unchecked")
     @NotNull
-    protected E getInstance() throws InstantiationException {
+    protected E getInstance() throws Exception {
         return (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
     }
 

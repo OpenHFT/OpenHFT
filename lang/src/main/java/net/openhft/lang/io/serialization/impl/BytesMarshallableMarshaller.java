@@ -66,7 +66,7 @@ public class BytesMarshallableMarshaller<E extends BytesMarshallable>
 
     @SuppressWarnings("unchecked")
     @NotNull
-    protected E getInstance() throws InstantiationException {
+    protected E getInstance() throws Exception {
         return (E) NativeBytes.UNSAFE.allocateInstance(classMarshaled);
     }
 
