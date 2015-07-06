@@ -103,12 +103,6 @@ public class DirectByteBufferBytesTest {
     }
 
     @Test
-    public void testCapacity()   {
-        assertEquals(SIZE, bytes.capacity());
-        assertEquals(10, new NativeBytes(0, 10).capacity());
-    }
-
-    @Test
     public void testRemaining()   {
         assertEquals(SIZE, bytes.remaining());
         bytes.position(10);

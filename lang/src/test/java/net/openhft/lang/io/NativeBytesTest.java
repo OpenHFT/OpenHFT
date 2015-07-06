@@ -110,7 +110,7 @@ public class NativeBytesTest {
     @Test
     public void testCapacity()   {
         assertEquals(SIZE, bytes.capacity());
-        assertEquals(10, new NativeBytes(0, 10).capacity());
+        assertEquals(10, new NativeBytes(100000, 100010).capacity());
     }
 
     @Test
