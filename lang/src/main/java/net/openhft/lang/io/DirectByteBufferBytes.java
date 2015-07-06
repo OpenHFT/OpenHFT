@@ -64,8 +64,7 @@ public class DirectByteBufferBytes extends NativeBytes implements IByteBufferByt
             }
 
             this.buffer = ByteBuffer.allocateDirect(newCapacity).order(ByteOrder.nativeOrder());
-            this.startAddr = ((DirectBuffer) buffer).address();
-            this.positionAddr = this.startAddr;
+            setStartPositionAddress(((DirectBuffer) buffer).address());
             this.capacityAddr = this.startAddr + newCapacity;
             this.limitAddr = this.capacityAddr;
 

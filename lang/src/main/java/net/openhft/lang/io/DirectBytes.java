@@ -42,7 +42,7 @@ public class DirectBytes extends NativeBytes {
         if (offset < 0 || size < 0 || offset + size > store.size())
             throw new IllegalArgumentException();
 
-        startAddr = positionAddr = store.address() + offset;
+        setStartPositionAddress(store.address() + offset);
         capacityAddr = limitAddr = startAddr + size;
     }
 

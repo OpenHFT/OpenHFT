@@ -64,12 +64,19 @@ public class NativeBytes extends AbstractBytes {
 
     public NativeBytes(long startAddr, long capacityAddr) {
         super();
-
-        this.positionAddr =
-                this.startAddr = startAddr;
+        setStartPositionAddress(startAddr);
+        if (startAddr > capacityAddr)
+            throw new IllegalArgumentException("Missorted capacity address");
         this.limitAddr =
                 this.capacityAddr = capacityAddr;
         positionChecks(positionAddr);
+    }
+
+    public void setStartPositionAddress(long startAddr) {
+        if ((startAddr & ~0x3fff) == 0)
+            throw new AssertionError("Invalid address " + Long.toHexString(startAddr));
+        this.positionAddr =
+                this.startAddr = startAddr;
     }
 
     public static NativeBytes wrap(long address, long capacity) {
@@ -84,8 +91,7 @@ public class NativeBytes extends AbstractBytes {
                        long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(bytesMarshallerFactory, refCount);
 
-        this.positionAddr =
-                this.startAddr = startAddr;
+        setStartPositionAddress(startAddr);
         this.limitAddr =
                 this.capacityAddr = capacityAddr;
         positionChecks(positionAddr);
@@ -95,8 +101,7 @@ public class NativeBytes extends AbstractBytes {
                        long startAddr, long capacityAddr, AtomicInteger refCount) {
         super(objectSerializer, refCount);
 
-        this.positionAddr =
-                this.startAddr = startAddr;
+        setStartPositionAddress(startAddr);
         this.limitAddr =
                 this.capacityAddr = capacityAddr;
         positionChecks(positionAddr);
@@ -104,7 +109,7 @@ public class NativeBytes extends AbstractBytes {
 
     public NativeBytes(NativeBytes bytes) {
         super(bytes.objectSerializer(), new AtomicInteger(1));
-        this.startAddr = bytes.startAddr;
+        setStartPositionAddress(bytes.startAddr);
 
         this.positionAddr = bytes.positionAddr;
         this.limitAddr = bytes.limitAddr;
@@ -139,6 +144,7 @@ public class NativeBytes extends AbstractBytes {
             appendable.append((char) c);
         }
     }
+
     @Override
     public NativeBytes slice() {
         return new NativeBytes(objectSerializer(), positionAddr, limitAddr, refCount);
@@ -762,7 +768,7 @@ public class NativeBytes extends AbstractBytes {
     }
 
     void address(long address) {
-        this.positionAddr = this.startAddr = address;
+        setStartPositionAddress(address);
     }
 
     void capacity(long capacity) {
