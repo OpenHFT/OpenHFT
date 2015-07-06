@@ -39,8 +39,8 @@ public class VanillaMappedBytes extends NativeBytes {
 
     protected VanillaMappedBytes(final MappedByteBuffer buffer, long index, final FileChannel channel) {
         super(
-            ((DirectBuffer)buffer).address(),
-            ((DirectBuffer)buffer).address() + buffer.capacity()
+                buffer.capacity() == 0 ? NO_PAGE : ((DirectBuffer) buffer).address(),
+                buffer.capacity() == 0 ? NO_PAGE : ((DirectBuffer) buffer).address() + buffer.capacity()
         );
 
         this.buffer = buffer;
