@@ -111,7 +111,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.5.3-beta-SNAPSHOT</version>
+                <version>1.5.3-beta</version>
             </dependency>
 
         </dependencies>
