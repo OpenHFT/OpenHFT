@@ -24,13 +24,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.0-SNAPSHOT</version>
+                <version>3.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.0.10-beta-SNAPSHOT</version>
+                <version>1.0.10-beta</version>
             </dependency>
 
             <dependency>
@@ -42,19 +42,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.0.12-beta-SNAPSHOT</version>
+                <version>1.0.12-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.0.17-beta-SNAPSHOT</version>
+                <version>1.0.17-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.13-beta-SNAPSHOT</version>
+                <version>1.0.13-beta</version>
             </dependency>
 
             <dependency>
@@ -108,7 +108,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.5.5-beta-SNAPSHOT</version>
+                <version>1.5.5-beta</version>
             </dependency>
 
         </dependencies>
