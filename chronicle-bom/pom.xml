@@ -11,7 +11,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>1.5.13-SNAPSHOT</version>
+    <version>1.5.14-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -37,7 +37,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.0.11-beta-SNAPSHOT</version>
+                <version>1.0.12-beta-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -55,7 +55,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.18-beta-SNAPSHOT</version>
+                <version>1.0.19-beta-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -109,7 +109,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.5.13-beta-SNAPSHOT</version>
+                <version>1.5.23-beta-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
