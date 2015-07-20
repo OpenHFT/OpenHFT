@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.1.1</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>1.5.16-SNAPSHOT</version>
+    <version>1.5.20-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -37,7 +36,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.0.12-beta-SNAPSHOT</version>
+                <version>1.0.13-beta</version>
             </dependency>
 
             <dependency>
@@ -55,7 +54,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.19-beta-SNAPSHOT</version>
+                <version>1.0.20-beta</version>
             </dependency>
 
             <dependency>
@@ -109,7 +108,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.5.28-beta-SNAPSHOT</version>
+                <version>1.5.29-beta</version>
             </dependency>
 
         </dependencies>
