@@ -16,7 +16,7 @@
 
 package net.openhft.lang.io;
 
-import net.openhft.affinity.AffinitySupport;
+import net.openhft.affinity.Affinity;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,8 +50,7 @@ public class LockingViaMMapWithThreadIdMain {
         MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, 0, RECORDS * RECORD_SIZE);
         // set the the Thread.getId() to match the process thread id
         // this way the getId() can be used across processes..
-        AffinitySupport.setThreadId();
-        AffinitySupport.setAffinity(toggleTo ? 1 << 3 : 1 << 2);
+        Affinity.setAffinity(toggleTo ? 1 << 3 : 1 << 2);
         Bytes bytes = ByteBufferBytes.wrap(mbb);
 
         long start = 0;

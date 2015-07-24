@@ -326,11 +326,11 @@ public abstract class AbstractBytes implements Bytes {
     public static long findUTFLength(@NotNull CharSequence str, long strlen) {
         long utflen = 0L;
 
-        for(int i = 0; (long)i < strlen; ++i) {
-            long c = (long)str.charAt(i);
-            if(c >= 0L && c <= 127L) {
+        for (int i = 0; (long) i < strlen; ++i) {
+            long c = (long) str.charAt(i);
+            if (c >= 0L && c <= 127L) {
                 ++utflen;
-            } else if(c > 2047L) {
+            } else if (c > 2047L) {
                 utflen += 3L;
             } else {
                 utflen += 2L;
@@ -373,6 +373,29 @@ public abstract class AbstractBytes implements Bytes {
     }
 
     public static void writeUTF0(Bytes bytes, @NotNull CharSequence str, long strlen) {
+        if (bytes instanceof DirectBytes) {
+            writeUTF1((DirectBytes) bytes, str, strlen);
+        } else {
+            writeUTF1(bytes, str, strlen);
+        }
+    }
+
+    public static void writeUTF1(DirectBytes bytes, @NotNull CharSequence str, long strlen) {
+        int c;
+        int i;
+        for (i = 0; i < strlen; i++) {
+            c = str.charAt(i);
+            if (!((c >= 0x0000) && (c <= 0x007F)))
+//            if (c + Integer.MIN_VALUE - 1 <= Integer.MIN_VALUE + 0x007F-1)
+                break;
+            NativeBytes.UNSAFE.putByte(bytes.positionAddr + i, (byte) c);
+        }
+        bytes.skip(i);
+        if (i < strlen)
+            writeUTF2(bytes, str, strlen, i);
+    }
+
+    public static void writeUTF1(Bytes bytes, @NotNull CharSequence str, long strlen) {
         int c;
         int i;
         for (i = 0; i < strlen; i++) {
@@ -381,7 +404,12 @@ public abstract class AbstractBytes implements Bytes {
                 break;
             bytes.write(c);
         }
+        if (i < strlen)
+            writeUTF2(bytes, str, strlen, i);
+    }
 
+    private static void writeUTF2(Bytes bytes, CharSequence str, long strlen, int i) {
+        int c;
         for (; i < strlen; i++) {
             c = str.charAt(i);
             if ((c >= 0x0000) && (c <= 0x007F)) {
