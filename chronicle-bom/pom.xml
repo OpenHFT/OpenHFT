@@ -48,7 +48,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.0.20-beta</version>
+                <version>1.0.21-beta-SNAPSHOT</version>
             </dependency>
 
             <dependency>
