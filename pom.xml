@@ -1,44 +1,59 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~     Copyright (C) 2015  higherfrequencytrading.com
+  ~ Copyright 2014 Higher Frequency Trading
   ~
-  ~     This program is free software: you can redistribute it and/or modify
-  ~     it under the terms of the GNU Lesser General Public License as published by
-  ~     the Free Software Foundation, either version 3 of the License.
+  ~ http://www.higherfrequencytrading.com
   ~
-  ~     This program is distributed in the hope that it will be useful,
-  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~     GNU Lesser General Public License for more details.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~     You should have received a copy of the GNU Lesser General Public License
-  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   -->
 
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-    <parent>
-        <groupId>net.openhft</groupId>
-        <artifactId>root-parent-pom</artifactId>
-        <version>1.1.0</version>
-        <relativePath/>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>Java-Lang</artifactId>
-    <version>6.6.10-SNAPSHOT</version>
+    <groupId>net.openhft</groupId>
+    <artifactId>OpenHFT</artifactId>
+    <version>1.0</version>
     <packaging>pom</packaging>
 
-    <name>Java Lang Parent</name>
-    <description>High Performance Java Lang library</description>
-
     <modules>
-        <module>lang</module>
-        <module>lang-test</module>
-        <!--<module>lang-sandbox</module>-->
+        <module>third-party-bom</module>
+        <module>root-parent-pom</module>
+        <module>java-parent-pom</module>
+        <module>chronicle-bom</module>
+
+        <!-- heritage -->
+        <!--<module>Java-Thread-Affinity</module>-->
+        <!--<module>Java-Runtime-Compiler</module>-->
+
+        <!-- stable -->
+        <!--<module>Java-Lang</module>-->
+
+        <!-- new -->
+        <module>Chronicle-Core</module>
+        <module>Chronicle-Threads</module>
+        <module>Chronicle-Network</module>
+        <module>Chronicle-Bytes</module>
+        <module>Chronicle-Algorithms</module>
+        <module>Chronicle-Wire</module>
+        <!--<module>Chronicle-Values</module>-->
+        <!--<module>Chronicle-Queue/chronicle-queue</module>-->
+        <module>SAXophone</module>
+        <module>Chronicle-Map</module>
+        <!--<module>Chronicle-Map-Java8</module>-->
+        <!--<module>Chronicle-Logger</module>-->
+        <module>Chronicle-Engine</module>
+        <!--<module>TransFIX</module>-->
+        <!--<module>Chronicle-Enterprise</module>-->
+        <!--<module>TransFIX</module>-->
     </modules>
-
 </project>
-
