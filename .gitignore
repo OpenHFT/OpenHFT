@@ -21,5 +21,3 @@ hs_err_pid*
 
 # maven
 target
-
-.attach_pid*

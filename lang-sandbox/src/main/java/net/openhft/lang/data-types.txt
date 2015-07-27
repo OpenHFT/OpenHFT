@@ -1,0 +1,19 @@
+sequence_push
+sequence_pop
+group_push
+group_pop
+mapping_start {data}
+mapping_end
+named_mapping {text} {data}
+numbered_mapping {number} {data}
+comment {data}
+document_start {text-type}
+document_end
+date {date-type} x
+type {text-type}
+define_alias {text-ref} {data}
+alias {text-ref}
+
+need to recognise
+- nested sequences
+- nested mappings
