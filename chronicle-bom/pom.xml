@@ -22,7 +22,7 @@
 
             <!--  dependencies listed in build order -->
             <dependency>
-                <groupId>net.openhft</groupId>
+                <groupId>net.opeanhft</groupId>
                 <artifactId>affinity</artifactId>
                 <version>3.0</version>
             </dependency>
@@ -30,31 +30,31 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                    <version>1.0.12-beta-SNAPSHOT</version>
+                <version>1.0.12-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.0.14-beta-SNAPSHOT</version>
+                <version>1.0.14-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.0.18-beta-SNAPSHOT</version>
+                <version>1.0.18-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.0.22-beta-SNAPSHOT</version>
+                <version>1.0.22-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.23-beta-SNAPSHOT</version>
+                <version>1.0.23-beta</version>
             </dependency>
 
             <dependency>
