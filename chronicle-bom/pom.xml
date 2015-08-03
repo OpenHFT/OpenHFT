@@ -22,7 +22,7 @@
 
             <!--  dependencies listed in build order -->
             <dependency>
-                <groupId>net.opeanhft</groupId>
+                <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
                 <version>3.0</version>
             </dependency>
