@@ -1,78 +1,46 @@
-#JavaLang
-This module provides marshalling, de-marshalling and handling of thread safe off heap memory through ByteBuffers.
+OpenHFT Parent Module
+=====================
 
-This module is available on maven central as
+Parent module to include active modules
 
-    <dependency>
-        <groupId>net.openhft</groupId>
-        <artifactId>lang</artifactId>
-        <version><!--replace with the latest version--></version>
-    </dependency>
+Key Modules
+===========
 
-The version 6.x signifies that it is build for Java 6+. (It requires Java 6 update 18 or later to build)
+Java Thread Affinity - Declaritive binding of threads to individual CPUs.  Using in combination with isocpus= on Linux, you can reduce scheduling jitter from 5 ms to 10 micro-seconds.
 
-##  JavaDoc
-Check out our documentation at [JavaDoc] (http://openhft.github.io/Java-Lang/apidocs/)
+Java Lang - Low level IO such as 64-bit access to off heap memory. Used by Chronicle and Huge Collections
 
-## Working with off heap objects.
+Java Chroncicle - Low latency IPC. Supports 0.1 micro-second persisted IPC between processes and signle digit persisted replication between machines. Less than 15 micro-seconds between machines, 99% of the time for real messages.
 
-Java-Lang 6.1 adds support for basic off heap data structures.  More collections types and more complex data types will be added in future versions.
+HugeCollections - Off heap hash maps.  HugeHashMap is a process private, off heap storage supporting over one billon key-values. SharedHashMap is a the same shared between processes and is persisted.  SharedHashMap supports tens of millions operations per second, for hundreds of millions of keys-values, with no GC pressure (trivial garbage produced)
 
-    public interface DataType {
-         // add getters and setters here
-    }
-    
-    // can create an array of any size (provided you have the memory) off heap.
-    HugeArray<DataType> array = HugeCollections.newArray(DataType.class, 10*1000*1000*1000L);
-    DataType dt = array.get(1111111111);
-    
-    // set data on dt
-    array.recycle(dt); // recycle the reference (or discard it)
-    
-    // create a ring writeBuffer
-    HugeQueue<DataType> queue = HugeCollections.newQueue(DataType.class, 10*1000*1000L);
-    // give me a reference to an object to populate
-    DataType dt2 = queue.offer();
-    // set the values od dt2
-    queue.recycle(dt2);
-    
-    DataType dt3 = queue.take();
-    // get values
-    queue.recycle(dt3);
-    
-This is designed to be largely GC-less and you can queue millions of entries with 32 MB heap and not trigger GCs.
-    
-## Working with buffers
-To work with buffers there is a several options:
-* _ByteBufferBytes_ which wraps [java.nio.ByteBuffer](http://docs.oracle.com/javase/7/docs/api/java/nio/ByteBuffer.html)
-* _DirectBytes_ which is slices/records of [DirectStore](https://github.com/OpenHFT/Java-Lang/blob/master/lang/src/main/java/net/openhft/lang/io/DirectStore.java) - own implementation for offheap storage
+Java Runtime Compiler - Wrapper for the Java Compiler API to support in memory compilation.  Give it is String of Java code and it will give you a Class.
 
-Both classes provide functionality:
-* write\read operations for primitives (writeLong(long n), readLong() etc.)
-* locking in native memory, so you can add thread safe constructs to your native record.
-* CAS operations for int and long _boolean compareAndSwapInt(long offset, int expected, int x)_, _boolean compareAndSwapLong(long offset, long expected, long x)_
-* addAndGetInt and getAndAddInt operations
+Tools
+=====
 
-####Example
-    ByteBuffer byteBuffer = ByteBuffer.allocate(SIZE);
-    ByteBufferBytes bytes = new ByteBufferBytes(byteBuffer);
-    for (long i = 0; i < bytes.maximumLimit(); i++)
-        bytes.writeLong(i);
-    for (long i = bytes.maximumLimit()-8; i >= 0; i -= 8) {
-        int j = bytes.readLong(i);
-        assert i ==  j;
-    }
+#### OpenHFT Recommends
 
-#Building for eclipse
+---
 
-Download Java-Lang zip from git https://github.com/OpenHFT/Java-Lang/archive/master.zip
+[![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com/)
+ 
+YourKit supports open source projects with its full-featured Java Profiler.
+YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a>
+and <a href="https://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>,
+innovative and intelligent tools for profiling Java and .NET applications.
 
-Unzip master.zip, Java-Lang-master folder will be extracted from zip.
+Review : The YourKit java profiler can help you optomize your java code, it displays a real-time display of CPU and memory usage. Another tab shows time spent in the garbage collector, how many collections have taken place recently. You can force a garbage collection to take place to watch the effect on performance. Other tabs provide info on the number of running threads and the number of classes loaded. YourKit also  allows you to take a snapshot of the running process; this is automatically saved and can be subsequently reopened for comparative purposes. Within the snapshot, you can view a hotspot listing, showing the methods where the application spent most of its time. You can also see a call tree - either merged or arranged by individual thread - and view back traces of individual methods showing where they were called from.
 
-    cd Java-Lang-master
-    mvn eclipse:eclipse
+---
 
-Now you have an eclipse project, import project into Eclipse
+[![TeamCity](https://www.jetbrains.com/teamcity/docs/logo_teamcity.png)](http://www.jetbrains.com/teamcity/)
 
-If your Eclipse configuration is not UTF-8, after importing the project you may see some errors and strange characters in some .java files. To get rid of this problem change character enconding to UTF-8: project->properties->resource->text file encoding->utf8
+---
+
+[![IntelliJ](http://www.jetbrains.com/img/logos/logo_intellij_idea.png)](http://www.jetbrains.com/idea/)
+
+---
+
+NOTE : Other commercial profilers and IDE's can be used.  VisualVM creates too much noise to be useful at this level.
 
