@@ -27,41 +27,40 @@
 
     <name>Root Parent Pom</name>
     <description>This root parent pom is used by all of OpenHft</description>
-    <url>http://www.openhft.net</url>
+    <url>http://chronicle.software</url>
 
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
+            <name>GNU General Lesser Public License (LGPL) version 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
         </license>
     </licenses>
 
+
     <developers>
         <developer>
-            <name>peter.lawrey Lawrey</name>
-            <email>peter.lawrey@higherfrequencytrading.com</email>
+            <name>Peter Lawrey</name>
+            <email>peter.lawrey@chronicle.software</email>
         </developer>
         <developer>
             <name>Luca Burgazzoli</name>
-            <email>luca.burgazzoli@higherfrequencytrading.com</email>
+            <email>luca.burgazzoli@chronicle.software</email>
         </developer>
         <developer>
             <name>Roman Leventov</name>
-            <email>roman.leventov@higherfrequencytrading.com</email>
+            <email>roman.leventov@chronicle.software</email>
         </developer>
         <developer>
             <name>Rob Austin</name>
-            <email>rob.austin@higherfrequencytrading.com</email>
+            <email>rob.austin@chronicle.software</email>
         </developer>
         <developer>
             <name>Daniel Shaya</name>
-            <email>daniel.shaya@higherfrequencytrading.com</email>
+            <email>daniel.shaya@chronicle.software</email>
         </developer>
         <developer>
             <name>Anshul Shelley</name>
-            <email>anshul.shelley@higherfrequencytrading.com</email>
+            <email>anshul.shelley@chronicle.software</email>
         </developer>
     </developers>
 
