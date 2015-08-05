@@ -30,7 +30,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.0.12-beta</version>
+                <version>1.0.13-beta-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -48,7 +48,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.0.22-beta</version>
+                <version>1.0.23-beta-SNAPSHOT</version>
             </dependency>
 
             <dependency>
