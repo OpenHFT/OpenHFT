@@ -43,13 +43,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                    <version>1.0.21-beta-SNAPSHOT</version>
+                    <version>1.0.21-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                    <version>1.0.27-beta-SNAPSHOT</version>
+                    <version>1.0.27-beta</version>
             </dependency>
 
             <dependency>
@@ -109,7 +109,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.6.9-beta-SNAPSHOT</version>
+                <version>1.6.9-beta</version>
             </dependency>
 
             <dependency>
