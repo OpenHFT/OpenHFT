@@ -54,6 +54,12 @@
         <dependencies>
 
             <dependency>
+                <groupId>org.dcache</groupId>
+                <artifactId>nfs4j-core</artifactId>
+                <version>0.10.6</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.glassfish.grizzly</groupId>
                 <artifactId>grizzly-framework</artifactId>
                 <version>2.3.14</version>
