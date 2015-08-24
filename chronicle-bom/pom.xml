@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>1.7.7-SNAPSHOT</version>
+    <version>1.7.7</version>
     <packaging>pom</packaging>
     <name>Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -66,7 +66,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.7.2-SNAPSHOT</version>
+                <version>6.7.2</version>
             </dependency>
 
             <dependency>
@@ -108,13 +108,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.7.5-beta-SNAPSHOT</version>
+                <version>1.7.5-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
-                <version>1.7.2-SNAPSHOT</version>
+                <version>1.7.2</version>
             </dependency>
 
         </dependencies>
