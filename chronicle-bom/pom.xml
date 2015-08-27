@@ -6,7 +6,7 @@
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.1.4</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -115,6 +115,12 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
                 <version>1.7.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
