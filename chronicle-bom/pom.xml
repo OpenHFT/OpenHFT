@@ -111,10 +111,16 @@
                 <version>1.7.7-beta-SNAPSHOT</version>
             </dependency>
 
-            <dependency>
+                <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>chronicle-engine-nfs</artifactId>
+                        <version>1.7.7-beta-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
-                    <version>1.7.3-SNAPSHOT</version>
+                        <version>1.7.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
