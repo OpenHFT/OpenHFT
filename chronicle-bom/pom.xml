@@ -119,7 +119,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
-                <version>1.7.3</version>
+                <version>1.7.9</version>
             </dependency>
 
             <dependency>
