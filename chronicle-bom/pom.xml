@@ -29,31 +29,31 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.0.19-beta</version>
+                <version>1.0.20-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.0.32-beta</version>
+                <version>1.0.33-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.33-beta</version>
+                <version>1.0.34-beta</version>
             </dependency>
 
             <dependency>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.7.3</version>
+                <version>6.7.4</version>
             </dependency>
 
             <dependency>
@@ -95,31 +95,31 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
-                <version>1.0.4-beta</version>
+                <version>1.0.5-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>2.3.3</version>
+                <version>2.3.4</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.7.7-beta</version>
+                <version>1.7.8-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine-nfs</artifactId>
-                <version>1.7.7-beta</version>
+                <version>1.7.8-beta</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
-                <version>1.7.3</version>
+                <version>1.7.4</version>
             </dependency>
 
             <dependency>
