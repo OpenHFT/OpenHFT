@@ -107,14 +107,14 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.7.8-beta-SNAPSHOT</version>
+                <version>1.7.8-beta</version>
             </dependency>
 
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-engine-nfs</artifactId>
-                <version>1.7.7-beta-SNAPSHOT</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>net.openhft</groupId>-->
+                <!--<artifactId>chronicle-engine-nfs</artifactId>-->
+                <!--<version>1.7.7-beta-SNAPSHOT</version>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>software.chronicle</groupId>
