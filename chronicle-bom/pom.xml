@@ -78,12 +78,6 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-values</artifactId>
-                <version>1.0.0-alpha</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
                 <artifactId>chronicle</artifactId>
                 <version>3.5.3</version>
             </dependency>
