@@ -28,12 +28,6 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-queue</artifactId>
-                <version>4.0.0-alpha</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
                 <version>1.1.2</version>
             </dependency>
@@ -102,6 +96,12 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
                 <version>1.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-queue</artifactId>
+                <version>4.0.0-alpha</version>
             </dependency>
 
             <dependency>
