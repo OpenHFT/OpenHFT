@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.1.4</version>
+                <version>1.1.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -55,7 +55,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.38</version>
+                <version>1.0.39-SNAPSHOT</version>
             </dependency>
 
             <dependency>
