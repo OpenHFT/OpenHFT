@@ -150,7 +150,6 @@
         </repository>
     </repositories>
 
-
     <scm>
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
