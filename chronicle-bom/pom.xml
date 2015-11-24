@@ -59,7 +59,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.45</version>
+                <version>1.0.46-SNAPSHOT</version>
             </dependency>
 
             <dependency>
