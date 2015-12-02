@@ -101,7 +101,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.10.9</version>
+                <version>1.10.10</version>
             </dependency>
 
             <dependency>
@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
-                <version>1.10.1</version>
+                <version>1.10.2</version>
             </dependency>
             <!--<dependency>-->
             <!--<groupId>software.chronicle</groupId>-->
