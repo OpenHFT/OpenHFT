@@ -261,7 +261,7 @@
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.url</groupId>
-                <artifactId>pax-url-wrap</artifactId>
+                <artifactId>pax-url-compressingStream</artifactId>
                 <version>${pax.url.version}</version>
             </dependency>
             <dependency>
