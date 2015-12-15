@@ -99,8 +99,8 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-engine</artifactId>
-                <version>1.10.13</version>
+                <artifactId>chronicle-engine</artifactId>\
+                <version>1.10.14</version>
             </dependency>
 
             <dependency>
