@@ -47,6 +47,7 @@
         <jmh.version>1.7</jmh.version>
         <log4j2.version>2.4.1</log4j2.version>
         <felix.framework.version>4.6.1</felix.framework.version>
+        <powermock.version>1.6.4</powermock.version>
     </properties>
 
     <dependencyManagement>
@@ -346,7 +347,19 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>1.9.5</version>
+                <version>1.10.19</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
             </dependency>
 
             <dependency>
