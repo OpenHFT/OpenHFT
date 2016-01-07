@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.1.5</version>
-        <relativePath/>
+        <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -48,19 +47,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.1.17</version>
+                <version>1.1.18-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.1.16</version>
+                <version>1.1.17-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.61</version>
+                <version>1.0.62-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -72,7 +71,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.7.7</version>
+                <version>6.7.8-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -102,7 +101,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.10.43-SNAPSHOT</version>
+                <version>1.10.24</version>
             </dependency>
 
             <dependency>
