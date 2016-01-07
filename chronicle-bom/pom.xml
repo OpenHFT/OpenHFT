@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
-                <version>1.10.7</version>
+                <version>1.10.8</version>
             </dependency>
             <!--<dependency>-->
             <!--<groupId>software.chronicle</groupId>-->
