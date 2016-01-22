@@ -121,6 +121,13 @@
                 <artifactId>chronicle-enterprise</artifactId>
                 <version>1.11.0</version>
             </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-enterprise</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
             <!--<dependency>-->
             <!--<groupId>software.chronicle</groupId>-->
             <!--<artifactId>chronicle-fix</artifactId>-->
