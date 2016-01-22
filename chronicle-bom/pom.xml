@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>1.11.0-SNAPSHOT</version>
+    <version>1.11.0</version>
     <packaging>pom</packaging>
     <name>Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -20,11 +20,10 @@
         <dependencies>
 
             <!--  dependencies listed in build order -->
-
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.0.1-SNAPSHOT</version>
+                <version>3.0.1</version>
             </dependency>
 
             <dependency>
@@ -36,31 +35,31 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.2.0-SNAPSHOT</version>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.2.0-SNAPSHOT</version>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.2.0-SNAPSHOT</version>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.2.0-SNAPSHOT</version>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.0.63-SNAPSHOT</version>
+                <version>1.0.63</version>
             </dependency>
 
             <dependency>
@@ -72,7 +71,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.8.0-SNAPSHOT</version>
+                <version>6.8.0</version>
             </dependency>
 
             <dependency>
@@ -108,7 +107,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.0.3-beta-SNAPSHOT</version>
+                <version>4.0.3-beta</version>
                 <!-- <version>4.0.2-alpha</version> -->
             </dependency>
 
