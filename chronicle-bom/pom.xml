@@ -125,8 +125,9 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1-SNAPSHOT</version>
             </dependency>
+
 
             <!--<dependency>-->
             <!--<groupId>software.chronicle</groupId>-->
