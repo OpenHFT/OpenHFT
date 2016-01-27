@@ -108,7 +108,6 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
                 <version>4.0.4-beta-SNAPSHOT</version>
-
             </dependency>
 
             <dependency>
