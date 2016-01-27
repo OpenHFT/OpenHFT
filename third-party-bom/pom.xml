@@ -56,6 +56,13 @@
 
         <dependencies>
 
+
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.quickfix</artifactId>
+                <version>1.6.0_1</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
