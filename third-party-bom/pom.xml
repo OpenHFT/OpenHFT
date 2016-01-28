@@ -56,7 +56,6 @@
 
         <dependencies>
 
-
             <dependency>
                 <groupId>org.apache.servicemix.bundles</groupId>
                 <artifactId>org.apache.servicemix.bundles.quickfix</artifactId>
