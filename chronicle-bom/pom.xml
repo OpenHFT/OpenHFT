@@ -16,6 +16,7 @@
     </description>
     <dependencyManagement>
         <dependencies>
+
             <!--  dependencies listed in build order -->
             <dependency>
                 <groupId>net.openhft</groupId>
