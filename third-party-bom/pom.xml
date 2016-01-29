@@ -55,7 +55,11 @@
     <dependencyManagement>
 
         <dependencies>
-
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>1.10.4</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.bundles</groupId>
                 <artifactId>org.apache.servicemix.bundles.quickfix</artifactId>
