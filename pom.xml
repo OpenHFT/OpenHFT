@@ -47,7 +47,7 @@
         <module>Chronicle-Algorithms</module>
         <module>Chronicle-Wire</module>
         <!--<module>Chronicle-Values</module>-->
-        <!--<module>Chronicle-Queue/chronicle-queue</module>-->
+        <module>Chronicle-Queue</module>
         <module>Chronicle-Map</module>
         <!--<module>Chronicle-Map-Java8</module>-->
         <!--<module>Chronicle-Logger</module>-->
