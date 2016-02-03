@@ -57,6 +57,13 @@
         <dependencies>
 
             <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <scope>test</scope>
+                <version>1.11.3</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>1.15</version>
