@@ -80,10 +80,11 @@
                 <version>0.4.10</version>
             </dependency>
 
+            <!-- version 3.0.0-M2 caused problems in build -->
             <dependency>
                 <groupId>org.apache.mina</groupId>
                 <artifactId>mina-core</artifactId>
-                <version>3.0.0-M2</version>
+                <version>2.0.9</version>
             </dependency>
 
             <dependency>
@@ -180,56 +181,26 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>jul-to-slf4j</artifactId>
                 <version>1.7.14</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.cal10n</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>1.7.14</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.cal10n</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.7.14</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.cal10n</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>1.7.14</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.cal10n</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-nop</artifactId>
                 <version>1.7.14</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.cal10n</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
