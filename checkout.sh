@@ -9,6 +9,7 @@ git clone git@github.com:OpenHFT/Chronicle-Values.git
 git clone git@github.com:OpenHFT/Chronicle-Threads.git
 git clone git@github.com:OpenHFT/Chronicle-Wire.git
 git clone git@github.com:OpenHFT/Chronicle-Network.git
+git clone git@github.com:OpenHFT/Chronicle-Websocket-Jetty.git
 git clone git@github.com:OpenHFT/Chronicle-Queue.git
 git clone git@github.com:OpenHFT/Chronicle-Map.git
 git clone git@github.com:OpenHFT/Chronicle-Map-Java8.git
