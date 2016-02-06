@@ -365,6 +365,24 @@
                 <version>1.5.1</version>
             </dependency>
 
+            <!-- To write basic websockets against -->
+            <dependency>
+                <groupId>org.eclipse.jetty.websocket</groupId>
+                <artifactId>websocket-api</artifactId>
+                <version>9.3.7.v20160115</version>
+            </dependency>
+            <!-- To run websockets in embedded server -->
+            <dependency>
+                <groupId>org.eclipse.jetty.websocket</groupId>
+                <artifactId>websocket-server</artifactId>
+                <version>9.3.7.v20160115</version>
+            </dependency>
+            <!-- To run websockets client -->
+            <dependency>
+                <groupId>org.eclipse.jetty.websocket</groupId>
+                <artifactId>websocket-client</artifactId>
+                <version>9.3.7.v20160115</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
