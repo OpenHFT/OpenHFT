@@ -46,6 +46,7 @@
         <module>Chronicle-Bytes</module>
         <module>Chronicle-Algorithms</module>
         <module>Chronicle-Wire</module>
+        <module>Chronicle-Websocket-Jetty</module>
         <!--<module>Chronicle-Values</module>-->
         <module>Chronicle-Queue</module>
         <module>Chronicle-Map</module>
