@@ -17,6 +17,7 @@
         chronicle dependencyManagement section.
     </description>
 
+    <!-- touching file -->
     <dependencyManagement>
         <dependencies>
 
