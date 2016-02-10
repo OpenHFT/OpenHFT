@@ -33,7 +33,7 @@
         <module>chronicle-bom</module>
 
         <!-- heritage -->
-        <module>Java-Thread-Affinity</module>
+        <!--<module>Java-Thread-Affinity</module>-->
         <!--<module>Java-Runtime-Compiler</module>-->
 
         <!-- stable -->
