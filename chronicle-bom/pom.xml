@@ -23,7 +23,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.0.3</version>
+                <version>3.0.4-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -48,7 +48,6 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
                 <version>1.2.6-SNAPSHOT</version>
-
             </dependency>
 
             <dependency>
@@ -114,7 +113,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.1.0</version>
+                <version>4.1.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
