@@ -34,7 +34,7 @@ Review : The YourKit java profiler can help you optomize your java code, it disp
 
 ---
 
-[![TeamCity](https://www.jetbrains.com/teamcity/docs/logo_teamcity.png)](http://www.jetbrains.com/teamcity/)
+[![TeamCity](http://chronicle.software/wp-content/uploads/2014/09/icon_TeamCity.png)](http://www.jetbrains.com/teamcity/)
 
 ---
 
