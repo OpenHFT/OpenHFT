@@ -53,7 +53,7 @@
         <!--<module>Chronicle-Map</module>-->
         <!--<module>Chronicle-Map-Java8</module>-->
 
-        <!--<module>Chronicle-Engine</module>-->
+        <module>Chronicle-Engine</module>
         <!--<module>Chronicle-Enterprise</module>-->
         <!--<module>Chronicle-FIX</module>-->
 
