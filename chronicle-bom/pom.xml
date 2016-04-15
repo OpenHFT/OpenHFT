@@ -103,17 +103,19 @@
                 <version>2.4.14</version>
             </dependency>
 
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-engine</artifactId>
-                <version>1.12.4-beta</version>
-            </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
                 <version>4.2.4</version>
             </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-engine</artifactId>
+                <version>1.12.4-beta</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>net.openhft</groupId>
