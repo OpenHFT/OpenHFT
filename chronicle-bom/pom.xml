@@ -28,14 +28,14 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-values</artifactId>
-                <version>1.0.8-alpha</version>
+                <artifactId>chronicle-core</artifactId>
+                <version>1.4.8</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-core</artifactId>
-                <version>1.4.8</version>
+                <artifactId>chronicle-values</artifactId>
+                <version>1.0.8-alpha</version>
             </dependency>
 
             <dependency>
