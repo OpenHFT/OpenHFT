@@ -29,37 +29,37 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.5.1-SNAPSHOT</version>
+                <version>1.5.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.5.1-SNAPSHOT</version>
+                <version>1.5.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.5.2-SNAPSHOT</version>
+                <version>1.5.2</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>1.5.1-SNAPSHOT</version>
+                <version>1.5.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.5.2-SNAPSHOT</version>
+                <version>1.5.2</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.5.1-SNAPSHOT</version>
+                <version>1.5.1</version>
             </dependency>
 
             <dependency>
@@ -107,13 +107,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.3.2-SNAPSHOT</version>
+                <version>4.3.2</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.12.7-SNAPSHOT</version>
+                <version>1.12.7</version>
             </dependency>
 
             <dependency>
