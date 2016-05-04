@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.1.8-SNAPSHOT</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -58,7 +60,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.5.1</version>
+                <version>1.5.2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -106,13 +108,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.3.2</version>
+                <version>4.3.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.12.7</version>
+                <version>1.12.8-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -124,7 +126,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-enterprise</artifactId>
-                <version>1.12.0</version>
+                <version>1.2.6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
