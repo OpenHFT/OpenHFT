@@ -125,7 +125,7 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-enterprise</artifactId>
+                <artifactId>chronicle-engine-enterprise</artifactId>
                 <version>1.11.5-SNAPSHOT</version>
             </dependency>
 
@@ -133,6 +133,12 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
                 <version>1.2.6-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-wire-enterprise</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
             <!--<dependency>-->
