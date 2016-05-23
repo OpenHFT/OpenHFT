@@ -29,19 +29,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.6.1-SNAPSHOT</version>
+                <version>1.6.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.6.1-SNAPSHOT</version>
+                <version>1.6.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.6.1-SNAPSHOT</version>
+                <version>1.6.1</version>
             </dependency>
 
             <dependency>
@@ -53,13 +53,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.6.1-SNAPSHOT</version>
+                <version>1.6.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.6.1-SNAPSHOT</version>
+                <version>1.6.1</version>
             </dependency>
 
             <dependency>
@@ -107,13 +107,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.4.1-SNAPSHOT</version>
+                <version>4.4.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.12.9-SNAPSHOT</version>
+                <version>1.12.9</version>
             </dependency>
 
             <dependency>
@@ -131,7 +131,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.2.7-SNAPSHOT</version>
+                <version>1.2.7</version>
             </dependency>
 
             <dependency>
