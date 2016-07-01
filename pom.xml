@@ -57,7 +57,7 @@
         <!--<module>Chronicle-Enterprise</module>-->
         <!--<module>Chronicle-FIX</module>-->
 
-        <!--<module>Chronicle-Websocket-Jetty</module>-->
+        <module>Chronicle-Websocket-Jetty</module>
         <!--<module>Chronicle-TimeSeries</module>-->
     </modules>
 </project>
