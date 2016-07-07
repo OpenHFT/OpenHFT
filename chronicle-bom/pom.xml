@@ -54,7 +54,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.7.1-SNAPSHOT</version>
+                <version>1.7.2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
