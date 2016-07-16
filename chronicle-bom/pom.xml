@@ -28,6 +28,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>compiler</artifactId>
+                <version>2.2.5-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
                 <version>1.7.2-SNAPSHOT</version>
             </dependency>
@@ -47,7 +53,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>1.5.1</version>
+                <version>1.5.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -72,12 +78,6 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
                 <version>6.8.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>compiler</artifactId>
-                <version>2.2.4</version>
             </dependency>
 
             <dependency>
