@@ -38,7 +38,7 @@
 
         <!-- stable -->
         <!--<module>Java-Lang</module>-->
-        <module>Chronicle-Logger</module>
+        <!--<module>Chronicle-Logger</module>-->
 
         <!-- new -->
         <module>Chronicle-Core</module>
