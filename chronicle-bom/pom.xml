@@ -67,7 +67,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.7.2-SNAPSHOT</version>
+                <version>1.7.2</version>
             </dependency>
 
             <dependency>
@@ -109,7 +109,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.5.12-SNAPSHOT</version>
+                <version>4.5.12</version>
             </dependency>
 
             <dependency>
