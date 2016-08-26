@@ -154,6 +154,11 @@
                 <version>1.0.17</version>
             </dependency>
 
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-runtime</artifactId>
+                <version>1.0.18-SNAPSHOT</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
