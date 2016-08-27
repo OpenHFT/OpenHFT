@@ -32,8 +32,8 @@
 
     <licenses>
         <license>
-            <name>GNU General Lesser Public License (LGPL) version 3.0</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
 
@@ -57,10 +57,6 @@
         <developer>
             <name>Daniel Shaya</name>
             <email>daniel.shaya@chronicle.software</email>
-        </developer>
-        <developer>
-            <name>Anshul Shelley</name>
-            <email>anshul.shelley@chronicle.software</email>
         </developer>
     </developers>
 
