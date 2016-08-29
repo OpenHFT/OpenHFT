@@ -145,19 +145,19 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix</artifactId>
-                <version>1.0.17</version>
+                <version>1.0.18</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-codegenerator</artifactId>
-                <version>1.0.17</version>
+                <version>1.0.18</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
-                <version>1.0.18-SNAPSHOT</version>
+                <version>1.0.18</version>
             </dependency>
 
         </dependencies>
