@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.7.12</version>
+                <version>1.7.16-SNAPSHOT</version>
             </dependency>
 
             <dependency>
