@@ -162,7 +162,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix</artifactId>
-                <version>1.0.18</version>
+                <version>1.0.19-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -174,7 +174,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
-                <version>1.0.18</version>
+                <version>1.0.19-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
