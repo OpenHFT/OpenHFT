@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.7.4-SNAPSHOT</version>
+                <version>1.7.4</version>
             </dependency>
 
             <dependency>
@@ -130,7 +130,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.13.13-SNAPSHOT</version>
+                <version>1.13.13</version>
             </dependency>
 
             <dependency>
@@ -178,7 +178,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine-gui</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
 
         </dependencies>
