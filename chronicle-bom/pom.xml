@@ -78,13 +78,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.7.16-SNAPSHOT</version>
+                <version>1.7.16</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.7.5-SNAPSHOT</version>
+                <version>1.7.5</version>
             </dependency>
 
             <dependency>
@@ -126,13 +126,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.5.16-SNAPSHOT</version>
+                <version>4.5.16</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.13.14-SNAPSHOT</version>
+                <version>1.13.14</version>
             </dependency>
 
             <dependency>
