@@ -130,7 +130,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.13.18</version>
+                <version>1.13.19-SNAPSHOT</version>
             </dependency>
 
             <dependency>
