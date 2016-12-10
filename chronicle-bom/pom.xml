@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.7.25</version>
+                <version>1.7.26-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -161,19 +161,19 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix</artifactId>
-                <version>1.0.23</version>
+                <version>1.1.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-codegenerator</artifactId>
-                <version>1.0.23</version>
+                <version>1.1.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
-                <version>1.0.23</version>
+                <version>1.1.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
