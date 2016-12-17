@@ -368,7 +368,7 @@
             <dependency>
                 <groupId>com.thoughtworks.xstream</groupId>
                 <artifactId>xstream</artifactId>
-                <version>1.4.8</version>
+                <version>1.4.9</version>
             </dependency>
 
             <dependency>
@@ -495,7 +495,30 @@
         </repository>
     </distributionManagement>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>codehaus-snapshots</id>
+            <url>whatever</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
     <repositories>
+        <repository>
+            <id>codehaus-snapshots</id>
+            <url>whatever</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
         <repository>
             <id>Snapshot Repository</id>
             <name>Snapshot Repository</name>
