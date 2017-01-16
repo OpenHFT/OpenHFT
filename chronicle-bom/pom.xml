@@ -129,6 +129,13 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-queue</artifactId>
+                <version>4.5.23-SNAPSHOT</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
                 <version>1.13.23-SNAPSHOT</version>
             </dependency>
