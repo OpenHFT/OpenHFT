@@ -70,7 +70,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>1.5.3</version>
+                <version>1.5.4</version>
             </dependency>
 
             <dependency>
