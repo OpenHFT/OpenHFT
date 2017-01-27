@@ -64,7 +64,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.7.31-SNAPSHOT</version>
+                <version>1.7.31</version>
             </dependency>
 
             <dependency>
@@ -76,7 +76,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.7.23-SNAPSHOT</version>
+                <version>1.7.23</version>
             </dependency>
 
             <dependency>
@@ -124,13 +124,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.5.24-SNAPSHOT</version>
+                <version>4.5.24</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.5.24-SNAPSHOT</version>
+                <version>4.5.24</version>
                 <type>test-jar</type>
             </dependency>
 
