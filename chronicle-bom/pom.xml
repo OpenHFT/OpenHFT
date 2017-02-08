@@ -212,5 +212,5 @@
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
         <tag>master</tag>
     </scm>
-
+    
 </project>
