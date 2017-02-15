@@ -161,7 +161,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>1.0.10</version> <!-- available to supported clients -->
+                <version>1.0.11-SNAPSHOT</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
