@@ -166,19 +166,19 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix</artifactId>
-                <version>1.3.8</version> <!-- available to supported clients -->
+              <version>1.3.8-SNAPSHOT</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-codegenerator</artifactId>
-                <version>1.3.8</version><!-- available to supported clients -->
+              <version>1.3.8-SNAPSHOT</version><!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
-                <version>1.3.8</version> <!-- available to supported clients -->
+              <version>1.3.8-SNAPSHOT</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
