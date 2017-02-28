@@ -126,6 +126,29 @@
         </repository>
     </repositories>
 
+    <profiles>
+        <profile>
+            <id>sign-artifact</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 
     <distributionManagement>
 
@@ -147,5 +170,5 @@
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
         <tag>master</tag>
     </scm>
-    
+
 </project>
