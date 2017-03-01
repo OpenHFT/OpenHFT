@@ -17,6 +17,13 @@
         <maven>3.0</maven>
     </prerequisites>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+    
     <developers>
         <developer>
             <name>Peter Lawrey</name>
@@ -145,22 +152,51 @@
                 </plugins>
             </build>
         </profile>
+ 
+        <profile>
+            <id>openhft</id>
+            <activation>
+                <property>
+                    <name>openhft</name>
+                </property>
+            </activation>
+             
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>sonatype-nexus-snapshots</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>sonatype-nexus-staging</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+                
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>chronicle-nexus</id>
+            <activation>
+                <property>
+                    <name>!openhft</name>
+                </property>
+            </activation>
+            <distributionManagement>
+
+                <repository>
+                    <id>chronicle-enterprise-release</id>
+                    <url>http://nexus.chronicle.software/content/repositories/releases</url>
+                </repository>
+
+                <snapshotRepository>
+                    <id>chronicle-enterprise-snapshots</id>
+                    <url>http://nexus.chronicle.software/content/repositories/snapshots</url>
+                </snapshotRepository>
+
+            </distributionManagement>
+        </profile>
     </profiles>
 
 
-    <distributionManagement>
-
-        <repository>
-            <id>chronicle-enterprise-release</id>
-            <url>http://nexus.chronicle.software/content/repositories/releases</url>
-        </repository>
-
-        <snapshotRepository>
-            <id>chronicle-enterprise-snapshots</id>
-            <url>http://nexus.chronicle.software/content/repositories/snapshots</url>
-        </snapshotRepository>
-
-    </distributionManagement>
 
     <scm>
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
