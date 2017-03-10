@@ -191,7 +191,8 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine-gui</artifactId>
-                <version>1.0.2</version>
+                <type>war</type>
+                <version>1.0.3-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
