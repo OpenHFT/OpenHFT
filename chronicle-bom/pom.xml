@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.7.15</version>
+                <version>1.7.16</version>
             </dependency>
 
             <dependency>
