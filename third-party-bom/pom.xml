@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>third-party-bom</artifactId>
-    <version>3.5.9-SNAPSHOT</version>
+    <version>3.5.10-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -72,7 +72,7 @@
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-generator-annprocess</artifactId>
                 <scope>test</scope>
-                <version>1.11.3</version>
+                <version>1.17.5</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.bundles</groupId>
@@ -157,12 +157,12 @@
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-core</artifactId>
-                <version>1.11.3</version>
+                <version>1.17.5</version>
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-core-benchmarks</artifactId>
-                <version>1.11.3</version>
+                <version>1.17.5</version>
             </dependency>
 
             <dependency>
