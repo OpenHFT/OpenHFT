@@ -33,7 +33,7 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>1.3.22-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>1.3.22</chronicle.fix.version>
     </properties>
 
     <dependencyManagement>
@@ -55,7 +55,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.8.0-SNAPSHOT</version>
+                <version>1.8.0</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
@@ -68,7 +68,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.8.1-SNAPSHOT</version>
+                <version>1.8.1</version>
             </dependency>
 
             <dependency>
@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.8.3-SNAPSHOT</version>
+                <version>1.8.3</version>
             </dependency>
 
             <dependency>
@@ -128,13 +128,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.3-SNAPSHOT</version>  <!-- available to supported clients -->
+                <version>4.6.3</version>  <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.3-SNAPSHOT</version> <!-- available to supported clients -->
+                <version>4.6.3</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
 
@@ -159,13 +159,13 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>1.0.12-SNAPSHOT</version> <!-- available to supported clients -->
+                <version>1.0.12</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.0-SNAPSHOT</version><!-- available to supported clients -->
+                <version>1.4.0</version><!-- available to supported clients -->
             </dependency>
 
             <dependency>
