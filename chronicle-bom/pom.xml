@@ -86,7 +86,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.7.16</version>
+                <version>1.8.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -141,7 +141,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.14.1</version>  <!-- available to supported clients -->
+                <version>1.14.2-SNAPSHOT</version>  <!-- available to supported clients -->
             </dependency>
 
             <dependency>
