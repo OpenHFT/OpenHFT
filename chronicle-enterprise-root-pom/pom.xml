@@ -4,7 +4,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>chronicle-enterprise-root-pom</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
 
     <name>Enterprise Root Parent Pom</name>
@@ -202,7 +202,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-enterprise-root-pom-1.0.4</tag>
     </scm>
 
 </project>
