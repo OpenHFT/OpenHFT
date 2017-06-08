@@ -39,7 +39,7 @@
     <dependencyManagement>
         <dependencies>
 
-            <!--  dependencies listed com.rbccm.fx.marketdepthbookbuilder.in build order -->
+            <!--  dependencies listed in build order -->
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
