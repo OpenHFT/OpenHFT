@@ -58,7 +58,7 @@
         <module>Chronicle-Engine-GUI</module>
 
         <module>Chronicle-Websocket-Jetty</module>
-        <module>Chronicle-TimeSeries</module>
+        <!--<module>Chronicle-TimeSeries</module>-->
 
         <module>Chronicle-Wire-Enterprise</module>
         <module>Chronicle-Queue-Enterprise</module>
