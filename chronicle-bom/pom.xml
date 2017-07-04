@@ -33,7 +33,7 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>1.3.36</chronicle.fix.version>
+        <chronicle.fix.version>1.3.37</chronicle.fix.version>
     </properties>
 
     <dependencyManagement>
@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.0-SNAPSHOT</version>
+                <version>1.8.9</version>
             </dependency>
 
             <dependency>
@@ -128,13 +128,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.7-SNAPSHOT</version>  <!-- available to supported clients -->
+                <version>4.6.6</version>  <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.7-SNAPSHOT</version> <!-- available to supported clients -->
+                <version>4.6.6</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
 
