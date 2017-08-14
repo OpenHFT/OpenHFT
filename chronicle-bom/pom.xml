@@ -55,7 +55,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.9.2-SNAPSHOT</version>
+                <version>1.9.1</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
@@ -68,7 +68,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.9.5-SNAPSHOT</version>
+                <version>1.9.4</version>
             </dependency>
 
             <dependency>
@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.7-SNAPSHOT</version>
+                <version>1.9.6</version>
             </dependency>
 
             <dependency>
@@ -141,7 +141,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.14.6-SNAPSHOT</version>  <!-- available to supported clients -->
+                <version>1.14.5</version>  <!-- available to supported clients -->
             </dependency>
 
             <dependency>
