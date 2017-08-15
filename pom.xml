@@ -26,11 +26,11 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>chronicle-enterprise-root-pom</module>
         <module>third-party-bom</module>
         <module>root-parent-pom</module>
         <module>java-parent-pom</module>
-            
+        <module>chronicle-nexus-root-pom</module>
+
         <module>chronicle-bom</module>
 
         <!-- heritage -->
