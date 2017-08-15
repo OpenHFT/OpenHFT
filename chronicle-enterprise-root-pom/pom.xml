@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.openhft</groupId>
@@ -8,8 +9,9 @@
     <packaging>pom</packaging>
 
     <name>Enterprise Root Parent Pom</name>
-    <description>This root parent pom is used by all open source projects that are released to the Chronicle Nexus
-        Server
+    <description>
+        This root parent pom is used by all open source projects
+        that are released to the Chronicle Nexus Server
     </description>
     <url>http://chronicle.software</url>
 
@@ -17,13 +19,6 @@
         <maven>3.0</maven>
     </prerequisites>
 
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-    
     <developers>
         <developer>
             <name>Peter Lawrey</name>
@@ -152,7 +147,7 @@
                 </plugins>
             </build>
         </profile>
- 
+
         <profile>
             <id>openhft</id>
             <activation>
@@ -160,7 +155,7 @@
                     <name>openhft</name>
                 </property>
             </activation>
-             
+
             <distributionManagement>
                 <snapshotRepository>
                     <id>sonatype-nexus-snapshots</id>
@@ -170,7 +165,7 @@
                     <id>sonatype-nexus-staging</id>
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
-                
+
             </distributionManagement>
         </profile>
         <profile>
@@ -197,11 +192,10 @@
     </profiles>
 
 
-
     <scm>
-        <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
-        <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
-        <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
+        <url>scm:git:git@github.com:ChronicleEnterprise/RootPom.git</url>
+        <connection>scm:git:git@github.com:ChronicleEnterprise/RootPom.git</connection>
+        <developerConnection>scm:git:git@github.com:ChronicleEnterprise/RootPom.git</developerConnection>
         <tag>master</tag>
     </scm>
 
