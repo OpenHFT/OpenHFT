@@ -19,14 +19,14 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.1.8</version>
+        <version>1.1.9</version>
         <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.14.43-SNAPSHOT</version>
+    <version>1.14.44-SNAPSHOT</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
@@ -128,13 +128,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.11</version>  <!-- available to supported clients -->
+                <version>4.6.12-SNAPSHOT</version>  <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.11</version> <!-- available to supported clients -->
+                <version>4.6.12-SNAPSHOT</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
 
@@ -159,13 +159,13 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>1.0.14</version> <!-- available to supported clients -->
+                <version>1.0.15-SNAPSHOT</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.1</version><!-- available to supported clients -->
+                <version>1.4.1-SNAPSHOT</version><!-- available to supported clients -->
             </dependency>
 
             <dependency>
