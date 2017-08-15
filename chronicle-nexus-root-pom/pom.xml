@@ -5,10 +5,10 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>chronicle-nexus-root-pom</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Enterprise Root Parent Pom</name>
+    <name>Chronicle Nexus Root Parent Pom</name>
     <description>
         This root parent pom is used by all open source projects
         that are released to the Chronicle Nexus Server
@@ -196,7 +196,7 @@
         <url>scm:git:git@github.com:ChronicleEnterprise/RootPom.git</url>
         <connection>scm:git:git@github.com:ChronicleEnterprise/RootPom.git</connection>
         <developerConnection>scm:git:git@github.com:ChronicleEnterprise/RootPom.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-nexus-root-pom-1.0.8</tag>
     </scm>
 
 </project>
