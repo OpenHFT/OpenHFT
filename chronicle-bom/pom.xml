@@ -62,13 +62,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.8.1</version>
+                <version>1.8.2</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.9.5</version>
+                <version>1.9.6</version>
             </dependency>
 
             <dependency>
@@ -80,13 +80,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.7</version>
+                <version>1.9.8</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.9.1</version>
+                <version>1.9.2</version>
             </dependency>
 
             <dependency>
@@ -128,20 +128,20 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.12</version>  <!-- available to supported clients -->
+                <version>4.6.13</version>  <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.12</version> <!-- available to supported clients -->
+                <version>4.6.13</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.14.6</version>  <!-- available to supported clients -->
+                <version>1.14.7</version>  <!-- available to supported clients -->
             </dependency>
 
             <dependency>
@@ -159,13 +159,13 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>1.0.15</version> <!-- available to supported clients -->
+                <version>1.0.16</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.1</version><!-- available to supported clients -->
+                <version>1.4.4</version><!-- available to supported clients -->
             </dependency>
 
             <dependency>
