@@ -165,7 +165,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.6</version>
+                <version>1.4.5</version>
             </dependency>
 
             <dependency>
