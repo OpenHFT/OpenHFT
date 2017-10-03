@@ -55,7 +55,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.9.11-SNAPSHOT</version>
+                <version>1.9.11</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.15-SNAPSHOT</version>
+                <version>1.9.15</version>
             </dependency>
 
             <dependency>
@@ -128,13 +128,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.21-SNAPSHOT</version>
+                <version>4.6.21</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.21-SNAPSHOT</version>
+                <version>4.6.21</version>
                 <type>test-jar</type>
             </dependency>
 
