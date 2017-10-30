@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.28</version>
+                <version>1.9.29-SNAPSHOT</version>
             </dependency>
 
             <dependency>
