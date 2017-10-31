@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.30-SNAPSHOT</version>
+                <version>1.9.30</version>
             </dependency>
 
             <dependency>
@@ -128,13 +128,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.38-SNAPSHOT</version>
+                <version>4.6.38</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.38-SNAPSHOT</version>
+                <version>4.6.38</version>
                 <type>test-jar</type>
             </dependency>
 
