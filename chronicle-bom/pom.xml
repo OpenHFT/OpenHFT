@@ -34,6 +34,7 @@
 
     <properties>
         <chronicle.fix.version>1.3.49</chronicle.fix.version>
+        <chronicle.services.version>1.0.6</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -191,6 +192,34 @@
                 <artifactId>chronicle-engine-gui</artifactId>
                 <version>1.0.4</version>
                 <type>war</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-api</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-config</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-engine</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-runner</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
             </dependency>
 
         </dependencies>
