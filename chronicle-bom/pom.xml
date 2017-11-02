@@ -69,7 +69,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.9.11-SNAPSHOT</version>
+                <version>1.9.11</version>
             </dependency>
 
             <dependency>
@@ -81,7 +81,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.31-SNAPSHOT</version>
+                <version>1.9.31</version>
             </dependency>
 
             <dependency>
