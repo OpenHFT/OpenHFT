@@ -4,7 +4,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>chronicle-nexus-root-pom</artifactId>
-    <version>1.0.10-SNAPSHOT</version>
+    <version>1.0.10</version>
     <packaging>pom</packaging>
 
     <name>Chronicle Nexus Root Parent Pom</name>
@@ -195,7 +195,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-nexus-root-pom-1.0.10</tag>
     </scm>
 
 </project>
