@@ -26,7 +26,7 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.14.105-SNAPSHOT</version>
+    <version>1.14.109-SNAPSHOT</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
@@ -56,7 +56,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.9.15</version>
+                <version>1.9.16</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
@@ -69,7 +69,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.9.11</version>
+                <version>1.9.14</version>
             </dependency>
 
             <dependency>
@@ -81,13 +81,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.9.32-SNAPSHOT</version>
+                <version>1.9.32</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.9.8</version>
+                <version>1.9.9-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -129,13 +129,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.38</version>
+                <version>4.6.39</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.38</version>
+                <version>4.6.39</version>
                 <type>test-jar</type>
             </dependency>
 
