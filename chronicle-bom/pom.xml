@@ -127,15 +127,21 @@
             </dependency>
 
             <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-queue</artifactId>
-                <version>4.6.46</version>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise</artifactId>
+                <version>1.0.14</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.46</version>
+                <version>4.6.47-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-queue</artifactId>
+                <version>4.6.47-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
