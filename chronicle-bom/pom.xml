@@ -200,7 +200,12 @@
                 <version>1.0.4</version>
                 <type>war</type>
             </dependency>
-
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-all</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services-api</artifactId>
