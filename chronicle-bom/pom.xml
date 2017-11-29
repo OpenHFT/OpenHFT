@@ -222,7 +222,7 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-engine</artifactId>
+                <artifactId>chronicle-services-replication</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
             </dependency>
