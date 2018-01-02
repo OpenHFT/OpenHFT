@@ -22,7 +22,7 @@
         <artifactId>root-parent-pom</artifactId>
         <version>1.1.9</version>
         <relativePath />
-    </parent>
+    </parent>                                       f
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
 
