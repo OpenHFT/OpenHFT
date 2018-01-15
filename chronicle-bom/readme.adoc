@@ -1,4 +1,4 @@
-= Chronicle-BOM ( "bill of materials" (BOM) )
+= Chronicle-Bom "bill of materials" (BOM)
 :toc: manual
 :css-signature: demo
 :toc-placement: preamble
