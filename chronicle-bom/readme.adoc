@@ -1,0 +1,12 @@
+= Chronicle-BOM
+:toc: manual
+:css-signature: demo
+:toc-placement: preamble
+
+== Version 
+
+[#image-maven]
+[caption="", link=https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-bom]
+image::https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-wire/badge.svg[]
+
+== About
