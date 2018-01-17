@@ -90,7 +90,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.9.20</version>
+                <version>1.9.21-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -175,7 +175,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.30</version>
+                <version>1.4.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
