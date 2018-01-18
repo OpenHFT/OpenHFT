@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>1.0.14</version>
+                <version>1.0.15-SNAPSHOT</version>
             </dependency>
 
             <dependency>
