@@ -27,7 +27,7 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.15.77-SNAPSHOT</version>
+    <version>1.15.77</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
@@ -70,7 +70,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.10.12-SNAPSHOT</version>
+                <version>1.10.12</version>
             </dependency>
 
             <dependency>
@@ -136,13 +136,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.68-SNAPSHOT</version>
+                <version>4.6.67</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.68-SNAPSHOT</version>
+                <version>4.6.67</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -174,12 +174,6 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
                 <version>1.4.34</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-network-enterprise</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -278,6 +272,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>chronicle-bom-1.15.74</tag>
+        <tag>chronicle-bom-1.15.77</tag>
     </scm>
 </project>
