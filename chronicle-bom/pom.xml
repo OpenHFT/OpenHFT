@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>1.4.0-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>1.0.41</chronicle.services.version>
+        <chronicle.services.version>1.0.42-SNAPSHOT</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -136,13 +136,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.70</version>
+                <version>4.6.71-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.70</version>
+                <version>4.6.71-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -173,7 +173,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.37</version>
+                <version>1.4.38-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -272,6 +272,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>chronicle-bom-1.15.98</tag>
+        <tag>master</tag>
     </scm>
 </project>
