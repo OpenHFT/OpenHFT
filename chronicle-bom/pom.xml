@@ -173,7 +173,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.41</version>
+                <version>1.4.41-SNAPSHOT</version>
             </dependency>
 
             <dependency>
