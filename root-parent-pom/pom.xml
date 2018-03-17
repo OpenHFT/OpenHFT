@@ -53,10 +53,7 @@
             <name>Rob Austin</name>
             <email>rob.austin@chronicle.software</email>
         </developer>
-        <developer>
-            <name>Daniel Shaya</name>
-            <email>daniel.shaya@chronicle.software</email>
-        </developer>
+  
     </developers>
 
     <properties>
