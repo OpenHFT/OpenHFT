@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>1.5.4</chronicle.fix.version>
-        <chronicle.services.version>1.11.4</chronicle.services.version>
+        <chronicle.services.version>1.11.5-SNAPSHOT</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
