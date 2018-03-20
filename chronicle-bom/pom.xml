@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>1.5.5</chronicle.fix.version>
-        <chronicle.services.version>1.11.6</chronicle.services.version>
+        <chronicle.services.version>1.11.7-SNAPSHOT</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -173,7 +173,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.45</version>
+                <version>1.4.46-SNAPSHOT</version>
             </dependency>
 
             <dependency>
