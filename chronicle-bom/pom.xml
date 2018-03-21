@@ -195,6 +195,12 @@
             </dependency>
 
             <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-42</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine-gui</artifactId>
                 <version>1.0.4</version>
