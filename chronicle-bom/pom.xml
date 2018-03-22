@@ -70,7 +70,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.11.4</version>
+                <version>1.11.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -191,6 +191,12 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-42</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
