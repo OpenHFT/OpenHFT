@@ -27,14 +27,14 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.15.200-SNAPSHOT</version>
+    <version>1.15.200</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
 
     <properties>
-        <chronicle.fix.version>1.5.11-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>1.5.11</chronicle.fix.version>
         <chronicle.services.version>1.11.16</chronicle.services.version>
     </properties>
 
@@ -173,7 +173,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.48</version>
+                <version>1.4.47</version>
             </dependency>
 
             <dependency>
@@ -278,6 +278,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-1.15.200</tag>
     </scm>
 </project>
