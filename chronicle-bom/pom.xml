@@ -76,6 +76,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-salt</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
                 <version>1.11.0</version>
             </dependency>
