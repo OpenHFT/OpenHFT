@@ -27,15 +27,15 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.15.238-SNAPSHOT</version>
+    <version>1.15.246-SNAPSHOT</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
 
     <properties>
-        <chronicle.fix.version>1.5.17</chronicle.fix.version>
-        <chronicle.services.version>1.11.22</chronicle.services.version>
+        <chronicle.fix.version>1.5.18</chronicle.fix.version>
+        <chronicle.services.version>1.11.24</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -82,13 +82,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.12.1</version>
+                <version>1.12.3</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.12.0</version>
+                <version>1.12.1</version>
             </dependency>
 
             <dependency>
@@ -173,13 +173,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.4.53</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <version>1.4.55</version>
             </dependency>
 
             <dependency>
