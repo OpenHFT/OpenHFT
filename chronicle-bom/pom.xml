@@ -178,12 +178,6 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-42</artifactId>
                 <version>${chronicle.fix.version}</version>
             </dependency>
