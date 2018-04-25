@@ -36,7 +36,7 @@
 
     <properties>
         <chronicle.fix.version>1.5.18</chronicle.fix.version>
-        <chronicle.services.version>1.11.25</chronicle.services.version>
+        <chronicle.services.version>1.11.26-SNAPSHOT</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -219,6 +219,13 @@
                 <artifactId>chronicle-services-config</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-api</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
