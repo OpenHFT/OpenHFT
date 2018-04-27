@@ -57,14 +57,14 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.12.3</version>
+                <version>1.12.4-SNAPSHOT</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.12.1</version>
+                <version>1.12.2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
