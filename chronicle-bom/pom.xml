@@ -215,6 +215,13 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-api</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services-config</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
