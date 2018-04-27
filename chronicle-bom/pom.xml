@@ -27,7 +27,7 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.15.254-SNAPSHOT</version>
+    <version>1.15.254</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>1.5.18</chronicle.fix.version>
-        <chronicle.services.version>1.12.0-SNAPSHOT</chronicle.services.version>
+        <chronicle.services.version>1.11.25</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -57,14 +57,14 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.12.2-SNAPSHOT</version>
+                <version>1.12.2</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.12.0-SNAPSHOT</version>
+                <version>1.11.2</version>
             </dependency>
 
             <dependency>
@@ -136,13 +136,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.102-SNAPSHOT</version>
+                <version>4.6.101</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.102-SNAPSHOT</version>
+                <version>4.6.101</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -173,7 +173,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.12.0-SNAPSHOT</version>
+                <version>1.4.56</version>
             </dependency>
 
             <dependency>
@@ -272,6 +272,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-1.15.254</tag>
     </scm>
 </project>
