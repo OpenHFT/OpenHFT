@@ -136,7 +136,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.105-SNAPSHOT</version>
+                <version>4.6.104</version>
             </dependency>
 
             <dependency>
