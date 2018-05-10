@@ -57,7 +57,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.12.6</version>
+                <version>1.12.7-SNAPSHOT</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.12.4</version>
+                <version>1.12.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
