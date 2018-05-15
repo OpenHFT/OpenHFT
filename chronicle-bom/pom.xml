@@ -27,15 +27,15 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.15.281-SNAPSHOT</version>
+    <version>1.15.299-SNAPSHOT</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
 
     <properties>
-        <chronicle.fix.version>1.5.21</chronicle.fix.version>
-        <chronicle.services.version>1.12.4</chronicle.services.version>
+        <chronicle.fix.version>1.5.24</chronicle.fix.version>
+        <chronicle.services.version>1.12.8-SNAPSHOT</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -57,20 +57,20 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.12.6-SNAPSHOT</version>
+                <version>1.12.7</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.12.4-SNAPSHOT</version>
+                <version>1.12.5</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.12.11</version>
+                <version>1.12.12</version>
             </dependency>
 
             <dependency>
@@ -82,13 +82,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.12.4</version>
+                <version>1.12.6</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.12.2</version>
+                <version>1.12.4</version>
             </dependency>
 
             <dependency>
@@ -130,19 +130,19 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>1.0.14</version>
+                <version>1.0.15</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.107-SNAPSHOT</version>
+                <version>4.6.109-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.6.107-SNAPSHOT</version>
+                <version>4.6.109-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -197,7 +197,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine-gui</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <type>war</type>
             </dependency>
             <dependency>
