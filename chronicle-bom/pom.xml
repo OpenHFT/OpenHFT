@@ -130,7 +130,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>1.0.14</version>
+                <version>1.0.15</version>
             </dependency>
 
             <dependency>
@@ -197,7 +197,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine-gui</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <type>war</type>
             </dependency>
             <dependency>
