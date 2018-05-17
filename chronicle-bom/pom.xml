@@ -36,6 +36,7 @@
     <properties>
         <chronicle.fix.version>1.5.26</chronicle.fix.version>
         <chronicle.services.version>1.12.12</chronicle.services.version>
+        <chronicle.logger.version>4.0.1</chronicle.logger.version>
     </properties>
 
     <dependencyManagement>
@@ -111,8 +112,50 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-logger</artifactId>
-                <version>4.0.1</version>
+                <artifactId>chronicle-logger-core</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-jul</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-jcl</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-slf4j</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-logback</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-log4j-1</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-log4j-2</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-tools</artifactId>
+                <version>${chronicle.logger.version}</version>
             </dependency>
 
             <dependency>
@@ -191,6 +234,12 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-acceptance-tests</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
