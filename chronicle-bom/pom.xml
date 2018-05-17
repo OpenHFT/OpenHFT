@@ -160,6 +160,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-logger-benchmark</artifactId>
+                <version>${chronicle.logger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
                 <version>1.1.10</version>
             </dependency>
