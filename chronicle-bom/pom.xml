@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>1.12.6</version>
+                <version>1.12.7-SNAPSHOT</version>
             </dependency>
 
             <dependency>
