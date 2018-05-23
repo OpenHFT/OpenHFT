@@ -34,8 +34,8 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>1.5.26</chronicle.fix.version>
-        <chronicle.services.version>1.12.13</chronicle.services.version>
+        <chronicle.fix.version>1.15.0-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>1.15.0-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.0.1</chronicle.logger.version>
     </properties>
 
@@ -198,7 +198,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.14.26</version>
+                <version>1.15.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -216,13 +216,13 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>1.0.16</version> <!-- available to supported clients -->
+                <version>1.15.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.12.0</version>
+                <version>1.15.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
