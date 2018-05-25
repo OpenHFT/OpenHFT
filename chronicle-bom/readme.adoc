@@ -21,6 +21,6 @@ The root of the project is the BOM pom. It defines the versions of all the artif
 
 https://github.com/issues?q=is%3Aopen+is%3Aissue+archived%3Afalse+user%3AOpenHFT+user%3AChronicleEnterprise
 
-=== Excluding
+=== Excluding Zero-Allocation-Hashing, Chronicle-Accelerate and Chronicle-Map
 
-https://github.com/issues?utf8=✓&q=is%3Aopen+is%3Aissue+archived%3Afalse+user%3AOpenHFT+user%3AChronicleEnterprise+-repo%3AOpenHFT%2FChronicle-Map++-repo%3AOpenHFT%2FZero-Allocation-Hashing+-repo%3AOpenHFT%2FChronicle-Accelerate
+https://github.com/issues?page=1&q=is%3Aopen+is%3Aissue+archived%3Afalse+user%3AOpenHFT+user%3AChronicleEnterprise+-repo%3AOpenHFT%2FChronicle-Map+-repo%3AOpenHFT%2FZero-Allocation-Hashing+-repo%3AOpenHFT%2FChronicle-Accelerate
