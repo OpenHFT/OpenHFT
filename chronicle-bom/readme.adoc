@@ -14,3 +14,8 @@ image::https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-bo
 Imports are most effective when used for defining a "library" of related artifacts that are generally part of a multiproject build. It is fairly common for one project to use one or more artifacts from these libraries. However, it has sometimes been difficult to keep the versions in the project using the artifacts in synch with the versions distributed in the library. The pattern below illustrates how a "bill of materials" (BOM) can be created for use by other projects.
 
 The root of the project is the BOM pom. It defines the versions of all the artifacts that will be created in the library. Other projects that wish to use the library should import this pom into the dependencyManagement section of their pom.
+
+
+== All Open Issues
+
+https://github.com/issues?q=is%3Aopen+is%3Aissue+archived%3Afalse+user%3AOpenHFT+user%3AChronicleEnterprise
