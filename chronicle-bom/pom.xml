@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.15.1</version>
+                <version>1.16.0-SNAPSHOT</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
@@ -71,7 +71,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.15.2</version>
+                <version>1.16.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -92,6 +92,121 @@
                 <version>1.15.2</version>
             </dependency>
 
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-algorithms</artifactId>
+                <version>1.15.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-map</artifactId>
+                <version>3.15.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise</artifactId>
+                <version>1.15.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-queue</artifactId>
+                <version>4.15.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-queue</artifactId>
+                <version>4.15.1</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-engine</artifactId>
+                <version>1.15.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-wire-enterprise</artifactId>
+                <version>1.15.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-enterprise</artifactId>
+                <version>1.15.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-42</artifactId>
+                <version>${chronicle.fix.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-codegenerator</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-runtime</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-acceptance-tests</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-all</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-api</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-api</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-config</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-replication</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-runner</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <!-- more stable releases -->
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-websocket-jetty</artifactId>
@@ -166,39 +281,9 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-algorithms</artifactId>
-                <version>1.15.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-map</artifactId>
-                <version>3.15.1</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-map-enterprise</artifactId>
-                <version>1.15.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-queue</artifactId>
-                <version>4.15.1</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-queue</artifactId>
-                <version>4.15.1</version>
-                <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-engine</artifactId>
-                <version>1.15.0</version>
+                <artifactId>chronicle-engine-gui</artifactId>
+                <version>1.0.5</version>
+                <type>war</type>
             </dependency>
 
             <dependency>
@@ -212,90 +297,6 @@
                 <artifactId>chronicle-engine-enterprise</artifactId>
                 <version>1.13.1</version> <!-- available to supported clients -->
             </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>1.15.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.15.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-42</artifactId>
-                <version>${chronicle.fix.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-codegenerator</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-runtime</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-acceptance-tests</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-engine-gui</artifactId>
-                <version>1.0.5</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-all</artifactId>
-                <version>${chronicle.services.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-api</artifactId>
-                <version>${chronicle.services.version}</version>
-                <type>jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-api</artifactId>
-                <version>${chronicle.services.version}</version>
-                <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-config</artifactId>
-                <version>${chronicle.services.version}</version>
-                <type>jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-replication</artifactId>
-                <version>${chronicle.services.version}</version>
-                <type>jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-runner</artifactId>
-                <version>${chronicle.services.version}</version>
-                <type>jar</type>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
