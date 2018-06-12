@@ -186,13 +186,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.15.2</version>
+                <version>4.15.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>4.15.2</version>
+                <version>4.15.3-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
