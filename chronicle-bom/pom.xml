@@ -222,7 +222,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.15.0</version>
+                <version>1.15.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
