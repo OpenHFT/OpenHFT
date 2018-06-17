@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>1.16.4</chronicle.fix.version>
-        <chronicle.services.version>1.16.4</chronicle.services.version>
+        <chronicle.services.version>1.16.5</chronicle.services.version>
         <chronicle.logger.version>4.0.1</chronicle.logger.version>
     </properties>
 
@@ -57,7 +57,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.16.10</version>
+                <version>1.16.11</version>
             </dependency>
 
             <dependency>
