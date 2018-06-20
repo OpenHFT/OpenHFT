@@ -69,7 +69,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.16.4</version>
+                <version>1.16.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -124,7 +124,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.16.6</version>
+                <version>1.16.7-SNAPSHOT</version>
             </dependency>
 
             <dependency>
