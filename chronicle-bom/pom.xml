@@ -34,8 +34,8 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>1.15.5</chronicle.fix.version>
-        <chronicle.services.version>1.15.2</chronicle.services.version>
+        <chronicle.fix.version>1.15.6-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>1.15.3-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.0.1</chronicle.logger.version>
     </properties>
 
@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.15.3</version>
+                <version>1.15.4-SNAPSHOT</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
