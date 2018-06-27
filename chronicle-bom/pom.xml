@@ -45,7 +45,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.16.10</version>
+                <version>1.16.11-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -57,7 +57,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.16.15</version>
+                <version>1.16.16-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -69,7 +69,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.16.6</version>
+                <version>1.16.7-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -99,13 +99,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.4</version>
+                <version>5.16.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.4</version>
+                <version>5.16.5-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
