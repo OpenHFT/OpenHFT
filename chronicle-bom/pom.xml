@@ -202,7 +202,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.1.8-SNAPSHOT</version>
+                <version>3.1.9-SNAPSHOT</version>
             </dependency>
 
             <dependency>
