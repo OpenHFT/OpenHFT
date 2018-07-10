@@ -99,13 +99,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.8</version>
+                <version>5.16.9-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.8</version>
+                <version>5.16.9-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
