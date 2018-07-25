@@ -198,9 +198,7 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>software.chronicle:chronicle-services-perftest</artifactId>
                 <version>${chronicle.services.version}</version>
-                <type>test-jar</type>
             </dependency>
-
 
             <!--  non-core projects -->
             <dependency>
