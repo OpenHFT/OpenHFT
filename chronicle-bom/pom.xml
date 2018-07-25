@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>1.16.17</chronicle.fix.version>
-        <chronicle.services.version>1.16.19</chronicle.services.version>
+        <chronicle.services.version>1.16.20-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.0.3</chronicle.logger.version>
     </properties>
 
@@ -204,6 +204,7 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services-perftest</artifactId>
                 <version>${chronicle.services.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <!--  non-core projects -->
