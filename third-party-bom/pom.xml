@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>third-party-bom</artifactId>
-    <version>3.6.5-SNAPSHOT</version>
+    <version>3.6.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -301,6 +301,12 @@
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna</artifactId>
+                <version>4.2.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
                 <version>4.2.1</version>
             </dependency>
 
