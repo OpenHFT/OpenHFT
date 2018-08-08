@@ -27,7 +27,7 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.16.137</version>
+    <version>1.16-SNAPSHOT</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
@@ -64,6 +64,12 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
                 <version>1.16.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-salt</artifactId>
+                <version>1.0.1</version>
             </dependency>
 
             <dependency>
@@ -196,6 +202,20 @@
                 <artifactId>chronicle-services-runner</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-perftest</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-perftest</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <!--  non-core projects -->
