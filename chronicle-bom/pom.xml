@@ -68,6 +68,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-salt</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
                 <version>1.16.16</version>
             </dependency>
@@ -124,7 +130,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>1.16.14</version>
+                <version>1.16.15</version>
             </dependency>
 
             <dependency>
@@ -196,6 +202,20 @@
                 <artifactId>chronicle-services-runner</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-perftest</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-perftest</artifactId>
+                <version>${chronicle.services.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <!--  non-core projects -->
