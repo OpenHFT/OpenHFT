@@ -34,7 +34,7 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>1.16.21</chronicle.fix.version>
+        <chronicle.fix.version>1.16.22-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.16.0</chronicle.services.version>
         <chronicle.logger.version>4.0.3</chronicle.logger.version>
     </properties>
