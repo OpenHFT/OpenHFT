@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>1.16.23</chronicle.fix.version>
-        <chronicle.services.version>2.16.2</chronicle.services.version>
+        <chronicle.services.version>2.16.3-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.0.3</chronicle.logger.version>
     </properties>
 
@@ -45,7 +45,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.16.20</version>
+                <version>1.16.21-SNAPSHOT</version>
             </dependency>
 
             <dependency>
