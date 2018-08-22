@@ -55,7 +55,7 @@
         <module>Chronicle-Map</module>
         <!--<module>Chronicle-Map-Java8</module>-->
 
-        <module>Chronicle-Engine</module>
+        <!--<module>Chronicle-Engine</module>-->
         <!--<module>Chronicle-Engine-GUI</module>-->
 
         <module>Chronicle-Websocket-Jetty</module>
