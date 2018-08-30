@@ -2,6 +2,8 @@
 
 Chronicle Software provides tools to help with the full life-cycle of the trade across multiple asset classes
 
+image::https://github.com/OpenHFT/OpenHFT/blob/master/images/Chronicle%20Products.jpg[]
+
 **Chronicle FIX/ITCH Engine** - Low latency FIX engine in Java for versions 4.0 to 5.0 SP2 that now has added ITCH capability, can parse and generate messages within 1 microsecond.
 
 **Chronicle Microservices Framework** (CMF) is the foundation of our Pricer, Hedger, Position Keeper, Market Gateway and Algo container. Using the CMF, these Microservices are interconnected using single dedicated threads with all messages recorded providing a low latency audit trail. CMF provides clients with the ability to simply utilize their own custom algos giving both control and flexibility.
