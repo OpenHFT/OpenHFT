@@ -1,0 +1,17 @@
+= Chronicle Overview
+
+Chronicle Software provides tools to help with the full life-cycle of the trade across multiple asset classes
+
+**Chronicle FIX/ITCH Engine** - Low latency FIX engine in Java for versions 4.0 to 5.0 SP2 that now has added ITCH capability, can parse and generate messages within 1 microsecond.
+
+**Chronicle Microservices Framework** (CMF) is the foundation of our Pricer, Hedger, Position Keeper, Market Gateway and Algo container. Using the CMF, these Microservices are interconnected using single dedicated threads with all messages recorded providing a low latency audit trail. CMF provides clients with the ability to simply utilize their own custom algos giving both control and flexibility.
+
+**Chronicle Map** (CM) is a key-value store sharing persisted memory between processes, either on the same server or across networks. CM is designed to store the data off-heap, which means it minimizes the heap usage and garbage collection allowing the data to be stored with sub-microsecond latency. CM is structured (is there a word missing here?) able to support exceptionally high updates and high throughput data e.g. OPRA Market Data with minimum configuration.
+
+**Chronicle Queue** (CQ) persists every event and message, recording these in a memory mapped file. Messages can be written concurrently in the same machine or across a network which ensures no messages are ever lost. CQ can serialize, write, read and deserialize realistic business messages in around two microseconds. This ensures our clients have a low latency complete picture of their trading strategy.
+
+"Datagrid" **Chronicle Engine (CE)** is a high performance, low latency access gateway, it is used to control manage access to your data and your services across a number of machines. CE can handle millions of events per second with latencies of around one microsecond on a single machine. CE allows you to install and configure your own business rules and can be used in a variety of ways:
+
+ - Provides a unified view of the state of your trading systems which abstracted away from how the data is actually stored.
+ - CE can access cached data at “in memory speeds” while keeping a copy on disk, removing your database from the critical path for reads and writes are spooled to your database as fast as it allows.
+ - GUI can share larger faster datasets, CE allows throttling of rates of updates making certain that your client only receives the latest updates out of the millions per second received by the server. Off-heap storage allows clients to scroll through millions of rows with no noticeable pauses.
