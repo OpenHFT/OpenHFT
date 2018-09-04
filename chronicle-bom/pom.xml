@@ -34,8 +34,8 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>1.16.25</chronicle.fix.version>
-        <chronicle.services.version>2.16.3</chronicle.services.version>
+        <chronicle.fix.version>1.16.26-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>2.16.4-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.0.3</chronicle.logger.version>
     </properties>
 
@@ -105,13 +105,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.12</version>
+                <version>5.16.13-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.12</version>
+                <version>5.16.13-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -130,7 +130,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>2.16.0</version>
+                <version>2.16.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
