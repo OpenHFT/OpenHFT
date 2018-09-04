@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.15.5</version>
+                <version>1.15.6-SNAPSHOT</version>
             </dependency>
 
             <!-- chronicle-bom must be released from here down -->
