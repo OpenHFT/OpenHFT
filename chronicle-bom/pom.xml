@@ -93,13 +93,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.16.2</version>
+                <version>3.16.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>1.16.1</version>
+                <version>1.16.2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
