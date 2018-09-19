@@ -99,7 +99,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>1.16.2-SNAPSHOT</version>
+                <version>1.16.1</version>
             </dependency>
 
             <dependency>
