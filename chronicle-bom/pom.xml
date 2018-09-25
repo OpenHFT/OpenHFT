@@ -75,13 +75,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.16.19</version>
+                <version>1.16.20-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.16.5</version>
+                <version>1.16.6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
