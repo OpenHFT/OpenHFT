@@ -27,7 +27,7 @@
     <artifactId>chronicle-bom</artifactId>
 
     <packaging>pom</packaging>
-    <version>1.16-SNAPSHOT</version>
+    <version>1.16.189</version>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
@@ -45,7 +45,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>1.16.28-SNAPSHOT</version>
+                <version>1.16.28</version>
             </dependency>
 
             <dependency>
@@ -57,7 +57,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>1.16.27-SNAPSHOT</version>
+                <version>1.16.26</version>
             </dependency>
 
             <dependency>
@@ -75,13 +75,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>1.16.20-SNAPSHOT</version>
+                <version>1.16.19</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>1.16.6-SNAPSHOT</version>
+                <version>1.16.5</version>
             </dependency>
 
             <dependency>
@@ -93,33 +93,32 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.16.4-SNAPSHOT</version>
+                <version>3.16.3</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>1.16.2-SNAPSHOT</version>
+                <version>1.16.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.15-SNAPSHOT</version>
+                <version>5.16.14</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.16.15-SNAPSHOT</version>
+                <version>5.16.14</version>
                 <type>test-jar</type>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>1.16.2-SNAPSHOT</version>
-
+                <version>1.16.1</version>
             </dependency>
 
             <dependency>
@@ -223,7 +222,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.1.10-SNAPSHOT</version>
+                <version>3.1.9</version>
             </dependency>
 
             <dependency>
@@ -361,6 +360,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-1.16.189</tag>
     </scm>
 </project>
