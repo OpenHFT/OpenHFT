@@ -184,6 +184,12 @@
             </dependency>
 
             <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-ring</artifactId>
+                <version>chronicle-ring</version>
+            </dependency>
+
+            <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services-config</artifactId>
                 <version>${chronicle.services.version}</version>
