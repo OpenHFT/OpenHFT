@@ -184,9 +184,9 @@
             </dependency>
 
             <dependency>
-                <groupId>net.openhft</groupId>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-ring</artifactId>
-                <version>chronicle-ring</version>
+                <version>1.16.2</version>
             </dependency>
 
             <dependency>
