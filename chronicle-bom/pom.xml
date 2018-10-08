@@ -218,12 +218,12 @@
                 <type>test-jar</type>
             </dependency>
             
-            <dependency>
+            <!--<dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-ring</artifactId>
                 <version>1.16.0-SNAPSHOT</version>
             </dependency>
-
+-->
             <!--  non-core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
