@@ -34,7 +34,7 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>1.16.29</chronicle.fix.version>
+        <chronicle.fix.version>1.16.30-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.16.10</chronicle.services.version>
         <chronicle.logger.version>4.16.0</chronicle.logger.version>
     </properties>
@@ -155,6 +155,13 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-runtime</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
