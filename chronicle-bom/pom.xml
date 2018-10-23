@@ -57,7 +57,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.17.1</version>
+                <version>2.17.2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -265,13 +265,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.8.2</version>
+                <version>6.8.17-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle</artifactId>
-                <version>3.6.6</version> <!-- available to supported clients -->
+                <version>3.6.17-SNAPSHOT</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
