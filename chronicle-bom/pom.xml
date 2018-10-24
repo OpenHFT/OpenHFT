@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.17-SNAPSHOT</version>
+    <version>2.17.17</version>
 
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
@@ -34,7 +34,7 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>2.17.2-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>2.17.1</chronicle.fix.version>
         <chronicle.services.version>2.17.4</chronicle.services.version>
         <chronicle.logger.version>4.16.0</chronicle.logger.version>
     </properties>
@@ -57,7 +57,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.17.2-SNAPSHOT</version>
+                <version>2.17.2</version>
             </dependency>
 
             <dependency>
@@ -69,13 +69,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-salt</artifactId>
-                <version>2.17.1</version>
+                <version>1.0.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.17.4-SNAPSHOT</version>
+                <version>2.17.3</version>
             </dependency>
 
             <dependency>
@@ -172,13 +172,7 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-itch-runtime</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-itch-cboe</artifactId>
+                <artifactId>chronicle-fix-acceptance-tests</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
@@ -265,13 +259,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.8.17-SNAPSHOT</version>
+                <version>6.8.2</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle</artifactId>
-                <version>3.6.17-SNAPSHOT</version> <!-- available to supported clients -->
+                <version>3.6.6</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
@@ -385,6 +379,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-2.17.17</tag>
     </scm>
 </project>
