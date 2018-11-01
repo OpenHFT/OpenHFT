@@ -23,7 +23,7 @@
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.1.12</version>
-        <relativePath/>
+        <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -43,7 +43,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- core projects -->                               
+            <!-- core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.17.5-SNAPSHOT</version>
+                <version>2.17.5</version>
             </dependency>
 
             <dependency>
@@ -107,13 +107,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.0-SNAPSHOT</version>
+                <version>5.17.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.0-SNAPSHOT</version>
+                <version>5.17.0</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -134,7 +134,7 @@
                 <artifactId>chronicle-market-data-distributor</artifactId>
                 <version>2.17.2</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
@@ -146,7 +146,6 @@
                 <artifactId>chronicle-fix-42</artifactId>
                 <version>${chronicle.fix.version}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>software.chronicle</groupId>
