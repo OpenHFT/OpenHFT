@@ -259,7 +259,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.8.2</version>
+                <version>6.8.18</version>
             </dependency>
 
             <dependency>
