@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.17-SNAPSHOT</version>
+    <version>2.17.38</version>
 
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
@@ -35,7 +35,7 @@
 
     <properties>
         <chronicle.fix.version>2.17.6</chronicle.fix.version>
-        <chronicle.services.version>2.17.12-SNAPSHOT</chronicle.services.version>
+        <chronicle.services.version>2.17.12</chronicle.services.version>
         <chronicle.logger.version>4.16.0</chronicle.logger.version>
     </properties>
 
@@ -379,6 +379,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-2.17.38</tag>
     </scm>
 </project>
