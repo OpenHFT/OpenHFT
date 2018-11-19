@@ -165,15 +165,21 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-runtime</artifactId>
+                <artifactId>chronicle-fix-itch-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-                <type>test-jar</type>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-acceptance-tests</artifactId>
+                <artifactId>chronicle-fix-itch-cboe</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-runtime</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
