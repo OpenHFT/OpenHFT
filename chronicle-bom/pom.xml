@@ -40,6 +40,13 @@
 
     <dependencyManagement>
         <dependencies>
+             <dependency>
+                <groupId>net.openhft</groupId>
+                 <artifactId>binance-api-client</artifactId>
+                <version>2.17.0</version>
+            </dependency>
+
+
             <!-- core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
