@@ -33,19 +33,20 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>2.17.17</chronicle.fix.version>
+        <chronicle.fix.version>2.17.17-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.26</chronicle.services.version>
         <chronicle.logger.version>4.16.0</chronicle.logger.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>binance-api-client</artifactId>
-                <version>2.17.1-SNAPSHOT</version>
-            </dependency>
 
+             <dependency>
+                <groupId>net.openhft</groupId>
+                 <artifactId>binance-api-client</artifactId>
+                 <version>2.17.1-SNAPSHOT</version>
+            </dependency>
+            
             <!-- core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
@@ -409,6 +410,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>chronicle-bom-2.17.86</tag>
+        <tag>master</tag>
     </scm>
 </project>
