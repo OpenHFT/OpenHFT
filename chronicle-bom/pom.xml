@@ -36,12 +36,19 @@
         <chronicle.fix.version>2.17.18-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.26</chronicle.services.version>
         <chronicle.logger.version>4.16.0</chronicle.logger.version>
+        <chronicle.crypto.exchange>2.17.0-SNAPSHOT</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
         <dependencies>
 
-             <dependency>
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>oms</artifactId>
+                <version>${chronicle.crypto.exchange>}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>net.openhft</groupId>
                  <artifactId>binance-api-client</artifactId>
                 <version>2.17.1</version>
