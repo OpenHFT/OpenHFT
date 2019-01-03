@@ -47,7 +47,7 @@
         <module>Chronicle-Network</module>
         <module>Chronicle-Bytes</module>
         <module>Chronicle-Wire</module>
-        <!--<module>Chronicle-Salt</module>-->
+        <module>Chronicle-Salt</module>
         <module>Chronicle-Queue</module>
 
         <module>Chronicle-Values</module>
@@ -55,6 +55,7 @@
         <module>Chronicle-Map</module>
         <!--<module>Chronicle-Map-Java8</module>-->
 
+        <module>Chronicle-Decentred</module>
         <!--<module>Chronicle-Engine</module>-->
         <!--<module>Chronicle-Engine-GUI</module>-->
 
