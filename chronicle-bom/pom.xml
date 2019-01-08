@@ -88,6 +88,12 @@
 
             <dependency>
                 <groupId>software.chronicle.exchange</groupId>
+                <artifactId>matching</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
                 <artifactId>bookbuilder</artifactId>
                 <version>${chronicle.crypto.exchange}</version>
             </dependency>
