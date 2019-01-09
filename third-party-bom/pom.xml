@@ -45,6 +45,11 @@
 
         <dependencies>
 
+            <dependency>
+                <groupId>com.koloboke</groupId>
+                <artifactId>koloboke-api-jdk8</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.koloboke</groupId>
