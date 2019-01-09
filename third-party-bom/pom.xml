@@ -45,6 +45,19 @@
 
         <dependencies>
 
+
+            <dependency>
+                <groupId>com.koloboke</groupId>
+                <artifactId>koloboke-compile</artifactId>
+                <version>0.5.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.koloboke</groupId>
+                <artifactId>koloboke-impl-common-jdk8</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+
             <dependency>
                 <groupId>io.undertow</groupId>
                 <artifactId>undertow-core</artifactId>
