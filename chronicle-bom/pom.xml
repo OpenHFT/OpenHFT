@@ -82,6 +82,12 @@
 
             <dependency>
                 <groupId>software.chronicle.exchange</groupId>
+                <artifactId>orchestrator</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
                 <artifactId>pricer</artifactId>
                 <version>${chronicle.crypto.exchange}</version>
             </dependency>
