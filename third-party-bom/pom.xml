@@ -46,6 +46,12 @@
         <dependencies>
 
             <dependency>
+                <groupId>org.bitcoinj</groupId>
+                <artifactId>bitcoinj-core</artifactId>
+                <version>0.14.7</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.koloboke</groupId>
                 <artifactId>koloboke-api-jdk8</artifactId>
                 <version>1.0.0</version>
