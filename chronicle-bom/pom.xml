@@ -23,6 +23,7 @@
         <version>1.1.12</version>
         <relativePath />
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
     <version>2.17-SNAPSHOT</version>
