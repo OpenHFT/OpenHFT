@@ -43,6 +43,18 @@
         <dependencies>
 
             <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-decentred</artifactId>
+                <version>0.3.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>chronicle-crypto-exchange</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>software.chronicle.exchange</groupId>
                 <artifactId>oms</artifactId>
                 <version>${chronicle.crypto.exchange}</version>
@@ -60,7 +72,50 @@
                 <version>${chronicle.crypto.exchange}</version>
                 <type>test-jar</type>
             </dependency>
-            
+
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>hedger</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>orchestrator</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>pricer</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>position</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>matching</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>bookbuilder</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>connector-binance</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
             <dependency>
                 <groupId>net.openhft.com.binance.api</groupId>
                 <artifactId>binance-api-client</artifactId>
