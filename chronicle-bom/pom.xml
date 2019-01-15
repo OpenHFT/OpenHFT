@@ -405,7 +405,6 @@
                 <type>test-jar</type>
             </dependency>
 
-
             <dependency>
                 <groupId>software.chronicle.exchange</groupId>
                 <artifactId>hedger</artifactId>
