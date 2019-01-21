@@ -42,7 +42,6 @@
     <dependencyManagement>
         <dependencies>
 
-
             <dependency>
                 <groupId>net.openhft.com.binance.api</groupId>
                 <artifactId>binance-api-client</artifactId>
