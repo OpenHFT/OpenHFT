@@ -136,9 +136,9 @@
             </dependency>
 
             <dependency>
-                <groupId>net.openhft</groupId>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>2.17.1</version>
+                <version>2.17.2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
