@@ -253,7 +253,7 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-perftest</artifactId>
+                <artifactId>chronicle-services-perfGtest</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
             </dependency>
@@ -496,6 +496,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>chronicle-bom-2.17.132</tag>
+        <tag>master</tag>
     </scm>
 </project>
