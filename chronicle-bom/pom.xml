@@ -42,8 +42,6 @@
     <dependencyManagement>
         <dependencies>
 
-
-
             <!-- core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
