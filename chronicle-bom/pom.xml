@@ -33,7 +33,7 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>2.17.25</chronicle.fix.version>
+        <chronicle.fix.version>2.17.26-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.37</chronicle.services.version>
         <chronicle.logger.version>4.16.0</chronicle.logger.version>
         <chronicle.crypto.exchange>2.17.14</chronicle.crypto.exchange>
