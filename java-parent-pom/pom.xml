@@ -33,6 +33,18 @@
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
 
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>17.0.0</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
     <build>
 
         <pluginManagement>
@@ -80,6 +92,27 @@
                     <version>3.0.0-M1</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>se.eris</groupId>
+                    <artifactId>notnull-instrumenter-maven-plugin</artifactId>
+                    <version>0.6.8</version>
+                    <executions>
+                        <execution>
+                            <id>instrument</id>
+                            <goals>
+                                <goal>instrument</goal>
+                                <goal>tests-instrument</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <notNull>
+                            <param>org.jetbrains.annotations.NotNull</param>
+                            <param>javax.validation.constraints.NotNull</param>
+                        </notNull>
+                    </configuration>
+                </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -121,6 +154,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -135,6 +169,7 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
