@@ -19,14 +19,14 @@ image::https://github.com/OpenHFT/OpenHFT/blob/master/images/Chronicle%20Product
  - GUI can share larger faster datasets, CE allows throttling of rates of updates making certain that your client only receives the latest updates out of the millions per second received by the server. Off-heap storage allows clients to scroll through millions of rows with no noticeable pauses.
 
 
-Tools
-=====
+
+===== Tools
 
 #### OpenHFT Recommends
 
 ---
 
-[![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com/)
+image::https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com[]
  
 YourKit supports open source projects with its full-featured Java Profiler.
 YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a>
