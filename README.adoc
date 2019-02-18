@@ -20,13 +20,15 @@ image::https://github.com/OpenHFT/OpenHFT/blob/master/images/Chronicle%20Product
 
 
 
-==== Tools
+== Tools
 
-===== OpenHFT Recommends
+=== OpenHFT Recommends
 
----
 
 image::https://www.yourkit.com/images/yklogo.png[https://www.yourkit.com]
  
 
 Review : The YourKit java profiler can help you optomize your java code, it displays a real-time display of CPU and memory usage. Another tab shows time spent in the garbage collector, how many collections have taken place recently. You can force a garbage collection to take place to watch the effect on performance. Other tabs provide info on the number of running threads and the number of classes loaded. YourKit also  allows you to take a snapshot of the running process; this is automatically saved and can be subsequently reopened for comparative purposes. Within the snapshot, you can view a hotspot listing, showing the methods where the application spent most of its time. You can also see a call tree - either merged or arranged by individual thread - and view back traces of individual methods showing where they were called from.
+
+
+see https://www.yourkit.com[https://www.yourkit.com]
