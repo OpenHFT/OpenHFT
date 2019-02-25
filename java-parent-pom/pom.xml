@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>java-parent-pom</artifactId>
-    <version>1.1.22</version>
+    <version>1.1.23-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
@@ -133,7 +133,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>java-parent-pom-1.1.22</tag>
+        <tag>master</tag>
     </scm>
 
 </project>
