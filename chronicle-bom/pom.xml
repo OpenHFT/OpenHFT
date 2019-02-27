@@ -35,8 +35,8 @@
     <properties>
         <chronicle.fix.version>2.17.27</chronicle.fix.version>
         <chronicle.services.version>2.17.41</chronicle.services.version>
-        <chronicle.logger.version>4.16.0</chronicle.logger.version>
-        <chronicle.crypto.exchange>2.17.17</chronicle.crypto.exchange>
+        <chronicle.logger.version>4.17.0-SNAPSHOT</chronicle.logger.version>
+        <chronicle.crypto.exchange>2.17.18-SNAPSHOT</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
@@ -113,13 +113,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.9</version>
+                <version>5.17.10-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.9</version>
+                <version>5.17.10-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
