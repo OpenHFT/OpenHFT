@@ -31,5 +31,36 @@
         <module>java-parent-pom</module>
 
         <module>chronicle-bom</module>
+
+        <!-- heritage -->
+        <!--<module>Java-Thread-Affinity</module>-->
+        <!--<module>Java-Runtime-Compiler</module>-->
+
+        <!-- stable -->
+        <!--<module>Java-Lang</module>-->
+        <!--<module>Chronicle-Logger</module>-->
+        <!--<module>Chronicle-Algorithms</module>-->
+
+        <!-- new -->
+        <module>Chronicle-Core</module>
+        <module>Chronicle-Threads</module>
+        <module>Chronicle-Network</module>
+        <module>Chronicle-Bytes</module>
+        <module>Chronicle-Wire</module>
+        <module>Chronicle-Salt</module>
+        <module>Chronicle-Queue</module>
+
+        <module>Chronicle-Values</module>
+        <module>Chronicle-Map</module>
+
+        <module>Chronicle-Decentred</module>
+        <!--<module>Chronicle-Engine</module>-->
+        <!--<module>Chronicle-Engine-GUI</module>-->
+
+        <!--<module>Chronicle-Websocket-Jetty</module>-->
+
+        <!--<module>Chronicle-Wire-Enterprise</module>-->
+        <!--<module>Chronicle-Queue-Enterprise</module>-->
+        <!--<module>Chronicle-Engine-Enterprise</module>-->
     </modules>
 </project>
