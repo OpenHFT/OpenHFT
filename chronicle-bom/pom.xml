@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.17-SNAPSHOT</version>
+    <version>2.17.189</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -33,10 +33,10 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>2.17.28-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>2.17.27</chronicle.fix.version>
         <chronicle.services.version>2.17.48</chronicle.services.version>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
-        <chronicle.crypto.exchange>2.17.25-SNAPSHOT</chronicle.crypto.exchange>
+        <chronicle.crypto.exchange>2.17.24</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
@@ -46,7 +46,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.17.9-SNAPSHOT</version>
+                <version>2.17.9</version>
             </dependency>
 
             <dependency>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.17.19-SNAPSHOT</version>
+                <version>2.17.18</version>
             </dependency>
 
             <dependency>
@@ -83,7 +83,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.17.31-SNAPSHOT</version>
+                <version>2.17.30</version>
             </dependency>
 
             <dependency>
@@ -266,13 +266,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-decentred</artifactId>
-                <version>2.17.2-SNAPSHOT</version>
+                <version>2.17.1</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-zero</artifactId>
-                <version>2.17.2-SNAPSHOT</version>
+                <version>2.17.1</version>
             </dependency>
 
 
@@ -494,6 +494,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-2.17.189</tag>
     </scm>
 </project>
