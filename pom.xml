@@ -53,7 +53,7 @@
         <module>Chronicle-Values</module>
         <module>Chronicle-Map</module>
 
-        <module>Chronicle-Decentred</module>
+        <!--<module>Chronicle-Decentred</module>-->
         <!--<module>Chronicle-Engine</module>-->
         <!--<module>Chronicle-Engine-GUI</module>-->
 
