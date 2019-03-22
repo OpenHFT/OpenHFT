@@ -119,7 +119,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.10</version>
+                <version>5.17.11-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
