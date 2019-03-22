@@ -275,6 +275,12 @@
                 <version>2.17.3</version>
             </dependency>
 
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-queue-zero</artifactId>
+                <version>5.17.0</version>
+            </dependency>
+
 
             <!--  non-core projects -->
 
