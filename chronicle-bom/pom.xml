@@ -33,10 +33,10 @@
     </description>
 
     <properties>
-        <chronicle.fix.version>2.17.29</chronicle.fix.version>
+        <chronicle.fix.version>2.17.30-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.50</chronicle.services.version>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
-        <chronicle.crypto.exchange>2.17.25</chronicle.crypto.exchange>
+        <chronicle.crypto.exchange>2.17.26-SNAPSHOT</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
