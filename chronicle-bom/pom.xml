@@ -35,7 +35,7 @@
         <chronicle.fix.version>3.17.0</chronicle.fix.version>
         <chronicle.services.version>2.17.55</chronicle.services.version>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
-        <chronicle.crypto.exchange>2.17.301-SNAPSHOT</chronicle.crypto.exchange>
+        <chronicle.crypto.exchange>2.17.31-SNAPSHOT</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
