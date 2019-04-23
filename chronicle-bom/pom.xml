@@ -153,10 +153,11 @@
             </dependency>
 
             <dependency>
-                <groupId>net.openhft</groupId>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-acceptance-tests</artifactId>
-                <version>${chronicle.fix.version}</version>
                 <type>test-jar</type>
+                <scope>test</scope>
+                <version>${chronicle.fix.version}</version>
             </dependency>
 
             <dependency>
