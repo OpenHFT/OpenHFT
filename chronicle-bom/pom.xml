@@ -32,7 +32,7 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.fix.version>3.17.2</chronicle.fix.version>
+        <chronicle.fix.version>3.17.3-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.56</chronicle.services.version>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
