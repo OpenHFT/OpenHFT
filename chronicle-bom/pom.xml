@@ -31,32 +31,40 @@
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
-
     <properties>
-        <chronicle.fix.version>2.17.13</chronicle.fix.version>
-        <chronicle.services.version>2.17.23</chronicle.services.version>
-        <chronicle.logger.version>4.16.0</chronicle.logger.version>
+        <chronicle.fix.version>3.17.4</chronicle.fix.version>
+        <chronicle.services.version>2.17.57</chronicle.services.version>
+        <chronicle.logger.version>4.17.2</chronicle.logger.version>
+        <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
             <!-- core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.17.1</version>
+                <version>2.17.12</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.17.1</version>
+                <version>2.17.2</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-ticker</artifactId>
+                <version>2.17.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.17.5</version>
+                <version>2.17.27</version>
             </dependency>
 
             <dependency>
@@ -68,19 +76,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-salt</artifactId>
-                <version>1.0.1</version>
+                <version>2.17.2</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.17.7</version>
+                <version>2.17.35</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.17.4</version>
+                <version>2.17.7</version>
             </dependency>
 
             <dependency>
@@ -92,7 +100,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.17.0</version>
+                <version>3.17.2</version>
             </dependency>
 
             <dependency>
@@ -104,38 +112,38 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.1</version>
+                <version>5.17.13</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.1</version>
+                <version>5.17.13</version>
                 <type>test-jar</type>
             </dependency>
 
             <dependency>
-                <groupId>net.openhft</groupId>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-engine</artifactId>
-                <version>2.17.0</version>
+                <version>2.17.4</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>2.17.0</version>
+                <version>2.17.1</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>2.17.3-SNAPSHOT</version>
+                <version>2.17.5</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>2.17.1</version>
+                <version>2.17.4</version>
             </dependency>
 
             <dependency>
@@ -242,7 +250,7 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-services-perftest</artifactId>
+                <artifactId>chronicle-services-perfGtest</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
             </dependency>
@@ -254,7 +262,32 @@
                 <type>test-jar</type>
             </dependency>
 
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-decentred</artifactId>
+                <version>2.17.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-zero</artifactId>
+                <version>2.17.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-queue-zero</artifactId>
+                <version>5.17.1</version>
+            </dependency>
+            
             <!--  non-core projects -->
+
+            <dependency>
+                <groupId>net.openhft.com.binance.api</groupId>
+                <artifactId>binance-api-client</artifactId>
+                <version>2.17.1</version>
+            </dependency>
+
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
@@ -264,7 +297,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>2.3.1</version>
+                <version>2.3.4</version>
             </dependency>
 
             <dependency>
@@ -356,6 +389,75 @@
                 <artifactId>chronicle-engine-gui</artifactId>
                 <version>1.0.5</version>
                 <type>war</type>
+            </dependency>
+
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>chronicle-crypto-exchange</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>oms</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>common</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>common</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+                <type>test-jar</type>
+            </dependency>
+
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>hedger</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>orchestrator</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>pricer</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>position</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>matching</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>bookbuilder</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>connector-binance</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
             </dependency>
 
         </dependencies>

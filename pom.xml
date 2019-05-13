@@ -29,7 +29,6 @@
         <module>third-party-bom</module>
         <module>root-parent-pom</module>
         <module>java-parent-pom</module>
-        <module>chronicle-nexus-root-pom</module>
 
         <module>chronicle-bom</module>
 
@@ -40,26 +39,26 @@
         <!-- stable -->
         <!--<module>Java-Lang</module>-->
         <!--<module>Chronicle-Logger</module>-->
+        <!--<module>Chronicle-Algorithms</module>-->
 
         <!-- new -->
         <module>Chronicle-Core</module>
+        <module>Chronicle-Coder</module>
         <module>Chronicle-Threads</module>
         <module>Chronicle-Network</module>
         <module>Chronicle-Bytes</module>
         <module>Chronicle-Wire</module>
-        <!--<module>Chronicle-Salt</module>-->
+        <module>Chronicle-Salt</module>
         <module>Chronicle-Queue</module>
 
         <module>Chronicle-Values</module>
-        <!--<module>Chronicle-Algorithms</module>-->
         <module>Chronicle-Map</module>
-        <!--<module>Chronicle-Map-Java8</module>-->
 
+        <!--<module>Chronicle-Decentred</module>-->
         <!--<module>Chronicle-Engine</module>-->
         <!--<module>Chronicle-Engine-GUI</module>-->
 
-        <module>Chronicle-Websocket-Jetty</module>
-        <!--<module>Chronicle-TimeSeries</module>-->
+        <!--<module>Chronicle-Websocket-Jetty</module>-->
 
         <!--<module>Chronicle-Wire-Enterprise</module>-->
         <!--<module>Chronicle-Queue-Enterprise</module>-->

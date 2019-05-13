@@ -22,68 +22,30 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.1.13</version>
-        <relativePath />
+        <version>1.2.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>java-parent-pom</artifactId>
-    <version>1.1.18-SNAPSHOT</version>
+    <version>1.1.23-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
 
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>17.0.0</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
     <build>
-
-        <pluginManagement>
-            <plugins>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.2</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-scm-publish-plugin</artifactId>
-                    <version>1.0-beta-2</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.servicemix.tooling</groupId>
-                    <artifactId>depends-maven-plugin</artifactId>
-                    <version>1.3</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.21.0</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0-M1</version>
-                </plugin>
-
-            </plugins>
-        </pluginManagement>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -121,10 +83,10 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.2</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-Xlint:deprecation</arg>
@@ -135,6 +97,7 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -147,12 +110,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <additionalparam>${javadoc.opts}</additionalparam>
+                    <additionalOptions>${javadoc.opts}</additionalOptions>
                 </configuration>
             </plugin>
-
         </plugins>
-
     </build>
 
     <profiles>
