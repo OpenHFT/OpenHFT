@@ -32,8 +32,8 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.fix.version>3.17.4</chronicle.fix.version>
-        <chronicle.services.version>2.17.57</chronicle.services.version>
+        <chronicle.fix.version>3.17.8</chronicle.fix.version>
+        <chronicle.services.version>2.17.60</chronicle.services.version>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
     </properties>
@@ -51,7 +51,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.17.2</version>
+                <version>2.17.3</version>
             </dependency>
 
 
@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.17.35</version>
+                <version>2.17.38</version>
             </dependency>
 
             <dependency>
@@ -100,25 +100,25 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.17.2</version>
+                <version>3.17.3</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>2.17.2</version>
+                <version>2.17.6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.13</version>
+                <version>5.17.14</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.13</version>
+                <version>5.17.14</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -137,7 +137,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>2.17.5</version>
+                <version>2.17.7</version>
             </dependency>
 
             <dependency>
@@ -271,7 +271,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-zero</artifactId>
-                <version>2.17.4</version>
+                <version>2.17.5</version>
             </dependency>
 
             <dependency>
