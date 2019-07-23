@@ -112,13 +112,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.15</version>
+                <version>5.17.16-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.15</version>
+                <version>5.17.16-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
