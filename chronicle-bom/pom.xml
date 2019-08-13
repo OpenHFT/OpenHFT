@@ -36,8 +36,8 @@
         <chronicle.services.version>2.17.63</chronicle.services.version>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
-        <chronicle.queue.enterprise>2.17.8</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.17.13</chronicle.map.enterprise>
+        <chronicle.queue.enterprise>2.17.9-SNAPSHOT</chronicle.queue.enterprise>
+        <chronicle.map.enterprise>2.17.14-SNAPSHOT</chronicle.map.enterprise>
     </properties>
 
     <dependencyManagement>
