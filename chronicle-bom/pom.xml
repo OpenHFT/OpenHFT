@@ -404,7 +404,6 @@
                 <type>war</type>
             </dependency>
 
-
             <dependency>
                 <groupId>software.chronicle.exchange</groupId>
                 <artifactId>chronicle-crypto-exchange</artifactId>
@@ -429,7 +428,6 @@
                 <version>${chronicle.crypto.exchange}</version>
                 <type>test-jar</type>
             </dependency>
-
 
             <dependency>
                 <groupId>software.chronicle.exchange</groupId>
