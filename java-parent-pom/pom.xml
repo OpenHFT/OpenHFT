@@ -32,18 +32,6 @@
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
 
-    <dependencyManagement>
-        <dependencies>
-
-            <dependency>
-                <groupId>org.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>17.0.0</version>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
-
     <build>
         <plugins>
             <plugin>
