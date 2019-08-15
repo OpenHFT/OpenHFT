@@ -155,7 +155,7 @@
             </dependency>
 
             <dependency>
-                <groupId>net.openhft</groupId>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise-guarded</artifactId>
                 <version>${chronicle.queue.enterprise}</version>
             </dependency>
