@@ -28,9 +28,11 @@
     <version>2.17-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
+
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
+
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue.enterprise>2.17.23</chronicle.queue.enterprise>
