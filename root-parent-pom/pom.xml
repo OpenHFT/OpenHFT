@@ -274,6 +274,10 @@
         </profile>
         <profile>
             <id>java11</id>
+            <properties>
+                <!-- https://github.com/osundblad/intellij-annotations-instrumenter-maven-plugin/issues/29 -->
+                <se.eris.notnull.instrument>false</se.eris.notnull.instrument>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
