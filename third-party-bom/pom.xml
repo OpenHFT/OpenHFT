@@ -385,7 +385,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.intellij</groupId>
+                <groupId>org.intellij</groupId>
                 <artifactId>annotations</artifactId>
                 <version>17.0</version>
             </dependency>
