@@ -397,14 +397,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.sun.java</groupId>
-                <artifactId>tools</artifactId>
-                <version>${java.version}</version>
-                <scope>system</scope>
-                <systemPath>${java.home}/../lib/tools.jar</systemPath>
-            </dependency>
-
-            <dependency>
                 <groupId>org.kohsuke.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
                 <version>9.0</version>
@@ -567,7 +559,23 @@
                     </plugin>
                 </plugins>
             </build>
-
+        </profile>
+        <profile>
+            <id>prejava9</id>
+            <activation>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.java</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>${java.version}</version>
+                    <scope>system</scope>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 
