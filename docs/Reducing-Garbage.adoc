@@ -1,0 +1,47 @@
+= Chronicle FIX Garbage reduction
+Peter Lawrey
+
+== Reducing Garbage
+
+Reducing garbage has a number of benefits.
+The obvious benefit is pausing for a Garbage Collection less often.
+
+However, creating less objects are reduces work allocating and clearing the object in the first place.
+
+Some indirect benefits include, simplifying the object life cycle reduces the amount of time a GC takes when it does happen, and reduces noise when trying to optimise an application which produces garbage.
+
+=== Placing the bulk of data off heap.
+
+Chronicle Queue, Map and Market Data Distributer, support storing tera-bytes of data off heap without adding significantly to the heap size or time to GC. Off heap memory can be as large as you disk space which can be several times main memory size, and far beyond what is a practical heap size.
+This frees up your JVMs to use data more freely at lower cost and simplify your designs.
+
+==== Off heap memory is persisted and shared.
+
+Chronicle Queue Map and Market Data Distributer, support concurrent writers and readers using persisted shared memory.
+This means there is only one copy in memory and no need for a broker.
+If all processes die, no data is lost (unless the OS also dies) OS failure can be protected against by using replication.
+
+NOTE: Chronicle FIX uses Queue and Chronicle Services supports all our data structrues.
+
+=== Recycling objects
+
+Chronicle software is designed to recycle objects as much as possible.
+After a full GC these end up in tenured space where they stay haven't little impact on minor collections.
+
+For example, if you want to send or receive a POJO or FIX Message, the object holding the data can be serialized or deserialized without creating new objects.
+
+==== POJOs are recycled even in deserialization.
+
+Most serialziation libraries expect to create new objects each time they are deserialized however Chronicle supports using flyweights to deserialize data into existing objects.
+
+==== Chronicle uses POJOs not wrappers for Maps.
+
+Some libraries use `HashMap` to for flexible dynamic data structures.
+This can create 1 to 3 objects per attribute which is garbage heavy. e.g.
+QuickFIX. Chronicle supports dynamically accessing real POJO objects with primitives or mutable buffers for fields.
+This can reduce the object creation to zero on deserialization.
+
+==== Chronicle supports object pools.
+
+Strings and other immutable types can be efficiently object pooled to minimise garbage created.
+Lookup can be as fast on average as creating new objects, but with lower memory foot print and far less garbage created.
