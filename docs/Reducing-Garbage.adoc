@@ -1,4 +1,4 @@
-= Chronicle FIX Garbage reduction
+= Chronicle Garbage reduction
 Peter Lawrey
 
 == Reducing Garbage
