@@ -4,9 +4,13 @@ Peter Lawrey
 == Reducing Garbage
 
 Reducing garbage has several benefits:
-* The obvious benefit is pausing for a Garbage Collection less often.
-* Creating fewer objects, will reduce the work allocating and clearing the object in the first place.
-* Some indirect benefits include simplifying the object life cycle, which reduces the amount of time a GC takes. This also reduces noise when trying to optimise an application which produces garbage.
+
+- The obvious benefit is pausing for a Garbage Collection less often.
+
+- Creating fewer objects, will reduce the work allocating and clearing the object in the first place.
+
+
+- Some indirect benefits include simplifying the object life cycle, which reduces the amount of time a GC takes. This also reduces noise when trying to optimise an application which produces garbage.
 
 === Placing the bulk of data off-heap.
 
