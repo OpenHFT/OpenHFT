@@ -1,0 +1,24 @@
+= Version Support
+Peter Lawrey
+
+Chronicle Software supports each version for two years from the start of the next minor version. 
+All our software has a MAJOR.STAGE.MINOR version. 
+The MAJOR version is the generation of the software, where major versions are not compatible with each other.
+The STAGE version is the same for all our products e.g 2.17.x or 3.17.x so you know that all the software is part of the same stage.
+The MINOR version is the incremental release of the software for a given MAJOR.STAGE.
+
+Once a MAJOR.STAGE is updated to the new version, the previous MAJOR.STAGE-1 starts two years until end of support.
+
+== Stage release dates and end of support.
+
+|====
+| Stage | first released | end of support
+| x.19  | 2020/05? | TBD
+| x.18  | 2019/11 | 2022/05?
+| x.17  | 2018/08 | 2022/01
+| x.16  | 2018/05 | 2020/08
+| x.15  | 2017/12 | 2020/15
+| x.14  | 2017/03 | 2019/12
+| x.13  | 2016/07 | 2019/03
+| x.12  | 2016/03 | 2019/03
+|====
