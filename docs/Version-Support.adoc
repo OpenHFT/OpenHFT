@@ -2,9 +2,13 @@
 Peter Lawrey
 
 Chronicle Software supports each version for two years from the start of the next minor version. 
+
 All our software has a MAJOR.STAGE.MINOR version. 
+
 The MAJOR version is the generation of the software, where major versions are not compatible with each other.
+
 The STAGE version is the same for all our products e.g 2.17.x or 3.17.x so you know that all the software is part of the same stage.
+
 The MINOR version is the incremental release of the software for a given MAJOR.STAGE.
 
 Once a MAJOR.STAGE is updated to the new version, the previous MAJOR.STAGE-1 starts two years until end of support.
