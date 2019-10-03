@@ -21,11 +21,11 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | end of support
-| x.19  | 2020/05? | TBD
-| x.18  | 2019/11 | 2022/05?
-| x.17  | 2018/08 | 2022/01
+| x.19  | 2020/05 (provisional) | TBD
+| x.18  | 2019/11 (expected) | 2022/05 (provisional)
+| x.17  | 2018/08 | 2021/11 (expected)
 | x.16  | 2018/05 | 2020/08
-| x.15  | 2017/12 | 2020/15
+| x.15  | 2017/12 | 2020/05
 | x.14  | 2017/03 | 2019/12
 | x.13  | 2016/07 | 2019/03
 | x.12  | 2016/03 | 2019/03
