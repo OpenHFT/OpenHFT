@@ -21,7 +21,8 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | end of support
-| x.19  | 2020/05 (provisional) | TBD
+| x.20  | 2020/11 (provisional) | 2023 (provisional)
+| x.19  | 2020/05 (provisional) | 2022/11 (provisional)
 | x.18  | 2019/11 (expected) | 2022/05 (provisional)
 | x.17  | 2018/08 | 2021/11 (expected)
 | x.16  | 2018/05 | 2020/08
