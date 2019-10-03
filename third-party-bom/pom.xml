@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>third-party-bom</artifactId>
-    <version>3.6.16-SNAPSHOT</version>
+    <version>3.6.17-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -384,17 +384,10 @@
                 <version>3.4</version>
             </dependency>
 
-            <!-- should use org.jetbrains:annotations -->
-            <dependency>
-                <groupId>com.intellij</groupId>
-                <artifactId>annotations</artifactId>
-                <version>12.0</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
-                <version>17.0</version>
+                <version>17.0.0</version>
             </dependency>
 
             <dependency>
