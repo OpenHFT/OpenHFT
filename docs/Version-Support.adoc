@@ -14,7 +14,7 @@ The MINOR version is the incremental release of the software for a given MAJOR.S
 Once a MAJOR.STAGE is updated to the new version, the previous MAJOR.STAGE-1 starts two years until end of support.
 
 
-A commercial support agreement is available from sales@chronicle.software, free open source support is also available but on a best efforts basis. Free support issues are not treated as a high priority unless the issues also affect organisations with a commercial agreement. The support agreement doesn’t just benefit your organisation but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries. 
+A commercial support agreement is available from mailto:sales@chronicle.software, free open source support is also available but on a best efforts basis. Free support issues are not treated as a high priority unless the issues also affect organisations with a commercial agreement. The support agreement doesn’t just benefit your organisation but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries. 
 
 == Stage release dates and end of support.
 
