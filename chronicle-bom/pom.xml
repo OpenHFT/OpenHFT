@@ -304,7 +304,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.1.11</version>
+                <version>3.1.12-SNAPSHOT</version>
             </dependency>
 
             <dependency>
