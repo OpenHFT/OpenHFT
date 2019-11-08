@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
-        <chronicle.queue.enterprise>2.17.28</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.17.29-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.35</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.30</chronicle.fix.version>
         <chronicle.services.version>2.17.65</chronicle.services.version>
