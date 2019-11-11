@@ -34,7 +34,7 @@
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue.enterprise>2.17.32</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.17.35</chronicle.map.enterprise>
+        <chronicle.map.enterprise>2.17.36-SNAPSHOT</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.31</chronicle.fix.version>
         <chronicle.services.version>2.17.65</chronicle.services.version>
         <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
