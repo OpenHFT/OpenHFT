@@ -55,8 +55,8 @@
         <module>Chronicle-Map</module>
 
         <!--<module>Chronicle-Decentred</module>-->
-        <!--<module>Chronicle-Engine</module>-->
-        <!--<module>Chronicle-Engine-GUI</module>-->
+        <module>Chronicle-Engine</module>
+        <module>Chronicle-Engine-Demo/demo</module>
 
         <!--<module>Chronicle-Websocket-Jetty</module>-->
 
