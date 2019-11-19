@@ -292,13 +292,13 @@
                 <artifactId>chronicle-fix-queue-zero</artifactId>
                 <version>5.17.1</version>
             </dependency>
-            
+
             <!--  non-core projects -->
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
             </dependency>
 
             <dependency>
