@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.17.473</version>
+    <version>2.17.474-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -112,6 +112,13 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise</artifactId>
+                <version>${chronicle.map.enterprise}</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise-guarded</artifactId>
                 <version>${chronicle.map.enterprise}</version>
             </dependency>
@@ -151,6 +158,13 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
                 <version>${chronicle.queue.enterprise}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-enterprise</artifactId>
+                <version>${chronicle.queue.enterprise}</version>
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
@@ -220,6 +234,7 @@
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
             </dependency>
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services-api</artifactId>
