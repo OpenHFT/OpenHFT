@@ -52,7 +52,7 @@
         <module>Chronicle-Queue</module>
 
         <module>Chronicle-Values</module>
-        <module>Chronicle-Services</module>
+<!--        <module>Chronicle-Services</module>-->
         <!--<module>Chronicle-Map</module>-->
 
         <!--<module>Chronicle-Decentred</module>-->
