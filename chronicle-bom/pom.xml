@@ -36,7 +36,7 @@
         <chronicle.queue.enterprise>2.17.43</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.45</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.37</chronicle.fix.version>
-        <chronicle.services.version>2.17.69</chronicle.services.version>
+        <chronicle.services.version>2.17.72-SNAPSHOT</chronicle.services.version>
         <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
     </properties>
 
@@ -374,7 +374,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
