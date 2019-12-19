@@ -35,7 +35,7 @@
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue.enterprise>2.17.44</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.45</chronicle.map.enterprise>
-        <chronicle.fix.version>3.17.39</chronicle.fix.version>
+        <chronicle.fix.version>3.17.40-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.72</chronicle.services.version>
         <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
     </properties>
@@ -356,7 +356,7 @@
                 <artifactId>chronicle-fix-queue-zero</artifactId>
                 <version>5.17.1</version>
             </dependency>
-            
+
             <!--  non-core projects -->
 
             <dependency>
