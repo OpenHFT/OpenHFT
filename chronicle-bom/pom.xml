@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
-        <chronicle.queue.enterprise>2.17.44</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.17.45-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.46</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.43</chronicle.fix.version>
         <chronicle.services.version>2.17.73</chronicle.services.version>
@@ -126,13 +126,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.38</version>
+                <version>5.17.39-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>5.17.38</version>
+                <version>5.17.39-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -141,7 +141,7 @@
                 <artifactId>chronicle-datagrid</artifactId>
                 <version>2.17.7</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-datagrid-guarded</artifactId>
@@ -362,7 +362,7 @@
                 <artifactId>chronicle-fix-queue-zero</artifactId>
                 <version>5.17.1</version>
             </dependency>
-            
+
             <!--  non-core projects -->
 
             <dependency>
