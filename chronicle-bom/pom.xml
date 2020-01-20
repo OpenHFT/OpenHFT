@@ -37,7 +37,6 @@
         <chronicle.map.enterprise>2.17.46</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.43</chronicle.fix.version>
         <chronicle.services.version>2.17.73</chronicle.services.version>
-        <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
@@ -478,75 +477,6 @@
                 <artifactId>chronicle-datagrid-gui</artifactId>
                 <version>1.0.5</version>
                 <type>war</type>
-            </dependency>
-
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>chronicle-crypto-exchange</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>oms</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>common</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>common</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-                <type>test-jar</type>
-            </dependency>
-
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>hedger</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>orchestrator</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>pricer</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>position</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>matching</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>bookbuilder</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle.exchange</groupId>
-                <artifactId>connector-binance</artifactId>
-                <version>${chronicle.crypto.exchange}</version>
             </dependency>
 
         </dependencies>
