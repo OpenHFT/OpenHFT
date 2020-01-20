@@ -34,6 +34,7 @@
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue>5.17.39</chronicle.queue>
+        <chronicle.datagrid.version>2.17.12</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.17.47</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.46</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.43</chronicle.fix.version>
@@ -139,13 +140,13 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-datagrid</artifactId>
-                <version>2.17.7</version>
+                <version>${chronicle.datagrid.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-datagrid-guarded</artifactId>
-                <version>2.17.7</version>
+                <version>${chronicle.datagrid.version}</version>
             </dependency>
 
             <dependency>
