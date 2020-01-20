@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.17-SNAPSHOT</version>
+    <version>2.17.547</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -33,11 +33,11 @@
     </description>
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
-        <chronicle.queue>5.17.39</chronicle.queue>
-        <chronicle.queue.enterprise>2.17.46-SNAPSHOT</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.17.46</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.46</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.43</chronicle.fix.version>
         <chronicle.services.version>2.17.73</chronicle.services.version>
+        <chronicle.crypto.exchange>2.17.31</chronicle.crypto.exchange>
     </properties>
 
     <dependencyManagement>
@@ -126,13 +126,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>${chronicle.queue}</version>
+                <version>5.17.39</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-queue</artifactId>
-                <version>${chronicle.queue}</version>
+                <version>5.17.39</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -141,7 +141,7 @@
                 <artifactId>chronicle-datagrid</artifactId>
                 <version>2.17.7</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-datagrid-guarded</artifactId>
@@ -362,7 +362,7 @@
                 <artifactId>chronicle-fix-queue-zero</artifactId>
                 <version>5.17.1</version>
             </dependency>
-
+            
             <!--  non-core projects -->
 
             <dependency>
@@ -480,6 +480,75 @@
                 <type>war</type>
             </dependency>
 
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>chronicle-crypto-exchange</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>oms</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>common</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>common</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+                <type>test-jar</type>
+            </dependency>
+
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>hedger</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>orchestrator</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>pricer</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>position</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>matching</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>bookbuilder</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.exchange</groupId>
+                <artifactId>connector-binance</artifactId>
+                <version>${chronicle.crypto.exchange}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -518,6 +587,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-2.17.547</tag>
     </scm>
 </project>
