@@ -34,7 +34,7 @@
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue>5.17.39</chronicle.queue>
-        <chronicle.datagrid.version>2.17.13</chronicle.datagrid.version>
+        <chronicle.datagrid.version>2.17.14-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.17.50</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.47</chronicle.map.enterprise>
         <chronicle.fix.version>3.17.43</chronicle.fix.version>
@@ -289,6 +289,7 @@
                 <version>${chronicle.services.version}</version>
                 <type>jar</type>
             </dependency>
+
 
             <dependency>
                 <groupId>software.chronicle</groupId>
