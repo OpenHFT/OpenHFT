@@ -37,7 +37,7 @@
         <chronicle.datagrid.version>2.17.13</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.17.51</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.48</chronicle.map.enterprise>
-        <chronicle.fix.version>3.17.43</chronicle.fix.version>
+        <chronicle.fix.version>3.17.44-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.73</chronicle.services.version>
     </properties>
 
