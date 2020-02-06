@@ -31,13 +31,14 @@
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
+    
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue>5.17.43</chronicle.queue>
         <chronicle.datagrid.version>2.17.14</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.17.61</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.48</chronicle.map.enterprise>
-        <chronicle.fix.version>4.17.4</chronicle.fix.version>
+        <chronicle.fix.version>4.17.5-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>2.17.73</chronicle.services.version>
     </properties>
 
@@ -406,7 +407,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
-                <version>6.8.18</version>
+                <version>6.8.2</version>
             </dependency>
 
             <dependency>
