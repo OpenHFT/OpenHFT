@@ -353,6 +353,13 @@
                 <version>3.0.3</version>
             </dependency>
 
+            <!--This is a newer version than the one above but has another artifactId.-->
+            <dependency>
+                <groupId>net.sf.trove4j</groupId>
+                <artifactId>core</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
