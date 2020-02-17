@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>third-party-bom</artifactId>
-    <version>3.6.17-SNAPSHOT</version>
+    <version>3.6.18-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -351,6 +351,13 @@
                 <groupId>net.sf.trove4j</groupId>
                 <artifactId>trove4j</artifactId>
                 <version>3.0.3</version>
+            </dependency>
+
+            <!--This is a newer version than the one above but has another artifactId.-->
+            <dependency>
+                <groupId>net.sf.trove4j</groupId>
+                <artifactId>core</artifactId>
+                <version>3.1.0</version>
             </dependency>
 
             <dependency>
