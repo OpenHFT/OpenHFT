@@ -34,7 +34,7 @@
     <properties>
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue>5.19.1</chronicle.queue>
-        <chronicle.datagrid.version>2.19.1</chronicle.datagrid.version>
+        <chronicle.datagrid.version>2.19.2-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.17.62</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.17.49</chronicle.map.enterprise>
         <chronicle.fix.version>4.17.6</chronicle.fix.version>
@@ -450,4 +450,5 @@
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
         <tag>master</tag>
     </scm>
+    
 </project>
