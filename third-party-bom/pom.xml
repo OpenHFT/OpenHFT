@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2014 Higher Frequency Trading
+  ~ Copyright 2014-2020 Higher Frequency Trading
   ~
   ~ http://www.chronicle.software
   ~
@@ -31,8 +31,7 @@
     <version>3.19.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
-    <description>This meta-project is used to generate a bill-of-materials POM that contains the
-        other projects in a dependencyManagement section.
+    <description>This meta-project is used to generate a bill-of-materials POM that contains the other projects in a dependencyManagement section.
     </description>
 
     <properties>
