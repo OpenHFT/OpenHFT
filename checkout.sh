@@ -16,3 +16,4 @@ git clone git@github.com:OpenHFT/Chronicle-Logger.git
 git clone git@github.com:OpenHFT/Chronicle-Engine.git
 git clone git@github.com:OpenHFT/Chronicle-Salt.git
 git clone git@github.com:OpenHFT/Chronicle-Decentred.git
+git clone git@github.com:OpenHFT/Chronicle-Coder.git
