@@ -28,7 +28,7 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 | x.15  | 2017/12 | 2018/05 | 2020/05
 | x.14  | 2017/03 | 2017/12 | 2019/12
 | x.13  | 2016/07 | 2017/03 | 2019/03
-| x.12  | 2016/03 | 2o16/07 | 2019/03
+| x.12  | 2016/03 | 2016/07 | 2019/03
 |====
 
 NOTE: There was no x.18 release.
