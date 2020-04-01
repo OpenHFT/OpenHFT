@@ -197,6 +197,7 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-yaml-tester</artifactId>
                 <version>${chronicle.fix.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
