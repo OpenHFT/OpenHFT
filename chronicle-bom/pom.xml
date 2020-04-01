@@ -251,6 +251,13 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-yaml-tester</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <type>test-jar</type>
+            </dependency>
+            
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
                 <version>${chronicle.services.version}</version>
             </dependency>
