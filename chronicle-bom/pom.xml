@@ -32,7 +32,7 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.logger.version>4.17.2</chronicle.logger.version>
+        <chronicle.logger.version>4.19.0-SNAPSHOT</chronicle.logger.version>
         <chronicle.queue>5.19.7</chronicle.queue>
         <chronicle.datagrid.version>2.19.3</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.19.4-SNAPSHOT</chronicle.queue.enterprise>
