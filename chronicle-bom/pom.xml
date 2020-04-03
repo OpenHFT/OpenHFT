@@ -35,7 +35,7 @@
         <chronicle.logger.version>4.17.2</chronicle.logger.version>
         <chronicle.queue>5.19.7</chronicle.queue>
         <chronicle.datagrid.version>2.19.3</chronicle.datagrid.version>
-        <chronicle.queue.enterprise>2.19.11</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.19.12-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.0</chronicle.map.enterprise>
         <chronicle.fix.version>4.19.13</chronicle.fix.version>
         <chronicle.services.version>3.19.7</chronicle.services.version>
