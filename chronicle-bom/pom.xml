@@ -40,7 +40,6 @@
         <chronicle.fix.version>4.19.10</chronicle.fix.version>
         <chronicle.services.version>3.19.7</chronicle.services.version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
 
