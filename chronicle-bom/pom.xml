@@ -38,7 +38,7 @@
         <chronicle.queue.enterprise>2.19.12</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.0</chronicle.map.enterprise>
         <chronicle.fix.version>4.19.15</chronicle.fix.version>
-        <chronicle.services.version>3.19.8</chronicle.services.version>
+        <chronicle.services.version>3.19.9-SNAPSHOT</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
@@ -255,7 +255,7 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
-            
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
