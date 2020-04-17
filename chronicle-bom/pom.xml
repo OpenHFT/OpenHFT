@@ -16,12 +16,13 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.1.12</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -36,7 +37,7 @@
         <chronicle.queue>5.19.8</chronicle.queue>
         <chronicle.datagrid.version>2.19.3</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.19.14</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.19.0</chronicle.map.enterprise>
+        <chronicle.map.enterprise>2.19.1-SNAPSHOT</chronicle.map.enterprise>
         <chronicle.fix.version>4.19.24</chronicle.fix.version>
         <chronicle.services.version>3.19.9</chronicle.services.version>
     </properties>
@@ -255,7 +256,7 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
-            
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
