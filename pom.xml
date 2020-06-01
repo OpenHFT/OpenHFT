@@ -43,6 +43,7 @@
 
         <!-- new -->
         <module>Chronicle-Core</module>
+        <module>JLBH</module>
         <!--        <module>Chronicle-Coder</module>-->
         <module>Chronicle-Threads</module>
         <module>Chronicle-Network</module>
@@ -59,7 +60,9 @@
 
         <!-- enterprise -->
         <module>Chronicle-Queue-Enterprise</module>
+        <module>Chronicle-Queue-Enterprise-Demo</module>
         <module>Chronicle-Datagrid</module>
+        <!--        <module>Chronicle-Datagrid-Demo</module>-->
 
         <module>Chronicle-Ring</module>
         <module>Chronicle-Market-Data-Distributor</module>
