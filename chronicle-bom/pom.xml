@@ -38,7 +38,7 @@
         <chronicle.queue.enterprise>2.19.30</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.1</chronicle.map.enterprise>
         <chronicle.fix.version>4.19.29</chronicle.fix.version>
-        <chronicle.services.version>3.19.12</chronicle.services.version>
+        <chronicle.services.version>3.19.30-SNAPSHOT</chronicle.services.version>
     </properties>
 
     <dependencyManagement>
