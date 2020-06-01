@@ -279,7 +279,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-ring</artifactId>
-                <version>2.19.30-SNAPSHOT</version>
+                <version>2.19.0</version>
             </dependency>
 
             <dependency>
