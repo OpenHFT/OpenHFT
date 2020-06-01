@@ -49,12 +49,12 @@
         <module>Chronicle-Network</module>
         <module>Chronicle-Bytes</module>
         <module>Chronicle-Wire</module>
-<!--        <module>Chronicle-Salt</module>-->
+        <!--        <module>Chronicle-Salt</module>-->
 
         <module>Chronicle-Queue</module>
 
         <module>Chronicle-Values</module>
-<!--        <module>Chronicle-Map</module>-->
+        <!--        <module>Chronicle-Map</module>-->
 
         <!--        <module>Chronicle-Decentred</module>-->
 
@@ -62,7 +62,7 @@
         <module>Chronicle-Queue-Enterprise</module>
         <module>Chronicle-Queue-Enterprise-Demo</module>
         <module>Chronicle-Datagrid</module>
-        <!--        <module>Chronicle-Datagrid-Demo</module>-->
+        <module>Chronicle-Datagrid-Demo</module>
 
         <module>Chronicle-Ring</module>
         <module>Chronicle-Market-Data-Distributor</module>
