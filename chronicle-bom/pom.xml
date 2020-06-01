@@ -39,6 +39,7 @@
         <chronicle.map.enterprise>2.19.1</chronicle.map.enterprise>
         <chronicle.fix.version>4.19.29</chronicle.fix.version>
         <chronicle.services.version>3.19.30-SNAPSHOT</chronicle.services.version>
+        <chronicle.ring>2.19.0</chronicle.ring>
     </properties>
 
     <dependencyManagement>
@@ -279,7 +280,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-ring</artifactId>
-                <version>2.19.0</version>
+                <version>${chronicle.ring}</version>
             </dependency>
 
             <dependency>
