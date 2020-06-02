@@ -36,7 +36,7 @@
         <chronicle.queue>5.19.31-SNAPSHOT</chronicle.queue>
         <chronicle.datagrid.version>2.19.9</chronicle.datagrid.version>
         <chronicle.queue.enterprise>2.19.30</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.19.1</chronicle.map.enterprise>
+        <chronicle.map.enterprise>2.19.30-SNAPSHOT</chronicle.map.enterprise>
         <chronicle.fix.version>4.19.29</chronicle.fix.version>
         <chronicle.services.version>3.19.30</chronicle.services.version>
     </properties>
@@ -102,7 +102,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.19.4</version>
+                <version>3.19.30-SNAPSHOT</version>
             </dependency>
 
             <dependency>
