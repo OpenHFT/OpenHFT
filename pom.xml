@@ -38,7 +38,7 @@
 
         <!-- stable -->
         <!--<module>Java-Lang</module>-->
-        <!--<module>Chronicle-Logger</module>-->
+        <module>Chronicle-Logger</module>
         <module>Chronicle-Algorithms</module>
 
         <!-- new -->
@@ -62,7 +62,7 @@
         <module>Chronicle-Queue-Enterprise</module>
         <module>Chronicle-Queue-Enterprise-Demo</module>
         <module>Chronicle-Datagrid</module>
-        <module>Chronicle-Datagrid-Demo</module>
+        <!--        <module>Chronicle-Datagrid-Demo</module>-->
 
         <module>Chronicle-Ring</module>
         <module>Chronicle-Market-Data-Distributor</module>
