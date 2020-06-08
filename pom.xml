@@ -72,5 +72,6 @@
 
         <module>Chronicle-Wire-Enterprise</module>
         <module>Chronicle-Map-Enterprise</module>
+        <module>Chronicle-Websocket-Jetty</module>
     </modules>
 </project>
