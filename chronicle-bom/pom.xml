@@ -329,7 +329,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-websocket-jetty</artifactId>
-                <version>1.19.30-SNAPSHOT</version>
+                <version>1.19.30</version>
             </dependency>
 
             <dependency>
