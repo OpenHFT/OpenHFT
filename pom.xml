@@ -59,6 +59,7 @@
         <!--        <module>Chronicle-Decentred</module>-->
 
         <!-- enterprise -->
+        <module>Chronicle-Network-Enterprise</module>
         <module>Chronicle-Queue-Enterprise</module>
         <module>Chronicle-Queue-Enterprise-Demo</module>
         <module>Chronicle-Datagrid</module>
