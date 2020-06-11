@@ -38,28 +38,30 @@
 
         <!-- stable -->
         <!--<module>Java-Lang</module>-->
-        <module>Chronicle-Logger</module>
-        <module>Chronicle-Algorithms</module>
 
         <!-- new -->
         <module>Chronicle-Core</module>
         <module>JLBH</module>
         <!--        <module>Chronicle-Coder</module>-->
-        <module>Chronicle-Threads</module>
-        <module>Chronicle-Network</module>
         <module>Chronicle-Bytes</module>
+        <module>Chronicle-Threads</module>
         <module>Chronicle-Wire</module>
-                <module>Chronicle-Salt</module>
+        <module>Chronicle-Network</module>
+        <!--        <module>Chronicle-Logger</module>-->
+        <!--                <module>Chronicle-Salt</module>-->
 
         <module>Chronicle-Queue</module>
 
         <module>Chronicle-Values</module>
+        <module>Chronicle-Algorithms</module>
         <module>Chronicle-Map</module>
 
         <!--        <module>Chronicle-Decentred</module>-->
 
         <!-- enterprise -->
         <module>Chronicle-Network-Enterprise</module>
+        <module>Chronicle-Wire-Enterprise</module>
+        <module>Chronicle-Map-Enterprise</module>
         <module>Chronicle-Queue-Enterprise</module>
         <module>Chronicle-Queue-Enterprise-Demo</module>
         <module>Chronicle-Datagrid</module>
@@ -70,8 +72,6 @@
         <module>Chronicle-Services</module>
         <module>Chronicle-FIX</module>
 
-        <module>Chronicle-Wire-Enterprise</module>
-        <module>Chronicle-Map-Enterprise</module>
         <module>Chronicle-Websocket-Jetty</module>
     </modules>
 </project>
