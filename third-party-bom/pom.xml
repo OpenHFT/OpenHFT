@@ -159,7 +159,8 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13</version>
+                <!-- v4.13 has issues with IntelliJ -->
+                <version>4.12</version>
             </dependency>
 
             <dependency>
