@@ -46,6 +46,7 @@
         <module>Chronicle-Bytes</module>
         <module>Chronicle-Threads</module>
         <module>Chronicle-Wire</module>
+        <module>Chronicle-Queue-Zero</module>
         <module>Chronicle-Network</module>
         <!--        <module>Chronicle-Logger</module>-->
         <!--                <module>Chronicle-Salt</module>-->
