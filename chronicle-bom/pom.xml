@@ -207,6 +207,18 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-router</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-router-guarded</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime-guarded</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
