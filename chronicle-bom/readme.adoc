@@ -15,9 +15,7 @@ Imports are most effective when used for defining a "library" of related artifac
 
 The root of the project is the BOM pom. It defines the versions of all the artifacts that will be created in the library. Other projects that wish to use the library should import this pom into the dependencyManagement section of their pom.
 
-
 == All Open Issues
-
 
 https://github.com/issues?q=is%3Aopen+is%3Aissue+archived%3Afalse+user%3AOpenHFT+user%3AChronicleEnterprise
 

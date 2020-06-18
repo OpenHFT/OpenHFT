@@ -148,12 +148,11 @@
             <type>test-jar</type>
         </dependency>
 
-
-        <dependency>
-            <groupId>software.chronicle</groupId>
-            <artifactId>chronicle-fix-42</artifactId>
-            <version>${chronicle.fix.version}</version>
-        </dependency>
+<dependency>
+    <groupId>software.chronicle</groupId>
+    <artifactId>chronicle-fix-42</artifactId>
+    <version>${chronicle.fix.version}</version>
+</dependency>
 
         <dependency>
             <groupId>software.chronicle</groupId>
@@ -166,7 +165,6 @@
             <artifactId>chronicle-fix-schema-optimizer</artifactId>
             <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
         </dependency>
-
 
         <dependency>
             <groupId>software.chronicle</groupId>
@@ -225,7 +223,6 @@
             <version>${chronicle.services.version}</version>
             <type>test-jar</type>
         </dependency>
-
 
         <dependency>
             <groupId>software.chronicle</groupId>
