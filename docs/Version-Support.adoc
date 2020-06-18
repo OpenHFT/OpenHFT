@@ -21,9 +21,10 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | stable release | end of support | Java versions
-| x.21  | 2021/11 (provisional) | 2022 | 2024 (provisional) | 11 & 17
-| x.20  | 2020/07 | 2021 (provisional) | 2023 (provisional) | 8 & 11
-| x.19  | 2020/02 | 2020/06 | 2022/06 | 8 & 11
+| x.22  | 2022/01 (a) | 2022/12 (a) | 2024 (a) | 11 & 17
+| x.21  | 2021/07 (a) | 2021/12 (a) | 2023/12 (a) | 8 & 11
+| x.20  | 2020/07 (a) | 2021/07 (a) | 2023/07 (a) | 8 & 11
+| x.19  | 2020/02 | 2020/06 (a) | 2022/06 (a) | 8 & 11
 | x.17  | 2018/08 | 2019/11 | 2022/02 | 8 & 11
 | x.16  | 2018/05 | 2018/08 | 2020/08 | 8
 | x.15  | 2017/12 | 2018/05 | 2020/05 | 8
@@ -31,6 +32,7 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 | x.13  | 2016/07 | 2017/03 | 2019/03 | 8
 | x.12  | 2016/03 | 2016/07 | 2019/03 | 8
 |====
+(a) Provisional dates
 
 NOTE: There was no x.18 release.
 
