@@ -102,7 +102,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.19.40-SNAPSHOT</version>
+                <version>3.19.39</version>
             </dependency>
 
             <dependency>
