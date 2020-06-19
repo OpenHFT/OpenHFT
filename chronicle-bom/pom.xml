@@ -41,7 +41,6 @@
         <chronicle.services.version>3.19.40-SNAPSHOT</chronicle.services.version>
         <chronicle-wire-enterprise.version>2.19.40-SNAPSHOT</chronicle-wire-enterprise.version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
 
