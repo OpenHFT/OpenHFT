@@ -31,49 +31,56 @@
         <module>java-parent-pom</module>
 
         <module>chronicle-bom</module>
-
-        <!-- heritage -->
-        <!--<module>Java-Thread-Affinity</module>-->
-        <!--<module>Java-Runtime-Compiler</module>-->
-
-        <!-- stable -->
-        <!--<module>Java-Lang</module>-->
-
-        <!-- new -->
-        <module>Chronicle-Core</module>
-<!--        <module>JLBH</module>-->
-        <!--        <module>Chronicle-Coder</module>-->
-        <module>Chronicle-Bytes</module>
-        <module>Chronicle-Threads</module>
-        <module>Chronicle-Wire</module>
-        <!--        <module>Chronicle-Queue-Zero</module>-->
-        <module>Chronicle-Network</module>
-        <!--        <module>Chronicle-Logger</module>-->
-        <!--                <module>Chronicle-Salt</module>-->
-
-        <module>Chronicle-Queue</module>
-
-        <module>Chronicle-Values</module>
-        <module>Chronicle-Algorithms</module>
-        <module>Chronicle-Map</module>
-
-        <!--        <module>Chronicle-Decentred</module>-->
-
-        <!-- enterprise -->
-        <module>Chronicle-Network-Enterprise</module>
-        <module>Chronicle-Wire-Enterprise</module>
-        <module>Chronicle-Map-Enterprise</module>
-        <module>Chronicle-Queue-Enterprise</module>
-        <module>Chronicle-Queue-Enterprise-Demo</module>
-        <module>Chronicle-Datagrid</module>
-        <!--        <module>Chronicle-Datagrid-Demo</module>-->
-
-        <module>Chronicle-Ring</module>
-        <module>Chronicle-Market-Data-Distributor</module>
-        <module>Chronicle-Services</module>
-        <module>Chronicle-FIX</module>
-
-        <module>Chronicle-Websocket-Jetty</module>
-        <module>All</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>All</id>
+            <modules>
+                <!-- heritage -->
+                <!--<module>Java-Thread-Affinity</module>-->
+                <!--<module>Java-Runtime-Compiler</module>-->
+
+                <!-- stable -->
+                <!--<module>Java-Lang</module>-->
+
+                <!-- new -->
+                <module>Chronicle-Core</module>
+                <!--        <module>JLBH</module>-->
+                <!--        <module>Chronicle-Coder</module>-->
+                <module>Chronicle-Bytes</module>
+                <module>Chronicle-Threads</module>
+                <module>Chronicle-Wire</module>
+                <!--        <module>Chronicle-Queue-Zero</module>-->
+                <module>Chronicle-Network</module>
+                <!--        <module>Chronicle-Logger</module>-->
+                <!--                <module>Chronicle-Salt</module>-->
+
+                <module>Chronicle-Queue</module>
+
+                <module>Chronicle-Values</module>
+                <module>Chronicle-Algorithms</module>
+                <module>Chronicle-Map</module>
+
+                <!--        <module>Chronicle-Decentred</module>-->
+
+                <!-- enterprise -->
+                <module>Chronicle-Network-Enterprise</module>
+                <module>Chronicle-Wire-Enterprise</module>
+                <module>Chronicle-Map-Enterprise</module>
+                <module>Chronicle-Queue-Enterprise</module>
+                <module>Chronicle-Queue-Enterprise-Demo</module>
+                <module>Chronicle-Datagrid</module>
+                <!--        <module>Chronicle-Datagrid-Demo</module>-->
+
+                <module>Chronicle-Ring</module>
+                <module>Chronicle-Market-Data-Distributor</module>
+                <module>Chronicle-Services</module>
+                <module>Chronicle-FIX</module>
+
+                <module>Chronicle-Websocket-Jetty</module>
+                <module>All</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
