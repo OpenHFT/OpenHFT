@@ -197,6 +197,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-router-guarded</artifactId>
+                <version>${chronicle.fix.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-codegenerator</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
