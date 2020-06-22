@@ -54,7 +54,7 @@
                 <!--        <module>Chronicle-Queue-Zero</module>-->
                 <module>Chronicle-Network</module>
                 <!--        <module>Chronicle-Logger</module>-->
-                <!--                <module>Chronicle-Salt</module>-->
+                                <module>Chronicle-Salt</module>
 
                 <module>Chronicle-Queue</module>
 
@@ -62,14 +62,14 @@
                 <module>Chronicle-Algorithms</module>
                 <module>Chronicle-Map</module>
 
-                <!--        <module>Chronicle-Decentred</module>-->
+                <module>Chronicle-Decentred</module>
 
                 <!-- enterprise -->
                 <module>Chronicle-Network-Enterprise</module>
                 <module>Chronicle-Wire-Enterprise</module>
                 <module>Chronicle-Map-Enterprise</module>
                 <module>Chronicle-Queue-Enterprise</module>
-                <module>Chronicle-Queue-Enterprise-Demo</module>
+                <!--                <module>Chronicle-Queue-Enterprise-Demo</module>-->
                 <module>Chronicle-Datagrid</module>
                 <!--        <module>Chronicle-Datagrid-Demo</module>-->
 
