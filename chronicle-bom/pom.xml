@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.logger.version>4.19.30</chronicle.logger.version>
-        <chronicle.queue>5.19.41</chronicle.queue>
+        <chronicle.queue>5.19.42-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.19.40</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.19.45</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.41</chronicle.map.enterprise>
@@ -300,7 +300,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-decentred</artifactId>
-                <version>2.17.2</version>
+                <version>2.19.40-SNAPSHOT</version>
             </dependency>
 
             <dependency>
