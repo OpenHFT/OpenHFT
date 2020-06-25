@@ -33,9 +33,9 @@
     </description>
     <properties>
         <chronicle.logger.version>4.19.30</chronicle.logger.version>
-        <chronicle.queue>5.19.43</chronicle.queue>
+        <chronicle.queue>5.19.44-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.19.40</chronicle-wire-enterprise.version>
-        <chronicle.queue.enterprise>2.19.45</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.19.46-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.41</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.19.42</chronicle.datagrid.version>
         <chronicle.fix.version>4.19.45</chronicle.fix.version>
@@ -270,7 +270,7 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
-            
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
