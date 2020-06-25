@@ -58,7 +58,6 @@
                 <artifactId>chronicle-threads</artifactId>
                 <version>2.19.46-SNAPSHOT</version>
             </dependency>
-
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-ticker</artifactId>
