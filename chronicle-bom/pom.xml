@@ -40,7 +40,7 @@
         <chronicle.datagrid.version>2.19.42</chronicle.datagrid.version>
         <chronicle.fix.version>4.19.45</chronicle.fix.version>
         <chronicle.services.version>3.19.41</chronicle.services.version>
-        <chronicle-ring.version>2.19.33</chronicle-ring.version>
+        <chronicle-ring.version>2.19.34-SNAPSHOT</chronicle-ring.version>
     </properties>
 
     <dependencyManagement>
