@@ -79,7 +79,6 @@
                 <!--                <module>Chronicle-FIX</module>-->
 
                 <module>Chronicle-Websocket-Jetty</module>
-                <module>All</module>
             </modules>
         </profile>
     </profiles>
