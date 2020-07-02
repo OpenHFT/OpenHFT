@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.19.40-SNAPSHOT</version>
+                <version>1.19.41</version>
             </dependency>
 
             <dependency>
