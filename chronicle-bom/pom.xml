@@ -60,7 +60,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.19.48</version>
+                <version>2.19.49-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -90,13 +90,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.19.48</version>
+                <version>2.19.49-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.19.49</version>
+                <version>2.19.50-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.19.30</version>
+                <version>1.19.40-SNAPSHOT</version>
             </dependency>
 
             <dependency>
