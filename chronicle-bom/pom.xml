@@ -37,7 +37,7 @@
     </description>
     <properties>
         <chronicle.logger.version>4.19.30</chronicle.logger.version>
-        <chronicle.queue>5.19.48</chronicle.queue>
+        <chronicle.queue>5.19.49-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.19.40</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.19.48-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.42</chronicle.map.enterprise>
