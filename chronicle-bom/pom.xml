@@ -16,12 +16,13 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -36,9 +37,9 @@
         <chronicle.queue>5.19.49</chronicle.queue>
         <chronicle-wire-enterprise.version>2.19.40</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.19.48</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.19.42</chronicle.map.enterprise>
+        <chronicle.map.enterprise>2.19.43-SNAPSHOT</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.19.45-SNAPSHOT</chronicle.datagrid.version>
-        <chronicle.fix.version>4.19.48</chronicle.fix.version>
+        <chronicle.fix.version>4.19.49-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.19.44</chronicle.services.version>
         <chronicle-ring.version>2.19.38</chronicle-ring.version>
     </properties>
@@ -50,7 +51,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.19.56</version>
+                <version>2.19.57-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -92,7 +93,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.19.52</version>
+                <version>2.19.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -270,7 +271,7 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
-            
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
