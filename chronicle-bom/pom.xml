@@ -36,10 +36,10 @@
         <chronicle.queue>5.19.49</chronicle.queue>
         <chronicle-wire-enterprise.version>2.19.40</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.19.49</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.19.42</chronicle.map.enterprise>
-        <chronicle.datagrid.version>2.19.45</chronicle.datagrid.version>
+        <chronicle.map.enterprise>2.19.43-SNAPSHOT</chronicle.map.enterprise>
+        <chronicle.datagrid.version>2.19.46-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.fix.version>4.19.48</chronicle.fix.version>
-        <chronicle.services.version>3.19.44</chronicle.services.version>
+        <chronicle.services.version>3.19.45-SNAPSHOT</chronicle.services.version>
         <chronicle-ring.version>2.19.38</chronicle-ring.version>
     </properties>
 
