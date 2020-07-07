@@ -3,16 +3,31 @@ Peter Lawrey
 
 While almost all libraries are built in Java 8, most are tested with Java 11 as a part of continous integration, there are inconsistencies which are listed here.
 
-|===
-| Library | Compiles With | Additionally tested with
-| Chronicle-Core
+== Compiles on Java 8
 
-Chronicle-Map | Java 8 only | Java 11 & 14
-| Chronicle-Threads 
+These libraries compile on Java 8 but pass all the tests in Java 11.0.7 and Java 14.0.1
 
-Chronicle-Network 
+- Chronicle-Core
+- Chronicle-Map 
 
-Chronicle-Threads 
+== Compiles and Runs on Java 8, 11, and 14.
 
-Chronicle-Queue | Java 8, 11, 14 |
-|===
+- Chronicle-Algorithms
+- Chronicle-Datagrid
+- Chronicle-Datagrid-Demo
+- Chronicle-FIX
+- Chronicle-Map-Enterprise
+- Chronicle-Market-Data-Distributor
+- Chronicle-Network 
+- Chronicle-Network-Enterprise
+- Chronicle-Queue
+- Chronicle-Queue-Enterprise
+- Chronicle-Ring
+- Chronicle-Salt
+- Chronicle-Services
+- Chronicle-Threads 
+- Chronicle-Threads 
+- Chronicle-Values
+- Chronicle-Websocket-Jetty
+- Chronicle-Wire-Enterprise
+- JLBH
