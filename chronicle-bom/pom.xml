@@ -92,7 +92,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.19.74</version>
+                <version>2.19.75-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -270,7 +270,7 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
-            
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
