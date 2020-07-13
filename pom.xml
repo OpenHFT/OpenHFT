@@ -46,7 +46,7 @@
                 <!--<module>Java-Lang</module>-->
 
                 <!-- new -->
-                <!--                <module>Chronicle-Core</module>-->
+                <module>Chronicle-Core</module>
                 <module>JLBH</module>
                 <!--        <module>Chronicle-Coder</module>-->
                 <module>Chronicle-Bytes</module>
