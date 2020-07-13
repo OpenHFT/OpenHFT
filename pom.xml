@@ -39,14 +39,14 @@
             <id>All</id>
             <modules>
                 <!-- heritage -->
-                <!--<module>Java-Thread-Affinity</module>-->
+                <module>Java-Thread-Affinity</module>
                 <!--<module>Java-Runtime-Compiler</module>-->
 
                 <!-- stable -->
                 <!--<module>Java-Lang</module>-->
 
                 <!-- new -->
-                <module>Chronicle-Core</module>
+                <!--                <module>Chronicle-Core</module>-->
                 <module>JLBH</module>
                 <!--        <module>Chronicle-Coder</module>-->
                 <module>Chronicle-Bytes</module>
@@ -63,7 +63,7 @@
                 <module>Chronicle-Algorithms</module>
                 <module>Chronicle-Map</module>
 
-                <module>Chronicle-Decentred</module>
+                <!--                <module>Chronicle-Decentred</module>-->
 
                 <!-- enterprise -->
                 <module>Chronicle-Network-Enterprise</module>
