@@ -33,14 +33,14 @@
     </description>
     <properties>
         <chronicle.logger.version>4.19.30</chronicle.logger.version>
-        <chronicle.queue>5.19.73</chronicle.queue>
+        <chronicle.queue>5.19.74-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.19.70</chronicle-wire-enterprise.version>
-        <chronicle.queue.enterprise>2.19.71</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.19.72-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.70</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.19.70</chronicle.datagrid.version>
-        <chronicle.fix.version>4.19.72</chronicle.fix.version>
+        <chronicle.fix.version>4.19.73-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.19.70</chronicle.services.version>
-        <chronicle-ring.version>2.19.39</chronicle-ring.version>
+        <chronicle-ring.version>2.19.40-SNAPSHOT</chronicle-ring.version>
     </properties>
 
     <dependencyManagement>
@@ -86,13 +86,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.19.72</version>
+                <version>2.19.74-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.19.76</version>
+                <version>2.19.77-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -338,7 +338,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.4-SNAPSHOT</version>
             </dependency>
 
             <dependency>
