@@ -16,12 +16,13 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -36,8 +37,8 @@
         <chronicle.queue>5.19.74-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.19.70</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.19.72-SNAPSHOT</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.19.70</chronicle.map.enterprise>
-        <chronicle.datagrid.version>2.19.70</chronicle.datagrid.version>
+        <chronicle.map.enterprise>2.19.71-SNAPSHOT</chronicle.map.enterprise>
+        <chronicle.datagrid.version>2.19.71-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.fix.version>4.19.73-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.19.70</chronicle.services.version>
         <chronicle-ring.version>2.19.40-SNAPSHOT</chronicle-ring.version>
@@ -270,7 +271,7 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
             </dependency>
-            
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
@@ -338,7 +339,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.2.4-SNAPSHOT</version>
+                <version>3.2.3</version>
             </dependency>
 
             <dependency>
