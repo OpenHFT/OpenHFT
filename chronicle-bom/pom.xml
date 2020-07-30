@@ -39,8 +39,8 @@
         <chronicle-wire-enterprise.version>2.19.70</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.20.0-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.19.71</chronicle.map.enterprise>
-        <chronicle.datagrid.version>2.19.71</chronicle.datagrid.version>
-        <chronicle.fix.version>4.19.73</chronicle.fix.version>
+        <chronicle.datagrid.version>2.20.0-SNAPSHOT</chronicle.datagrid.version>
+        <chronicle.fix.version>4.20.0-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.20.0-SNAPSHOT</chronicle.services.version>
         <chronicle-ring.version>2.20.0-SNAPSHOT</chronicle-ring.version>
     </properties>
