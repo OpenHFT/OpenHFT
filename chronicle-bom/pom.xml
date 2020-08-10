@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-salt</artifactId>
-    <version>2.20.3-SNAPSHOT</version>
+                <version>2.19.40</version>
             </dependency>
 
             <dependency>
