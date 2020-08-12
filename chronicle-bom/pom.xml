@@ -33,13 +33,13 @@
     </description>
     <properties>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
-        <chronicle.queue>5.19.76</chronicle.queue>
+        <chronicle.queue>5.20.3-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.20.1</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.20.2</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.20.1</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.20.1</chronicle.datagrid.version>
         <chronicle.fix.version>4.20.1</chronicle.fix.version>
-        <chronicle.services.version>3.20.1</chronicle.services.version>
+        <chronicle.services.version>3.20.2-SNAPSHOT</chronicle.services.version>
         <chronicle-ring.version>2.20.1</chronicle-ring.version>
     </properties>
 
