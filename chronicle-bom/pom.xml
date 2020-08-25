@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
-        <chronicle.queue>5.20.5</chronicle.queue>
+        <chronicle.queue>5.20.6-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.20.1</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.20.3</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.20.2</chronicle.map.enterprise>
