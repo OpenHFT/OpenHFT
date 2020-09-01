@@ -60,8 +60,8 @@
                 <module>Chronicle-Queue</module>
 
                 <module>Chronicle-Values</module>
-                <module>Chronicle-Algorithms</module>
-                <module>Chronicle-Map</module>
+                <!--                <module>Chronicle-Algorithms</module>-->
+                <!--                <module>Chronicle-Map</module>-->
 
                 <module>Chronicle-Decentred</module>
 
