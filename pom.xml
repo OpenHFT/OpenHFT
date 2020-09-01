@@ -74,7 +74,7 @@
                 <module>Chronicle-Datagrid</module>
                 <!--                <module>Chronicle-Datagrid-Demo</module>-->
 
-                <module>Chronicle-Ring</module>
+<!--                <module>Chronicle-Ring</module>-->
                 <module>Chronicle-Market-Data-Distributor</module>
                 <module>Chronicle-Services</module>
                 <module>Chronicle-FIX</module>
