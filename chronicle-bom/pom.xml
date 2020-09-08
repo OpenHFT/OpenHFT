@@ -50,7 +50,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.20.24-SNAPSHOT</version>
+                <version>2.20.25-SNAPSHOT</version>
             </dependency>
 
             <dependency>
