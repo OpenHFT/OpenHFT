@@ -35,12 +35,12 @@
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
         <chronicle.queue>5.20.21</chronicle.queue>
         <chronicle-wire-enterprise.version>2.20.1</chronicle-wire-enterprise.version>
-        <chronicle.queue.enterprise>2.20.21</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.20.23</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.20.21-SNAPSHOT</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.20.20</chronicle.datagrid.version>
-        <chronicle.fix.version>4.20.21</chronicle.fix.version>
-        <chronicle.services.version>3.20.21</chronicle.services.version>
-        <chronicle-ring.version>2.20.2</chronicle-ring.version>
+        <chronicle.fix.version>4.20.22</chronicle.fix.version>
+        <chronicle.services.version>3.20.22</chronicle.services.version>
+        <chronicle-ring.version>2.20.20-SNAPSHOT</chronicle-ring.version>
     </properties>
 
     <dependencyManagement>
@@ -50,7 +50,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.20.24-SNAPSHOT</version>
+                <version>2.20.26</version>
             </dependency>
 
             <dependency>
@@ -68,7 +68,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.20.10</version>
+                <version>2.20.22-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -86,13 +86,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.20.24-SNAPSHOT</version>
+                <version>2.20.28-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.20.20-SNAPSHOT</version>
+                <version>2.20.21-SNAPSHOT</version>
             </dependency>
 
             <dependency>
