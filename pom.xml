@@ -68,7 +68,7 @@
                 <!-- enterprise -->
                 <module>Chronicle-Network-Enterprise</module>
                 <module>Chronicle-Wire-Enterprise</module>
-                <!--                <module>Chronicle-Map-Enterprise</module>-->
+                <module>Chronicle-Map-Enterprise</module>
                 <module>Chronicle-Queue-Enterprise</module>
                 <!--                <module>Chronicle-Queue-Enterprise-Demo</module>-->
                 <!--                <module>Chronicle-Datagrid</module>-->
