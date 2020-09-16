@@ -33,9 +33,9 @@
     </description>
     <properties>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
-        <chronicle.queue>5.20.21</chronicle.queue>
+        <chronicle.queue>5.20.22-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.20.1</chronicle-wire-enterprise.version>
-        <chronicle.queue.enterprise>2.20.24</chronicle.queue.enterprise>
+        <chronicle.queue.enterprise>2.20.25-SNAPSHOT</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.20.22-SNAPSHOT</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.20.21-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.fix.version>4.20.24-SNAPSHOT</chronicle.fix.version>
@@ -56,7 +56,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.20.20-SNAPSHOT</version>
+                <version>2.20.21-SNAPSHOT</version>
             </dependency>
 
             <dependency>
