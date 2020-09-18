@@ -60,8 +60,8 @@
                 <module>Chronicle-Queue</module>
 
                 <module>Chronicle-Values</module>
-                <!--                <module>Chronicle-Algorithms</module>-->
-                <!--                <module>Chronicle-Map</module>-->
+                <module>Chronicle-Algorithms</module>
+                <module>Chronicle-Map</module>
 
                 <!--                <module>Chronicle-Decentred</module>-->
 
@@ -71,7 +71,7 @@
                 <module>Chronicle-Map-Enterprise</module>
                 <module>Chronicle-Queue-Enterprise</module>
                 <!--                <module>Chronicle-Queue-Enterprise-Demo</module>-->
-                <!--                <module>Chronicle-Datagrid</module>-->
+                <module>Chronicle-Datagrid</module>
                 <!--                <module>Chronicle-Datagrid-Demo</module>-->
 
                 <!--                <module>Chronicle-Ring</module>-->
