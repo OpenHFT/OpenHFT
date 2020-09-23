@@ -38,7 +38,7 @@
         <chronicle.queue.enterprise>2.20.42</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.20.41</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.20.40</chronicle.datagrid.version>
-        <chronicle.fix.version>4.20.40</chronicle.fix.version>
+        <chronicle.fix.version>4.20.41-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.20.41</chronicle.services.version>
         <chronicle-ring.version>2.20.20</chronicle-ring.version>
     </properties>
