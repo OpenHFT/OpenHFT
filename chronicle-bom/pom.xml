@@ -39,7 +39,7 @@
         <chronicle.map.enterprise>2.20.60</chronicle.map.enterprise>
         <chronicle.datagrid.version>2.20.40</chronicle.datagrid.version>
         <chronicle.fix.version>4.20.60</chronicle.fix.version>
-        <chronicle.services.version>3.20.41</chronicle.services.version>
+        <chronicle.services.version>3.20.60-SNAPSHOT</chronicle.services.version>
         <chronicle-ring.version>2.20.20</chronicle-ring.version>
     </properties>
 
