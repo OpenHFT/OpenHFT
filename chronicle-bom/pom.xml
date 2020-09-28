@@ -344,7 +344,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>2.3.7-SNAPSHOT</version>
+                <version>2.3.6</version>
             </dependency>
 
             <dependency>
