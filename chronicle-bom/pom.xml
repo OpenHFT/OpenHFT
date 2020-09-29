@@ -437,6 +437,12 @@
                 <version>1.0.5</version>
                 <type>war</type>
             </dependency>
+          
+            <dependency>
+              <groupId>software.chronicle.efx</groupId>
+              <artifactId>efx-parent</artifactId>
+              <version>1.0.0</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
