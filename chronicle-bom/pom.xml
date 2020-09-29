@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.20.68-SNAPSHOT</version>
+    <version>2.20.70-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -350,7 +350,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-websocket-jetty</artifactId>
-                <version>1.20.20-SNAPSHOT</version>
+                <version>1.20.19</version>
             </dependency>
 
             <dependency>
@@ -437,7 +437,7 @@
                 <version>1.0.5</version>
                 <type>war</type>
             </dependency>
-          
+
             <dependency>
               <groupId>software.chronicle.efx</groupId>
               <artifactId>efx-parent</artifactId>
