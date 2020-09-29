@@ -32,8 +32,8 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.logger.version>4.20.1</chronicle.logger.version>
-        <chronicle.queue>5.20.60</chronicle.queue>
+        <chronicle.logger.version>4.20.2-SNAPSHOT</chronicle.logger.version>
+        <chronicle.queue>5.20.61-SNAPSHOT</chronicle.queue>
         <chronicle-wire-enterprise.version>2.20.1</chronicle-wire-enterprise.version>
         <chronicle.queue.enterprise>2.20.60</chronicle.queue.enterprise>
         <chronicle.map.enterprise>2.20.60</chronicle.map.enterprise>
@@ -350,7 +350,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-websocket-jetty</artifactId>
-                <version>1.19.30</version>
+                <version>1.20.20-SNAPSHOT</version>
             </dependency>
 
             <dependency>
