@@ -47,25 +47,26 @@
 
                 <!-- new -->
                 <module>Chronicle-Core</module>
-                <module>JLBH</module>
+                <!--                <module>JLBH</module>-->
                 <!--        <module>Chronicle-Coder</module>-->
                 <module>Chronicle-Bytes</module>
                 <module>Chronicle-Threads</module>
                 <module>Chronicle-Wire</module>
-                <module>Chronicle-Queue-Zero</module>
                 <module>Chronicle-Network</module>
-                <module>Chronicle-Logger</module>
-                <module>Chronicle-Salt</module>
+                <module>Chronicle-Queue-Zero</module>
+                <!--                <module>Chronicle-Logger</module>-->
+                <!--                <module>Chronicle-Salt</module>-->
 
                 <module>Chronicle-Queue</module>
 
                 <module>Chronicle-Values</module>
-                <!--                <module>Chronicle-Algorithms</module>-->
-                <!--                <module>Chronicle-Map</module>-->
+                <module>Chronicle-Algorithms</module>
+                <module>Chronicle-Map</module>
 
-                <module>Chronicle-Decentred</module>
+                <!--                <module>Chronicle-Decentred</module>-->
 
                 <!-- enterprise -->
+                <module>Chronicle-Market-Data-Distributor</module>
                 <module>Chronicle-Network-Enterprise</module>
                 <module>Chronicle-Wire-Enterprise</module>
                 <module>Chronicle-Map-Enterprise</module>
@@ -74,12 +75,11 @@
                 <module>Chronicle-Datagrid</module>
                 <!--                <module>Chronicle-Datagrid-Demo</module>-->
 
-                <module>Chronicle-Ring</module>
-                <module>Chronicle-Market-Data-Distributor</module>
+                <!--                <module>Chronicle-Ring</module>-->
                 <module>Chronicle-Services</module>
                 <module>Chronicle-FIX</module>
 
-                <module>Chronicle-Websocket-Jetty</module>
+                <!--                <module>Chronicle-Websocket-Jetty</module>-->
             </modules>
         </profile>
     </profiles>

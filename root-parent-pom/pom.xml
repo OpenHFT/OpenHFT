@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>1.2.4-SNAPSHOT</version>
+    <version>1.2.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Root Parent Pom</name>
@@ -58,8 +58,8 @@
             <email>jerry.shea@chronicle.software</email>
         </developer>
         <developer>
-            <name>Roman Leventov</name>
-            <email>roman.leventov@chronicle.software</email>
+            <name>Per Minborg</name>
+            <email>per.minborg@chronicle.software</email>
         </developer>
     </developers>
 
@@ -101,12 +101,7 @@
                     <version>3.0.0-M4</version>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.3</version>
-                </plugin>
-
+                
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
@@ -161,38 +156,6 @@
                     <version>1.4.0</version>
                 </plugin>
 
-                <plugin>
-                    <groupId>com.google.code.maven-replacer-plugin</groupId>
-                    <artifactId>replacer</artifactId>
-                    <version>1.5.3</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>se.eris</groupId>
-                    <artifactId>notnull-instrumenter-maven-plugin</artifactId>
-                    <version>0.6.8</version>
-                    <executions>
-                        <execution>
-                            <id>instrument</id>
-                            <goals>
-                                <goal>instrument</goal>
-                                <goal>tests-instrument</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <notNull>
-                            <param>org.jetbrains.annotations.NotNull</param>
-                            <param>javax.validation.constraints.NotNull</param>
-                        </notNull>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
 
