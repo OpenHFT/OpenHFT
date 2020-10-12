@@ -61,7 +61,7 @@
 
                 <module>Chronicle-Values</module>
                 <module>Chronicle-Algorithms</module>
-                <module>Chronicle-Map</module>
+<!--                <module>Chronicle-Map</module>-->
 
                 <!--                <module>Chronicle-Decentred</module>-->
 
@@ -77,7 +77,7 @@
 
                 <!--                <module>Chronicle-Ring</module>-->
                 <module>Chronicle-Services</module>
-                <module>Chronicle-FIX</module>
+                <!--                <module>Chronicle-FIX</module>-->
 
                 <!--                <module>Chronicle-Websocket-Jetty</module>-->
             </modules>
