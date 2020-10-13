@@ -16,12 +16,13 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -36,12 +37,13 @@
         <chronicle.queue.zero.version>5.20.80-SNAPSHOT</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.20.1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.20.81-SNAPSHOT</chronicle.queue.enterprise.version>
-        <chronicle.map.enterprise>2.20.80-SNAPSHOT</chronicle.map.enterprise>
+        <chronicle.map.enterprise.version>2.20.80-SNAPSHOT</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.20.81-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.ring.version>2.20.80-SNAPSHOT</chronicle.ring.version>
         <chronicle.fix.version>4.20.80-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.20.80-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
+        <chronicle.efx.version>1.0.0</chronicle.efx.version>
     </properties>
 
     <dependencyManagement>
@@ -161,20 +163,20 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
                 <type>test-jar</type>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise-guarded</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
             </dependency>
 
             <dependency>
@@ -436,6 +438,12 @@
                 <artifactId>chronicle-datagrid-gui</artifactId>
                 <version>1.0.5</version>
                 <type>war</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle.efx</groupId>
+                <artifactId>chronicle-efx</artifactId>
+                <version>${chronicle.efx.version}</version>
             </dependency>
 
         </dependencies>
