@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.20-SNAPSHOT</version>
+    <version>2.20.100-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -36,12 +36,13 @@
         <chronicle.queue.zero.version>2.20.81</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.20.1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.20.81</chronicle.queue.enterprise.version>
-        <chronicle.map.enterprise>2.20.80</chronicle.map.enterprise>
+        <chronicle.map.enterprise.version>2.20.80</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.20.81-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.ring.version>2.20.80-SNAPSHOT</chronicle.ring.version>
         <chronicle.fix.version>4.20.80-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.20.80-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
+        <chronicle.efx.version>1.0.0</chronicle.efx.version>
     </properties>
 
     <dependencyManagement>
@@ -161,20 +162,20 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
                 <type>test-jar</type>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise-guarded</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
             </dependency>
 
             <dependency>
@@ -436,6 +437,48 @@
                 <artifactId>chronicle-datagrid-gui</artifactId>
                 <version>1.0.5</version>
                 <type>war</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-bookbuilder</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-common</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-config</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-hedger</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-oms</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-position</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-pricer</artifactId>
+                <version>${chronicle.efx.version}</version>
             </dependency>
 
         </dependencies>
