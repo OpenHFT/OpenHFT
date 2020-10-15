@@ -32,17 +32,17 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.20.84</chronicle.queue.version>
+        <chronicle.queue.version>5.20.85-SNAPSHOT</chronicle.queue.version>
         <chronicle.queue.zero.version>2.20.81</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.20.1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.20.82</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.20.80</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.20.82</chronicle.datagrid.version>
         <chronicle.ring.version>2.20.80</chronicle.ring.version>
-        <chronicle.fix.version>4.20.80</chronicle.fix.version>
+        <chronicle.fix.version>4.20.81-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.20.82</chronicle.services.version>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
-        <chronicle.efx.version>2.20.80</chronicle.efx.version>
+        <chronicle.efx.version>2.20.81-SNAPSHOT</chronicle.efx.version>
     </properties>
 
     <dependencyManagement>
