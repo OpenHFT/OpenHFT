@@ -40,7 +40,7 @@
             <modules>
                 <!-- heritage -->
                 <module>Java-Thread-Affinity</module>
-                <!--<module>Java-Runtime-Compiler</module>-->
+                <module>Java-Runtime-Compiler</module>
 
                 <!-- stable -->
                 <!--<module>Java-Lang</module>-->
