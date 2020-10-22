@@ -52,7 +52,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.20.102</version>
+                <version>2.20.103-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -94,7 +94,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.20.81</version>
+                <version>2.20.100-SNAPSHOT</version>
             </dependency>
 
             <dependency>
