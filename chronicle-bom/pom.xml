@@ -32,15 +32,17 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
+        <chronicle.queue.version>5.20.103-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.zero.version>2.20.81</chronicle.queue.zero.version>
+        <chronicle.wire.enterprise.version>2.20.1</chronicle.wire.enterprise.version>
+        <chronicle.queue.enterprise.version>2.20.102</chronicle.queue.enterprise.version>
+        <chronicle.map.enterprise.version>2.20.81</chronicle.map.enterprise.version>
+        <chronicle.datagrid.version>2.20.82</chronicle.datagrid.version>
+        <chronicle.ring.version>2.20.80</chronicle.ring.version>
+        <chronicle.fix.version>4.20.82</chronicle.fix.version>
+        <chronicle.services.version>3.20.105</chronicle.services.version>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
-        <chronicle.queue>5.20.21</chronicle.queue>
-        <chronicle-wire-enterprise.version>2.20.1</chronicle-wire-enterprise.version>
-        <chronicle.queue.enterprise>2.20.24</chronicle.queue.enterprise>
-        <chronicle.map.enterprise>2.20.21</chronicle.map.enterprise>
-        <chronicle.datagrid.version>2.20.20</chronicle.datagrid.version>
-        <chronicle.fix.version>4.20.23</chronicle.fix.version>
-        <chronicle.services.version>3.20.23-SNAPSHOT</chronicle.services.version>
-        <chronicle-ring.version>2.20.20</chronicle-ring.version>
+        <chronicle.efx.version>2.20.101</chronicle.efx.version>
     </properties>
 
     <dependencyManagement>
@@ -56,7 +58,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.20.7</version>
+                <version>2.20.101</version>
             </dependency>
 
             <dependency>
@@ -68,13 +70,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.20.22</version>
+                <version>2.20.101</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>2.20.6</version>
+                <version>2.20.80</version>
             </dependency>
 
             <dependency>
@@ -86,57 +88,94 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.20.28</version>
+                <version>2.20.102-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.20.23</version>
+                <version>2.20.100</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
-                <version>2.20.2</version>
+                <version>2.20.80</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.20.3</version>
+                <version>3.20.83</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-market-data-distributor</artifactId>
+                <version>3.20.100</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-queue</artifactId>
+                <version>${chronicle.queue.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-queue</artifactId>
+                <version>${chronicle.queue.version}</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-zero</artifactId>
+                <version>${chronicle.queue.zero.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-wire-enterprise</artifactId>
+                <version>${chronicle.wire.enterprise.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-enterprise</artifactId>
+                <version>${chronicle.queue.enterprise.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-enterprise</artifactId>
+                <version>${chronicle.queue.enterprise.version}</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-enterprise-guarded</artifactId>
+                <version>${chronicle.queue.enterprise.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise}</version>
+                <version>${chronicle.map.enterprise.version}</version>
                 <type>test-jar</type>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise-guarded</artifactId>
-                <version>${chronicle.map.enterprise}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-queue</artifactId>
-                <version>${chronicle.queue}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-queue</artifactId>
-                <version>${chronicle.queue}</version>
-                <type>test-jar</type>
+                <version>${chronicle.map.enterprise.version}</version>
             </dependency>
 
             <dependency>
@@ -160,33 +199,14 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-wire-enterprise</artifactId>
-                <version>${chronicle-wire-enterprise.version}</version>
+                <artifactId>chronicle-ring</artifactId>
+                <version>${chronicle.ring.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>2.20.1</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>${chronicle.queue.enterprise}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-queue-enterprise</artifactId>
-                <version>${chronicle.queue.enterprise}</version>
-                <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-queue-enterprise-guarded</artifactId>
-                <version>${chronicle.queue.enterprise}</version>
+                <artifactId>chronicle-ring-guarded</artifactId>
+                <version>${chronicle.ring.version}</version>
             </dependency>
 
             <dependency>
@@ -206,7 +226,6 @@
                 <artifactId>chronicle-fix-router</artifactId>
                 <version>${chronicle.fix.version}</version>
             </dependency>
-
 
             <dependency>
                 <groupId>software.chronicle</groupId>
@@ -292,18 +311,6 @@
             </dependency>
 
             <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-ring</artifactId>
-                <version>${chronicle-ring.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-ring-guarded</artifactId>
-                <version>${chronicle-ring.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-decentred</artifactId>
                 <version>2.17.2</version>
@@ -311,14 +318,20 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-queue-zero</artifactId>
-                <version>2.20.20</version>
+                <artifactId>chronicle-fix-queue-zero</artifactId>
+                <version>5.19.0</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-queue-zero</artifactId>
-                <version>5.19.0</version>
+                <artifactId>chronicle-fix-tr-sbe</artifactId>
+                <version>2.20.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-ebs-ultra</artifactId>
+                <version>2.20.0</version>
             </dependency>
 
             <!--  non-core projects -->
@@ -338,13 +351,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.2.3</version>
+                <version>3.20.0</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>2.3.6</version>
+                <version>2.4.0</version>
             </dependency>
 
             <dependency>
@@ -436,6 +449,49 @@
                 <artifactId>chronicle-datagrid-gui</artifactId>
                 <version>1.0.5</version>
                 <type>war</type>
+            </dependency>
+
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-bookbuilder</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-common</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-config</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-hedger</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-oms</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-position</artifactId>
+                <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-pricer</artifactId>
+                <version>${chronicle.efx.version}</version>
             </dependency>
 
         </dependencies>
