@@ -39,7 +39,7 @@
         <chronicle.map.enterprise.version>2.20.81</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.20.82</chronicle.datagrid.version>
         <chronicle.ring.version>2.20.80</chronicle.ring.version>
-        <chronicle.fix.version>4.20.82</chronicle.fix.version>
+        <chronicle.fix.version>4.20.83-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.20.105</chronicle.services.version>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
         <chronicle.efx.version>2.20.101</chronicle.efx.version>
@@ -340,7 +340,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.20.0-SNAPSHOT</version>
+                <version>1.19.30</version>
             </dependency>
 
             <dependency>
