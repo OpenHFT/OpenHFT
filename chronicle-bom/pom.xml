@@ -115,7 +115,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>3.20.100</version>
+                <version>3.20.101</version>
             </dependency>
 
             <dependency>
