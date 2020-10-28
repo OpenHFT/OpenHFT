@@ -454,12 +454,11 @@
                 <type>war</type>
             </dependency>
 
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-efx-bookbuilder</artifactId>
-                <version>${chronicle.efx.version}</version>
-            </dependency>
+<dependency>
+    <groupId>software.chronicle</groupId>
+    <artifactId>chronicle-efx-bookbuilder</artifactId>
+    <version>${chronicle.efx.version}</version>
+</dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
