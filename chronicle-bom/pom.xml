@@ -25,24 +25,24 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.20-SNAPSHOT</version>
+    <version>2.20.150</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.20.108-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.version>5.20.108</chronicle.queue.version>
         <chronicle.queue.zero.version>2.20.81</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.20.1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.20.106-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.20.103</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.20.82</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.20.82</chronicle.datagrid.version>
         <chronicle.ring.version>2.20.80</chronicle.ring.version>
-        <chronicle.fix.version>4.20.87-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>3.20.111-SNAPSHOT</chronicle.services.version>
+        <chronicle.fix.version>4.20.86</chronicle.fix.version>
+        <chronicle.services.version>3.20.108</chronicle.services.version>
         <chronicle.logger.version>4.20.1</chronicle.logger.version>
-        <chronicle.efx.version>2.20.103-SNAPSHOT</chronicle.efx.version>
+        <chronicle.efx.version>2.20.102</chronicle.efx.version>
     </properties>
 
     <dependencyManagement>
@@ -52,7 +52,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.20.112-SNAPSHOT</version>
+                <version>2.20.112</version>
             </dependency>
 
             <dependency>
@@ -70,7 +70,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.20.103-SNAPSHOT</version>
+                <version>2.20.103</version>
             </dependency>
 
             <dependency>
@@ -88,7 +88,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.20.105-SNAPSHOT</version>
+                <version>2.20.105</version>
             </dependency>
 
             <dependency>
@@ -331,7 +331,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-ebs-ultra</artifactId>
-                <version>2.20.1-SNAPSHOT</version>
+                <version>2.20.0</version>
             </dependency>
 
             <!--  non-core projects -->
@@ -532,6 +532,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-2.20.150</tag>
     </scm>
 </project>
