@@ -25,17 +25,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.20-SNAPSHOT</version>
+    <version>2.20.162</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.20.111-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.version>5.20.111</chronicle.queue.version>
         <chronicle.queue.zero.version>2.20.81</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.20.1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.20.110-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.20.110</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.20.82</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.20.82</chronicle.datagrid.version>
         <chronicle.ring.version>2.20.80</chronicle.ring.version>
@@ -49,12 +49,6 @@
         <dependencies>
 
             <!-- core projects -->
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-analytics</artifactId>
-                <version>2.20.1-SNAPSHOT</version>
-            </dependency>
-
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
@@ -118,7 +112,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>3.20.105-SNAPSHOT</version>
+                <version>3.20.105</version>
             </dependency>
 
             <dependency>
@@ -538,6 +532,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-2.20.162</tag>
     </scm>
 </project>
