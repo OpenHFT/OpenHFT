@@ -51,6 +51,12 @@
             <!-- core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-analytics</artifactId>
+                <version>2.20.1-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
                 <version>2.20.116</version>
             </dependency>
