@@ -52,7 +52,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-analytics</artifactId>
-                <version>0.EMPTY</version>
+                <version>1.0.0</version>
             </dependency>
 
             <dependency>
