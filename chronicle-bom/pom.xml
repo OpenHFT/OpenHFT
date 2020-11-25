@@ -25,17 +25,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.20-SNAPSHOT</version>
+    <version>2.20.178</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.20.114-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.version>5.20.114</chronicle.queue.version>
         <chronicle.queue.zero.version>2.20.81</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.20.1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.20.115-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.20.115</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.20.82</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.20.82</chronicle.datagrid.version>
         <chronicle.ring.version>2.20.80</chronicle.ring.version>
@@ -94,13 +94,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.20.109-SNAPSHOT</version>
+                <version>2.20.109</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.20.104-SNAPSHOT</version>
+                <version>2.20.104</version>
             </dependency>
 
             <dependency>
@@ -538,6 +538,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-bom-2.20.178</tag>
     </scm>
 </project>
