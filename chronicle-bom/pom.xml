@@ -64,7 +64,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.20.103T</version>
+                <version>2.20.103</version>
             </dependency>
 
             <dependency>
