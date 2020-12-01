@@ -501,14 +501,10 @@
                 <version>${chronicle.efx.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>binary-compatibility-enforcer-plugin</artifactId>
-                <version>1.0.3-SNAPSHOT</version>
-            </dependency>
 
         </dependencies>
     </dependencyManagement>
+
 
     <repositories>
         <repository>
@@ -527,6 +523,8 @@
     </repositories>
 
     <build>
+
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
