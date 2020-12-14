@@ -235,6 +235,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-multischema-guarded</artifactId>
+                <version>${chronicle.fix.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-router</artifactId>
                 <version>${chronicle.fix.version}</version>
             </dependency>
