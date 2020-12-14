@@ -8,6 +8,7 @@
 # IntelliJ
 *.iml
 .idea
+compat_reports
 
 # maven
 target
