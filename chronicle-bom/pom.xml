@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>3.20.105</version>
+                <version>3.20.106-SNAPSHOT</version>
             </dependency>
 
             <dependency>
