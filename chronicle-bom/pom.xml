@@ -41,7 +41,7 @@
         <chronicle.ring.version>2.21ea0</chronicle.ring.version>
         <chronicle.fix.version>4.21ea0-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.21ea0-SNAPSHOT</chronicle.services.version>
-        <chronicle.logger.version>4.20ea2</chronicle.logger.version>
+        <chronicle.logger.version>4.21ea1-SNAPSHOT</chronicle.logger.version>
         <chronicle.efx.version>2.21ea0-SNAPSHOT</chronicle.efx.version>
     </properties>
 
