@@ -37,12 +37,12 @@
         <chronicle.wire.enterprise.version>2.21ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.21ea0</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea0</chronicle.map.enterprise.version>
-        <chronicle.datagrid.version>2.20.82</chronicle.datagrid.version>
+        <chronicle.datagrid.version>2.21ea0-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea0</chronicle.ring.version>
-        <chronicle.fix.version>4.20.99</chronicle.fix.version>
-        <chronicle.services.version>3.20.119</chronicle.services.version>
+        <chronicle.fix.version>4.21ea0-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>3.21ea0-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.21ea1</chronicle.logger.version>
-        <chronicle.efx.version>2.20.116</chronicle.efx.version>
+        <chronicle.efx.version>2.21ea0-SNAPSHOT</chronicle.efx.version>
     </properties>
 
     <dependencyManagement>
