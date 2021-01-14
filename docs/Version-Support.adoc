@@ -21,7 +21,7 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | stable release | end of support | Java versions
-| x.24  | 2022/10 (a) | 2021/12 (a) | 2023/12 (a) | 8 & 11 & 17
+| x.24  | 2021/10 (a) | 2021/12 (a) | 2023/12 (a) | 8 & 11 & 17
 | x.23  | 2021/07 (a) | 2021/09 (a) | 2023/09 (a) | 8 & 11
 | x.22  | 2021/04 (a) | 2021/06 (a) | 2023/06 (a) | 8 & 11
 | x.21  | 2021/01 | 2021/03 (a) | 2023/03 (a) | 8 & 11
