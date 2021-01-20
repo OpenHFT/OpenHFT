@@ -56,6 +56,8 @@ We have introduced the characters “ea” into our build versions, to denote ou
 
 Note: Most organizations use the “ea” release in production, as this contains the latest functionality and fixes. 
 
+= Binary Compatibility
 
+Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions.
 
 
