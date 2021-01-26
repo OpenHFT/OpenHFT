@@ -41,7 +41,7 @@
         <chronicle.datagrid.version>2.21ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea1</chronicle.ring.version>
         <chronicle.fix.version>4.21ea4</chronicle.fix.version>
-        <chronicle.services.version>3.21ea2</chronicle.services.version>
+        <chronicle.services.version>3.21ea3-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.21ea1</chronicle.logger.version>
         <chronicle.efx.version>2.21ea1</chronicle.efx.version>
     </properties>
@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.21ea2</version>
+                <version>2.21ea3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
