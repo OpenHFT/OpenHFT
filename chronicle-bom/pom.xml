@@ -16,17 +16,16 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath/>
+        <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.21ea-SNAPSHOT</version>
+    <version>2.21ea28</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -40,8 +39,8 @@
         <chronicle.map.enterprise.version>2.21ea1</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea1</chronicle.ring.version>
-        <chronicle.fix.version>4.21ea5-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>3.21ea3-SNAPSHOT</chronicle.services.version>
+        <chronicle.fix.version>4.21ea4</chronicle.fix.version>
+        <chronicle.services.version>3.21ea2</chronicle.services.version>
         <chronicle.logger.version>4.21ea1</chronicle.logger.version>
         <chronicle.efx.version>2.21ea1</chronicle.efx.version>
     </properties>
@@ -59,7 +58,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.21ea12-SNAPSHOT</version>
+                <version>2.21ea12</version>
             </dependency>
 
             <dependency>
@@ -77,7 +76,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.21ea3-SNAPSHOT</version>
+                <version>2.21ea3</version>
             </dependency>
 
             <dependency>
@@ -222,11 +221,11 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-recursivemap</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-            </dependency>
+<dependency>
+    <groupId>software.chronicle</groupId>
+    <artifactId>chronicle-fix-recursivemap</artifactId>
+    <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+</dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
@@ -557,6 +556,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.21ea28</tag>
     </scm>
 </project>
