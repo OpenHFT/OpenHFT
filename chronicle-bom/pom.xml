@@ -221,15 +221,27 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
-<dependency>
-    <groupId>software.chronicle</groupId>
-    <artifactId>chronicle-fix-recursivemap</artifactId>
-    <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-</dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-recursivemap</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-42</artifactId>
+                <version>${chronicle.fix.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-44</artifactId>
+                <version>${chronicle.fix.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-50</artifactId>
                 <version>${chronicle.fix.version}</version>
             </dependency>
 
