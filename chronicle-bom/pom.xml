@@ -42,7 +42,7 @@
         <chronicle.fix.version>4.21ea9-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.21ea4</chronicle.services.version>
         <chronicle.logger.version>4.21ea1</chronicle.logger.version>
-        <chronicle.efx.version>2.21ea3</chronicle.efx.version>
+        <chronicle.efx.version>2.21ea4-SNAPSHOT</chronicle.efx.version>
     </properties>
 
     <dependencyManagement>
