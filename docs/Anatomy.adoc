@@ -1,16 +1,17 @@
 = Chronicle Maven Anatomy
 Per Miborg
 
-== Simplified open-source anatomy
+The various Chronicle libraries depends on each other in order to reuse common functionality.
 
-The Chronicle libraries depends on each other in order to reuse common functionality. The simplified, one-level-depth, "anatomy" of some open-source Maven dependencies is illustrated hereunder:
+== Simplified open-source anatomy
+The simplified, one-level-depth, "anatomy" of some open-source Maven dependencies is illustrated hereunder:
 
 image::../images/Simplified-Maven-Anatomy.png[Simplified Anatomy]
 _Image 1: Simplified anatomy_
 
 == Full depth open-source anatomy
 
-Regarding the full depth of the open-source Maven dependency tree yealds a more complex anatomy illustrated hereunder:
+Regarding the full depth of the open-source Maven dependency tree yields a more complex anatomy illustrated hereunder:
 
 image::../images/Complex-Maven-Anatomy.png[Full Anatomy]
 _Image 1: Full anatomy_
