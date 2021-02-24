@@ -11,7 +11,7 @@ _Figure 1: Simplified anatomy._
 
 == Full depth open-source anatomy
 
-Regarding the full depth of the open-source Maven dependency tree yields a more complex anatomy illustrated hereunder:
+The full depth of the open-source Maven dependency tree yields a more complex anatomy as depicted here:
 
 image::../images/Complex-Maven-Anatomy.png[Full Anatomy]
 _Figure 2: Full anatomy._
