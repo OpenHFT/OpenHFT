@@ -13,9 +13,9 @@ The MINOR version is the incremental release of the software for a given MAJOR.S
 
 Once a MAJOR.STAGE is updated to the new version, the previous MAJOR.STAGE-1 starts two years until end of support.
 
-=== Commercial Support Agreement
+== Commercial Support Agreement
 
-A commercial support agreement is available from mailto:sales@chronicle.software[sales@chronicle.software], free open source support is also available but on a best efforts basis. Free support issues are not treated as a high priority unless the issues also affect organisations with a commercial agreement. The support agreement doesn’t just benefit your organisation but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries. 
+A commercial support agreement is available from mailto:sales@chronicle.software[sales@chronicle.software], free open source support is also available but on a best effort basis. Free support issues are not treated as a high priority unless the issues also affect organisations with a commercial agreement. The support agreement doesn’t just benefit your organisation, but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries.
 
 == Stage release dates and end of support.
 
@@ -46,17 +46,17 @@ Once the master branch updates to a new stage, older stages are only updated and
 
 After Java 17 LTS is released we will support Java 11 and Java 17 on the master branch and Java 8 will only be supported on an x.20 branch.
 
-= BOM files
+== BOM files
 
 We use maven dependency management to express the version set of all our libraries, hence. We always publish a set of artifacts that work together using a BOM file ( see details on BOM files at https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms/).
 
-= EA ( Early Access )
+== EA ( Early Access )
 
 We have introduced the characters “ea” into our build versions, to denote our Early Access release. As the name suggests, we release our early access version regularly. Then about every three months we will cut a non "ea" release. 
 
 Note: Most organizations use the “ea” release in production, as this contains the latest functionality and fixes. 
 
-= Binary Compatibility
+== Binary Compatibility
 
 Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions.
 
