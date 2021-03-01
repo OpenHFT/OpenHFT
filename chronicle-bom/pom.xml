@@ -16,12 +16,13 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -36,7 +37,7 @@
         <chronicle.queue.zero.version>2.21ea0</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.21ea5</chronicle.queue.enterprise.version>
-        <chronicle.map.enterprise.version>2.21ea8</chronicle.map.enterprise.version>
+        <chronicle.map.enterprise.version>2.21ea9-SNAPSHOT</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea1</chronicle.ring.version>
         <chronicle.fix.version>4.21ea15</chronicle.fix.version>
@@ -112,7 +113,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.21ea5</version>
+                <version>3.21ea6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -180,6 +181,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-matching-engine</artifactId>
+                <version>2.21ea0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise-guarded</artifactId>
                 <version>${chronicle.map.enterprise.version}</version>
             </dependency>
@@ -221,11 +228,11 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
-<dependency>
-    <groupId>software.chronicle</groupId>
-    <artifactId>chronicle-fix-recursivemap</artifactId>
-    <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-</dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-recursivemap</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
