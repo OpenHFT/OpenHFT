@@ -248,7 +248,7 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-multischema-guarded</artifactId>
+                <artifactId>chronicle-fix-multischema-guarded</artifactId> <!-- available to supported clients -->
                 <version>${chronicle.fix.version}</version>
             </dependency>
 
