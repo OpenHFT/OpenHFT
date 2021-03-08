@@ -43,6 +43,7 @@
         <chronicle.services.version>3.21ea9</chronicle.services.version>
         <chronicle.logger.version>4.21ea1</chronicle.logger.version>
         <chronicle.efx.version>2.21ea9</chronicle.efx.version>
+        <chronicle.matching.engine.version>2.21ea1-SNAPSHOT</chronicle.matching.engine.version>
     </properties>
 
     <dependencyManagement>
@@ -181,7 +182,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
-                <version>2.21ea0</version>
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
 
             <dependency>
@@ -219,6 +220,12 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-ring-guarded</artifactId>
                 <version>${chronicle.ring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-matching-engine-guarded</artifactId>
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
 
             <dependency>
