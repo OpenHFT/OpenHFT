@@ -181,7 +181,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
-                <version>2.21ea0</version>
+                <version>2.21ea1</version>
             </dependency>
 
             <dependency>
