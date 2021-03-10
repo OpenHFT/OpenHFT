@@ -37,6 +37,7 @@
         <chronicle.wire.enterprise.version>2.21ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.21ea6</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea11-SNAPSHOT</chronicle.map.enterprise.version>
+        <chronicle.matching.engine.version>2.21ea1-SNAPSHOT</chronicle.matching.engine.version>
         <chronicle.datagrid.version>2.21ea1-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea1</chronicle.ring.version>
         <chronicle.fix.version>4.21ea17-SNAPSHOT</chronicle.fix.version>
@@ -58,13 +59,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.21ea29</version>
+                <version>2.21ea30-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.21ea10</version>
+                <version>2.21ea11-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -76,7 +77,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.21ea13</version>
+                <version>2.21ea14-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -94,7 +95,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.21ea12</version>
+                <version>2.21ea13-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -181,7 +182,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
-                <version>2.21ea0</version>
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
 
             <dependency>
@@ -219,6 +220,12 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-ring-guarded</artifactId>
                 <version>${chronicle.ring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-matching-engine-guarded</artifactId>
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
 
             <dependency>
