@@ -41,6 +41,8 @@
         <jetty.version>9.4.28.v20200408</jetty.version>
         <log4j2.version>2.13.3</log4j2.version>
         <slf4j.version>1.7.30</slf4j.version>
+        <junit.jupiter.version>5.7.1</junit.jupiter.version>
+        <junit.platform.provider.version>1.7.1</junit.platform.provider.version>
     </properties>
 
     <dependencyManagement>
@@ -78,8 +80,30 @@
 
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>RELEASE</version>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-engine</artifactId>
+                <version>${junit.platform.provider.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>${junit.platform.provider.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
