@@ -60,4 +60,3 @@ Note: Most organizations use the “ea” release in production, as this contain
 
 Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions.
 
-
