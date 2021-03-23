@@ -363,7 +363,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-tr-sbe</artifactId>
-                <version>2.21ea4</version>
+                <version>2.21ea40-SNAPSHOT</version>
             </dependency>
 
             <dependency>
