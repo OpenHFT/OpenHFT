@@ -44,6 +44,7 @@
         <chronicle.logger.version>4.21ea40</chronicle.logger.version>
         <chronicle.efx.version>2.21ea40</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21ea41</chronicle.matching.engine.version>
+        <chronicle.platform.version>2.21ea1</chronicle.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -534,8 +535,14 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-platform-example1</artifactId>
+                <version>2.21ea1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-platform</artifactId>
-                <version>1.21ea0</version>
+                <version>${chronicle.platform.version}</version>
             </dependency>
 
         </dependencies>
