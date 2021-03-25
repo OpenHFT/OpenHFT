@@ -16,17 +16,16 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath/>
+        <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.21ea-SNAPSHOT</version>
+    <version>2.21ea95</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -36,12 +35,12 @@
         <chronicle.queue.version>5.21ea40</chronicle.queue.version>
         <chronicle.queue.zero.version>2.21ea40</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21ea40</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.21ea43-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.21ea42</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea40</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea40</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea40</chronicle.ring.version>
         <chronicle.fix.version>4.21ea43</chronicle.fix.version>
-        <chronicle.services.version>3.21ea43-SNAPSHOT</chronicle.services.version>
+        <chronicle.services.version>3.21ea40</chronicle.services.version>
         <chronicle.logger.version>4.21ea40</chronicle.logger.version>
         <chronicle.efx.version>2.21ea40</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21ea41</chronicle.matching.engine.version>
@@ -61,13 +60,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.21ea43-SNAPSHOT</version>
+                <version>2.21ea43</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.21ea41-SNAPSHOT</version>
+                <version>2.21ea40</version>
             </dependency>
 
             <dependency>
@@ -103,7 +102,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.21ea43-SNAPSHOT</version>
+                <version>2.21ea42</version>
             </dependency>
 
             <dependency>
@@ -184,15 +183,15 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
-                <version>${chronicle.matching.engine.version}</version>
+                <version>${chronicle.matching.engine.version}</version>           
             </dependency>
-
+          
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine-guarded</artifactId>
-                <version>${chronicle.matching.engine.version}</version>
+                    <version>${chronicle.matching.engine.version}</version>  
             </dependency>
-
+          
 
             <dependency>
                 <groupId>software.chronicle</groupId>
@@ -537,7 +536,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-platform-example1</artifactId>
-                <version>${chronicle.platform.version}</version>
+                <version>2.21ea1</version>
             </dependency>
 
             <dependency>
@@ -584,6 +583,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.21ea95</tag>
     </scm>
 </project>
