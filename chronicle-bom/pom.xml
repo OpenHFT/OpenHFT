@@ -16,12 +16,13 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -44,6 +45,7 @@
         <chronicle.logger.version>4.21ea40</chronicle.logger.version>
         <chronicle.efx.version>2.21ea40</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21ea41</chronicle.matching.engine.version>
+        <chronicle.platform.version>2.21ea1</chronicle.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -182,15 +184,15 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
-                <version>${chronicle.matching.engine.version}</version>           
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
-          
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine-guarded</artifactId>
-                    <version>${chronicle.matching.engine.version}</version>  
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
-          
+
 
             <dependency>
                 <groupId>software.chronicle</groupId>
@@ -534,10 +536,15 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-platform</artifactId>
+                <artifactId>chronicle-platform-example1</artifactId>
                 <version>2.21ea1</version>
             </dependency>
 
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-platform</artifactId>
+                <version>${chronicle.platform.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
