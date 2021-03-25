@@ -36,7 +36,7 @@
         <chronicle.queue.version>5.21ea40</chronicle.queue.version>
         <chronicle.queue.zero.version>2.21ea40</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21ea40</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.21ea42</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.21ea43-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea40</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea40</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea40</chronicle.ring.version>
@@ -61,13 +61,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.21ea42</version>
+                <version>2.21ea43-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.21ea40</version>
+                <version>2.21ea41-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -103,7 +103,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.21ea42</version>
+                <version>2.21ea43-SNAPSHOT</version>
             </dependency>
 
             <dependency>
