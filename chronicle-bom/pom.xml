@@ -532,6 +532,13 @@
                 <version>${chronicle.efx.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-platform</artifactId>
+                <version>1.21ea0</version>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
