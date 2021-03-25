@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.21ea-SNAPSHOT</version>
+    <version>2.21ea99</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -35,16 +35,16 @@
         <chronicle.queue.version>5.21ea40</chronicle.queue.version>
         <chronicle.queue.zero.version>2.21ea40</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21ea40</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.21ea43-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.21ea43</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea40</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea40</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea40</chronicle.ring.version>
         <chronicle.fix.version>4.21ea43</chronicle.fix.version>
-        <chronicle.services.version>3.21ea43-SNAPSHOT</chronicle.services.version>
+        <chronicle.services.version>3.21ea43</chronicle.services.version>
         <chronicle.logger.version>4.21ea40</chronicle.logger.version>
         <chronicle.efx.version>2.21ea40</chronicle.efx.version>
-        <chronicle.matching.engine.version>2.21ea42-SNAPSHOT</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.21ea2-SNAPSHOT</chronicle.platform.version>
+        <chronicle.matching.engine.version>2.21ea42</chronicle.matching.engine.version>
+        <chronicle.platform.version>2.21ea2</chronicle.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -583,6 +583,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.21ea99</tag>
     </scm>
 </project>
