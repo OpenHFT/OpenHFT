@@ -8,7 +8,7 @@ password: #*<TO BE PROVIDED>*#
 
 === Maven settings file
 
-Please add the following maven setup up to your nexus server or settings.xml, please replace the *username* and *password* below, with those you have been provided with.
+Please add the following to your maven settings.xml or add thiese credentials to your nexus server, please replace the *username* and *password* below, with those you have been provided with.
 
 [source,xml]
 ----
@@ -49,7 +49,7 @@ once you have authenticated in, and in *the same browser session*, please go to 
 
 link:https://nexus.chronicle.software/content/repositories/releases/[https://nexus.chronicle.software/content/repositories/releases]
 
-for here you can see what artifacts are available.
+from here you can see what artifacts are available.
 
 image::PastedGraphic-13.png[]
 
