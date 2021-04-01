@@ -5,7 +5,7 @@ If you are a paying client we can grant you access to our nexus server, your cre
 username: #*<TO BE PROVIDED>*#
 password: #*<TO BE PROVIDED>*#
 
-=== maven settings file
+=== Maven settings file
 
 Please add the following maven setup up to your nexus server or settings.xml, please replace the *username* and *password* below, with those you have been provided with.
 
@@ -30,7 +30,7 @@ Please add the following maven setup up to your nexus server or settings.xml, pl
     </servers>
 ----
 
-== Nexus Web UI
+=== Nexus UI
 
 You won't have access to our nexus UI, but to view the artifacts you have access to in a web browser navigate to:
 
