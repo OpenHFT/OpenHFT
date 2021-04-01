@@ -6,7 +6,7 @@ username: #*<TO BE PROVIDED>*#
 
 password: #*<TO BE PROVIDED>*#
 
-The maven setup is as follows, please replace the *username* and *password* below, with those you have been provided with.
+Please add the following maven setup up to your nexus server or settings.xml, please replace the *username* and *password* below, with those you have been provided with.
 
 [source,xml]
 ----
