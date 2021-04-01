@@ -3,6 +3,7 @@
 If you are a paying client we can grant you access to our nexus server, your credentials are as follows :
 
 username: #*<TO BE PROVIDED>*#
+
 password: #*<TO BE PROVIDED>*#
 
 === Maven settings file
