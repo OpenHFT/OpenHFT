@@ -8,7 +8,7 @@ password: #*<TO BE PROVIDED>*#
 
 === Maven settings file
 
-Please add the following to your maven settings.xml or add thiese credentials to your nexus server, please replace the *username* and *password* below, with those you have been provided with.
+Please add the following to your maven settings.xml or add these credentials to your nexus server, please replace the *username* and *password* below:
 
 [source,xml]
 ----
