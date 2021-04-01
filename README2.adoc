@@ -8,6 +8,7 @@ password: #*<TO BE PROVIDED>*#
 
 Please add the following maven setup up to your nexus server or settings.xml, please replace the *username* and *password* below, with those you have been provided with.
 
+== settings.xml
 [source,xml]
 ----
  <servers>
@@ -28,6 +29,8 @@ Please add the following maven setup up to your nexus server or settings.xml, pl
         </server>
     </servers>
 ----
+
+== Nexus Web UI
 
 You won't have access to our nexus UI, but to view the artifacts you have access to in a web browser navigate to:
 
