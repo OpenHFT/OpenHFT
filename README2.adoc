@@ -2,11 +2,11 @@
 
 We have granted you access to our nexus server, your credentials are as follows :
 
-username: #*<UPDATE THIS>*#
+username: #*<TO BE PROVIDED>*#
 
-password: #*<UPDATE THIS>*#
+password: #*<TO BE PROVIDED>*#
 
-The maven setup if as follows, please replace the *username* and *password* below, with those you have been provided with.
+The maven setup is as follows, please replace the *username* and *password* below, with those you have been provided with.
 
 [source,xml]
 ----
