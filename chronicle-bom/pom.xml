@@ -25,17 +25,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.21ea-SNAPSHOT</version>
+    <version>2.21ea109</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.21ea42-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.version>5.21ea42</chronicle.queue.version>
         <chronicle.queue.zero.version>2.21ea40</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21ea40</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.21ea47-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.21ea47</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea41</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea40</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea40</chronicle.ring.version>
@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.21ea43-SNAPSHOT</version>
+                <version>2.21ea43</version>
             </dependency>
 
             <dependency>
@@ -102,7 +102,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.21ea45-SNAPSHOT</version>
+                <version>2.21ea45</version>
             </dependency>
 
             <dependency>
@@ -583,6 +583,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.21ea109</tag>
     </scm>
 </project>
