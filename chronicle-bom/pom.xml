@@ -39,7 +39,7 @@
         <chronicle.map.enterprise.version>2.21ea41</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea40</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea40</chronicle.ring.version>
-        <chronicle.fix.version>4.21ea47-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>4.21ea47</chronicle.fix.version>
         <chronicle.services.version>3.21ea45</chronicle.services.version>
         <chronicle.logger.version>4.21ea40</chronicle.logger.version>
         <chronicle.efx.version>2.21ea40</chronicle.efx.version>
@@ -60,13 +60,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.21ea45-SNAPSHOT</version>
+                <version>2.21ea45</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.21ea42-SNAPSHOT</version>
+                <version>2.21ea42</version>
             </dependency>
 
             <dependency>
@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.21ea46-SNAPSHOT</version>
+                <version>2.21ea46</version>
             </dependency>
 
             <dependency>
