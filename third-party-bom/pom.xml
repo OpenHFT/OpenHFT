@@ -66,11 +66,13 @@
                 <artifactId>koloboke-impl-common-jdk8</artifactId>
                 <version>1.0.0</version>
             </dependency>
+
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
                 <version>1.10.19</version>
             </dependency>
+
             <dependency>
                 <groupId>org.eclipse.jetty.aggregate</groupId>
                 <artifactId>jetty-all</artifactId>
@@ -111,6 +113,7 @@
                 <artifactId>snappy-java</artifactId>
                 <version>1.1.4</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
@@ -143,11 +146,13 @@
                 <artifactId>jmh-core</artifactId>
                 <version>1.23</version>
             </dependency>
+
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-core-benchmarks</artifactId>
                 <version>1.23</version>
             </dependency>
+
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-generator-annprocess</artifactId>
@@ -166,6 +171,7 @@
                 <artifactId>javax.inject</artifactId>
                 <version>1</version>
             </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -199,6 +205,7 @@
                 <artifactId>org.osgi.compendium</artifactId>
                 <version>5.0.0</version>
             </dependency>
+
             <dependency>
                 <groupId>org.ops4j.pax.exam</groupId>
                 <artifactId>pax-exam-container-native</artifactId>
@@ -224,6 +231,7 @@
                 <artifactId>pax-url-reference</artifactId>
                 <version>2.6.2</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.framework</artifactId>
@@ -317,7 +325,7 @@
             <dependency>
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
-                <version>4.8.93</version>
+                <version>4.8.105</version>
             </dependency>
 
             <dependency>
@@ -344,6 +352,13 @@
                 <artifactId>websocket-client</artifactId>
                 <version>${jetty.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.undertow</groupId>
+                <artifactId>undertow-core</artifactId>
+                <version>2.2.7.Final</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
