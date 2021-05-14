@@ -16,12 +16,13 @@
   ~
   -
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.2.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
@@ -183,15 +184,15 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
-                <version>${chronicle.matching.engine.version}</version>           
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
-          
+
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine-guarded</artifactId>
-                    <version>${chronicle.matching.engine.version}</version>  
+                <version>${chronicle.matching.engine.version}</version>
             </dependency>
-          
+
 
             <dependency>
                 <groupId>software.chronicle</groupId>
@@ -535,13 +536,31 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-platform-example1</artifactId>
-                <version>2.21ea1</version>
+                <artifactId>chronicle-platform</artifactId>
+                <version>${chronicle.platform.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-platform</artifactId>
+                <artifactId>chronicle-platform-fix-matching-engine-adaptor</artifactId>
+                <version>${chronicle.platform.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-platform-dockerization</artifactId>
+                <version>${chronicle.platform.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-platform-queue-web-gateway</artifactId>
+                <version>${chronicle.platform.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-platform-fix-gui</artifactId>
                 <version>${chronicle.platform.version}</version>
             </dependency>
 
