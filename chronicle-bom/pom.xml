@@ -144,6 +144,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-zero-guarded</artifactId>
+                <version>${chronicle.queue.zero.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
                 <version>${chronicle.wire.enterprise.version}</version>
             </dependency>
