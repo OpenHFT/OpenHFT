@@ -39,11 +39,11 @@ link:https://nexus.chronicle.software/content/repositories/releases/[https://nex
 
 you will first be asked to authenticate, click on *login*
 
-image::PastedGraphic-10.png[]
+image::/docs/images/PastedGraphic-10.png[]
 
 and enter your username and password.
 
-image::PastedGraphic-11.png[]
+image::/docs/images/PastedGraphic-11.png[]
 
 once you have authenticated in, and in *the same browser session*, please go to the following URL:
 
@@ -51,12 +51,12 @@ link:https://nexus.chronicle.software/content/repositories/releases/[https://nex
 
 from here you can see what artifacts are available.
 
-image::PastedGraphic-13.png[]
+image::/docs/images/PastedGraphic-13.png[]
 
 I suggest click on *software* then *chronicle*.
 
 
-image::PastedGraphic-14.png[]
+image::/docs/images/PastedGraphic-14.png[]
 
 
 *NOTE:* you will only see the products you have been permission for.

@@ -6,14 +6,14 @@ The various Chronicle libraries depends on each other in order to reuse common f
 == Simplified open-source anatomy
 The simplified, one-level-depth, "anatomy" of some open-source Maven dependencies is illustrated hereunder:
 
-image::../images/Simplified-Maven-Anatomy.png[Simplified Anatomy]
+image::../docs/images/Simplified-Maven-Anatomy.png[Simplified Anatomy]
 _Figure 1: Simplified anatomy._
 
 == Full depth open-source anatomy
 
 The full depth of the open-source Maven dependency tree yields a more complex anatomy as depicted here:
 
-image::../images/Complex-Maven-Anatomy.png[Full Anatomy]
+image::../docs/images/Complex-Maven-Anatomy.png[Full Anatomy]
 _Figure 2: Full anatomy._
 
 == Source
