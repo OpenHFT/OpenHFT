@@ -384,7 +384,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.21ea2</version>
+                <version>1.21ea3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
