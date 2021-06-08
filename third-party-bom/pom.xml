@@ -336,7 +336,7 @@
             <dependency>
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
-                <version>1.12.1</version>
+                <version>1.13.0</version>
             </dependency>
 
             <!-- To write basic websockets against -->
