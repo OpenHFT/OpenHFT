@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.21ea-SNAPSHOT</version>
+    <version>2.21ea165</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -39,7 +39,7 @@
         <chronicle.map.enterprise.version>2.21ea63</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea60</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea60</chronicle.ring.version>
-        <chronicle.fix.version>4.21ea66-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>4.21ea65</chronicle.fix.version>
         <chronicle.services.version>3.21ea62</chronicle.services.version>
         <chronicle.logger.version>4.21ea60</chronicle.logger.version>
         <chronicle.efx.version>2.21ea62</chronicle.efx.version>
@@ -60,7 +60,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.21ea62-SNAPSHOT</version>
+                <version>2.21ea62</version>
             </dependency>
 
             <dependency>
@@ -102,7 +102,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.21ea65-SNAPSHOT</version>
+                <version>2.21ea65</version>
             </dependency>
 
             <dependency>
@@ -619,6 +619,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.21ea165</tag>
     </scm>
 </project>
