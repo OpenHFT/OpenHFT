@@ -290,6 +290,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-testlib</artifactId>
+                <scope>test</scope>
                 <version>30.1.1-jre</version>
             </dependency>
 
