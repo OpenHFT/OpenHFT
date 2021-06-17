@@ -35,7 +35,7 @@
         <chronicle.queue.version>5.21ea65</chronicle.queue.version>
         <chronicle.queue.zero.version>2.21ea61</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21ea60</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.21ea62</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.21ea63-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea63</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea60</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea60</chronicle.ring.version>
