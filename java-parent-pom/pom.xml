@@ -24,12 +24,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.2.5</version>
+        <version>1.2.7</version>
         <relativePath />
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.1.25-SNAPSHOT</version>
+    <version>1.1.26-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
@@ -39,7 +39,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M4</version>
                 <configuration>
                     <systemPropertyVariables>
                         <project.build.directory>${project.build.directory}</project.build.directory>
