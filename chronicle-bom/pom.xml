@@ -20,7 +20,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.2.7</version>
+        <version>1.2.3</version>
         <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -114,7 +114,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.21ea63-SNAPSHOT</version>
+                <version>3.21ea63</version>
             </dependency>
 
             <dependency>
@@ -384,7 +384,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.21ea4-SNAPSHOT</version>
+                <version>1.21ea4</version>
             </dependency>
 
             <dependency>
