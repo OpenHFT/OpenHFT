@@ -43,6 +43,7 @@
         <junit.jupiter.version>5.7.2</junit.jupiter.version>
         <junit.platform.provider.version>1.7.2</junit.platform.provider.version>
         <jmh.version>1.32</jmh.version>
+        <jna.version>5.5.0</jna.version>
     </properties>
 
     <dependencyManagement>
@@ -265,13 +266,13 @@
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna</artifactId>
-                <version>5.8.0</version>
+                <version>${jna.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna-platform</artifactId>
-                <version>5.8.0</version>
+                <version>${jna.version}</version>
             </dependency>
 
             <dependency>
