@@ -20,7 +20,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.2.3</version>
+        <version>1.2.8</version>
         <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -39,8 +39,8 @@
         <chronicle.map.enterprise.version>2.21ea63</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea60</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea60</chronicle.ring.version>
-        <chronicle.fix.version>4.21ea70</chronicle.fix.version>
-        <chronicle.services.version>3.21ea64</chronicle.services.version>
+        <chronicle.fix.version>4.21ea70-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>3.21ea63</chronicle.services.version>
         <chronicle.logger.version>4.21ea60</chronicle.logger.version>
         <chronicle.efx.version>2.21ea64</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21ea60</chronicle.matching.engine.version>
@@ -396,7 +396,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.21ea5</version>
+                <version>3.21ea4</version>
             </dependency>
 
             <dependency>
