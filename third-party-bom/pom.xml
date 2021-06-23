@@ -439,6 +439,17 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <jna.version>5.8.0</jna.version>
+            </properties>
+        </profile>
     </profiles>
 
     <distributionManagement>
