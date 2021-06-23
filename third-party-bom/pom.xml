@@ -29,7 +29,7 @@
     </parent>
 
     <artifactId>third-party-bom</artifactId>
-    <version>3.19.10</version>
+    <version>3.19.11-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the other projects in a dependencyManagement section.
@@ -506,7 +506,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>third-party-bom-3.19.10</tag>
+        <tag>master</tag>
     </scm>
 
 </project>
