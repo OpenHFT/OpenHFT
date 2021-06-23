@@ -374,6 +374,12 @@
                 <version>3.8.4.Final</version>
             </dependency>
 
+            <dependency>
+                <groupId>net.sf.proguard</groupId>
+                <artifactId>proguard-base</artifactId>
+                <version>6.2.2</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
