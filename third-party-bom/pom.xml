@@ -409,6 +409,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -425,9 +426,7 @@
         <profile>
             <id>prejava9</id>
             <activation>
-                <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
-                </file>
+                <jdk>1.8</jdk>
             </activation>
             <dependencies>
                 <dependency>
