@@ -198,7 +198,6 @@
                 <version>${chronicle.matching.engine.version}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-map-enterprise-guarded</artifactId>
@@ -495,7 +494,6 @@
                 <version>1.0.5</version>
                 <type>war</type>
             </dependency>
-
 
             <dependency>
                 <groupId>software.chronicle</groupId>
