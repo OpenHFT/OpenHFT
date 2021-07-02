@@ -60,7 +60,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.21ea81-SNAPSHOT</version>
+                <version>2.21ea82-SNAPSHOT</version>
             </dependency>
 
             <dependency>
