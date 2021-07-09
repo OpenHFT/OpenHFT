@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>3.21ea80</version>
+                <version>3.21ea81-SNAPSHOT</version>
             </dependency>
 
             <dependency>
