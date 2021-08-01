@@ -32,19 +32,19 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.21ea83-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.version>5.21ea83</chronicle.queue.version>
         <chronicle.queue.zero.version>2.21ea80</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21ea81</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.21ea84-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.21ea84</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.21ea83</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.21ea82</chronicle.datagrid.version>
         <chronicle.ring.version>2.21ea81</chronicle.ring.version>
-        <chronicle.fix.version>4.21ea85-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>3.21ea85-SNAPSHOT</chronicle.services.version>
+        <chronicle.fix.version>4.21ea85</chronicle.fix.version>
+        <chronicle.services.version>3.21ea85</chronicle.services.version>
         <chronicle.logger.version>4.21ea80</chronicle.logger.version>
         <chronicle.efx.version>2.21ea85</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21ea80</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.21ea87-SNAPSHOT</chronicle.platform.version>
+        <chronicle.platform.version>2.21ea87</chronicle.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.21ea85-SNAPSHOT</version>
+                <version>2.21ea85</version>
             </dependency>
 
             <dependency>
