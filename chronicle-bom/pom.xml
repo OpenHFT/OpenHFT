@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
     <!-- Needs to be changed to 2.22ea0-SNAPSHOT for first release? -->
-    <version>2.21.222</version>
+    <version>2.21.223-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -620,6 +620,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>chronicle-bom-2.21.222</tag>
+        <tag>ea</tag>
     </scm>
 </project>
