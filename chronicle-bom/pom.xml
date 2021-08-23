@@ -42,7 +42,7 @@
         <chronicle.fix.version>4.21.88</chronicle.fix.version>
         <chronicle.services.version>3.21.90</chronicle.services.version>
         <chronicle.logger.version>4.21.82</chronicle.logger.version>
-        <chronicle.efx.version>2.21.87</chronicle.efx.version>
+        <chronicle.efx.version>2.21.87-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21.82</chronicle.matching.engine.version>
         <chronicle.platform.version>2.21.93</chronicle.platform.version>
     </properties>
@@ -370,13 +370,13 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-tr-sbe</artifactId>
-                <version>2.21.81</version>
+                <version>2.21.81-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-ebs-ultra</artifactId>
-                <version>2.21.81</version>
+                <version>2.21.81-SNAPSHOT</version>
             </dependency>
 
             <!--  non-core projects -->
