@@ -44,7 +44,7 @@
         <chronicle.logger.version>4.21.82</chronicle.logger.version>
         <chronicle.efx.version>2.21.88</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21.82</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.21.93</chronicle.platform.version>
+        <chronicle.platform.version>2.21.94-SNAPSHOT</chronicle.platform.version>
     </properties>
 
     <dependencyManagement>
