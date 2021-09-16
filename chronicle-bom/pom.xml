@@ -35,11 +35,11 @@
         <chronicle.queue.version>5.22ea2</chronicle.queue.version>
         <chronicle.queue.zero.version>2.22ea1</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.22ea2</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.22ea3-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.22ea1</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.22ea1</chronicle.datagrid.version>
         <chronicle.ring.version>2.22ea2</chronicle.ring.version>
-        <chronicle.fix.version>4.22ea1</chronicle.fix.version>
+        <chronicle.fix.version>4.22ea2-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.22ea3</chronicle.services.version>
         <chronicle.logger.version>4.22ea1</chronicle.logger.version>
         <chronicle.efx.version>2.22ea1</chronicle.efx.version>
@@ -66,7 +66,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.22ea2</version>
+                <version>2.22ea3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -102,7 +102,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.22ea1</version>
+                <version>2.22ea2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
