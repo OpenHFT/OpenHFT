@@ -383,6 +383,32 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>java17</id>
+            <properties>
+                <!-- https://github.com/osundblad/intellij-annotations-instrumenter-maven-plugin/issues/29 -->
+                <se.eris.notnull.instrument>false</se.eris.notnull.instrument>
+                <!-- see https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/ -->
+                <maven.compiler.release>8</maven.compiler.release>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>
+                                --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+                                --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                                --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                                --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+                                --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED
+                            </argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <distributionManagement>
