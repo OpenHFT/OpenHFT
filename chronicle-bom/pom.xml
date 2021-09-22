@@ -54,7 +54,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
-                <version>1.22ea3-SNAPSHOT</version>
+                <version>1.22ea4-SNAPSHOT</version>
             </dependency>
 
             <dependency>
