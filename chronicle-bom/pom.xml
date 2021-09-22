@@ -53,6 +53,12 @@
             <!-- core projects -->
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>posix</artifactId>
+                <version>1.22ea2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-analytics</artifactId>
                 <version>2.22ea3</version>
             </dependency>
