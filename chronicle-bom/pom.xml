@@ -35,10 +35,10 @@
         <chronicle.queue.version>5.22ea6-SNAPSHOT</chronicle.queue.version>
         <chronicle.queue.zero.version>2.22ea2</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.22ea4</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.22ea5-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.22ea1</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.22ea2</chronicle.datagrid.version>
-        <chronicle.ring.version>2.22ea3</chronicle.ring.version>
+        <chronicle.ring.version>2.22ea4-SNAPSHOT</chronicle.ring.version>
         <chronicle.fix.version>4.22ea4</chronicle.fix.version>
         <chronicle.services.version>3.22ea4-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea1</chronicle.logger.version>
