@@ -365,8 +365,6 @@
             <properties>
                 <!-- https://github.com/osundblad/intellij-annotations-instrumenter-maven-plugin/issues/29 -->
                 <se.eris.notnull.instrument>false</se.eris.notnull.instrument>
-                <!-- see https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/ -->
-                <maven.compiler.release>8</maven.compiler.release>
             </properties>
             <build>
                 <plugins>
@@ -387,8 +385,6 @@
             <properties>
                 <!-- https://github.com/osundblad/intellij-annotations-instrumenter-maven-plugin/issues/29 -->
                 <se.eris.notnull.instrument>false</se.eris.notnull.instrument>
-                <!-- see https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/ -->
-                <maven.compiler.release>8</maven.compiler.release>
             </properties>
             <build>
                 <plugins>
