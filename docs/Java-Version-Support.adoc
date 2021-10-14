@@ -3,17 +3,12 @@ Peter Lawrey
 
 Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11 and Java 17 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described hereunder:
 
-== Compiles on Java 8, Runs on Java 11 and 17.
-
-These libraries compile on Java 8 and pass all the tests under Java 8, Java 11 and Java 17.
-
-- Chronicle-Core
-
 == Compiles and Runs on Java 8, 11, and 17.
 
 These libraries compile on either Java 8, 11 and 17 and pass all the tests under the version built and higher.
 
 - Chronicle-Algorithms
+- Chronicle-Core
 - Chronicle-Datagrid
 - Chronicle-Datagrid-Demo
 - Chronicle-FIX
