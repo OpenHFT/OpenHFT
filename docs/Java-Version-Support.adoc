@@ -1,21 +1,18 @@
 = Java Version Support
 Peter Lawrey
 
-While almost all libraries are built in Java 8, most are tested with Java 11 as a part of continuous integration, there are inconsistencies which are listed here.
+Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11 and Java 17 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described hereunder:
 
-== Compiles on Java 8, Runs on Java 11 and 14.
+== Compiles and Runs on Java 8, 11, and 17.
 
-These libraries compile on Java 8 but pass all the tests in Java 11.0.7 and Java 14.0.1
-
-- Chronicle-Core
-- Chronicle-Map 
-
-== Compiles and Runs on Java 8, 11, and 14.
+These libraries compile on either Java 8, 11 and 17 and pass all the tests under the version built and higher.
 
 - Chronicle-Algorithms
+- Chronicle-Core
 - Chronicle-Datagrid
 - Chronicle-Datagrid-Demo
 - Chronicle-FIX
+- Chronicle-Map
 - Chronicle-Map-Enterprise
 - Chronicle-Market-Data-Distributor
 - Chronicle-Network 
@@ -30,3 +27,21 @@ These libraries compile on Java 8 but pass all the tests in Java 11.0.7 and Java
 - Chronicle-Websocket-Jetty
 - Chronicle-Wire-Enterprise
 - JLBH
+
+== Running under Java 17 (class path)
+When starting a JVM explicitly using the `java` command, the follow command line parameters need to be passed in:
+
+[source, shell script]
+----
+--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
+--add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
+--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+--add-opens=java.base/java.lang=ALL-UNNAMED
+--add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+--add-opens=java.base/java.io=ALL-UNNAMED
+--add-opens=java.base/java.util=ALL-UNNAMED
+----
+
+TIP: Even though not strictly required, we recommend providing the same command line options for Java 11 as for Java 17 as this will remove some warnings in the output logs.
