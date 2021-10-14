@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.21.89</version>
+                <version>2.21.90-SNAPSHOT</version>
             </dependency>
 
             <dependency>
