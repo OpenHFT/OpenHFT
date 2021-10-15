@@ -22,8 +22,8 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 |====
 | Stage | first released | stable release | end of support | Java versions
 | x.24  | 2021/10 (a) | 2021/12 (a) | 2023/12 (a) | 8 & 11 & 17
-| x.23  | 2021/07 (a) | 2021/09 (a) | 2023/09 (a) | 8 & 11
-| x.22  | 2021/04 (a) | 2021/06 (a) | 2023/06 (a) | 8 & 11
+| x.23  | 2021/07 (a) | 2021/09 (a) | 2023/09 (a) | 8 & 11 & 17
+| x.22  | 2021/04 (a) | 2021/06 (a) | 2023/06 (a) | 8 & 11 & 17
 | x.21  | 2021/01 | 2021/03 (a) | 2023/03 (a) | 8 & 11
 | x.20  | 2020/07 | 2020/12 | 2022/12 (a) | 8 & 11
 | x.19  | 2020/02 | 2020/06 | 2022/06 (a) | 8 & 11
@@ -36,25 +36,27 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 |====
 (a) Provisional dates
 
+Java 17 is supported with the x.22 release. x.24 is planned to be the first release that fully takes advantage of Java 17 source features.
+
 NOTE: There was no x.18 release.
 
 == Java 8 support.
 
-We currently support Java 8 and Java 11.
+We currently support Java 8, 11 and 17.
 
-Once the master branch updates to a new stage, older stages are only updated and release based on client requirement ensuring they stay stable.
+Once the master branch updates to a new stage, older stages are only updated and released based on client requirement ensuring they stay stable.
 
-After Java 17 LTS is released we will support Java 11 and Java 17 on the master branch and Java 8 will only be supported on an x.20 branch.
+Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.22 branch.
 
 == BOM files
 
-We use maven dependency management to express the version set of all our libraries, hence. We always publish a set of artifacts that work together using a BOM file ( see details on BOM files at https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms/).
+We use maven dependency management to express the version set of all our libraries, hence. We always publish a set of artifacts that work together using a BOM file (see details on BOM files link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms/[here]).
 
-== EA ( Early Access )
+== EA (Early Access)
 
-We have introduced the characters “ea” into our build versions, to denote our Early Access release. As the name suggests, we release our early access version regularly. Then about every three months we will cut a non "ea" release. 
+We have introduced the characters “ea” into our build versions, to denote our Early Access release. As the name suggests, we release our early access version regularly. Then about every three months we will cut a non "ea" release.
 
-Note: Most organizations use the “ea” release in production, as this contains the latest functionality and fixes. 
+Note: Many organizations use the “ea” release in production, as this contains the latest functionality and fixes.
 
 == Binary Compatibility
 
