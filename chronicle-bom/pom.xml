@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.22ea-SNAPSHOT</version>
+    <version>2.22ea43-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -349,6 +349,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-queue-zero-guarded</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-services</artifactId>
                 <version>${chronicle.services.version}</version>
             </dependency>
@@ -371,12 +377,6 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-decentred</artifactId>
                 <version>2.17.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-queue-zero</artifactId>
-                <version>5.19.0</version>
             </dependency>
 
             <dependency>
