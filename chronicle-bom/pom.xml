@@ -108,7 +108,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.22ea4</version>
+                <version>2.22ea5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
