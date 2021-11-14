@@ -32,14 +32,14 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.22ea11-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.version>5.22ea11</chronicle.queue.version>
         <chronicle.queue.zero.version>2.22ea2</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.22ea6-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.22ea6</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.22ea2</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.22ea2</chronicle.datagrid.version>
         <chronicle.ring.version>2.22ea4</chronicle.ring.version>
-        <chronicle.fix.version>4.22ea15-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>4.22ea15</chronicle.fix.version>
         <chronicle.services.version>3.22ea4</chronicle.services.version>
         <chronicle.logger.version>4.22ea1</chronicle.logger.version>
         <chronicle.efx.version>2.22ea3</chronicle.efx.version>
@@ -79,7 +79,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.22ea9-SNAPSHOT</version>
+                <version>2.22ea9</version>
             </dependency>
 
             <dependency>
@@ -91,7 +91,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.22ea12-SNAPSHOT</version>
+                <version>2.22ea12</version>
             </dependency>
 
             <dependency>
@@ -109,7 +109,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.22ea10-SNAPSHOT</version>
+                <version>2.22ea10</version>
             </dependency>
 
             <dependency>
@@ -403,7 +403,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.22ea4-SNAPSHOT</version>
+                <version>1.22ea4</version>
             </dependency>
 
             <dependency>
