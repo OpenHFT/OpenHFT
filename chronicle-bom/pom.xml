@@ -51,13 +51,13 @@
         <dependencies>
 
             <!-- core projects -->
-          
+
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-test-framework</artifactId>
-                <version>1.22ea2</version>
+                <version>1.22ea3-SNAPSHOT</version>
             </dependency>
-          
+
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
