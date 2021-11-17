@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.22ea58</version>
+    <version>2.22ea58.1</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -51,6 +51,12 @@
         <dependencies>
 
             <!-- core projects -->
+
+        <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-test-framework</artifactId>
+                <version>1.22ea2</version>
+            </dependency>
              <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
@@ -631,6 +637,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>chronicle-bom-2.22ea58</tag>
+        <tag>chronicle-bom-2.22ea58.1</tag>
     </scm>
 </project>
