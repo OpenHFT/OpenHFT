@@ -40,7 +40,7 @@
         <chronicle.datagrid.version>2.21.85</chronicle.datagrid.version>
         <chronicle.ring.version>2.21.83</chronicle.ring.version>
         <chronicle.fix.version>4.21.91</chronicle.fix.version>
-        <chronicle.services.version>3.21.92</chronicle.services.version>
+        <chronicle.services.version>3.21.93-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.21.82</chronicle.logger.version>
         <chronicle.efx.version>2.21.92</chronicle.efx.version>
         <chronicle.matching.engine.version>2.21.82</chronicle.matching.engine.version>
