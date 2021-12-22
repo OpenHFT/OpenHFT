@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.22ea-SNAPSHOT</version>
+    <version>2.22ea73</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -41,10 +41,10 @@
         <chronicle.ring.version>2.22ea4</chronicle.ring.version>
         <chronicle.fix.version>4.22ea20</chronicle.fix.version>
         <chronicle.services.version>3.22ea4</chronicle.services.version>
-        <chronicle.logger.version>4.22ea2-SNAPSHOT</chronicle.logger.version>
+        <chronicle.logger.version>4.22ea2</chronicle.logger.version>
         <chronicle.efx.version>2.22ea3</chronicle.efx.version>
         <chronicle.matching.engine.version>2.22ea3</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.22ea20-SNAPSHOT</chronicle.platform.version>
+        <chronicle.platform.version>2.22ea20</chronicle.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -72,13 +72,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.22ea20-SNAPSHOT</version>
+                <version>2.22ea20</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.22ea10-SNAPSHOT</version>
+                <version>2.22ea10</version>
             </dependency>
 
             <dependency>
@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.22ea5-SNAPSHOT</version>
+                <version>1.22ea5</version>
             </dependency>
 
             <dependency>
@@ -420,7 +420,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>2.21ea81-SNAPSHOT</version>
+                <version>2.21ea81</version>
             </dependency>
 
             <dependency>
@@ -637,6 +637,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.22ea73</tag>
     </scm>
 </project>
