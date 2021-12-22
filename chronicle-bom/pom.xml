@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.22ea4</version>
+                <version>1.22ea5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
