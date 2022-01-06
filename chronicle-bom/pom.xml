@@ -34,7 +34,7 @@
     </description>
     <properties>
         <chronicle.queue.version>5.22ea14</chronicle.queue.version>
-        <chronicle.queue.zero.version>2.22ea2</chronicle.queue.zero.version>
+        <chronicle.queue.zero.version>2.22ea3-SNAPSHOT</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.22ea8</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.22ea2</chronicle.map.enterprise.version>
