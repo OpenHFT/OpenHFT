@@ -57,7 +57,9 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-test-framework</artifactId>
                 <version>1.22ea6-SNAPSHOT</version>
+                <scope>test</scope>
             </dependency>
+
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
