@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.queue.version>5.22ea14</chronicle.queue.version>
-        <chronicle.queue.zero.version>2.22ea2</chronicle.queue.zero.version>
+        <chronicle.queue.zero.version>2.22ea3-SNAPSHOT</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.22ea8</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.22ea2</chronicle.map.enterprise.version>
@@ -44,7 +44,7 @@
         <chronicle.logger.version>4.22ea2</chronicle.logger.version>
         <chronicle.efx.version>2.22ea3</chronicle.efx.version>
         <chronicle.matching.engine.version>2.22ea4</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.22ea21</chronicle.platform.version>
+        <chronicle.platform.version>2.22ea22-SNAPSHOT</chronicle.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -60,7 +60,7 @@
              <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
-                <version>2.22ea5</version>
+                <version>2.22ea6-SNAPSHOT</version>
             </dependency>
 
              <dependency>
@@ -72,13 +72,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.22ea21</version>
+                <version>2.22ea22-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.22ea10</version>
+                <version>2.22ea11-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -90,7 +90,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.22ea16</version>
+                <version>2.22ea17-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -108,7 +108,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.22ea11</version>
+                <version>2.22ea12-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>3.22ea5</version>
+                <version>3.22ea6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.22ea5</version>
+                <version>1.22ea6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
