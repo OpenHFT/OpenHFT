@@ -55,7 +55,7 @@
         <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-test-framework</artifactId>
-                <version>1.22ea7</version>
+                <version>1.22ea8-SNAPSHOT</version>
             </dependency>
              <dependency>
                 <groupId>net.openhft</groupId>
