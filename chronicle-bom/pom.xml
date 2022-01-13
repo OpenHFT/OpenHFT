@@ -32,7 +32,8 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.22ea14</chronicle.queue.version>
+        <chronicle.network.version>2.22ea9</chronicle.network.version>
+        <chronicle.queue.version>5.22ea15-SNAPSHOT</chronicle.queue.version>
         <chronicle.queue.zero.version>2.22ea3</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.22ea8</chronicle.queue.enterprise.version>
@@ -114,7 +115,14 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.22ea9</version>
+                <version>${chronicle.network.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-network</artifactId>
+                <type>test-jar</type>
+                <version>${chronicle.network.version}</version>
             </dependency>
 
             <dependency>
