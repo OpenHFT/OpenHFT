@@ -32,6 +32,7 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
+        <chronicle.network.version>2.22ea9</chronicle.network.version>
         <chronicle.queue.version>5.22ea15</chronicle.queue.version>
         <chronicle.queue.zero.version>2.22ea3</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea2</chronicle.wire.enterprise.version>
@@ -114,7 +115,14 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.22ea9</version>
+                <version>${chronicle.network.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-network</artifactId>
+                <type>test-jar</type>
+                <version>${chronicle.network.version}</version>
             </dependency>
 
             <dependency>
@@ -356,6 +364,19 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-queue-zero-guarded</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-benchmarks</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-benchmarks</artifactId>
+                <type>test-jar</type>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
