@@ -121,8 +121,8 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <type>test-jar</type>
                 <version>${chronicle.network.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
