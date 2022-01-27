@@ -401,6 +401,12 @@
             </dependency>
 
             <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-web-gateway</artifactId>
+                <version>${chronicle.services.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-decentred</artifactId>
                 <version>2.17.2</version>
