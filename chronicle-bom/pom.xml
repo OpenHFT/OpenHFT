@@ -441,7 +441,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.21ea82</version>
+                <version>3.21ea83-SNAPSHOT</version>
             </dependency>
 
             <dependency>
