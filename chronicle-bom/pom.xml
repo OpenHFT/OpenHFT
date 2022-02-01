@@ -32,7 +32,7 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2.22ea9</chronicle.network.version>
+        <chronicle.network.version>2.22ea11-SNAPSHOT</chronicle.network.version>
         <chronicle.queue.version>5.22ea15</chronicle.queue.version>
         <chronicle.queue.zero.version>2.22ea3</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22ea2</chronicle.wire.enterprise.version>
@@ -41,7 +41,7 @@
         <chronicle.datagrid.version>2.22ea2</chronicle.datagrid.version>
         <chronicle.ring.version>2.22ea5</chronicle.ring.version>
         <chronicle.fix.version>4.22ea22</chronicle.fix.version>
-        <chronicle.services.version>3.22ea7</chronicle.services.version>
+        <chronicle.services.version>3.22ea8-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea2</chronicle.logger.version>
         <chronicle.efx.version>2.22ea3</chronicle.efx.version>
         <chronicle.matching.engine.version>2.22ea5</chronicle.matching.engine.version>
@@ -115,13 +115,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.22ea10</version>
+                <version>${chronicle.network.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
-                <version>2.22ea10</version>
+                <version>${chronicle.network.version}</version>
                 <type>test-jar</type>
             </dependency>
 
