@@ -32,7 +32,7 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.queue.version>5.21.95</chronicle.queue.version>
+        <chronicle.queue.version>5.21.96-SNAPSHOT</chronicle.queue.version>
         <chronicle.queue.zero.version>2.21.82</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.21.83</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.21.90</chronicle.queue.enterprise.version>
