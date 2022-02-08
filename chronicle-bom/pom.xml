@@ -46,6 +46,7 @@
         <chronicle.efx.version>2.22ea4-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.22ea5</chronicle.matching.engine.version>
         <chronicle.platform.version>2.22ea34-SNAPSHOT</chronicle.platform.version>
+        <chronicle.market.data.distributor.version>3.22ea7-SNAPSHOT</chronicle.market.data.distributor.version>
     </properties>
 
     <dependencyManagement>
@@ -140,7 +141,14 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <version>3.22ea6</version>
+                <version>${chronicle.market.data.distributor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-market-data-distributor</artifactId>
+                <type>test-jar</type>
+                <version>${chronicle.market.data.distributor.version}</version>
             </dependency>
 
             <dependency>
