@@ -102,6 +102,7 @@
                 </executions>
                 <configuration>
                     <additionalOptions>${javadoc.opts}</additionalOptions>
+                    <quiet>true</quiet>
                 </configuration>
             </plugin>
         </plugins>
