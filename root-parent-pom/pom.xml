@@ -248,6 +248,11 @@
                     <version>3.3.0</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>net.openhft</groupId>
+                    <artifactId>binary-compatibility-enforcer-plugin</artifactId>
+                    <version>1.0.10</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
