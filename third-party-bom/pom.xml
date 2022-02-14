@@ -43,7 +43,7 @@
         <slf4j.version>1.7.32</slf4j.version>
         <junit.jupiter.version>5.8.1</junit.jupiter.version>
         <junit.platform.provider.version>1.8.1</junit.platform.provider.version>
-        <jmh.version>1.33</jmh.version>
+        <jmh.version>1.34</jmh.version>
         <jna.version>5.5.0</jna.version>
     </properties>
 
