@@ -44,7 +44,7 @@
         <junit.jupiter.version>5.8.1</junit.jupiter.version>
         <junit.platform.provider.version>1.8.1</junit.platform.provider.version>
         <jmh.version>1.33</jmh.version>
-        <jna.version>5.5.0</jna.version>
+        <jna.version>5.10.0</jna.version>
     </properties>
 
     <dependencyManagement>
