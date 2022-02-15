@@ -114,7 +114,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-sync</artifactId>
-                <version>3.12.10</version>
+                <version>4.5.0</version>
             </dependency>
 
             <dependency>
