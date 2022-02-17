@@ -147,8 +147,8 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
-                <type>test-jar</type>
                 <version>${chronicle.market.data.distributor.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
@@ -384,8 +384,8 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-benchmarks</artifactId>
-                <type>test-jar</type>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
