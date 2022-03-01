@@ -377,6 +377,9 @@
         </profile>
         <profile>
             <id>java11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -393,6 +396,9 @@
         </profile>
         <profile>
             <id>java17</id>
+            <activation>
+                <jdk>17</jdk>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
