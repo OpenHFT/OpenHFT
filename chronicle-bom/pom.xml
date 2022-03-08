@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.22-SNAPSHOT</version>
+    <version>2.22.127</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -86,13 +86,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-ticker</artifactId>
-                <version>2.17.2</version>
+                <version>2.20.1</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.22.21-SNAPSHOT</version>
+                <version>2.22.21</version>
             </dependency>
 
             <dependency>
@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-salt</artifactId>
-                <version>2.19.40</version>
+                <version>2.22.0</version>
             </dependency>
 
             <dependency>
@@ -129,7 +129,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
-                <version>2.22.3-SNAPSHOT</version>
+                <version>2.22.3</version>
             </dependency>
 
             <dependency>
@@ -417,7 +417,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-decentred</artifactId>
-                <version>2.17.2</version>
+                <version>2.21.80</version>
             </dependency>
 
             <dependency>
@@ -672,6 +672,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>release/2.22</tag>
+        <tag>chronicle-bom-2.22.127</tag>
     </scm>
 </project>
