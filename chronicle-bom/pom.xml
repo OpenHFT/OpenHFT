@@ -36,7 +36,7 @@
         <chronicle.queue.version>5.22.21-SNAPSHOT</chronicle.queue.version>
         <chronicle.queue.zero.version>2.22.4</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.22.3</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.22.11</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.22.12-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.22.5</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.22ea2</chronicle.datagrid.version>
         <chronicle.ring.version>2.22.6</chronicle.ring.version>
