@@ -47,6 +47,7 @@
         <chronicle.matching.engine.version>2.23ea0</chronicle.matching.engine.version>
         <chronicle.platform.version>2.23ea7</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.22ea7</chronicle.market.data.distributor.version>
+        <chronicle.core.version>2.23ea9-SNAPSHOT</chronicle.core.version>
     </properties>
 
     <dependencyManagement>
@@ -74,7 +75,14 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-core</artifactId>
-                <version>2.23ea9-SNAPSHOT</version>
+                <version>${chronicle.core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-core</artifactId>
+                <version>${chronicle.core.version}</version>
+                <type>test-jar</type>
             </dependency>
 
             <dependency>
