@@ -92,7 +92,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.22.22</version>
+                <version>2.22.23-SNAPSHOT</version>
             </dependency>
 
             <dependency>
