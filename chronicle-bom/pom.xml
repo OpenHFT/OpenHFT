@@ -32,7 +32,7 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2.23ea3</chronicle.network.version>
+        <chronicle.network.version>2.23ea4-SNAPSHOT</chronicle.network.version>
         <chronicle.queue.version>5.23ea5</chronicle.queue.version>
         <chronicle.queue.zero.version>2.23ea1</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.23ea0</chronicle.wire.enterprise.version>
@@ -88,7 +88,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.23ea3</version>
+                <version>2.23ea4-SNAPSHOT</version>
             </dependency>
 
             <dependency>
