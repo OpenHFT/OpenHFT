@@ -20,7 +20,6 @@ Chronicle Software provides tools to help with the full life-cycle of the trade 
 
 https://chronicle.software/contributor-agreement/
 
-
 == Tools
 
 === OpenHFT Recommends
