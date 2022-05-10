@@ -60,7 +60,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver</artifactId>
-                <version>3.12.10</version>
+                <version>3.12.11</version>
             </dependency>
           
             <dependency>
@@ -312,7 +312,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.2.9</version>
+                <version>1.2.11</version>
             </dependency>
 
             <dependency>
@@ -392,7 +392,7 @@
             <dependency>
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
-                <version>4.8.139</version>
+                <version>4.8.146</version>
             </dependency>
 
             <dependency>
