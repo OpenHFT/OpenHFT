@@ -36,16 +36,16 @@
         <chronicle.queue.version>5.23ea7</chronicle.queue.version>
         <chronicle.queue.zero.version>2.23ea1</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.23ea0</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.23ea5-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.23ea5</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.23ea1</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.23ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.23ea2</chronicle.ring.version>
-        <chronicle.fix.version>4.23ea9</chronicle.fix.version>
-        <chronicle.services.version>3.23ea10-SNAPSHOT</chronicle.services.version>
+        <chronicle.fix.version>4.23ea10</chronicle.fix.version>
+        <chronicle.services.version>3.23ea11-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea2</chronicle.logger.version>
         <chronicle.efx.version>2.23ea0</chronicle.efx.version>
         <chronicle.matching.engine.version>2.23ea0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.23ea14</chronicle.platform.version>
+        <chronicle.platform.version>2.23ea16-SNAPSHOT</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.22ea7</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.23ea12</chronicle.core.version>
     </properties>
@@ -100,7 +100,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.23ea7-SNAPSHOT</version>
+                <version>2.23ea7</version>
             </dependency>
 
             <dependency>
@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.23ea9-SNAPSHOT</version>
+                <version>2.23ea10-SNAPSHOT</version>
             </dependency>
 
             <dependency>
