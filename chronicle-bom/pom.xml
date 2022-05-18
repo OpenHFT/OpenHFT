@@ -653,6 +653,13 @@
                 <artifactId>assertions-disabled</artifactId>
                 <version>1.0.0</version>
             </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-crypto-adapoters</artifactId>
+                <version>2.23ea0-SNAPSHOT</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
