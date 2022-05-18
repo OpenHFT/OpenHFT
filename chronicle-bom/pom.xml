@@ -48,7 +48,7 @@
         <chronicle.platform.version>2.23ea16</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.22ea7</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.23ea12</chronicle.core.version>
-        <chronicle.crypto-adapters>2.23ea0</chronicle.crypto-adapters>
+        <chronicle.crypto.adapters>2.23ea0</chronicle.crypto.adapters>
     </properties>
 
     <dependencyManagement>
@@ -658,13 +658,13 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-crypto-adapters</artifactId>
-                <version>${chronicle.crypto-adapters}</version>
+                <version>${chronicle.crypto.adapters}</version>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-crypto-adapters-guarded</artifactId>
-                <version>${chronicle.crypto-adapters}</version>
+                <version>${chronicle.crypto.adapters}</version>
             </dependency>
 
         </dependencies>
