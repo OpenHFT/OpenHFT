@@ -240,14 +240,8 @@
                     <artifactId>depgraph-maven-plugin</artifactId>
                     <version>4.0.1</version>
                     <configuration>
-                        <scope>compile</scope>
+                        <classpathScope>compile</classpathScope>
                     </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>com.github.ferstl</groupId>
-                    <artifactId>depgraph-maven-plugin</artifactId>
-                    <version>4.0.1</version>
                 </plugin>
 
                 <plugin>
