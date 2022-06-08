@@ -24,12 +24,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.2.18</version>
+        <version>1.2.21</version>
         <relativePath />
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.1.32-SNAPSHOT</version>
+    <version>1.1.34-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
@@ -64,7 +64,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

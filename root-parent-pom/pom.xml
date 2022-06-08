@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>1.2.20-SNAPSHOT</version>
+    <version>1.2.22-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Root Parent Pom</name>
@@ -65,6 +65,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--
+            By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
+            contain the arguments necessary to run the Chronicle libraries
+        -->
+        <jvm.requiredArgs />
     </properties>
 
     <build>
@@ -110,16 +115,13 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.0.0-M2</version>
                 </plugin>
 
-                <!--
-                    Do not upgrade to M5, it's broken https://issues.apache.org/jira/browse/SUREFIRE-1863
-                -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M4</version>
+                    <version>3.0.0-M6</version>
                 </plugin>
 
                 <plugin>
@@ -173,7 +175,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>5.1.2</version>
+                    <version>5.1.6</version>
                 </plugin>
 
                 <plugin>
@@ -186,6 +188,18 @@
                     <groupId>com.google.code.maven-replacer-plugin</groupId>
                     <artifactId>replacer</artifactId>
                     <version>1.5.3</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.3.0</version>
                 </plugin>
 
                 <plugin>
@@ -238,14 +252,8 @@
                     <artifactId>depgraph-maven-plugin</artifactId>
                     <version>4.0.1</version>
                     <configuration>
-                        <scope>compile</scope>
+                        <classpathScope>compile</classpathScope>
                     </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>com.github.ferstl</groupId>
-                    <artifactId>depgraph-maven-plugin</artifactId>
-                    <version>4.0.1</version>
                 </plugin>
 
                 <plugin>
@@ -306,6 +314,19 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!--
+                Set argLine to include ${jvm.requiredArgs} (JVM args needed to run Chronicle libraries on the detected JVM)
+
+                If a child POM wants to override the argLine, they must include ${jvm.requiredArgs}
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} ${jvm.requiredArgs}</argLine>
+                </configuration>
             </plugin>
 
         </plugins>
@@ -380,42 +401,53 @@
             <activation>
                 <jdk>[11,16]</jdk>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>--add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports
-                                java.base/jdk.internal.misc=ALL-UNNAMED --add-exports java.base/sun.nio.ch=ALL-UNNAMED
-                            </argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <!-- Required JVM args for Java 11 -> 16 -->
+                <jvm.requiredArgs>
+                                --illegal-access=permit
+                                --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+                                --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+                                --add-exports java.base/jdk.internal.util=ALL-UNNAMED
+                                --add-exports java.base/sun.nio.ch=ALL-UNNAMED
+                </jvm.requiredArgs>
+            </properties>
         </profile>
         <profile>
             <id>java17</id>
             <activation>
                 <jdk>[17,</jdk>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>
-                                --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
-                                --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
-                                --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
-                                --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
-                                --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED
-                            </argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <!-- Required JVM args for Java 17+ -->
+                <jvm.requiredArgs>
+                    --illegal-access=permit
+                                --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+                    --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
+                    --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                    --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+                    --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+                    --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED
+                                --add-exports java.base/jdk.internal.util=ALL-UNNAMED
+                                --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+                            </jvm.requiredArgs>
+            </properties>
+        </profile>
+        <!--
+            Only default argLine if it's not set. If we blanket default it, it can't be overriden!?
+        -->
+        <profile>
+            <id>default-argLine</id>
+            <activation>
+                <property>
+                    <name>!argLine</name>
+                </property>
+            </activation>
+            <properties>
+                <argLine />
+            </properties>
         </profile>
     </profiles>
 
