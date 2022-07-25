@@ -47,6 +47,7 @@
         <chronicle.matching.engine.version>2.22ea5</chronicle.matching.engine.version>
         <chronicle.platform.version>2.22ea38</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.22ea7</chronicle.market.data.distributor.version>
+        <chronicle.itch.adapters.version>4.22.37</chronicle.itch.adapters.version>
     </properties>
 
     <dependencyManagement>
@@ -326,12 +327,6 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-itch-cboe</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
@@ -428,8 +423,20 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-cboe</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-cnx</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-ebs-ultra</artifactId>
-                <version>4.22.37</version>
+                <version>${chronicle.itch.adapters.version}</version>
             </dependency>
 
             <!--  non-core projects -->
