@@ -34,13 +34,13 @@
     <properties>
         <chronicle.network.version>2.23ea20</chronicle.network.version>
         <chronicle.queue.version>5.23ea25</chronicle.queue.version>
-        <chronicle.queue.zero.version>2.23ea2-SNAPSHOT</chronicle.queue.zero.version>
+        <chronicle.queue.zero.version>2.23ea3-SNAPSHOT</chronicle.queue.zero.version>
         <chronicle.wire.enterprise.version>2.23ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.23ea22</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.23ea3</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.23ea20</chronicle.datagrid.version>
         <chronicle.ring.version>2.23ea21</chronicle.ring.version>
-        <chronicle.fix.version>4.23ea22</chronicle.fix.version>
+        <chronicle.fix.version>4.23ea23-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.23ea29</chronicle.services.version>
         <chronicle.logger.version>4.22ea2</chronicle.logger.version>
         <chronicle.efx.version>2.23ea2</chronicle.efx.version>
