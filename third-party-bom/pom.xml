@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>3.12.10</version>
+                <version>4.7.1</version>
             </dependency>
 
             <dependency>
