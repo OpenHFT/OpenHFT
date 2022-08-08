@@ -40,14 +40,14 @@
         <chronicle.map.enterprise.version>2.22.5</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.22.3</chronicle.datagrid.version>
         <chronicle.ring.version>2.22.7</chronicle.ring.version>
-        <chronicle.fix.version>4.22.37</chronicle.fix.version>
+        <chronicle.fix.version>4.22.38-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.22.17</chronicle.services.version>
         <chronicle.logger.version>4.22ea2</chronicle.logger.version>
         <chronicle.efx.version>2.22.9</chronicle.efx.version>
         <chronicle.matching.engine.version>2.22ea5</chronicle.matching.engine.version>
         <chronicle.platform.version>2.22ea38</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.22ea7</chronicle.market.data.distributor.version>
-        <chronicle.itch.adapters.version>4.22.37</chronicle.itch.adapters.version>
+        <chronicle.itch.adapters.version>4.22.38-SNAPSHOT</chronicle.itch.adapters.version>
     </properties>
 
     <dependencyManagement>
