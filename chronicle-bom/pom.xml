@@ -90,7 +90,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.23ea21</version>
+                <version>2.23ea22-SNAPSHOT</version>
             </dependency>
 
             <dependency>
