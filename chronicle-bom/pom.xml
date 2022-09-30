@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.network.version>2.23.22</chronicle.network.version>
-        <chronicle.queue.version>5.23.35</chronicle.queue.version>
+        <chronicle.queue.version>5.23.36-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2.23.6</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.23.2</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.23.25</chronicle.queue.enterprise.version>
