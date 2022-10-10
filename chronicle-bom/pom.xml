@@ -48,7 +48,7 @@
         <chronicle.platform.version>2.23.36</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.23.1</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.23.35</chronicle.core.version>
-        <chronicle.crypto.adapters.version>2.23.14</chronicle.crypto.adapters.version>
+        <chronicle.crypto.adapters.version>2.23.15-SNAPSHOT</chronicle.crypto.adapters.version>
         <chronicle.itch.adapters.version>4.23.23</chronicle.itch.adapters.version>
     </properties>
 
