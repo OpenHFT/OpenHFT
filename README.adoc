@@ -1,22 +1,20 @@
 = Chronicle Overview
 
-Chronicle Software provides tools to help with the full life-cycle of the trade across multiple asset classes
+Chronicle Software provides libraries to help with fast data. The majority of our customers are in financial services. Our products include:
 
-**Chronicle FIX/ITCH Engine** - Low latency FIX/ITCH engine in Java for versions 4.0 to 5.0 SP2, can parse and generate messages within 1 microsecond.
+**link:https://chronicle.software/fix-engine/[Chronicle FIX/ITCH Engine]** - Low latency FIX/ITCH engine in Java for all versions of FIX. Can parse and generate messages within 1 microsecond.
 
-**Chronicle Microservices Framework** (CMF) is the foundation of our Pricer, Hedger, Position Keeper, Market Gateway and Algo container. Using the CMF, these Microservices are interconnected using single dedicated threads with all messages recorded providing a low latency audit trail. CMF provides clients with the ability to simply utilize their own custom algos giving both control and flexibility.
+**link:https://chronicle.software/services/[Chronicle Microservices Framework]** - Microservices built with Chronicle Services are efficient, easy to build, test, and maintain. Equally importantly they provide exceptional high-throughput, and low latency.
 
-**Chronicle Map** (CM) is a key-value store sharing persisted memory between processes, either on the same server or across networks. CM is designed to store the data off-heap, which means it minimizes the heap usage and garbage collection allowing the data to be stored with sub-microsecond latency. CM is structured key-value store able to support exceptionally high updates and high throughput data e.g. OPRA Market Data with minimum configuration.
+**link:https://chronicle.software/matching-engine/[Chronicle Matching Engine]** - forms the backbone for a resilient and scalable exchange solution. It provides order matching, validation, and risk checks with high capacity and low latency. It has a modular and flexible design which enables it to be used stand-alone, or seamlessly integrated with Chronicle FIX and Chronicle Services.
 
-**Chronicle Queue** (CQ) persists every event and message, recording these in a memory mapped file. Messages can be written concurrently in the same machine or across a network which ensures no messages are ever lost. CQ can serialize, write, read and deserialize realistic business messages in around two microseconds. This ensures our clients have a low latency complete picture of their trading strategy.
+**link:https://chronicle.software/efx/[Chronicle EFX]** - built on Chronicle Microservices, EFX contains components for Aggregation, Pricing, Hedging, Position Keeping, P&L, Market Gateway and Algo containers. EFX allows the customer to use off the shelf functionality built and maintained by Chronicle, or to extend and customise with their own algos and IP - the best compromise of "buy vs build".
 
-"Datagrid" **Chronicle Datagrid (CE)** is a high performance, low latency access gateway, it is used to control manage access to your data and your services across a number of machines. CE can handle millions of events per second with latencies of around one microsecond on a single machine. CE allows you to install and configure your own business rules and can be used in a variety of ways:
+**link:https://chronicle.software/queue/[Chronicle Queue]** and also link:https://chronicle.software/queue-enterprise/[Chronicle Queue Enterprise] - using Chronicle Queue for low latency message passing provides an effectively unlimited buffer between producers and consumers and a complete audit trail of every message sent. Queue Enterprise provides even lower latencies and additional delivery semantics - for example - only process a message once it is guaranteed replicated to another host(s).
 
- - Provides a unified view of the state of your trading systems which abstracted away from how the data is actually stored.
- - CE can access cached data at “in memory speeds” while keeping a copy on disk, removing your database from the critical path for reads and writes are spooled to your database as fast as it allows.
- - GUI can share larger faster datasets, CE allows throttling of rates of updates making certain that your client only receives the latest updates out of the millions per second received by the server. Off-heap storage allows clients to scroll through millions of rows with no noticeable pauses.
+**link:https://chronicle.software/map/[Chronicle Map]** is a key-value store sharing persisted memory between processes, either on the same server or across networks. CM is designed to store the data off-heap, which means it minimizes the heap usage and garbage collection allowing the data to be stored with sub-microsecond latency. CM is structured key-value store able to support exceptionally high updates and high throughput data e.g. OPRA Market Data with minimum configuration.
 
-=== contributor-agreement
+=== Contributor agreement
 
 https://chronicle.software/contributor-agreement/
 
