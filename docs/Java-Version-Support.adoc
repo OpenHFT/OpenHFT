@@ -1,9 +1,31 @@
 = Java Version Support
 Peter Lawrey
 
-Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11 and Java 17 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described hereunder:
+We support Java 8, 11 and 17 - all libraries will run under these versions of Java.
+
+We support Sun's JDK, OpenJDK (including popular distributions such as Azul Zulu), and Azul Platform Prime (AKA Zing).
+
+== Running under Java 11 or Java 17 (class path)
+When starting a JVM explicitly using the `java` command, the follow command line parameters need to be passed in:
+
+[source, shell script]
+----
+--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
+--add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
+--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+--add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+--add-opens=java.base/java.lang=ALL-UNNAMED
+--add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+--add-opens=java.base/java.io=ALL-UNNAMED
+--add-opens=java.base/java.util=ALL-UNNAMED
+----
+
+TIP: Even though not all of them are strictly required, we recommend providing the same command line options for Java 11 as for Java 17 as this will remove some warnings in the output logs.
 
 == Compiles and Runs on Java 8, 11, and 17.
+
+Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11 and Java 17 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described here:
 
 These libraries compile on either Java 8, 11 and 17 and pass all the tests under the version built and higher.
 
@@ -27,21 +49,3 @@ These libraries compile on either Java 8, 11 and 17 and pass all the tests under
 - Chronicle-Websocket-Jetty
 - Chronicle-Wire-Enterprise
 - JLBH
-
-== Running under Java 17 (class path)
-When starting a JVM explicitly using the `java` command, the follow command line parameters need to be passed in:
-
-[source, shell script]
-----
---add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
---add-exports=java.base/sun.nio.ch=ALL-UNNAMED
---add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
---add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
---add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
---add-opens=java.base/java.lang=ALL-UNNAMED
---add-opens=java.base/java.lang.reflect=ALL-UNNAMED
---add-opens=java.base/java.io=ALL-UNNAMED
---add-opens=java.base/java.util=ALL-UNNAMED
-----
-
-TIP: Even though not strictly required, we recommend providing the same command line options for Java 11 as for Java 17 as this will remove some warnings in the output logs.
