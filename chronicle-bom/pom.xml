@@ -32,8 +32,8 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2.24ea0</chronicle.network.version>
-        <chronicle.queue.version>5.24ea0</chronicle.queue.version>
+        <chronicle.network.version>2.24ea1-SNAPSHOT</chronicle.network.version>
+        <chronicle.queue.version>5.24ea1-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2.24ea0</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.24ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.24ea0</chronicle.queue.enterprise.version>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
-                <version>2.24ea0</version>
+                <version>2.24ea1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
