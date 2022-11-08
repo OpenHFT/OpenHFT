@@ -36,7 +36,7 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 |====
 (a) Provisional dates
 
-Java 17 is supported with the x.22 release. x.24 is planned to be the first release that fully takes advantage of Java 17 source features.
+Java 17 is supported with the x.22 release. 
 
 NOTE: There was no x.18 release.
 
