@@ -33,10 +33,10 @@
     </description>
     <properties>
         <chronicle.network.version>2.24ea2</chronicle.network.version>
-        <chronicle.queue.version>5.24ea3</chronicle.queue.version>
+        <chronicle.queue.version>5.24ea4-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2.24ea0</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.24ea0</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.24ea1</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.24ea2-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.24ea1</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.24ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.24ea0</chronicle.ring.version>
