@@ -21,9 +21,10 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | stable release | end of support | Java versions
-| x.24  | 2022/10 | 2023 (a) | 2025 (a) | 8 & 11 & 17
-| x.23  | 2022/03 | 2022/10 | 2024/10 | 8 & 11 & 17
-| x.22  | 2021/08 | 2022/03 | 2024/03 | 8 & 11 & 17
+| x.25  | 2023/04 (a) | 2023/11 (a) | 2025/11 (a) | 8, 11, 17, 21
+| x.24  | 2022/10 | 2023/04 (a) | 2025/04 (a) | 8, 11, 17
+| x.23  | 2022/03 | 2022/10 | 2024/10 | 8, 11, 17
+| x.22  | 2021/08 | 2022/03 | 2024/03 | 8, 11, 17
 | x.21  | 2021/01 | 2021/08 | 2023/08 | 8 & 11
 | x.20  | 2020/07 | 2020/12 | 2022/12 | 8 & 11
 | x.19  | 2020/02 | 2020/06 | 2022/06 | 8 & 11
@@ -38,6 +39,8 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 Java 17 is supported with the x.22 release. 
 
+Java 21 will be supported with the x.25 release. 
+
 NOTE: There was no x.18 release.
 
 == Java 8 support.
@@ -46,7 +49,7 @@ We currently support Java 8, 11 and 17.
 
 Once the master branch updates to a new stage, older stages are only updated and released based on client requirement ensuring they stay stable.
 
-Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.22 branch.
+Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.25 branch.
 
 == BOM files
 
