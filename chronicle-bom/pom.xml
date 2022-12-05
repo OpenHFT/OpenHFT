@@ -47,7 +47,7 @@
         <chronicle.matching.engine.version>2.24ea0</chronicle.matching.engine.version>
         <chronicle.platform.version>2.24ea4</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.24ea0</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2.24ea2</chronicle.core.version>
+        <chronicle.core.version>2.24ea3-SNAPSHOT</chronicle.core.version>
         <chronicle.crypto.adapters.version>2.24ea2</chronicle.crypto.adapters.version>
         <chronicle.itch.adapters.version>4.24ea1</chronicle.itch.adapters.version>
     </properties>
