@@ -50,7 +50,19 @@
     <dependencyManagement>
 
         <dependencies>
+                 
+           <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.34</version>
+            </dependency>
 
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>1.4.20</version>
+            </dependency>
+          
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>bson</artifactId>
