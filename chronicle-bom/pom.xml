@@ -62,6 +62,8 @@
                 <artifactId>chronicle-test-framework</artifactId>
                 <version>2.24ea1</version>
             </dependency>
+          
+          
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
@@ -677,6 +679,13 @@
                 <classifier>obfuscated</classifier>
             </dependency>
 
+          
+          <dependency>
+                 <groupId>net.openhft</groupId>
+                 <artifactId>zero-allocation-hashing</artifactId>
+                 <version>0.16</version>
+             </dependency>
+          
         </dependencies>
     </dependencyManagement>
 
