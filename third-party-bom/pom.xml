@@ -58,12 +58,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>zero-allocation-hashing</artifactId>
-                <version>0.16</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.samskivert</groupId>
                 <artifactId>samskivert</artifactId>
                 <version>1.9</version>
