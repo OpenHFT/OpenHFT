@@ -29,7 +29,7 @@
     </parent>
 
     <artifactId>third-party-bom</artifactId>
-    <version>3.23.1-SNAPSHOT</version>
+    <version>3.23.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Third Party BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the other projects in a
@@ -50,7 +50,31 @@
     <dependencyManagement>
 
         <dependencies>
+                 
+             <dependency>
+                <groupId>org.skyscreamer</groupId>
+                <artifactId>jsonassert</artifactId>
+                <version>1.5.0</version>
+            </dependency>
 
+            <dependency>
+                <groupId>com.samskivert</groupId>
+                <artifactId>samskivert</artifactId>
+                <version>1.9</version>
+            </dependency>
+          
+           <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.34</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>1.4.20</version>
+            </dependency>
+          
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>bson</artifactId>
