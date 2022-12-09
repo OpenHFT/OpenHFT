@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.network.version>2.24ea3</chronicle.network.version>
-        <chronicle.queue.version>5.24ea5</chronicle.queue.version>
+        <chronicle.queue.version>5.24ea6-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2.24ea0</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.24ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.24ea3</chronicle.queue.enterprise.version>
@@ -62,8 +62,8 @@
                 <artifactId>chronicle-test-framework</artifactId>
                 <version>2.24ea1</version>
             </dependency>
-          
-          
+
+
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
@@ -679,13 +679,13 @@
                 <classifier>obfuscated</classifier>
             </dependency>
 
-          
+
           <dependency>
                  <groupId>net.openhft</groupId>
                  <artifactId>zero-allocation-hashing</artifactId>
                  <version>0.16</version>
              </dependency>
-          
+
         </dependencies>
     </dependencyManagement>
 
