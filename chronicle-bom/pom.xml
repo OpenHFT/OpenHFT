@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.network.version>2.24ea3</chronicle.network.version>
-        <chronicle.queue.version>5.24ea6-SNAPSHOT</chronicle.queue.version>
+        <chronicle.queue.version>5.24ea6</chronicle.queue.version>
         <chronicle.zero.version>2.24ea0</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.24ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.24ea3</chronicle.queue.enterprise.version>
@@ -45,7 +45,7 @@
         <chronicle.logger.version>4.22ea2</chronicle.logger.version>
         <chronicle.efx.version>2.24ea0</chronicle.efx.version>
         <chronicle.matching.engine.version>2.24ea0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.24ea5-SNAPSHOT</chronicle.platform.version>
+        <chronicle.platform.version>2.24ea5</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.24ea0</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.24ea3</chronicle.core.version>
         <chronicle.crypto.adapters.version>2.24ea2</chronicle.crypto.adapters.version>
@@ -457,7 +457,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.23ea1-SNAPSHOT</version>
+                <version>1.23ea1</version>
             </dependency>
 
             <dependency>
