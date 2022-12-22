@@ -650,6 +650,13 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-platform-fix-gui</artifactId>
+                <version>${chronicle.platform.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-platform-queue-replication-orchestration</artifactId>
                 <version>${chronicle.platform.version}</version>
             </dependency>
