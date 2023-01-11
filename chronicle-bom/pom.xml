@@ -430,6 +430,13 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>services-monitoring-gateway</artifactId>
+                <version>${chronicle.services.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-tr-sbe</artifactId>
                 <version>2.24ea0</version>
             </dependency>
