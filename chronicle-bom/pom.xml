@@ -197,6 +197,13 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-wire-enterprise</artifactId>
+                <version>${chronicle.wire.enterprise.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise</artifactId>
                 <version>${chronicle.queue.enterprise.version}</version>
             </dependency>
