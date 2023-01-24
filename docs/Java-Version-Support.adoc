@@ -1,9 +1,11 @@
 = Java Version Support
 Peter Lawrey
 
-We support Java 8, 11 and 17 - all libraries will run under these versions of Java.
+We support current LTS versions: Java 8, 11 and 17 - all libraries will run under these versions of Java.
 
 We support Sun's JDK, OpenJDK (including popular distributions such as Azul Zulu), and Azul Platform Prime (AKA Zing).
+
+We plan to support the next LTS version of Java (21) soon after it is released.
 
 == Running under Java 11 or Java 17 (class path)
 When starting a JVM explicitly using the `java` command, the follow command line parameters need to be passed in:
