@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.22-SNAPSHOT</version>
+    <version>2.22.171</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -40,7 +40,7 @@
         <chronicle.map.enterprise.version>2.22.6</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.22.3</chronicle.datagrid.version>
         <chronicle.ring.version>2.22.7</chronicle.ring.version>
-        <chronicle.fix.version>4.22.43-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>4.22.43</chronicle.fix.version>
         <chronicle.services.version>3.22.17</chronicle.services.version>
         <chronicle.logger.version>4.22ea3</chronicle.logger.version>
         <chronicle.efx.version>2.22.17</chronicle.efx.version>
@@ -679,6 +679,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>release/2.22</tag>
+        <tag>chronicle-bom-2.22.171</tag>
     </scm>
 </project>
