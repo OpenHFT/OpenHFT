@@ -191,6 +191,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-zero-guarded</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-wire-enterprise</artifactId>
                 <version>${chronicle.wire.enterprise.version}</version>
             </dependency>
@@ -220,6 +226,12 @@
                 <artifactId>chronicle-queue-enterprise</artifactId>
                 <version>${chronicle.queue.enterprise.version}</version>
                 <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-enterprise-guarded</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
@@ -257,6 +269,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise-guarded</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-datagrid</artifactId>
                 <version>${chronicle.datagrid.version}</version>
                 <type>test-jar</type>
@@ -286,6 +304,12 @@
                 <artifactId>chronicle-ring</artifactId>
                 <version>${chronicle.ring.version}</version>
                 <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-ring-guarded</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
@@ -310,13 +334,19 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-router</artifactId>
                 <version>${chronicle.fix.version}</version>
-                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-router</artifactId>
                 <version>${chronicle.fix.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-router-guarded</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
@@ -333,13 +363,6 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-fix-runtime</artifactId>
-                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
-                <classifier>obfuscated</classifier>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-itch-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
@@ -348,6 +371,19 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-runtime</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-runtime-guarded</artifactId>
+                <version>${project.version}</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
@@ -388,6 +424,12 @@
                 <artifactId>chronicle-fix-queue-zero</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-queue-zero-guarded</artifactId>
+                <version>${project.version}</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
@@ -433,6 +475,12 @@
                 <artifactId>chronicle-services</artifactId>
                 <version>${chronicle.services.version}</version>
                 <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-services-guarded</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
