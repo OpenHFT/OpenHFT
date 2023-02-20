@@ -41,11 +41,11 @@
         <chronicle.datagrid.version>2.24ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.24ea0</chronicle.ring.version>
         <chronicle.fix.version>4.24ea17</chronicle.fix.version>
-        <chronicle.services.version>3.24ea7</chronicle.services.version>
+        <chronicle.services.version>3.24ea8-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea3</chronicle.logger.version>
         <chronicle.efx.version>2.24ea3-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.24ea0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.24ea11</chronicle.platform.version>
+        <chronicle.platform.version>2.24ea12-SNAPSHOT</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.24ea0</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.24ea6</chronicle.core.version>
         <chronicle.crypto.adapters.version>2.24ea2</chronicle.crypto.adapters.version>
