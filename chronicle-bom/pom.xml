@@ -519,7 +519,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.23ea2</version>
+                <version>1.23ea3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
