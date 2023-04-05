@@ -391,7 +391,6 @@
                 <artifactId>chronicle-fix-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -399,7 +398,6 @@
                 <artifactId>chronicle-fix-acceptance-tests</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -413,7 +411,6 @@
                 <artifactId>chronicle-fix-yaml-tester</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -446,7 +443,6 @@
                 <artifactId>chronicle-fix-benchmarks</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -472,7 +468,6 @@
                 <artifactId>chronicle-services</artifactId>
                 <version>${chronicle.services.version}</version>
                 <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
