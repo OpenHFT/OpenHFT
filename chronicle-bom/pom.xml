@@ -49,7 +49,7 @@
         <chronicle.market.data.distributor.version>3.24ea0</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.24ea11</chronicle.core.version>
         <chronicle.crypto.adapters.version>2.24ea2</chronicle.crypto.adapters.version>
-        <chronicle.itch.adapters.version>4.24ea2</chronicle.itch.adapters.version>
+        <chronicle.itch.adapters.version>4.24ea3-SNAPSHOT</chronicle.itch.adapters.version>
     </properties>
 
     <dependencyManagement>
