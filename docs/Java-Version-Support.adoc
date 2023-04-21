@@ -1,5 +1,4 @@
 = Java Version Support
-Peter Lawrey
 
 We support current LTS versions: Java 8, 11 and 17 - all libraries will run under these versions of Java.
 

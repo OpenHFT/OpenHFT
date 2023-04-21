@@ -1,5 +1,4 @@
 = Version Support
-Peter Lawrey
 
 Chronicle Software supports each version for two years from the start of the next minor version. 
 
@@ -50,6 +49,8 @@ We currently support Java 8, 11 and 17.
 Once the master branch updates to a new stage, older stages are only updated and released based on client requirement ensuring they stay stable.
 
 Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.25 branch.
+
+See also <<docs/Java-Version-Support.adoc#,Java Version Support>>
 
 == BOM files
 
