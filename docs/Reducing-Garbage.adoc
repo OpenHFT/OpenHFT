@@ -1,5 +1,4 @@
 = Chronicle Garbage Reduction
-Peter Lawrey
 
 == Reducing Garbage
 
