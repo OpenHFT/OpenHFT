@@ -1,5 +1,6 @@
 = Chronicle Maven Anatomy
-Per Miborg
+
+(last updated Feb 2021)
 
 The various Chronicle libraries depends on each other in order to reuse common functionality.
 
