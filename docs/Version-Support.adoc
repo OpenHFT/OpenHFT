@@ -46,7 +46,7 @@ NOTE: There was no x.18 release.
 
 We currently support Java 8, 11 and 17.
 
-Once the master branch updates to a new stage, older stages are only updated and released based on client requirement ensuring they stay stable.
+Once the master branch updates to a new stage, older stages are only updated and released based on client requirements, thus ensuring they stay stable.
 
 Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.25 branch.
 
@@ -64,5 +64,8 @@ Note: Many organizations use the “ea” release in production, as this contain
 
 == Binary Compatibility
 
-Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions.
+Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions. This means that any 2.23 chronicle-bom should be a drop-in replacement for any other chronicle-bom 2.23, with full binary compatibility.
 
+== API evolution
+
+Requirements changes and APIs evolve. Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones. All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea
