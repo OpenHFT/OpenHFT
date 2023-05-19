@@ -33,7 +33,7 @@
     </description>
     <properties>
         <chronicle.network.version>2.24ea11</chronicle.network.version>
-        <chronicle.queue.version>5.24ea14</chronicle.queue.version>
+        <chronicle.queue.version>5.24ea15-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2.24ea0</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.24ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.24ea19</chronicle.queue.enterprise.version>
@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.24ea9</version>
+                <version>2.24ea10-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -122,7 +122,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.24ea16</version>
+                <version>2.24ea17-SNAPSHOT</version>
             </dependency>
 
             <dependency>
