@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.23-SNAPSHOT</version>
+    <version>2.23.180</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -40,10 +40,10 @@
         <chronicle.map.enterprise.version>2.23.6</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.23.21</chronicle.datagrid.version>
         <chronicle.ring.version>2.23.24</chronicle.ring.version>
-        <chronicle.fix.version>4.23.66-SNAPSHOT</chronicle.fix.version>
+        <chronicle.fix.version>4.23.66</chronicle.fix.version>
         <chronicle.services.version>3.23.43</chronicle.services.version>
         <chronicle.logger.version>4.22ea2</chronicle.logger.version>
-        <chronicle.efx.version>2.23.12-SNAPSHOT</chronicle.efx.version>
+        <chronicle.efx.version>2.23.12</chronicle.efx.version>
         <chronicle.matching.engine.version>2.23.2</chronicle.matching.engine.version>
         <chronicle.platform.version>2.23.38</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.23.1</chronicle.market.data.distributor.version>
@@ -102,7 +102,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.23.39-SNAPSHOT</version>
+                <version>2.23.39</version>
             </dependency>
 
             <dependency>
@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.23.44-SNAPSHOT</version>
+                <version>2.23.44</version>
             </dependency>
 
             <dependency>
@@ -718,6 +718,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>release/2.23</tag>
+        <tag>chronicle-bom-2.23.180</tag>
     </scm>
 </project>
