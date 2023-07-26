@@ -47,7 +47,7 @@
         <chronicle.matching.engine.version>2.24ea0</chronicle.matching.engine.version>
         <chronicle.platform.version>2.24ea14</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.24ea1</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2.24ea22</chronicle.core.version>
+        <chronicle.core.version>2.24ea23-SNAPSHOT</chronicle.core.version>
         <chronicle.crypto.adapters.version>2.24ea2</chronicle.crypto.adapters.version>
         <chronicle.itch.adapters.version>4.24ea3</chronicle.itch.adapters.version>
     </properties>
@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.24ea15</version>
+                <version>2.24ea16-SNAPSHOT</version>
             </dependency>
 
             <dependency>
