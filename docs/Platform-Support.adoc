@@ -1,0 +1,23 @@
+= Platform Support
+
+== Java
+
+Chronicle Java libraries are supported on:
+
+* Linux on Intel for production
+* Windows & MacOS Intel and M1 for development - not all functionality fully supported
+* 32/64-bit ARM - not all functionality fully supported
+
+== C++ & Python
+
+Chronicle C++ and Python libraries support
+
+* Linux on Intel x86_64 for production
+* MacOS on Intel x86_64 and arm64 for production
+
+== Rust
+
+Chronicle Rust libraries
+
+* Linux on Intel x86_64 for production
+

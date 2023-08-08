@@ -2,7 +2,7 @@
 <!--
   ~ Copyright 2014 Higher Frequency Trading
   ~
-  ~ http://www.chronicle.software
+  ~ https://chronicle.software
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.2.18</version>
+        <version>1.2.23</version>
         <relativePath />
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.1.32-SNAPSHOT</version>
+    <version>1.1.37-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Java Parent Pom</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
@@ -64,7 +64,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -104,6 +103,45 @@
                     <additionalOptions>${javadoc.opts}</additionalOptions>
                     <quiet>true</quiet>
                 </configuration>
+            </plugin>
+
+            <!-- This is duplicated in enterprise-parent-pom. If you update it here, update it there. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configLocation>net/openhft/quality/checkstyle/checkstyle.xml</configLocation>
+                    <failOnViolation>true</failOnViolation>
+                    <logViolationsToConsole>true</logViolationsToConsole>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <dependencies>
+                    <!--
+                        Choose the latest version that supports Java 8
+
+                        See https://checkstyle.sourceforge.io/#JRE_and_JDK
+                    -->
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>9.3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>chronicle-quality-rules</artifactId>
+                        <version>1.23ea6</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

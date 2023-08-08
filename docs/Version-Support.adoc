@@ -1,5 +1,4 @@
 = Version Support
-Peter Lawrey
 
 Chronicle Software supports each version for two years from the start of the next minor version. 
 
@@ -21,8 +20,10 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | stable release | end of support | Java versions
-| x.23  | 2022 (a) | 2023 (a) | 2025 (a) | 8 & 11 & 17
-| x.22  | 2021/08 | 2022 (a) | 2024 (a) | 8 & 11 & 17
+| x.25  | 2023/04 (a) | 2023/11 (a) | 2025/11 (a) | 8, 11, 17, 21
+| x.24  | 2022/10 | 2023/04 (a) | 2025/04 (a) | 8, 11, 17
+| x.23  | 2022/03 | 2022/10 | 2024/10 | 8, 11, 17
+| x.22  | 2021/08 | 2022/03 | 2024/03 | 8, 11, 17
 | x.21  | 2021/01 | 2021/08 | 2023/08 | 8 & 11
 | x.20  | 2020/07 | 2020/12 | 2022/12 | 8 & 11
 | x.19  | 2020/02 | 2020/06 | 2022/06 | 8 & 11
@@ -35,7 +36,9 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 |====
 (a) Provisional dates
 
-Java 17 is supported with the x.22 release. x.24 is planned to be the first release that fully takes advantage of Java 17 source features.
+Java 17 is supported with the x.22 release. 
+
+Java 21 will be supported with the x.25 release. 
 
 NOTE: There was no x.18 release.
 
@@ -43,9 +46,11 @@ NOTE: There was no x.18 release.
 
 We currently support Java 8, 11 and 17.
 
-Once the master branch updates to a new stage, older stages are only updated and released based on client requirement ensuring they stay stable.
+Once the master branch updates to a new stage, older stages are only updated and released based on client requirements, thus ensuring they stay stable.
 
-Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.22 branch.
+Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.25 branch.
+
+See also <<docs/Java-Version-Support.adoc#,Java Version Support>>
 
 == BOM files
 
@@ -59,5 +64,8 @@ Note: Many organizations use the “ea” release in production, as this contain
 
 == Binary Compatibility
 
-Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions.
+Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions. This means that any 2.23 chronicle-bom should be a drop-in replacement for any other chronicle-bom 2.23, with full binary compatibility.
 
+== API evolution
+
+Requirements changes and APIs evolve. Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones. All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea
