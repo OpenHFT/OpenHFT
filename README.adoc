@@ -4,7 +4,7 @@ Chronicle Software provides libraries to help with fast data. The majority of ou
 
 **link:https://chronicle.software/fix-engine/[Chronicle FIX/ITCH Engine]** - Low latency FIX/ITCH engine in Java for all versions of FIX. Can parse and generate messages within 1 microsecond.
 
-**link:https://chronicle.software/services/[Chronicle Microservices Framework]** - Microservices built with Chronicle Services are efficient, easy to build, test, and maintain. Equally importantly they provide exceptional high-throughput, and low latency.
+**link:https://chronicle.software/services/[Chronicle Microservices Framework]** - Microservices built with Chronicle Services are efficient, easy to build, test, and maintain. Equally importantly they provide exceptional high-throughput, low latency, and transparent HA/DR.
 
 **link:https://chronicle.software/matching-engine/[Chronicle Matching Engine]** - forms the backbone for a resilient and scalable exchange solution. It provides order matching, validation, and risk checks with high capacity and low latency. It has a modular and flexible design which enables it to be used stand-alone, or seamlessly integrated with Chronicle FIX and Chronicle Services.
 
@@ -12,9 +12,23 @@ Chronicle Software provides libraries to help with fast data. The majority of ou
 
 **link:https://chronicle.software/queue/[Chronicle Queue]** and also link:https://chronicle.software/queue-enterprise/[Chronicle Queue Enterprise] - using Chronicle Queue for low latency message passing provides an effectively unlimited buffer between producers and consumers and a complete audit trail of every message sent. Queue Enterprise provides even lower latencies and additional delivery semantics - for example - only process a message once it is guaranteed replicated to another host(s).
 
-**link:https://chronicle.software/map/[Chronicle Map]** is a key-value store sharing persisted memory between processes, either on the same server or across networks. CM is designed to store the data off-heap, which means it minimizes the heap usage and garbage collection allowing the data to be stored with sub-microsecond latency. CM is structured key-value store able to support exceptionally high updates and high throughput data e.g. OPRA Market Data with minimum configuration.
+**link:https://chronicle.software/map/[Chronicle Map]** is a key-value store sharing persisted memory between processes, either on the same server or across networks. CM is designed to store the data off-heap, which means it minimizes the heap usage and garbage collection allowing the data to be stored with sub-microsecond latency. CM is structured key-value store able to support exceptionally high updates and high throughput data e.g. OPRA Market Data with minimum configuration. Replication is provided by Chronicle Map Enterprise
 
 === Contributor agreement
 
+For us to accept contributions to open source libraries we require contributors to sign the below
+
 https://chronicle.software/contributor-agreement/
+
+=== Documentation in this repo
+
+This repo contains the following docs
+
+* <<docs/Java-Version-Support.adoc#,Java Version Support>> documents which versions of Java/JVM are supported by Chronicle libraries
+* <<docs/Platform-Support.adoc#,Platform Support>> documents which Operating Systems are supported by Chronicle libraries
+* <<docs/Version-Support.adoc#,Version Support>> explains Chronicle's version numbers and release timestable
+* <<docs/Anatomy.adoc#,Anatomy>> shows a graphical representation of the OpenHFT projects and their dependencies
+* <<docs/Reducing-Garbage.adoc#,Reducing Garbage>> contains tips and tricks to reduce garbage
+
+
 

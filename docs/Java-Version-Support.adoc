@@ -1,5 +1,4 @@
 = Java Version Support
-Peter Lawrey
 
 We support current LTS versions: Java 8, 11 and 17 - all libraries will run under these versions of Java.
 
@@ -33,8 +32,6 @@ These libraries compile on either Java 8, 11 and 17 and pass all the tests under
 
 - Chronicle-Algorithms
 - Chronicle-Core
-- Chronicle-Datagrid
-- Chronicle-Datagrid-Demo
 - Chronicle-FIX
 - Chronicle-Map
 - Chronicle-Map-Enterprise
@@ -48,6 +45,5 @@ These libraries compile on either Java 8, 11 and 17 and pass all the tests under
 - Chronicle-Services
 - Chronicle-Threads
 - Chronicle-Values
-- Chronicle-Websocket-Jetty
 - Chronicle-Wire-Enterprise
 - JLBH
