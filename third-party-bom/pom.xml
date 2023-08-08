@@ -79,7 +79,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>bson</artifactId>
-                <version>3.12.10</version>
+                <version>4.7.2</version>
             </dependency>
 
             <dependency>
