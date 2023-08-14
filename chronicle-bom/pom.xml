@@ -543,12 +543,6 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-websocket-jetty</artifactId>
-                <version>1.19.30</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
                 <artifactId>lang</artifactId>
                 <version>6.8.18</version>
             </dependency>
