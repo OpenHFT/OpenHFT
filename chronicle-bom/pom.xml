@@ -524,12 +524,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.openhft.com.binance.api</groupId>
-                <artifactId>binance-api-client</artifactId>
-                <version>2.17.1</version>
-            </dependency>
-
-            <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
                 <version>3.23.3</version>
@@ -539,18 +533,6 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
                 <version>2.23ea0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>lang</artifactId>
-                <version>6.8.18</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle</artifactId>
-                <version>3.6.6</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
@@ -606,26 +588,6 @@
                 <artifactId>chronicle-logger-benchmark</artifactId>
                 <version>${chronicle.logger.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-datagrid-nfs</artifactId>
-                <version>1.8.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-datagrid-enterprise</artifactId>
-                <version>2.17.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-datagrid-gui</artifactId>
-                <version>1.0.5</version>
-                <type>war</type>
-            </dependency>
-
 
             <dependency>
                 <groupId>software.chronicle</groupId>
