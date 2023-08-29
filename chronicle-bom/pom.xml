@@ -36,12 +36,12 @@
         <chronicle.queue.version>5.24ea25</chronicle.queue.version>
         <chronicle.zero.version>2.24ea1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.24ea3</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.24ea29</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.24ea30-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.24ea5</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.24ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.24ea2</chronicle.ring.version>
-        <chronicle.fix.version>4.24ea39</chronicle.fix.version>
-        <chronicle.services.version>3.24ea23</chronicle.services.version>
+        <chronicle.fix.version>4.24ea4-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>3.24ea24-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea4</chronicle.logger.version>
         <chronicle.efx.version>2.24ea6</chronicle.efx.version>
         <chronicle.matching.engine.version>2.24ea0</chronicle.matching.engine.version>
