@@ -520,7 +520,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.24ea0</version>
+                <version>1.24ea1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
