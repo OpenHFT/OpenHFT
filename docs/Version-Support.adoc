@@ -60,6 +60,9 @@ We use maven dependency management to express the version set of all our librari
 
 We have introduced the characters “ea” into our build versions, to denote our Early Access release. As the name suggests, we release our early access version regularly. Then about every three months we will cut a non "ea" release.
 
+Only ea releases are released to maven central. Releases of stable versions (e.g. x.23) are made to
+Chronicle's nexus and are available to customers with a commercial agreement.
+
 Note: Many organizations use the “ea” release in production, as this contains the latest functionality and fixes.
 
 == Binary Compatibility
