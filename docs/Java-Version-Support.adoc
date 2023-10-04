@@ -1,12 +1,10 @@
 = Java Version Support
 
-We support current LTS versions: Java 8, 11 and 17 - all libraries will run under these versions of Java.
+We support current LTS versions: Java 8, 11, 17 and 21 - all libraries will run under these versions of Java.
 
 We support Sun's JDK, OpenJDK (including popular distributions such as Azul Zulu), and Azul Platform Prime (AKA Zing).
 
-We plan to support the next LTS version of Java (21) soon after it is released.
-
-== Running under Java 11 or Java 17 (class path)
+== Running under Java 11, Java 17 or Java 21 (class path)
 When starting a JVM explicitly using the `java` command, the follow command line parameters need to be passed in:
 
 [source, shell script]
@@ -22,13 +20,13 @@ When starting a JVM explicitly using the `java` command, the follow command line
 --add-opens=java.base/java.util=ALL-UNNAMED
 ----
 
-TIP: Even though not all of them are strictly required, we recommend providing the same command line options for Java 11 as for Java 17 as this will remove some warnings in the output logs.
+TIP: Even though not all of them are strictly required, we recommend providing the same command line options for Java 11 as for Java 17 and Java 21 as this will remove some warnings in the output logs.
 
-== Compiles and Runs on Java 8, 11, and 17.
+== Compiles and Runs on Java 8, 11, 17 and 21.
 
-Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11 and Java 17 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described here:
+Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11, Java 17 and Java 21 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described here:
 
-These libraries compile on either Java 8, 11 and 17 and pass all the tests under the version built and higher.
+These libraries compile on either Java 8, 11, 17 or 21 and pass all the tests under the version built and higher.
 
 - Chronicle-Algorithms
 - Chronicle-Core
