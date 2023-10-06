@@ -1,4 +1,5 @@
 = Version Support
+Peter Lawrey
 
 Chronicle Software supports each version for two years from the start of the next minor version. 
 
@@ -6,22 +7,26 @@ All our software has a MAJOR.STAGE.MINOR version.
 
 The MAJOR version is the generation of the software, where major versions are not compatible with each other.
 
-The STAGE version is the same for all our products e.g 2.20.x or 3.20.x so you know that all the software is part of the same stage.
+The STAGE version is the same for all our products e.g 2.20.x or 3.20.x so you know that all the software is in the same stage.
 
 The MINOR version is the incremental release of the software for a given MAJOR.STAGE.
 
-Once a MAJOR.STAGE is updated to the new version, the previous MAJOR.STAGE-1 starts two years until end of support.
+Once a MAJOR.STAGE is updated to the new version, the previous MAJOR.STAGE-1 starts two years until the end of support.
 
 == Commercial Support Agreement
 
-A commercial support agreement is available from mailto:sales@chronicle.software[sales@chronicle.software], free open source support is also available but on a best effort basis. Free support issues are not treated as a high priority unless the issues also affect organisations with a commercial agreement. The support agreement doesn’t just benefit your organisation, but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries.
+A commercial support agreement is available from mailto:sales@chronicle.software[sales@chronicle.software], free open-source support is also available but on a best-effort basis. Free support issues are only treated as a high priority if the issues also affect organisations with a commercial agreement. The support agreement doesn’t just benefit your organisation, but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries.
 
 == Stage release dates and end of support.
 
 |====
 | Stage | first released | stable release | end of support | Java versions
-| x.25  | 2023/04 (a) | 2023/11 (a) | 2025/11 (a) | 8, 11, 17, 21
-| x.24  | 2022/10 | 2023/04 (a) | 2025/04 (a) | 8, 11, 17
+| x.29  | 2025/10 (a) | 2026/04 (a) | 2028/04 (a) | 11, 17, 21, 25
+| x.28  | 2025/04 (a) | 2025/10 (a) | 2027/10 (a) | 8, 11, 17, 21
+| x.27  | 2024/10 (a) | 2025/04 (a) | 2027/04 (a) | 8, 11, 17, 21
+| x.26  | 2024/04 (a) | 2024/10 (a) | 2026/10 (a) | 8, 11, 17, 21
+| x.25  | 2023/10 | 2024/04 (a) | 2026/06 (a) | 8, 11, 17, 21
+| x.24  | 2022/10 | 2023/10 | 2025/10 | 8, 11, 17
 | x.23  | 2022/03 | 2022/10 | 2024/10 | 8, 11, 17
 | x.22  | 2021/08 | 2022/03 | 2024/03 | 8, 11, 17
 | x.21  | 2021/01 | 2021/08 | 2023/08 | 8 & 11
@@ -36,39 +41,41 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 |====
 (a) Provisional dates
 
-Java 17 is supported with the x.22 release. 
+Java 17 LTS is supported from the x.22 release.
 
-Java 21 will be supported with the x.25 release. 
+Java 21 LTS is supported from the x.25 release.
+
+Java 25 LTS will be supported from the x.29 release.
 
 NOTE: There was no x.18 release.
 
 == Java 8 support.
 
-We currently support Java 8, 11 and 17.
+We currently support Java 8, 11, 17, and 21.
 
 Once the master branch updates to a new stage, older stages are only updated and released based on client requirements, thus ensuring they stay stable.
 
-Java 11 and Java 17 are supported on the master branch and Java 8 will likely only be supported up to and including the x.25 branch.
+Java 11, 17, and 21 are supported on the ea branch, and Java 8 will likely only be supported up to and including the x.28 branch.
 
 See also <<docs/Java-Version-Support.adoc#,Java Version Support>>
 
 == BOM files
 
-We use maven dependency management to express the version set of all our libraries, hence. We always publish a set of artifacts that work together using a BOM file (see details on BOM files link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms/[here]).
+We use Maven dependency management to express the version set of all our libraries. We always publish a set of artefacts that work together using a BOM file (see details on BOM files link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms/[here]).
 
 == EA (Early Access)
 
-We have introduced the characters “ea” into our build versions, to denote our Early Access release. As the name suggests, we release our early access version regularly. Then about every three months we will cut a non "ea" release.
+We have introduced the characters "ea" into our build versions to denote our Early Access release. As the name suggests, we release our early access version regularly.
 
-Only ea releases are released to maven central. Releases of stable versions (e.g. x.23) are made to
+Only EA releases are released to Maven Central. Releases of stable versions (e.g. x.23) are made to
 Chronicle's nexus and are available to customers with a commercial agreement.
 
 Note: Many organizations use the “ea” release in production, as this contains the latest functionality and fixes.
 
 == Binary Compatibility
 
-Each release is now automatically checked to be binary backward compatible to the first patch release of any version, this also includes the early access release versions. This means that any 2.23 chronicle-bom should be a drop-in replacement for any other chronicle-bom 2.23, with full binary compatibility.
+Each release is now automatically checked to be binary backwards compatible to the first patch release of any version; this also includes the early access release versions. This means that any 2.25.x chronicle-bom should be a drop-in replacement for any other 2.25.y chronicle-bom, with full binary compatibility.
 
 == API evolution
 
-Requirements changes and APIs evolve. Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones. All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea
+Requirements change and APIs evolve. Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones. All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea
