@@ -505,6 +505,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-cboe-ndf</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-ebs-ultra</artifactId>
                 <version>${chronicle.itch.adapters.version}</version>
             </dependency>
