@@ -489,7 +489,7 @@
             <dependency>
                 <groupId>org.jboss.xnio</groupId>
                 <artifactId>xnio-nio</artifactId>
-                <version>3.8.9.Final</version>
+                <version>3.8.11.Final</version>
             </dependency>
 
             <dependency>
