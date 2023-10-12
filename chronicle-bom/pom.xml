@@ -160,6 +160,19 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-market-data-distributor</artifactId>
                 <version>${chronicle.market.data.distributor.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-market-data-distributor-guarded</artifactId>
+                <version>${chronicle.market.data.distributor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-market-data-distributor</artifactId>
+                <version>${chronicle.market.data.distributor.version}</version>
                 <type>test-jar</type>
             </dependency>
 
