@@ -227,27 +227,6 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>se.eris</groupId>
-                    <artifactId>notnull-instrumenter-maven-plugin</artifactId>
-                    <version>1.1.1</version>
-                    <executions>
-                        <execution>
-                            <id>instrument</id>
-                            <goals>
-                                <goal>instrument</goal>
-                                <goal>tests-instrument</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <notNull>
-                            <param>org.jetbrains.annotations.NotNull</param>
-                            <param>javax.validation.constraints.NotNull</param>
-                        </notNull>
-                    </configuration>
-                </plugin>
-
-                <plugin>
                     <groupId>com.github.ferstl</groupId>
                     <artifactId>depgraph-maven-plugin</artifactId>
                     <version>4.0.2</version>
@@ -448,6 +427,37 @@
             <properties>
                 <argLine />
             </properties>
+        </profile>
+
+        <profile>
+            <id>notnull-instrumenter</id>
+            <activation>
+                <jdk>[,17]</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>se.eris</groupId>
+                        <artifactId>notnull-instrumenter-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>instrument</id>
+                                <goals>
+                                    <goal>instrument</goal>
+                                    <goal>tests-instrument</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <notNull>
+                                <param>org.jetbrains.annotations.NotNull</param>
+                                <param>javax.validation.constraints.NotNull</param>
+                            </notNull>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
