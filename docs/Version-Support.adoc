@@ -78,4 +78,7 @@ Each release is now automatically checked to be binary backwards compatible to t
 
 == API evolution
 
-Requirements change and APIs evolve. Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones. All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea
+Requirements change and APIs evolve. Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones. All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea.
+
+NOTE: we recommend to enable deprecation warnings e.g. turning on
+link:https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#showDeprecation[`showDeprecation` in your maven builds]
