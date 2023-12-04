@@ -33,23 +33,23 @@
     </description>
     <properties>
         <chronicle.network.version>2.25ea1-SNAPSHOT</chronicle.network.version>
-        <chronicle.queue.version>5.25ea2-SNAPSHOT</chronicle.queue.version>
-        <chronicle.zero.version>2.25ea0</chronicle.zero.version>
-        <chronicle.wire.enterprise.version>2.25ea0</chronicle.wire.enterprise.version>
+        <chronicle.queue.version>5.25ea1-SNAPSHOT</chronicle.queue.version>
+        <chronicle.zero.version>2.25ea1-SNAPSHOT</chronicle.zero.version>
+        <chronicle.wire.enterprise.version>2.25ea1-SNAPSHOT</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.25ea1-SNAPSHOT</chronicle.queue.enterprise.version>
-        <chronicle.map.enterprise.version>2.25ea0</chronicle.map.enterprise.version>
-        <chronicle.datagrid.version>2.24ea0</chronicle.datagrid.version>
-        <chronicle.ring.version>2.25ea0</chronicle.ring.version>
+        <chronicle.map.enterprise.version>2.25ea1-SNAPSHOT</chronicle.map.enterprise.version>
+        <chronicle.datagrid.version>2.24ea1-SNAPSHOT</chronicle.datagrid.version>
+        <chronicle.ring.version>2.25ea1-SNAPSHOT</chronicle.ring.version>
         <chronicle.fix.version>4.25ea1-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.25ea1-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea6</chronicle.logger.version>
         <chronicle.efx.version>2.25ea1-SNAPSHOT</chronicle.efx.version>
-        <chronicle.matching.engine.version>2.25ea0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.25ea0</chronicle.platform.version>
-        <chronicle.market.data.distributor.version>3.25ea2-SNAPSHOT</chronicle.market.data.distributor.version>
+        <chronicle.matching.engine.version>2.25ea1-SNAPSHOT</chronicle.matching.engine.version>
+        <chronicle.platform.version>2.25ea1-SNAPSHOT</chronicle.platform.version>
+        <chronicle.market.data.distributor.version>3.25ea1-SNAPSHOT</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.25ea1-SNAPSHOT</chronicle.core.version>
-        <chronicle.crypto.adapters.version>2.25ea0</chronicle.crypto.adapters.version>
-        <chronicle.itch.adapters.version>4.25ea0</chronicle.itch.adapters.version>
+        <chronicle.crypto.adapters.version>2.25ea1-SNAPSHOT</chronicle.crypto.adapters.version>
+        <chronicle.itch.adapters.version>4.25ea1-SNAPSHOT</chronicle.itch.adapters.version>
     </properties>
 
     <dependencyManagement>
@@ -60,7 +60,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-test-framework</artifactId>
-                <version>2.25ea0</version>
+                <version>2.25ea1-SNAPSHOT</version>
             </dependency>
 
 
@@ -104,13 +104,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.25ea2-SNAPSHOT</version>
+                <version>2.25ea1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>2.25ea0</version>
+                <version>2.25ea1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -147,7 +147,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.25ea0</version>
+                <version>3.25ea1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
