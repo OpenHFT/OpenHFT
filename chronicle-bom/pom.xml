@@ -32,8 +32,8 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2.25ea3</chronicle.network.version>
-        <chronicle.queue.version>5.25ea1</chronicle.queue.version>
+        <chronicle.network.version>2.25ea3-SNAPSHOT</chronicle.network.version>
+        <chronicle.queue.version>5.25ea3-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2.25ea1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.25ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.25ea1</chronicle.queue.enterprise.version>
