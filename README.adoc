@@ -26,7 +26,7 @@ This repo contains the following docs
 
 * <<docs/Java-Version-Support.adoc#,Java Version Support>> documents which versions of Java/JVM are supported by Chronicle libraries
 * <<docs/Platform-Support.adoc#,Platform Support>> documents which Operating Systems are supported by Chronicle libraries
-* <<docs/Version-Support.adoc#,Version Support>> explains Chronicle's version numbers and release timestable
+* <<docs/Version-Support.adoc#,Version Support>> explains Chronicle's version numbers and release timetable
 * <<docs/Anatomy.adoc#,Anatomy>> shows a graphical representation of the OpenHFT projects and their dependencies
 * <<docs/Reducing-Garbage.adoc#,Reducing Garbage>> contains tips and tricks to reduce garbage
 
