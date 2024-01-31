@@ -29,7 +29,7 @@
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.25.2</version>
+    <version>1.25.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
@@ -163,7 +163,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>java-parent-pom-1.25.2</tag>
+        <tag>master</tag>
     </scm>
 
 </project>
