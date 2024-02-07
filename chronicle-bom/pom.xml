@@ -36,14 +36,14 @@
         <chronicle.queue.version>5.24.30-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2.24.3</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.24.5</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.24.37-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.24.38-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.map.enterprise.version>2.24.7</chronicle.map.enterprise.version>
         <chronicle.datagrid.version>2.24ea0</chronicle.datagrid.version>
         <chronicle.ring.version>2.24.4</chronicle.ring.version>
         <chronicle.fix.version>4.24.55-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.24.30-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea6</chronicle.logger.version>
-        <chronicle.efx.version>2.24.11-SNAPSHOT</chronicle.efx.version>
+        <chronicle.efx.version>2.24.12-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.24.2</chronicle.matching.engine.version>
         <chronicle.platform.version>2.24.17</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.24.5</chronicle.market.data.distributor.version>
@@ -92,7 +92,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.24.16-SNAPSHOT</version>
+                <version>2.24.17-SNAPSHOT</version>
             </dependency>
 
             <dependency>
