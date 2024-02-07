@@ -420,11 +420,22 @@
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
+            <!--
+                We publish as a test-jar for backward compatibility, clients are advised
+                to move to using the non-test-jar artifact (see below)
+                To be removed in x.26
+            -->
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-yaml-tester</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
                 <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-yaml-tester</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
             <dependency>
