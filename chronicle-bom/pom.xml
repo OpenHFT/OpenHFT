@@ -48,7 +48,6 @@
         <chronicle.platform.version>2.23.38</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.23.1</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.23.50</chronicle.core.version>
-        <chronicle.crypto.adapters.version>2.23.15</chronicle.crypto.adapters.version>
         <chronicle.itch.adapters.version>4.23.29</chronicle.itch.adapters.version>
     </properties>
 
@@ -672,18 +671,6 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>assertions-disabled</artifactId>
                 <version>1.0.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-crypto-adapters</artifactId>
-                <version>${chronicle.crypto.adapters.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-crypto-adapters-guarded</artifactId>
-                <version>${chronicle.crypto.adapters.version}</version>
             </dependency>
 
         </dependencies>
