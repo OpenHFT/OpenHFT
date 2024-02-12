@@ -21,13 +21,13 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | stable release | end of support | Java versions
-| x.29  | 2025/10 (a) | 2026/04 (a) | 2028/04 (a) | 11, 17, 21, 25
-| x.28  | 2025/04 (a) | 2025/10 (a) | 2027/10 (a) | 8, 11, 17, 21
-| x.27  | 2024/10 (a) | 2025/04 (a) | 2027/04 (a) | 8, 11, 17, 21
-| x.26  | 2024/04 (a) | 2024/10 (a) | 2026/10 (a) | 8, 11, 17, 21
-| x.25  | 2023/10 | 2024/04 (a) | 2026/06 (a) | 8, 11, 17, 21
-| x.24  | 2022/10 | 2023/10 | 2025/10 | 8, 11, 17
-| x.23  | 2022/03 | 2022/10 | 2024/10 | 8, 11, 17
+| x.29  | 2025/10 (a) | 2026/04 (a) | 2027/04 (a) | 11, 17, 21, 25
+| x.28  | 2025/04 (a) | 2025/10 (a) | 2026/10 (a) | 8, 11, 17, 21
+| x.27  | 2024/10 (a) | 2025/04 (a) | 2026/04 (a) | 8, 11, 17, 21
+| x.26  | 2024/04 (a) | 2024/10 (a) | 2025/10 (a) | 8, 11, 17, 21
+| x.25  | 2023/10 | 2024/04 (a) | 2025/06 (a) | 8, 11, 17, 21
+| x.24  | 2022/10 | 2023/10 | 2024/10 | 8, 11, 17
+| x.23  | 2022/03 | 2022/10 | 2024/03 | 8, 11, 17
 | x.22  | 2021/08 | 2022/03 | 2024/03 | 8, 11, 17
 | x.21  | 2021/01 | 2021/08 | 2023/08 | 8 & 11
 | x.20  | 2020/07 | 2020/12 | 2022/12 | 8 & 11
@@ -40,6 +40,8 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 | x.12  | 2016/03 | 2016/07 | 2019/03 | 8
 |====
 (a) Provisional dates
+
+From x.24, stable releases will only be supported for at least a year, though they might be supported longer.
 
 Java 17 LTS is supported from the x.22 release.
 
