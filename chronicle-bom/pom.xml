@@ -103,7 +103,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.24.26</version>
+                <version>2.24.27-SNAPSHOT</version>
             </dependency>
 
             <dependency>
