@@ -20,7 +20,7 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 == Stage release dates and end of support.
 
 |====
-| Stage | first released | stable release | end of support | Java versions
+| Stage | first released | stable release | end of backport | Java versions
 | x.29  | 2025/10 (a) | 2026/04 (a) | 2027/04 (a) | 11, 17, 21, 25
 | x.28  | 2025/04 (a) | 2025/10 (a) | 2026/10 (a) | 8, 11, 17, 21
 | x.27  | 2024/10 (a) | 2025/04 (a) | 2026/04 (a) | 8, 11, 17, 21
@@ -41,7 +41,7 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 |====
 (a) Provisional dates
 
-From x.24, stable releases will only be supported for at least a year, though they might be supported longer.
+From x.24, backporting changes for stable releases will only be guaranteed for 1 year, after that fixes will be backported as required and as practical.
 
 Java 17 LTS is supported from the x.22 release.
 
