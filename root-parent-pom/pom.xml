@@ -378,7 +378,7 @@
         <profile>
             <id>java11</id>
             <activation>
-                <jdk>[11,16]</jdk>
+                <jdk>[11,17)</jdk>
             </activation>
             <properties>
                 <!-- Required JVM args for Java 11 -> 16 -->

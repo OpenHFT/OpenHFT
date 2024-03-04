@@ -637,7 +637,7 @@
         <profile>
             <id>java11</id>
             <activation>
-                <jdk>[11,</jdk>
+                <jdk>[11,)</jdk>
             </activation>
             <properties>
                 <maven.compiler.release>11</maven.compiler.release>
