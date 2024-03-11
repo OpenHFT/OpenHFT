@@ -43,7 +43,7 @@
         <chronicle.fix.version>4.24.60</chronicle.fix.version>
         <chronicle.services.version>3.24.33</chronicle.services.version>
         <chronicle.logger.version>4.22ea6</chronicle.logger.version>
-        <chronicle.efx.version>2.24.16</chronicle.efx.version>
+        <chronicle.efx.version>2.24.17-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.24.2</chronicle.matching.engine.version>
         <chronicle.platform.version>2.24.17</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.24.5</chronicle.market.data.distributor.version>
