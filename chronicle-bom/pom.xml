@@ -20,7 +20,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.26.0-SNAPSHOT</version>
+        <version>1.25.4</version>
         <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -37,6 +37,8 @@
         <chronicle.zero.version>2.26ea0-SNAPSHOT</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.26ea0-SNAPSHOT</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.26ea0-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.map.enterprise.version>2.26ea0-SNAPSHOT</chronicle.map.enterprise.version>
+        <chronicle.datagrid.version>2.26ea0-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.ring.version>2.26ea0-SNAPSHOT</chronicle.ring.version>
         <chronicle.fix.version>4.26ea0-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.26ea0-SNAPSHOT</chronicle.services.version>
@@ -94,6 +96,12 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
+                <artifactId>chronicle-ticker</artifactId>
+                <version>2.24ea0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
                 <version>2.26ea0-SNAPSHOT</version>
             </dependency>
@@ -101,6 +109,12 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
+                <version>2.26ea0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-salt</artifactId>
                 <version>2.26ea0-SNAPSHOT</version>
             </dependency>
 
@@ -132,7 +146,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.25ea6</version>
+                <version>3.26ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -234,6 +248,26 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise</artifactId>
+                <version>${chronicle.map.enterprise.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise</artifactId>
+                <version>${chronicle.map.enterprise.version}</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise</artifactId>
+                <version>${chronicle.map.enterprise.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
                 <version>${chronicle.matching.engine.version}</version>
             </dependency>
@@ -242,6 +276,32 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
                 <version>${chronicle.matching.engine.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-map-enterprise-guarded</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-datagrid</artifactId>
+                <version>${chronicle.datagrid.version}</version>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-datagrid</artifactId>
+                <version>${chronicle.datagrid.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-datagrid</artifactId>
+                <version>${chronicle.datagrid.version}</version>
                 <classifier>obfuscated</classifier>
             </dependency>
 
@@ -664,7 +724,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>zero-allocation-hashing</artifactId>
-                <version>0.16</version>
+                <version>1.26ea0-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
