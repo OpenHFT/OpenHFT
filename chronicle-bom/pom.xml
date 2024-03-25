@@ -678,7 +678,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>zero-allocation-hashing</artifactId>
-                <version>1.26ea0-SNAPSHOT</version>
+                <version>0.16</version>
             </dependency>
 
         </dependencies>
