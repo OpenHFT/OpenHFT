@@ -106,12 +106,6 @@
 
             <dependency>
                 <groupId>net.openhft</groupId>
-                <artifactId>chronicle-salt</artifactId>
-                <version>2.26ea0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
                 <version>2.26ea0-SNAPSHOT</version>
             </dependency>
