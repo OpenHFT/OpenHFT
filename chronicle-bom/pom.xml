@@ -114,6 +114,12 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-network</artifactId>
                 <version>${chronicle.network.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>chronicle-network</artifactId>
+                <version>${chronicle.network.version}</version>
                 <type>test-jar</type>
             </dependency>
 
@@ -166,12 +172,6 @@
                 <artifactId>chronicle-queue</artifactId>
                 <version>${chronicle.queue.version}</version>
                 <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-network</artifactId>
-                <version>${chronicle.network.version}</version>
             </dependency>
 
             <dependency>
