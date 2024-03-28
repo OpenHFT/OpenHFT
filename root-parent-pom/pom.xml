@@ -428,37 +428,6 @@
                 <argLine />
             </properties>
         </profile>
-
-        <profile>
-            <id>notnull-instrumenter</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>se.eris</groupId>
-                        <artifactId>notnull-instrumenter-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>instrument</id>
-                                <goals>
-                                    <goal>instrument</goal>
-                                    <goal>tests-instrument</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <notNull>
-                                <param>org.jetbrains.annotations.NotNull</param>
-                                <param>javax.validation.constraints.NotNull</param>
-                            </notNull>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 
     <distributionManagement>
