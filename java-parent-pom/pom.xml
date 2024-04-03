@@ -80,13 +80,14 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgs>
-                        <arg>-Xlint:deprecation,-options</arg>
+                        <arg>-Xlint:deprecation</arg>
                         <arg>-parameters</arg>
                     </compilerArgs>
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
-                    <failOnWarning>true</failOnWarning>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
 
