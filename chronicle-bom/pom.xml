@@ -37,8 +37,6 @@
         <chronicle.zero.version>2.26ea0-SNAPSHOT</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.26ea0-SNAPSHOT</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.26ea0-SNAPSHOT</chronicle.queue.enterprise.version>
-        <chronicle.map.enterprise.version>2.26ea0-SNAPSHOT</chronicle.map.enterprise.version>
-        <chronicle.datagrid.version>2.26ea0-SNAPSHOT</chronicle.datagrid.version>
         <chronicle.ring.version>2.26ea0-SNAPSHOT</chronicle.ring.version>
         <chronicle.fix.version>4.26ea0-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.26ea0-SNAPSHOT</chronicle.services.version>
@@ -92,12 +90,6 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
                 <version>2.26ea0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>chronicle-ticker</artifactId>
-                <version>2.24ea0</version>
             </dependency>
 
             <dependency>
@@ -248,26 +240,6 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise.version}</version>
-                <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-map-enterprise</artifactId>
-                <version>${chronicle.map.enterprise.version}</version>
-                <classifier>obfuscated</classifier>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
                 <version>${chronicle.matching.engine.version}</version>
             </dependency>
@@ -276,32 +248,6 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-matching-engine</artifactId>
                 <version>${chronicle.matching.engine.version}</version>
-                <classifier>obfuscated</classifier>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-map-enterprise-guarded</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-datagrid</artifactId>
-                <version>${chronicle.datagrid.version}</version>
-                <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-datagrid</artifactId>
-                <version>${chronicle.datagrid.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>software.chronicle</groupId>
-                <artifactId>chronicle-datagrid</artifactId>
-                <version>${chronicle.datagrid.version}</version>
                 <classifier>obfuscated</classifier>
             </dependency>
 
