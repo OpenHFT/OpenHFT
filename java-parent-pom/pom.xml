@@ -80,12 +80,13 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgs>
-                        <arg>-Xlint:deprecation</arg>
+                        <arg>-Xlint:all,-options,-processing</arg>
                         <arg>-parameters</arg>
                     </compilerArgs>
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
+                    <failOnWarning>true</failOnWarning>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                 </configuration>
@@ -103,8 +104,12 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <source>8</source>
                     <additionalOptions>${javadoc.opts}</additionalOptions>
-                    <quiet>true</quiet>
+                    <failOnError>true</failOnError>
+                    <failOnWarnings>true</failOnWarnings>
+                    <excludePackageNames>*.internal:*.internal.*;*.impl;*.impl.*</excludePackageNames>
+                    <doclint>all,-missing</doclint>
                 </configuration>
             </plugin>
 
