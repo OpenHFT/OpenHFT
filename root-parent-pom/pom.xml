@@ -70,7 +70,7 @@
             By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
             contain the arguments necessary to run the Chronicle libraries
         -->
-        <jvm.requiredArgs />
+        <jvm.requiredArgs/>
     </properties>
 
     <build>
@@ -426,7 +426,7 @@
                 </property>
             </activation>
             <properties>
-                <argLine />
+                <argLine/>
             </properties>
         </profile>
     </profiles>
