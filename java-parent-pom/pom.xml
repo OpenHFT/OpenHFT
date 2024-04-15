@@ -87,6 +87,9 @@
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
                     <failOnWarning>true</failOnWarning>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <proc>none</proc>
                 </configuration>
             </plugin>
 
