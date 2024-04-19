@@ -36,16 +36,16 @@
         <chronicle.queue.version>5.25ea13</chronicle.queue.version>
         <chronicle.zero.version>2.25ea1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.25ea1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.25ea10-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.queue.enterprise.version>2.25ea10</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.25ea2</chronicle.ring.version>
-        <chronicle.fix.version>4.25ea14</chronicle.fix.version>
+        <chronicle.fix.version>4.25ea15-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.25ea12-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea6</chronicle.logger.version>
-        <chronicle.efx.version>2.25ea2</chronicle.efx.version>
+        <chronicle.efx.version>2.25ea3</chronicle.efx.version>
         <chronicle.matching.engine.version>2.25ea2</chronicle.matching.engine.version>
         <chronicle.platform.version>2.25ea3</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.25ea2</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2.25ea14-SNAPSHOT</chronicle.core.version>
+        <chronicle.core.version>2.25ea14</chronicle.core.version>
         <chronicle.itch.adapters.version>4.25ea2</chronicle.itch.adapters.version>
     </properties>
 
@@ -404,6 +404,25 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-prometheus-gateway</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-prometheus-gateway</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-prometheus-gateway-guarded</artifactId>
+                <version>${project.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-benchmarks</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
@@ -610,6 +629,62 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-efx-pnl</artifactId>
                 <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-bookbuilder</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-common</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-config</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-hedger</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-oms</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-position</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-pricer</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-pnl</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
