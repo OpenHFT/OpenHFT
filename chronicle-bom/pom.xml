@@ -404,6 +404,25 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-prometheus-gateway</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-prometheus-gateway</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-prometheus-gateway-guarded</artifactId>
+                <version>${project.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-benchmarks</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
