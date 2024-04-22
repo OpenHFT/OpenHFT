@@ -278,8 +278,22 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-multischema</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-recursivemap</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-recursivemap</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
@@ -315,7 +329,27 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-codegenerator</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-schema-optimizer</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-schema-optimizer</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
@@ -323,6 +357,7 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-itch-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
@@ -381,6 +416,13 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-yaml-tester</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-yaml-tester</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
@@ -448,7 +490,7 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
-                <artifactId>services-queue-web-gateway</artifactId>
+                <artifactId>chronicle-queue-web-gateway</artifactId>
                 <version>${chronicle.services.version}</version>
                 <classifier>obfuscated</classifier>
             </dependency>
