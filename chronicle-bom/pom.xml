@@ -332,8 +332,22 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-multischema</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-recursivemap</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-recursivemap</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
@@ -369,7 +383,27 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-codegenerator</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-schema-optimizer</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-schema-optimizer</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
             </dependency>
 
@@ -377,6 +411,7 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-itch-runtime</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
@@ -423,6 +458,13 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-yaml-tester</artifactId>
                 <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-yaml-tester</artifactId>
+                <version>${chronicle.fix.version}</version> <!-- available to supported clients -->
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <!-- TODO: remove this once migrated to non test-jar -->
@@ -475,6 +517,13 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-web-gateway</artifactId>
                 <version>${chronicle.services.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-queue-web-gateway</artifactId>
+                <version>${chronicle.services.version}</version>
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
@@ -660,6 +709,62 @@
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-efx-pnl</artifactId>
                 <version>${chronicle.efx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-bookbuilder</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-common</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-config</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-hedger</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-oms</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-position</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-pricer</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-efx-pnl</artifactId>
+                <version>${chronicle.efx.version}</version>
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
