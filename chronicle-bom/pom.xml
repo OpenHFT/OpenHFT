@@ -41,7 +41,7 @@
         <chronicle.fix.version>4.25ea16</chronicle.fix.version>
         <chronicle.services.version>3.25ea15</chronicle.services.version>
         <chronicle.logger.version>4.22ea6</chronicle.logger.version>
-        <chronicle.efx.version>2.25ea5</chronicle.efx.version>
+        <chronicle.efx.version>2.25ea6-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.25ea2</chronicle.matching.engine.version>
         <chronicle.platform.version>2.25ea3</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.25ea2</chronicle.market.data.distributor.version>
