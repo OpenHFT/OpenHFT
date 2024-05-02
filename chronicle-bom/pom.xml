@@ -38,10 +38,10 @@
         <chronicle.wire.enterprise.version>2.25ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.25ea11</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.25ea2</chronicle.ring.version>
-        <chronicle.fix.version>4.25ea17</chronicle.fix.version>
+        <chronicle.fix.version>4.25ea18-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.25ea16-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.22ea6</chronicle.logger.version>
-        <chronicle.efx.version>2.25ea6</chronicle.efx.version>
+        <chronicle.efx.version>2.25ea7-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.25ea2</chronicle.matching.engine.version>
         <chronicle.platform.version>2.25ea5</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.25ea2</chronicle.market.data.distributor.version>
