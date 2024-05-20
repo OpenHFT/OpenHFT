@@ -25,27 +25,27 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.25ea-SNAPSHOT</version>
+    <version>2.25ea60</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2.25ea8-SNAPSHOT</chronicle.network.version>
+        <chronicle.network.version>2.25ea8</chronicle.network.version>
         <chronicle.queue.version>5.25ea16</chronicle.queue.version>
         <chronicle.zero.version>2.25ea1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.25ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.25ea12</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.25ea2</chronicle.ring.version>
         <chronicle.fix.version>4.25ea18</chronicle.fix.version>
-        <chronicle.services.version>3.25ea18-SNAPSHOT</chronicle.services.version>
+        <chronicle.services.version>3.25ea18</chronicle.services.version>
         <chronicle.logger.version>4.22ea6</chronicle.logger.version>
         <chronicle.efx.version>2.25ea8</chronicle.efx.version>
         <chronicle.matching.engine.version>2.25ea2</chronicle.matching.engine.version>
         <chronicle.platform.version>2.25ea6</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.25ea2</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2.25ea15-SNAPSHOT</chronicle.core.version>
+        <chronicle.core.version>2.25ea15</chronicle.core.version>
         <chronicle.itch.adapters.version>4.25ea2</chronicle.itch.adapters.version>
     </properties>
 
@@ -101,7 +101,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.25ea11-SNAPSHOT</version>
+                <version>2.25ea11</version>
             </dependency>
 
             <dependency>
@@ -113,7 +113,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.25ea16-SNAPSHOT</version>
+                <version>2.25ea16</version>
             </dependency>
 
             <dependency>
@@ -835,6 +835,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.25ea60</tag>
     </scm>
 </project>
