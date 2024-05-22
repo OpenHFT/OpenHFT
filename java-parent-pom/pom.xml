@@ -29,7 +29,7 @@
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.26.0</version>
+    <version>1.26.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
@@ -171,7 +171,7 @@
     <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
     <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
     <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-    <tag>java-parent-pom-1.26.0</tag>
+    <tag>x.26</tag>
    </scm>
 
 
