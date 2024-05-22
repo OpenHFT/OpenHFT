@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>1.26.0</version>
+    <version>1.26.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Root Parent POM</name>
@@ -457,7 +457,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>root-parent-pom-1.26.0</tag>
+        <tag>master</tag>
     </scm>
 
 </project>
