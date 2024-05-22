@@ -29,7 +29,7 @@
     </parent>
 
     <artifactId>third-party-bom</artifactId>
-    <version>3.26.0</version>
+    <version>3.26.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Third Party BOM (Bill of Materials)</name>
@@ -675,7 +675,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>third-party-bom-3.26.0</tag>
+        <tag>master</tag>
     </scm>
 
 </project>
