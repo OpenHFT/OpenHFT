@@ -24,12 +24,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.26.0</version>
+        <version>1.26.1</version>
         <relativePath />
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.26.0-SNAPSHOT</version>
+    <version>1.26.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
