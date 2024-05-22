@@ -17,13 +17,12 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>1.26.0-SNAPSHOT</version>
+    <version>1.26.0</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Root Parent POM</name>
@@ -70,7 +69,7 @@
             By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
             contain the arguments necessary to run the Chronicle libraries
         -->
-        <jvm.requiredArgs/>
+        <jvm.requiredArgs />
     </properties>
 
     <build>
@@ -426,7 +425,7 @@
                 </property>
             </activation>
             <properties>
-                <argLine/>
+                <argLine />
             </properties>
         </profile>
     </profiles>
@@ -458,7 +457,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
+        <tag>root-parent-pom-1.26.0</tag>
     </scm>
 
 </project>
