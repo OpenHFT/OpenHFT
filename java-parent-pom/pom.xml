@@ -24,12 +24,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.25.4</version>
+        <version>1.26.0</version>
         <relativePath />
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.25.5-SNAPSHOT</version>
+    <version>1.26.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
@@ -80,12 +80,16 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgs>
-                        <arg>-Xlint:deprecation</arg>
+                        <arg>-Xlint:all,-options,-processing</arg>
                         <arg>-parameters</arg>
                     </compilerArgs>
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
+                    <failOnWarning>true</failOnWarning>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <proc>none</proc>
                 </configuration>
             </plugin>
 
@@ -101,8 +105,12 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <source>8</source>
                     <additionalOptions>${javadoc.opts}</additionalOptions>
-                    <quiet>true</quiet>
+                    <failOnError>true</failOnError>
+                    <failOnWarnings>true</failOnWarnings>
+                    <excludePackageNames>*.internal:*.internal.*;*.impl;*.impl.*</excludePackageNames>
+                    <doclint>all,-missing</doclint>
                 </configuration>
             </plugin>
 
@@ -159,11 +167,12 @@
         </profile>
     </profiles>
 
-    <scm>
-        <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
-        <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
-        <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>master</tag>
-    </scm>
+   <scm>
+    <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
+    <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
+    <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
+    <tag>x.26</tag>
+   </scm>
+
 
 </project>

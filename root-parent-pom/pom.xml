@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>1.25.5-SNAPSHOT</version>
+    <version>1.26.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Root Parent POM</name>
@@ -54,12 +54,12 @@
             <email>jerry.shea@chronicle.software</email>
         </developer>
         <developer>
-            <name>Ivan Rakov</name>
-            <email>ivan.rakov@chronicle.software</email>
+            <name>Ryan Andrews</name>
+            <email>ryan.andrews@chronicle.software</email>
         </developer>
         <developer>
-            <name>Per Minborg</name>
-            <email>per.minborg@chronicle.software</email>
+            <name>Tom Dellmann</name>
+            <email>tom.dellmann@chronicle.software</email>
         </developer>
     </developers>
 
@@ -378,10 +378,10 @@
         <profile>
             <id>java11</id>
             <activation>
-                <jdk>[11,17)</jdk>
+                <jdk>[9,17)</jdk>
             </activation>
             <properties>
-                <!-- Required JVM args for Java 11 -> 16 -->
+                <!-- Required JVM args for Java 9 -> 16 -->
                 <jvm.requiredArgs>
                     --illegal-access=permit
                     --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
@@ -427,37 +427,6 @@
             <properties>
                 <argLine />
             </properties>
-        </profile>
-
-        <profile>
-            <id>notnull-instrumenter</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>se.eris</groupId>
-                        <artifactId>notnull-instrumenter-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>instrument</id>
-                                <goals>
-                                    <goal>instrument</goal>
-                                    <goal>tests-instrument</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <notNull>
-                                <param>org.jetbrains.annotations.NotNull</param>
-                                <param>javax.validation.constraints.NotNull</param>
-                            </notNull>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 
