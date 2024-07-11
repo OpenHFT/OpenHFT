@@ -53,9 +53,8 @@
     </properties>
 
     <dependencyManagement>
-
         <dependencies>
-
+          
              <!-- OpenTelemetry API -->
              <dependency>
               <groupId>io.opentelemetry</groupId>
