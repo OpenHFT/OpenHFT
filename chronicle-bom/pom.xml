@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.26ea-SNAPSHOT</version>
+    <version>2.26ea26</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
@@ -38,8 +38,8 @@
         <chronicle.wire.enterprise.version>2.26ea0</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.26ea2</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.26ea1</chronicle.ring.version>
-        <chronicle.fix.version>4.26ea4-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>3.26ea4-SNAPSHOT</chronicle.services.version>
+        <chronicle.fix.version>4.26ea4</chronicle.fix.version>
+        <chronicle.services.version>3.26ea4</chronicle.services.version>
         <chronicle.logger.version>4.26ea0</chronicle.logger.version>
         <chronicle.efx.version>2.26ea1</chronicle.efx.version>
         <chronicle.matching.engine.version>2.26ea0</chronicle.matching.engine.version>
@@ -107,7 +107,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.26ea4-SNAPSHOT</version>
+                <version>2.26ea4</version>
             </dependency>
 
             <dependency>
@@ -563,7 +563,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.26ea5-SNAPSHOT</version>
+                <version>3.26ea5</version>
             </dependency>
 
             <dependency>
@@ -829,6 +829,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2.26ea26</tag>
     </scm>
 </project>
