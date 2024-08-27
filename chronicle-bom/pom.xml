@@ -146,7 +146,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.24.5</version>
+                <version>3.24.6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
