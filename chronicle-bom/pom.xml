@@ -229,6 +229,12 @@
 
             <dependency>
                 <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-extensions</artifactId>
+                <version>${chronicle.extensions.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-queue-enterprise-prometheus-gateway</artifactId>
                 <version>${chronicle.extensions.version}</version>
             </dependency>
