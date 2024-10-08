@@ -20,34 +20,34 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.26.0</version>
+        <version>1.27ea0-SNAPSHOT</version>
         <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2.26ea-SNAPSHOT</version>
+    <version>2.27ea-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2.26ea3</chronicle.network.version>
-        <chronicle.queue.version>5.26ea7</chronicle.queue.version>
-        <chronicle.zero.version>2.26ea1</chronicle.zero.version>
-        <chronicle.wire.enterprise.version>2.26ea1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.26ea9</chronicle.queue.enterprise.version>
-        <chronicle.ring.version>2.26ea3</chronicle.ring.version>
-        <chronicle.fix.version>4.26ea17-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>3.26ea9</chronicle.services.version>
-        <chronicle.logger.version>4.26ea0</chronicle.logger.version>
-        <chronicle.efx.version>2.26ea4</chronicle.efx.version>
-        <chronicle.matching.engine.version>2.26ea0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.26ea2</chronicle.platform.version>
-        <chronicle.market.data.distributor.version>3.26ea1</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2.26ea2</chronicle.core.version>
-        <chronicle.itch.adapters.version>4.26ea4</chronicle.itch.adapters.version>
-        <chronicle.extensions.version>2.26ea3</chronicle.extensions.version>
+        <chronicle.network.version>2.27ea0-SNAPSHOT</chronicle.network.version>
+        <chronicle.queue.version>5.27ea0-SNAPSHOT</chronicle.queue.version>
+        <chronicle.zero.version>2.27ea0-SNAPSHOT</chronicle.zero.version>
+        <chronicle.wire.enterprise.version>2.27ea0-SNAPSHOT</chronicle.wire.enterprise.version>
+        <chronicle.queue.enterprise.version>2.27ea0-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.ring.version>2.27ea0-SNAPSHOT</chronicle.ring.version>
+        <chronicle.fix.version>4.27ea0-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>3.27ea0-SNAPSHOT</chronicle.services.version>
+        <chronicle.logger.version>4.27ea0-SNAPSHOT</chronicle.logger.version>
+        <chronicle.efx.version>2.27ea0-SNAPSHOT</chronicle.efx.version>
+        <chronicle.matching.engine.version>2.27ea0-SNAPSHOT</chronicle.matching.engine.version>
+        <chronicle.platform.version>2.27ea0-SNAPSHOT</chronicle.platform.version>
+        <chronicle.market.data.distributor.version>3.27ea0-SNAPSHOT</chronicle.market.data.distributor.version>
+        <chronicle.core.version>2.27ea0-SNAPSHOT</chronicle.core.version>
+        <chronicle.itch.adapters.version>4.27ea0-SNAPSHOT</chronicle.itch.adapters.version>
+        <chronicle.extensions.version>2.27ea0-SNAPSHOT</chronicle.extensions.version>
     </properties>
 
     <dependencyManagement>
@@ -58,20 +58,20 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-test-framework</artifactId>
-                <version>2.26ea1</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
-                <version>2.26ea2</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-analytics</artifactId>
-                <version>2.26ea1</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -90,25 +90,25 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2.26ea1</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2.26ea1</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>2.26ea1</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2.26ea10</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -127,13 +127,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
-                <version>2.26ea1</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.26ea4</version>
+                <version>3.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -564,7 +564,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-tr-sbe</artifactId>
-                <version>2.26ea0</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -632,19 +632,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>1.26ea0</version>
+                <version>1.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.26ea6</version>
+                <version>3.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>2.26ea0</version>
+                <version>2.27ea0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -870,7 +870,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>zero-allocation-hashing</artifactId>
-                <version>0.26ea0</version>
+                <version>0.27ea0-SNAPSHOT</version>
             </dependency>
 
         </dependencies>

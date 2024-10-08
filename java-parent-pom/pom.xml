@@ -29,7 +29,7 @@
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>1.26.1-SNAPSHOT</version>
+    <version>1.27ea0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
