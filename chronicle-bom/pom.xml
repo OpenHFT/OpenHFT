@@ -602,7 +602,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>3.26ea5</version>
+                <version>3.26ea6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
