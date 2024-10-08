@@ -22,7 +22,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>1.26.1-SNAPSHOT</version>
+    <version>1.27ea0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Root Parent POM</name>
