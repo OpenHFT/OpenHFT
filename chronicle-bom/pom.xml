@@ -591,6 +591,12 @@
                 <version>${chronicle.itch.adapters.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-integral</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+            </dependency>
+
             <!--  non-core projects -->
 
             <dependency>
