@@ -572,11 +572,23 @@
                 <artifactId>chronicle-fix-itch-cboe</artifactId>
                 <version>${chronicle.itch.adapters.version}</version>
             </dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-cboe</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-itch-cboe-ndf</artifactId>
                 <version>${chronicle.itch.adapters.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-cboe-ndf</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <dependency>
@@ -584,17 +596,35 @@
                 <artifactId>chronicle-fix-ebs-ultra</artifactId>
                 <version>${chronicle.itch.adapters.version}</version>
             </dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-ebs-ultra</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-itch-cnx</artifactId>
                 <version>${chronicle.itch.adapters.version}</version>
             </dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-cnx</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+                <classifier>obfuscated</classifier>
+            </dependency>
 
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-itch-integral</artifactId>
                 <version>${chronicle.itch.adapters.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.chronicle</groupId>
+                <artifactId>chronicle-fix-itch-integral</artifactId>
+                <version>${chronicle.itch.adapters.version}</version>
+                <classifier>obfuscated</classifier>
             </dependency>
 
             <!--  non-core projects -->
