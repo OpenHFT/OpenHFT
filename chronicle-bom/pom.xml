@@ -38,7 +38,7 @@
         <chronicle.wire.enterprise.version>2.26ea1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.26ea9</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.26ea3</chronicle.ring.version>
-        <chronicle.fix.version>4.26ea15</chronicle.fix.version>
+        <chronicle.fix.version>4.26ea16-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.26ea9</chronicle.services.version>
         <chronicle.logger.version>4.26ea0</chronicle.logger.version>
         <chronicle.efx.version>2.26ea4</chronicle.efx.version>
@@ -47,7 +47,7 @@
         <chronicle.market.data.distributor.version>3.26ea1</chronicle.market.data.distributor.version>
         <chronicle.core.version>2.26ea2</chronicle.core.version>
         <chronicle.itch.adapters.version>4.26ea4-SNAPSHOT</chronicle.itch.adapters.version>
-        <chronicle.extensions.version>2.26ea2</chronicle.extensions.version>
+        <chronicle.extensions.version>2.26ea3-SNAPSHOT</chronicle.extensions.version>
     </properties>
 
     <dependencyManagement>
