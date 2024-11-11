@@ -24,12 +24,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.26.0</version>
-        <relativePath />
+        <version>1.27ea0-SNAPSHOT</version>
+        <relativePath>../root-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>third-party-bom</artifactId>
-    <version>3.26.1-SNAPSHOT</version>
+    <version>3.27ea0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Third Party BOM (Bill of Materials)</name>
