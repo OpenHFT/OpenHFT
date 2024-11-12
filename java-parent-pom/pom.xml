@@ -25,7 +25,7 @@
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.27ea0-SNAPSHOT</version>
-        <relativePath>../root-parent-pom/pom.xml</relativePath>
+        <relativePath />
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
