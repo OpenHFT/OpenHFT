@@ -39,9 +39,9 @@
         <chronicle.queue.enterprise.version>2.25.20</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.25.3</chronicle.ring.version>
         <chronicle.fix.version>4.25.30</chronicle.fix.version>
-        <chronicle.services.version>3.25.24</chronicle.services.version>
+        <chronicle.services.version>3.25.25-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.25.0</chronicle.logger.version>
-        <chronicle.efx.version>2.25.13</chronicle.efx.version>
+        <chronicle.efx.version>2.25.14-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.25.4</chronicle.matching.engine.version>
         <chronicle.platform.version>2.25.8</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.25.3</chronicle.market.data.distributor.version>
