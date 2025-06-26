@@ -39,7 +39,7 @@
         <chronicle.queue.enterprise.version>2.27ea2</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.27ea0</chronicle.ring.version>
         <chronicle.fix.version>4.27ea16-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>3.27ea1</chronicle.services.version>
+        <chronicle.services.version>3.27ea2-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>4.27ea0</chronicle.logger.version>
         <chronicle.efx.version>2.27ea1</chronicle.efx.version>
         <chronicle.matching.engine.version>2.27ea0</chronicle.matching.engine.version>
