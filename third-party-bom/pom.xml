@@ -645,11 +645,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
         <repository>
             <id>sonatype-nexus-staging</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -675,19 +675,6 @@
             </snapshots>
             <releases>
                 <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>Snapshot Repository</id>
-            <name>Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
             </releases>
         </repository>
     </repositories>
