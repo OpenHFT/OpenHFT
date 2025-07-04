@@ -20,7 +20,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.27ea4</version>
+        <version>1.27ea5-SNAPSHOT</version>
         <relativePath />
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -60,7 +60,6 @@
                 <artifactId>chronicle-test-framework</artifactId>
                 <version>2.27ea0</version>
             </dependency>
-
 
             <dependency>
                 <groupId>net.openhft</groupId>
@@ -914,22 +913,6 @@
 
         </dependencies>
     </dependencyManagement>
-
-    <repositories>
-        <repository>
-            <id>Snapshot Repository</id>
-            <name>Snapshot Repository</name>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
