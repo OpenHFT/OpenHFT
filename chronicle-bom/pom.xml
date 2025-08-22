@@ -38,7 +38,7 @@
         <chronicle.wire.enterprise.version>2.25.3</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.25.23</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.25.4</chronicle.ring.version>
-        <chronicle.fix.version>4.25.43</chronicle.fix.version>
+        <chronicle.fix.version>4.25.44-SNAPSHOT</chronicle.fix.version>
         <chronicle.services.version>3.25.26</chronicle.services.version>
         <chronicle.logger.version>4.25.1</chronicle.logger.version>
         <chronicle.efx.version>2.25.16</chronicle.efx.version>
