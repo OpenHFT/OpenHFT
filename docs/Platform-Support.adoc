@@ -1,4 +1,5 @@
 = Platform Support
+:pp: ++
 
 == Java
 
@@ -8,9 +9,9 @@ Chronicle Java libraries are supported on:
 * Windows & MacOS Intel and M1 for development - not all functionality fully supported
 * 32/64-bit ARM - not all functionality fully supported
 
-== C++ & Python
+== C{pp} & Python
 
-Chronicle C++ and Python libraries support
+Chronicle C{pp} and Python libraries support
 
 * Linux on Intel x86_64 for production
 * MacOS on Intel x86_64 and arm64 for production

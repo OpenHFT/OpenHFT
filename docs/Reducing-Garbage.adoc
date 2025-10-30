@@ -4,11 +4,11 @@
 
 Reducing garbage has several benefits:
 
-- The obvious benefit is pausing for a Garbage Collection less often.
+* The obvious benefit is pausing for a Garbage Collection less often.
 
-- Creating fewer objects, will reduce the work allocating and clearing the object in the first place.
+* Creating fewer objects, will reduce the work allocating and clearing the object in the first place.
 
-- Some indirect benefits include simplifying the object life cycle, which reduces the amount of time a GC takes. This also reduces noise when trying to optimise an application which produces garbage.
+* Some indirect benefits include simplifying the object life cycle, which reduces the amount of time a GC takes. This also reduces noise when trying to optimise an application which produces garbage.
 
 === Placing the bulk of data off-heap.
 
@@ -20,7 +20,8 @@ This frees up your JVMs to use data more freely at a lower cost and simplify you
 
 Chronicle Queue Map and Market Data Distributor, support concurrent writers and readers using persisted shared memory.
 This means there is only one copy in memory and no need for a broker.
-If all processes die, no data is lost (unless the OS also dies). To protect your system against and OS failure we recommend using chronicle queue or chronicle map replication.
+If all processes die, no data is lost (unless the OS also dies).
+To protect your system against and OS failure we recommend using chronicle queue or chronicle map replication.
  
 NOTE: Chronicle FIX uses Chronicle Queue to persist its data.
 

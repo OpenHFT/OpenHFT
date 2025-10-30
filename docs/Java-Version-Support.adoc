@@ -24,24 +24,25 @@ TIP: Even though not all of them are strictly required, we recommend providing t
 
 == Compiles and Runs on Java 8, 11, 17 and 21.
 
-Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11, Java 17 and Java 21 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described here:
+Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11, Java 17 and Java 21 as a part of our continuous integration process.
+However, some libraries may also be build with more recent Java version as described here:
 
 These libraries compile on either Java 8, 11, 17 or 21 and pass all the tests under the version built and higher.
 
-- Chronicle-Algorithms
-- Chronicle-Core
-- Chronicle-FIX
-- Chronicle-Map
-- Chronicle-Map-Enterprise
-- Chronicle-Market-Data-Distributor
-- Chronicle-Network 
-- Chronicle-Network-Enterprise
-- Chronicle-Queue
-- Chronicle-Queue-Enterprise
-- Chronicle-Ring
-- Chronicle-Salt
-- Chronicle-Services
-- Chronicle-Threads
-- Chronicle-Values
-- Chronicle-Wire-Enterprise
-- JLBH
+* Chronicle-Algorithms
+* Chronicle-Core
+* Chronicle-FIX
+* Chronicle-Map
+* Chronicle-Map-Enterprise
+* Chronicle-Market-Data-Distributor
+* Chronicle-Network
+* Chronicle-Network-Enterprise
+* Chronicle-Queue
+* Chronicle-Queue-Enterprise
+* Chronicle-Ring
+* Chronicle-Salt
+* Chronicle-Services
+* Chronicle-Threads
+* Chronicle-Values
+* Chronicle-Wire-Enterprise
+* JLBH

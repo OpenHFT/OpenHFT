@@ -261,7 +261,7 @@
                 <executions>
                     <execution>
                         <!--
-                            Enforce minimum of maven 3.5.4
+                            Enforce minimum of maven 3.8
                         -->
                         <id>enforce-maven</id>
                         <goals>
@@ -270,7 +270,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.5.4</version>
+                                    <version>[3.8,)</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>

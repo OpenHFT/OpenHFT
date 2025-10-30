@@ -57,5 +57,6 @@ I suggest click on *software* then *chronicle*.
 
 image::/docs/images/PastedGraphic-14.png[]
 
-*NOTE:* you will only see the products you have been permission for.
+==== NOTE
+you will only see the products you have been permission for.
 
