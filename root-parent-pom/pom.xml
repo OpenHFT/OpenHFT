@@ -68,6 +68,9 @@
             contain the arguments necessary to run the Chronicle libraries
         -->
         <jvm.requiredArgs />
+        <!-- Define the target coverage thresholds as properties -->
+        <jacoco.line.coverage>0.8</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
     </properties>
 
     <build>
@@ -95,7 +98,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.14.0</version>
                 </plugin>
 
                 <plugin>
@@ -221,7 +224,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.10</version>
+                    <version>0.8.14</version>
                 </plugin>
 
                 <plugin>
@@ -306,10 +309,128 @@
                 </configuration>
             </plugin>
 
+            <!-- This is duplicated in enterprise-parent-pom. If you update it here, update it there. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <failOnViolation>true</failOnViolation>
+                    <logViolationsToConsole>true</logViolationsToConsole>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+                <dependencies>
+                    <!--
+                        Choose the latest version that supports Java 8
+
+                        See https://checkstyle.sourceforge.io/#JRE_and_JDK
+                    -->
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>9.3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>chronicle-quality-rules</artifactId>
+                        <version>1.23ea6</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 
     <profiles>
+        <profile>
+            <id>sonar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>${surefireArgLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>surefireArgLine</propertyName>
+                                    <excludes>
+                                        <exclude>net/openhft/chronicle/bytes/internal/ByteBuffers*</exclude>
+                                        <exclude>net/openhft/chronicle/bytes/internal/UnsafeText*</exclude>
+                                        <exclude>net/openhft/chronicle/map/MemoryLeaksTest*</exclude>
+                                        <exclude>net/openhft/chronicle/network/connection/AbstractStatelessClient.class</exclude>
+                                        <exclude>net/openhft/chronicle/queue/impl/single/AppenderFileHandleLeakTest*
+                                        </exclude>
+                                    </excludes>
+                                </configuration>
+                            </execution>
+
+                            <!-- Generates HTML at target/site/jacoco/index.html on every mvn verify -->
+                            <execution>
+                                <id>report</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+
+                            <execution>
+                                <id>check</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <phase>verify</phase>
+                                <configuration>
+                                    <rules>
+                                        <rule>
+                                            <element>BUNDLE</element>
+                                            <limits>
+                                                <limit>
+                                                    <counter>LINE</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.line.coverage}</minimum>
+                                                </limit>
+                                                <limit>
+                                                    <counter>BRANCH</counter>
+                                                    <value>COVEREDRATIO</value>
+                                                    <minimum>${jacoco.branch.coverage}</minimum>
+                                                </limit>
+                                            </limits>
+                                        </rule>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>sign-artifact</id>
             <build>
@@ -433,11 +554,6 @@
             <id>sonatype-nexus-snapshots</id>
             <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/</url>
-        </repository>
-
     </distributionManagement>
 
     <repositories>
