@@ -12,7 +12,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.27ea5-SNAPSHOT</version>
+        <version>1.27ea6</version>
         <relativePath/>
     </parent>
 
@@ -35,7 +35,10 @@
         <jacoco.line.coverage>0.8</jacoco.line.coverage>
         <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <license.header>Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0</license.header>
+        <license.year>2013-2025</license.year>
+        <license.owner>chronicle.software</license.owner>
+        <license.spdx>Apache-2.0</license.spdx>
+        <license.skip>false</license.skip>
     </properties>
 
     <build>
@@ -44,46 +47,40 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>4.6</version>
-
                 <configuration>
-                    <!-- One-line header; no newlines -->
-                    <inlineHeader>${license.header}</inlineHeader>
-                    <failIfUnknown>false</failIfUnknown>
-                    <excludes>
-                        <exclude>LICENSE</exclude>
-                        <exclude>**/*.adoc</exclude>
-                        <exclude>**/*.md</exclude>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>docs/antora/**</exclude>
-                        <exclude>src/main/config/**</exclude>
-                        <exclude>src/main/docs/**</exclude>
-                        <exclude>src/main/resources/**</exclude>
-                        <exclude>src/test/resources/**</exclude>
-                        <exclude>target/**</exclude>
-                        <exclude>**/*.versionsBackup</exclude>
-                        <exclude>surefire-buildagent/**</exclude>
-                    </excludes>
-
+                    <skip>${license.skip}</skip>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <strictCheck>true</strictCheck>
+                    <defaultProperties>
+                        <year>${license.year}</year>
+                        <owner>${license.owner}</owner>
+                        <spdx>${license.spdx}</spdx>
+                    </defaultProperties>
                     <mapping>
-                        <!-- Languages with // comments -->
-                        <java>DOUBLESLASH_STYLE</java>
-                        <kt>DOUBLESLASH_STYLE</kt>
-                        <scala>DOUBLESLASH_STYLE</scala>
-                        <groovy>DOUBLESLASH_STYLE</groovy>
-                        <js>DOUBLESLASH_STYLE</js>
-                        <ts>DOUBLESLASH_STYLE</ts>
-
-                        <!-- Properties, YAML, shells, Python: # comments -->
-                        <properties>SCRIPT_STYLE</properties>
-                        <yml>SCRIPT_STYLE</yml>
-                        <yaml>SCRIPT_STYLE</yaml>
+                        <java>SLASHSTAR_STYLE</java>
                         <sh>SCRIPT_STYLE</sh>
-                        <py>SCRIPT_STYLE</py>
                     </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <inlineHeader><![CDATA[Copyright ${license.year} ${license.owner}; SPDX-License-Identifier: ${license.spdx}]]></inlineHeader>
+                            <includes>
+                                <include>**/*.java</include>
+                                <include>**/*.sh</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/target/**</exclude>
+                                <exclude>**/generated-sources/**</exclude>
+                                <exclude>**/build/generated/**</exclude>
+                                <exclude>**/src/test/resources/**</exclude>
+                                <exclude>**/src/main/resources/**</exclude>
+                            </excludes>
+                            <useDefaultExcludes>true</useDefaultExcludes>
+                        </licenseSet>
+                    </licenseSets>
                 </configuration>
-
                 <executions>
                     <execution>
+                        <id>license-check</id>
                         <goals>
                             <goal>check</goal>
                         </goals>
