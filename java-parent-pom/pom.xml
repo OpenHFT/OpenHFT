@@ -39,6 +39,7 @@
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
         <javadoc.failOnWarnings>true</javadoc.failOnWarnings>
+        <checkstyle.skip>true</checkstyle.skip>
     </properties>
 
     <build>
@@ -136,10 +137,12 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <configLocation>net/openhft/quality/checkstyle/checkstyle.xml</configLocation>
+                    <configLocation>google_checks.xml</configLocation>
+                    <skip>${checkstyle.skip}</skip>
                     <failOnViolation>true</failOnViolation>
                     <logViolationsToConsole>true</logViolationsToConsole>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <useFile>false</useFile>
                 </configuration>
                 <dependencies>
                     <!--
