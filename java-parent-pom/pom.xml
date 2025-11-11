@@ -33,6 +33,14 @@
     <name>OpenHFT/Java Parent POM</name>
     <description>This parent pom is used by all the OpenHft java projects</description>
 
+    <properties>
+        <license.year>2013-2025</license.year>
+        <license.owner>chronicle.software</license.owner>
+        <license.spdx>Apache-2.0</license.spdx>
+        <license.skip>false</license.skip>
+        <javadoc.failOnWarnings>true</javadoc.failOnWarnings>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -106,13 +114,14 @@
                     <source>8</source>
                     <additionalOptions>${javadoc.opts}</additionalOptions>
                     <failOnError>true</failOnError>
-                    <failOnWarnings>true</failOnWarnings>
+                    <failOnWarnings>${javadoc.failOnWarnings}</failOnWarnings>
                     <excludePackageNames>*.internal:*.internal.*;*.impl;*.impl.*</excludePackageNames>
                     <doclint>all,-missing</doclint>
+                    <detectJavaApiLink>false</detectJavaApiLink>
                 </configuration>
             </plugin>
 
-            <!-- This is duplicated in enterprise-parent-pom. If you update it here, update it there. -->
+            <!-- This is duplicated in chronicle-enterprise-root-pom If you update it here, update it there. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -150,20 +159,51 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.6</version>
+                <configuration>
+                    <skip>${license.skip}</skip>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <strictCheck>true</strictCheck>
+                    <defaultProperties>
+                        <year>${license.year}</year>
+                        <owner>${license.owner}</owner>
+                        <spdx>${license.spdx}</spdx>
+                    </defaultProperties>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <inlineHeader><![CDATA[Copyright ${license.year} ${license.owner}; SPDX-License-Identifier: ${license.spdx}]]></inlineHeader>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/target/**</exclude>
+                                <exclude>**/generated-sources/**</exclude>
+                                <exclude>**/build/generated/**</exclude>
+                                <exclude>**/src/test/resources/**</exclude>
+                                <exclude>**/src/main/resources/**</exclude>
+                            </excludes>
+                            <useDefaultExcludes>true</useDefaultExcludes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>license-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>doclint-java8-disable</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <javadoc.opts>-Xdoclint:none</javadoc.opts>
-            </properties>
-        </profile>
-    </profiles>
 
    <scm>
     <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
