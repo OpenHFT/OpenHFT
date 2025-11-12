@@ -12,7 +12,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.27ea6</version>
+        <version>1.27ea7-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -39,6 +39,7 @@
         <license.owner>chronicle.software</license.owner>
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
+        <surefireArgLine/>
     </properties>
 
     <build>
