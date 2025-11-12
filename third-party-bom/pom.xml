@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,7 +24,7 @@
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.27ea4</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>third-party-bom</artifactId>
@@ -52,29 +53,29 @@
 
     <dependencyManagement>
         <dependencies>
-          
-             <!-- OpenTelemetry API -->
-             <dependency>
-              <groupId>io.opentelemetry</groupId>
-              <artifactId>opentelemetry-api</artifactId>
-              <version>${opentelemetry.version}</version>
-             </dependency>
-            
-             <!-- OpenTelemetry SDK -->
-             <dependency>
-              <groupId>io.opentelemetry</groupId>
-              <artifactId>opentelemetry-sdk</artifactId>
-              <version>${opentelemetry.version}</version>
-             </dependency>
-            
-             <!-- OpenTelemetry OTLP Exporter -->
-             <dependency>
-              <groupId>io.opentelemetry</groupId>
-              <artifactId>opentelemetry-exporter-otlp</artifactId>
-              <version>${opentelemetry.version}</version>
-             </dependency>
-    
-             <dependency>
+
+            <!-- OpenTelemetry API -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-api</artifactId>
+                <version>${opentelemetry.version}</version>
+            </dependency>
+
+            <!-- OpenTelemetry SDK -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-sdk</artifactId>
+                <version>${opentelemetry.version}</version>
+            </dependency>
+
+            <!-- OpenTelemetry OTLP Exporter -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-exporter-otlp</artifactId>
+                <version>${opentelemetry.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
                 <version>1.5.1</version>
@@ -85,7 +86,7 @@
                 <artifactId>samskivert</artifactId>
                 <version>1.9</version>
             </dependency>
-          
+
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
@@ -97,7 +98,7 @@
                 <artifactId>xstream</artifactId>
                 <version>1.4.20</version>
             </dependency>
-          
+
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>bson</artifactId>
