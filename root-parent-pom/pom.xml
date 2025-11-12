@@ -71,6 +71,8 @@
         <!-- Define the target coverage thresholds as properties -->
         <jacoco.line.coverage>0.8</jacoco.line.coverage>
         <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
+        <checkstyle.config.location>google_checks.xml</checkstyle.config.location>
+        <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
     </properties>
 
     <build>
@@ -324,10 +326,11 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <configLocation>google_checks.xml</configLocation>
+                    <configLocation>${checkstyle.config.location}</configLocation>
                     <failOnViolation>true</failOnViolation>
                     <logViolationsToConsole>true</logViolationsToConsole>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
                 </configuration>
                 <dependencies>
                     <!--
