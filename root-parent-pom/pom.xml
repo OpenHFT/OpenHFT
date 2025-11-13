@@ -71,8 +71,6 @@
         <!-- Define the target coverage thresholds as properties -->
         <jacoco.line.coverage>0.8</jacoco.line.coverage>
         <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
-        <checkstyle.config.location>google_checks.xml</checkstyle.config.location>
-        <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
     </properties>
 
     <build>
@@ -310,50 +308,54 @@
                     <argLine>@{argLine} ${jvm.requiredArgs}</argLine>
                 </configuration>
             </plugin>
-
-            <!-- This is duplicated in enterprise-parent-pom. If you update it here, update it there. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <configLocation>${checkstyle.config.location}</configLocation>
-                    <failOnViolation>true</failOnViolation>
-                    <logViolationsToConsole>true</logViolationsToConsole>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
-                </configuration>
-                <dependencies>
-                    <!--
-                        Choose the latest version that supports Java 8
-
-                        See https://checkstyle.sourceforge.io/#JRE_and_JDK
-                    -->
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>9.3</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>net.openhft</groupId>
-                        <artifactId>chronicle-quality-rules</artifactId>
-                        <version>1.23ea6</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
         </plugins>
     </build>
 
     <profiles>
+        <profile>
+            <id>checkstyle</id>
+            <properties>
+                <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <executions>
+                            <execution>
+                                <id>validate</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <configLocation>${checkstyle.config.location}</configLocation>
+                            <failOnViolation>true</failOnViolation>
+                            <logViolationsToConsole>true</logViolationsToConsole>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.puppycrawl.tools</groupId>
+                                <artifactId>checkstyle</artifactId>
+                                <version>9.3</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>net.openhft</groupId>
+                                <artifactId>chronicle-quality-rules</artifactId>
+                                <version>1.23ea6</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>sonar</id>
             <build>
