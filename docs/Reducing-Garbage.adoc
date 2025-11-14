@@ -1,4 +1,7 @@
 = Chronicle Garbage Reduction
+:toc:
+:lang: en-GB
+:source-highlighter: rouge
 
 == Reducing Garbage
 

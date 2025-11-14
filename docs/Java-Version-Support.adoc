@@ -1,4 +1,7 @@
 = Java Version Support
+:toc:
+:lang: en-GB
+:source-highlighter: rouge
 
 We support current LTS versions: Java 8, 11, 17 and 21 - all libraries will run under these versions of Java.
 

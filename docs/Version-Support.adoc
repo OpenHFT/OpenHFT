@@ -1,5 +1,6 @@
 = Version Support
 Peter Lawrey
+:source-highlighter: rouge
 
 Chronicle Software supports each version for two years from the start of the next minor version. 
 

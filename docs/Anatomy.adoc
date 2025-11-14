@@ -1,4 +1,5 @@
 = Chronicle Maven Anatomy
+:source-highlighter: rouge
 
 (last updated Feb 2021)
 
