@@ -78,6 +78,8 @@
             -Dcheckstyle.config.location=/path/to/custom.xml when experimenting locally.
         -->
         <checkstyle.config.location>net/openhft/quality/checkstyle27/chronicle-baseline-checkstyle.xml</checkstyle.config.location>
+        <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
+        <checkstyle.skip>false</checkstyle.skip>
     </properties>
 
     <build>
@@ -321,9 +323,6 @@
     <profiles>
         <profile>
             <id>checkstyle</id>
-            <properties>
-                <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
