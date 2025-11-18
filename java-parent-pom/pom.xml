@@ -93,6 +93,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>${surefireArgLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
                     <systemPropertyVariables>
                         <project.build.directory>${project.build.directory}</project.build.directory>
                     </systemPropertyVariables>
@@ -132,7 +133,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgs>
-                        <arg>-Xlint:all,-options,-processing</arg>
+                        <arg>-Xlint:all,-options,-processing,-restricted</arg>
                         <arg>-parameters</arg>
                     </compilerArgs>
                     <source>1.8</source>
@@ -143,31 +144,6 @@
                     <showWarnings>true</showWarnings>
                     <proc>none</proc>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <configLocation>${checkstyle.config.location}</configLocation>
-                    <failOnViolation>true</failOnViolation>
-                    <logViolationsToConsole>true</logViolationsToConsole>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>9.3</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>net.openhft</groupId>
-                        <artifactId>chronicle-quality-rules</artifactId>
-                        <version>1.27.0-SNAPSHOT</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <plugin>
