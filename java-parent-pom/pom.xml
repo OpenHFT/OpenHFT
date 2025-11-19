@@ -133,7 +133,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgs>
-                        <arg>-Xlint:all,-options,-processing,-restricted</arg>
+                        <arg>-Xlint:all,-options,-processing</arg>
                         <arg>-parameters</arg>
                     </compilerArgs>
                     <source>1.8</source>
