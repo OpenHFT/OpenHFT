@@ -1,4 +1,5 @@
 = Chronicle Overview
+:toc:
 :lang: en-GB
 :source-highlighter: rouge
 

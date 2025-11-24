@@ -1,4 +1,6 @@
 = Chronicle Maven Anatomy
+:toc:
+:lang: en-GB
 :source-highlighter: rouge
 
 (last updated Feb 2021)
@@ -24,46 +26,46 @@ The graphs above were obtained by running `mvn dependency:tree | grep compile | 
 [source, text]
 ----
 digraph G {
-    Queue -> Core ;
-    Queue -> Bytes ;
-    Queue -> Wire ;
-    Queue -> Compiler ;
-    Queue -> Threads ;
-    Queue -> Affinity ;
-    Queue -> Jlbh ;
+    Queue -> Core;
+    Queue -> Bytes;
+    Queue -> Wire;
+    Queue -> Compiler;
+    Queue -> Threads;
+    Queue -> Affinity;
+    Queue -> Jlbh;
 
-    Network -> Core ;
-    Network -> Threads ;
-    Network -> Wire ;
-    Network -> Bytes ;
-    Network -> Compiler ;
+    Network -> Core;
+    Network -> Threads;
+    Network -> Wire;
+    Network -> Bytes;
+    Network -> Compiler;
 
-    Map -> Core ;
-    Map -> Values ;
-    Map -> Bytes ;
-    Map -> Threads ;
-    Map -> Wire ;
-    Map -> Compiler ;
-    Map -> Algorithms ;
+    Map -> Core;
+    Map -> Values;
+    Map -> Bytes;
+    Map -> Threads;
+    Map -> Wire;
+    Map -> Compiler;
+    Map -> Algorithms;
 
-    Wire -> Core ;
-    Wire -> Bytes ;
-    Wire -> Threads ;
-    Wire -> Affinity ;
-    Wire -> Compiler ;
+    Wire -> Core;
+    Wire -> Bytes;
+    Wire -> Threads;
+    Wire -> Affinity;
+    Wire -> Compiler;
 
-    Algorithms -> Core ;
-    Algorithms -> Bytes ;
+    Algorithms -> Core;
+    Algorithms -> Bytes;
 
-    Values -> Core ;
-    Values -> Bytes ;
+    Values -> Core;
+    Values -> Bytes;
 
-    Threads -> Affinity ;
-    Threads -> Core ;
+    Threads -> Affinity;
+    Threads -> Core;
 
-    Bytes -> Core ;
+    Bytes -> Core;
 
-    Core -> Affinity ;
+    Core -> Affinity;
 }
 ----
 

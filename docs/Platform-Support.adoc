@@ -1,6 +1,7 @@
 = Platform Support
-:source-highlighter: rouge
+:toc:
 :lang: en-GB
+:source-highlighter: rouge
 
 == Java
 

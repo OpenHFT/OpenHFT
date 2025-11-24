@@ -1,7 +1,9 @@
 = Chronicle-Bom "Bill Of Materials" (BOM)
-:toc: manual
+:toc:
+:lang: en-GB
 :css-signature: demo
 :toc-placement: preamble
+:source-highlighter: rouge
 
 == Version 
 
