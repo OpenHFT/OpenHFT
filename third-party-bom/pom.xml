@@ -246,7 +246,7 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-migrationsupport</artifactId>
-                <version>${junit.platform.provider.version}</version>
+                <version>${junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
 
