@@ -1,0 +1,101 @@
+/*
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ */
+package net.openhft.thirdparty.smoke;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import org.codehaus.jettison.json.JSONObject;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.yaml.snakeyaml.Yaml;
+
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+/**
+ * Minimal usage smoke tests for serialisation dependencies from
+ * third-party-bom.
+ * <p>
+ * These tests validate JSON, YAML, and XML serialisation libraries can
+ * round-trip simple objects.
+ * See {@code SMOKE-TEST-004} in
+ * {@code src/main/docs/project-requirements.adoc}.
+ */
+class MinimalSerializationSmokeTest {
+
+    @Test
+    @DisplayName("JSONAssert can compare payloads")
+    void jsonAssertWorks() throws Exception {
+        JSONAssert.assertEquals("{\"key\":1}", "{\"key\":1}", false);
+    }
+
+    @Test
+    @DisplayName("SnakeYAML can parse a simple document")
+    void snakeYamlParses() {
+        Yaml yaml = new Yaml();
+        Map<?, ?> parsed = yaml.load("name: demo");
+        assertEquals("demo", parsed.get("name"));
+    }
+
+    @Test
+    @DisplayName("XStream can round-trip a simple object")
+    void xstreamRoundTrips() {
+        XStream xStream = new XStream(new StaxDriver());
+        xStream.allowTypes(new Class<?>[]{SimplePojo.class});
+        SimplePojo pojo = new SimplePojo("value");
+        String xml = xStream.toXML(pojo);
+        SimplePojo read = (SimplePojo) xStream.fromXML(xml);
+        assertEquals(pojo.value, read.value);
+    }
+
+    @Test
+    @DisplayName("Jackson jsonSchema can generate a schema")
+    void jacksonSchemaGenerates() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonSchemaGenerator generator = new JsonSchemaGenerator(mapper);
+        JsonSchema schema = generator.generateSchema(SimplePojo.class);
+        assertNotNull(schema);
+    }
+
+    @Test
+    @DisplayName("Jettison can build a JSON object")
+    void jettisonBuildsJson() throws Exception {
+        JSONObject object = new JSONObject();
+        object.put("hello", "world");
+        assertEquals("world", object.getString("hello"));
+    }
+
+    /**
+     * Simple POJO for serialisation round-trip tests.
+     */
+    private static final class SimplePojo {
+        /**
+         * Stored value used for round-tripping.
+         */
+        private final String value;
+
+        /**
+         * Creates a SimplePojo with the given value.
+         *
+         * @param newValue textual value
+         */
+        private SimplePojo(final String newValue) {
+            this.value = newValue;
+        }
+
+        /**
+         * Default constructor for deserialisation.
+         */
+        @SuppressWarnings("unused")
+        SimplePojo() {
+            this.value = "";
+        }
+    }
+}
