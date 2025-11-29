@@ -1,0 +1,21 @@
+= Version Issues and Follow-up
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Known version quirks
+* JUnit migration support :: The BOM now uses `junit-jupiter-migrationsupport` 5.10.0 (the 1.10.0 coordinate was invalid). Keep the JUnit 5.10 line for Java 8 compatibility; avoid JUnit 6 unless the baseline moves to Java 17.
+* Bytecode level guard :: The smoke module enforces `maxJdkVersion` 1.8 via `enforceBytecodeVersion` (extra-enforcer-rules) and currently excludes `org.hsqldb:hsqldb` and `org.mongodb:bson-record-codec`, which ship Java 11+/17 classfiles. All other dependencies must remain at Java 8 bytecode.
+* HSQLDB Java 8 note :: The default `org.hsqldb:hsqldb:2.7.1` artifact is compiled for Java 11 (classfile version 55); the `jdk8` classifier is available for Java 8. The smoke test tolerates the default jar on Java 8 but still loads the driver on newer JDKs.
+* SLF4J bindings :: The smoke classpath intentionally contains multiple SLF4J providers (Simple, NOP, Logback) to verify they resolve. This triggers warnings during tests; tolerable for now but could be reduced if noise becomes a problem.
+* Dual HSQLDB artefacts :: Both the base artefact and the `jdk8` classifier are included. Confirm whether both are required or if one can be dropped without losing Java 8 coverage.
+
+== Follow-up topics to research
+* Verify every BOM entry publishes Java 8 bytecode (major version 52) and document any exceptions.
+* Consider a multi-JDK CI matrix (8, 11, 17, 21) for the smoke module to surface future runtime or module-layer issues.
+* Audit Jetty aggregation usage (`jetty-all` is a POM); confirm runtime coverage is fully provided by the websocket modules already under test.
+* Review Pax Exam and OSGi artefact usage paths to ensure their presence is still required for downstream consumers.
+* Check whether ProGuard 6.2.2 remains the right baseline for Java 8 builds or if a newer, still-compatible version is available.
+* Trim SLF4J bindings on the test classpath (keep one binding per run) if the warnings become distracting while still keeping load coverage.

@@ -1,0 +1,23 @@
+= Decision Log
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Recorded decisions
+
+=== ALL-TEST-001 Third-party BOM smoke module for Java 8
+Date:: 2025-11-29
+Context:: The third-party BOM must stay usable on Java 8, but the set of dependencies evolves and can drift in bytecode level or transitive requirements.
+Decision Statement:: Add a `third-party-smoke` module that imports the BOM and runs class-loading plus minimal-behaviour checks for every artefact to prove Java 8 compatibility.
+Alternatives Considered::
+* Do nothing and rely on downstream projects:
+** *Pros:* No extra module to maintain.
+** *Cons:* Breakage would be detected late; Java 8 regressions would surface only in consumers.
+* Selective spot checks per family:
+** *Pros:* Smaller test surface.
+** *Cons:* Gaps remain; silent regressions likely.
+Rationale for Decision:: A dedicated smoke module gives fast, deterministic feedback on compatibility and missing transitive dependencies without invoking external services.
+Impact & Consequences:: Contributors must keep the smoke suite green; version bumps that break Java 8 will now fail early. Build time increases slightly but remains bounded due to minimal operations.
+Notes/Links:: Module path `third-party-smoke`; see `src/test/java/net/openhft/thirdparty/smoke`.

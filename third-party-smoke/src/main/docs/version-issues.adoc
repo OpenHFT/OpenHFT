@@ -1,0 +1,103 @@
+= Version Issues and Follow-up
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Known Version Quirks
+
+* *JCommander 1.48* :: Hardcoded version (pom.xml line 497) observed in peer modules; not currently managed in `third-party-bom`. Consider adding to BOM or documenting explicit exclusion policy if this library is being phased out.
+
+* *Gson 2.8.2* :: Hardcoded version (pom.xml line 503) matches peer module usage patterns. Newer versions (2.10.x) are available; verify Java 8 compatibility before upgrading. Gson is widely used across Chronicle ecosystem.
+
+* *Unirest 1.4.9* :: Hardcoded version (pom.xml line 509). This HTTP client library appears to be archived/unmaintained. Consider migration path to modern alternatives (OkHttp, Apache HttpClient 5.x) and document deprecation timeline.
+
+* *Joda-Time 2.14.0* :: Hardcoded version (pom.xml line 515). Library is in maintenance mode (use `java.time` on Java 8+). Retained for legacy compatibility with existing Chronicle modules. Migration to `java.time` should be considered for new code.
+
+* *Commons Email 1.5* :: Hardcoded version (pom.xml line 521). Verify if version 1.6.0 (or newer) is Java 8 compatible and provides security fixes. Update if safe to do so.
+
+* *JGit 5.13.0.202109080827-r* :: Hardcoded version (pom.xml lines 527, 533) for both core and SSH modules. Newer versions in 6.x series are available. Verify Java 8 support in later releases before upgrading.
+
+* *Maven Model 3.6.3* :: Hardcoded version (pom.xml line 539). Maven 3.9.x is available but requires Java 8 validation. Upgrading may provide better POM parsing but needs compatibility verification.
+
+* *JUnit Jupiter Migration Support 5.10.0* :: Corrected from invalid coordinate (was mistakenly listed as 1.10.0 in pom.xml line 393). Do not upgrade to JUnit 6.x until Java 17 becomes the baseline.
+
+== Bytecode Level Exclusions
+
+These dependencies are excluded from `enforceBytecodeVersion` enforcement (pom.xml lines 568-572):
+
+* *org.hsqldb:hsqldb 2.7.1* :: Compiled for Java 11 (classfile version 55). The `jdk8` classifier (pom.xml line 335) provides Java 8 bytecode, but both artefacts are currently included in dependencies. *Action*: Confirm if both are needed or consolidate to `jdk8` classifier only. See `ClassLoadingSmokeTest.assertHsqldbDriver()` for special Java 8 handling.
+
+* *org.mongodb:bson-record-codec* :: Compiled for Java 17 (uses Java records). *Action*: Check if this artefact is actually exercised in smoke tests or is merely transitive. May be safe to exclude from dependencies if unused.
+
+== SLF4J Binding Conflicts
+
+The test classpath intentionally includes multiple SLF4J implementations (pom.xml lines 220-227, 230-237):
+
+* `slf4j-simple`
+* `slf4j-nop`
+* `logback-classic`
+
+This configuration triggers SLF4J warnings: "Multiple bindings were found on the class path"
+
+*Decision*: Warnings are tolerated to validate all bindings load correctly without failures (see SMOKE-DEC-006 in decision-log.adoc).
+
+*Future*: Consider separate test execution groups if warning noise becomes problematic for developers.
+
+== Follow-up Research Topics
+
+=== Dependency Version Migration
+* Create tickets to add hardcoded dependencies to `third-party-bom` for centralized version management:
+** JCommander (if still required)
+** Gson (widely used)
+** Unirest (evaluate replacement first)
+** Joda-Time (document as legacy)
+** Commons Email
+** JGit
+** Maven Model
+
+=== Multi-JDK CI Matrix
+* Run smoke tests on Java 8, 11, 17, 21 to catch runtime-specific issues
+* Identify dependencies that work on Java 8 bytecode but fail at runtime on newer JDKs
+* Validate module-layer compatibility for Java 9+
+
+=== HSQLDB Artefact Consolidation
+* Determine if both base artefact and `jdk8` classifier are required
+* If only `jdk8` classifier is needed, remove base artefact from dependencies
+* Document usage pattern for downstream consumers requiring HSQLDB
+
+=== Verify Unused Transitive Dependencies
+* Check if `bson-record-codec` is actually used or just resolved transitively
+* Run dependency analysis to identify unused artefacts
+* Remove unnecessary transitive dependencies from explicit dependency list
+
+=== ProGuard Version Baseline
+* Confirm ProGuard 6.2.2 (pom.xml line 297) is appropriate for Java 8 builds
+* Check if newer compatible versions are available
+* Document any known issues with ProGuard versions
+
+=== OSGi Artefact Usage Audit
+* Review Pax Exam and OSGi dependencies (pom.xml lines 463-492)
+* Confirm downstream consumers still require these artefacts
+* Consider removing if no longer used in Chronicle ecosystem
+
+=== Jetty Aggregation POM Review
+* `jetty-all` is a POM dependency that aggregates multiple modules
+* Verify coverage is complete via explicit websocket modules (pom.xml lines 147-160)
+* Confirm no missing transitive dependencies
+
+=== SLF4J Binding Optimisation
+* Current approach validates all bindings load (pom.xml lines 218-237)
+* Consider test execution groups to isolate bindings if warnings become excessive
+* Maintain coverage whilst reducing noise in test output
+
+=== Koloboke Usage Validation
+* Three Koloboke artefacts included (pom.xml lines 246-259)
+* Only package-presence checks in `ClassLoadingSmokeTest`
+* Consider adding minimal usage tests for high-performance map operations if Koloboke is widely used
+
+=== Commons and Samskivert Coverage
+* `Samskivert` utilities (pom.xml line 79) only have package presence check
+* Consider adding minimal usage test if library is actively used
+* Audit usage patterns across Chronicle modules

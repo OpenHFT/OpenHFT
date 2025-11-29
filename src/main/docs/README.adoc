@@ -1,0 +1,36 @@
+= OpenHFT Documentation
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Purpose
+This directory holds the durable documentation for the OpenHFT aggregation build. It complements the repository root files and records decisions, requirements, and verification expectations. Update these pages whenever code, tests, or dependencies change so they stay in sync with the build.
+
+== Structure
+* link:project-requirements.adoc[Project requirements] – current obligations and behaviours we rely on.
+* link:decision-log.adoc[Decision log] – notable choices with context and impact.
+* link:version-issues.adoc[Version issues and follow-up] – known version pinning quirks and items to revisit.
+
+== Build and test
+* Run `mvn -q verify` from the repository root before raising a pull request.
+* The third-party smoke suite lives in `third-party-smoke` and is expected to pass on Java 8 and Java 21.
+* The smoke module enforces Java 8 bytecode for all resolved dependencies via `enforceBytecodeVersion`; version bumps that slip past the Java 8 target will fail fast.
+
+== Current focus: third-party BOM smoke coverage
+* The `third-party-smoke` module imports the third-party BOM and runs class-loading and minimal-behaviour checks for every artefact to guard Java 8 compatibility.
+* Failures here usually indicate version drift, missing transitive dependencies, or bytecode levels higher than Java 8.
+
+== Open topics to track
+* Version alignment for testing stacks (for example, the corrected `junit-jupiter-migrationsupport` version).
+* Whether both HSQLDB artefacts (base and `jdk8` classifier) should be retained.
+* Reducing duplicate logging bindings during smoke runs to avoid noisy SLF4J warnings.
+* Extending smoke coverage to multi-JDK matrices for early signal on 11/17/21 where relevant.
+
+== Future work
+* Fold newly discovered third-party dependencies (from peer modules) into `third-party-bom` so smoke coverage and BOM stay aligned.
+* Switch from `sun_checks.xml` to the shared Chronicle Checkstyle rules once released; consider re-enabling parent-level Checkstyle then.
+* Trim SLF4J bindings in the smoke classpath while keeping targeted coverage for each binding when needed.
+* Source Java-8-compatible variants for HSQLDB and BSON record codec to remove bytecode exclusions.
+* Persist dependency-scan output (from `scripts/list-third-party-deps.sh`) in CI to flag unmanaged third-party jars.
