@@ -1,0 +1,21 @@
+= Project Requirements
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Scope
+These requirements cover the aggregate OpenHFT build, with emphasis on the third-party BOM and its Java 8 compatibility guarantees.
+
+== Functional and non-functional obligations
+*TEST-001* Third-party BOM smoke coverage :: Every artefact listed in `third-party-bom` must load and perform minimal operations on Java 8. The `third-party-smoke` module provides the gate and must remain green on Java 8 as a baseline.
+*NF-O-001* Repeatable verification :: Contributors run `mvn -q verify` from the repository root before opening a pull request. The smoke module is part of the default reactor and must not be skipped.
+*NF-O-002* Documentation currency :: When code, tests, or dependency versions change, update the AsciiDoc files in `src/main/docs/` in the same change set to prevent drift.
+*NF-P-001* Minimal smoke runtime :: Smoke tests should stay fast (class loading or minimal local operations only) and avoid external network calls or persistent side effects.
+*NF-O-003* Bytecode compatibility gate :: The third-party smoke module enforces a maximum bytecode level of Java 8 for all resolved dependencies. Any artefact compiled for a newer classfile version must be rejected or explicitly excluded.
+*NF-O-004* LTS runtime check :: The smoke module must execute on Java 8 (baseline) and Java 21 (current LTS) to catch runtime-specific regressions early.
+
+== Toolchain expectations
+* Baseline compiler target is Java 8 via `java-parent-pom`.
+* Additional JDKs may run the same tests, but Java 8 compatibility remains the primary gate for the third-party BOM.
