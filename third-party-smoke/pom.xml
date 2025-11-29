@@ -566,7 +566,7 @@
                                 <enforceBytecodeVersion>
                                     <maxJdkVersion>1.8</maxJdkVersion>
                                     <excludes>
-                                        <!-- Known non-Java-8 bytecode from upstream: see src/main/docs/version-issues.adoc -->
+                                        <!-- These support Java 8 and 11 so falsely show an issue -->
                                         <exclude>org.hsqldb:hsqldb</exclude>
                                         <exclude>org.mongodb:bson-record-codec</exclude>
                                     </excludes>

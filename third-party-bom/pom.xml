@@ -556,6 +556,7 @@
                 <artifactId>hsqldb</artifactId>
                 <version>2.7.1</version>
             </dependency>
+
             <!-- for when running with Java 8 -->
             <dependency>
                 <groupId>org.hsqldb</groupId>
