@@ -8,9 +8,10 @@ We support current LTS versions: Java 8, 11, 17 and 21 - all libraries will run 
 We support Oracle's JDK, OpenJDK (including popular distributions such as Azul Zulu), and Azul Platform Prime (AKA Zing).
 
 == Running under Java 11, Java 17 or Java 21 (class path)
+
 When starting a JVM explicitly using the `java` command, the follow command line parameters need to be passed in:
 
-[source, shell script]
+[source,shell script]
 ----
 --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
 --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
@@ -27,7 +28,8 @@ TIP: Even though not all of them are strictly required, we recommend providing t
 
 == Compiles and Runs on Java 8, 11, 17 and 21.
 
-Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11, Java 17 and Java 21 as a part of our continuous integration process. However, some libraries may also be build with more recent Java version as described here:
+Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11, Java 17 and Java 21 as a part of our continuous integration process.
+However, some libraries may also be build with more recent Java version as described here:
 
 These libraries compile on either Java 8, 11, 17 or 21 and pass all the tests under the version built and higher.
 
@@ -37,7 +39,7 @@ These libraries compile on either Java 8, 11, 17 or 21 and pass all the tests un
 - Chronicle-Map
 - Chronicle-Map-Enterprise
 - Chronicle-Market-Data-Distributor
-- Chronicle-Network 
+- Chronicle-Network
 - Chronicle-Network-Enterprise
 - Chronicle-Queue
 - Chronicle-Queue-Enterprise
