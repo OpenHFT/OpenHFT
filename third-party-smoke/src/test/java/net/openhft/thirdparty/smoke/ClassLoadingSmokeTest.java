@@ -110,13 +110,6 @@ class ClassLoadingSmokeTest {
                 () -> assertClassesLoad("org.apache.commons.mail.Email")
         ));
         tests.add(dynamic(
-                "JGit",
-                () -> assertClassesLoad(
-                        "org.eclipse.jgit.api.Git",
-                        "org.eclipse.jgit.transport.sshd.SshdSessionFactory"
-                )
-        ));
-        tests.add(dynamic(
                 "Maven Model",
                 () -> assertClassesLoad("org.apache.maven.model.Model")
         ));
@@ -136,10 +129,6 @@ class ClassLoadingSmokeTest {
         tests.add(dynamic(
                 "SnakeYAML",
                 () -> assertClassesLoad("org.yaml.snakeyaml.Yaml")
-        ));
-        tests.add(dynamic(
-                "XStream",
-                () -> assertClassesLoad("com.thoughtworks.xstream.XStream")
         ));
         tests.add(dynamic(
                 "Jettison",

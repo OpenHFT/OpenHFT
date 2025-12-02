@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,7 +24,7 @@
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
         <version>1.27ea4</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>third-party-bom</artifactId>
@@ -57,7 +58,6 @@
         <pax-exam.version>4.13.5</pax-exam.version>
         <pax-url.version>2.6.17</pax-url.version>
         <hsqldb.version>2.7.4</hsqldb.version>
-        <org.eclipse.jgit.version>5.13.4.202507202350-r</org.eclipse.jgit.version>
     </properties>
 
     <dependencyManagement>
@@ -555,12 +555,6 @@
                 <version>4.1.128.Final</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.hsqldb</groupId>
-                <artifactId>hsqldb</artifactId>
-                <version>${hsqldb.version}</version>
-            </dependency>
-
             <!-- for when running with Java 8 -->
             <dependency>
                 <groupId>org.hsqldb</groupId>
@@ -649,18 +643,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-email</artifactId>
+                <artifactId>commons-email</artifactId>
                 <version>1.6.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jgit</groupId>
-                <artifactId>org.eclipse.jgit</artifactId>
-                <version>${org.eclipse.jgit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jgit</groupId>
-                <artifactId>org.eclipse.jgit.ssh.apache</artifactId>
-                <version>${org.eclipse.jgit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
