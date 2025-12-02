@@ -6,8 +6,6 @@ package net.openhft.thirdparty.smoke;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,17 +40,6 @@ class MinimalSerializationSmokeTest {
         Yaml yaml = new Yaml();
         Map<?, ?> parsed = yaml.load("name: demo");
         assertEquals("demo", parsed.get("name"));
-    }
-
-    @Test
-    @DisplayName("XStream can round-trip a simple object")
-    void xstreamRoundTrips() {
-        XStream xStream = new XStream(new StaxDriver());
-        xStream.allowTypes(new Class<?>[]{SimplePojo.class});
-        SimplePojo pojo = new SimplePojo("value");
-        String xml = xStream.toXML(pojo);
-        SimplePojo read = (SimplePojo) xStream.fromXML(xml);
-        assertEquals(pojo.value, read.value);
     }
 
     @Test
