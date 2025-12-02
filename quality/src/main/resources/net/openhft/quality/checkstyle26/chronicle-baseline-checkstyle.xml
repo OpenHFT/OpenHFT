@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  Baseline Checkstyle profile generated from the violation census.
+  Only rules with <= 1200 hits across the workspace are enabled here,
+  making this a good starting point for identifying the 99%-compliant set.
+  Tweak or extend the modules below to experiment locally, then re-run
+  the census script to validate compliance numbers.
+-->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="warning"/>
+
+    <module name="SuppressionFilter">
+        <property name="file"
+                  value="${chronicle.checkstyle.suppressions}"
+                  default="classpath:net/openhft/quality/checkstyle27/checkstyle-suppressions.xml"/>
+        <property name="optional" value="true"/>
+    </module>
+    <module name="SuppressionFilter">
+        <property name="file"
+                  value="${chronicle.checkstyle.suppressions.tests}"
+                  default="classpath:net/openhft/quality/checkstyle27/checkstyle-suppressions-tests.xml"/>
+        <property name="optional" value="true"/>
+    </module>
+
+    <module name="FileTabCharacter"/>
+
+    <module name="TreeWalker">
+        <module name="SuppressionCommentFilter"/>
+        <module name="SingleLineJavadoc"/>
+        <module name="NonEmptyAtclauseDescription"/>
+        <module name="AtclauseOrder"/>
+        <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+        <module name="InvalidJavadocPosition"/>
+
+        <module name="PackageName"/>
+        <module name="TypeName">
+            <property name="format" value="^[A-Z][a-zA-Z0-9_]*$"/>
+        </module>
+        <module name="ClassTypeParameterName"/>
+        <module name="InterfaceTypeParameterName"/>
+        <module name="MethodTypeParameterName"/>
+        <module name="LambdaParameterName"/>
+        <module name="ParameterName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName">
+            <property name="id" value="MethodNameStrict"/>
+            <property name="format" value="^[a-z$][a-zA-Z0-9_$]*$"/>
+        </module>
+        <module name="MethodName">
+            <property name="id" value="MethodNameLegacy"/>
+            <property name="format" value="^[a-z$][a-zA-Z0-9_$]*$"/>
+        </module>
+
+        <module name="MissingSwitchDefault"/>
+        <module name="OneStatementPerLine"/>
+        <module name="VariableDeclarationUsageDistance">
+            <property name="ignoreVariablePattern" value="^(?:l[0-3](?:a)?|sourceOffset|otherOffset|position|offset|startTimeNs|ret)$"/>
+        </module>
+
+        <module name="LeftCurly"/>
+        <module name="RightCurly">
+            <property name="option" value="same"/>
+            <property name="id" value="RightCurlySame"/>
+        </module>
+        <module name="EmptyBlock"/>
+        <module name="EmptyCatchBlock"/>
+
+        <module name="MethodParamPad"/>
+        <module name="ParenPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/>
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapComma"/>
+            <property name="tokens" value="COMMA"/>
+            <property name="option" value="EOL"/>
+        </module>
+        <module name="ModifierOrder"/>
+        <module name="CommentsIndentation"/>
+    </module>
+</module>

@@ -1,0 +1,108 @@
+= Chronicle Quality Rules
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+This module packages shared quality configuration and documentation used across Chronicle projects.
+It provides:
+
+* Checkstyle rule sets and configuration files;
+* SpotBugs include and exclude filters;
+* shared architectural, security and operations guidance that other modules can reference.
+
+The goal is to keep quality and compliance rules centralised so that individual repositories can reuse them with minimal boilerplate.
+
+== Maven Usage
+
+Most Chronicle modules inherit these rules through a parent POM (for example `chronicle-enterprise-root-pom`), but they can also consume the artefact directly in a build.
+
+=== Checkstyle
+
+To apply the Chronicle Checkstyle rules in a standalone Maven project, add the plugin and dependency:
+
+[source,xml]
+----
+<profile>
+    <id>quality</id>
+    <activation>
+        <jdk>[11,)</jdk>
+    </activation>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configLocation>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml</configLocation>
+                    <failOnViolation>true</failOnViolation>
+                    <logViolationsToConsole>true</logViolationsToConsole>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <violationSeverity>warning</violationSeverity>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>10.26.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>quality</artifactId>
+                        <version>2026.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.9.8.1</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                    <includeTests>true</includeTests>
+                    <failOnError>true</failOnError>
+                    <includeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-include.xml</includeFilterFile>
+                    <excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>quality</artifactId>
+                        <version>2026.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>spotbugs-main</id>
+                        <!-- Bind after test classes are compiled so includeTests=true analyses src/test/java as well. -->
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</profile>
+----
+
+Parent POMs such as `root-parent-pom` and `chronicle-enterprise-root-pom` already wire this plugin and the quality rules into a `quality` profile; most Chronicle modules should prefer that route rather than duplicating configuration.
+
+=== SpotBugs
+
+SpotBugs configuration (rule filters, effort and threshold settings) is also provided from this module and surfaced by the parent POMs.
+To consume it directly, add the `spotbugs-maven-plugin` with a dependency on `chronicle-quality-rules` in a similar fashion to the Checkstyle example above, or enable the shared `quality` profile in the parent.
+
+

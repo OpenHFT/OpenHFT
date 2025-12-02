@@ -37,9 +37,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bnd.annotation.version>6.3.1</bnd.annotation.version>
         <jetty.version>9.4.57.v20241219</jetty.version>
         <log4j2.version>2.24.1</log4j2.version>
+        <osgi.annotation.version>8.1.0</osgi.annotation.version>
         <slf4j.version>2.0.17</slf4j.version>
+        <spotbugs.annotations.version>4.8.6</spotbugs.annotations.version>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <junit.platform.provider.version>1.10.2</junit.platform.provider.version>
         <jmh.version>1.37</jmh.version>
@@ -52,6 +55,12 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>biz.aQute.bnd.annotation</artifactId>
+                <version>${bnd.annotation.version}</version>
+            </dependency>
 
             <!-- OpenTelemetry API -->
             <dependency>
@@ -662,6 +671,16 @@
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-model</artifactId>
                 <version>3.9.9</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>${spotbugs.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi.annotation</artifactId>
+                <version>${osgi.annotation.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
