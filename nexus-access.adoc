@@ -1,4 +1,7 @@
 == Nexus Access
+:toc:
+:lang: en-GB
+:source-highlighter: rouge
 
 If you are a paying client we can grant you access to our nexus server, your credentials are as follows :
 
