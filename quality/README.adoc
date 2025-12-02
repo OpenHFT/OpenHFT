@@ -39,7 +39,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
     </executions>
     <configuration>
         <configLocation>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml</configLocation>
-        <failOnViolation>true</failOnViolation>
+        <failOnViolation>false</failOnViolation>
         <logViolationsToConsole>true</logViolationsToConsole>
         <includeTestSourceDirectory>true</includeTestSourceDirectory>
         <violationSeverity>warning</violationSeverity>
@@ -65,7 +65,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
         <effort>Max</effort>
         <threshold>Low</threshold>
         <includeTests>true</includeTests>
-        <failOnError>true</failOnError>
+        <failOnError>false</failOnError>
         <includeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-include.xml</includeFilterFile>
         <excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml</excludeFilterFile>
     </configuration>
