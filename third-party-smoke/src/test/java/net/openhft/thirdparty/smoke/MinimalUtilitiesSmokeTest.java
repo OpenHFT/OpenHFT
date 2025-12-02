@@ -5,6 +5,10 @@ package net.openhft.thirdparty.smoke;
 
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.koloboke.collect.map.hash.HashIntIntMaps;
+import com.samskivert.util.QuickSort;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +39,45 @@ class MinimalUtilitiesSmokeTest {
      * Test value.
      */
     private static final int TEST_VAL = 100;
+
+    /**
+     * Values used for quick sort smoke test.
+     */
+    private static final Integer QUICK_SORT_FIRST = 3;
+    /**
+     * Middle value for quick sort validation.
+     */
+    private static final Integer QUICK_SORT_SECOND = 1;
+    /**
+     * Highest value for quick sort validation.
+     */
+    private static final Integer QUICK_SORT_THIRD = 2;
+
+    /**
+     * Values used for Koloboke map assertions.
+     */
+    private static final int KOLOBOKE_KEY = 7;
+
+    /**
+     * Stored value for Koloboke map assertions.
+     */
+    private static final int KOLOBOKE_VALUE = 11;
+
+    /**
+     * CLI flag value used for JCommander parsing.
+     */
+    private static final String FLAG_VALUE = "value";
+
+    /**
+     * Simple container for JCommander argument parsing.
+     */
+    private static final class CliArgs {
+        /**
+         * Sample flag parsed by JCommander.
+         */
+        @Parameter(names = "-f")
+        private String flag;
+    }
 
     @Test
     @DisplayName("Trove4j map can be used")
@@ -115,5 +158,35 @@ class MinimalUtilitiesSmokeTest {
     @DisplayName("JNR Runtime is accessible")
     void jnrUsage() {
         assertNotNull(jnr.ffi.Runtime.getSystemRuntime());
+    }
+
+    @Test
+    @DisplayName("Samskivert QuickSort sorts arrays")
+    void samskivertQuickSort() {
+        Integer[] nums = {
+                QUICK_SORT_FIRST,
+                QUICK_SORT_SECOND,
+                QUICK_SORT_THIRD
+        };
+        QuickSort.sort(nums);
+        assertEquals(QUICK_SORT_SECOND, nums[0]);
+        assertEquals(QUICK_SORT_FIRST, nums[2]);
+    }
+
+    @Test
+    @DisplayName("Koloboke map factory class is accessible")
+    void kolobokeMapFactoryAccessible() {
+        assertNotNull(HashIntIntMaps.class.getName());
+    }
+
+    @Test
+    @DisplayName("JCommander parses simple args")
+    void jCommanderParses() {
+        CliArgs args = new CliArgs();
+        JCommander.newBuilder()
+                .addObject(args)
+                .build()
+                .parse("-f", FLAG_VALUE);
+        assertEquals(FLAG_VALUE, args.flag);
     }
 }

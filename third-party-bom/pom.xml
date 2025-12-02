@@ -37,17 +37,17 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.46.v20220331</jetty.version>
-        <log4j2.version>2.17.2</log4j2.version>
+        <jetty.version>9.4.57.v20241219</jetty.version>
+        <log4j2.version>2.24.1</log4j2.version>
         <slf4j.version>2.0.17</slf4j.version>
-        <junit.jupiter.version>5.10.0</junit.jupiter.version>
-        <junit.platform.provider.version>1.10.0</junit.platform.provider.version>
-        <jmh.version>1.36</jmh.version>
-        <jna.version>5.5.0</jna.version>
+        <junit.jupiter.version>5.10.2</junit.jupiter.version>
+        <junit.platform.provider.version>1.10.2</junit.platform.provider.version>
+        <jmh.version>1.37</jmh.version>
+        <jna.version>5.14.0</jna.version>
         <!-- mockito 5.x requires Java 11+ -->
         <mockito.version>4.11.0</mockito.version>
         <prometheus.version>0.16.0</prometheus.version>
-        <opentelemetry.version>1.12.0</opentelemetry.version>
+        <opentelemetry.version>1.32.0</opentelemetry.version>
     </properties>
 
     <dependencyManagement>
@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
-                <version>1.5.1</version>
+                <version>1.5.3</version>
             </dependency>
 
             <dependency>
@@ -89,19 +89,19 @@
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
-                <version>2.0</version>
+                <version>2.3</version>
             </dependency>
 
             <dependency>
                 <groupId>com.thoughtworks.xstream</groupId>
                 <artifactId>xstream</artifactId>
-                <version>1.4.20</version>
+                <version>1.4.21</version>
             </dependency>
 
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>bson</artifactId>
-                <version>4.10.2</version>
+                <version>4.11.1</version>
             </dependency>
 
             <dependency>
@@ -153,7 +153,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>4.10.2</version>
+                <version>4.11.1</version>
             </dependency>
 
             <dependency>
@@ -177,7 +177,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-sync</artifactId>
-                <version>4.10.2</version>
+                <version>4.11.1</version>
             </dependency>
 
             <dependency>
@@ -253,7 +253,7 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>mockwebserver</artifactId>
-                <version>4.9.3</version>
+                <version>4.12.0</version>
             </dependency>
 
             <dependency>
@@ -439,19 +439,19 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-testlib</artifactId>
                 <scope>test</scope>
-                <version>33.1.0-jre</version>
+                <version>33.2.1-jre</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.12.0</version>
+                <version>3.14.0</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-cli</groupId>
                 <artifactId>commons-cli</artifactId>
-                <version>1.5.0</version>
+                <version>1.6.0</version>
             </dependency>
 
             <dependency>
@@ -493,7 +493,7 @@
             <dependency>
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
-                <version>4.8.161</version>
+                <version>4.8.174</version>
             </dependency>
 
             <dependency>
@@ -524,7 +524,7 @@
             <dependency>
                 <groupId>org.jboss.xnio</groupId>
                 <artifactId>xnio-nio</artifactId>
-                <version>3.8.9.Final</version>
+                <version>3.8.12.Final</version>
             </dependency>
 
             <dependency>
@@ -542,13 +542,13 @@
             <dependency>
                 <groupId>org.apache.mina</groupId>
                 <artifactId>mina-core</artifactId>
-                <version>2.2.2</version>
+                <version>2.2.3</version>
             </dependency>
 
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
-                <version>5.0.0.Alpha2</version>
+                <version>4.1.115.Final</version>
             </dependency>
 
             <dependency>
@@ -574,7 +574,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jsonSchema</artifactId>
-                <version>2.14.2</version>
+                <version>2.17.2</version>
             </dependency>
 
             <dependency>
@@ -621,6 +621,47 @@
                         <artifactId>asm-util</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.beust</groupId>
+                <artifactId>jcommander</artifactId>
+                <version>1.82</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mashape.unirest</groupId>
+                <artifactId>unirest-java</artifactId>
+                <version>1.4.9</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.14.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-email</artifactId>
+                <version>1.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jgit</groupId>
+                <artifactId>org.eclipse.jgit</artifactId>
+                <version>5.13.3.202401111512-r</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jgit</groupId>
+                <artifactId>org.eclipse.jgit.ssh.apache</artifactId>
+                <version>5.13.3.202401111512-r</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-model</artifactId>
+                <version>3.9.9</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -114,3 +114,21 @@ Alternatives Considered::
 Rationale for Decision:: Validates each binding resolves correctly. Mirrors potential downstream classpath conflicts. Warnings are informational, not failures. Tests remain deterministic despite warnings.
 Impact & Consequences:: Noisy test output with SLF4J warnings during execution. Acceptable for smoke testing. Developers must distinguish warnings from actual failures. Future: may separate test execution groups if noise becomes problematic.
 Notes/Links:: See pom.xml lines 213-237 for SLF4J dependencies. Documented in version-issues.adoc. See `MinimalLoggingSmokeTest` for SLF4J validation.
+
+=== SMOKE-DEC-007 Promote peer versions into BOM and broaden behavioural smokes
+Date:: 2025-12-02
+Context:: Several dependencies used across Chronicle projects (JCommander, Gson, Commons Email, JGit, Maven Model, OkHttp 4.12.x, MongoDB 4.11.x, Netty 4.1.x, Jetty 9.4.x, OpenTelemetry 1.32.x) were validated in `third-party-smoke` but not centrally managed. Behavioural coverage previously focused on a small subset of libraries and missed newer stacks (e.g. Jetty websockets, OkHttp, OSGi/Pax URL, JGit, ClassGraph, ProGuard).
+Decision Statement:: Promote the peer dependency versions into `third-party-bom` (Java 8-capable lines) and expand behavioural smoke coverage with focused JUnit tests per dependency family.
+Alternatives Considered::
+* Leave versions unmanaged in the smoke module:
+** *Pros:* Minimal BOM churn.
+** *Cons:* Duplication, drift risk, harder upgrades across projects.
+* Manage versions in BOM but keep behavioural coverage minimal:
+** *Pros:* Centralised versions.
+** *Cons:* Less assurance that managed versions run on Java 8.
+* Current approach (managed + expanded smokes):
+** *Pros:* Single source of truth for versions; executable proof of Java 8 compatibility; clearer failure signals when baselines shift.
+** *Cons:* Larger test surface, more maintenance.
+Rationale for Decision:: Aligns the BOM with real-world dependency usage and provides executable evidence for Java 8 compatibility before upgrades land elsewhere. Focused smokes remain offline and fast, keeping CI practical while covering more libraries.
+Impact & Consequences:: BOM now manages additional artefacts; `third-party-smoke` adds targeted tests (OkHttp/MockWebServer, Jetty websockets, networking stacks, CLI/HTTP/time/email utilities, JGit/Maven model, ProGuard parsing, JMH/JUnit variants, OSGi/Pax URL). Contributors must maintain both version entries and corresponding smoke coverage when upgrading.
+Notes/Links:: See updated versions in `third-party-bom/pom.xml` and behavioural tests under `third-party-smoke/src/test/java/net/openhft/thirdparty/smoke/`. Version watchpoints and exclusions tracked in `version-issues.adoc`.
