@@ -1,4 +1,7 @@
 = Platform Support
+:toc:
+:lang: en-GB
+:source-highlighter: rouge
 
 == Java
 
@@ -20,4 +23,3 @@ Chronicle C++ and Python libraries support
 Chronicle Rust libraries
 
 * Linux on Intel x86_64 for production
-
