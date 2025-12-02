@@ -4,7 +4,10 @@
 package net.openhft.thirdparty.smoke;
 
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import org.junit.jupiter.api.DisplayName;
@@ -48,11 +51,28 @@ class MinimalObservabilitySmokeTest {
     @Test
     @DisplayName("OpenTelemetry tracer provider initialises")
     void openTelemetryInitialises() {
-        SdkTracerProvider provider = SdkTracerProvider.builder().build();
+        SdkTracerProvider provider = SdkTracerProvider.builder()
+                .setResource(Resource.getDefault())
+                .build();
         OpenTelemetrySdk sdk = OpenTelemetrySdk.builder()
                 .setTracerProvider(provider)
                 .build();
-        assertNotNull(sdk.getTracer("smoke"));
+        assertNotNull(sdk.getTracer("smoke")
+                .spanBuilder("hello-span")
+                .startSpan());
+        provider.close();
+    }
+
+    @Test
+    @DisplayName("OTLP exporter builds without network calls")
+    void otlpExporterBuilds() {
+        OtlpGrpcSpanExporter exporter = OtlpGrpcSpanExporter.builder()
+                .setEndpoint("http://localhost:4317")
+                .build();
+        SdkTracerProvider provider = SdkTracerProvider.builder()
+                .addSpanProcessor(SimpleSpanProcessor.create(exporter))
+                .build();
+        // No spans exported; this simply exercises wiring and shutdown paths
         provider.close();
     }
 }

@@ -6,6 +6,7 @@ package net.openhft.thirdparty.smoke;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
+import com.google.gson.Gson;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,16 @@ class MinimalSerializationSmokeTest {
         Yaml yaml = new Yaml();
         Map<?, ?> parsed = yaml.load("name: demo");
         assertEquals("demo", parsed.get("name"));
+    }
+
+    @Test
+    @DisplayName("Gson can serialise and deserialise")
+    void gsonRoundTrips() {
+        Gson gson = new Gson();
+        SimplePojo pojo = new SimplePojo("gson");
+        String json = gson.toJson(pojo);
+        SimplePojo read = gson.fromJson(json, SimplePojo.class);
+        assertEquals(pojo.value, read.value);
     }
 
     @Test
