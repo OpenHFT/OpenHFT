@@ -15,7 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke test for JMH annotations and benchmark discovery helpers.
  */
-class JmhSmokeTest {
+@SuppressWarnings("java:S5786") // JMH requires specific method signatures
+public class JmhSmokeTest {
 
     /**
      * Test value used in the sample benchmark.
