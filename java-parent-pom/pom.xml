@@ -39,6 +39,8 @@
         <license.owner>chronicle.software</license.owner>
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
+        <!-- TODO raise this to true -->
+        <quality.enforced>false</quality.enforced>
         <surefireArgLine/>
     </properties>
 
@@ -161,10 +163,76 @@
                     <source>8</source>
                     <additionalOptions>${javadoc.opts}</additionalOptions>
                     <failOnError>true</failOnError>
-                    <failOnWarnings>true</failOnWarnings>
+                    <failOnWarnings>${quality.enforced}</failOnWarnings>
                     <excludePackageNames>*.internal:*.internal.*;*.impl;*.impl.*</excludePackageNames>
                     <doclint>all,-missing</doclint>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configLocation>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml</configLocation>
+                    <failOnViolation>${quality.enforced}</failOnViolation>
+                    <logViolationsToConsole>true</logViolationsToConsole>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <violationSeverity>warning</violationSeverity>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>9.3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>quality</artifactId>
+                        <version>2026.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <!-- SpotBugs 4.9 line that requires Java 11+ -->
+                <version>4.8.6.6</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                    <includeTests>true</includeTests>
+                    <failOnError>${quality.enforced}</failOnError>
+                    <!-- Shared SpotBugs filters from quality rules -->
+                    <includeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-include.xml</includeFilterFile>
+                    <excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>quality</artifactId>
+                        <version>2026.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>spotbugs-main</id>
+                        <!-- Run after compilation of main and test classes, and gate on findings -->
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

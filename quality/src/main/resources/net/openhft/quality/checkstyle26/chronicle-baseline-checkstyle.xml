@@ -17,13 +17,13 @@
     <module name="SuppressionFilter">
         <property name="file"
                   value="${chronicle.checkstyle.suppressions}"
-                  default="classpath:net/openhft/quality/checkstyle27/checkstyle-suppressions.xml"/>
+                  default="classpath:net/openhft/quality/checkstyle26/checkstyle-suppressions.xml"/>
         <property name="optional" value="true"/>
     </module>
     <module name="SuppressionFilter">
         <property name="file"
                   value="${chronicle.checkstyle.suppressions.tests}"
-                  default="classpath:net/openhft/quality/checkstyle27/checkstyle-suppressions-tests.xml"/>
+                  default="classpath:net/openhft/quality/checkstyle26/checkstyle-suppressions-tests.xml"/>
         <property name="optional" value="true"/>
     </module>
 

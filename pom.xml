@@ -32,10 +32,10 @@
     <modules>
         <module>root-parent-pom</module>
         <module>third-party-bom</module>
-        <module>third-party-smoke</module>
+        <module>quality</module>
         <module>java-parent-pom</module>
         <module>chronicle-bom</module>
-        <module>quality</module>
+        <module>third-party-smoke</module>
     </modules>
 
     <build>
