@@ -25,17 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class CliJsonHttpTimeEmailSmokeTest {
 
-    /**
-     * Command-line arguments container.
-     */
-    static class Args {
-        /**
-         * Name parameter parsed by JCommander.
-         */
-        @Parameter(names = "--name")
-        private String name = "default";
-    }
-
     @Test
     void jcommanderParsesArgument() {
         Args args = new Args();
@@ -86,5 +75,16 @@ class CliJsonHttpTimeEmailSmokeTest {
         email.setSubject("Test");
         email.setMsg("Hello");
         assertEquals("Test", email.getSubject());
+    }
+
+    /**
+     * Command-line arguments container.
+     */
+    static class Args {
+        /**
+         * Name parameter parsed by JCommander.
+         */
+        @Parameter(names = "--name")
+        private String name = "default";
     }
 }

@@ -25,23 +25,6 @@ class ClassLoadingSmokeTest {
     private static final ClassLoader LOADER =
             Thread.currentThread().getContextClassLoader();
 
-    @TestFactory
-    @DisplayName("Loads representative classes from each third-party artefact")
-    Collection<DynamicTest> classLoads() {
-        List<DynamicTest> tests = new ArrayList<>();
-        tests.addAll(observabilityTests());
-        tests.addAll(serialisationTests());
-        tests.addAll(mongoTests());
-        tests.addAll(networkingTests());
-        tests.addAll(loggingTests());
-        tests.addAll(collectionTests());
-        tests.addAll(databaseTests());
-        tests.addAll(testingFrameworkTests());
-        tests.addAll(osgiTests());
-        tests.addAll(additionalPeerTests());
-        return tests;
-    }
-
     private static Collection<DynamicTest> observabilityTests() {
         List<DynamicTest> tests = new ArrayList<>();
         tests.add(dynamic(
@@ -446,5 +429,22 @@ class ClassLoadingSmokeTest {
     private static boolean isJava8() {
         String spec = System.getProperty("java.specification.version", "");
         return spec.startsWith("1.8") || "8".equals(spec);
+    }
+
+    @TestFactory
+    @DisplayName("Loads representative classes from each third-party artefact")
+    Collection<DynamicTest> classLoads() {
+        List<DynamicTest> tests = new ArrayList<>();
+        tests.addAll(observabilityTests());
+        tests.addAll(serialisationTests());
+        tests.addAll(mongoTests());
+        tests.addAll(networkingTests());
+        tests.addAll(loggingTests());
+        tests.addAll(collectionTests());
+        tests.addAll(databaseTests());
+        tests.addAll(testingFrameworkTests());
+        tests.addAll(osgiTests());
+        tests.addAll(additionalPeerTests());
+        return tests;
     }
 }

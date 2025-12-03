@@ -13,9 +13,7 @@ import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Smoke tests for Prometheus client and JNR FFI.

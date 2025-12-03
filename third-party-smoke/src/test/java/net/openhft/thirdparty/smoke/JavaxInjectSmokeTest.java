@@ -5,10 +5,9 @@ package net.openhft.thirdparty.smoke;
 
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,6 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Smoke test for javax.inject annotations.
  */
 class JavaxInjectSmokeTest {
+
+    @Test
+    void injectAnnotationsPresentAtRuntime() throws Exception {
+        Field serviceField = Client.class.getDeclaredField("service");
+        Field providerField = Client.class.getDeclaredField("serviceProvider");
+
+        assertTrue(serviceField.isAnnotationPresent(Inject.class));
+        assertTrue(providerField.isAnnotationPresent(Inject.class));
+        assertEquals(Provider.class, providerField.getType());
+    }
 
     /**
      * Sample service type.
@@ -39,15 +48,5 @@ class JavaxInjectSmokeTest {
          */
         @Inject
         private Provider<Service> serviceProvider;
-    }
-
-    @Test
-    void injectAnnotationsPresentAtRuntime() throws Exception {
-        Field serviceField = Client.class.getDeclaredField("service");
-        Field providerField = Client.class.getDeclaredField("serviceProvider");
-
-        assertTrue(serviceField.isAnnotationPresent(Inject.class));
-        assertTrue(providerField.isAnnotationPresent(Inject.class));
-        assertEquals(Provider.class, providerField.getType());
     }
 }

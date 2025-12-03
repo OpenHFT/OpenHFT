@@ -21,6 +21,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class DatabaseAndSchemaSmokeTest {
 
+    @Test
+    void hsqldbInMemoryRoundTrip() throws Exception {
+        // Use a non-empty password to avoid empty-credential warnings in static analysis
+        try (Connection conn = DriverManager.getConnection(
+                "jdbc:hsqldb:mem:smokedb", "SA", "sa")) {
+            try (Statement st = conn.createStatement()) {
+                st.execute("CREATE TABLE test("
+                        + "id INT PRIMARY KEY, name VARCHAR(50))");
+                st.execute("INSERT INTO test VALUES (1, 'hello')");
+                try (ResultSet rs = st.executeQuery(
+                        "SELECT name FROM test WHERE id=1")) {
+                    assertTrue(rs.next());
+                    assertEquals("hello", rs.getString(1));
+                }
+            }
+        }
+    }
+
+    @Test
+    void jacksonJsonSchemaGeneratorProducesSchema() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonSchemaGenerator generator = new JsonSchemaGenerator(mapper);
+        JsonSchema schema = generator.generateSchema(Person.class);
+        assertTrue(schema != null);
+    }
+
     /**
      * Simple POJO for schema generation.
      */
@@ -63,30 +89,5 @@ class DatabaseAndSchemaSmokeTest {
         public void setName(final String newName) {
             this.name = newName;
         }
-    }
-
-    @Test
-    void hsqldbInMemoryRoundTrip() throws Exception {
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:hsqldb:mem:smokedb", "SA", "")) {
-            try (Statement st = conn.createStatement()) {
-                st.execute("CREATE TABLE test("
-                        + "id INT PRIMARY KEY, name VARCHAR(50))");
-                st.execute("INSERT INTO test VALUES (1, 'hello')");
-                try (ResultSet rs = st.executeQuery(
-                        "SELECT name FROM test WHERE id=1")) {
-                    assertTrue(rs.next());
-                    assertEquals("hello", rs.getString(1));
-                }
-            }
-        }
-    }
-
-    @Test
-    void jacksonJsonSchemaGeneratorProducesSchema() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonSchemaGenerator generator = new JsonSchemaGenerator(mapper);
-        JsonSchema schema = generator.generateSchema(Person.class);
-        assertTrue(schema != null);
     }
 }

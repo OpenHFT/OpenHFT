@@ -5,12 +5,7 @@ package net.openhft.thirdparty.smoke;
 
 import org.junit.jupiter.api.Test;
 import quickfix.Message;
-import quickfix.field.ClOrdID;
-import quickfix.field.HandlInst;
-import quickfix.field.OrdType;
-import quickfix.field.Side;
-import quickfix.field.Symbol;
-import quickfix.field.TransactTime;
+import quickfix.field.*;
 
 import java.util.Date;
 

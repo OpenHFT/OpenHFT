@@ -24,17 +24,6 @@ public class JmhSmokeTest {
     private static final int SAMPLE_VALUE = 42;
 
     /**
-     * Sample state shared across benchmark invocations.
-     */
-    @State(Scope.Benchmark)
-    public static class SampleState {
-        /**
-         * Test value used by the sample benchmark.
-         */
-        private final int value = SAMPLE_VALUE;
-    }
-
-    /**
      * Sample benchmark method discovered by JMH.
      *
      * @param state state holder
@@ -42,7 +31,7 @@ public class JmhSmokeTest {
      */
     @Benchmark
     public int sampleBenchmark(final SampleState state) {
-        return state.value;
+        return state.value();
     }
 
     @Test
@@ -59,5 +48,20 @@ public class JmhSmokeTest {
         Class<?> clazz = Class.forName(
                 "org.openjdk.jmh.benchmarks.BlackholeConsumeCPUBench");
         assertNotNull(clazz);
+    }
+
+    /**
+     * Sample state shared across benchmark invocations.
+     */
+    @State(Scope.Benchmark)
+    public static class SampleState {
+        /**
+         * Test value used by the sample benchmark.
+         */
+        private static final int VALUE = SAMPLE_VALUE;
+
+        int value() {
+            return VALUE;
+        }
     }
 }
