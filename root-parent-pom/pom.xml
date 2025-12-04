@@ -69,8 +69,8 @@
         -->
         <jvm.requiredArgs />
         <!-- Define the target coverage thresholds as properties -->
-        <jacoco.line.coverage>0.8</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.9</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.8</jacoco.branch.coverage>
     </properties>
 
     <build>
@@ -240,6 +240,18 @@
                     <groupId>net.openhft</groupId>
                     <artifactId>binary-compatibility-enforcer-plugin</artifactId>
                     <version>1.0.13</version>
+                    <configuration>
+                        <extraOptions>
+                            <!--This skips "internal" but checks "impl"-->
+                            <extraOption>
+                                <name>-keep-internal</name>
+                            </extraOption>
+                            <extraOption>
+                                <name>skip-internal-packages</name>
+                                <value>.*internal.*</value>
+                            </extraOption>
+                        </extraOptions>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -324,7 +336,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>${surefireArgLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
+                            <argLine>@{argLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
                             <forkCount>1</forkCount>
                             <reuseForks>false</reuseForks>
                         </configuration>
@@ -339,7 +351,7 @@
                                     <goal>prepare-agent</goal>
                                 </goals>
                                 <configuration>
-                                    <propertyName>surefireArgLine</propertyName>
+                                    <propertyName>argLine</propertyName>
                                     <excludes>
                                         <exclude>net/openhft/chronicle/bytes/internal/ByteBuffers*</exclude>
                                         <exclude>net/openhft/chronicle/bytes/internal/UnsafeText*</exclude>
