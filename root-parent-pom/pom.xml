@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.openhft</groupId>
@@ -67,10 +68,17 @@
             By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
             contain the arguments necessary to run the Chronicle libraries
         -->
-        <jvm.requiredArgs />
+        <jvm.requiredArgs/>
         <!-- Define the target coverage thresholds as properties -->
         <jacoco.line.coverage>0.9</jacoco.line.coverage>
         <jacoco.branch.coverage>0.8</jacoco.branch.coverage>
+
+        <pmd.targetJdk>1.8</pmd.targetJdk>
+        <pmd.failOnViolation>false</pmd.failOnViolation>
+        <pmd.includeTests>true</pmd.includeTests>
+        <pmd.ruleset>net/openhft/quality/pmd26/pmd-ruleset.xml</pmd.ruleset>
+        <pmd.skip>false</pmd.skip>
+        <pmdVersion>7.19.0</pmdVersion>
     </properties>
 
     <build>
@@ -307,6 +315,77 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.25.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${pmd.ruleset}</ruleset>
+                    </rulesets>
+                    <excludeRoots>
+                        <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
+                        <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
+                        <excludeRoot>${project.build.directory}/classes</excludeRoot>
+                        <excludeRoot>${project.build.directory}/test-classes</excludeRoot>
+                    </excludeRoots>
+                    <excludes>
+                        <exclude>**/target/**</exclude>
+                        <exclude>**/build/**</exclude>
+                        <exclude>**/out/**</exclude>
+                        <exclude>**/generated/**</exclude>
+                    </excludes>
+                    <includeTests>${pmd.includeTests}</includeTests>
+                    <failOnViolation>${pmd.failOnViolation}</failOnViolation>
+                    <targetJdk>${pmd.targetJdk}</targetJdk>
+                    <skip>${pmd.skip}</skip>
+                    <printFailingErrors>true</printFailingErrors>
+                    <linkXRef>false</linkXRef>
+                    <analysisCache>true</analysisCache>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-core</artifactId>
+                        <version>${pmdVersion}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-java</artifactId>
+                        <version>${pmdVersion}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>quality</artifactId>
+                        <version>2026.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>pmd-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>cpd-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cpd-check</goal>
+                        </goals>
+                        <configuration>
+                            <minimumTokens>300</minimumTokens>
+                            <failOnViolation>false</failOnViolation>
+                            <includeTests>true</includeTests>
+                            <!-- Ignore literals/identifiers to focus on structure -->
+                            <ignoreLiterals>true</ignoreLiterals>
+                            <ignoreIdentifiers>true</ignoreIdentifiers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!--
                 Set argLine to include ${jvm.requiredArgs} (JVM args needed to run Chronicle libraries on the detected JVM)
 
@@ -355,7 +434,9 @@
                                         <exclude>net/openhft/chronicle/bytes/internal/ByteBuffers*</exclude>
                                         <exclude>net/openhft/chronicle/bytes/internal/UnsafeText*</exclude>
                                         <exclude>net/openhft/chronicle/map/MemoryLeaksTest*</exclude>
-                                        <exclude>net/openhft/chronicle/network/connection/AbstractStatelessClient.class</exclude>
+                                        <exclude>
+                                            net/openhft/chronicle/network/connection/AbstractStatelessClient.class
+                                        </exclude>
                                         <exclude>net/openhft/chronicle/queue/impl/single/AppenderFileHandleLeakTest*
                                         </exclude>
                                     </excludes>
@@ -410,7 +491,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
                         <configuration>
                             <gpgArguments>
                                 <arg>--batch</arg>
@@ -516,7 +596,7 @@
                 </property>
             </activation>
             <properties>
-                <argLine />
+                <argLine/>
             </properties>
         </profile>
     </profiles>
