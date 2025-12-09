@@ -22,7 +22,7 @@ class ProGuardParserSmokeTest {
     @Test
     void proguardConfigurationParserParsesTrivialArgs() throws Exception {
         Configuration configuration = new Configuration();
-        String[] args = new String[]{"-dontoptimize"};
+        String[] args = {"-dontoptimize"};
 
         ConfigurationParser parser = new ConfigurationParser(
                 args, System.getProperties());

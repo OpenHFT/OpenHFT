@@ -12,7 +12,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.27ea6</version>
+        <version>1.27ea7-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -40,9 +40,23 @@
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
         <surefireArgLine/>
+        <pmd.failOnViolation>false</pmd.failOnViolation>
     </properties>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <configuration>
+                        <failOnViolation>${pmd.failOnViolation}</failOnViolation>
+                        <printFailingErrors>true</printFailingErrors>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>com.mycila</groupId>

@@ -48,13 +48,13 @@ class OsgiAndPaxSmokeTest {
         org.osgi.framework.launch.FrameworkFactory factory =
                 loader.iterator().next();
         Framework framework = factory.newFramework(
-                Collections.<String, String>emptyMap());
+                Collections.emptyMap());
         assertNotNull(framework);
     }
 
     @Test
     void paxExamCoreOptionsAndOptionsInterfaceArePresent() {
-        Option[] options = new Option[]{
+        Option[] options = {
                 junitBundles(),
                 systemProperty("pax.exam.smoke").value("true")
         };

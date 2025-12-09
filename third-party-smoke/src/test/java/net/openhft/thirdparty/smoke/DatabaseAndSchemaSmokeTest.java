@@ -14,7 +14,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Smoke tests for HSQLDB and Jackson jsonSchema.
@@ -75,7 +76,9 @@ class DatabaseAndSchemaSmokeTest {
                 st.execute("INSERT INTO test VALUES (1, 'hello')");
                 try (ResultSet rs = st.executeQuery(
                         "SELECT name FROM test WHERE id=1")) {
-                    assertTrue(rs.next());
+                    if (!rs.next()) {
+                        fail("Expected a row for id=1");
+                    }
                     assertEquals("hello", rs.getString(1));
                 }
             }
@@ -87,6 +90,6 @@ class DatabaseAndSchemaSmokeTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonSchemaGenerator generator = new JsonSchemaGenerator(mapper);
         JsonSchema schema = generator.generateSchema(Person.class);
-        assertTrue(schema != null);
+        assertNotNull(schema);
     }
 }

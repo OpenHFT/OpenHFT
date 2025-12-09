@@ -80,6 +80,16 @@
         <checkstyle.config.location>net/openhft/quality/checkstyle27/chronicle-baseline-checkstyle.xml</checkstyle.config.location>
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
         <checkstyle.skip>false</checkstyle.skip>
+        <pmd.targetJdk>1.8</pmd.targetJdk>
+        <pmd.failOnViolation>false</pmd.failOnViolation>
+        <pmd.includeTests>true</pmd.includeTests>
+        <pmd.skip>false</pmd.skip>
+        <pmd.ruleset>${maven.multiModuleProjectDirectory}/OpenHFT/root-parent-pom/pmd-ruleset.xml</pmd.ruleset>
+        <!-- OWASP Dependency Check configuration -->
+        <dependency-check.skip>false</dependency-check.skip>
+        <!-- Set to 11 to avoid failing build (CVSS max is 10). Set back to 7.0 to enforce strict checks. -->
+        <dependency-check.failBuildOnCVSS>11</dependency-check.failBuildOnCVSS>
+        <pmdVersion>7.19.0</pmdVersion>
     </properties>
 
     <build>
@@ -254,6 +264,18 @@
                     <artifactId>binary-compatibility-enforcer-plugin</artifactId>
                     <version>1.0.13</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>10.0.4</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>3.25.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -304,6 +326,75 @@
                                 </requireReleaseDeps>
                             </rules>
                             <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.25.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${pmd.ruleset}</ruleset>
+                    </rulesets>
+                    <excludeRoots>
+                        <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
+                        <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
+                        <excludeRoot>${project.build.directory}/classes</excludeRoot>
+                        <excludeRoot>${project.build.directory}/test-classes</excludeRoot>
+                    </excludeRoots>
+                    <excludes>
+                        <exclude>**/target/**</exclude>
+                        <exclude>**/build/**</exclude>
+                        <exclude>**/out/**</exclude>
+                        <exclude>**/generated/**</exclude>
+                    </excludes>
+                    <includeTests>${pmd.includeTests}</includeTests>
+                    <failOnViolation>${pmd.failOnViolation}</failOnViolation>
+                    <targetJdk>${pmd.targetJdk}</targetJdk>
+                    <skip>${pmd.skip}</skip>
+                    <printFailingErrors>true</printFailingErrors>
+                    <linkXRef>false</linkXRef>
+                    <analysisCache>true</analysisCache>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-core</artifactId>
+                        <version>${pmdVersion}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-java</artifactId>
+                        <version>${pmdVersion}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>pmd-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>cpd-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cpd-check</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Start at 300 tokens (~40+ lines) for 1.6M LOC codebase -->
+                            <!-- Focus on top ~20 largest duplications first -->
+                            <!-- Reduce threshold as large duplications are addressed -->
+                            <minimumTokens>300</minimumTokens>
+                            <failOnViolation>false</failOnViolation>
+                            <includeTests>true</includeTests>
+                            <!-- Optional: ignore literals/identifiers to focus on structure -->
+                            <!-- <ignoreLiterals>true</ignoreLiterals> -->
+                            <!-- <ignoreIdentifiers>true</ignoreIdentifiers> -->
                         </configuration>
                     </execution>
                 </executions>
@@ -521,6 +612,42 @@
             <properties>
                 <argLine />
             </properties>
+        </profile>
+        <profile>
+            <id>owasp-dependency-check</id>
+            <build>
+                <plugins>
+                    <!-- Optional OWASP dependency scan; enable with -Powasp-dependency-check -->
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <configuration>
+                            <skip>${dependency-check.skip}</skip>
+                            <failBuildOnCVSS>${dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
+                            <skipTestScope>true</skipTestScope>
+                            <skipProvidedScope>true</skipProvidedScope>
+                            <format>ALL</format>
+                            <autoUpdate>false</autoUpdate>
+                            <dataDirectory>${user.home}/.m2/dependency-check-data</dataDirectory>
+                            <suppressionFiles>
+                                <suppressionFile>${project.basedir}/owasp-suppressions.xml</suppressionFile>
+                            </suppressionFiles>
+                            <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                            <retiredAnalyzerEnabled>false</retiredAnalyzerEnabled>
+                            <outputDirectory>${project.build.directory}/dependency-check</outputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>dependency-check</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
