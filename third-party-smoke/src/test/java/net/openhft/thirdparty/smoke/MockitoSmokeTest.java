@@ -22,10 +22,10 @@ class MockitoSmokeTest {
     @Test
     void mockitoSettingsAreAvailable() {
         org.mockito.MockSettings settings = Mockito.withSettings();
-        assertNotNull(settings);
+        assertNotNull(settings, "Mockito.withSettings should return settings");
         Calculator calculator = new Calculator();
         Service service = new Service(calculator);
-        assertEquals(EXPECTED_SUM, service.compute());
+        assertEquals(EXPECTED_SUM, service.compute(), "Service should compute sum via calculator");
     }
 
     /**

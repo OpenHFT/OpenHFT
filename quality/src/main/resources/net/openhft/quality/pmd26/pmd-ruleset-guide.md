@@ -112,3 +112,11 @@ To adjust CPD sensitivity for specific modules, override in the module's `pom.xm
 | **PMD** | 9.1 (Monitoring) | Quality metrics in reports |
 | **CPD** | 10.3 (Improvement) | Duplicate code detection |
 | **Reports** | 8.5.2 (Traceability) | `target/site/*.html` |
+
+## Profiles / layering guidance
+
+- **Baseline** (`pmd-ruleset.xml`): Excludes noisy rules; explicitly excludes `UnitTestAssertionsShouldIncludeMessage`, `UnitTestShouldIncludeAssert`, and `MissingOverride`.
+- **Core** (`pmd-ruleset-core.xml`): Baseline + core additions. Does not re-enable the excluded unit-test/missing override rules.
+- **Strict** (`pmd-ruleset-strict.xml`): Inherits **core** and then adds the strict-only rules (including `UnitTestAssertionsShouldIncludeMessage`, `UnitTestShouldIncludeAssert`, `MissingOverride`, and other low-count additions). Use this for new/greenfield modules.
+
+Use `-Dpmd.ruleset=...` to point at the desired ruleset; keep baseline/core clean and layer strict on top to avoid duplicates.

@@ -19,13 +19,15 @@ class JettyWebSocketSmokeTest {
     @Test
     void websocketApiClassesArePresent() {
         Class<?> sessionClass = Session.class;
-        assertNotNull(sessionClass);
+        assertNotNull(sessionClass, "Jetty Session class should be loadable");
     }
 
     @Test
     void websocketClientAndServerFactoryConstructAndStop() throws Exception {
         WebSocketClient client = new WebSocketClient();
         WebSocketServerFactory serverFactory = new WebSocketServerFactory();
+        assertNotNull(client, "Jetty WebSocketClient should construct");
+        assertNotNull(serverFactory, "Jetty WebSocketServerFactory should construct");
 
         client.start();
         serverFactory.start();

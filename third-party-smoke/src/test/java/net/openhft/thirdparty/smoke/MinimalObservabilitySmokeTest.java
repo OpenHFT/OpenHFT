@@ -44,8 +44,8 @@ class MinimalObservabilitySmokeTest {
         Double value = registry.getSampleValue(
                 "third_party_smoke_counter_total"
         );
-        assertNotNull(value);
-        assertEquals(1.0, value, DELTA);
+        assertNotNull(value, "Prometheus counter should be registered and readable");
+        assertEquals(1.0, value, DELTA, "Prometheus counter should increment once");
     }
 
     @Test
@@ -59,7 +59,7 @@ class MinimalObservabilitySmokeTest {
                 .build();
         assertNotNull(sdk.getTracer("smoke")
                 .spanBuilder("hello-span")
-                .startSpan());
+                .startSpan(), "OpenTelemetry tracer should start a span");
         provider.close();
     }
 
@@ -72,6 +72,7 @@ class MinimalObservabilitySmokeTest {
         SdkTracerProvider provider = SdkTracerProvider.builder()
                 .addSpanProcessor(SimpleSpanProcessor.create(exporter))
                 .build();
+        assertNotNull(provider, "OTLP exporter wiring should produce a tracer provider");
         // No spans exported; this simply exercises wiring and shutdown paths
         provider.close();
     }

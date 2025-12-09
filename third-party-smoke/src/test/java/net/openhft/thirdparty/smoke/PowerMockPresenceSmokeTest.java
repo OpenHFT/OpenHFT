@@ -20,8 +20,8 @@ class PowerMockPresenceSmokeTest {
      */
     @Test
     void powermockClassesLoad() {
-        assertNotNull(PowerMockito.class);
-        assertNotNull(PowerMockRunner.class);
-        assertNotNull(PrepareForTest.class);
+        assertNotNull(PowerMockito.class, "PowerMockPresenceSmokeTest.java:23");
+        assertNotNull(PowerMockRunner.class, "PowerMockPresenceSmokeTest.java:24");
+        assertNotNull(PrepareForTest.class, "PowerMockPresenceSmokeTest.java:25");
     }
 }

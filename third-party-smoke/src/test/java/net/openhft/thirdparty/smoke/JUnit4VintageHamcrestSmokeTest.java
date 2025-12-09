@@ -34,7 +34,7 @@ public class JUnit4VintageHamcrestSmokeTest {
      */
     @Test
     public void vintageRunsBasicTest() {
-        assertEquals(EXPECTED_SUM, 2 + 2);
+        assertEquals("JUnit4 vintage engine should execute assertions", EXPECTED_SUM, 2 + 2);
     }
 
     /**
@@ -42,8 +42,9 @@ public class JUnit4VintageHamcrestSmokeTest {
      */
     @Test
     public void hamcrestMatchersWork() {
-        MatcherAssert.assertThat("hello", Matchers.startsWith("he"));
-        MatcherAssert.assertThat(Integer.valueOf(MEANING_OF_LIFE),
-                Matchers.greaterThan(LOWER_BOUND));
+        MatcherAssert.assertThat("Hamcrest should match string prefix",
+                "hello", Matchers.startsWith("he"));
+        MatcherAssert.assertThat("Hamcrest should compare numeric greaterThan",
+                MEANING_OF_LIFE, Matchers.greaterThan(LOWER_BOUND));
     }
 }

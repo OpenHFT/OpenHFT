@@ -37,7 +37,7 @@ class JavaPoetSmokeTest {
                 .build();
 
         String source = javaFile.toString();
-        assertTrue(source.contains("class HelloWorld"));
-        assertTrue(source.contains("Hello, JavaPoet!"));
+        assertTrue(source.contains("class HelloWorld"), "JavaPoet should generate HelloWorld class");
+        assertTrue(source.contains("Hello, JavaPoet!"), "Generated source should include println statement");
     }
 }

@@ -31,6 +31,7 @@ class NioAndNetworkStacksSmokeTest {
     void grizzlyCanBuildStartAndShutdownTransport() throws Exception {
         TCPNIOTransport transport = TCPNIOTransportBuilder.newInstance()
                 .build();
+        assertNotNull(transport, "Grizzly transport should build");
         transport.start();
         transport.shutdownNow();
     }
@@ -38,7 +39,7 @@ class NioAndNetworkStacksSmokeTest {
     @Test
     void minaCanCreateAndDisposeAcceptor() {
         IoAcceptor acceptor = new NioSocketAcceptor();
-        assertNotNull(acceptor);
+        assertNotNull(acceptor, "Apache MINA should construct an acceptor");
         acceptor.dispose();
     }
 
@@ -50,7 +51,7 @@ class NioAndNetworkStacksSmokeTest {
             ServerBootstrap bootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class);
-            assertNotNull(bootstrap);
+            assertNotNull(bootstrap, "Netty ServerBootstrap should be configurable");
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
@@ -61,6 +62,6 @@ class NioAndNetworkStacksSmokeTest {
     void proguardConfigurationAndProGuardCanBeConstructed() {
         Configuration configuration = new Configuration();
         ProGuard proGuard = new ProGuard(configuration);
-        assertNotNull(proGuard);
+        assertNotNull(proGuard, "ProGuard should construct with configuration");
     }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="OpenHFT PMD Strict (core plus strict additions)"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Inherits the core ruleset and layers strict-only additions.
+    </description>
+
+    <!-- Start from core -->
+    <rule ref="net/openhft/quality/pmd26/pmd-ruleset-core.xml"/>
+
+    <!-- Strict-only additions -->
+    <rule ref="category/java/bestpractices.xml/UnitTestAssertionsShouldIncludeMessage"/>
+    <rule ref="category/java/bestpractices.xml/UnitTestShouldIncludeAssert"/>
+    <rule ref="category/java/bestpractices.xml/UnitTestShouldUseTestAnnotation"/>
+    <rule ref="category/java/bestpractices.xml/MissingOverride"/>
+    <rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP"/>
+    <rule ref="category/java/bestpractices.xml/UnnecessaryWarningSuppression"/>
+    <rule ref="category/java/errorprone.xml/FinalizeOverloaded"/>
+</ruleset>

@@ -21,6 +21,8 @@
 
     <properties>
         <third-party-bom.version>2026.0-SNAPSHOT</third-party-bom.version>
+        <pmd.ruleset>net/openhft/quality/pmd26/pmd-ruleset-strict.xml</pmd.ruleset>
+        <quality.enforced>true</quality.enforced>
     </properties>
 
     <dependencyManagement>

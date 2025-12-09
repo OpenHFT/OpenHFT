@@ -30,7 +30,7 @@ class OkHttpSmokeTest {
                     .build();
 
             try (Response response = client.newCall(request).execute()) {
-                assertEquals("hello", response.body().string());
+                assertEquals("hello", response.body().string(), "OkHttp should receive mocked response body");
             }
         }
     }

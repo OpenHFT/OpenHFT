@@ -54,12 +54,12 @@
         <exclude name="UnusedLocalVariable"/>
         <exclude name="UnitTestContainsTooManyAsserts"/>
         <exclude name="UnusedFormalParameter"/>
-<!--        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>-->
+        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
         <exclude name="AvoidUsingHardCodedIP"/>
         <exclude name="AvoidPrintStackTrace"/>
         <exclude name="AccessorMethodGeneration"/>
         <exclude name="AccessorClassGeneration"/>
-<!--        <exclude name="UnitTestShouldIncludeAssert"/>-->
+        <exclude name="UnitTestShouldIncludeAssert"/>
         <exclude name="UnitTestShouldUseTestAnnotation"/>
         <exclude name="AvoidReassigningParameters"/>
         <exclude name="UseVarargs"/>
@@ -83,6 +83,7 @@
         <exclude name="UnusedPrivateMethod"/>
         <exclude name="UnnecessaryVarargsArrayCreation"/>
         <exclude name="UnnecessaryWarningSuppression"/>
+        <exclude name="MissingOverride"/>
     </rule>
 
     <rule ref="category/java/codestyle.xml">
@@ -91,11 +92,13 @@
         <exclude name="UnnecessaryImport"/>
         <exclude name="TooManyStaticImports"/>
         <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="OnlyOneReturn"/>
         <exclude name="ShortClassName"/>
-        <exclude name="UseUnderscoresInNumericLiterals"/>
-        <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="ShortVariable"/>
+        <exclude name="UseUnderscoresInNumericLiterals"/>
+        
+        
         <exclude name="ControlStatementBraces"/>
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="LongVariable"/>

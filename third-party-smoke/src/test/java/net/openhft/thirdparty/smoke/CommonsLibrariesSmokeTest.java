@@ -21,7 +21,7 @@ class CommonsLibrariesSmokeTest {
     @Test
     void commonsLangStringUtilsWorks() {
         String joined = StringUtils.join(new String[]{"a", "b", "c"}, ",");
-        assertEquals("a,b,c", joined);
+        assertEquals("a,b,c", joined, "Commons Lang StringUtils#join should join with comma");
     }
 
     @Test
@@ -30,13 +30,13 @@ class CommonsLibrariesSmokeTest {
                 .addOption("v", "verbose", false, "verbose output");
         CommandLine cmd = new DefaultParser()
                 .parse(options, new String[]{"-v"});
-        assertTrue(cmd.hasOption("v"));
+        assertTrue(cmd.hasOption("v"), "Commons CLI should parse -v option");
     }
 
     @Test
     void commonsLoggingObtainsLogger() {
         Log log = LogFactory.getLog(CommonsLibrariesSmokeTest.class);
         log.info("commons-logging smoke");
-        assertNotNull(log);
+        assertNotNull(log, "Commons Logging should return a logger");
     }
 }

@@ -25,7 +25,7 @@ class MinimalLoggingSmokeTest {
         org.apache.logging.log4j.Logger logger =
                 LogManager.getLogger(MinimalLoggingSmokeTest.class);
         logger.info("Log4j2 smoke test");
-        assertNotNull(logger);
+        assertNotNull(logger, "Log4j2 should create a logger instance");
     }
 
     @Test
@@ -34,6 +34,6 @@ class MinimalLoggingSmokeTest {
         org.slf4j.Logger logger =
                 LoggerFactory.getLogger(MinimalLoggingSmokeTest.class);
         logger.info("SLF4J smoke test");
-        assertNotNull(logger);
+        assertNotNull(logger, "SLF4J should create a logger instance");
     }
 }

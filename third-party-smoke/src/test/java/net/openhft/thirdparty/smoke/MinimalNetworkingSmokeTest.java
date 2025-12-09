@@ -41,11 +41,13 @@ class MinimalNetworkingSmokeTest {
                 .setHandler(exchange ->
                         exchange.getResponseSender().send("ok"))
                 .build();
+        assertNotNull(undertow, "Undertow builder should create a server");
         undertow.stop();
     }
 
     @Test
     @DisplayName("Jetty WebSocket client constructs")
+    @SuppressWarnings("java:S1612") // Suppress "Utility classes should not have public constructors")
     void jettyClientConstructs() {
         assertDoesNotThrow(() -> new WebSocketClient());
     }
@@ -59,6 +61,7 @@ class MinimalNetworkingSmokeTest {
         context.setContextPath("/");
         server.setHandler(context);
         context.addServlet(new ServletHolder(new HelloServlet()), "/hello");
+        assertNotNull(server, "Jetty server should construct");
         server.start();
         server.stop();
     }
@@ -67,21 +70,21 @@ class MinimalNetworkingSmokeTest {
     @DisplayName("Netty bootstrap can be configured")
     void nettyBootstrapConfigurable() {
         ServerBootstrap bootstrap = new ServerBootstrap();
-        assertNotNull(bootstrap);
+        assertNotNull(bootstrap, "Netty ServerBootstrap should construct");
     }
 
     @Test
     @DisplayName("Grizzly HTTP server base class is available")
     void grizzlyServerAccessible() {
         FilterChainBuilder builder = FilterChainBuilder.stateless();
-        assertNotNull(builder);
+        assertNotNull(builder, "Grizzly FilterChainBuilder should be constructible");
     }
 
     @Test
     @DisplayName("MockWebServer can be constructed and closed")
     void mockWebServerLifecycle() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
-            assertNotNull(server);
+            assertNotNull(server, "MockWebServer should construct");
         }
     }
 
@@ -101,6 +104,7 @@ class MinimalNetworkingSmokeTest {
                     }
                 })
                 .build();
+        assertNotNull(server, "Undertow server should build");
         server.start();
         server.stop();
     }
@@ -116,7 +120,7 @@ class MinimalNetworkingSmokeTest {
                 .setContextPath("/")
                 .setDeploymentName("hello.war")
                 .addServlet(servlet);
-        assertNotNull(deployment.getDeploymentName());
+        assertNotNull(deployment.getDeploymentName(), "Undertow deployment should have a name");
     }
 
     @Test
@@ -126,7 +130,7 @@ class MinimalNetworkingSmokeTest {
                 javax.websocket.server.ServerEndpointConfig.Builder
                         .create(UndertowWebsocketEndpoint.class, "/ws")
                         .build();
-        assertNotNull(config);
+        assertNotNull(config, "Undertow websocket config should be built");
     }
 
     /**

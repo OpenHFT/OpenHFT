@@ -40,7 +40,7 @@ class MinimalSerializationSmokeTest {
     void snakeYamlParses() {
         Yaml yaml = new Yaml();
         Map<?, ?> parsed = yaml.load("name: demo");
-        assertEquals("demo", parsed.get("name"));
+        assertEquals("demo", parsed.get("name"), "SnakeYAML should parse key/value");
     }
 
     @Test
@@ -50,7 +50,7 @@ class MinimalSerializationSmokeTest {
         SimplePojo pojo = new SimplePojo("gson");
         String json = gson.toJson(pojo);
         SimplePojo read = gson.fromJson(json, SimplePojo.class);
-        assertEquals(pojo.value, read.value);
+        assertEquals(pojo.value, read.value, "Gson should round-trip SimplePojo");
     }
 
     @Test
@@ -59,7 +59,7 @@ class MinimalSerializationSmokeTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonSchemaGenerator generator = new JsonSchemaGenerator(mapper);
         JsonSchema schema = generator.generateSchema(SimplePojo.class);
-        assertNotNull(schema);
+        assertNotNull(schema, "Jackson jsonSchema should generate schema for SimplePojo");
     }
 
     @Test
@@ -67,7 +67,7 @@ class MinimalSerializationSmokeTest {
     void jettisonBuildsJson() throws Exception {
         JSONObject object = new JSONObject();
         object.put("hello", "world");
-        assertEquals("world", object.getString("hello"));
+        assertEquals("world", object.getString("hello"), "Jettison should read inserted value");
     }
 
     /**

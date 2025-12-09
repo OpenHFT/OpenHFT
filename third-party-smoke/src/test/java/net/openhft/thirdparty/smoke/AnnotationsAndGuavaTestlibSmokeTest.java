@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -19,18 +20,18 @@ class AnnotationsAndGuavaTestlibSmokeTest {
     @Test
     void jetbrainsNotNullIsVisibleViaReflection() throws Exception {
         Method method = Person.class.getDeclaredMethod("getName");
-        assertNotNull(method);
+        assertNotNull(method, "reflection should find Person#getName");
         // JetBrains annotations are CLASS-retention; presence of the type is
         // sufficient to show dependency resolution.
-        assertNotNull(NotNull.class.getName());
+        assertNotNull(NotNull.class.getName(), "JetBrains NotNull type should be loadable");
     }
 
     @Test
     void guavaEqualsTesterValidatesEqualsContract() {
-        new EqualsTester()
+        assertDoesNotThrow(() -> new EqualsTester()
                 .addEqualityGroup(new Person("Alice"), new Person("Alice"))
                 .addEqualityGroup(new Person("Bob"))
-                .testEquals();
+                .testEquals(), "Guava EqualsTester should validate equals contract");
     }
 
     /**

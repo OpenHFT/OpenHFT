@@ -13,8 +13,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Smoke tests for HSQLDB and Jackson jsonSchema.
@@ -26,14 +25,17 @@ class DatabaseAndSchemaSmokeTest {
         // Use a non-empty password to avoid empty-credential warnings in static analysis
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:hsqldb:mem:smokedb", "SA", "sa")) {
-            try (Statement st = conn.createStatement()) {
-                st.execute("CREATE TABLE test("
+            try (Statement statement = conn.createStatement()) {
+                statement.execute("CREATE TABLE test("
                         + "id INT PRIMARY KEY, name VARCHAR(50))");
-                st.execute("INSERT INTO test VALUES (1, 'hello')");
-                try (ResultSet rs = st.executeQuery(
+                statement.execute("INSERT INTO test VALUES (1, 'hello')");
+                try (ResultSet resultSet = statement.executeQuery(
                         "SELECT name FROM test WHERE id=1")) {
-                    assertTrue(rs.next());
-                    assertEquals("hello", rs.getString(1));
+                    if (resultSet.next()) {
+                        assertEquals("hello", resultSet.getString(1), "HSQLDB should return inserted value");
+                    } else {
+                        fail("HSQLDB should return a row for id=1");
+                    }
                 }
             }
         }
@@ -44,7 +46,7 @@ class DatabaseAndSchemaSmokeTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonSchemaGenerator generator = new JsonSchemaGenerator(mapper);
         JsonSchema schema = generator.generateSchema(Person.class);
-        assertTrue(schema != null);
+        assertNotNull(schema, "JsonSchemaGenerator should produce a schema for Person");
     }
 
     /**

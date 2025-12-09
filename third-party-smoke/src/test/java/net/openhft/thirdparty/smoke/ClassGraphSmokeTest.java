@@ -19,8 +19,8 @@ class ClassGraphSmokeTest {
         try (ScanResult scanResult = new ClassGraph()
                 .enableClassInfo()
                 .scan()) {
-            assertNotNull(scanResult);
-            assertNotNull(scanResult.getAllClasses());
+            assertNotNull(scanResult, "ClassGraph scan should produce a result");
+            assertNotNull(scanResult.getAllClasses(), "ClassGraph scan should list classes");
         }
     }
 }

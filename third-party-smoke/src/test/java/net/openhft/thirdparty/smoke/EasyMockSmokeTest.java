@@ -20,7 +20,7 @@ class EasyMockSmokeTest {
         EasyMock.replay(service);
 
         String result = service.greet("World");
-        assertEquals("Hello World", result);
+        assertEquals("Hello World", result, "EasyMock should replay expected greeting");
 
         EasyMock.verify(service);
     }

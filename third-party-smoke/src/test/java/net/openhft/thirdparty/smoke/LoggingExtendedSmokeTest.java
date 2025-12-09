@@ -21,7 +21,7 @@ class LoggingExtendedSmokeTest {
     void log4jApiCoreWork() {
         Logger logger = LogManager.getLogger(LoggingExtendedSmokeTest.class);
         logger.info("Log4j2 hello");
-        assertNotNull(logger);
+        assertNotNull(logger, "Log4j2 API should return a logger");
     }
 
     @Test
@@ -29,7 +29,7 @@ class LoggingExtendedSmokeTest {
         org.slf4j.Logger logger =
                 LoggerFactory.getLogger("slf4jSmoke");
         logger.info("SLF4J hello");
-        assertNotNull(logger);
+        assertNotNull(logger, "SLF4J binding should produce a logger");
     }
 
     @Test
@@ -38,6 +38,6 @@ class LoggingExtendedSmokeTest {
                 java.util.logging.Logger.getLogger("julSmoke");
         julLogger.setLevel(Level.INFO);
         julLogger.info("JUL via Log4j2");
-        assertNotNull(julLogger);
+        assertNotNull(julLogger, "JUL bridge should provide a logger");
     }
 }

@@ -39,18 +39,19 @@ class NativeAndCollectionsSmokeTest {
     void troveMapStoresAndRetrievesValues() {
         TObjectIntHashMap<String> map = new TObjectIntHashMap<>();
         map.put("answer", ANSWER);
-        assertEquals(ANSWER, map.get("answer"));
+        assertEquals(ANSWER, map.get("answer"), "Trove map should return stored answer");
     }
 
     @Test
     void jnaNativeCanReportNativeSize() {
         int size = Native.getNativeSize(Integer.TYPE);
-        assertTrue(size == SIZE_TWO || size == SIZE_FOUR || size == SIZE_EIGHT);
+        assertTrue(size == SIZE_TWO || size == SIZE_FOUR || size == SIZE_EIGHT,
+                "JNA should report an expected native int size");
     }
 
     @Test
     void jnaPlatformFileUtilsCanBeInstantiated() {
         FileUtils utils = FileUtils.getInstance();
-        assertNotNull(utils);
+        assertNotNull(utils, "JNA FileUtils should be instantiable");
     }
 }

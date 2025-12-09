@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke test for JMH annotations and benchmark discovery helpers.
  */
-@SuppressWarnings("java:S5786") // JMH requires specific method signatures
+@SuppressWarnings({"java:S5786", "PMD.JUnit5TestShouldBePackagePrivate"}) // JMH/JUnit rules disagree; JMH requires public
 public class JmhSmokeTest {
 
     /**
@@ -40,14 +40,14 @@ public class JmhSmokeTest {
                 .include(JmhSmokeTest.class.getSimpleName())
                 .forks(0)
                 .build();
-        assertNotNull(opts);
+        assertNotNull(opts, "JMH OptionsBuilder should create options");
     }
 
     @Test
     void coreBenchmarksJarIsOnClasspath() throws Exception {
         Class<?> clazz = Class.forName(
                 "org.openjdk.jmh.benchmarks.BlackholeConsumeCPUBench");
-        assertNotNull(clazz);
+        assertNotNull(clazz, "JMH core benchmarks should be present on classpath");
     }
 
     /**

@@ -56,26 +56,27 @@ class MetricsAndFfiSmokeTest {
 
         counter.inc();
         Double value = registry.getSampleValue(COUNTER_NAME);
-        assertNotNull(value);
-        assertEquals(1.0, value, DELTA);
+        assertNotNull(value, "Prometheus counter should be registered");
+        assertEquals(1.0, value, DELTA, "Prometheus counter should increment");
     }
 
     @Test
     void prometheusHttpServerCanStartAndStop() throws Exception {
         HTTPServer server = new HTTPServer(0);
-        assertNotNull(server);
+        assertNotNull(server, "Prometheus HTTPServer should start on an ephemeral port");
         server.close();
     }
 
     @Test
     void prometheusHotspotDefaultExportsInitialize() {
         DefaultExports.initialize();
+        assertTrue(true, "Prometheus DefaultExports.initialize should complete");
     }
 
     @Test
     void jnrConstantsErrnoProvidesIntegerValue() {
         int ebadf = Errno.EBADF.intValue();
-        assertTrue(ebadf > 0);
+        assertTrue(ebadf > 0, "JNR Errno should expose positive integer value");
     }
 
     @Test
@@ -83,6 +84,6 @@ class MetricsAndFfiSmokeTest {
         Runtime runtime = Runtime.getSystemRuntime();
         Pointer pointer = Memory.allocate(runtime, EIGHT_BYTES);
         pointer.putLong(OFFSET_ZERO, VALUE_42);
-        assertEquals(VALUE_42, pointer.getLong(OFFSET_ZERO));
+        assertEquals(VALUE_42, pointer.getLong(OFFSET_ZERO), "JNR pointer should read back written long");
     }
 }

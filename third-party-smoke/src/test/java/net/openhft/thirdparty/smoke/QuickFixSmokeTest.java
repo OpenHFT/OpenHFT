@@ -31,7 +31,7 @@ class QuickFixSmokeTest {
 
         Message msg = order;
 
-        assertEquals("123", msg.getString(ClOrdID.FIELD));
-        assertEquals("AAPL", msg.getString(Symbol.FIELD));
+        assertEquals("123", msg.getString(ClOrdID.FIELD), "QuickFIX message should carry ClOrdID");
+        assertEquals("AAPL", msg.getString(Symbol.FIELD), "QuickFIX message should carry Symbol");
     }
 }

@@ -52,16 +52,6 @@ class MinimalUtilitiesSmokeTest {
     private static final Integer QUICK_SORT_THIRD = 2;
 
     /**
-     * Values used for Koloboke map assertions.
-     */
-    private static final int KOLOBOKE_KEY = 7;
-
-    /**
-     * Stored value for Koloboke map assertions.
-     */
-    private static final int KOLOBOKE_VALUE = 11;
-
-    /**
      * CLI flag value used for JCommander parsing.
      */
     private static final String FLAG_VALUE = "value";
@@ -71,13 +61,14 @@ class MinimalUtilitiesSmokeTest {
     void troveMapUsage() {
         TIntIntHashMap map = new TIntIntHashMap();
         map.put(1, TEST_VAL);
-        assertEquals(TEST_VAL, map.get(1));
+        assertEquals(TEST_VAL, map.get(1), "Trove4j map should return stored value");
     }
 
     @Test
     @DisplayName("Commons Lang StringUtils can be used")
     void commonsLangUsage() {
-        assertEquals("test", StringUtils.trim(" test "));
+        String joined = StringUtils.join(new String[]{"a", "b", "c"}, ",");
+        assertEquals("a,b,c", joined, "Commons Lang should join strings with delimiter");
     }
 
     @Test
@@ -85,7 +76,7 @@ class MinimalUtilitiesSmokeTest {
     void commonsCliUsage() {
         Options options = new Options();
         options.addOption("t", "test", false, "test option");
-        assertEquals(1, options.getOptions().size());
+        assertNotNull(options.getOption("t"), "Commons CLI should register option");
     }
 
     @Test
@@ -97,21 +88,22 @@ class MinimalUtilitiesSmokeTest {
         JavaFile javaFile = JavaFile.builder("com.example.helloworld",
                         helloWorld)
                 .build();
-        assertNotNull(javaFile.toString());
+        String source = javaFile.toString();
+        assertTrue(source.contains("class HelloWorld"), "JavaPoet should render class definition");
     }
 
     @Test
     @DisplayName("Joda-Time DateTime can be instantiated")
     void jodaTimeUsage() {
         DateTime dt = new DateTime();
-        assertNotNull(dt.toString());
+        assertNotNull(dt, "Joda-Time DateTime should instantiate");
     }
 
     @Test
     @DisplayName("Commons Email can be instantiated")
-    void commonsEmailUsage() throws Exception {
+    void commonsEmailUsage() {
         SimpleEmail email = new SimpleEmail();
-        assertNotNull(email);
+        assertNotNull(email, "Commons Email should instantiate");
     }
 
     @Test
@@ -121,7 +113,8 @@ class MinimalUtilitiesSmokeTest {
         byte[] compressed = Snappy.compress(
                 input.getBytes(StandardCharsets.UTF_8));
         byte[] uncompressed = Snappy.uncompress(compressed);
-        assertEquals(input, new String(uncompressed, StandardCharsets.UTF_8));
+        assertEquals(input, new String(uncompressed, StandardCharsets.UTF_8),
+                "Snappy should round-trip compressed bytes");
     }
 
     @Test
@@ -131,20 +124,20 @@ class MinimalUtilitiesSmokeTest {
                      new io.github.classgraph.ClassGraph()
                              .enableClassInfo()
                              .scan()) {
-            assertFalse(scanResult.getAllClasses().isEmpty());
+            assertFalse(scanResult.getAllClasses().isEmpty(), "ClassGraph should find classes on classpath");
         }
     }
 
     @Test
     @DisplayName("JNA Native class is accessible")
     void jnaAccess() {
-        assertNotNull(com.sun.jna.Native.POINTER_SIZE);
+        assertTrue(com.sun.jna.Native.POINTER_SIZE > 0, "JNA Native should expose POINTER_SIZE");
     }
 
     @Test
     @DisplayName("JNR Runtime is accessible")
     void jnrUsage() {
-        assertNotNull(jnr.ffi.Runtime.getSystemRuntime());
+        assertNotNull(jnr.ffi.Runtime.getSystemRuntime(), "JNR Runtime should be accessible");
     }
 
     @Test
@@ -156,14 +149,14 @@ class MinimalUtilitiesSmokeTest {
                 QUICK_SORT_THIRD
         };
         QuickSort.sort(nums);
-        assertEquals(QUICK_SORT_SECOND, nums[0]);
-        assertEquals(QUICK_SORT_FIRST, nums[2]);
+        assertEquals(QUICK_SORT_SECOND, nums[0], "QuickSort should order smallest first");
+        assertEquals(QUICK_SORT_THIRD, nums[1], "QuickSort should order middle value second");
     }
 
     @Test
     @DisplayName("Koloboke map factory class is accessible")
     void kolobokeMapFactoryAccessible() {
-        assertNotNull(HashIntIntMaps.class.getName());
+        assertNotNull(HashIntIntMaps.class.getName(), "Koloboke factory class should be loadable");
     }
 
     @Test
@@ -174,7 +167,7 @@ class MinimalUtilitiesSmokeTest {
                 .addObject(args)
                 .build()
                 .parse("-f", FLAG_VALUE);
-        assertEquals(FLAG_VALUE, args.flag);
+        assertEquals(FLAG_VALUE, args.flag, "JCommander should parse -f flag");
     }
 
     /**

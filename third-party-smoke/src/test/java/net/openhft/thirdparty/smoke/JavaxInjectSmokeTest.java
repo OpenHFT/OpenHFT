@@ -22,9 +22,9 @@ class JavaxInjectSmokeTest {
         Field serviceField = Client.class.getDeclaredField("service");
         Field providerField = Client.class.getDeclaredField("serviceProvider");
 
-        assertTrue(serviceField.isAnnotationPresent(Inject.class));
-        assertTrue(providerField.isAnnotationPresent(Inject.class));
-        assertEquals(Provider.class, providerField.getType());
+        assertTrue(serviceField.isAnnotationPresent(Inject.class), "service field should carry @Inject");
+        assertTrue(providerField.isAnnotationPresent(Inject.class), "provider field should carry @Inject");
+        assertEquals(Provider.class, providerField.getType(), "provider field should be a Provider");
     }
 
     /**

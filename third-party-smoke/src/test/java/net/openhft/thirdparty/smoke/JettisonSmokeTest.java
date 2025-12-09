@@ -24,7 +24,7 @@ class JettisonSmokeTest {
         obj.put("hello", "world");
         obj.put("answer", ANSWER);
 
-        assertEquals("world", obj.getString("hello"));
-        assertEquals(ANSWER, obj.getInt("answer"));
+        assertEquals("world", obj.getString("hello"), "Jettison should read back string field");
+        assertEquals(ANSWER, obj.getInt("answer"), "Jettison should read back numeric field");
     }
 }

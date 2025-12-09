@@ -370,7 +370,7 @@ class ClassLoadingSmokeTest {
             try {
                 Class.forName(className, false, LOADER);
                 return;
-            } catch (Throwable t) {
+            } catch (ClassNotFoundException | LinkageError t) {
                 failures.add(className + ": " + t.toString());
             }
         }
@@ -445,6 +445,7 @@ class ClassLoadingSmokeTest {
         tests.addAll(testingFrameworkTests());
         tests.addAll(osgiTests());
         tests.addAll(additionalPeerTests());
+        assertFalse(tests.isEmpty(), "Dynamic class-loading test list should not be empty");
         return tests;
     }
 }
