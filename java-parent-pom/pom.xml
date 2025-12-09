@@ -38,6 +38,13 @@
         <license.skip>false</license.skip>
         <!-- TODO raise this to true -->
         <quality.enforced>false</quality.enforced>
+        <quality.version>2026.0-SNAPSHOT</quality.version>
+
+        <pmd.targetJdk>1.8</pmd.targetJdk>
+        <pmd.includeTests>true</pmd.includeTests>
+        <pmd.ruleset>net/openhft/quality/pmd26/pmd-ruleset.xml</pmd.ruleset>
+        <pmd.skip>false</pmd.skip>
+        <pmdVersion>7.19.0</pmdVersion>
     </properties>
 
     <build>
@@ -87,6 +94,25 @@
                 </executions>
             </plugin>
 
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint:all,-options,-processing</arg>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <failOnWarning>true</failOnWarning>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -128,24 +154,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgs>
-                        <arg>-Xlint:all,-options,-processing</arg>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                    <failOnWarning>true</failOnWarning>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <proc>none</proc>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
@@ -157,7 +165,6 @@
                 </executions>
                 <configuration>
                     <source>8</source>
-                    <additionalOptions>${javadoc.opts}</additionalOptions>
                     <failOnError>true</failOnError>
                     <failOnWarnings>${quality.enforced}</failOnWarnings>
                     <excludePackageNames>*.internal:*.internal.*;*.impl;*.impl.*</excludePackageNames>
@@ -194,7 +201,7 @@
                     <dependency>
                         <groupId>net.openhft</groupId>
                         <artifactId>quality</artifactId>
-                        <version>2026.0-SNAPSHOT</version>
+                        <version>${quality.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -216,7 +223,7 @@
                     <dependency>
                         <groupId>net.openhft</groupId>
                         <artifactId>quality</artifactId>
-                        <version>2026.0-SNAPSHOT</version>
+                        <version>${quality.version}</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -227,6 +234,72 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.28.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${pmd.ruleset}</ruleset>
+                    </rulesets>
+                    <excludeRoots>
+                        <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
+                        <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
+                        <excludeRoot>${project.build.directory}/classes</excludeRoot>
+                        <excludeRoot>${project.build.directory}/test-classes</excludeRoot>
+                    </excludeRoots>
+                    <excludes>
+                        <exclude>**/target/**</exclude>
+                        <exclude>**/build/**</exclude>
+                        <exclude>**/out/**</exclude>
+                        <exclude>**/generated/**</exclude>
+                    </excludes>
+                    <includeTests>${pmd.includeTests}</includeTests>
+                    <failOnViolation>${quality.enforced}</failOnViolation>
+                    <targetJdk>${pmd.targetJdk}</targetJdk>
+                    <skip>${pmd.skip}</skip>
+                    <printFailingErrors>true</printFailingErrors>
+                    <linkXRef>false</linkXRef>
+                    <analysisCache>true</analysisCache>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-core</artifactId>
+                        <version>${pmdVersion}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.sourceforge.pmd</groupId>
+                        <artifactId>pmd-java</artifactId>
+                        <version>${pmdVersion}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.openhft</groupId>
+                        <artifactId>quality</artifactId>
+                        <version>${quality.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>pmd-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>cpd-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cpd-check</goal>
+                        </goals>
+                        <configuration>
+                            <failOnViolation>${quality.enforced}</failOnViolation>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -54,12 +54,12 @@
         <exclude name="UnusedLocalVariable"/>
         <exclude name="UnitTestContainsTooManyAsserts"/>
         <exclude name="UnusedFormalParameter"/>
-        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
+<!--        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>-->
         <exclude name="AvoidUsingHardCodedIP"/>
         <exclude name="AvoidPrintStackTrace"/>
         <exclude name="AccessorMethodGeneration"/>
         <exclude name="AccessorClassGeneration"/>
-        <exclude name="UnitTestShouldIncludeAssert"/>
+<!--        <exclude name="UnitTestShouldIncludeAssert"/>-->
         <exclude name="UnitTestShouldUseTestAnnotation"/>
         <exclude name="AvoidReassigningParameters"/>
         <exclude name="UseVarargs"/>
@@ -77,11 +77,9 @@
         <exclude name="ConstantsInInterface"/>
         <exclude name="AvoidReassigningLoopVariables"/>
         <exclude name="OneDeclarationPerLine"/>
-        <!-- Removed invalid PMD 7 exclude: no matching rule -->
         <exclude name="ImplicitFunctionalInterface"/>
         <exclude name="RelianceOnDefaultCharset"/>
         <exclude name="ExhaustiveSwitchHasDefault"/>
-        <!-- Removed invalid PMD 7 exclude: no matching rule -->
         <exclude name="UnusedPrivateMethod"/>
         <exclude name="UnnecessaryVarargsArrayCreation"/>
         <exclude name="UnnecessaryWarningSuppression"/>
@@ -105,7 +103,6 @@
         <exclude name="CallSuperInConstructor"/>
         <exclude name="FieldNamingConventions"/>
         <exclude name="FormalParameterNamingConventions"/>
-        <!-- Removed invalid PMD 7 exclude: no matching rule -->
         <exclude name="MethodNamingConventions"/>
         <exclude name="ShortMethodName"/>
         <exclude name="ConfusingTernary"/>
@@ -124,6 +121,7 @@
         <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
         <exclude name="FinalParameterInAbstractMethod"/>
         <exclude name="UnnecessaryCast"/>
+        <exclude name="PackageCase"/>
     </rule>
 
     <rule ref="category/java/performance.xml">
