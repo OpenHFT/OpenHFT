@@ -68,6 +68,9 @@ class DatabaseAndSchemaSmokeTest {
 
     @Test
     void hsqldbInMemoryRoundTrip() throws Exception {
+        // Ensure the HSQLDB driver is registered on Java 8
+        // where auto-registration can be skipped
+        Class.forName("org.hsqldb.jdbcDriver");
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:hsqldb:mem:smokedb", "SA", "")) {
             try (Statement st = conn.createStatement()) {

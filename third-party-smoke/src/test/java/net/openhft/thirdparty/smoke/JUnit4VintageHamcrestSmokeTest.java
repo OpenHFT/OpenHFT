@@ -43,7 +43,7 @@ public class JUnit4VintageHamcrestSmokeTest {
     @Test
     public void hamcrestMatchersWork() {
         MatcherAssert.assertThat("hello", Matchers.startsWith("he"));
-        MatcherAssert.assertThat(Integer.valueOf(MEANING_OF_LIFE),
+        MatcherAssert.assertThat(MEANING_OF_LIFE,
                 Matchers.greaterThan(LOWER_BOUND));
     }
 }

@@ -81,9 +81,10 @@
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
         <checkstyle.skip>false</checkstyle.skip>
         <pmd.targetJdk>1.8</pmd.targetJdk>
-        <pmd.failOnViolation>false</pmd.failOnViolation>
+        <pmd.failOnViolation>true</pmd.failOnViolation>
         <pmd.includeTests>true</pmd.includeTests>
         <pmd.skip>false</pmd.skip>
+        <cpd.skip>false</cpd.skip>
         <pmd.ruleset>${maven.multiModuleProjectDirectory}/OpenHFT/root-parent-pom/pmd-ruleset.xml</pmd.ruleset>
         <!-- OWASP Dependency Check configuration -->
         <dependency-check.skip>false</dependency-check.skip>
@@ -124,10 +125,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.5.0</version>
-                    <configuration>
-                        <!-- Enable all doclint checks except missing Javadoc. -->
-                        <doclint>all,-missing</doclint>
-                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -392,6 +389,7 @@
                             <minimumTokens>300</minimumTokens>
                             <failOnViolation>false</failOnViolation>
                             <includeTests>true</includeTests>
+                            <skip>${cpd.skip}</skip>
                             <!-- Optional: ignore literals/identifiers to focus on structure -->
                             <!-- <ignoreLiterals>true</ignoreLiterals> -->
                             <!-- <ignoreIdentifiers>true</ignoreIdentifiers> -->

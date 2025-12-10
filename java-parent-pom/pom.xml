@@ -173,11 +173,10 @@
                 </executions>
                 <configuration>
                     <source>8</source>
-                    <additionalOptions>${javadoc.opts}</additionalOptions>
                     <failOnError>true</failOnError>
                     <failOnWarnings>true</failOnWarnings>
                     <excludePackageNames>*.internal:*.internal.*;*.impl;*.impl.*</excludePackageNames>
-                    <doclint>all,-missing</doclint>
+                    <doclint>all</doclint>
                 </configuration>
             </plugin>
         </plugins>
