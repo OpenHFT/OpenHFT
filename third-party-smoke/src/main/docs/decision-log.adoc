@@ -8,8 +8,10 @@ Chronicle Software
 == Recorded Decisions
 
 === SMOKE-DEC-001 Dedicated smoke test module
+
 Date:: 2025-11-29
-Context:: The third-party BOM must stay usable on Java 8, but the set of dependencies evolves and can drift in bytecode level or transitive requirements. Without continuous validation, regressions would only be detected when downstream consumers attempt to use the BOM.
+Context:: The third-party BOM must stay usable on Java 8, but the set of dependencies evolves and can drift in bytecode level or transitive requirements.
+Without continuous validation, regressions would only be detected when downstream consumers attempt to use the BOM.
 Decision Statement:: Create dedicated `third-party-smoke` module with class loading and minimal usage tests to validate Java 8 compatibility continuously.
 Alternatives Considered::
 * Manual spot checks:
@@ -21,13 +23,21 @@ Alternatives Considered::
 * CI-only validation without committed tests:
 ** *Pros:* Keeps repository lightweight.
 ** *Cons:* No local reproducibility, unclear coverage.
-Rationale for Decision:: Fast feedback loop prevents regressions. Validates transitive dependencies. No external service dependencies. Developers can run locally before pushing.
-Impact & Consequences:: Contributors must keep tests green. Build time increases ~15-30 seconds. Version bumps that break Java 8 fail fast with clear error messages.
-Notes/Links:: Module path `/home/peter/Second/OpenHFT/third-party-smoke`. See requirement `SMOKE-TEST-001` in project-requirements.adoc.
+Rationale for Decision:: Fast feedback loop prevents regressions.
+Validates transitive dependencies.
+No external service dependencies.
+Developers can run locally before pushing.
+Impact & Consequences:: Contributors must keep tests green.
+Build time increases ~15-30 seconds.
+Version bumps that break Java 8 fail fast with clear error messages.
+Notes/Links:: Module path `/home/peter/Second/OpenHFT/third-party-smoke`.
+See requirement `SMOKE-TEST-001` in project-requirements.adoc.
 
 === SMOKE-DEC-002 Separate class loading and usage tests
+
 Date:: 2025-11-29
-Context:: Class loading proves artifact resolution and bytecode compatibility but not runtime behaviour. Some libraries may load successfully but fail when actually used due to API changes, missing resources, or runtime assumptions.
+Context:: Class loading proves artifact resolution and bytecode compatibility but not runtime behaviour.
+Some libraries may load successfully but fail when actually used due to API changes, missing resources, or runtime assumptions.
 Decision Statement:: Maintain `ClassLoadingSmokeTest` (85+ tests) for comprehensive coverage and `MinimalUsageSmokeTest` suite for behavioural validation of critical dependencies.
 Alternatives Considered::
 * Class loading only:
@@ -39,13 +49,19 @@ Alternatives Considered::
 * Combined approach (current):
 ** *Pros:* Fast comprehensive class loading + targeted behavioural validation.
 ** *Cons:* Two test layers to maintain.
-Rationale for Decision:: Class loading is fast (85+ tests in ~1.3s) and proves basic compatibility. Minimal usage tests catch runtime issues without external dependencies. Balance between speed and confidence.
-Impact & Consequences:: Two test layers require maintenance. Minimal usage tests focus on frequently-used artifacts. Less-common artifacts rely on class loading only.
+Rationale for Decision:: Class loading is fast (85+ tests in ~1.3s) and proves basic compatibility.
+Minimal usage tests catch runtime issues without external dependencies.
+Balance between speed and confidence.
+Impact & Consequences:: Two test layers require maintenance.
+Minimal usage tests focus on frequently-used artifacts.
+Less-common artifacts rely on class loading only.
 Notes/Links:: `ClassLoadingSmokeTest.java` (85+ dynamic tests), `Minimal*SmokeTest.java` (25+ tests across 6 categories).
 
 === SMOKE-DEC-003 Categorised minimal usage tests
+
 Date:: 2025-11-29
-Context:: `MinimalUsageSmokeTest` grew to 25+ tests covering disparate technologies (observability, serialisation, networking, logging, utilities, database). Single file became difficult to navigate and didn't align with dependency groupings.
+Context:: `MinimalUsageSmokeTest` grew to 25+ tests covering disparate technologies (observability, serialisation, networking, logging, utilities, database).
+Single file became difficult to navigate and didn't align with dependency groupings.
 Decision Statement:: Split minimal usage tests into category-based test classes: `MinimalObservabilitySmokeTest`, `MinimalSerializationSmokeTest`, `MinimalNetworkingSmokeTest`, `MinimalLoggingSmokeTest`, `MinimalUtilitiesSmokeTest`, `MinimalDatabaseSmokeTest`.
 Alternatives Considered::
 * Single monolithic test class:
@@ -57,13 +73,20 @@ Alternatives Considered::
 * Artifact-based organisation (one class per dependency):
 ** *Pros:* Maximum granularity.
 ** *Cons:* Too many files (80+ test classes), maintenance burden.
-Rationale for Decision:: Category-based organisation aligns with dependency groupings in pom.xml and `ClassLoadingSmokeTest` helper methods. IDE navigation and test execution become clearer. Parallel execution can target specific categories.
-Impact & Consequences:: More test files (6 classes instead of 1). Clearer test organisation and reporting. Easier to add new tests to appropriate category.
-Notes/Links:: Test classes in `/home/peter/Second/OpenHFT/third-party-smoke/src/test/java/net/openhft/thirdparty/smoke/`. See requirement `SMOKE-TEST-002` in project-requirements.adoc.
+Rationale for Decision:: Category-based organisation aligns with dependency groupings in pom.xml and `ClassLoadingSmokeTest` helper methods.
+IDE navigation and test execution become clearer.
+Parallel execution can target specific categories.
+Impact & Consequences:: More test files (6 classes instead of 1).
+Clearer test organisation and reporting.
+Easier to add new tests to appropriate category.
+Notes/Links:: Test classes in `/home/peter/Second/OpenHFT/third-party-smoke/src/test/java/net/openhft/thirdparty/smoke/`.
+See requirement `SMOKE-TEST-002` in project-requirements.adoc.
 
 === SMOKE-DEC-004 Hardcoded dependency versions
+
 Date:: 2025-11-29
-Context:: Several dependencies (JCommander 1.48, Gson 2.8.2, Unirest 1.4.9, Joda-Time 2.14.0, Commons Email 1.5, JGit 5.13.0.202109080827-r, Maven Model 3.6.3) were found in peer modules but not managed in `third-party-bom`. These represent actual usage patterns in the Chronicle ecosystem.
+Context:: Several dependencies (JCommander 1.48, Gson 2.8.2, Unirest 1.4.9, Joda-Time 2.14.0, Commons Email 1.5, JGit 5.13.0.202109080827-r, Maven Model 3.6.3) were found in peer modules but not managed in `third-party-bom`.
+These represent actual usage patterns in the Chronicle ecosystem.
 Decision Statement:: Keep hardcoded versions in `pom.xml` as "additional peer tests" until `third-party-bom` is updated to manage these dependencies.
 Alternatives Considered::
 * Remove from smoke tests:
@@ -75,13 +98,22 @@ Alternatives Considered::
 * Create separate smoke module for peer dependencies:
 ** *Pros:* Clear separation of concerns.
 ** *Cons:* Over-engineered, unnecessary complexity for 7 dependencies.
-Rationale for Decision:: Validates real usage patterns. Documents version drift between peer modules and BOM. Provides evidence for future BOM migration. Tests remain green with known versions.
-Impact & Consequences:: Version maintenance burden in smoke module pom.xml. Documented in version-issues.adoc with migration path. Requires manual version updates when peer modules change.
-Notes/Links:: See pom.xml lines 495-541 for hardcoded versions. Documented in version-issues.adoc. See requirement `SMOKE-NF-O-003` for documentation currency.
+Rationale for Decision:: Validates real usage patterns.
+Documents version drift between peer modules and BOM.
+Provides evidence for future BOM migration.
+Tests remain green with known versions.
+Impact & Consequences:: Version maintenance burden in smoke module pom.xml.
+Documented in version-issues.adoc with migration path.
+Requires manual version updates when peer modules change.
+Notes/Links:: See pom.xml lines 495-541 for hardcoded versions.
+Documented in version-issues.adoc.
+See requirement `SMOKE-NF-O-003` for documentation currency.
 
 === SMOKE-DEC-005 Bytecode enforcement with exclusions
+
 Date:: 2025-11-29
-Context:: HSQLDB and MongoDB bson-record-codec ship with Java 11+/17 bytecode, exceeding Java 8 baseline. Complete rejection would break legitimate use cases (HSQLDB has jdk8 classifier; bson-record-codec may be transitive-only).
+Context:: HSQLDB and MongoDB bson-record-codec ship with Java 11+/17 bytecode, exceeding Java 8 baseline.
+Complete rejection would break legitimate use cases (HSQLDB has jdk8 classifier; bson-record-codec may be transitive-only).
 Decision Statement:: Use `enforceBytecodeVersion` with explicit exclusions for HSQLDB and bson-record-codec, documented in version-issues.adoc with action items to investigate alternatives.
 Alternatives Considered::
 * Remove dependencies entirely:
@@ -93,13 +125,20 @@ Alternatives Considered::
 * Skip bytecode enforcement:
 ** *Pros:* No exclusion management.
 ** *Cons:* Silent Java 8 breakage, defeats purpose of smoke tests.
-Rationale for Decision:: Balanced approach - enforce for most artifacts, document exceptions, alert on new violations. Exceptions require justification and follow-up. HSQLDB provides jdk8 classifier. bson-record-codec may be transitive and unused.
-Impact & Consequences:: Explicit exclusion list in pom.xml lines 559-577. Requires documentation updates when adding exclusions. Follow-up action to verify if both HSQLDB artifacts needed.
-Notes/Links:: See `maven-enforcer-plugin` configuration in pom.xml. Documented in version-issues.adoc. See requirement `SMOKE-NF-O-001` in project-requirements.adoc.
+Rationale for Decision:: Balanced approach - enforce for most artifacts, document exceptions, alert on new violations.
+Exceptions require justification and follow-up.
+HSQLDB provides jdk8 classifier. bson-record-codec may be transitive and unused.
+Impact & Consequences:: Explicit exclusion list in pom.xml lines 559-577. Requires documentation updates when adding exclusions.
+Follow-up action to verify if both HSQLDB artifacts needed.
+Notes/Links:: See `maven-enforcer-plugin` configuration in pom.xml.
+Documented in version-issues.adoc.
+See requirement `SMOKE-NF-O-001` in project-requirements.adoc.
 
 === SMOKE-DEC-006 Multiple SLF4J bindings tolerated
+
 Date:: 2025-11-29
-Context:: Test classpath includes multiple SLF4J implementations (slf4j-simple, slf4j-nop, logback-classic) to validate all bindings resolve correctly. This triggers SLF4J warnings: "Multiple bindings were found on the class path".
+Context:: Test classpath includes multiple SLF4J implementations (slf4j-simple, slf4j-nop) to validate all bindings resolve correctly.
+This triggers SLF4J warnings: "Multiple bindings were found on the class path".
 Decision Statement:: Tolerate SLF4J binding warnings during test execution to validate all bindings load correctly without failures.
 Alternatives Considered::
 * Single binding per test:
@@ -111,13 +150,23 @@ Alternatives Considered::
 * Separate test profiles per binding:
 ** *Pros:* Isolated validation.
 ** *Cons:* Complex configuration, slower CI, maintenance burden.
-Rationale for Decision:: Validates each binding resolves correctly. Mirrors potential downstream classpath conflicts. Warnings are informational, not failures. Tests remain deterministic despite warnings.
-Impact & Consequences:: Noisy test output with SLF4J warnings during execution. Acceptable for smoke testing. Developers must distinguish warnings from actual failures. Future: may separate test execution groups if noise becomes problematic.
-Notes/Links:: See pom.xml lines 213-237 for SLF4J dependencies. Documented in version-issues.adoc. See `MinimalLoggingSmokeTest` for SLF4J validation.
+Rationale for Decision:: Validates each binding resolves correctly.
+Mirrors potential downstream classpath conflicts.
+Warnings are informational, not failures.
+Tests remain deterministic despite warnings.
+Impact & Consequences:: Noisy test output with SLF4J warnings during execution.
+Acceptable for smoke testing.
+Developers must distinguish warnings from actual failures.
+Future: may separate test execution groups if noise becomes problematic.
+Notes/Links:: See pom.xml lines 213-237 for SLF4J dependencies.
+Documented in version-issues.adoc.
+See `MinimalLoggingSmokeTest` for SLF4J validation.
 
 === SMOKE-DEC-007 Promote peer versions into BOM and broaden behavioural smokes
+
 Date:: 2025-12-02
-Context:: Several dependencies used across Chronicle projects (JCommander, Gson, Commons Email, JGit, Maven Model, OkHttp 4.12.x, MongoDB 4.11.x, Netty 4.1.x, Jetty 9.4.x, OpenTelemetry 1.32.x) were validated in `third-party-smoke` but not centrally managed. Behavioural coverage previously focused on a small subset of libraries and missed newer stacks (e.g. Jetty websockets, OkHttp, OSGi/Pax URL, JGit, ClassGraph, ProGuard).
+Context:: Several dependencies used across Chronicle projects (JCommander, Gson, Commons Email, JGit, Maven Model, OkHttp 4.12.x, MongoDB 4.11.x, Netty 4.1.x, Jetty 9.4.x, OpenTelemetry 1.32.x) were validated in `third-party-smoke` but not centrally managed.
+Behavioural coverage previously focused on a small subset of libraries and missed newer stacks (e.g. Jetty websockets, OkHttp, OSGi/Pax URL, JGit, ClassGraph, ProGuard).
 Decision Statement:: Promote the peer dependency versions into `third-party-bom` (Java 8-capable lines) and expand behavioural smoke coverage with focused JUnit tests per dependency family.
 Alternatives Considered::
 * Leave versions unmanaged in the smoke module:
@@ -129,6 +178,9 @@ Alternatives Considered::
 * Current approach (managed + expanded smokes):
 ** *Pros:* Single source of truth for versions; executable proof of Java 8 compatibility; clearer failure signals when baselines shift.
 ** *Cons:* Larger test surface, more maintenance.
-Rationale for Decision:: Aligns the BOM with real-world dependency usage and provides executable evidence for Java 8 compatibility before upgrades land elsewhere. Focused smokes remain offline and fast, keeping CI practical while covering more libraries.
-Impact & Consequences:: BOM now manages additional artefacts; `third-party-smoke` adds targeted tests (OkHttp/MockWebServer, Jetty websockets, networking stacks, CLI/HTTP/time/email utilities, JGit/Maven model, ProGuard parsing, JMH/JUnit variants, OSGi/Pax URL). Contributors must maintain both version entries and corresponding smoke coverage when upgrading.
-Notes/Links:: See updated versions in `third-party-bom/pom.xml` and behavioural tests under `third-party-smoke/src/test/java/net/openhft/thirdparty/smoke/`. Version watchpoints and exclusions tracked in `version-issues.adoc`.
+Rationale for Decision:: Aligns the BOM with real-world dependency usage and provides executable evidence for Java 8 compatibility before upgrades land elsewhere.
+Focused smokes remain offline and fast, keeping CI practical while covering more libraries.
+Impact & Consequences:: BOM now manages additional artefacts; `third-party-smoke` adds targeted tests (OkHttp/MockWebServer, Jetty websockets, networking stacks, CLI/HTTP/time/email utilities, JGit/Maven model, ProGuard parsing, JMH/JUnit variants, OSGi/Pax URL).
+Contributors must maintain both version entries and corresponding smoke coverage when upgrading.
+Notes/Links:: See updated versions in `third-party-bom/pom.xml` and behavioural tests under `third-party-smoke/src/test/java/net/openhft/thirdparty/smoke/`.
+Version watchpoints and exclusions tracked in `version-issues.adoc`.

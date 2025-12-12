@@ -6,9 +6,12 @@ Chronicle Software
 :source-highlighter: rouge
 
 == Purpose
-This module validates that all dependencies declared in the `third-party-bom` remain usable on Java 8 (baseline) and Java 21 (current LTS). It provides two layers of validation: class loading tests confirm artifact resolution and bytecode compatibility, whilst minimal usage tests verify basic runtime behaviour.
+
+This module validates that all dependencies declared in the `third-party-bom` remain usable on Java 8 (baseline) and Java 21 (current LTS).
+It provides two layers of validation: class loading tests confirm artifact resolution and bytecode compatibility, whilst minimal usage tests verify basic runtime behaviour.
 
 == Structure
+
 * link:project-requirements.adoc[Project requirements] – functional and non-functional requirements with IDs
 * link:decision-log.adoc[Decision log] – Architecture Decision Records (ADRs) documenting key choices
 * link:version-issues.adoc[Version issues and follow-up] – hardcoded versions, bytecode exclusions, research topics
@@ -16,7 +19,9 @@ This module validates that all dependencies declared in the `third-party-bom` re
 == Test Categories and Coverage
 
 === Class Loading Tests
-`ClassLoadingSmokeTest` dynamically generates coverage to load representative classes from each third-party artefact. Tests are grouped by dependency category:
+
+`ClassLoadingSmokeTest` dynamically generates 85+ tests to load representative classes from each third-party artefact.
+Tests are grouped by dependency category:
 
 * Observability (OpenTelemetry, Prometheus)
 * Serialisation (JSONAssert, SnakeYAML, XStream, Jackson, Jettison, BSON)
@@ -26,10 +31,11 @@ This module validates that all dependencies declared in the `third-party-bom` re
 * Collections (Koloboke, Trove4j)
 * Databases (HSQLDB)
 * Testing frameworks (JUnit, JMH, Hamcrest, Mockito, PowerMock, EasyMock, Guava Testlib)
-* OSGi (OSGi core/compendium, Pax Exam, Felix framework, Pax URL)
-* Tooling and utilities (JCommander, Gson, Unirest, Joda-Time, Commons Email, JGit, Maven Model, JavaPoet, ProGuard)
+* OSGi (OSGi core/compendium, Pax Exam, Felix framework)
+* Additional peer dependencies (JCommander, Gson, Unirest, Joda-Time, Commons Email, JGit, Maven Model)
 
-=== Behavioural Smoke Tests
+=== Minimal Usage Tests
+
 Behavioural smoke tests validate runtime behaviour beyond class loading, organised by category:
 
 * Core categories retained: `MinimalObservabilitySmokeTest`, `MinimalSerializationSmokeTest`, `MinimalNetworkingSmokeTest`, `MinimalLoggingSmokeTest`, `MinimalUtilitiesSmokeTest`, `MinimalDatabaseSmokeTest`.
@@ -42,17 +48,21 @@ Behavioural smoke tests validate runtime behaviour beyond class loading, organis
 ** Test frameworks and mocking: `JupiterSmokeTest`, `JupiterParamsSmokeTest`, `JUnitPlatformLauncherSmokeTest`, `JUnit4VintageHamcrestSmokeTest`, `JUnitMigrationSupportSmokeTest`, `MockitoSmokeTest`, `EasyMockSmokeTest`, `PowerMockPresenceSmokeTest`, `JmhSmokeTest`.
 ** Domain-specific libraries: `QuickFixSmokeTest`, `AnnotationsAndGuavaTestlibSmokeTest`, `JavaxInjectSmokeTest`, `OsgiAndPaxSmokeTest`.
 
-Each test is intentionally offline-friendly (ports bound to `0`, no external services) and Java 8 compatible.
+=== Legacy JUnit4 Test
+
+`LegacyJUnit4SmokeTest` verifies the JUnit 4 vintage engine correctly executes legacy `@Test` annotations.
 
 == Build and Test
 
 === Run all smoke tests
+
 [source,bash]
 ----
 mvn -pl third-party-smoke test
 ----
 
 === Run specific test category
+
 [source,bash]
 ----
 mvn -pl third-party-smoke -Dtest=ClassLoadingSmokeTest test
@@ -61,18 +71,23 @@ mvn -pl third-party-smoke -Dtest=MinimalSerializationSmokeTest test
 ----
 
 === Run all minimal usage tests
+
 [source,bash]
 ----
 mvn -pl third-party-smoke -Dtest="Minimal*SmokeTest" test
 ----
 
 === Expected scope
+
 * `ClassLoadingSmokeTest`: dynamic coverage of all BOM-managed artefacts.
 * Behavioural tests: targeted smokes per dependency family (networking, observability, logging, tooling, mocking, CLI/HTTP/time/email, FFI).
 * Vintage coverage: JUnit 4 and PowerMock presence validated alongside Jupiter.
 
 == Current Focus
-The module enforces Java 8 bytecode compatibility via Maven Enforcer Plugin's `enforceBytecodeVersion` rule. Any dependency compiled for Java 9+ (classfile version > 52) will fail the build unless explicitly excluded. Current exclusions:
+
+The module enforces Java 8 bytecode compatibility via Maven Enforcer Plugin's `enforceBytecodeVersion` rule.
+Any dependency compiled for Java 9+ (classfile version > 52) will fail the build unless explicitly excluded.
+Current exclusions:
 
 * `org.hsqldb:hsqldb` – Java 11 bytecode (jdk8 classifier available)
 * `org.mongodb:bson-record-codec` – Java 17 bytecode (uses records)
@@ -80,13 +95,20 @@ The module enforces Java 8 bytecode compatibility via Maven Enforcer Plugin's `e
 See link:version-issues.adoc[version-issues.adoc] for details and follow-up actions.
 
 == Open Topics
-* *SLF4J binding warnings*: multiple SLF4J implementations on the test classpath trigger "multiple bindings found" warnings. Tolerated for now to validate each binding loads correctly.
-* *HSQLDB dual artefacts*: both base artefact and `jdk8` classifier remain. Confirm if both are required or consolidate to the classifier.
+
+* *Hardcoded dependency versions*: JCommander, Gson, Unirest, Joda-Time, Commons Email, JGit, Maven Model are not in `third-party-bom` but observed in peer modules.
+See link:version-issues.adoc[version-issues.adoc] for migration plan.
+* *SLF4J binding warnings*: multiple SLF4J implementations on test classpath trigger "multiple bindings found" warnings.
+Tolerated for now to validate each binding loads correctly.
+* *HSQLDB dual artefacts*: both base artefact and `jdk8` classifier remain.
+Confirm if both are required or consolidate to the classifier.
 * *Mongo record codec*: confirm whether `bson-record-codec` is still pulled with the 4.11.1 driver set.
 * *Baseline watchpoints*: track OTel 1.33+, OkHttp/okio/Kotlin baseline shifts, and Jetty 9.4.x security drops.
 
 == Future Work
+
 * Multi-JDK CI matrix: run smoke tests on Java 8, 11, 17, 21 to catch runtime-specific regressions
 * Integrate with `third-party-bom` version bump workflow to automatically revalidate on dependency updates
 * Reduce SLF4J binding conflicts by using separate test execution groups
+* Migrate hardcoded versions to `third-party-bom` or document exclusion policy
 * Audit OSGi and Pax Exam dependencies to confirm downstream consumers still require them
