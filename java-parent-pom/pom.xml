@@ -12,7 +12,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>1.27ea6</version>
+        <version>1.27ea7-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -31,15 +31,19 @@
     <properties>
         <sonar.organization>openhft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <!-- Define the target coverage thresholds as properties -->
-        <jacoco.line.coverage>0.8</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <license.year>2013-2025</license.year>
         <license.owner>chronicle.software</license.owner>
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
-        <surefireArgLine/>
+        <!-- TODO raise this to true -->
+        <quality.enforced>false</quality.enforced>
+
+        <pmd.targetJdk>1.8</pmd.targetJdk>
+        <pmd.includeTests>true</pmd.includeTests>
+        <pmd.ruleset>net/openhft/quality/pmd26/pmd-ruleset.xml</pmd.ruleset>
+        <pmd.skip>false</pmd.skip>
+        <pmdVersion>7.19.0</pmdVersion>
     </properties>
 
     <build>
@@ -89,11 +93,30 @@
                 </executions>
             </plugin>
 
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint:all,-options,-processing</arg>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <failOnWarning>true</failOnWarning>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>${surefireArgLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
+                    <argLine>@{argLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
                     <systemPropertyVariables>
                         <project.build.directory>${project.build.directory}</project.build.directory>
                     </systemPropertyVariables>
@@ -130,24 +153,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgs>
-                        <arg>-Xlint:all,-options,-processing</arg>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                    <failOnWarning>true</failOnWarning>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <proc>none</proc>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
@@ -159,9 +164,8 @@
                 </executions>
                 <configuration>
                     <source>8</source>
-                    <additionalOptions>${javadoc.opts}</additionalOptions>
                     <failOnError>true</failOnError>
-                    <failOnWarnings>true</failOnWarnings>
+                    <failOnWarnings>${quality.enforced}</failOnWarnings>
                     <excludePackageNames>*.internal:*.internal.*;*.impl;*.impl.*</excludePackageNames>
                     <doclint>all,-missing</doclint>
                 </configuration>

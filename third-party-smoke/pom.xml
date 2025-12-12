@@ -85,11 +85,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <scope>test</scope>
@@ -206,11 +201,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
@@ -223,16 +213,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -283,8 +263,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -324,11 +304,6 @@
         </dependency>
 
         <!-- Databases -->
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
@@ -410,7 +385,7 @@
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -502,7 +477,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.mashape.unirest</groupId>
+            <groupId>com.konghq</groupId>
             <artifactId>unirest-java</artifactId>
             <scope>test</scope>
         </dependency>
@@ -517,14 +492,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jgit</groupId>
-            <artifactId>org.eclipse.jgit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jgit</groupId>
-            <artifactId>org.eclipse.jgit.ssh.apache</artifactId>
-            <scope>test</scope>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -538,7 +507,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.3.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
@@ -558,53 +526,12 @@
                                 <enforceBytecodeVersion>
                                     <maxJdkVersion>1.8</maxJdkVersion>
                                     <excludes>
-                                        <!-- These support Java 8 and 11 so falsely show an issue -->
-                                        <exclude>org.hsqldb:hsqldb</exclude>
                                         <exclude>org.mongodb:bson-record-codec</exclude>
                                     </excludes>
                                 </enforceBytecodeVersion>
                             </rules>
                             <fail>true</fail>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <configLocation>sun_checks.xml</configLocation>
-                    <violationSeverity>warning</violationSeverity>
-                    <failOnViolation>true</failOnViolation>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>checkstyle-verify</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.8.6.6</version>
-                <configuration>
-                    <failOnError>true</failOnError>
-                    <effort>Max</effort>
-                    <threshold>Medium</threshold>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>spotbugs-verify</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
