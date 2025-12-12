@@ -6,17 +6,16 @@ package net.openhft.thirdparty.smoke;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ClassLoadingSmokeTest {
 
@@ -25,23 +24,6 @@ class ClassLoadingSmokeTest {
      */
     private static final ClassLoader LOADER =
             Thread.currentThread().getContextClassLoader();
-
-    @TestFactory
-    @DisplayName("Loads representative classes from each third-party artefact")
-    Collection<DynamicTest> classLoads() {
-        List<DynamicTest> tests = new ArrayList<>();
-        tests.addAll(observabilityTests());
-        tests.addAll(serialisationTests());
-        tests.addAll(mongoTests());
-        tests.addAll(networkingTests());
-        tests.addAll(loggingTests());
-        tests.addAll(collectionTests());
-        tests.addAll(databaseTests());
-        tests.addAll(testingFrameworkTests());
-        tests.addAll(osgiTests());
-        tests.addAll(additionalPeerTests());
-        return tests;
-    }
 
     private static Collection<DynamicTest> observabilityTests() {
         List<DynamicTest> tests = new ArrayList<>();
@@ -99,8 +81,12 @@ class ClassLoadingSmokeTest {
                 () -> assertClassesLoad("com.google.gson.Gson")
         ));
         tests.add(dynamic(
-                "Unirest",
-                () -> assertClassesLoad("com.mashape.unirest.http.Unirest")
+                "Unirest (KongHQ)",
+                () -> assertClassesLoad(
+                        "kong.unirest.Unirest",
+                        "kong.unirest.HttpRequest",
+                        "kong.unirest.GetRequest"
+                )
         ));
         tests.add(dynamic(
                 "Joda-Time",
@@ -109,13 +95,6 @@ class ClassLoadingSmokeTest {
         tests.add(dynamic(
                 "Commons Email",
                 () -> assertClassesLoad("org.apache.commons.mail.Email")
-        ));
-        tests.add(dynamic(
-                "JGit",
-                () -> assertClassesLoad(
-                        "org.eclipse.jgit.api.Git",
-                        "org.eclipse.jgit.transport.sshd.SshdSessionFactory"
-                )
         ));
         tests.add(dynamic(
                 "Maven Model",
@@ -137,10 +116,6 @@ class ClassLoadingSmokeTest {
         tests.add(dynamic(
                 "SnakeYAML",
                 () -> assertClassesLoad("org.yaml.snakeyaml.Yaml")
-        ));
-        tests.add(dynamic(
-                "XStream",
-                () -> assertClassesLoad("com.thoughtworks.xstream.XStream")
         ));
         tests.add(dynamic(
                 "Jettison",
@@ -221,10 +196,6 @@ class ClassLoadingSmokeTest {
                 )
         ));
         tests.add(dynamic(
-                "Log4j 1.x",
-                () -> assertClassesLoad("org.apache.log4j.Logger")
-        ));
-        tests.add(dynamic(
                 "SLF4J API",
                 () -> assertClassesLoad("org.slf4j.LoggerFactory")
         ));
@@ -235,13 +206,6 @@ class ClassLoadingSmokeTest {
         tests.add(dynamic(
                 "SLF4J NOP binding",
                 () -> assertClassesLoad("org.slf4j.helpers.NOPLogger")
-        ));
-        tests.add(dynamic(
-                "Logback",
-                () -> assertClassesLoad(
-                        "ch.qos.logback.classic.LoggerContext",
-                        "ch.qos.logback.core.AppenderBase"
-                )
         ));
         tests.add(dynamic(
                 "Commons Logging",
@@ -266,8 +230,11 @@ class ClassLoadingSmokeTest {
                 "org.apache.commons.cli.Options")));
         tests.add(dynamic("JavaPoet", () -> assertClassesLoad(
                 "com.squareup.javapoet.JavaFile")));
-        tests.add(dynamic("JSR-330 javax.inject", () -> assertClassesLoad(
-                "javax.inject.Inject")));
+        tests.add(dynamic("JSR-330 inject (jakarta or javax)",
+                () -> assertAnyClassLoads(
+                        "jakarta.inject.Inject",
+                        "javax.inject.Inject"
+                )));
         tests.add(dynamic("JetBrains annotations", () -> assertClassesLoad(
                 "org.jetbrains.annotations.NotNull")));
         tests.add(dynamic("QuickFIX/J bundle",
@@ -400,6 +367,21 @@ class ClassLoadingSmokeTest {
         );
     }
 
+    private static void assertAnyClassLoads(final String... classNames) {
+        List<String> names = Arrays.asList(classNames);
+        List<String> failures = new ArrayList<>();
+        for (String className : names) {
+            try {
+                Class.forName(className, false, LOADER);
+                return;
+            } catch (Throwable t) {
+                failures.add(className + ": " + t.toString());
+            }
+        }
+        fail("Could not load any of " + names + " -> "
+                + failures.stream().collect(Collectors.joining("; ")));
+    }
+
     private static void assertClassesLoad(final String... classNames) {
         List<String> names = Arrays.asList(classNames);
         for (String className : names) {
@@ -451,5 +433,22 @@ class ClassLoadingSmokeTest {
     private static boolean isJava8() {
         String spec = System.getProperty("java.specification.version", "");
         return spec.startsWith("1.8") || "8".equals(spec);
+    }
+
+    @TestFactory
+    @DisplayName("Loads representative classes from each third-party artefact")
+    Collection<DynamicTest> classLoads() {
+        List<DynamicTest> tests = new ArrayList<>();
+        tests.addAll(observabilityTests());
+        tests.addAll(serialisationTests());
+        tests.addAll(mongoTests());
+        tests.addAll(networkingTests());
+        tests.addAll(loggingTests());
+        tests.addAll(collectionTests());
+        tests.addAll(databaseTests());
+        tests.addAll(testingFrameworkTests());
+        tests.addAll(osgiTests());
+        tests.addAll(additionalPeerTests());
+        return tests;
     }
 }

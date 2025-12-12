@@ -16,6 +16,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class AnnotationsAndGuavaTestlibSmokeTest {
 
+    @Test
+    void jetbrainsNotNullIsVisibleViaReflection() throws Exception {
+        Method method = Person.class.getDeclaredMethod("getName");
+        assertNotNull(method);
+        // JetBrains annotations are CLASS-retention; presence of the type is
+        // sufficient to show dependency resolution.
+        assertNotNull(NotNull.class.getName());
+    }
+
+    @Test
+    void guavaEqualsTesterValidatesEqualsContract() {
+        new EqualsTester()
+                .addEqualityGroup(new Person("Alice"), new Person("Alice"))
+                .addEqualityGroup(new Person("Bob"))
+                .testEquals();
+    }
+
     /**
      * Simple value object used in equality tests.
      */
@@ -46,22 +63,5 @@ class AnnotationsAndGuavaTestlibSmokeTest {
         public int hashCode() {
             return name.hashCode();
         }
-    }
-
-    @Test
-    void jetbrainsNotNullIsVisibleViaReflection() throws Exception {
-        Method method = Person.class.getDeclaredMethod("getName");
-        assertNotNull(method);
-        // JetBrains annotations are CLASS-retention; presence of the type is
-        // sufficient to show dependency resolution.
-        assertNotNull(NotNull.class.getName());
-    }
-
-    @Test
-    void guavaEqualsTesterValidatesEqualsContract() {
-        new EqualsTester()
-                .addEqualityGroup(new Person("Alice"), new Person("Alice"))
-                .addEqualityGroup(new Person("Bob"))
-                .testEquals();
     }
 }

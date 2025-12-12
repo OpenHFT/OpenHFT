@@ -3,12 +3,12 @@
  */
 package net.openhft.thirdparty.smoke;
 
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.koloboke.collect.map.hash.HashIntIntMaps;
 import com.samskivert.util.QuickSort;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.TypeSpec;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
@@ -21,9 +21,7 @@ import org.xerial.snappy.Snappy;
 import javax.lang.model.element.Modifier;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Minimal usage smoke tests for utility dependencies from third-party-bom.
@@ -67,17 +65,6 @@ class MinimalUtilitiesSmokeTest {
      * CLI flag value used for JCommander parsing.
      */
     private static final String FLAG_VALUE = "value";
-
-    /**
-     * Simple container for JCommander argument parsing.
-     */
-    private static final class CliArgs {
-        /**
-         * Sample flag parsed by JCommander.
-         */
-        @Parameter(names = "-f")
-        private String flag;
-    }
 
     @Test
     @DisplayName("Trove4j map can be used")
@@ -142,8 +129,8 @@ class MinimalUtilitiesSmokeTest {
     void classGraphScans() {
         try (io.github.classgraph.ScanResult scanResult =
                      new io.github.classgraph.ClassGraph()
-                .enableClassInfo()
-                .scan()) {
+                             .enableClassInfo()
+                             .scan()) {
             assertFalse(scanResult.getAllClasses().isEmpty());
         }
     }
@@ -188,5 +175,16 @@ class MinimalUtilitiesSmokeTest {
                 .build()
                 .parse("-f", FLAG_VALUE);
         assertEquals(FLAG_VALUE, args.flag);
+    }
+
+    /**
+     * Simple container for JCommander argument parsing.
+     */
+    private static final class CliArgs {
+        /**
+         * Sample flag parsed by JCommander.
+         */
+        @Parameter(names = "-f")
+        private String flag;
     }
 }

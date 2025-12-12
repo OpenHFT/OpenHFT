@@ -18,17 +18,6 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
  */
 class JUnitPlatformLauncherSmokeTest {
 
-    /**
-     * Jupiter sample executed by the platform launcher.
-     */
-    static class LauncherSample {
-
-        @Test
-        void sample() {
-            Assertions.assertTrue(true, "Launcher sample should pass");
-        }
-    }
-
     @Test
     void canCreateLauncherAndExecuteSampleClass() {
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder
@@ -40,5 +29,16 @@ class JUnitPlatformLauncherSmokeTest {
         launcher.execute(request);
 
         assertNotNull(launcher, "Launcher should be created");
+    }
+
+    /**
+     * Jupiter sample executed by the platform launcher.
+     */
+    static class LauncherSample {
+
+        @Test
+        void sample() {
+            Assertions.assertTrue(true, "Launcher sample should pass");
+        }
     }
 }

@@ -15,6 +15,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class MockitoSmokeTest {
 
     /**
+     * Expected sum for the service compute result.
+     */
+    private static final int EXPECTED_SUM = 3;
+
+    @Test
+    void mockitoSettingsAreAvailable() {
+        org.mockito.MockSettings settings = Mockito.withSettings();
+        assertNotNull(settings);
+        Calculator calculator = new Calculator();
+        Service service = new Service(calculator);
+        assertEquals(EXPECTED_SUM, service.compute());
+    }
+
+    /**
      * Simple calculator used for mocking.
      */
     static class Calculator {
@@ -39,19 +53,5 @@ class MockitoSmokeTest {
         int compute() {
             return serviceCalculator.add(1, 2);
         }
-    }
-
-    /**
-     * Expected sum for the service compute result.
-     */
-    private static final int EXPECTED_SUM = 3;
-
-    @Test
-    void mockitoSettingsAreAvailable() {
-        org.mockito.MockSettings settings = Mockito.withSettings();
-        assertNotNull(settings);
-        Calculator calculator = new Calculator();
-        Service service = new Service(calculator);
-        assertEquals(EXPECTED_SUM, service.compute());
     }
 }

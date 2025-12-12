@@ -13,10 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class EasyMockSmokeTest {
 
-    interface GreetingService {
-        String greet(String name);
-    }
-
     @Test
     void easyMockCanRecordReplayAndVerify() {
         GreetingService service = EasyMock.createMock(GreetingService.class);
@@ -27,5 +23,9 @@ class EasyMockSmokeTest {
         assertEquals("Hello World", result);
 
         EasyMock.verify(service);
+    }
+
+    interface GreetingService {
+        String greet(String name);
     }
 }

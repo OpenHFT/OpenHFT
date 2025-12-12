@@ -4,20 +4,18 @@
 package net.openhft.thirdparty.smoke;
 
 import org.junit.jupiter.api.Test;
+import org.ops4j.pax.exam.Option;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.service.log.LogService;
-import org.ops4j.pax.exam.Option;
 
 import java.util.Collections;
 import java.util.ServiceLoader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 

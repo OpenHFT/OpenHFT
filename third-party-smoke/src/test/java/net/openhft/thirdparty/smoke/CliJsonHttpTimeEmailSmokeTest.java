@@ -6,12 +6,13 @@ package net.openhft.thirdparty.smoke;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.google.gson.Gson;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.HttpRequest;
+import kong.unirest.GetRequest;
+import kong.unirest.Unirest;
 import org.apache.commons.mail.SimpleEmail;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -25,15 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class CliJsonHttpTimeEmailSmokeTest {
 
-    /**
-     * Command-line arguments container.
-     */
-    static class Args {
-        /**
-         * Name parameter parsed by JCommander.
-         */
-        @Parameter(names = "--name")
-        private String name = "default";
+    @AfterAll
+    static void shutdownUnirest() {
+        // Kong Unirest keeps shared resources (thread pools / HTTP client) - shut down to avoid test leaks.
+        Unirest.shutDown();
     }
 
     @Test
@@ -49,8 +45,7 @@ class CliJsonHttpTimeEmailSmokeTest {
     @Test
     void gsonCanSerializeAndDeserializeMap() {
         Gson gson = new Gson();
-        Map<String, String> source =
-                Collections.singletonMap("hello", "world");
+        Map<String, String> source = Collections.singletonMap("hello", "world");
         String json = gson.toJson(source);
         @SuppressWarnings("unchecked")
         Map<String, String> restored = gson.fromJson(json, Map.class);
@@ -59,7 +54,7 @@ class CliJsonHttpTimeEmailSmokeTest {
 
     @Test
     void unirestBuildsRequestWithoutExecuting() {
-        HttpRequest request = Unirest.get("http://example.com")
+        GetRequest request = Unirest.get("http://example.com")
                 .queryString("q", "x");
         assertNotNull(request);
     }
@@ -86,5 +81,16 @@ class CliJsonHttpTimeEmailSmokeTest {
         email.setSubject("Test");
         email.setMsg("Hello");
         assertEquals("Test", email.getSubject());
+    }
+
+    /**
+     * Command-line arguments container.
+     */
+    static class Args {
+        /**
+         * Name parameter parsed by JCommander.
+         */
+        @Parameter(names = "--name")
+        private String name = "default";
     }
 }
