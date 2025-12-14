@@ -1,6 +1,66 @@
 = Version Support
 Peter Lawrey
 
+== New Release Methodology (from 2026.X onwards)
+
+This section describes the new annual release methodology introduced from 2026.X onwards.
+The previous approach remains below for reference.
+
+Chronicle Software now follows an **annual release cycle**, with a new stable version released each **January**.
+Each version is supported for **two years** from its initial release.
+
+All releases now use a **YEAR.MINOR** versioning format.
+For example, the first release under this system will be **2026.01**, followed by **2026.02**, **2026.03**, and so on, for incremental updates throughout that year.
+The following January will introduce a new annual baseline, for example **2027.01**, which becomes the next stable version stream.
+
+=== Support Lifecycle
+
+Each annual release series receives:
+- **Two years of active support** from its release month (January).
+- **Incremental updates** (for example, 2026.02, 2026.03) released throughout the year to deliver enhancements and fixes.
+- **Backports and maintenance** only during its supported period.
+- **No overlapping version streams** beyond the two-year window, ensuring predictable maintenance and stable dependencies.
+
+=== Java Version Support
+
+|====
+| Year | Version Format | Supported Java Versions | Support End
+| 2026 | 2026.X | 8, 11, 17, 21 | January 2028
+| 2027 | 2027.X | 11, 17, 21, 25 | January 2029
+| 2028 | 2028.X | 11, 17, 21, 25 | January 2030
+| 2029 | 2029.X | 11, 17, 21, 25 | January 2031
+| 2030 | 2030.X | 11, 17, 21, 25 | January 2032
+| 2031 | 2031.X | 11, 17, 21, 25 | January 2033
+| 2032 | 2032.X | 11, 17, 21, 25 | January 2034
+| 2033 | 2033.X | 11, 17, 21, 25 | January 2035
+| 2034 | 2034.X | 11, 17, 21, 25 | January 2036
+| 2035 | 2035.X | 11, 17, 21, 25 | January 2037
+|====
+
+=== Release and Development Model
+
+The annual release represents a **single stable branch** that is actively developed and refined throughout the year.
+Subsequent point releases (for example, 2026.02, 2026.03) are produced as needed, incorporating improvements, bug fixes, and selected feature updates.
+Each January, a new major line begins, such as **2027.X**, which becomes the next supported baseline.
+
+There are **no longer Early Access (EA) releases**.
+Development occurs continuously on the main branch, and the January release marks the culmination of that year’s development cycle.
+This approach ensures predictability, stability, and synchronised release timing across all Chronicle Software products.
+
+=== Binary Compatibility and Deprecation Policy
+
+Chronicle Software will continue to maintain **binary compatibility** within each annual release series (for example, all 2026.X artefacts remain compatible).
+Deprecations will follow a **two-release schedule**: methods deprecated in 2026.X will typically be removed in 2028.X.
+
+=== Transition from Legacy Model
+
+All existing versions up to and including **x.27** will continue to follow the previous release and support model until their respective end-of-support dates.
+
+
+
+== Legacy Release Methodology (up to x.27)
+
+This methodology applies to all versions up to and including **x.27**.
 Chronicle Software supports each version for two years from the start of the next minor version. 
 
 All our software has a MAJOR.STAGE.MINOR version. 
@@ -21,9 +81,7 @@ A commercial support agreement is available from mailto:sales@chronicle.software
 
 |====
 | Stage | first released | stable release | end of backport | Java versions
-| x.29  | 2025/10 (a) | 2026/04 (a) | 2027/04 (a) | 11, 17, 21, 25
-| x.28  | 2025/04 (a) | 2025/10 (a) | 2026/10 (a) | 8, 11, 17, 21
-| x.27  | 2024/11 (a) | 2025/04 (a) | 2026/04 (a) | 8, 11, 17, 21
+| x.27  | 2024/11 (a) | 2026/01 (a) | 2026/12 (a) | 8, 11, 17, 21
 | x.26  | 2024/05 | 2024/11 (a) | 2025/10 (a) | 8, 11, 17, 21
 | x.25  | 2023/10 | 2024/05 | 2025/06 | 8, 11, 17, 21
 | x.24  | 2022/10 | 2023/10 | 2024/11 | 8, 11, 17
