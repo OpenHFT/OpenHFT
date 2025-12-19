@@ -1,0 +1,453 @@
+= Assertion Message Quality Guide
+:toc:
+:toclevels: 2
+:sectnums:
+
+== Quick Reference
+
+[cols="1,2,3"]
+|===
+|Code |Rule |Quick Fix
+
+|AMQ01 |Duplicate |Make each message unique to its assertion site
+|AMQ02 |Redundant class name |Add 2+ meaningful words beyond the class name
+|AMQ03 |Redundant method name |Add 2+ meaningful words beyond the method name
+|AMQ04 |Redundant line number |Remove line reference, describe invariant
+|AMQ05 |Trivial Supplier |Use plain String or add dynamic content
+|AMQ06 |Generic message |Name subject + expected behaviour
+|AMQ07 |Restates assertion |Explain the invariant, not the assertion type
+|AMQ08 |Index only |Name what the indexed element represents
+|AMQ09 |Contextless |State what is compared and why it matters
+|AMQ10 |Too short |Add subject + expected behaviour (3+ words)
+|AMQ11 |Too long |Keep invariant, move data to expected/actual
+|AMQ12 |Long word |Use short descriptive terms, not identifiers
+|===
+
+[#AMQ01]
+== AMQ01: Duplicate Message
+
+=== Problem
+
+The same assertion message appears multiple times in the same file.
+
+=== Why This Matters
+
+When a test fails, duplicate messages make it impossible to identify which specific assertion failed without looking at line numbers. Each assertion should have a unique message describing its specific invariant.
+
+=== How to Fix
+
+Describe the specific invariant being tested at each assertion site.
+
+.Before
+[source,java]
+----
+assertEquals(5, users.size(), "check value");
+assertEquals("admin", users.get(0).getRole(), "check value");  // duplicate!
+----
+
+.After
+[source,java]
+----
+assertEquals(5, users.size(), "user count after filtering inactive accounts");
+assertEquals("admin", users.get(0).getRole(), "first user should have admin role");
+----
+
+[#AMQ02]
+== AMQ02: Redundant Class Name
+
+=== Problem
+
+The message contains the enclosing class name but lacks substance without it.
+
+=== Why This Matters
+
+The class name already appears in the stack trace. A message that only repeats the class name (e.g., "BytesStore test") provides no additional diagnostic value.
+
+=== How to Fix
+
+Add 2+ meaningful words that describe the invariant, independent of the class name.
+
+.Before
+[source,java]
+----
+class BytesStoreTest {
+    void test() {
+        assertTrue(result, "BytesStore is valid");
+        // Diagnosis: only 1 meaningful word: valid (filler: is)
+    }
+}
+----
+
+.After
+[source,java]
+----
+class BytesStoreTest {
+    void test() {
+        assertTrue(result, "buffer should preserve byte order after write");
+    }
+}
+----
+
+[#AMQ03]
+== AMQ03: Redundant Method Name
+
+=== Problem
+
+The message contains the enclosing method name but lacks substance without it.
+
+=== Why This Matters
+
+The method name already appears in the stack trace. A message like "testWriteBuffer" or "testWriteBuffer failed" adds no diagnostic value.
+
+=== How to Fix
+
+Add 2+ meaningful words that describe what the method is testing.
+
+.Before
+[source,java]
+----
+void testWriteBuffer() {
+    assertTrue(result, "testWriteBuffer");
+}
+----
+
+.After
+[source,java]
+----
+void testWriteBuffer() {
+    assertTrue(result, "write should flush all bytes to underlying storage");
+}
+----
+
+[#AMQ04]
+== AMQ04: Redundant Line Number
+
+=== Problem
+
+The message contains a line number reference.
+
+=== Why This Matters
+
+Line numbers are already shown in stack traces. Including them in messages ("L42", "line 42", "File.java:42") is redundant and becomes stale when code changes.
+
+=== How to Fix
+
+Remove the line reference and describe the invariant instead.
+
+.Before
+[source,java]
+----
+assertEquals(5, count, "L42");
+assertEquals(5, count, "line 42 check");
+----
+
+.After
+[source,java]
+----
+assertEquals(5, count, "active user count after filtering");
+----
+
+[#AMQ05]
+== AMQ05: Trivial Supplier
+
+=== Problem
+
+A `Supplier<String>` lambda returns a constant string.
+
+=== Why This Matters
+
+JUnit 5's message suppliers exist for lazy evaluation - to avoid expensive string construction when tests pass. A trivial supplier like `() -> "constant"` adds lambda overhead with no benefit.
+
+=== How to Fix
+
+Use a plain String, or include dynamic content to justify lazy evaluation.
+
+.Before
+[source,java]
+----
+assertEquals(expected, actual, () -> "values should match");
+----
+
+.After (plain String)
+[source,java]
+----
+assertEquals(expected, actual, "values should match");
+----
+
+.After (dynamic content)
+[source,java]
+----
+assertEquals(expected, actual,
+    () -> "mismatch at index " + i + ": expected " + expected);
+----
+
+[#AMQ06]
+== AMQ06: Generic Message
+
+=== Problem
+
+The message is a generic single word like "actual", "expected", "value", "test".
+
+=== Why This Matters
+
+These words provide no context about what is being tested or what went wrong. They're often just variable names copied into the message.
+
+=== How to Fix
+
+Name what is being checked (subject) and what should hold (expected behaviour).
+
+.Before
+[source,java]
+----
+assertEquals(expected, actual, "value");
+assertTrue(condition, "test");
+----
+
+.After
+[source,java]
+----
+assertEquals(expected, actual, "order total after applying discount");
+assertTrue(condition, "user session should be active after login");
+----
+
+[#AMQ07]
+== AMQ07: Restates Assertion
+
+=== Problem
+
+The message just restates the assertion type ("should be true", "assertEquals", "not null").
+
+=== Why This Matters
+
+The assertion type is already clear from the method name. The message should explain *why* this condition matters, not repeat *what* is being checked.
+
+=== How to Fix
+
+Explain the expected behaviour or invariant.
+
+.Before
+[source,java]
+----
+assertTrue(flag, "should be true");
+assertNotNull(obj, "not null");
+assertEquals(a, b, "should equal");
+----
+
+.After
+[source,java]
+----
+assertTrue(flag, "feature flag should be enabled in production config");
+assertNotNull(obj, "connection pool should be initialized before first request");
+assertEquals(a, b, "serialized form should match original after round-trip");
+----
+
+[#AMQ08]
+== AMQ08: Index Only
+
+=== Problem
+
+The message is just an array/list index ("0", "[0]", "index 5").
+
+=== Why This Matters
+
+An index alone doesn't explain what the element represents or why it matters.
+
+=== How to Fix
+
+Include what the element at that index represents.
+
+.Before
+[source,java]
+----
+assertEquals(expected, array[0], "0");
+assertEquals(expected, list.get(5), "[5]");
+----
+
+.After
+[source,java]
+----
+assertEquals(expected, array[0], "first entry should be header record");
+assertEquals(expected, list.get(5), "sixth item should be the sentinel value");
+----
+
+[#AMQ09]
+== AMQ09: Contextless Message
+
+=== Problem
+
+The message describes the action but not the meaning ("comparison", "validation", "mismatch").
+
+=== Why This Matters
+
+These words describe what the assertion *does*, not what the values *represent* or why the comparison matters.
+
+=== How to Fix
+
+State what is being compared and why it matters (domain meaning).
+
+.Before
+[source,java]
+----
+assertEquals(a, b, "comparison");
+assertEquals(x, y, "values should match");
+----
+
+.After
+[source,java]
+----
+assertEquals(a, b, "calculated tax should match expected rate");
+assertEquals(x, y, "cache entry should reflect database state");
+----
+
+[#AMQ10]
+== AMQ10: Too Short
+
+=== Problem
+
+The message has fewer than 3 words.
+
+=== Why This Matters
+
+Very short messages rarely provide sufficient context to diagnose failures without reading the code.
+
+=== How to Fix
+
+Add a subject (what) and expected behaviour (should what). Aim for 3-8 words.
+
+.Pattern
+----
+"<subject> should <expected behaviour>"
+----
+
+.Before
+[source,java]
+----
+assertEquals(5, count, "count");
+assertTrue(valid, "ok");
+----
+
+.After
+[source,java]
+----
+assertEquals(5, count, "user count after filtering inactive");
+assertTrue(valid, "order should pass validation rules");
+----
+
+[#AMQ11]
+== AMQ11: Too Long
+
+=== Problem
+
+The message has more than 20 words.
+
+=== Why This Matters
+
+Overly long messages often contain data dumps or implementation details that belong in expected/actual values or logs, not in the message.
+
+=== How to Fix
+
+Keep the invariant description; move data to expected/actual parameters or test output.
+
+.Before
+[source,java]
+----
+assertEquals(expected, actual,
+    "the value that was returned from the method after calling it with the specified parameters should be equal to the expected result that we calculated earlier");
+----
+
+.After
+[source,java]
+----
+assertEquals(expected, actual, "computed result should match expected value");
+// Let the assertion framework show expected vs actual
+----
+
+[#AMQ12]
+== AMQ12: Long Word
+
+=== Problem
+
+The message contains a word exceeding 16 characters (likely a class or method name).
+
+=== Why This Matters
+
+Long identifiers like `ConfigurationManagerServiceFactory` suggest the message is restating code rather than describing the invariant in domain terms.
+
+=== How to Fix
+
+Use short, descriptive domain terms instead of code identifiers.
+
+.Before
+[source,java]
+----
+assertEquals(expected, actual, "ConfigurationManagerServiceFactory returned wrong value");
+----
+
+.After
+[source,java]
+----
+assertEquals(expected, actual, "config service should return cached settings");
+----
+
+== Writing Good Messages
+
+=== The Pattern
+
+A good assertion message follows this pattern:
+
+----
+<subject> should <expected behaviour> [when/after <context>]
+----
+
+=== Examples
+
+[cols="1,2"]
+|===
+|Context |Good Message
+
+|Collection size
+|"user list should contain 5 active users after filtering"
+
+|Object state
+|"order should be valid after setting all required fields"
+
+|Specific data
+|"first market data entry should be AAPL ticker"
+
+|Round-trip
+|"object should preserve all fields through serialization"
+
+|Index with context
+|"first entry should be header record"
+|===
+
+=== Anti-Patterns to Avoid
+
+[cols="1,2,2"]
+|===
+|Anti-Pattern |Example |Why It's Bad
+
+|Variable name
+|"count"
+|No context about what count represents
+
+|Assertion type
+|"should be true"
+|Already obvious from `assertTrue`
+
+|Line number
+|"L42"
+|Already in stack trace
+
+|Class/method name
+|"BytesStoreTest"
+|Already in stack trace
+
+|Index only
+|"[0]"
+|No context about what element represents
+
+|Generic comparison
+|"values should match"
+|Doesn't explain what values represent
+|===

@@ -1,0 +1,676 @@
+= Assertion Message Improvement Tool: Research Topics
+:toc:
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+This document outlines research topics for developing a tool that improves assertion messages to make diagnosing test failures easier. The goal is to move beyond detection (current state) to automated suggestion and transformation.
+
+== Research Areas
+
+=== 1. Context Extraction from Code
+
+==== 1.1 Variable Semantic Analysis
+
+Research how to extract meaning from variable names and usage patterns.
+
+.Questions to explore
+* How to decompose camelCase/snake_case into semantic components?
+* Can we infer purpose from variable type + name + usage context?
+* How to distinguish domain terms from implementation details?
+
+.Example transformation
+[source,java]
+----
+// Before: no context
+assertEquals(5, activeUserCount);
+
+// After: extracted from variable name semantics
+assertEquals(5, activeUserCount, "active user count after filtering");
+----
+
+==== 1.2 Method Context Mining
+
+Extract context from the enclosing method and its documentation.
+
+.Research questions
+* How to leverage Javadoc/comments for message generation?
+* Can method name decomposition (`testUserRegistration_shouldRejectDuplicateEmail`) inform messages?
+* How to identify the "subject under test" from method structure?
+
+==== 1.3 Assertion Argument Analysis
+
+Analyze the actual/expected arguments to generate meaningful descriptions.
+
+.Research questions
+* How to describe what `expected` represents (constant, calculation, fixture)?
+* How to describe what `actual` computes (method chain, field access)?
+* Can we infer invariants from the relationship between expected and actual?
+
+.Example
+[source,java]
+----
+// The assertion:
+assertEquals(order.getItems().size(), cart.getItemCount());
+
+// Generated insight:
+// - Left side: order item collection size
+// - Right side: cart item count
+// - Invariant: order should mirror cart contents
+----
+
+=== 2. Domain Vocabulary Learning
+
+==== 2.1 Project-Specific Terminology
+
+Build domain glossaries from project sources.
+
+.Data sources to mine
+* Class and method names
+* Javadoc and comments
+* README and documentation files
+* Existing good assertion messages
+* Package naming conventions
+
+.Research questions
+* How to weight terms by frequency and specificity?
+* How to identify domain vs generic vocabulary?
+* Can we cluster related domain concepts?
+
+==== 2.2 Abbreviation Expansion
+
+Map common abbreviations to full terms.
+
+.Example mappings
+----
+cfg  → configuration
+ctx  → context
+req  → request
+resp → response
+txn  → transaction
+msg  → message
+buf  → buffer
+idx  → index
+cnt  → count
+----
+
+.Research questions
+* How to build project-specific abbreviation dictionaries?
+* How to handle ambiguous abbreviations?
+* Should messages use abbreviations or full terms?
+
+=== 3. Message Generation Strategies
+
+==== 3.1 Template-Based Generation
+
+Define templates for common assertion patterns.
+
+.Research questions
+* What are the most common assertion patterns in Java codebases?
+* Can we categorize assertions by intent (state validation, invariant check, precondition)?
+* What template variables are most useful?
+
+.Example templates
+----
+// Collection size assertion
+"<collection> should contain <n> <element-type>(s) after <operation>"
+
+// Null check
+"<subject> should be initialized before <operation>"
+
+// Equality check
+"<computed-value> should match <expected-source>"
+
+// Boolean condition
+"<subject> should be <state> when <condition>"
+----
+
+==== 3.2 LLM-Assisted Generation
+
+Use language models to generate contextual messages.
+
+.Research questions
+* What context to include in prompts (method, class, test name, arguments)?
+* How to constrain output to be concise and actionable?
+* How to validate generated messages for accuracy?
+* What's the latency/cost tradeoff for real-time suggestions?
+
+==== 3.3 Example-Based Learning
+
+Learn from existing high-quality messages in the codebase.
+
+.Research questions
+* How to identify "good" messages to learn from?
+* Can we use similarity matching to suggest messages from analogous assertions?
+* How to adapt learned patterns to new contexts?
+
+=== 4. Failure Diagnosis Enhancement
+
+==== 4.1 Failure Message Enrichment
+
+Research what additional information helps diagnose failures.
+
+.Data to include
+* Assertion location (already in stack trace)
+* Variable values at failure time
+* Recent state changes (if trackable)
+* Related assertions that passed
+* Test setup context
+
+.Research questions
+* What information is most valuable but typically missing?
+* How to avoid information overload in failure output?
+* Can we link failures to likely root causes?
+
+==== 4.2 Failure Pattern Recognition
+
+Analyze historical failures to identify common patterns.
+
+.Research questions
+* What assertion failures are most common in CI?
+* Are there recurring failure patterns with common fixes?
+* Can we suggest likely causes based on failure signatures?
+
+==== 4.3 Diff-Aware Messages
+
+Generate messages that highlight what changed.
+
+.Example
+[source,java]
+----
+// Instead of:
+// Expected: [a, b, c]
+// Actual: [a, b, d]
+
+// Show:
+// List differs at index 2: expected 'c' but was 'd'
+// (first 2 elements match: [a, b])
+----
+
+.Research questions
+* How to generate minimal diff descriptions?
+* What diff granularity is most helpful (element, field, character)?
+* How to handle large collections/objects?
+
+=== 5. IDE and Tooling Integration
+
+==== 5.1 Real-Time Suggestions
+
+Provide message suggestions as developers write assertions.
+
+.Research questions
+* What IDE extension APIs support inline suggestions?
+* How to trigger suggestions (on assertion write, on test run, on commit)?
+* How to present multiple suggestions for user selection?
+
+==== 5.2 Quick-Fix Actions
+
+Offer automated fixes for detected issues.
+
+.Research questions
+* How to integrate with IDE quick-fix systems?
+* Should fixes be fully automated or require confirmation?
+* How to handle multiple valid fix options?
+
+==== 5.3 Pre-Commit Hooks
+
+Validate and suggest improvements before commit.
+
+.Research questions
+* How to balance speed vs thoroughness in pre-commit checks?
+* Should improvements be blocking or advisory?
+* How to handle legacy code with many violations?
+
+=== 6. Automated Transformation
+
+==== 6.1 Safe Transformation Rules
+
+Define deterministic transformations that are always safe.
+
+.Example safe transformations
+----
+// Remove redundant content
+"BytesStore test" → "buffer preserves byte order" (in BytesStoreTest)
+
+// Expand abbreviations
+"cfg validation" → "configuration validation"
+
+// Add structure
+"size" → "collection size after operation"
+----
+
+.Research questions
+* What transformations are always improvements?
+* How to verify transformations don't change meaning?
+* How to handle edge cases and exceptions?
+
+==== 6.2 Confidence-Based Application
+
+Apply transformations based on confidence level.
+
+.Confidence tiers
+[cols="1,2,2"]
+|===
+|Tier |Confidence |Action
+
+|High (>90%)
+|Mechanical fix (remove line number, expand abbreviation)
+|Auto-apply
+
+|Medium (70-90%)
+|Pattern-based suggestion (template match)
+|Suggest with preview
+
+|Low (<70%)
+|LLM-generated or inferred
+|Present as option
+|===
+
+==== 6.3 Batch Transformation
+
+Apply improvements across entire codebases.
+
+.Research questions
+* How to prioritize which files/assertions to improve first?
+* How to validate batch changes don't break tests?
+* How to handle merge conflicts with in-flight changes?
+
+=== 7. Metrics and Evaluation
+
+==== 7.1 Message Quality Metrics
+
+Define measurable quality dimensions.
+
+.Proposed metrics
+* **Specificity**: Does it identify the exact invariant?
+* **Actionability**: Does it suggest what to check/fix?
+* **Brevity**: Is it concise without losing meaning?
+* **Uniqueness**: Is it distinguishable from other assertions?
+* **Domain relevance**: Does it use project vocabulary?
+
+.Research questions
+* How to quantify these dimensions?
+* Can we create an automated quality scorer?
+* What's the correlation between metrics and actual diagnostic utility?
+
+==== 7.2 Diagnostic Time Studies
+
+Measure impact on failure diagnosis time.
+
+.Study design
+* Compare diagnosis time with poor vs improved messages
+* Track which message components are most valuable
+* Measure across experience levels (junior, senior, unfamiliar with code)
+
+==== 7.3 A/B Testing Framework
+
+Test message improvements in production.
+
+.Research questions
+* How to A/B test assertion messages in CI?
+* What metrics indicate improvement (time to fix, reopen rate)?
+* How to attribute improvements to specific message changes?
+
+=== 8. Cross-Language Considerations
+
+==== 8.1 Language-Specific Patterns
+
+Research assertion patterns across languages.
+
+.Languages to study
+* Java (JUnit, AssertJ, TestNG)
+* Kotlin (kotlin.test, Kotest)
+* Python (pytest, unittest)
+* JavaScript/TypeScript (Jest, Mocha, Vitest)
+* Go (testing package, testify)
+* Rust (built-in assert, proptest)
+
+.Research questions
+* What assertion patterns are universal vs language-specific?
+* How do fluent APIs (AssertJ, Kotest) affect message generation?
+* Can improvement strategies transfer across languages?
+
+==== 8.2 Framework-Specific Optimizations
+
+Optimize for specific testing frameworks.
+
+.Research questions
+* How do different frameworks report failures?
+* What framework features can enhance diagnostics (soft assertions, nested contexts)?
+* How to leverage framework-specific message customization?
+
+=== 9. Historical and Empirical Analysis
+
+==== 9.1 Open Source Corpus Study
+
+Analyze assertion messages across open source projects.
+
+.Data to collect
+* Message length distribution
+* Common patterns and anti-patterns
+* Correlation with project maturity/quality
+* Framework usage patterns
+
+.Research questions
+* What distinguishes well-maintained projects' assertion messages?
+* Are there industry-specific patterns (fintech, web, systems)?
+* How do messages evolve over project lifetime?
+
+==== 9.2 Failure Log Mining
+
+Mine CI logs for assertion failure patterns.
+
+.Data to extract
+* Most frequent failure messages
+* Time to resolution per failure type
+* Correlation between message quality and fix speed
+* Flaky test identification
+
+==== 9.3 Developer Survey
+
+Gather developer perspectives on assertion messages.
+
+.Survey topics
+* What information do developers want in failure messages?
+* What makes a message "good" vs "bad"?
+* How much time is spent deciphering poor messages?
+* Willingness to adopt automated improvements?
+
+=== 10. Framework-Aware Diagnostics
+
+==== 10.1 When Custom Messages Disable Rich Failure Output
+
+Some frameworks generate *better-than-human* diagnostics by default, but a custom message can suppress it.
+
+.Known framework behaviours
+* **pytest**: Adding an explicit message to `assert ..., "msg"` disables assertion introspection (the rewritten, value-rich output)
+* **Spock/Groovy power asserts**: Adding a custom message can remove the detailed "power assert" rendering
+* **Kotlin power-assert**: Compiler plugin renders intermediate values; custom messages may override
+
+.Research questions
+* For each framework, what message forms preserve rich diagnostics vs override them?
+* Can the tool choose between: (a) add message, (b) add description/label, (c) no message (rely on power-assert)?
+* What is the crossover point where "message text" is inferior to "value decomposition"?
+
+.References
+* https://docs.pytest.org/en/stable/how-to/assert.html[pytest assertion rewriting docs]
+* https://github.com/spockframework/spock/issues/922[Spock issue #922: message disables power assertion]
+* https://kotlinlang.org/docs/power-assert.html[Kotlin power-assert compiler plugin]
+* https://kotest.io/docs/assertions/power-assert/[Kotest Power Assert]
+
+==== 10.2 Prefer Structured Diagnostics Over Free-Text
+
+Google's testing guidance pushes "actionable failures" and leveraging assertion libraries/features that produce more informative output.
+
+.Research questions
+* When is it better to replace `assertEquals(...)` + message with a framework feature (matchers, specialised assertions, custom subjects)?
+* Can your tool detect "complex expression assertions" and recommend enabling power-assert instead of generating a long message?
+
+.Reference
+* https://testing.googleblog.com/2024/05/test-failures-should-be-actionable.html[Google Testing Blog: Test Failures Should Be Actionable]
+
+==== 10.3 Structured Failure Messages (Facts/Fields) Rather Than Prose
+
+Truth explicitly frames failure messages as **key-value "facts"**, with guidelines about separating fixed keys from runtime values.
+
+.Research questions
+* Can your suggestion engine output a *structured* representation (facts) and map it to:
+** Truth facts (best case)
+** AssertJ descriptions/labels
+** Plain String message fallback
+* What "fact schema" works across frameworks (subject, phase, key invariant, index/field, expected-source)?
+
+.Reference
+* https://truth.dev/failure_messages.html[Truth: Writing failure messages for a Subject]
+
+=== 11. Grouped Assertions and Headings
+
+==== 11.1 assertAll Heading as First-Class Diagnostic Surface
+
+JUnit 5 `assertAll` supports a **heading** that appears in aggregated failure output (MultipleFailuresError).
+
+.Research questions
+* How should the tool generate `assertAll` headings (phase-based, scenario-based, fixture-based)?
+* When multiple assertions exist, is it better to:
+** Add per-assert messages, or
+** Introduce `assertAll("phase: ...", ...)` plus minimal per-assert context?
+
+.Reference
+* https://docs.junit.org/5.13.0-M1/user-guide/index.html[JUnit 5 User Guide]
+
+==== 11.2 Heading Quality Rules
+
+If `assertAll` heading is "assertAll", "grouped assertions", or similarly low-signal, it provides no diagnostic value.
+
+.Detection approach
+* Run headings through existing semantic rules (generic/restates/contextless/too-short)
+* If assertAll has N>=3 executables and heading is absent, emit a suggestion (not error)
+
+=== 12. Security: Secrets and PII in Failure Messages
+
+==== 12.1 Failure Message Enrichment Risks
+
+If you move toward "failure message enrichment" (values, snapshots), you need guardrails: logs can contain sensitive data.
+
+.Research questions
+* What redaction rules are needed (tokens, credentials, customer data)?
+* Can the tool detect "sensitive variables" (name patterns + annotations) and avoid emitting raw values?
+* How do CI systems redact (and where do they fail), especially with encoding?
+
+.Sensitive variable patterns to detect
+----
+*password*, *secret*, *token*, *apiKey*, *api_key*,
+*credential*, *auth*, *private*, *ssn*, *creditCard*
+----
+
+.References
+* https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html[OWASP Logging Cheat Sheet]
+* https://trufflesecurity.com/blog/secrets-leak-in-ci-cd[How Secrets Leak in CI/CD Pipelines]
+
+=== 13. Empirical Evidence and Practitioner Research
+
+==== 13.1 When Messages Help vs When They Are Noise
+
+Recent practitioner-focused work surveyed **138 professionals** on how and why they use assertion messages.
+
+.Research questions
+* Where do messages deliver the most value (unit vs integration vs end-to-end, flaky tests, long-running CI jobs)?
+* How do practitioners balance "self-describing assertion" vs "message as documentation"?
+* Should the tool apply different policies by test type (fast unit vs slow integration)?
+
+.References
+* https://arxiv.org/abs/2408.01751[Peruma et al. (2024): On the Rationale and Use of Assertion Messages in Test Code]
+* https://research.tudelft.nl/files/137994226/s10664_022_10207_5.pdf[Test smells 20 years later: detectability, validity, and reliability]
+
+==== 13.2 Automated Refactoring Research
+
+RAIDE is explicitly about automatically identifying and refactoring **Assertion Roulette** and **Duplicate Assert** smells.
+
+.Research questions
+* What mechanical refactorings are consistently safe (split tests, introduce `assertAll` headings, add per-assert context)?
+* Can you mine your own history for accepted "message improvement" edits and learn local patterns?
+
+.References
+* https://arxiv.org/abs/2207.05539[RAIDE: Refactoring Assertion Roulette and Duplicate Assert test smells]
+* https://arxiv.org/pdf/2504.07277[Agentic LMs: Hunting Down Test Smells]
+* https://arxiv.org/abs/1712.03201[Mining Fix Patterns for FindBugs Violations]
+
+=== 14. Advanced Techniques
+
+==== 14.1 Static Analysis Integration
+
+Combine with existing static analysis tools.
+
+.Integration points
+* SpotBugs/FindBugs bug patterns
+* Error Prone checks
+* SonarQube rules
+* PMD rules
+
+.Research questions
+* Can we correlate assertion quality with code quality metrics?
+* Do certain code smells correlate with poor assertion messages?
+* Can we predict which assertions will be hard to diagnose?
+
+==== 14.2 Runtime Enhancement
+
+Enhance messages at runtime with dynamic context.
+
+.Techniques to explore
+* Aspect-oriented message enrichment
+* Debug agent integration
+* Failure context capture (variable snapshots)
+* Execution trace summary
+
+==== 14.3 Property-Based Test Integration
+
+Special handling for property-based testing.
+
+.Research questions
+* How to describe shrunk counterexamples?
+* How to summarize failing property constraints?
+* Can we generate reproduction steps from failures?
+
+== Priority Ranking
+
+[cols="1,2,1,1"]
+|===
+|Priority |Topic |Impact |Feasibility
+
+|1
+|**Framework-Aware Diagnostics (10.1, 10.2)**
+|Critical
+|High
+
+|2
+|Context Extraction (1.1, 1.2, 1.3)
+|High
+|Medium
+
+|3
+|Template-Based Generation (3.1)
+|High
+|High
+
+|4
+|Safe Transformation Rules (6.1)
+|High
+|High
+
+|5
+|Grouped Assertions / assertAll (11.1, 11.2)
+|High
+|High
+
+|6
+|Message Quality Metrics (7.1)
+|Medium
+|High
+
+|7
+|IDE Integration (5.1, 5.2)
+|High
+|Medium
+
+|8
+|Security / PII Redaction (12.1)
+|High
+|Medium
+
+|9
+|Domain Vocabulary Learning (2.1)
+|Medium
+|Medium
+
+|10
+|LLM-Assisted Generation (3.2)
+|High
+|Low
+
+|11
+|Open Source Corpus Study (9.1)
+|Medium
+|High
+
+|12
+|Empirical Practitioner Research (13.1)
+|Medium
+|Medium
+
+|13
+|Failure Pattern Recognition (4.2)
+|Medium
+|Medium
+
+|14
+|Cross-Language Considerations (8.1)
+|Low
+|Low
+|===
+
+NOTE: **Framework-Aware Diagnostics** is ranked #1 because an auto-message tool that suppresses framework introspection (pytest, Spock power-assert) is a **net regression**. This must be addressed before any message generation features.
+
+== Recommended Starting Points
+
+=== Quick Wins (1-2 weeks each)
+
+1. **Template library**: Build templates for the 10 most common assertion patterns
+2. **Variable name decomposition**: Parse camelCase/snake_case into word lists
+3. **Domain dictionary**: Extract vocabulary from class/method names in target project
+4. **Quality scorer**: Implement metrics from 7.1 to measure current state
+
+=== Medium-Term Projects (1-2 months each)
+
+1. **Context-aware suggester**: Combine variable analysis + templates for suggestions
+2. **IDE plugin prototype**: VS Code or IntelliJ plugin for real-time suggestions
+3. **Corpus analysis**: Study 100+ open source projects for patterns
+4. **Batch transformer**: Tool to improve messages across a codebase
+
+=== Long-Term Research (3+ months)
+
+1. **LLM fine-tuning**: Train model on high-quality assertion messages
+2. **Diagnostic time study**: Measure real-world impact of improved messages
+3. **Cross-language framework**: Generalize approach beyond Java
+
+== References
+
+=== Academic
+
+* https://arxiv.org/abs/2408.01751[Peruma et al. (2024): On the Rationale and Use of Assertion Messages in Test Code] - practitioner survey (138 professionals)
+* https://arxiv.org/abs/2207.05539[RAIDE: Refactoring Assertion Roulette and Duplicate Assert test smells] - controlled experiment on automated refactoring
+* https://arxiv.org/abs/1712.03201[Mining Fix Patterns for FindBugs Violations] - learning fixes from history
+* https://arxiv.org/pdf/2504.07277[Agentic LMs: Hunting Down Test Smells] - LLM-based test smell detection
+* https://research.tudelft.nl/files/137994226/s10664_022_10207_5.pdf[Test smells 20 years later: detectability, validity, and reliability]
+* "Readable Assertions for Fluent Testing" - patterns for fluent assertion APIs
+* "Automated Test Oracle Generation" - generating expected values and checks
+
+=== Industry
+
+* https://testing.googleblog.com/2024/05/test-failures-should-be-actionable.html[Google Testing Blog: Test Failures Should Be Actionable]
+* https://abseil.io/resources/swe-book/html/ch12.html[Software Engineering at Google - Unit Testing chapter] (clarity/actionability)
+* Martin Fowler's "Mocks Aren't Stubs" - assertion philosophy
+* xUnit Test Patterns - assertion patterns and anti-patterns
+
+=== Framework Documentation
+
+* https://docs.pytest.org/en/stable/how-to/assert.html[pytest assertion rewriting / introspection docs]
+* https://spockframework.org/spock/docs/1.2-RC3/all_in_one.html[Spock Framework Reference Documentation]
+* https://github.com/spockframework/spock/issues/922[Spock issue #922: custom messages suppress power-assert output]
+* https://kotlinlang.org/docs/power-assert.html[Kotlin power-assert compiler plugin]
+* https://kotest.io/docs/assertions/power-assert/[Kotest Power Assert]
+* https://truth.dev/failure_messages.html[Truth: Writing failure messages for a Subject] (facts/fields approach)
+* https://assertj.github.io/doc/[AssertJ documentation] (as() vs withFailMessage())
+* https://docs.junit.org/5.13.0-M1/user-guide/index.html[JUnit 5 User Guide] (assertAll headings)
+
+=== Security
+
+* https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html[OWASP Logging Cheat Sheet] (sensitive data in logs)
+* https://trufflesecurity.com/blog/secrets-leak-in-ci-cd[How Secrets Leak in CI/CD Pipelines]
+
+=== Tools to Study
+
+* Approval Tests - snapshot-based assertions with diff output
+* Power Assert (Groovy, Kotlin) - expression decomposition in failures
+* pytest-clarity - enhanced assertion failure messages
+* Spock Framework - condition rendering in failures
