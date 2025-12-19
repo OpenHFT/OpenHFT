@@ -319,4 +319,63 @@ public class UniqueAssertMessagesCheckTest extends AbstractModuleTestSupport {
 
         verify(checkConfig, getPath("InputWordMetrics.java"), expected);
     }
+
+    /**
+     * Test Phase 2 rules: AMQ13 (duplicates input), AMQ14 (assertAll heading), AMQ15 (restates derived).
+     */
+    @Test
+    public void testPhase2Rules() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(UniqueAssertMessagesCheck.class);
+
+        final String[] expected = {
+                // AMQ13: Message duplicates input
+                "20: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_DUPLICATES_INPUT,
+                        "admin", "admin"),
+                // Line 21: "expected" triggers both AMQ06 (generic) and AMQ13 (duplicates variable name)
+                "21: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_GENERIC, "expected"),
+                "21: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_DUPLICATES_INPUT,
+                        "expected", "expected"),
+
+                // AMQ14: Low-signal assertAll headings
+                "35: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTALL_HEADING,
+                        "assertAll"),
+                "39: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTALL_HEADING,
+                        "assertions"),
+                "43: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTALL_HEADING,
+                        "checks"),
+                "47: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTALL_HEADING,
+                        "validation"),
+                "51: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTALL_HEADING,
+                        "test"),
+
+                // AMQ15: Restates derived assertion
+                "69: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "empty", "empty"),
+                "70: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "is empty", "is empty"),
+                "71: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "not empty", "not empty"),
+                "72: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "blank", "blank"),
+                "73: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "present", "present"),
+                "74: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "not present", "not present"),
+                "75: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "contains", "contains"),
+                "76: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "matches", "matches"),
+                "77: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "size", "size"),
+                "78: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "zero", "zero"),
+                "79: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "positive", "positive"),
+                "80: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_RESTATES_DERIVED,
+                        "negative", "negative"),
+        };
+
+        verify(checkConfig, getPath("InputPhase2Rules.java"), expected);
+    }
 }

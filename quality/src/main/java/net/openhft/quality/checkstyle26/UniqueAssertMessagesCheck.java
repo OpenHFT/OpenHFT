@@ -90,6 +90,21 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
      */
     public static final String MSG_LONG_WORD = "assert.message.long.word";
 
+    /**
+     * Message key for messages that duplicate an assertion input (expected value, variable name).
+     */
+    public static final String MSG_DUPLICATES_INPUT = "assert.message.duplicates.input";
+
+    /**
+     * Message key for low-signal assertAll headings.
+     */
+    public static final String MSG_ASSERTALL_HEADING = "assert.message.assertall.heading";
+
+    /**
+     * Message key for messages that restate derived assertions (empty, present, contains).
+     */
+    public static final String MSG_RESTATES_DERIVED = "assert.message.restates.derived";
+
     // ========== Rule Codes (machine-parsable identifiers) ==========
 
     /** Rule code for duplicate messages. */
@@ -116,6 +131,12 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
     public static final String CODE_TOO_LONG = "AMQ11";
     /** Rule code for long word in message. */
     public static final String CODE_LONG_WORD = "AMQ12";
+    /** Rule code for message duplicating assertion input. */
+    public static final String CODE_DUPLICATES_INPUT = "AMQ13";
+    /** Rule code for low-signal assertAll heading. */
+    public static final String CODE_ASSERTALL_HEADING = "AMQ14";
+    /** Rule code for restating derived assertion. */
+    public static final String CODE_RESTATES_DERIVED = "AMQ15";
 
     /** Minimum number of words required in a message. */
     private static final int MIN_WORD_COUNT = 3;
@@ -217,6 +238,42 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
             "not equal|" +
             "mismatch|" +
             "failed|failure|error" +
+            ")$"
+    );
+
+    /**
+     * Pattern to detect messages that restate derived assertion conditions.
+     * These are conditions that assertion frameworks already show in their output.
+     */
+    private static final Pattern RESTATES_DERIVED_PATTERN = Pattern.compile(
+            "(?i)^(" +
+            "(is )?empty|" +
+            "not empty|" +
+            "(is )?blank|" +
+            "not blank|" +
+            "(is )?present|" +
+            "not present|" +
+            "contains|" +
+            "does not contain|" +
+            "matches|" +
+            "does not match|" +
+            "(has |have )?size|" +
+            "(is )?zero|" +
+            "(is )?positive|" +
+            "(is )?negative" +
+            ")$"
+    );
+
+    /**
+     * Pattern to detect low-signal assertAll headings.
+     */
+    private static final Pattern LOW_SIGNAL_HEADING_PATTERN = Pattern.compile(
+            "(?i)^(" +
+            "assert(all|ions?)?|" +
+            "grouped? assertions?|" +
+            "checks?|" +
+            "validat(e|ions?)|" +
+            "tests?" +
             ")$"
     );
 
@@ -385,8 +442,16 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
         // JUnit 4: message is FIRST argument: assertEquals(message, expected, actual)
         // JUnit 5: message is LAST argument: assertEquals(expected, actual, message)
         // AssertJ: as("message"), describedAs("message") - only argument
+        // assertAll: first string is heading (AMQ14), rest are lambdas
+
+        // Special handling for assertAll (AMQ14)
+        if (methodName.equals("assertAll")) {
+            checkAssertAllHeading(elist, lineNo);
+            return;
+        }
 
         // Count arguments and collect string literals with their positions
+        // Also collect potential input values for AMQ13 (message duplicates input)
         int argCount = 0;
         DetailAST firstStringExpr = null;
         DetailAST lastStringExpr = null;
@@ -394,6 +459,8 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
         int firstStringArgIndex = -1;
         int lastStringArgIndex = -1;
         int lastLambdaArgIndex = -1;
+        // Map EXPR nodes to their input values (for AMQ13)
+        java.util.Map<DetailAST, String> exprToInputValue = new java.util.IdentityHashMap<>();
 
         DetailAST child = elist.getFirstChild();
         while (child != null) {
@@ -409,13 +476,21 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
                     if (innerLambda != null) {
                         lastLambda = innerLambda;
                         lastLambdaArgIndex = argCount;
-                    } else if (extractStringLiteral(child) != null) {
-                        if (firstStringExpr == null) {
-                            firstStringExpr = child;
-                            firstStringArgIndex = argCount;
+                    } else {
+                        String strLiteral = extractStringLiteral(child);
+                        if (strLiteral != null) {
+                            if (firstStringExpr == null) {
+                                firstStringExpr = child;
+                                firstStringArgIndex = argCount;
+                            }
+                            lastStringExpr = child;
+                            lastStringArgIndex = argCount;
                         }
-                        lastStringExpr = child;
-                        lastStringArgIndex = argCount;
+                        // Collect input value for AMQ13 check (associate with EXPR node)
+                        String inputValue = extractInputValue(child);
+                        if (inputValue != null) {
+                            exprToInputValue.put(child, inputValue);
+                        }
                     }
                 }
             }
@@ -476,7 +551,17 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
         if (messageExpr != null) {
             String message = extractStringLiteral(messageExpr);
             if (message != null) {
-                checkMessage(message, lineNo);
+                // Collect input values, excluding the message expression itself (AMQ13)
+                java.util.List<String> inputValues = new java.util.ArrayList<>();
+                for (java.util.Map.Entry<DetailAST, String> entry : exprToInputValue.entrySet()) {
+                    if (entry.getKey() != messageExpr) {
+                        inputValues.add(entry.getValue());
+                    }
+                }
+                // Check if message duplicates any input value (AMQ13)
+                boolean duplicatesInput = checkDuplicatesInput(message, inputValues, lineNo);
+                // Check other message quality rules
+                checkMessage(message, lineNo, duplicatesInput);
             }
         }
     }
@@ -869,6 +954,13 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
             warningFired = true;
         }
 
+        // Check for messages that restate derived assertion conditions (AMQ15)
+        String derivedMatch = extractMatch(RESTATES_DERIVED_PATTERN, message);
+        if (derivedMatch != null) {
+            log(lineNo, MSG_RESTATES_DERIVED, message, derivedMatch);
+            warningFired = true;
+        }
+
         // Check word count and word lengths (skip word count if any warning already fired)
         checkMessageWordMetrics(message, lineNo, warningFired);
     }
@@ -1248,5 +1340,130 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
             }
         }
         return true;
+    }
+
+    /**
+     * Extracts an input value from an assertion argument for AMQ13 checking.
+     * Returns string literals, identifiers, and simple class references.
+     *
+     * @param expr the EXPR node containing the argument
+     * @return the input value as a string, or null if not extractable
+     */
+    private String extractInputValue(DetailAST expr) {
+        if (expr == null) {
+            return null;
+        }
+
+        // Unwrap EXPR if needed
+        DetailAST content = expr;
+        if (content.getType() == TokenTypes.EXPR && content.getChildCount() == 1) {
+            content = content.getFirstChild();
+        }
+
+        // String literal - extract the value
+        if (content.getType() == TokenTypes.STRING_LITERAL) {
+            String text = content.getText();
+            if (text.length() >= 2) {
+                return text.substring(1, text.length() - 1);
+            }
+            return null;
+        }
+
+        // Simple identifier - return the variable name
+        if (content.getType() == TokenTypes.IDENT) {
+            return content.getText();
+        }
+
+        // Class literal like IllegalArgumentException.class
+        if (content.getType() == TokenTypes.DOT) {
+            DetailAST lastChild = content.getLastChild();
+            if (lastChild != null && "class".equals(lastChild.getText())) {
+                DetailAST firstChild = content.getFirstChild();
+                if (firstChild != null && firstChild.getType() == TokenTypes.IDENT) {
+                    return firstChild.getText();
+                }
+            }
+        }
+
+        // Method call result - extract the method name
+        if (content.getType() == TokenTypes.METHOD_CALL) {
+            DetailAST ident = content.findFirstToken(TokenTypes.IDENT);
+            if (ident != null) {
+                return ident.getText();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks assertAll heading quality (AMQ14).
+     * Flags low-signal headings like "assertAll", "grouped assertions", etc.
+     *
+     * @param elist the ELIST node containing arguments
+     * @param lineNo the line number for reporting
+     */
+    private void checkAssertAllHeading(DetailAST elist, int lineNo) {
+        // Find the first string argument (the heading)
+        DetailAST child = elist.getFirstChild();
+        while (child != null) {
+            if (child.getType() == TokenTypes.EXPR) {
+                String heading = extractStringLiteral(child);
+                if (heading != null) {
+                    // Check for low-signal headings
+                    if (LOW_SIGNAL_HEADING_PATTERN.matcher(heading.trim()).matches()) {
+                        log(lineNo, MSG_ASSERTALL_HEADING, heading);
+                    } else {
+                        // Valid heading - check other quality rules but skip duplicate check
+                        checkMessage(heading, lineNo);
+                    }
+                    return;
+                }
+            }
+            child = child.getNextSibling();
+        }
+    }
+
+    /**
+     * Checks if a message duplicates an assertion input value (AMQ13).
+     *
+     * @param message the assertion message
+     * @param inputValues list of input values from the assertion
+     * @param lineNo the line number for reporting
+     * @return true if a warning was logged
+     */
+    private boolean checkDuplicatesInput(String message, java.util.List<String> inputValues,
+                                          int lineNo) {
+        if (message == null || inputValues.isEmpty()) {
+            return false;
+        }
+
+        String messageLower = message.toLowerCase().trim();
+
+        for (String input : inputValues) {
+            if (input == null || input.isEmpty()) {
+                continue;
+            }
+
+            String inputLower = input.toLowerCase().trim();
+
+            // Check for exact match (case-insensitive)
+            if (messageLower.equals(inputLower)) {
+                log(lineNo, MSG_DUPLICATES_INPUT, message, input);
+                return true;
+            }
+
+            // Check if message is just the input with common suffixes/prefixes
+            // e.g., "expected" as message when expected is a variable name
+            if (messageLower.equals(inputLower + " value")
+                    || messageLower.equals(inputLower + " result")
+                    || messageLower.equals("expected " + inputLower)
+                    || messageLower.equals("actual " + inputLower)) {
+                log(lineNo, MSG_DUPLICATES_INPUT, message, input);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

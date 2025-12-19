@@ -21,6 +21,9 @@
 |AMQ10 |Too short |Add subject + expected behaviour (3+ words)
 |AMQ11 |Too long |Keep invariant, move data to expected/actual
 |AMQ12 |Long word |Use short descriptive terms, not identifiers
+|AMQ13 |Duplicates input |Explain invariant, not the data
+|AMQ14 |Low-signal assertAll heading |Name what the group validates
+|AMQ15 |Restates derived assertion |Explain why the property matters
 |===
 
 [#AMQ01]
@@ -387,6 +390,111 @@ assertEquals(expected, actual, "ConfigurationManagerServiceFactory returned wron
 [source,java]
 ----
 assertEquals(expected, actual, "config service should return cached settings");
+----
+
+[#AMQ13]
+== AMQ13: Duplicates Input
+
+=== Problem
+
+The assertion message duplicates an input value (expected value, variable name, or exception class).
+
+=== Why This Matters
+
+When the message just echoes the expected value or variable name, it provides no additional diagnostic value. The assertion framework already shows the expected and actual values.
+
+=== How to Fix
+
+Explain the invariant - why this value matters, not what the value is.
+
+.Before
+[source,java]
+----
+assertEquals("admin", role, "admin");
+assertThrows(IllegalArgumentException.class, code, "IllegalArgumentException");
+assertEquals(expected, actual, "expected");
+----
+
+.After
+[source,java]
+----
+assertEquals("admin", role, "first user should have admin role");
+assertThrows(IllegalArgumentException.class, code, "negative quantity should be rejected");
+assertEquals(expected, actual, "computed hash should match stored value");
+----
+
+[#AMQ14]
+== AMQ14: Low-Signal assertAll Heading
+
+=== Problem
+
+The `assertAll` heading uses generic terms like "assertAll", "grouped assertions", "checks", or "validations".
+
+=== Why This Matters
+
+The `assertAll` heading is meant to describe what the group of assertions validates. Generic headings provide no context about what invariant is being checked.
+
+=== How to Fix
+
+Name what the group of assertions validates - the business rule or invariant.
+
+.Before
+[source,java]
+----
+assertAll("assertions",
+    () -> assertEquals(5, order.getItems().size()),
+    () -> assertTrue(order.isValid())
+);
+
+assertAll("checks",
+    () -> assertNotNull(user.getId()),
+    () -> assertEquals("active", user.getStatus())
+);
+----
+
+.After
+[source,java]
+----
+assertAll("order should be complete and valid",
+    () -> assertEquals(5, order.getItems().size()),
+    () -> assertTrue(order.isValid())
+);
+
+assertAll("user should be properly initialized",
+    () -> assertNotNull(user.getId()),
+    () -> assertEquals("active", user.getStatus())
+);
+----
+
+[#AMQ15]
+== AMQ15: Restates Derived Assertion
+
+=== Problem
+
+The message restates a derived assertion condition like "empty", "present", "contains", "matches".
+
+=== Why This Matters
+
+Derived assertions like `isEmpty()`, `isPresent()`, or `contains()` already describe their condition clearly in framework output. Restating this in the message adds no value.
+
+=== How to Fix
+
+Explain why this property matters in the domain context.
+
+.Before
+[source,java]
+----
+assertThat(list).isEmpty();  // with message "empty"
+assertThat(optional).isPresent();  // with message "present"
+assertThat(text).contains("@");  // with message "contains"
+----
+
+.After
+[source,java]
+----
+assertThat(list).as("no pending orders after cleanup").isEmpty();
+assertThat(optional).as("authenticated user should have a session").isPresent();
+assertThat(text).as("email should have valid format").contains("@");
 ----
 
 == Writing Good Messages
