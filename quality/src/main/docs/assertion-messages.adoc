@@ -24,6 +24,8 @@
 |AMQ13 |Duplicates input |Explain invariant, not the data
 |AMQ14 |Low-signal assertAll heading |Name what the group validates
 |AMQ15 |Restates derived assertion |Explain why the property matters
+|AMQ16 |AssertJ generic override |Prefer as() over withFailMessage()
+|AMQ17 |Cheap supplier |Use plain String for simple concatenation
 |===
 
 [#AMQ01]
@@ -495,6 +497,86 @@ assertThat(text).contains("@");  // with message "contains"
 assertThat(list).as("no pending orders after cleanup").isEmpty();
 assertThat(optional).as("authenticated user should have a session").isPresent();
 assertThat(text).as("email should have valid format").contains("@");
+----
+
+[#AMQ16]
+== AMQ16: AssertJ Generic Override
+
+=== Problem
+
+Using `withFailMessage()` or `overridingErrorMessage()` with a generic or low-quality message.
+
+=== Why This Matters
+
+AssertJ's `withFailMessage()` and `overridingErrorMessage()` replace the entire failure output, including the rich diff that AssertJ normally provides. If the replacement message is generic or low-quality, you lose valuable diagnostic information.
+
+In contrast, `as()` adds context while preserving AssertJ's detailed failure output.
+
+=== How to Fix
+
+Prefer `as()` for adding context. Only use `withFailMessage()` when you need to completely replace the output with specific diagnostic information.
+
+.Before
+[source,java]
+----
+assertThat(result).withFailMessage("value").isEqualTo(expected);
+assertThat(list).overridingErrorMessage("check").isEmpty();
+----
+
+.After
+[source,java]
+----
+assertThat(result).as("computed hash should match stored value").isEqualTo(expected);
+assertThat(list).as("pending orders after cleanup").isEmpty();
+----
+
+.When withFailMessage is appropriate
+[source,java]
+----
+// Use when you need complete control over the error message
+assertThat(response.getStatus())
+    .withFailMessage("API returned %d: %s", response.getStatus(), response.getBody())
+    .isEqualTo(200);
+----
+
+[#AMQ17]
+== AMQ17: Cheap Supplier
+
+=== Problem
+
+A `Supplier<String>` lambda contains only simple string concatenation with variable references.
+
+=== Why This Matters
+
+JUnit 5's message suppliers exist for lazy evaluation - to defer expensive string construction until the test actually fails. A "cheap" supplier like `() -> "value: " + x` adds lambda overhead without meaningful benefit, since simple concatenation is fast.
+
+This is distinct from AMQ05 (Trivial Supplier) which flags constant-only suppliers. Cheap suppliers have dynamic content, but the construction cost doesn't justify lazy evaluation.
+
+=== How to Fix
+
+Use plain String concatenation for simple cases. Reserve suppliers for expensive operations.
+
+.Before
+[source,java]
+----
+assertEquals(expected, actual, () -> "value: " + x);
+assertTrue(condition, () -> "failed for " + name);
+----
+
+.After
+[source,java]
+----
+assertEquals(expected, actual, "value: " + x);
+assertTrue(condition, "failed for " + name);
+----
+
+.When Supplier is appropriate
+[source,java]
+----
+// Use when message construction is expensive
+assertEquals(expected, actual, () -> "diff:\n" + computeDetailedDiff(expected, actual));
+assertTrue(valid, () -> "validation errors: " + validator.getErrors().stream()
+    .map(Error::getMessage).collect(Collectors.joining(", ")));
 ----
 
 == Writing Good Messages

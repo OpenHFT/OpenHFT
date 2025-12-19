@@ -105,6 +105,16 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
      */
     public static final String MSG_RESTATES_DERIVED = "assert.message.restates.derived";
 
+    /**
+     * Message key for AssertJ generic override messages (prefer as() over withFailMessage()).
+     */
+    public static final String MSG_ASSERTJ_OVERRIDE = "assert.message.assertj.override";
+
+    /**
+     * Message key for cheap supplier messages that should be plain strings.
+     */
+    public static final String MSG_CHEAP_SUPPLIER = "assert.message.cheap.supplier";
+
     // ========== Rule Codes (machine-parsable identifiers) ==========
 
     /** Rule code for duplicate messages. */
@@ -137,6 +147,10 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
     public static final String CODE_ASSERTALL_HEADING = "AMQ14";
     /** Rule code for restating derived assertion. */
     public static final String CODE_RESTATES_DERIVED = "AMQ15";
+    /** Rule code for AssertJ generic override. */
+    public static final String CODE_ASSERTJ_OVERRIDE = "AMQ16";
+    /** Rule code for cheap supplier. */
+    public static final String CODE_CHEAP_SUPPLIER = "AMQ17";
 
     /** Minimum number of words required in a message. */
     private static final int MIN_WORD_COUNT = 3;
@@ -502,6 +516,12 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
             if (lastStringExpr != null) {
                 String message = extractStringLiteral(lastStringExpr);
                 if (message != null) {
+                    // Check for AMQ16: withFailMessage/overridingErrorMessage with problematic message
+                    if (isAssertJOverrideMethod(methodName)) {
+                        if (isProblematicMessage(message)) {
+                            log(lineNo, MSG_ASSERTJ_OVERRIDE, message);
+                        }
+                    }
                     checkMessage(message, lineNo);
                 }
             }
@@ -519,6 +539,12 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
                 log(lineNo, MSG_TRIVIAL_SUPPLIER, trivialLambdaMessage);
                 checkMessage(trivialLambdaMessage, lineNo, true);
                 return; // Only return early if we found a trivial supplier
+            }
+            // Check for cheap supplier (AMQ17): simple concatenation with variable references
+            String cheapSupplierDesc = extractCheapSupplierDescription(lastLambda);
+            if (cheapSupplierDesc != null) {
+                log(lineNo, MSG_CHEAP_SUPPLIER, cheapSupplierDesc);
+                // Don't return - still check the message if extractable
             }
             // Lambda is not a message supplier - fall through to check string args
         }
@@ -571,6 +597,202 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
                 || methodName.equals("describedAs")
                 || methodName.equals("withFailMessage")
                 || methodName.equals("overridingErrorMessage");
+    }
+
+    /**
+     * Checks if the method is an AssertJ override method (withFailMessage/overridingErrorMessage).
+     * These methods replace the entire failure message, hiding rich diff output.
+     */
+    private boolean isAssertJOverrideMethod(String methodName) {
+        return methodName.equals("withFailMessage")
+                || methodName.equals("overridingErrorMessage");
+    }
+
+    /**
+     * Checks if a message is problematic (generic, restates assertion, contextless, or too short).
+     * Used for AMQ16 to suggest as() over withFailMessage().
+     */
+    private boolean isProblematicMessage(String message) {
+        if (message == null || message.isEmpty()) {
+            return false;
+        }
+        // Check for generic single-word messages
+        if (GENERIC_MESSAGE_PATTERN.matcher(message).matches()) {
+            return true;
+        }
+        // Check for messages that restate the assertion type
+        if (RESTATES_ASSERTION_PATTERN.matcher(message).find()) {
+            return true;
+        }
+        // Check for contextless comparison messages
+        if (CONTEXTLESS_PATTERN.matcher(message).matches()) {
+            return true;
+        }
+        // Check for too-short messages (fewer than MIN_WORD_COUNT words)
+        String[] words = WORD_SPLITTER.split(message);
+        int wordCount = 0;
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                wordCount++;
+            }
+        }
+        if (wordCount < MIN_WORD_COUNT) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Extracts a description of a cheap supplier (AMQ17).
+     * A cheap supplier is a no-arg lambda whose body is a simple concatenation
+     * of string literals and simple variable references. These don't benefit
+     * from lazy evaluation and add lambda overhead.
+     *
+     * @param lambda the LAMBDA node to check
+     * @return a description of the cheap expression, or null if not cheap
+     */
+    private String extractCheapSupplierDescription(DetailAST lambda) {
+        if (lambda == null) {
+            return null;
+        }
+
+        // Check if it's a no-arg lambda: () -> ...
+        DetailAST params = lambda.findFirstToken(TokenTypes.PARAMETERS);
+        if (params != null && params.getChildCount() > 0) {
+            return null;
+        }
+
+        // Find the lambda body
+        DetailAST body = lambda.findFirstToken(TokenTypes.EXPR);
+        if (body != null) {
+            body = body.getFirstChild();
+        }
+        if (body == null) {
+            body = lambda.getLastChild();
+            if (body != null && body.getType() == TokenTypes.EXPR) {
+                body = body.getFirstChild();
+            }
+        }
+
+        if (body == null) {
+            return null;
+        }
+
+        // Check if the body is a cheap concatenation
+        if (isCheapConcatenation(body)) {
+            return describeCheapExpression(body);
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if an expression is a cheap concatenation (strings + simple identifiers).
+     * This excludes method calls, array access, and complex expressions.
+     */
+    private boolean isCheapConcatenation(DetailAST expr) {
+        if (expr == null) {
+            return false;
+        }
+
+        switch (expr.getType()) {
+            case TokenTypes.STRING_LITERAL:
+                // String literal alone - this would be trivial, not cheap
+                return false;
+            case TokenTypes.IDENT:
+                // Simple identifier alone - this is cheap
+                return true;
+            case TokenTypes.PLUS:
+                // Concatenation - check if all parts are cheap
+                DetailAST left = expr.getFirstChild();
+                DetailAST right = expr.getLastChild();
+                boolean leftCheap = isCheapPart(left);
+                boolean rightCheap = isCheapPart(right);
+                // At least one part must be non-constant for it to be "cheap" not "trivial"
+                boolean hasNonConstant = hasNonConstantPart(expr);
+                return leftCheap && rightCheap && hasNonConstant;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Checks if an expression part is cheap (string literal, identifier, or cheap concatenation).
+     */
+    private boolean isCheapPart(DetailAST expr) {
+        if (expr == null) {
+            return false;
+        }
+
+        switch (expr.getType()) {
+            case TokenTypes.STRING_LITERAL:
+                return true;
+            case TokenTypes.IDENT:
+                return true;
+            case TokenTypes.PLUS:
+                DetailAST left = expr.getFirstChild();
+                DetailAST right = expr.getLastChild();
+                return isCheapPart(left) && isCheapPart(right);
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Checks if the expression contains at least one non-constant part (identifier).
+     */
+    private boolean hasNonConstantPart(DetailAST expr) {
+        if (expr == null) {
+            return false;
+        }
+
+        if (expr.getType() == TokenTypes.IDENT) {
+            return true;
+        }
+
+        if (expr.getType() == TokenTypes.PLUS) {
+            return hasNonConstantPart(expr.getFirstChild())
+                    || hasNonConstantPart(expr.getLastChild());
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a description of a cheap expression for reporting.
+     */
+    private String describeCheapExpression(DetailAST expr) {
+        StringBuilder sb = new StringBuilder();
+        describeCheapExpressionPart(expr, sb);
+        return sb.toString();
+    }
+
+    private void describeCheapExpressionPart(DetailAST expr, StringBuilder sb) {
+        if (expr == null) {
+            return;
+        }
+
+        switch (expr.getType()) {
+            case TokenTypes.STRING_LITERAL:
+                String text = expr.getText();
+                if (text.length() > 12) {
+                    sb.append(text.substring(0, 10)).append("...\"");
+                } else {
+                    sb.append(text);
+                }
+                break;
+            case TokenTypes.IDENT:
+                sb.append(expr.getText());
+                break;
+            case TokenTypes.PLUS:
+                describeCheapExpressionPart(expr.getFirstChild(), sb);
+                sb.append(" + ");
+                describeCheapExpressionPart(expr.getLastChild(), sb);
+                break;
+            default:
+                sb.append("?");
+                break;
+        }
     }
 
     /**

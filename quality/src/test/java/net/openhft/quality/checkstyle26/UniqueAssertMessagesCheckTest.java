@@ -198,6 +198,12 @@ public class UniqueAssertMessagesCheckTest extends AbstractModuleTestSupport {
                 // assertFalse with trivial supplier
                 "36: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_TRIVIAL_SUPPLIER,
                         "condition should be false"),
+
+                // AMQ17: Cheap suppliers with simple variable concatenation
+                "55: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CHEAP_SUPPLIER,
+                        "\"expected ...\" + x"),
+                "61: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CHEAP_SUPPLIER,
+                        "\"object: \" + obj"),
         };
 
         verify(checkConfig, getPath("InputTrivialSupplier.java"), expected);
@@ -377,5 +383,46 @@ public class UniqueAssertMessagesCheckTest extends AbstractModuleTestSupport {
         };
 
         verify(checkConfig, getPath("InputPhase2Rules.java"), expected);
+    }
+
+    /**
+     * Test Phase 3 rules: AMQ16 (AssertJ override), AMQ17 (cheap supplier).
+     */
+    @Test
+    public void testPhase3Rules() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(UniqueAssertMessagesCheck.class);
+
+        final String[] expected = {
+                // AMQ16: AssertJ generic override with withFailMessage/overridingErrorMessage
+                "21: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_GENERIC, "value"),
+                "21: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTJ_OVERRIDE, "value"),
+                "22: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_GENERIC, "check"),
+                "22: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CONTEXTLESS, "check"),
+                "22: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTJ_OVERRIDE, "check"),
+                "23: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_GENERIC, "test"),
+                "23: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CONTEXTLESS, "test"),
+                "23: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTJ_OVERRIDE, "test"),
+                "24: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_GENERIC, "ok"),
+                "24: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_ASSERTJ_OVERRIDE, "ok"),
+
+                // AMQ17: Cheap supplier - simple concatenation with variable references
+                "40: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CHEAP_SUPPLIER,
+                        "\"value: \" + name"),
+                "41: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CHEAP_SUPPLIER,
+                        "\"failed fo...\" + value"),
+                "42: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CHEAP_SUPPLIER,
+                        "\"prefix \" + name + \" suffix\""),
+
+                // Trivial supplier (constant only) triggers AMQ05
+                "45: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_TRIVIAL_SUPPLIER,
+                        "constant message"),
+
+                // Plain String concatenation triggers too-short warning
+                "48: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_TOO_SHORT,
+                        "value: ", 1, 3),
+        };
+
+        verify(checkConfig, getPath("InputPhase3Rules.java"), expected);
     }
 }
