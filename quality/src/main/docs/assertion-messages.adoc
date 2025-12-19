@@ -26,6 +26,8 @@
 |AMQ15 |Restates derived assertion |Explain why the property matters
 |AMQ16 |AssertJ generic override |Prefer as() over withFailMessage()
 |AMQ17 |Cheap supplier |Use plain String for simple concatenation
+|AMQ18 |Missing comparison values |Include operand values in comparison assertions
+|AMQ19 |Missing string search value |Include string value in contains/startsWith/endsWith
 |===
 
 [#AMQ01]
@@ -578,6 +580,103 @@ assertEquals(expected, actual, () -> "diff:\n" + computeDetailedDiff(expected, a
 assertTrue(valid, () -> "validation errors: " + validator.getErrors().stream()
     .map(Error::getMessage).collect(Collectors.joining(", ")));
 ----
+
+[#AMQ18]
+== AMQ18: Missing Comparison Values
+
+=== Problem
+
+A `assertTrue` or `assertFalse` with a comparison expression (like `a > b`) uses a constant message that doesn't include the operand values.
+
+=== Why This Matters
+
+When a comparison assertion fails, you need to know what the actual values were to diagnose the problem. A constant message like `"should be greater"` doesn't tell you what `a` and `b` actually were.
+
+=== How to Fix
+
+Include the operand values in the message so they're visible when the assertion fails.
+
+.Before
+[source,java]
+----
+assertTrue(a > b, "a should be greater than b");
+assertTrue(count >= minCount, "count too low");
+assertFalse(x == y, "values should differ");
+----
+
+.After
+[source,java]
+----
+assertTrue(a > b, a + " should be greater than " + b);
+assertTrue(count >= minCount, "count " + count + " should be >= " + minCount);
+assertFalse(x == y, x + " should not equal " + y);
+----
+
+.With context
+[source,java]
+----
+assertTrue(a > b, a + " > " + b + " required for valid range");
+assertTrue(count >= minCount,
+    "count " + count + " below minimum " + minCount + " after filtering");
+----
+
+=== When This Rule Doesn't Apply
+
+This rule only triggers when:
+- The assertion is `assertTrue` or `assertFalse`
+- The condition is a comparison (`>`, `<`, `>=`, `<=`, `==`, `!=`)
+- The message is a constant string (no dynamic content)
+
+If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
+
+[#AMQ19]
+== AMQ19: Missing String Search Value
+
+=== Problem
+
+A `assertTrue` or `assertFalse` with a string search method (`contains`, `startsWith`, `endsWith`) uses a constant message that doesn't include the actual string value.
+
+=== Why This Matters
+
+When a string search assertion fails, you need to see what the actual string was to understand why it didn't contain/start with/end with the expected value. A constant message like `"should contain pattern"` doesn't tell you what the string actually was.
+
+=== How to Fix
+
+Include the string being searched in the message so it's visible when the assertion fails.
+
+.Before
+[source,java]
+----
+assertTrue(text.contains("@"), "should contain @");
+assertTrue(name.startsWith("Mr"), "should start with title");
+assertFalse(path.endsWith(".tmp"), "should not be temp file");
+----
+
+.After
+[source,java]
+----
+assertTrue(text.contains("@"), text + " should contain @");
+assertTrue(name.startsWith("Mr"), name + " should start with Mr");
+assertFalse(path.endsWith(".tmp"), path + " should not end with .tmp");
+----
+
+.With context
+[source,java]
+----
+assertTrue(email.contains("@"),
+    "email '" + email + "' should contain @ symbol");
+assertTrue(filename.endsWith(".json"),
+    "config file '" + filename + "' should have .json extension");
+----
+
+=== When This Rule Doesn't Apply
+
+This rule only triggers when:
+- The assertion is `assertTrue` or `assertFalse`
+- The condition is a call to `contains()`, `startsWith()`, or `endsWith()`
+- The message is a constant string (no dynamic content)
+
+If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
 == Writing Good Messages
 

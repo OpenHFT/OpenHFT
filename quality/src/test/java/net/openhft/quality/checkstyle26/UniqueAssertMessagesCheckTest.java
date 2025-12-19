@@ -425,4 +425,68 @@ public class UniqueAssertMessagesCheckTest extends AbstractModuleTestSupport {
 
         verify(checkConfig, getPath("InputPhase3Rules.java"), expected);
     }
+
+    /**
+     * Test AMQ18: Missing comparison values in assertion message.
+     */
+    @Test
+    public void testMissingComparisonValues() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(UniqueAssertMessagesCheck.class);
+
+        final String[] expected = {
+                // AMQ18: Comparison with constant message - should include values
+                "20: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_COMPARISON_VALUES,
+                        ">", "a", "b"),
+                "21: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_COMPARISON_VALUES,
+                        ">=", "a", "b"),
+                "22: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_COMPARISON_VALUES,
+                        "<", "a", "b"),
+                "23: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_COMPARISON_VALUES,
+                        "<=", "a", "b"),
+                "24: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_COMPARISON_VALUES,
+                        "==", "a", "b"),
+                "25: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_COMPARISON_VALUES,
+                        "!=", "a", "b"),
+                "26: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_COMPARISON_VALUES,
+                        ">", "a", "b"),
+
+                // AMQ17: Lambda with cheap concatenation
+                "36: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CHEAP_SUPPLIER,
+                        "a + \" should b...\" + b"),
+        };
+
+        verify(checkConfig, getPath("InputComparisonValues.java"), expected);
+    }
+
+    /**
+     * Test AMQ19: Missing string search value in assertion message.
+     */
+    @Test
+    public void testMissingStringSearchValues() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(UniqueAssertMessagesCheck.class);
+
+        final String[] expected = {
+                // AMQ19: String search with constant message - should include string value
+                "19: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_STRING_VALUE,
+                        "contains", "text", "\"@\""),
+                "20: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_STRING_VALUE,
+                        "startsWith", "name", "\"Mr\""),
+                "21: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_STRING_VALUE,
+                        "endsWith", "path", "\".txt\""),
+                "22: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_STRING_VALUE,
+                        "contains", "text", "\"spam\""),
+                "23: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_STRING_VALUE,
+                        "startsWith", "name", "\"Mrs\""),
+                "24: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_MISSING_STRING_VALUE,
+                        "endsWith", "path", "\".tmp\""),
+
+                // AMQ17: Lambda with cheap concatenation
+                "34: " + getCheckMessage(UniqueAssertMessagesCheck.MSG_CHEAP_SUPPLIER,
+                        "text + \" should c...\""),
+        };
+
+        verify(checkConfig, getPath("InputStringSearchValues.java"), expected);
+    }
 }

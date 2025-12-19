@@ -115,6 +115,16 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
      */
     public static final String MSG_CHEAP_SUPPLIER = "assert.message.cheap.supplier";
 
+    /**
+     * Message key for comparison assertions missing operand values in message.
+     */
+    public static final String MSG_MISSING_COMPARISON_VALUES = "assert.message.missing.comparison.values";
+
+    /**
+     * Message key for string search assertions missing the searched string in message.
+     */
+    public static final String MSG_MISSING_STRING_VALUE = "assert.message.missing.string.value";
+
     // ========== Rule Codes (machine-parsable identifiers) ==========
 
     /** Rule code for duplicate messages. */
@@ -151,6 +161,10 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
     public static final String CODE_ASSERTJ_OVERRIDE = "AMQ16";
     /** Rule code for cheap supplier. */
     public static final String CODE_CHEAP_SUPPLIER = "AMQ17";
+    /** Rule code for missing comparison values in message. */
+    public static final String CODE_MISSING_COMPARISON_VALUES = "AMQ18";
+    /** Rule code for missing string value in message. */
+    public static final String CODE_MISSING_STRING_VALUE = "AMQ19";
 
     /** Minimum number of words required in a message. */
     private static final int MIN_WORD_COUNT = 3;
@@ -462,6 +476,12 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
         if (methodName.equals("assertAll")) {
             checkAssertAllHeading(elist, lineNo);
             return;
+        }
+
+        // Special handling for assertTrue/assertFalse with comparisons (AMQ18) and string searches (AMQ19)
+        if (methodName.equals("assertTrue") || methodName.equals("assertFalse")) {
+            checkComparisonAssertion(elist, lineNo);
+            checkStringSearchAssertion(elist, lineNo);
         }
 
         // Count arguments and collect string literals with their positions
@@ -1643,6 +1663,311 @@ public class UniqueAssertMessagesCheck extends AbstractCheck {
                 }
             }
             child = child.getNextSibling();
+        }
+    }
+
+    /**
+     * Checks assertTrue/assertFalse with comparison expressions (AMQ18).
+     * When a comparison like {@code a > b} is used, the message should include
+     * the operand values for diagnostic purposes.
+     *
+     * @param elist the ELIST node containing arguments
+     * @param lineNo the line number for reporting
+     */
+    private void checkComparisonAssertion(DetailAST elist, int lineNo) {
+        // Find the condition (first EXPR) and message (second EXPR or last)
+        DetailAST conditionExpr = null;
+        DetailAST messageExpr = null;
+        int argCount = 0;
+
+        DetailAST child = elist.getFirstChild();
+        while (child != null) {
+            if (child.getType() == TokenTypes.EXPR) {
+                argCount++;
+                if (argCount == 1) {
+                    conditionExpr = child;
+                } else {
+                    messageExpr = child;
+                }
+            } else if (child.getType() == TokenTypes.LAMBDA) {
+                // Lambda message supplier - skip this check as it likely has dynamic content
+                return;
+            }
+            child = child.getNextSibling();
+        }
+
+        // No message provided, or no condition - nothing to check
+        if (conditionExpr == null || messageExpr == null) {
+            return;
+        }
+
+        // Check if condition contains a comparison operator
+        ComparisonInfo comparison = extractComparison(conditionExpr);
+        if (comparison == null) {
+            return;
+        }
+
+        // Check if message is a constant string (no dynamic content)
+        // Unwrap EXPR to get to the actual content
+        DetailAST messageContent = messageExpr;
+        if (messageContent.getType() == TokenTypes.EXPR && messageContent.getChildCount() > 0) {
+            messageContent = messageContent.getFirstChild();
+        }
+
+        if (isConstantStringExpression(messageContent)) {
+            // Message is constant but condition has comparison - suggest including values
+            String message = extractConstantString(messageContent);
+            if (message != null) {
+                log(lineNo, MSG_MISSING_COMPARISON_VALUES, comparison.operator,
+                        comparison.leftOperand, comparison.rightOperand);
+            }
+        }
+    }
+
+    /**
+     * Checks assertTrue/assertFalse with string search methods (AMQ19).
+     * When a method like contains(), startsWith(), or endsWith() is used,
+     * the message should include the string being searched for diagnostic purposes.
+     *
+     * @param elist the ELIST node containing arguments
+     * @param lineNo the line number for reporting
+     */
+    private void checkStringSearchAssertion(DetailAST elist, int lineNo) {
+        // Find the condition (first EXPR) and message (second EXPR or last)
+        DetailAST conditionExpr = null;
+        DetailAST messageExpr = null;
+        int argCount = 0;
+
+        DetailAST child = elist.getFirstChild();
+        while (child != null) {
+            if (child.getType() == TokenTypes.EXPR) {
+                argCount++;
+                if (argCount == 1) {
+                    conditionExpr = child;
+                } else {
+                    messageExpr = child;
+                }
+            } else if (child.getType() == TokenTypes.LAMBDA) {
+                // Lambda message supplier - skip this check as it likely has dynamic content
+                return;
+            }
+            child = child.getNextSibling();
+        }
+
+        // No message provided, or no condition - nothing to check
+        if (conditionExpr == null || messageExpr == null) {
+            return;
+        }
+
+        // Check if condition contains a string search method call
+        StringSearchInfo searchInfo = extractStringSearch(conditionExpr);
+        if (searchInfo == null) {
+            return;
+        }
+
+        // Check if message is a constant string (no dynamic content)
+        DetailAST messageContent = messageExpr;
+        if (messageContent.getType() == TokenTypes.EXPR && messageContent.getChildCount() > 0) {
+            messageContent = messageContent.getFirstChild();
+        }
+
+        if (isConstantStringExpression(messageContent)) {
+            // Message is constant but condition has string search - suggest including the string
+            String message = extractConstantString(messageContent);
+            if (message != null) {
+                log(lineNo, MSG_MISSING_STRING_VALUE, searchInfo.methodName,
+                        searchInfo.stringVar, searchInfo.searchArg);
+            }
+        }
+    }
+
+    /**
+     * Information about a string search method call.
+     */
+    private static class StringSearchInfo {
+        final String methodName;
+        final String stringVar;
+        final String searchArg;
+
+        StringSearchInfo(String methodName, String stringVar, String searchArg) {
+            this.methodName = methodName;
+            this.stringVar = stringVar;
+            this.searchArg = searchArg;
+        }
+    }
+
+    /**
+     * Extracts string search information from an expression.
+     * Returns null if the expression is not a string search method call.
+     */
+    private StringSearchInfo extractStringSearch(DetailAST expr) {
+        if (expr == null) {
+            return null;
+        }
+
+        // Unwrap EXPR if needed
+        DetailAST content = expr;
+        if (content.getType() == TokenTypes.EXPR && content.getChildCount() > 0) {
+            content = content.getFirstChild();
+        }
+
+        // Look for method call
+        if (content.getType() != TokenTypes.METHOD_CALL) {
+            return null;
+        }
+
+        // Get method name from DOT structure: str.contains(...)
+        DetailAST dot = content.findFirstToken(TokenTypes.DOT);
+        if (dot == null) {
+            return null;
+        }
+
+        // Get the method name (rightmost IDENT in DOT)
+        DetailAST methodIdent = findRightmostIdent(dot);
+        if (methodIdent == null) {
+            return null;
+        }
+
+        String methodName = methodIdent.getText();
+
+        // Check if it's a string search method
+        if (!methodName.equals("contains")
+                && !methodName.equals("startsWith")
+                && !methodName.equals("endsWith")) {
+            return null;
+        }
+
+        // Get the object the method is called on (left side of DOT)
+        DetailAST objectExpr = dot.getFirstChild();
+        String stringVar = extractOperandName(objectExpr);
+        if (stringVar == null) {
+            stringVar = "string";
+        }
+
+        // Get the search argument from ELIST
+        DetailAST elist = content.findFirstToken(TokenTypes.ELIST);
+        String searchArg = "pattern";
+        if (elist != null) {
+            DetailAST argExpr = elist.getFirstChild();
+            if (argExpr != null && argExpr.getType() == TokenTypes.EXPR) {
+                String extracted = extractOperandName(argExpr.getFirstChild());
+                if (extracted != null) {
+                    searchArg = extracted;
+                }
+            }
+        }
+
+        return new StringSearchInfo(methodName, stringVar, searchArg);
+    }
+
+    /**
+     * Information about a comparison expression.
+     */
+    private static class ComparisonInfo {
+        final String operator;
+        final String leftOperand;
+        final String rightOperand;
+
+        ComparisonInfo(String operator, String leftOperand, String rightOperand) {
+            this.operator = operator;
+            this.leftOperand = leftOperand;
+            this.rightOperand = rightOperand;
+        }
+    }
+
+    /**
+     * Extracts comparison information from an expression.
+     * Returns null if the expression is not a comparison.
+     */
+    private ComparisonInfo extractComparison(DetailAST expr) {
+        if (expr == null) {
+            return null;
+        }
+
+        // Unwrap EXPR if needed
+        DetailAST content = expr;
+        if (content.getType() == TokenTypes.EXPR && content.getChildCount() > 0) {
+            content = content.getFirstChild();
+        }
+
+        // Check for comparison operators
+        String operator = null;
+        switch (content.getType()) {
+            case TokenTypes.GT:
+                operator = ">";
+                break;
+            case TokenTypes.LT:
+                operator = "<";
+                break;
+            case TokenTypes.GE:
+                operator = ">=";
+                break;
+            case TokenTypes.LE:
+                operator = "<=";
+                break;
+            case TokenTypes.EQUAL:
+                operator = "==";
+                break;
+            case TokenTypes.NOT_EQUAL:
+                operator = "!=";
+                break;
+            default:
+                return null;
+        }
+
+        // Extract operands
+        DetailAST left = content.getFirstChild();
+        DetailAST right = content.getLastChild();
+
+        String leftName = extractOperandName(left);
+        String rightName = extractOperandName(right);
+
+        if (leftName != null && rightName != null) {
+            return new ComparisonInfo(operator, leftName, rightName);
+        }
+
+        return null;
+    }
+
+    /**
+     * Extracts a simple name for an operand (variable name, literal, or method call).
+     */
+    private String extractOperandName(DetailAST operand) {
+        if (operand == null) {
+            return null;
+        }
+
+        switch (operand.getType()) {
+            case TokenTypes.IDENT:
+                return operand.getText();
+            case TokenTypes.NUM_INT:
+            case TokenTypes.NUM_LONG:
+            case TokenTypes.NUM_FLOAT:
+            case TokenTypes.NUM_DOUBLE:
+                return operand.getText();
+            case TokenTypes.STRING_LITERAL:
+                return operand.getText();
+            case TokenTypes.METHOD_CALL:
+                DetailAST ident = operand.findFirstToken(TokenTypes.IDENT);
+                if (ident != null) {
+                    return ident.getText() + "()";
+                }
+                return "method()";
+            case TokenTypes.DOT:
+                // Field access like obj.field
+                DetailAST lastIdent = findRightmostIdent(operand);
+                if (lastIdent != null) {
+                    return lastIdent.getText();
+                }
+                return null;
+            case TokenTypes.EXPR:
+                // Unwrap and recurse
+                if (operand.getChildCount() > 0) {
+                    return extractOperandName(operand.getFirstChild());
+                }
+                return null;
+            default:
+                return "expr";
         }
     }
 
