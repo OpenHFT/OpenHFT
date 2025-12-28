@@ -419,7 +419,7 @@ Truth explicitly frames failure messages as **key-value "facts"**, with guidelin
 ** Truth facts (best case)
 ** AssertJ descriptions/labels
 ** Plain String message fallback
-* What "fact schema" works across frameworks (subject, phase, key invariant, index/field, expected-source)?
+* What "fact schema" works across frameworks (subject, scenario, key invariant, index/field, expected-source)?
 
 .Reference
 * https://truth.dev/failure_messages.html[Truth: Writing failure messages for a Subject]
@@ -431,10 +431,10 @@ Truth explicitly frames failure messages as **key-value "facts"**, with guidelin
 JUnit 5 `assertAll` supports a **heading** that appears in aggregated failure output (MultipleFailuresError).
 
 .Research questions
-* How should the tool generate `assertAll` headings (phase-based, scenario-based, fixture-based)?
+* How should the tool generate `assertAll` headings (scenario-based, fixture-based)?
 * When multiple assertions exist, is it better to:
 ** Add per-assert messages, or
-** Introduce `assertAll("phase: ...", ...)` plus minimal per-assert context?
+** Introduce `assertAll("scenario: ...", ...)` plus minimal per-assert context?
 
 .Reference
 * https://docs.junit.org/5.13.0-M1/user-guide/index.html[JUnit 5 User Guide]

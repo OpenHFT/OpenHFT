@@ -33,7 +33,7 @@ class MinimalObservabilitySmokeTest {
     private static final double DELTA = 0.0001d;
 
     @Test
-    @DisplayName("Prometheus counters can be registered")
+    @DisplayName("Prometheus registry should register a usable counter")
     void prometheusCountersCollect() {
         CollectorRegistry registry = new CollectorRegistry();
         Counter counter = Counter.build()
@@ -49,7 +49,7 @@ class MinimalObservabilitySmokeTest {
     }
 
     @Test
-    @DisplayName("OpenTelemetry tracer provider initialises")
+    @DisplayName("OpenTelemetry tracer provider should initialise and start spans")
     void openTelemetryInitialises() {
         SdkTracerProvider provider = SdkTracerProvider.builder()
                 .setResource(Resource.getDefault())

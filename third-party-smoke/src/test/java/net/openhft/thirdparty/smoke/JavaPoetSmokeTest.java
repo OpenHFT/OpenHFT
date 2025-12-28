@@ -6,6 +6,7 @@ package net.openhft.thirdparty.smoke;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import javax.lang.model.element.Modifier;
@@ -13,11 +14,12 @@ import javax.lang.model.element.Modifier;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Smoke test for JavaPoet source generation.
+ * Smoke test verifying JavaPoet can generate simple Java source files.
  */
 class JavaPoetSmokeTest {
 
     @Test
+    @DisplayName("JavaPoet should generate a simple HelloWorld class")
     void javapoetCanGenerateSimpleHelloWorldClass() {
         MethodSpec main = MethodSpec.methodBuilder("main")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -37,7 +39,9 @@ class JavaPoetSmokeTest {
                 .build();
 
         String source = javaFile.toString();
-        assertTrue(source.contains("class HelloWorld"), "JavaPoet should generate HelloWorld class");
-        assertTrue(source.contains("Hello, JavaPoet!"), "Generated source should include println statement");
+        assertTrue(source.contains("class HelloWorld"),
+                source + " should contain class HelloWorld");
+        assertTrue(source.contains("Hello, JavaPoet!"),
+                source + " should contain Hello, JavaPoet!");
     }
 }

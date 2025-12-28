@@ -32,20 +32,13 @@
         <exclude name="AvoidAccessibilityAlteration"/>
         <exclude name="DoNotCallGarbageCollectionExplicitly"/>
         <exclude name="UseLocaleWithCaseConversions"/>
-        <exclude name="ImplicitSwitchFallThrough"/>
         <exclude name="UnnecessaryBooleanAssertion"/>
         <exclude name="DontImportSun"/>
-        <exclude name="DetachedTestCase"/>
         <exclude name="AvoidFieldNameMatchingTypeName"/>
         <exclude name="DoNotTerminateVM"/>
         <exclude name="SimpleDateFormatNeedsLocale"/>
-        <exclude name="NonSerializableClass"/>
-        <exclude name="FinalizeOverloaded"/>
-        <exclude name="AvoidInstanceofChecksInCatchClause"/>
         <exclude name="DontUseFloatTypeForLoopIndices"/>
         <exclude name="ReplaceJavaUtilDate"/>
-        <exclude name="TestClassWithoutTestCases"/>
-        <exclude name="AvoidUsingOctalValues"/>
     </rule>
 
     <rule ref="category/java/bestpractices.xml">
@@ -54,13 +47,9 @@
         <exclude name="UnusedLocalVariable"/>
         <exclude name="UnitTestContainsTooManyAsserts"/>
         <exclude name="UnusedFormalParameter"/>
-        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
-        <exclude name="AvoidUsingHardCodedIP"/>
         <exclude name="AvoidPrintStackTrace"/>
         <exclude name="AccessorMethodGeneration"/>
         <exclude name="AccessorClassGeneration"/>
-        <exclude name="UnitTestShouldIncludeAssert"/>
-        <exclude name="UnitTestShouldUseTestAnnotation"/>
         <exclude name="AvoidReassigningParameters"/>
         <exclude name="UseVarargs"/>
         <exclude name="GuardLogStatement"/>
@@ -68,22 +57,17 @@
         <exclude name="ForLoopCanBeForeach"/>
         <exclude name="MethodReturnsInternalArray"/>
         <exclude name="UseTryWithResources"/>
-        <exclude name="AbstractClassWithoutAbstractMethod"/>
         <exclude name="LooseCoupling"/>
         <exclude name="ForLoopVariableCount"/>
         <exclude name="ArrayIsStoredDirectly"/>
         <exclude name="AvoidStringBufferField"/>
         <exclude name="PreserveStackTrace"/>
-        <exclude name="ConstantsInInterface"/>
         <exclude name="AvoidReassigningLoopVariables"/>
         <exclude name="OneDeclarationPerLine"/>
         <exclude name="ImplicitFunctionalInterface"/>
         <exclude name="RelianceOnDefaultCharset"/>
         <exclude name="ExhaustiveSwitchHasDefault"/>
-        <exclude name="UnusedPrivateMethod"/>
         <exclude name="UnnecessaryVarargsArrayCreation"/>
-        <exclude name="UnnecessaryWarningSuppression"/>
-        <exclude name="MissingOverride"/>
     </rule>
 
     <rule ref="category/java/codestyle.xml">
@@ -105,7 +89,6 @@
         <exclude name="AtLeastOneConstructor"/>
         <exclude name="CallSuperInConstructor"/>
         <exclude name="FieldNamingConventions"/>
-        <exclude name="FormalParameterNamingConventions"/>
         <exclude name="MethodNamingConventions"/>
         <exclude name="ShortMethodName"/>
         <exclude name="ConfusingTernary"/>
@@ -114,8 +97,6 @@
         <exclude name="UnnecessaryModifier"/>
         <exclude name="EmptyControlStatement"/>
         <exclude name="AvoidDollarSigns"/>
-        <exclude name="ModifierOrder"/>
-        <exclude name="UnnecessaryConstructor"/>
         <exclude name="ClassNamingConventions"/>
         <exclude name="UseDiamondOperator"/>
         <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
@@ -124,7 +105,6 @@
         <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
         <exclude name="FinalParameterInAbstractMethod"/>
         <exclude name="UnnecessaryCast"/>
-        <exclude name="PackageCase"/>
     </rule>
 
     <rule ref="category/java/performance.xml">
@@ -150,12 +130,8 @@
         <exclude name="AvoidThreadGroup"/>
         <exclude name="AvoidUsingVolatile"/>
         <exclude name="DoNotUseThreads"/>
-        <exclude name="DontCallThreadRun"/>
-        <exclude name="DoubleCheckedLocking"/>
-        <exclude name="NonThreadSafeSingleton"/>
         <exclude name="UnsynchronizedStaticFormatter"/>
         <exclude name="UseConcurrentHashMap"/>
-        <exclude name="UseNotifyAllInsteadOfNotify"/>
         <exclude name="AvoidSynchronizedStatement"/>
     </rule>
 </ruleset>

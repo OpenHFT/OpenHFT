@@ -11,22 +11,23 @@ import jnr.constants.platform.Errno;
 import jnr.ffi.Memory;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Smoke tests for Prometheus client and JNR FFI.
+ * Smoke tests verifying Prometheus client metrics and JNR FFI integration.
  */
 class MetricsAndFfiSmokeTest {
 
     /**
-     * Tolerance used in numeric comparisons.
+     * Tolerance value used for numeric comparison assertions.
      */
     private static final double DELTA = 0.0001d;
 
     /**
-     * Test counter name.
+     * Prometheus counter name used for registry lookups.
      */
     private static final String COUNTER_NAME =
             "third_party_smoke_counter_total";
@@ -47,6 +48,7 @@ class MetricsAndFfiSmokeTest {
     private static final long VALUE_42 = 42L;
 
     @Test
+    @DisplayName("Prometheus SimpleClient should register and read counter")
     void prometheusSimpleClientRegistersAndReadsCounter() {
         CollectorRegistry registry = new CollectorRegistry();
         Counter counter = Counter.build()
@@ -61,6 +63,7 @@ class MetricsAndFfiSmokeTest {
     }
 
     @Test
+    @DisplayName("Prometheus HTTPServer should start and stop")
     void prometheusHttpServerCanStartAndStop() throws Exception {
         HTTPServer server = new HTTPServer(0);
         assertNotNull(server, "Prometheus HTTPServer should start on an ephemeral port");
@@ -68,18 +71,21 @@ class MetricsAndFfiSmokeTest {
     }
 
     @Test
+    @DisplayName("Prometheus hotspot DefaultExports should initialize JVM metrics collection")
     void prometheusHotspotDefaultExportsInitialize() {
         DefaultExports.initialize();
         assertTrue(true, "Prometheus DefaultExports.initialize should complete");
     }
 
     @Test
+    @DisplayName("JNR Constants Errno should provide integer value")
     void jnrConstantsErrnoProvidesIntegerValue() {
         int ebadf = Errno.EBADF.intValue();
-        assertTrue(ebadf > 0, "JNR Errno should expose positive integer value");
+        assertTrue(ebadf > 0, "JNR Errno.EBADF should be > 0 but was " + ebadf);
     }
 
     @Test
+    @DisplayName("JNR FFI should allocate and use memory")
     void jnrFfiCanAllocateAndUseMemory() {
         Runtime runtime = Runtime.getSystemRuntime();
         Pointer pointer = Memory.allocate(runtime, EIGHT_BYTES);

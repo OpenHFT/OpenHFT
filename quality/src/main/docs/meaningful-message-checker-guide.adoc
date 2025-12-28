@@ -1,0 +1,166 @@
+= Meaningful Message Checker Guide
+:toc:
+:toclevels: 2
+:sectnums:
+
+The Meaningful Message Check is a Checkstyle extension that flags low-signal messages in tests and
+log templates. It helps ensure assertion and log messages explain the invariant and provide
+actionable context when failures occur.
+
+== What it checks (summary)
+
+* Assertions (JUnit 4/5, TestNG, AssertJ, Hamcrest)
+* Java `assert` statements
+* Preconditions such as `Objects.requireNonNull`
+* `throw new` exception/error messages
+* Test metadata like `@DisplayName`, `@Disabled`, `@Ignore`, parameterised and repeated test names
+  (`@ParameterizedTest`, `@RepeatedTest`), and `disabledReason` attributes
+* Javadoc first paragraphs for top-level classes and members
+* Log templates for SLF4J, Log4j2, JUL, System.Logger, and Chronicle `Jvm.*.on(...)`
+
+Common findings include missing messages, too short or low-meaning messages, duplicates, redundant
+class or method names, line number references, contextless or index-only messages, and whitespace
+runs.
+
+For `requireNonNull`/`requireNotNull`, a message that exactly matches the parameter name is treated
+as sufficient and the Meaningful Message rules are skipped for that call.
+
+Minimum word and meaningful-word thresholds are source-specific (assertions, preconditions, throws,
+annotations, logs, and Javadoc first paragraphs). See
+`meaningful-message-checker-requirements.adoc` for the per-source minimums.
+
+For cases where a message must be omitted (especially low-level throws), an inline block comment
+with a real reason word inside the argument list (for example,
+`throw new IllegalArgumentException(/* reason */);`) is treated as an intentional omission and
+suppresses MMMissingMessage. Empty comments and line comments do not suppress.
+
+== Rules (summary)
+
+[cols="1,3"]
+|===
+|Rule |Summary
+
+|MMAssertJGenericOverride |AssertJ uses a generic override instead of `as(...)`
+|MMContextless |Message is vague without stating what is being checked
+|MMDuplicate |Same message text reused within a file
+|MMDuplicatesInput |Message mostly repeats input or comparison values
+|MMGenericMessage |Message uses generic words with no subject or invariant
+|MMIndexOnly |Message is just an index or index label
+|MMLongWord |Message relies on an overly long word or identifier
+|MMLowSignalAssertAllHeading |`assertAll` heading is generic or low-signal
+|MMMissingComparisonValues |Comparison message omits operand values
+|MMMissingLoopIndex |Looped assertions omit index context
+|MMMissingMessage |No message supplied where one is required
+|MMMissingStringSearchValue |String search message omits the searched value
+|MMMissingSubject |Message lacks a clear subject before a modal verb
+|MMRedundantClassName |Message relies on the enclosing class name for meaning
+|MMRedundantLineNumber |Message includes line-number tokens such as `L42` or `:123`
+|MMRedundantMethodName |Message relies on the enclosing method name for meaning
+|MMRestatesAssertion |Message repeats the assertion type instead of the invariant
+|MMRestatesDerivedAssertion |Message restates a derived assertion without context
+|MMTooFewMeaningfulWords |Message lacks enough non-filler words or placeholders
+|MMTooLong |Message exceeds the maximum length
+|MMTooShort |Message has fewer than the minimum words or placeholders
+|MMTrivialSupplier |Supplier returns a trivial constant or cheap string
+|MMWhitespaceRun |Message contains multiple spaces or whitespace runs
+|===
+
+== How to include it
+
+=== Use the Chronicle baseline Checkstyle configuration (recommended)
+
+The baseline configuration already enables the Meaningful Message Check. Configure the Maven
+Checkstyle plugin and depend on `net.openhft:quality`:
+
+[source,xml]
+----
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-checkstyle-plugin</artifactId>
+    <version>3.3.1</version>
+    <configuration>
+        <configLocation>net/openhft/quality/chronicle-baseline-checkstyle.xml</configLocation>
+        <failOnViolation>${quality.enforced}</failOnViolation>
+        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+        <violationSeverity>warning</violationSeverity>
+    </configuration>
+    <dependencies>
+        <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>quality</artifactId>
+            <version>2026.0</version>
+        </dependency>
+    </dependencies>
+</plugin>
+----
+
+=== Add it to a custom Checkstyle configuration
+
+If you maintain a custom ruleset, add the module explicitly:
+
+[source,xml]
+----
+<module name="net.openhft.quality.MeaningfulMessageCheck">
+    <property name="ignoredExceptionClassNames" value="UnsupportedOperationException"/>
+</module>
+----
+
+== Message extraction and analysis
+
+To analyse message quality across a whole codebase, enable message extraction and generate a
+summary report. The extractor writes a TSV file with per-message metrics and the analysis script
+produces a Markdown report.
+
+1. Run Checkstyle with extraction enabled:
++
+[source,sh]
+----
+mvn -DskipTests -Dquality.enforced=false -Dmm.extract.file=logs/message-extraction.tsv checkstyle:check
+----
+
+2. Generate the analysis report:
++
+[source,sh]
+----
+python quality/src/main/docs/message-extraction-report.py \
+  --input logs/message-extraction.tsv \
+  --output logs/message-extraction-summary.md
+----
+
+The report includes:
+
+* Message length distribution (characters and words, including placeholders)
+* Most common words and candidate filler words
+* Duplicate message counts
+* Placeholder usage distribution
+* Counts below the per-source minimum word and meaningful-word thresholds
+
+== Learn more
+
+* Rules and examples: `assertion-messages.adoc`
+* Detailed specification: `meaningful-message-checker-requirements.adoc`
+
+== Suppression examples
+
+Use targeted suppressions for legacy or exceptional cases:
+
+[source,java]
+----
+@SuppressWarnings("MMTooShort")
+void testLegacyMessage() {
+    assertTrue(condition, "ok for legacy test");
+}
+----
+
+[source,java]
+----
+@SuppressWarnings("MM-all")
+void testLegacyBatch() {
+    assertTrue(condition, "legacy message");
+}
+----

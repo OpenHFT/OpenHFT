@@ -22,7 +22,7 @@ This requirement ensures that basic runtime behaviour works correctly, not just 
 Implementation: `MinimalObservabilitySmokeTest.prometheusCountersCollect()`, `MinimalObservabilitySmokeTest.openTelemetryInitialises()`.
 
 *SMOKE-TEST-004* Serialisation smoke :: JSON, YAML, XML serialisation libraries must round-trip simple objects.
-Implementation: all tests in `MinimalSerializationSmokeTest` covering JSONAssert, SnakeYAML, XStream, Jackson jsonSchema, and Jettison.
+Implementation: all tests in `MinimalSerializationSmokeTest` covering JSONAssert, SnakeYAML, Jackson jsonSchema, and Jettison.
 
 *SMOKE-TEST-005* Networking smoke :: Web server frameworks (Undertow, Jetty, Netty, Grizzly) must initialise without starting actual listeners.
 Implementation: all tests in `MinimalNetworkingSmokeTest` validating framework construction and configuration.
@@ -44,13 +44,16 @@ Implementation: `MinimalDatabaseSmokeTest.mongoConnectionStringParses()`, HSQLDB
 
 *SMOKE-NF-O-001* Bytecode enforcement :: Maven enforcer must reject dependencies with bytecode > Java 8 (classfile version 52.0), with documented exclusions only.
 Current exclusions: `org.hsqldb:hsqldb` (Java 11 bytecode), `org.mongodb:bson-record-codec` (Java 17 bytecode).
-Implementation: `maven-enforcer-plugin` with `enforceBytecodeVersion` rule in pom.xml lines 546-578.
+Implementation: `maven-enforcer-plugin` with `enforceBytecodeVersion` rule in `pom.xml`.
 
 *SMOKE-NF-O-002* Multi-JDK validation :: Tests must pass on Java 8 (baseline) and Java 21 (current LTS).
 Contributors must verify smoke tests pass on both JDK versions before raising pull requests.
 
 *SMOKE-NF-O-003* Documentation currency :: When tests or dependencies change, update documentation in `src/main/docs/` in the same commit to prevent drift.
 This includes updating requirement references, version notes, and decision logs.
+
+*SMOKE-NF-O-004* Clean build logs :: Builds must be clean: capture output with `mvn ... -l <log>` and ensure the log contains no warnings or errors (Maven or runtime).
+If a warning cannot be eliminated immediately, document it and track remediation work.
 
 === Performance Requirements
 

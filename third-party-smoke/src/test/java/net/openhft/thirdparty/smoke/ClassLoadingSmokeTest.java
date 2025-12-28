@@ -195,14 +195,35 @@ class ClassLoadingSmokeTest {
                 "SLF4J API",
                 () -> assertClassesLoad("org.slf4j.LoggerFactory")
         ));
+        boolean slf4jSimplePresent = isClassPresent(
+                "org.slf4j.simple.SimpleServiceProvider");
+        boolean slf4jNopPresent = isClassPresent(
+                "org.slf4j.nop.NOPServiceProvider");
+
         tests.add(dynamic(
-                "SLF4J simple binding",
-                () -> assertClassesLoad("org.slf4j.simple.SimpleLogger")
+                "SLF4J binding (exactly one) is present",
+                () -> assertTrue(
+                        slf4jSimplePresent ^ slf4jNopPresent,
+                        "Expected exactly one SLF4J binding on the classpath"
+                )
         ));
-        tests.add(dynamic(
-                "SLF4J NOP binding",
-                () -> assertClassesLoad("org.slf4j.helpers.NOPLogger")
-        ));
+        if (slf4jSimplePresent) {
+            tests.add(dynamic(
+                    "SLF4J simple binding",
+                    () -> assertClassesLoad(
+                            "org.slf4j.simple.SimpleServiceProvider",
+                            "org.slf4j.simple.SimpleLogger"
+                    )
+            ));
+        }
+        if (slf4jNopPresent) {
+            tests.add(dynamic(
+                    "SLF4J NOP binding",
+                    () -> assertClassesLoad(
+                            "org.slf4j.nop.NOPServiceProvider"
+                    )
+            ));
+        }
         tests.add(dynamic(
                 "Commons Logging",
                 () -> assertClassesLoad("org.apache.commons.logging.LogFactory")
@@ -388,6 +409,15 @@ class ClassLoadingSmokeTest {
         }
     }
 
+    private static boolean isClassPresent(final String className) {
+        try {
+            Class.forName(className, false, LOADER);
+            return true;
+        } catch (ClassNotFoundException | LinkageError e) {
+            return false;
+        }
+    }
+
     private static void assertPackagePresent(final String packagePrefix) {
         try (ScanResult scan = new ClassGraph()
                 .acceptPackages(packagePrefix)
@@ -409,7 +439,7 @@ class ClassLoadingSmokeTest {
     private static void assertResourcePresent(final String resourcePath) {
         assertNotNull(
                 LOADER.getResource(resourcePath),
-                "Missing resource " + resourcePath
+                "Expected to find resource " + resourcePath
         );
     }
 
@@ -422,7 +452,10 @@ class ClassLoadingSmokeTest {
             }
             throw e;
         } catch (ClassNotFoundException e) {
-            throw new AssertionError(e);
+            AssertionError error =
+                    new AssertionError("HSQLDB JDBC driver class should be loadable");
+            error.initCause(e);
+            throw error;
         }
     }
 

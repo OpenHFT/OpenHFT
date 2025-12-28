@@ -24,7 +24,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 // Public "umbrella" type so all the helper classes can live in one file.
-public class SpotBugs27AllRulesExample {
+public class SpotBugs26AllRulesExample {
 
     // ---------------------------------------------------------------------
     // DMI_* / DM_* examples

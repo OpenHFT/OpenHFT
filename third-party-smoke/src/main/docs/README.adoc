@@ -14,7 +14,7 @@ It provides two layers of validation: class loading tests confirm artifact resol
 
 * link:project-requirements.adoc[Project requirements] – functional and non-functional requirements with IDs
 * link:decision-log.adoc[Decision log] – Architecture Decision Records (ADRs) documenting key choices
-* link:version-issues.adoc[Version issues and follow-up] – hardcoded versions, bytecode exclusions, research topics
+* link:version-issues.adoc[Version issues and follow-up] – version quirks, bytecode exclusions, research topics
 
 == Test Categories
 
@@ -24,15 +24,15 @@ It provides two layers of validation: class loading tests confirm artifact resol
 Tests are grouped by dependency category:
 
 * Observability (OpenTelemetry, Prometheus)
-* Serialisation (JSONAssert, SnakeYAML, XStream, Jackson, Jettison, BSON)
+* Serialisation (JSONAssert, SnakeYAML, Jackson, Jettison, BSON)
 * MongoDB drivers (legacy, GridFS, core, sync)
 * Networking (Undertow, Jetty, Netty, Grizzly, MINA, XNIO, MockWebServer)
-* Logging (Log4j 2, Log4j 1.x, SLF4J, Logback, Commons Logging)
+* Logging (Log4j 2, SLF4J, Commons Logging)
 * Collections (Koloboke, Trove4j)
 * Databases (HSQLDB)
 * Testing frameworks (JUnit, JMH, Hamcrest, Mockito, PowerMock, EasyMock, Guava Testlib)
 * OSGi (OSGi core/compendium, Pax Exam, Felix framework)
-* Additional peer dependencies (JCommander, Gson, Unirest, Joda-Time, Commons Email, JGit, Maven Model)
+* Additional peer dependencies (JCommander, Gson, Unirest, Joda-Time, Commons Email, Maven Model)
 
 === Minimal Usage Tests
 
@@ -55,23 +55,33 @@ Minimal usage tests validate basic runtime behaviour beyond class loading, organ
 
 [source,bash]
 ----
-mvn -pl third-party-smoke test
+mkdir -p logs
+mvn -pl third-party-smoke verify -l logs/mvn-third-party-smoke.log
+----
+
+Review `logs/mvn-third-party-smoke.log` and treat any warnings or errors as defects (the goal is a clean build, not just a zero exit code).
+
+To validate the alternative SLF4J binding (NOP):
+
+[source,bash]
+----
+mvn -pl third-party-smoke -Pslf4j-nop verify -l logs/mvn-third-party-smoke-slf4j-nop.log
 ----
 
 === Run specific test category
 
 [source,bash]
 ----
-mvn -pl third-party-smoke -Dtest=ClassLoadingSmokeTest test
-mvn -pl third-party-smoke -Dtest=MinimalObservabilitySmokeTest test
-mvn -pl third-party-smoke -Dtest=MinimalSerializationSmokeTest test
+mvn -pl third-party-smoke -Dtest=ClassLoadingSmokeTest test -l logs/mvn-third-party-smoke-ClassLoadingSmokeTest.log
+mvn -pl third-party-smoke -Dtest=MinimalObservabilitySmokeTest test -l logs/mvn-third-party-smoke-MinimalObservabilitySmokeTest.log
+mvn -pl third-party-smoke -Dtest=MinimalSerializationSmokeTest test -l logs/mvn-third-party-smoke-MinimalSerializationSmokeTest.log
 ----
 
 === Run all minimal usage tests
 
 [source,bash]
 ----
-mvn -pl third-party-smoke -Dtest="Minimal*SmokeTest" test
+mvn -pl third-party-smoke -Dtest="Minimal*SmokeTest" test -l logs/mvn-third-party-smoke-MinimalSmokeTests.log
 ----
 
 === Expected test counts
@@ -79,7 +89,7 @@ mvn -pl third-party-smoke -Dtest="Minimal*SmokeTest" test
 * `ClassLoadingSmokeTest`: 85+ dynamic tests
 * Minimal usage tests: 25 tests across 6 categories
 * `LegacyJUnit4SmokeTest`: 1 test
-* *Total*: approximately 111 tests
+* Additional focused smoke tests: varies
 
 == Current Focus
 
@@ -94,17 +104,12 @@ See link:version-issues.adoc[version-issues.adoc] for details and follow-up acti
 
 == Open Topics
 
-* *Hardcoded dependency versions*: JCommander, Gson, Unirest, Joda-Time, Commons Email, JGit, Maven Model are not in `third-party-bom` but observed in peer modules.
-See link:version-issues.adoc[version-issues.adoc] for migration plan.
-* *SLF4J binding warnings*: multiple SLF4J implementations on test classpath trigger "multiple bindings found" warnings.
-Tolerated for now to validate each binding loads correctly.
-* *HSQLDB dual artefacts*: both base artefact and `jdk8` classifier are included.
-Confirm if both are required or consolidate.
+* *Clean builds*: keep the build output free of warnings (capture logs with `-l` and review them, do not rely on exit codes alone).
+* *SLF4J bindings*: validate bindings separately via `-Pslf4j-simple` (default) and `-Pslf4j-nop` to avoid multiple-provider warnings.
+* *HSQLDB classifier requirement*: confirm the `jdk8` classifier remains necessary as upstream evolves.
 
 == Future Work
 
-* Multi-JDK CI matrix: run smoke tests on Java 8, 11, 17, 21 to catch runtime-specific regressions
+* CI matrix: currently runs on Java 8 and 21; consider adding 11 and 17 to catch runtime-specific regressions
 * Integrate with `third-party-bom` version bump workflow to automatically revalidate on dependency updates
-* Reduce SLF4J binding conflicts by using separate test execution groups
-* Migrate hardcoded versions to `third-party-bom` or document exclusion policy
 * Audit OSGi and Pax Exam dependencies to confirm downstream consumers still require them

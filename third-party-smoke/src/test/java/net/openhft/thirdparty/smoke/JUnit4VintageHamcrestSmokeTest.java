@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class JUnit4VintageHamcrestSmokeTest {
 
     /**
-     * Expected sum value for the vintage assertion.
+     * Expected sum used by the vintage JUnit assertion check.
      */
     private static final int EXPECTED_SUM = 4;
 
@@ -42,9 +42,9 @@ public class JUnit4VintageHamcrestSmokeTest {
      */
     @Test
     public void hamcrestMatchersWork() {
-        MatcherAssert.assertThat("Hamcrest should match string prefix",
+        MatcherAssert.assertThat("Hamcrest matcher should verify string prefix correctly",
                 "hello", Matchers.startsWith("he"));
-        MatcherAssert.assertThat("Hamcrest should compare numeric greaterThan",
+        MatcherAssert.assertThat("Hamcrest matcher should verify numeric comparison correctly",
                 MEANING_OF_LIFE, Matchers.greaterThan(LOWER_BOUND));
     }
 }

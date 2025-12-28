@@ -7,52 +7,45 @@ Chronicle Software
 
 == Known Version Quirks
 
-* *Jetty 9.4.57.v20241219* :: Latest Java 8-compatible line; 10.x/11.x/12.x require newer JDKs.
-Track 9.4.58+ for security drops.
-* *Netty 4.1.115.Final* :: Replaces the old 5.0.0.Alpha2; 4.1 is the Java 8 line.
+* *Jetty 9.4.58.v20250814* :: Java 8-compatible line; 10.x/11.x/12.x require newer JDKs.
+* *Netty 4.1.128.Final* :: 4.1 remains the Java 8-compatible line.
 Avoid Netty 5.x (Java 11+).
-* *OpenTelemetry 1.32.0* :: Still advertises Java 8 support; monitor 1.33+ for any baseline change.
-* *OkHttp/MockWebServer 4.12.0* :: Pulls okio 3.6.0 and Kotlin stdlib 1.8.21/1.9.10 transitively; bytecode is Java 8 today, revisit if Kotlin lifts its baseline.
-* *MongoDB drivers 4.11.1* :: Last 4.x line on Java 8; keep legacy 3.12.14 artefacts for `mongo-java-driver`.
+* *OpenTelemetry 1.56.0* :: Still supports Java 8; monitor release notes for any baseline change.
+* *OkHttp/MockWebServer 5.3.0* :: Kotlin-based; keep bytecode checks to catch any baseline lift early.
+* *MongoDB drivers 4.11.5* :: Keep legacy 3.12.14 artefacts for `mongo-java-driver`.
 Avoid 5.x (Java 17).
-* *HSQLDB 2.7.1* :: Base artefact is Java 11 bytecode; the `jdk8` classifier stays required.
-Consider removing the non-classified jar once consumers are checked.
+* *HSQLDB 2.7.4* :: Base artefact is Java 11 bytecode; the `jdk8` classifier stays required.
 * *ProGuard 6.2.2* :: 6.2.4 is not present on Central; 7.x requires Java 11. Stay pinned here unless a Java 8-compatible 6.3+ release appears.
-* *Logging caps* :: Logback 1.3.16 is the last Java 8 line (1.4+/1.5 Java 11).
-Log4j2 2.24.1 and SLF4J 2.0.17 remain Java 8-compatible.
+* *Logging caps* :: Log4j2 2.18.0 and SLF4J 2.0.17 remain Java 8-compatible.
+* *Javassist 3.27.0-GA* :: Managed explicitly to avoid Maven model warnings from older transitive versions (for example, Powermock 1.x pulls 3.21.0-GA).
 
 == Bytecode Level Exclusions
 
 These dependencies stay excluded from `enforceBytecodeVersion`:
 
-* *org.hsqldb:hsqldb 2.7.1* :: Compiled for Java 11 (classfile version 55).
+* *org.hsqldb:hsqldb 2.7.4* :: Compiled for Java 11 (classfile version 55).
 The `jdk8` classifier provides Java 8 bytecode.
-Action: confirm whether the non-classified jar can be removed from dependencies.
 * *org.mongodb:bson-record-codec* :: Compiled for Java 17 (uses Java records).
-Action: confirm whether this is still resolved transitively with the 4.11.1 driver set; exclude if unused.
+Action: confirm whether this is still resolved transitively with the 4.11.5 driver set; exclude if unused.
 
-== SLF4J Binding Conflicts
+== SLF4J Binding Profiles
 
-The test classpath intentionally includes multiple SLF4J implementations (pom.xml lines 220-227, 230-237):
+To keep smoke-test builds clean, SLF4J bindings are validated one at a time via Maven profiles:
 
-* `slf4j-simple`
+* `slf4j-simple` (active by default)
 * `slf4j-nop`
 
-This configuration triggers SLF4J warnings: "Multiple bindings were found on the class path"
-
-*Decision*: Warnings are tolerated to validate all bindings load correctly without failures (see SMOKE-DEC-006 in decision-log.adoc).
-
-*Future*: Consider separate test execution groups if warning noise becomes problematic for developers.
+`ClassLoadingSmokeTest` asserts that exactly one binding provider is present on the classpath.
 
 == Resolved Hardcoded Versions (now BOM-managed)
 
-* *JCommander 1.82*, *Gson 2.11.0*, *Commons Email 1.6.0*, *JGit 5.13.3.202401111512-r*, *Maven Model 3.9.9* :: Now managed in `third-party-bom` and validated on Java 8.
+* *JCommander 1.82*, *Gson 2.13.2*, *Unirest 1.4.9*, *Joda-Time 2.14.0*, *Commons Email 1.6.0*, *Maven Model 3.9.11* :: Now managed in `third-party-bom` and validated on Java 8.
 
 == Follow-up Research Topics
 
 === Multi-JDK CI Matrix
 
-* Run smoke tests on Java 8, 11, 17, 21 to catch runtime-specific issues.
+* CI currently runs smoke tests on Java 8 and 21; consider adding 11 and 17 to catch runtime-specific issues.
 * Identify dependencies that pass bytecode checks yet fail at runtime on newer JDKs.
 
 === HSQLDB Artefact Consolidation
@@ -62,12 +55,12 @@ This configuration triggers SLF4J warnings: "Multiple bindings were found on the
 
 === Verify Unused Transitive Dependencies
 
-* Confirm whether `bson-record-codec` is still pulled with Mongo 4.11.1.
+* Confirm whether `bson-record-codec` is still pulled with Mongo 4.11.5.
 * Remove unused transitive artefacts from the explicit dependency list.
 
 === OpenTelemetry Baseline Watch
 
-* Track OTel 1.33+ release notes for any Java baseline change.
+* Track OpenTelemetry release notes for any Java baseline change.
 * Re-run smoke tests after each OTel bump to ensure bytecode stays at 52.
 
 === OkHttp/Kotlin Baseline Watch
@@ -78,7 +71,3 @@ This configuration triggers SLF4J warnings: "Multiple bindings were found on the
 === Jetty Security Maintenance
 
 * Stay on the 9.4.x LTS line and monitor 9.4.58+ for security advisories.
-
-=== SLF4J Binding Optimisation
-
-* Current approach validates all bindings load; consider isolating bindings if warning noise becomes disruptive.

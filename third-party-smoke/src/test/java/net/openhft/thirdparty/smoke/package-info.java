@@ -21,6 +21,9 @@
  *       <li>{@link MinimalDatabaseSmokeTest} - MongoDB, HSQLDB</li>
  *     </ul>
  *   </li>
+ *   <li>Additional focused smoke tests for specific libraries (for example
+ *     OkHttp, OSGi/Pax Exam, JMH), kept separate to make failures easier to
+ *     diagnose</li>
  *   <li>{@link LegacyJUnit4SmokeTest} - JUnit 4 vintage engine compatibility
  *   </li>
  * </ul>

@@ -3,6 +3,7 @@
  */
 package net.openhft.thirdparty.smoke;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
@@ -13,13 +14,13 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Smoke test for JMH annotations and benchmark discovery helpers.
+ * Smoke test verifying JMH annotations and benchmark discovery helpers are available.
  */
 @SuppressWarnings({"java:S5786", "PMD.JUnit5TestShouldBePackagePrivate"}) // JMH/JUnit rules disagree; JMH requires public
 public class JmhSmokeTest {
 
     /**
-     * Test value used in the sample benchmark.
+     * Benchmark seed used to verify state handling across iterations.
      */
     private static final int SAMPLE_VALUE = 42;
 
@@ -35,6 +36,7 @@ public class JmhSmokeTest {
     }
 
     @Test
+    @DisplayName("JMH OptionsBuilder should create benchmark options")
     void canBuildJmhOptions() {
         Options opts = new OptionsBuilder()
                 .include(JmhSmokeTest.class.getSimpleName())
@@ -44,6 +46,7 @@ public class JmhSmokeTest {
     }
 
     @Test
+    @DisplayName("JMH core benchmarks JAR should be on classpath")
     void coreBenchmarksJarIsOnClasspath() throws Exception {
         Class<?> clazz = Class.forName(
                 "org.openjdk.jmh.benchmarks.BlackholeConsumeCPUBench");
@@ -56,7 +59,7 @@ public class JmhSmokeTest {
     @State(Scope.Benchmark)
     public static class SampleState {
         /**
-         * Test value used by the sample benchmark.
+         * Benchmark value cached in state for sample execution.
          */
         private static final int VALUE = SAMPLE_VALUE;
 

@@ -3,6 +3,7 @@
  */
 package net.openhft.thirdparty.smoke;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.ops4j.pax.exam.Option;
 import org.osgi.framework.Bundle;
@@ -19,11 +20,12 @@ import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 /**
- * Smoke tests covering OSGi and Pax Exam/URL artefacts.
+ * Smoke tests covering OSGi APIs and Pax Exam URL artefacts.
  */
 class OsgiAndPaxSmokeTest {
 
     @Test
+    @DisplayName("OSGi core and compendium types should be usable")
     void osgiCoreAndCompendiumTypesAreUsable() {
         Bundle bundle = FrameworkUtil.getBundle(
                 OsgiAndPaxSmokeTest.class);
@@ -37,6 +39,7 @@ class OsgiAndPaxSmokeTest {
     }
 
     @Test
+    @DisplayName("Felix FrameworkFactory should be discoverable via ServiceLoader")
     void felixFrameworkFactoryCanBeLoaded() {
         ServiceLoader<org.osgi.framework.launch.FrameworkFactory> loader =
                 ServiceLoader.load(
@@ -51,6 +54,7 @@ class OsgiAndPaxSmokeTest {
     }
 
     @Test
+    @DisplayName("Pax Exam CoreOptions and Option interface should be present")
     void paxExamCoreOptionsAndOptionsInterfaceArePresent() {
         Option[] options = {
                 junitBundles(),
@@ -61,6 +65,7 @@ class OsgiAndPaxSmokeTest {
     }
 
     @Test
+    @DisplayName("Pax URL handler classes should be loadable")
     void paxUrlHandlersClassesCanBeLoaded() throws Exception {
         Class<?> mvnHandler = Class.forName(
                 "org.ops4j.pax.url.mvn.Handler");

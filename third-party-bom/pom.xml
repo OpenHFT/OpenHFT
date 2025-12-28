@@ -49,6 +49,7 @@
         <junit.platform.provider.version>1.10.5</junit.platform.provider.version>
         <jmh.version>1.37</jmh.version>
         <jna.version>5.18.1</jna.version>
+        <javassist.version>3.27.0-GA</javassist.version>
         <!-- mockito 5.x requires Java 11+ -->
         <mockito.version>4.11.0</mockito.version>
         <prometheus.version>0.16.0</prometheus.version>
@@ -489,6 +490,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.codehaus.jettison</groupId>
                 <artifactId>jettison</artifactId>
                 <version>1.5.4</version>
@@ -669,7 +676,7 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
@@ -691,6 +698,7 @@
                 </os>
             </activation>
             <properties>
+                <!-- Kept as an explicit override for macOS compatibility; revisit if no longer required. -->
                 <jna.version>5.8.0</jna.version>
             </properties>
         </profile>
@@ -702,32 +710,6 @@
             <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codehaus-snapshots</id>
-            <url>whatever</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <repositories>
-        <repository>
-            <id>codehaus-snapshots</id>
-            <url>whatever</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
     <scm>
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>

@@ -1,0 +1,8 @@
+= Meaningful Message Check Improvements Plan
+:toc:
+:toclevels: 3
+:sectnums:
+
+This content has been merged into `meaningful-message-checker-requirements.adoc` under
+"Improvements Plan (v2026.0)" to keep the 2026.0 history in a single stage for
+checkstyle26, pmd26, and spotbugs26.

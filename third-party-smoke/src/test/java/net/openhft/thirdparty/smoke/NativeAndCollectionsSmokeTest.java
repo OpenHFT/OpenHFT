@@ -6,12 +6,13 @@ package net.openhft.thirdparty.smoke;
 import com.sun.jna.Native;
 import com.sun.jna.platform.FileUtils;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Smoke tests for Trove and JNA artefacts.
+ * Smoke tests verifying Trove collections and JNA native helpers load correctly.
  */
 class NativeAndCollectionsSmokeTest {
 
@@ -21,21 +22,22 @@ class NativeAndCollectionsSmokeTest {
     private static final int ANSWER = 42;
 
     /**
-     * Acceptable native sizes for integer types.
+     * Native size candidate representing two-byte integer types.
      */
     private static final int SIZE_TWO = 2;
 
     /**
-     * Acceptable native sizes for integer types.
+     * Native size candidate representing four-byte integer types.
      */
     private static final int SIZE_FOUR = 4;
 
     /**
-     * Acceptable native sizes for integer types.
+     * Native size candidate representing eight-byte integer types.
      */
     private static final int SIZE_EIGHT = 8;
 
     @Test
+    @DisplayName("Trove map should store and retrieve values")
     void troveMapStoresAndRetrievesValues() {
         TObjectIntHashMap<String> map = new TObjectIntHashMap<>();
         map.put("answer", ANSWER);
@@ -43,6 +45,7 @@ class NativeAndCollectionsSmokeTest {
     }
 
     @Test
+    @DisplayName("JNA Native should report native size")
     void jnaNativeCanReportNativeSize() {
         int size = Native.getNativeSize(Integer.TYPE);
         assertTrue(size == SIZE_TWO || size == SIZE_FOUR || size == SIZE_EIGHT,
@@ -50,6 +53,7 @@ class NativeAndCollectionsSmokeTest {
     }
 
     @Test
+    @DisplayName("JNA Platform FileUtils should be instantiable")
     void jnaPlatformFileUtilsCanBeInstantiated() {
         FileUtils utils = FileUtils.getInstance();
         assertNotNull(utils, "JNA FileUtils should be instantiable");

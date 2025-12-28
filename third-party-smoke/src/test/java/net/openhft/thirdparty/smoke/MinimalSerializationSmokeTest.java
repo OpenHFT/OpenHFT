@@ -30,9 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class MinimalSerializationSmokeTest {
 
     @Test
-    @DisplayName("JSONAssert can compare payloads")
+    @DisplayName("JSONAssert should compare identical JSON payloads")
     void jsonAssertWorks() throws Exception {
-        JSONAssert.assertEquals("{\"key\":1}", "{\"key\":1}", false);
+        JSONAssert.assertEquals("JSONAssert reports no diff for identical payloads",
+                "{\"key\":1}", "{\"key\":1}", false);
     }
 
     @Test
@@ -44,7 +45,7 @@ class MinimalSerializationSmokeTest {
     }
 
     @Test
-    @DisplayName("Gson can serialise and deserialise")
+    @DisplayName("Gson should serialise and deserialise a simple payload")
     void gsonRoundTrips() {
         Gson gson = new Gson();
         SimplePojo pojo = new SimplePojo("gson");
@@ -80,7 +81,7 @@ class MinimalSerializationSmokeTest {
         private final String value;
 
         /**
-         * Creates a SimplePojo with the given value.
+         * Creates a new instance using the supplied text value.
          *
          * @param newValue textual value
          */
@@ -89,7 +90,7 @@ class MinimalSerializationSmokeTest {
         }
 
         /**
-         * Default constructor for deserialisation.
+         * Default constructor required for deserialisation by Jackson.
          */
         @SuppressWarnings("unused")
         SimplePojo() {

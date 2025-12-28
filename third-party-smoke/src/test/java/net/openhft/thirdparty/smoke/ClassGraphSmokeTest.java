@@ -5,16 +5,18 @@ package net.openhft.thirdparty.smoke;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Additional ClassGraph smoke to scan for this test class.
+ * Additional smoke test that ensures ClassGraph can scan the test classpath.
  */
 class ClassGraphSmokeTest {
 
     @Test
+    @DisplayName("ClassGraph should scan classpath and find classes")
     void classgraphCanScanClasspathAndFindThisTestClass() {
         try (ScanResult scanResult = new ClassGraph()
                 .enableClassInfo()

@@ -30,7 +30,7 @@ Developers can run locally before pushing.
 Impact & Consequences:: Contributors must keep tests green.
 Build time increases ~15-30 seconds.
 Version bumps that break Java 8 fail fast with clear error messages.
-Notes/Links:: Module path `/home/peter/Second/OpenHFT/third-party-smoke`.
+Notes/Links:: Module path `third-party-smoke`.
 See requirement `SMOKE-TEST-001` in project-requirements.adoc.
 
 === SMOKE-DEC-002 Separate class loading and usage tests
@@ -79,7 +79,7 @@ Parallel execution can target specific categories.
 Impact & Consequences:: More test files (6 classes instead of 1).
 Clearer test organisation and reporting.
 Easier to add new tests to appropriate category.
-Notes/Links:: Test classes in `/home/peter/Second/OpenHFT/third-party-smoke/src/test/java/net/openhft/thirdparty/smoke/`.
+Notes/Links:: Test classes in `src/test/java/net/openhft/thirdparty/smoke/`.
 See requirement `SMOKE-TEST-002` in project-requirements.adoc.
 
 === SMOKE-DEC-004 Hardcoded dependency versions
@@ -105,7 +105,8 @@ Tests remain green with known versions.
 Impact & Consequences:: Version maintenance burden in smoke module pom.xml.
 Documented in version-issues.adoc with migration path.
 Requires manual version updates when peer modules change.
-Notes/Links:: See pom.xml lines 495-541 for hardcoded versions.
+Status:: Resolved by moving peer dependency versions into `third-party-bom` and relying on BOM-managed versions in the smoke tests.
+Notes/Links:: See the `pom.xml` section "Additional third-party jars observed in peer modules".
 Documented in version-issues.adoc.
 See requirement `SMOKE-NF-O-003` for documentation currency.
 
@@ -128,36 +129,82 @@ Alternatives Considered::
 Rationale for Decision:: Balanced approach - enforce for most artifacts, document exceptions, alert on new violations.
 Exceptions require justification and follow-up.
 HSQLDB provides jdk8 classifier. bson-record-codec may be transitive and unused.
-Impact & Consequences:: Explicit exclusion list in pom.xml lines 559-577. Requires documentation updates when adding exclusions.
-Follow-up action to verify if both HSQLDB artifacts needed.
+Impact & Consequences:: Explicit exclusion list in `pom.xml`. Requires documentation updates when adding exclusions.
 Notes/Links:: See `maven-enforcer-plugin` configuration in pom.xml.
 Documented in version-issues.adoc.
 See requirement `SMOKE-NF-O-001` in project-requirements.adoc.
 
-=== SMOKE-DEC-006 Multiple SLF4J bindings tolerated
+=== SMOKE-DEC-006 Focused smoke tests for specific technologies
 
-Date:: 2025-11-29
-Context:: Test classpath includes multiple SLF4J implementations (slf4j-simple, slf4j-nop) to validate all bindings resolve correctly.
-This triggers SLF4J warnings: "Multiple bindings were found on the class path".
-Decision Statement:: Tolerate SLF4J binding warnings during test execution to validate all bindings load correctly without failures.
+Date:: 2025-12-24
+Context:: Beyond the `Minimal*SmokeTest` category-based tests, some dependencies require more detailed validation or have complex integration scenarios that don't fit cleanly into a category.
+A single test method per file allows targeted execution and clearer failure diagnostics.
+Decision Statement:: Create focused smoke test classes for specific technologies: testing frameworks (JUnit variants, Mockito, EasyMock, PowerMock), serialisation libraries (Jettison), networking stacks (OkHttp, Jetty WebSocket, NIO stacks), build tools (JMH, ProGuard), and specialized utilities (ClassGraph, JavaPoet, JavaxInject, OSGi/Pax).
 Alternatives Considered::
-* Single binding per test:
-** *Pros:* Clean test output, no warnings.
-** *Cons:* Doesn't validate that multiple bindings can coexist, misses downstream classpath scenarios.
-* Exclude extra bindings:
-** *Pros:* Eliminates warnings.
-** *Cons:* Reduces test coverage, doesn't validate binding resolution.
-* Separate test profiles per binding:
-** *Pros:* Isolated validation.
-** *Cons:* Complex configuration, slower CI, maintenance burden.
-Rationale for Decision:: Validates each binding resolves correctly.
-Mirrors potential downstream classpath conflicts.
-Warnings are informational, not failures.
-Tests remain deterministic despite warnings.
-Impact & Consequences:: Noisy test output with SLF4J warnings during execution.
-Acceptable for smoke testing.
-Developers must distinguish warnings from actual failures.
-Future: may separate test execution groups if noise becomes problematic.
-Notes/Links:: See pom.xml lines 213-237 for SLF4J dependencies.
-Documented in version-issues.adoc.
-See `MinimalLoggingSmokeTest` for SLF4J validation.
+* Add to Minimal* category tests:
+** *Pros:* Fewer files, simpler structure.
+** *Cons:* Categories become bloated; failure messages less specific; harder to run individual library tests.
+* One test class per dependency (artifact-level granularity):
+** *Pros:* Maximum clarity and isolation.
+** *Cons:* Too many files (80+); many would have only 1-2 tests.
+* Keep only ClassLoadingSmokeTest:
+** *Pros:* Minimal test maintenance.
+** *Cons:* Misses runtime behaviour issues; insufficient for complex integrations.
+Rationale for Decision:: Focused tests complement category tests by providing deeper validation for:
+* Libraries with complex setup/teardown (Jetty, Grizzly, Netty)
+* Testing frameworks that themselves test (JUnit launcher, Mockito mocks)
+* Libraries requiring specific usage patterns (JMH options, ProGuard configuration)
+* Dependencies with known integration complexity (OSGi, PowerMock)
+Each focused test remains small (typically 20-90 lines) but provides clear, isolated validation.
+Impact & Consequences:: 27 focused test files in addition to 6 Minimal* tests.
+IDE navigation by class name maps directly to library under test.
+Parallel test execution can target specific technologies.
+New contributors should add focused tests for complex libraries, category tests for simple ones.
+Notes/Links:: Focused tests in `src/test/java/net/openhft/thirdparty/smoke/`.
+See requirement `SMOKE-TEST-002` in project-requirements.adoc.
+
+=== SMOKE-DEC-007 Shared test fixtures and constants
+
+Date:: 2025-12-24
+Context:: Multiple test files defined similar POJO classes (`SimplePojo`, `Person`, `CliArgs`) and constants (`DELTA`, test values) independently, leading to duplication and inconsistent implementations.
+Decision Statement:: Extract shared test fixtures to `SmokeTestFixtures.java` and shared constants to `SmokeTestConstants.java` for reuse across the test suite.
+Alternatives Considered::
+* Keep inline definitions:
+** *Pros:* Each test is self-contained.
+** *Cons:* Duplication; inconsistent implementations; harder to maintain.
+* Abstract base test class:
+** *Pros:* Inheritance provides shared behaviour.
+** *Cons:* Over-engineered for simple fixtures; limits test class design.
+* Per-category fixture classes:
+** *Pros:* Fixtures aligned with test categories.
+** *Cons:* Creates 6+ fixture classes for ~5 shared types; artificial boundaries.
+Rationale for Decision:: Single shared fixtures file is sufficient for the small number of shared types.
+Constants interface centralises magic numbers.
+Tests remain easy to read by importing specific fixtures.
+Future shared types have a clear home.
+Impact & Consequences:: Tests should import from `SmokeTestFixtures` and `SmokeTestConstants` rather than defining local copies.
+Existing inline definitions can be migrated incrementally.
+Notes/Links:: `SmokeTestFixtures.java` and `SmokeTestConstants.java` in test sources.
+
+=== SMOKE-DEC-008 SLF4J bindings isolated via profiles
+
+Date:: 2025-12-13
+Context:: The smoke tests must keep build output clean (no warnings) while still validating multiple SLF4J bindings used across the ecosystem.
+Keeping multiple SLF4J providers on the same test classpath triggers "multiple bindings" warnings, which makes log review harder and can hide real issues.
+Decision Statement:: Validate SLF4J bindings one at a time via Maven profiles (`slf4j-simple` by default, `slf4j-nop` on demand) and assert that exactly one provider is present.
+Alternatives Considered::
+* Keep multiple bindings together:
+** *Pros:* Matches a "worst-case" classpath.
+** *Cons:* Produces warnings and makes clean builds impossible.
+* Pick a single binding and drop the rest:
+** *Pros:* Clean output.
+** *Cons:* Loses validation of the other binding(s) used by downstream consumers.
+* Attempt to suppress SLF4J warnings:
+** *Pros:* Noisy output reduced.
+** *Cons:* Fragile and may vary across SLF4J versions.
+Rationale for Decision:: Keeps logs clean while still validating both bindings.
+Avoids hiding genuine warnings in CI output.
+Impact & Consequences:: CI should run at least the default binding and the alternative binding profile.
+Developers can reproduce issues by selecting the relevant profile.
+Notes/Links:: See `pom.xml` profiles `slf4j-simple` and `slf4j-nop`.
+Documented in version-issues.adoc and enforced by requirement `SMOKE-NF-O-004`.

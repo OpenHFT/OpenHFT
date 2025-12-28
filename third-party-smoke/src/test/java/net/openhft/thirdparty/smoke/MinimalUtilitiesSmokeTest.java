@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MinimalUtilitiesSmokeTest {
 
     /**
-     * Test value.
+     * Reference value used for utility smoke assertions.
      */
     private static final int TEST_VAL = 100;
 
@@ -57,7 +57,7 @@ class MinimalUtilitiesSmokeTest {
     private static final String FLAG_VALUE = "value";
 
     @Test
-    @DisplayName("Trove4j map can be used")
+    @DisplayName("Trove4j map should store and return values")
     void troveMapUsage() {
         TIntIntHashMap map = new TIntIntHashMap();
         map.put(1, TEST_VAL);
@@ -89,7 +89,8 @@ class MinimalUtilitiesSmokeTest {
                         helloWorld)
                 .build();
         String source = javaFile.toString();
-        assertTrue(source.contains("class HelloWorld"), "JavaPoet should render class definition");
+        assertTrue(source.contains("class HelloWorld"),
+                source + " should contain class HelloWorld");
     }
 
     @Test
@@ -100,7 +101,7 @@ class MinimalUtilitiesSmokeTest {
     }
 
     @Test
-    @DisplayName("Commons Email can be instantiated")
+    @DisplayName("Commons Email should construct without network access")
     void commonsEmailUsage() {
         SimpleEmail email = new SimpleEmail();
         assertNotNull(email, "Commons Email should instantiate");
@@ -118,7 +119,7 @@ class MinimalUtilitiesSmokeTest {
     }
 
     @Test
-    @DisplayName("ClassGraph can scan")
+    @DisplayName("ClassGraph should scan the classpath for classes")
     void classGraphScans() {
         try (io.github.classgraph.ScanResult scanResult =
                      new io.github.classgraph.ClassGraph()
@@ -129,19 +130,20 @@ class MinimalUtilitiesSmokeTest {
     }
 
     @Test
-    @DisplayName("JNA Native class is accessible")
+    @DisplayName("JNA Native constants should be accessible")
     void jnaAccess() {
-        assertTrue(com.sun.jna.Native.POINTER_SIZE > 0, "JNA Native should expose POINTER_SIZE");
+        int pointerSize = com.sun.jna.Native.POINTER_SIZE;
+        assertTrue(pointerSize > 0, "JNA POINTER_SIZE should be > 0 but was " + pointerSize);
     }
 
     @Test
-    @DisplayName("JNR Runtime is accessible")
+    @DisplayName("JNR Runtime should be accessible for ffi")
     void jnrUsage() {
         assertNotNull(jnr.ffi.Runtime.getSystemRuntime(), "JNR Runtime should be accessible");
     }
 
     @Test
-    @DisplayName("Samskivert QuickSort sorts arrays")
+    @DisplayName("Samskivert QuickSort should sort integer arrays")
     void samskivertQuickSort() {
         Integer[] nums = {
                 QUICK_SORT_FIRST,
@@ -160,7 +162,7 @@ class MinimalUtilitiesSmokeTest {
     }
 
     @Test
-    @DisplayName("JCommander parses simple args")
+    @DisplayName("JCommander should parse simple flag arguments")
     void jCommanderParses() {
         CliArgs args = new CliArgs();
         JCommander.newBuilder()
@@ -175,7 +177,7 @@ class MinimalUtilitiesSmokeTest {
      */
     private static final class CliArgs {
         /**
-         * Sample flag parsed by JCommander.
+         * Sample flag parsed by JCommander for command-line coverage.
          */
         @Parameter(names = "-f")
         private String flag;

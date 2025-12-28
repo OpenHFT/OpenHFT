@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MinimalDatabaseSmokeTest {
 
     @Test
-    @DisplayName("Mongo ConnectionString parses without network")
+    @DisplayName("Mongo ConnectionString should parse database name offline")
     void mongoConnectionStringParses() {
         ConnectionString connectionString = new ConnectionString(
                 "mongodb://localhost:27017/testdb"
@@ -34,7 +34,7 @@ class MinimalDatabaseSmokeTest {
     }
 
     @Test
-    @DisplayName("Mongo BSON Document works offline")
+    @DisplayName("Mongo BSON Document should store fields offline")
     void mongoBsonDocument() {
         Document document = new Document("hello", "world")
                 .append("_id", new ObjectId());

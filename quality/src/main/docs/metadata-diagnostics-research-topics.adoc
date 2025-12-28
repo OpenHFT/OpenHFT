@@ -1,0 +1,541 @@
+= Metadata and Diagnostic Message Quality Research Topics
+:toc:
+:toclevels: 3
+:sectnums:
+
+Below are research topics that map directly to automated checks you can run in CI (and also use for "linting" new or changed messages). It includes concrete search keywords and anchor specs or guides worth reading.
+
+== Metadata description quality
+
+=== 1) JUnit display metadata consistency rules
+
+What to research::
+* Patterns for `@DisplayName`, parameterised invocation names, and centrally configured default name patterns.
+* How parameter names are surfaced in parameterised display names (build flags, language specifics).
+
+Why it helps triage::
+* Better test report readability and faster "what failed?" scanning.
+
+Anchors::
+* link:https://docs.junit.org/5.10.2/user-guide/?utm_source=chatgpt.com[JUnit 5 User Guide]
+
+Keywords::
+* `JUnit 5 DisplayName guidelines`
+* `junit.jupiter.displayname.generator`
+* `ParameterizedTest name pattern junit.jupiter.params.displayname.default`
+
+=== 2) "Disabled reason" quality gates
+
+What to research::
+* Enforce: who disabled, why, when to re-enable, link to ticket or runbook.
+* Anti-pattern detection: "temporarily", "flaky", "fix later".
+
+Keywords::
+* `@Disabled reason best practice`
+* `test quarantine policy`
+* `flaky test triage metadata`
+
+=== 3) Ownership and runbook metadata schema
+
+What to research::
+* Minimum fields for ownership (`team`, `service/component`, `oncall`, `runbook_url`, `severity/impact`).
+* Whether to embed as annotations or tags in tests vs a central registry (or both).
+
+Keywords::
+* `service ownership metadata taxonomy`
+* `runbook link conventions`
+* `component taxonomy SRE`
+
+=== 4) Environment and build provenance metadata (and how to standardise it)
+
+What to research::
+* Standard fields for `service.name`, `deployment.environment.name`, version and build identifiers.
+* Where to attach them (resource attributes vs log attributes).
+
+Anchors::
+* link:https://opentelemetry.io/docs/specs/semconv/resource/?utm_source=chatgpt.com[OpenTelemetry resource semantic conventions]
+
+Keywords::
+* `OpenTelemetry resource attributes build version`
+* `deployment.environment.name`
+* `service.name uniqueness`
+
+=== 5) Metadata validation via schemas and policy-as-code
+
+What to research::
+* Express required or optional fields, controlled vocabularies, and uniqueness constraints using JSON Schema.
+* Enforce additional rules (for example, "runbook must be present when severity >= S2") using OPA/Rego (Conftest-style workflows).
+
+Anchors::
+* link:https://json-schema.org/draft/2020-12/json-schema-validation?utm_source=chatgpt.com[JSON Schema validation vocabulary]
+* link:https://openpolicyagent.org/docs/configuration?utm_source=chatgpt.com[OPA configuration]
+
+Keywords::
+* `JSON Schema required properties`
+* `schema linting CI`
+* `OPA Rego conftest linting YAML`
+
+== Diagnostic message quality
+
+=== 6) Actionable message design (human factors)
+
+What to research::
+* Message structure: plain language, precise cause, concrete next step, avoid blame.
+* Localisation and consistency considerations (tense, voice, terms).
+
+Anchors::
+* link:https://learn.microsoft.com/en-us/windows/win32/debug/error-message-guidelines?utm_source=chatgpt.com[Microsoft error message guidelines]
+* link:https://www.nngroup.com/articles/error-message-guidelines/?utm_source=chatgpt.com[Nielsen Norman Group error message guidelines]
+
+Keywords::
+* `error message writing guidelines`
+* `actionable error messages remediation`
+* `plain language error text`
+
+=== 7) Structured logging fields and semantic conventions (machine triage)
+
+What to research::
+* Which fields should always exist: `trace_id`, `span_id`, `service.name`, `deployment.environment`, `exception.*`, plus domain keys.
+* Adopt OpenTelemetry log semantic conventions for consistency across services.
+
+Anchors::
+* link:https://opentelemetry.io/docs/concepts/semantic-conventions/?utm_source=chatgpt.com[OpenTelemetry semantic conventions]
+
+Keywords::
+* `OpenTelemetry logs semantic conventions`
+* `exception attributes logs`
+* `correlation id trace id best practice`
+
+=== 8) ECS vs OTel field mapping strategy
+
+What to research::
+* When storing logs in Elastic, how ECS `error.*` and `event.*` map to OTel attributes (or how to dual-write).
+
+Anchors::
+* link:https://www.elastic.co/docs/reference/ecs/ecs-error?utm_source=chatgpt.com[Elastic Common Schema error fields]
+
+Keywords::
+* `Elastic ECS error fields`
+* `OTel ECS mapping`
+* `structured logging schema design`
+
+=== 9) Stable error identifiers (codes) and classification
+
+What to research::
+* Designing stable error codes (taxonomy, ownership mapping, severity mapping).
+* Canonical error code sets for APIs (the taxonomy ideas transfer even when not using gRPC or Google RPC).
+
+Anchors::
+* link:https://google.aip.dev/193?utm_source=chatgpt.com[Google AIP-193: Errors]
+
+Keywords::
+* `error code taxonomy design`
+* `severity classification scheme`
+* `stable identifiers incident triage`
+
+=== 10) Problem Details (RFC 7807 / RFC 9457) for API-facing diagnostics
+
+What to research::
+* Using `application/problem+json` with structured fields (`type`, `title`, `status`, `detail`, `instance`) and extensions for domain context.
+* How to lint OpenAPI specs to ensure consistent error responses.
+
+Anchors::
+* link:https://datatracker.ietf.org/doc/html/rfc7807?utm_source=chatgpt.com[RFC 7807 - Problem Details for HTTP APIs]
+* link:https://redocly.com/docs/cli/rules/oas/operation-4xx-problem-details-rfc7807?utm_source=chatgpt.com[OpenAPI lint rule for RFC 7807 responses]
+
+Keywords::
+* `RFC 7807 problem+json best practices`
+* `RFC 9457 problem details`
+* `OpenAPI lint problem details`
+
+=== 11) Template discipline and high-cardinality controls
+
+What to research::
+* Rules for message templates: keep stable text and put variable data in fields or structured attributes.
+* Detect accidental high-cardinality strings (for example, embedding full payloads).
+
+Keywords::
+* `log message cardinality`
+* `message template hashing`
+* `structured logging anti patterns`
+
+=== 12) Automated message lint metrics
+
+What to research::
+* Concrete scoring: missing subject, missing action, missing component or owner, missing correlation IDs, ambiguous pronouns, redundant phrases, length heuristics.
+* Duplicate detection via template hashing.
+
+Keywords::
+* `log quality metrics`
+* `message deduplication`
+* `diagnostic linting`
+
+=== 13) Failure signature clustering (triage acceleration)
+
+What to research::
+* Stack trace fingerprinting and message-template grouping, and where to allow overrides.
+* How incident tools group events and what signals they prioritise.
+
+Anchors::
+* link:https://docs.sentry.io/concepts/data-management/event-grouping/?utm_source=chatgpt.com[Sentry event grouping concepts]
+
+Keywords::
+* `stack trace fingerprinting`
+* `failure signature clustering`
+* `issue grouping algorithm`
+
+== Cross-cutting checker design topics
+
+=== 14) Where to enforce: compile-time, test-time, or ingest-time
+
+What to research::
+* Trade-offs between:
+** compile-time (annotation processors, static analysis),
+** test-time (JUnit extensions or listeners),
+** ingest-time (log pipeline rules, schema enforcement).
+
+Keywords::
+* `policy enforcement layers observability`
+* `CI lint vs runtime validation`
+
+=== 15) Governance: controlled vocab and drift management
+
+What to research::
+* How to manage allowed component, team, and severity values, deprecate terms, and handle migrations without breaking searches or dashboards.
+
+Keywords::
+* `controlled vocabulary governance`
+* `schema evolution`
+* `data contracts observability`
+
+== Next research candidates
+
+=== 16) Exception-to-insight pipeline (structured exceptions)
+
+What to research::
+* Structured exception types that carry stable error codes and diagnostic fields, not just message strings.
+* Compile-time enforcement so custom exceptions include a stable code (ArchUnit or Error Prone).
+
+Keywords::
+* `structured exception interface`
+* `Error Prone custom check`
+* `stable error code taxonomy`
+
+=== 17) Test report portability via the JUnit Platform Launcher
+
+What to research::
+* Capturing display names, tags, and parameterised invocation names via the Launcher API before XML loss.
+* OpenTestReporting format support and where CI parsers drop metadata.
+
+Keywords::
+* `JUnit Platform LauncherDiscoveryRequest`
+* `OpenTestReporting format`
+* `Surefire usePhrasedTestCaseMethodName`
+
+=== 18) Correlation and baggage propagation from test runner to SUT
+
+What to research::
+* Passing `traceparent` and approved baggage from the JUnit process into the service under test.
+* Allowlist and redaction rules for baggage keys to avoid leaking identifiers.
+
+Keywords::
+* `W3C traceparent propagation`
+* `OpenTelemetry baggage allowlist`
+* `test harness correlation id`
+
+=== 19) Diagnostic quality scorecard and diff-scoped gating
+
+What to research::
+* A measurable score for actionability, traceability, and structure, with thresholds for new or changed messages.
+* Trend monitoring to catch gradual drift rather than only per-change regressions.
+
+Keywords::
+* `message quality metrics`
+* `diff scoped linting`
+* `quality gate new code`
+
+=== 20) Privacy and security scanning for diagnostics
+
+What to research::
+* PII and secret scanning applied to logs, test reports, and attachments, not just source files.
+* Redaction markers and safe external vs internal diagnostic channels.
+
+Keywords::
+* `log PII redaction`
+* `secret scanning logs`
+* `CWE-209 error message exposure`
+
+=== 21) Performance and cost controls for diagnostics
+
+What to research::
+* Zero-allocation or low-allocation logging patterns and guidance for hot paths.
+* Payload size caps, sampling policies, and rate limiting for diagnostic events.
+
+Keywords::
+* `zero allocation logging Java`
+* `log cardinality control`
+* `OpenTelemetry tail sampling`
+
+== AI remediation guardrails
+
+=== 22) YAML spec schema and validation
+
+What to research::
+* JSON Schema-for-YAML pipeline: parse YAML to a JSON-like object and validate with JSON Schema (draft 2020-12).
+* Strictness knobs (`additionalProperties: false`, required fields, enums) and actionable validation errors.
+* Validator behaviour and failure UX: Yamale, pykwalify, StrictYAML, and yamllint.
+
+Anchors::
+* link:https://json-schema.org/draft/2020-12/json-schema-validation?utm_source=chatgpt.com[JSON Schema validation vocabulary]
+* link:https://github.com/23andMe/Yamale?utm_source=chatgpt.com[Yamale]
+* link:https://pykwalify.readthedocs.io/?utm_source=chatgpt.com[pykwalify]
+* link:https://pypi.org/project/strictyaml/?utm_source=chatgpt.com[StrictYAML]
+* link:https://yamllint.readthedocs.io/en/stable/configuration.html?utm_source=chatgpt.com[yamllint configuration]
+
+Keywords::
+* `YAML schema validation`
+* `additionalProperties false`
+* `StrictYAML`
+
+CI checks to design::
+* Spec must parse with a strict loader (StrictYAML or locked parser config).
+* Schema validation must pass; unknown fields forbidden.
+* TitleCase rule IDs and required fields enforced by schema and lint.
+
+=== 23) Flow-style YAML reliability
+
+What to research::
+* Flow style semantics and edge cases for YAML 1.2.2.
+* Parser compatibility and round-trip normalisation to block style (ruamel.yaml).
+
+Anchors::
+* link:https://yaml.org/spec/1.2.2/?utm_source=chatgpt.com[YAML 1.2.2 spec]
+* link:https://pypi.org/project/ruamel.yaml/?utm_source=chatgpt.com[ruamel.yaml]
+
+Keywords::
+* `flow style YAML`
+* `brace balance validation`
+* `round trip YAML`
+
+CI checks to design::
+* Brace and bracket balance pre-check for fast failure.
+* Normalise to block style after parsing to stabilise stored specs.
+
+=== 24) TitleCase rule registry governance
+
+What to research::
+* Registry contract: stable ID, risk tier, version and deprecation policy, and mapping to rewrite parameters.
+* Recipe metadata patterns and `@Option` documentation in OpenRewrite.
+
+Anchors::
+* link:https://docs.openrewrite.org/concepts-and-explanations/recipes?utm_source=chatgpt.com[OpenRewrite recipes]
+
+Keywords::
+* `TitleCase taxonomy`
+* `rule registry versioning`
+* `risk tiering`
+
+CI checks to design::
+* Registry schema validation (unique IDs; TitleCase; risk tier present).
+* Deprecated rules cannot be referenced by new specs.
+
+=== 25) Spec-to-rewrite binding (deterministic mapping and idempotency)
+
+What to research::
+* OpenRewrite `@Option` parameter binding and Maven plugin wiring to source sets.
+* Refaster templates as deterministic executors and the OpenRewrite bridge for Refaster recipes.
+
+Anchors::
+* link:https://docs.openrewrite.org/concepts-and-explanations/recipes?utm_source=chatgpt.com[OpenRewrite recipes]
+* link:https://errorprone.info/docs/refaster?utm_source=chatgpt.com[Refaster templates]
+* link:https://docs.openrewrite.org/authoring-recipes/refaster-recipes?utm_source=chatgpt.com[OpenRewrite Refaster recipes]
+
+Keywords::
+* `OpenRewrite @Option`
+* `Refaster templates`
+* `idempotent refactoring`
+
+CI checks to design::
+* Preconditions: detector match count greater than zero.
+* Postconditions: detector match count decreases.
+* Idempotency: second run produces no diff.
+
+=== 26) Node-level invariants (semantic diff guardrails)
+
+What to research::
+* AST diff tooling bake-off: GumTree and RefactoringMiner for semantic diffs.
+* Node-kind allowlists to prevent drive-by edits.
+
+Anchors::
+* link:https://github.com/GumTreeDiff/gumtree?utm_source=chatgpt.com[GumTree]
+* link:https://github.com/tsantalis/RefactoringMiner?utm_source=chatgpt.com[RefactoringMiner]
+
+Keywords::
+* `AST diff`
+* `semantic invariants`
+* `node allowlist`
+
+CI checks to design::
+* Only authorised node kinds change (for example, literal strings or annotation values).
+* No symbol resolution regressions where type resolution is required.
+
+=== 27) Diff-scoped enforcement and patch budgets
+
+What to research::
+* Diff filtering infrastructure (reviewdog) and review-size guidance (small CLs).
+* Patch size and module boundary constraints that keep review effort predictable.
+
+Anchors::
+* link:https://github.com/reviewdog/reviewdog?utm_source=chatgpt.com[reviewdog]
+* link:https://google.github.io/eng-practices/review/developer/small-cls.html?utm_source=chatgpt.com[Small CLs guidance]
+
+Keywords::
+* `diff scoped`
+* `patch budget`
+* `module boundary enforcement`
+
+CI checks to design::
+* Patch touches only within detector span plus margin.
+* Per-file and per-module change limits.
+
+=== 28) Reviewable campaign reports
+
+What to research::
+* Report content that reduces reviewer load: risk tier, counts, spot-check links, and rationale.
+* Semantic diff grouping as inspiration for summarised review links.
+
+Anchors::
+* link:https://semanticdiff.com/github/?utm_source=chatgpt.com[SemanticDiff for GitHub]
+* link:https://docs.github.com/articles/reviewing-proposed-changes-in-a-pull-request?utm_source=chatgpt.com[GitHub review workflow]
+
+Keywords::
+* `batch change report`
+* `review summary`
+* `spot check sampling`
+
+CI checks to design::
+* Campaign report generated per batch with rule counts and sample links.
+* Report linked from PR description or build artefact.
+
+=== 29) State persistence and replay
+
+What to research::
+* SQLite for deterministic task ledgers and atomic updates.
+* Replayability requirements: identical spec and patch or a loud failure.
+
+Anchors::
+* link:https://sqlite.org/atomiccommit.html?utm_source=chatgpt.com[SQLite atomic commit]
+
+Keywords::
+* `SQLite task ledger`
+* `JSONL task tracking`
+* `replayable remediation`
+
+CI checks to design::
+* Every applied patch has a ledger entry with spec hash and input hash.
+* Replay mode must reproduce the same spec and patch.
+
+=== 30) Provenance and attestations
+
+What to research::
+* Sigstore Cosign in-toto attestations for patch manifests and tool versions.
+
+Anchors::
+* link:https://docs.sigstore.dev/cosign/verifying/attestation/?utm_source=chatgpt.com[Sigstore in-toto attestations]
+
+Keywords::
+* `in-toto attestation`
+* `patch provenance`
+* `signed manifest`
+
+CI checks to design::
+* Require signed patch manifest attached to the build artefact or commit.
+* Verify signature and predicate schema in CI.
+
+=== 31) Human-in-the-loop UX and risk-tier routing
+
+What to research::
+* Review ergonomics for large campaigns and how to keep changes reviewable.
+* Risk-tier routing: auto-merge only for high-confidence fixes.
+
+Anchors::
+* link:https://abseil.io/resources/swe-book/html/ch09.html?utm_source=chatgpt.com[Code review guidance]
+
+Keywords::
+* `review ergonomics`
+* `risk tier routing`
+* `human centric determinism`
+
+CI checks to design::
+* Enforce reviewer sign-off for medium or low risk tiers.
+* Auto-merge only for high-confidence rules with passing verification.
+
+== Prioritisation by impact and ease (Maven-first)
+
+The ordering below favours checks that can run as part of the Maven build (Checkstyle, PMD, SpotBugs, Error Prone, ArchUnit, Surefire).
+
+=== P0: High impact, easy to automate in Maven
+
+Automatable now::
+* Exception message quality: Error Prone check for variable-only messages and ArchUnit ban on generic exceptions.
+* Assertion and log message linting: extend Checkstyle rules and align with PMD or SpotBugs message checks.
+* JUnit metadata consistency: Surefire phrased names and a fixture test that asserts display names and disabled reasons are preserved.
+
+Gen AI later::
+* Draft contextual messages for exceptions and assertions.
+* Suggest DisplayName and Disabled reason improvements based on test context.
+
+Human judgement::
+* Approve naming conventions for DisplayName and Disabled reasons.
+* Decide where messages are mandatory (exceptions, logs, assertions).
+
+=== P0 coverage and gaps (MeaningfulMessage)
+
+Current coverage::
+* Assertions, preconditions, throw messages, and annotation descriptions are checked for low-signal patterns (generic, too short, too few meaningful, line numbers, whitespace runs).
+* Duplicates are checked for assertions and annotations; class or method redundancy and missing subject apply only to assertions.
+
+Automatable gaps::
+* Exception messages: require non-empty messages for common exception types (IllegalArgumentException, IllegalStateException, UnsupportedOperationException, AssertionError); flag variable-only messages or ones that just restate the exception type. For low-latency or high-performance classes, allow an explicit suppression on the class or method to waive the message requirement, but require messages by default elsewhere.
+* Log sites: apply core MeaningfulMessage checks to SLF4J `trace/debug/info/warn/error`, Log4j2 `trace/debug/info/warn/error/fatal`, JUL `java.util.logging.Logger`, `System.Logger`, and Chronicle `Jvm.*.on(...)` calls (generic, too short, too few meaningful, contextless, index-only, missing subject, whitespace runs). Treat duplicate messages as a lower-severity signal. For `Jvm.*.on(...)` callsites, require a non-null message or a throwable (null templates without a throwable are missing-message failures), enforced by `MMMissingMessage`. Empty templates are treated as present and fail via MMTooShort/MMTooFewMeaningfulWords, even when a throwable is supplied. For SLF4J, Log4j2, JUL, and System.Logger, empty templates are handled by MMTooShort/MMTooFewMeaningfulWords rather than a missing-message rule. Null templates are missing-message failures unless any argument is a known throwable, regardless of additional arguments. "Known throwable" means any subtype of `Throwable` (including `StackTrace`), type-based only (no name-based guessing). If a throwable is present, the message is optional but must be meaningful when provided. For SLF4J, Log4j2, JUL, and System.Logger, treat varargs as placeholders and do not infer throwable position.
+* Missing metadata: `MMMissingMessage` also covers `@Disabled`/`@Ignore` with no reason.
+* Missing-message rules for `Jvm.*.on(...)` treat only null messages without a throwable as missing;
+  empty templates are present and fail via MMTooShort/MMTooFewMeaningfulWords.
+* DisplayName annotations: apply the core MeaningfulMessage checks (generic, too short, too few meaningful, line numbers, whitespace runs, duplicates), while allowing JUnit standard placeholders (`{index}`, `{arguments}`, `{argumentsWithNames}`, `{displayName}`, `{0}`).
+* Message-required cases: consider PMD UnitTestAssertionsShouldIncludeMessage (tests) and require messages for Objects.requireNonNull or similar preconditions in production code.
+
+=== P1: High impact, medium effort (Maven plus auxiliary tooling)
+
+Automatable now::
+* YAML spec schema validation and TitleCase rule registry checks (run via Maven exec or a small Java tool).
+* Spec-to-rewrite binding tests and idempotency checks for OpenRewrite or Refaster recipes.
+* Privacy and secret scans of test reports and attachments as an optional Maven profile.
+
+Gen AI later::
+* Emit YAML specs that fill in structured fields and remediation hints.
+* Propose rule registry entries with risk tier metadata.
+
+Human judgement::
+* Approve risk tiers and deprecation policy for rules.
+* Review medium-confidence changes and adjust schema constraints.
+
+=== P2: High impact, harder to automate (cross-system or integration heavy)
+
+Automatable now::
+* Correlation and baggage propagation integration tests across the test runner and SUT.
+* Structured logging field presence checks for OpenTelemetry and ECS mappings in config.
+
+Gen AI later::
+* Generate campaign reports with sampling suggestions and summaries.
+* Propose migration notes for schema or logging changes.
+
+Human judgement::
+* Accept or reject semantic diff invariants and provenance requirements.
+* Tune sampling, retention, and privacy policies for production use.
+
+=== Deferred: standardised error codes
+
+Future improvement::
+* Define a stable error code taxonomy and enforce it for exception messages once the message-quality checks are in place.
+
+If you want, this can be converted into a research backlog format with priority, expected artefacts, and acceptance criteria per topic.

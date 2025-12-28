@@ -7,11 +7,24 @@
 This module packages shared quality configuration and documentation used across Chronicle projects.
 It provides:
 
-* Checkstyle rule sets and configuration files;
+* Checkstyle rule sets and custom checks (including the Meaningful Message Check);
 * SpotBugs include and exclude filters;
-* shared architectural, security and operations guidance that other modules can reference.
+* PMD rulesets and suppression guidance;
+* shared quality and diagnostics guidance that other modules can reference.
+
+Documentation under `src/main/docs` is provided for development context and is not packaged in the release JAR.
 
 The goal is to keep quality and compliance rules centralised so that individual repositories can reuse them with minimal boilerplate.
+
+== Documentation
+
+Key documentation under `src/main/docs`:
+
+* link:src/main/docs/meaningful-message-checker-guide.adoc[Meaningful Message checker guide]
+* link:src/main/docs/meaningful-message-checker-requirements.adoc[Meaningful Message requirements]
+* link:src/main/docs/pmd-ruleset-guide.md[PMD ruleset guide]
+* link:src/main/docs/project-requirements.adoc[Project requirements]
+* link:src/main/docs/decision-log.adoc[Decision log]
 
 == Maven Usage
 
@@ -38,7 +51,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
         </execution>
     </executions>
     <configuration>
-        <configLocation>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml</configLocation>
+        <configLocation>net/openhft/quality/chronicle-baseline-checkstyle.xml</configLocation>
         <failOnViolation>${quality.enforced}</failOnViolation>
         <logViolationsToConsole>true</logViolationsToConsole>
         <includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -48,7 +61,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.45.1</version>
+            <version>9.3</version>
         </dependency>
         <dependency>
             <groupId>net.openhft</groupId>
@@ -90,13 +103,22 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
 </plugins>
 ----
 
-NOTE: `quality.enforced` will be true by default but can be override in a consuming project's properties to disable enforcement (for example, during development).
+NOTE: Chronicle parent POMs wire `quality.enforced` as the switch for failing the build on violations. It is typically `false` during development and can be enabled in CI by setting it to `true` (for example, `java-parent-pom` provides `-Pquality`).
+
+Prefer capturing Maven output with `-l <log>` and reviewing the log for warnings and errors; the goal is clean builds, not just a zero exit code.
 
 Parent POMs such as `root-parent-pom` and `chronicle-enterprise-root-pom` already wire this plugin; most Chronicle modules should prefer that route rather than duplicating configuration.
+
+For a short overview of the Meaningful Message Check and how to include it, see
+link:src/main/docs/meaningful-message-checker-guide.adoc[Meaningful Message checker guide].
 
 === SpotBugs
 
 SpotBugs configuration (rule filters, effort and threshold settings) is also provided from this module and surfaced by the parent POMs.
-To consume it directly, add the `spotbugs-maven-plugin` with a dependency on `chronicle-quality-rules` in a similar fashion to the Checkstyle example above.
+To consume it directly, add the `spotbugs-maven-plugin` with a dependency on `quality` in a similar fashion to the Checkstyle example above.
 
+=== PMD
 
+PMD configuration is available at `net/openhft/quality/pmd26/pmd-ruleset.xml`. The baseline now
+includes the former core and strict rulesets, so only the baseline file should be referenced.
+See `net/openhft/quality/pmd26/pmd-ruleset-guide.md` for suppression guidance.

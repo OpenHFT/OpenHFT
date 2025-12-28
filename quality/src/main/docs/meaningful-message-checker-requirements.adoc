@@ -1,0 +1,1990 @@
+= Meaningful Message Check Requirements
+:toc:
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+This document specifies requirements for the Meaningful Message Check, a Checkstyle-based assertion message quality checker.
+The goal is to detect low-signal assertion messages that provide little diagnostic value when tests fail,
+and encourage developers to write meaningful messages that explain the invariant being tested.
+
+=== Scope
+
+The check analyses messages in:
+
+* Assertion methods (JUnit, AssertJ, etc.)
+* Java `assert` statements (`assert condition : "message";`)
+* Preconditions such as `Objects.requireNonNull` and `requireNotNull`
+* `throw new <Exception/Error>(message)` constructor calls
+* JUnit annotation descriptions (e.g., `@DisplayName`, `@ParameterizedTest(name=...)`,
+  `@RepeatedTest(name=...)`, `@Disabled`, `@Ignore`, and `disabledReason` attributes)
+* Javadoc first paragraphs (top-level classes and members)
+* Log sites (SLF4J `Logger.trace/debug/info/warn/error`, Log4j2 `Logger.trace/debug/info/warn/error/fatal`,
+  JUL `java.util.logging.Logger` levels, `System.Logger.log(Level, ...)`, and Chronicle
+  `Jvm.debug/warn/error/startup/perf().on(...)` callsites)
+
+Precondition messages for `requireNonNull`/`requireNotNull` are exempt from message-quality rules
+when the message exactly matches the checked parameter name.
+
+=== Rule Applicability by Message Source
+
+[cols="1,1,1,1,1,1"]
+|===
+|Rule |Assertions |Preconditions |Throw Messages |Annotation Descriptions |Log Sites
+
+|MMDuplicate (Duplicate)
+|Yes
+|No
+|No
+|Yes
+|Yes (low severity)
+
+|MMRedundantClassName / MMRedundantMethodName (Redundant class name / Redundant method name)
+|Yes
+|No
+|No
+|No
+|No
+
+|MMMissingSubject (Missing subject)
+|Yes
+|No
+|No
+|No
+|Yes
+
+|MMGenericMessage / MMTooShort / MMTooFewMeaningfulWords / MMContextless / MMIndexOnly / MMWhitespaceRun
+|Yes
+|Yes
+|Yes
+|Yes
+|Yes
+
+|MMMissingMessage
+|No
+|No
+|No
+|Yes
+|Yes
+
+|All other Meaningful Message rules
+|Yes
+|Yes
+|Yes
+|Yes
+|No
+|===
+
+Duplicate detection is scoped per message source so display names do not collide with assertion or throw messages.
+For log sites, duplicates are reported at low severity because repeated templates are expected.
+Javadoc first paragraphs are evaluated by redundancy (class/member), duplicate, long-word, and word-count rules only.
+
+=== Log Site Behaviour
+
+Log site checks apply to:
+
+* SLF4J `Logger.trace`, `Logger.debug`, `Logger.info`, `Logger.warn`, `Logger.error`
+* Log4j2 `Logger.trace`, `Logger.debug`, `Logger.info`, `Logger.warn`, `Logger.error`, `Logger.fatal`
+* JUL `java.util.logging.Logger.log(Level, ...)` plus convenience methods (`severe`, `warning`, `info`,
+  `fine`, `finer`, `finest`)
+* `System.Logger.log(Level, ...)` including supplier variants
+* Chronicle `Jvm.debug/warn/error/startup/perf().on(...)` callsites
+
+`trace` and `info` are in scope by default (same standard as `debug`);
+`Jvm.startup()` and `Jvm.perf()` are included as dedicated channels.
+
+Message requirement rules:
+
+* For `Jvm.*.on(...)` callsites (class or logger overloads), require a non-null message or a
+  throwable. Empty templates are treated as messages and evaluated by the MM rules.
+* For SLF4J, Log4j2, JUL, and System.Logger:
+** A null template is a missing message (MMMissingMessage) unless a known throwable is present.
+   Additional arguments do not satisfy the missing-message rule.
+** An empty template (`""`) is still a message and is evaluated by MMTooShort or
+   MMTooFewMeaningfulWords.
+* If a throwable is present, the message is optional; when present, it must meet the log-site MM subset.
+* For these loggers, apply the log-site MM subset to non-null templates with no varargs, even for
+  constant strings.
+
+Throwable handling rules:
+
+* For SLF4J, Log4j2, JUL `log(Level, String, Object...)`, and `System.Logger.log(Level, String, Object...)`
+  varargs, treat each argument as a placeholder; do not infer a throwable by position.
+  Missing-message checks apply whenever the template is null and no known throwable is present.
+* `Jvm.*.on(...)` overloads define throwable presence by signature.
+
+Hot-path code may suppress the message-required rule at class or method level to avoid forced message
+construction; if a message is provided, quality checks still apply.
+
+Placeholder handling for logs:
+
+* Treat `{}` as meaningful placeholders (SLF4J/Log4j2).
+* Allow numeric placeholders like `{0}` when present.
+* Treat printf-style `%s` as meaningful placeholders.
+
+Message handling for logs:
+
+* `Jvm.*.on(clazz, null, throwable)` treats the message as absent (allowed).
+* `Jvm.*.on(clazz, "", throwable)` is a present message and fails via MMTooShort/MMTooFewMeaningfulWords.
+* `Jvm.*.on(clazz, "")` or `Jvm.*.on(clazz, "", null)` is a present but empty message and is evaluated by
+  MMTooShort/MMTooFewMeaningfulWords.
+* `Jvm.*.on(clazz, null)` or `Jvm.*.on(clazz, null, null)` is missing a message (fail missing-message rule).
+* `Jvm.*.on(clazz, throwable)` is allowed; the throwable is assumed to carry a meaningful message.
+* The same rules apply to `Jvm.*.on(logger, ...)` overloads.
+* For SLF4J, Log4j2, JUL, and System.Logger, a null template is missing a message unless a known
+  throwable is supplied (all levels).
+* For these loggers, a null template with any known throwable argument is allowed; the throwable is
+  assumed to carry a meaningful message.
+* For these loggers, a null template with arguments but no known throwable is a missing message
+  (MMMissingMessage). "Known throwable" means any subtype of `Throwable` (including custom types like
+  `StackTrace`), determined by type only (no name-based guessing).
+* Empty templates (`""`) are treated as messages and fail via MMTooShort or MMTooFewMeaningfulWords.
+* For `System.Logger` supplier variants, treat the supplier as message presence. Only evaluate the
+  message when the supplier returns a compile-time constant string; otherwise treat it as a dynamic
+  placeholder.
+* Initial checks should focus on string literals and compile-time constants. For simple concatenations,
+  treat dynamic elements as placeholders that count as meaningful tokens.
+
+Missing message rule (MMMissingMessage):
+
+* Add a dedicated rule to flag missing messages: `MMMissingMessage`.
+* Apply this rule to JUnit `fail()` and `assertXxx(...)` callsites when no message argument
+  is supplied or the message is explicitly `null` (JUnit 4 and JUnit 5).
+* Apply this rule to `throw new` statements when no non-Throwable message argument is supplied
+  (message-less or cause-only constructors).
+* Apply this rule to all `Jvm.*.on(...)` callsites (class and logger overloads) when the message
+  is null and no throwable is provided; placeholders do not satisfy it.
+* Apply this rule to SLF4J, Log4j2, JUL, and System.Logger callsites when the template is null and
+  no known throwable is supplied (additional arguments do not satisfy the rule).
+* For `System.Logger` supplier overloads, a null supplier with no throwable is a missing message;
+  non-null suppliers are treated as message presence.
+* Apply this rule to annotation descriptions when a reason is omitted (for example, `@Disabled` without
+  a value). Empty strings are treated as present and fail via MMTooShort/MMTooFewMeaningfulWords.
+* SLF4J, Log4j2, JUL, and System.Logger empty templates are handled by
+  MMTooShort/MMTooFewMeaningfulWords instead.
+* An inline block comment with a real reason word inside the argument list (for example,
+  `throw new IllegalArgumentException(/* condition not met */);`) suppresses MMMissingMessage.
+  Empty comments and line comments do not suppress. Use this sparingly for low-level or
+  performance-sensitive call sites.
+* Priority: MMMissingMessage is highest priority and suppresses other MM warnings for that site.
+
+Message extraction output:
+
+* When `messageExtractionFile` is set or the `mm.extract.file` system property is provided, the
+  checker writes TSV records for each message it evaluates.
+* Columns: `file`, `line`, `source`, `chars`, `words`, `meaningful`, `placeholders`,
+  `keyValueLabels`, `totalWords`, `effectiveMeaningful`, `message`.
+* Unset or unresolved values disable output so normal builds are unaffected.
+
+Scope restrictions:
+
+* Direct `Jvm.*().on(...)` callsites only; `ExceptionHandler.on(...)` callsites are out of scope.
+
+=== Test Metadata Placeholders
+
+For `@DisplayName`, `@Disabled`, and parameterised/repeated names, placeholder tokens count as meaningful
+words. Allow the JUnit standard set: `{index}`, `{arguments}`, `{argumentsWithNames}`, `{displayName}`,
+and numeric placeholders like `{0}` and `{1}`.
+
+Enable Surefire phrased-name reporting via the `quality` profile so XML outputs use phrased
+method names while keeping class names stable for TeamCity grouping.
+
+Missing metadata rules:
+
+* `@Disabled` or `@Ignore` with no reason triggers MMMissingMessage.
+* Empty reasons are treated as present and fail via MMTooShort/MMTooFewMeaningfulWords.
+
+=== Rollout Defaults (release/2026.XYZ)
+
+* Apply checks to existing code to address tech debt (no "new code only" gating).
+* Include `info` and `trace` at the same standard as `debug`.
+* Do not infer throwable position for SLF4J, Log4j2, JUL, or System.Logger; treat varargs as
+  placeholders and apply missing-message checks when the template is null and no known throwable is present.
+* Keep `ExceptionHandler.on(...)` callsites out of scope; only direct `Jvm.*.on(...)` callsites.
+* All MeaningfulMessage findings are reported at warning severity and fail the build only when
+  `quality.enforced=true` (consistent with the Maven Checkstyle configuration).
+
+=== Rationale
+
+When a test fails, the assertion message is often the first (and sometimes only) information a developer sees.
+Low-quality messages like `"value"`, `"should be true"`, or `"L42"` force developers to:
+
+* Open the source file and find the failing line
+* Understand the test context from surrounding code
+* Mentally reconstruct what the assertion was checking
+
+Good messages eliminate this friction by explaining:
+
+* What invariant is being tested
+* What the expected state should be
+* Why this matters (business context)
+
+== Implementation Status
+
+=== Currently Implemented (v2026.0)
+
+The `MeaningfulMessageCheck` currently detects the following issues:
+
+[cols="1,2,1"]
+|===
+|Check |Description |Message Key
+
+|Duplicate Messages
+|Same message string used multiple times in a file
+|`assert.message.duplicate`
+
+|Redundant Class Name
+|Message contains the enclosing class name (or variant) but lacks substance without it
+|`assert.message.redundant.class`
+
+|Redundant Method Name
+|Message contains the enclosing method name (or variant) but lacks substance without it
+|`assert.message.redundant.method`
+
+|Redundant Line Number
+|Message contains line number patterns like `"line 42"`, `"L42"`, `":123"`
+|`assert.message.redundant.line`
+
+|Trivial Supplier
+|Lambda like `() -> "constant"`, `() -> "value: " + x`, or `() -> name` that defeats lazy evaluation
+|`assert.message.trivial.supplier`
+
+|Generic Single-Word
+|Messages like `"actual"`, `"expected"`, `"value"` that provide no context
+|`assert.message.generic`
+
+|Assertion Type Repetition
+|Messages like `"assertEquals"`, `"should be true"` that restate the assertion
+|`assert.message.restates.assertion`
+
+|Index-Only Messages
+|Messages like `"0"`, `"[0]"`, `"index 5"` without context
+|`assert.message.index.only`
+
+|Contextless Comparison
+|Messages like `"comparison"`, `"validation"`, `"mismatch"` without specifics
+|`assert.message.contextless`
+
+|Too Short
+|Message has fewer than the source minimum words or placeholders (see Rule 9)
+|`assert.message.too.short`
+
+|Too Few Meaningful Words
+|Message has fewer than the source minimum meaningful words or placeholders (see Rule 9)
+|`assert.message.too.few.meaningful`
+
+|Too Long
+|Message has more than 42 words
+|`assert.message.too.long`
+
+|Whitespace Run
+|Message contains two or more whitespace characters in a row
+|`assert.message.whitespace.run`
+
+|Long Word
+|Message contains a word exceeding 42 characters (likely a class/method name)
+|`assert.message.long.word`
+
+|Duplicates Input
+|Message duplicates an assertion input (expected value or variable name)
+|`assert.message.duplicates.input`
+
+|Low-Signal assertAll Heading
+|assertAll heading is generic or context-free
+|`assert.message.assertall.heading`
+
+|Restates Derived Assertion
+|Message restates derived assertion like isEmpty()/isPresent()/contains()
+|`assert.message.restates.derived`
+
+|AssertJ Generic Override
+|withFailMessage()/overridingErrorMessage() uses a generic override message
+|`assert.message.assertj.override`
+
+|Missing Comparison Values
+|Comparison assertion message omits operand values
+|`assert.message.missing.comparison.values`
+
+|Missing String Search Value
+|String search message omits the string being searched
+|`assert.message.missing.string.value`
+
+|Missing Loop Index
+|Assertion in indexed loop omits index in message
+|`assert.message.missing.loop.index`
+
+|Missing Subject
+|Message starts with "should"/"must" without a subject
+|`assert.message.missing.subject`
+|===
+
+== Detection Rules
+
+=== Rule 1: Duplicate Messages
+
+Identical assertion messages within the same file indicate copy-paste without thought.
+
+[source,java]
+----
+// BAD - duplicate message
+assertEquals(expected1, actual1, "check value");  // line 10
+assertEquals(expected2, actual2, "check value");  // line 20 - duplicate!
+----
+
+*Detection:* Track all assertion message strings; flag second and subsequent occurrences.
+
+*Message:* `Duplicate assert message "{0}" (first used at line {1}). Each assert should have a unique message.`
+
+=== Rule 2: Redundant Class/Method Name (Substance Analysis)
+
+Messages that rely heavily on the class or method name provide little value because this information
+is already in the stack trace. The checker uses *substance analysis* to determine if the message
+has enough meaningful content without the name.
+
+[source,java]
+----
+class BytesStoreTest {
+    void testWriteBuffer() {
+        // BAD - no substance without class name
+        assertTrue(result, "BytesStore should be valid");
+        // → only 1 meaningful word: "valid" (filler: should, be)
+
+        // BAD - no substance without method name
+        assertTrue(result, "testWriteBuffer");
+        // → nothing remains after removing the name
+
+        // GOOD - substance remains without the names
+        assertTrue(result, "buffer should preserve byte order after write");
+    }
+}
+----
+
+==== Name Variant Detection
+
+The checker detects multiple variants of the class/method name:
+
+|===
+|Original |Variants Checked
+
+|`BytesStore` (class)
+|`BytesStore`, `bytesStore` (field), `bytesstore` (lowercase), `BYTESSTORE` (uppercase)
+
+|`getValue` (method)
+|`getValue`, `GetValue` (class-style), `getvalue` (lowercase), `GETVALUE` (uppercase)
+|===
+
+==== Filler Word Filtering
+
+Words that add no diagnostic value are filtered out when analyzing substance:
+
+[cols="1,3"]
+|===
+|Category |Words
+
+|Articles & Prepositions
+|a, an, the, is, are, was, were, be, been, to, of, in, for, on, at, by, with, from, as, if, or, and, not, no, when, after, before
+
+|Test-Related Generic
+|should, must, expected, actual, value, result, test, check, assert, equals, return, returns, error, fail, failed, failure, exception, null, true, false, non, empty
+
+|Structural Words
+|have, has, does, contain, contains, exist, exists, present, set, get, first, second, one, two, more, only, all, without, within
+
+|Low-Value Context
+|line, method, class, assertion, occurred, here, call, new, instance, created, successfully
+|===
+
+Filler words are not a violation on their own; they are ignored when counting meaningful words.
+They still count toward total word count checks. The requirement is 2+ non-filler words remaining
+after removing the class or method name.
+
+==== Diagnosis Types
+
+The checker provides context-aware diagnosis messages:
+
+|===
+|Situation |Diagnosis
+
+|Nothing left after removing name
+|`nothing remains after removing the name`
+
+|Only filler words remain
+|`only filler words remain: should, be`
+
+|No filler words, just too short
+|`too short - only 1 word(s): valid`
+
+|Filler words present but still too short
+|`only 1 meaningful word(s): valid (filler: should, be)`
+|===
+
+*Requirement:* At least 2 meaningful (non-filler) words must remain after removing the class/method name.
+Filler words do not count toward this minimum.
+
+=== Rule 3: Redundant Line Number
+
+Line numbers are redundant because the stack trace already shows them.
+
+[source,java]
+----
+// BAD - line number in message
+assertEquals(5, count, "L42");
+assertEquals(5, count, "line 42");
+assertEquals(5, count, "MyTest.java:42");
+----
+
+*Detection Pattern:*
+----
+(?i)(?:
+    \bline\s+#?\d+|           # "line 42", "line #42"
+    \bL\d+\b|                 # "L42" shorthand
+    \.java:\d+|               # "File.java:42"
+    \.kt:\d+|                 # "File.kt:42"
+    \.scala:\d+               # "File.scala:42"
+)
+----
+
+NOTE: Patterns like `Line1`, `Level2`, `Kernel32` are NOT flagged (no word boundary after number, or part of identifier).
+
+=== Rule 4: Trivial Supplier
+
+JUnit 5 supports `Supplier<String>` for lazy message evaluation. A trivial supplier that just returns
+a constant string, a simple concatenation with a string literal, or a cheap expression with no
+literals defeats this purpose.
+
+[source,java]
+----
+// BAD - trivial supplier (constant string)
+assertEquals(1, 1, () -> "constant message");
+assertEquals(1, 1, () -> "prefix " + "suffix");  // still constant
+assertEquals(1, 1, () -> "value: " + value);
+assertEquals(1, 1, () -> name);
+assertEquals(1, 1, () -> left + right);
+
+// GOOD - dynamic message (lazy evaluation justified)
+assertEquals(expected, actual,
+    () -> "mismatch at index " + index + ": expected " + formatValue(expected));
+----
+
+*Detection:* No-arg lambda where the body is a string literal, literal-only concatenation,
+literal + placeholder concatenation, or a simple identifier/concatenation with no literals.
+The report summarises the constant parts.
+
+=== Rule 5: Generic Single-Word Messages
+
+Single-word messages that are just variable names or generic terms provide no context.
+
+[source,java]
+----
+// BAD - too generic
+assertEquals(expected, actual, "actual");
+assertEquals(expected, actual, "value");
+assertTrue(condition, "test");
+----
+
+*Detection Pattern:*
+----
+(?i)^(actual|expected|value|result|data|object|condition|
+      test|check|message|msg|err|error|fail|ok|true|false)$
+----
+
+=== Rule 6: Assertion Type Repetition
+
+Messages that just restate what the assertion method does.
+
+[source,java]
+----
+// BAD - restates assertion type
+assertEquals(5, count, "assertEquals");
+assertTrue(flag, "should be true");
+assertFalse(flag, "is false");
+assertNotNull(obj, "not null");
+----
+
+*Detection Pattern:*
+----
+(?i)(
+    ^assert(equals|true|false|null|notnull|same|notequals?|that)?$|
+    ^should (be )?(equal|true|false|null|not null|same|the same)$|
+    ^should not be null$|
+    ^must (be )?(equal|true|false|null|not null|same|the same)$|
+    ^must not be null$|
+    ^(should|must|expected to) match$|
+    ^values? (should|must) match$|
+    ^equals?$|
+    ^not null$|
+    ^is null$|
+    ^is true$|
+    ^is false$
+)
+----
+
+=== Rule 7: Index-Only Messages
+
+Messages that are just array/list indices without context.
+
+[source,java]
+----
+// BAD - just an index
+assertEquals(expected, actual, "0");
+assertEquals(expected, actual, "[0]");
+assertEquals(expected, actual, "index 5");
+----
+
+*Detection Pattern:*
+----
+^(\d+|\[\d+\]|index\s*\d+|element\s*\d+|item\s*\d+|#\d+|i=\d+)$
+----
+
+NOTE: Messages with context like `"first entry should be header"` or array values like `"[a, b, c]"` are NOT flagged.
+
+=== Rule 8: Contextless Comparison Messages
+
+Messages that describe the action but not the meaning.
+
+[source,java]
+----
+// BAD - doesn't explain what's being compared
+assertEquals(expected, actual, "comparison");
+assertEquals(x, y, "values should match");
+assertEquals(a, b, "validation");
+----
+
+*Detection Pattern:*
+----
+(?i)^(
+    comparison|check|validation|equality|verify|test|
+    values? (should |must )?(match|equal|be equal)|
+    (should|must) (be )?equal|
+    not equal|
+    mismatch|
+    failed|failure|error
+)$
+----
+
+=== Rule 9: Word Count Limits
+
+Messages should be neither too terse nor too verbose, and should contain enough meaningful words.
+
+|===
+|Source |Minimum total |Minimum meaningful |Rationale
+
+|Assertions/Preconditions
+|4 words/placeholders
+|2 meaningful words/placeholders
+|Assertions should state subject + behaviour
+
+|Throw
+|2 words/placeholders
+|1 meaningful word/placeholder
+|Throws can be terse but must name the issue
+
+|Annotations
+|6 words/placeholders
+|4 meaningful words/placeholders
+|Display names and disable reasons should be descriptive
+
+|Top-level class Javadoc first paragraph
+|10 words/placeholders
+|8 meaningful words/placeholders
+|Class overviews should be descriptive
+
+|Member Javadoc first paragraph
+|6 words/placeholders
+|4 meaningful words/placeholders
+|Member summaries should be descriptive
+
+|Logs
+|4 words/placeholders
+|2 meaningful words/placeholders
+|Log templates need enough context for triage
+|===
+
+Maximum: 42 words/placeholders for all sources. Filler words do not count toward the meaningful minimums.
+Only the first top-level type Javadoc in a file uses the class minimum; subsequent type and member Javadocs
+use the member minimum.
+
+[source,java]
+----
+// BAD - too short (2 words)
+assertEquals(5, count, "count ok");
+
+// BAD - too few meaningful words (only 1 meaningful word)
+assertTrue(valid, "should be ok");
+
+// BAD - too long (>42 words)
+assertEquals(5, count, "the count value returned from the method should match the expected result we calculated earlier after applying filters, rounding rules, and post processing checks for the active user list in the final report including any adjustments for missing entries and archived records from last week");
+
+// GOOD
+assertEquals(5, count, "active user count after filtering inactive users");
+----
+
+NOTE: Word count checks are skipped if a more specific semantic warning (e.g., generic, restates assertion) already fired for the same message.
+
+=== Rule 10: Long Word Detection
+
+Words exceeding 42 characters are likely class or method names that should not appear in messages.
+
+[source,java]
+----
+// BAD - contains long word (likely class name)
+assertEquals(expected, actual, "ConfigurationManagerService failed");
+
+// GOOD - descriptive text instead
+assertEquals(expected, actual, "config service should return cached value");
+----
+
+*Threshold:* 42 characters
+
+NOTE: Words matching the current class or method name are already flagged by Rule 2 and are not double-flagged.
+
+=== Rule 11: Duplicates Assertion Input
+
+Messages that just echo an expected value or variable name add no diagnostic value because assertion output already shows the inputs.
+
+[source,java]
+----
+// BAD - duplicates input
+assertEquals("admin", role, "admin");
+assertEquals(expected, actual, "expected");
+----
+
+*Detection:* Message matches a single input literal or variable name without added context.
+
+=== Rule 12: assertAll Heading Quality
+
+JUnit 5 `assertAll` headings should describe the scenario being validated.
+
+[source,java]
+----
+// BAD - low-signal heading
+assertAll("checks",
+        () -> assertEquals(1, one),
+        () -> assertEquals(2, two));
+
+// GOOD
+assertAll("round-trip serialisation",
+        () -> assertEquals(expected, actual));
+----
+
+*Detection:* Heading is generic (e.g., "check", "validation", "assertions").
+
+=== Rule 13: Restates Derived Assertion
+
+Derived assertions already encode the condition; repeating it adds no value.
+
+[source,java]
+----
+// BAD - restates derived assertion
+assertThat(list).as("empty").isEmpty();
+----
+
+*Detection:* Message restates derived assertion keywords like empty/present/contains.
+
+=== Rule 14: AssertJ Generic Override
+
+AssertJ override messages (`withFailMessage`, `overridingErrorMessage`) replace rich diff output.
+
+[source,java]
+----
+// BAD - generic override
+assertThat(actual).withFailMessage("failure").isEqualTo(expected);
+----
+
+*Detection:* Override message is generic or low-signal.
+
+=== Rule 15: Missing Comparison Values
+
+Comparison assertions should include operand values when the message is constant.
+
+[source,java]
+----
+// BAD - missing operand values
+assertTrue(a > b, "should be greater");
+----
+
+*Detection:* Comparison expression with constant message lacking operands.
+
+=== Rule 16: Missing String Search Value
+
+String search assertions should include the actual string in the message.
+
+[source,java]
+----
+// BAD - missing string value
+assertTrue(text.contains("@"), "should contain @");
+----
+
+*Detection:* contains/startsWith/endsWith with constant message and no string value.
+
+=== Rule 17: Missing Loop Index
+
+Assertions inside indexed loops should include the index in the message.
+
+[source,java]
+----
+for (int i = 0; i < items.length; i++) {
+    assertNotNull(items[i], "item should be present");
+}
+----
+
+*Detection:* Indexed loop assertion with constant message missing index.
+
+=== Rule 18: Missing Subject
+
+Messages starting with "should" or "must" need a subject.
+
+[source,java]
+----
+// BAD - missing subject
+assertTrue(ok, "should be true");
+----
+
+*Detection:* Message starts with modal verb without subject.
+
+=== Rule 19: Whitespace Run
+
+Messages should avoid repeated whitespace runs.
+
+[source,java]
+----
+// BAD - repeated whitespace
+assertEquals(expected, actual, "order  should persist");
+
+// GOOD
+assertEquals(expected, actual, "order should persist");
+----
+
+*Detection:* Message contains two or more whitespace characters in a row.
+
+== Improvements Plan (v2026.0)
+
+=== Overview
+
+This document outlines planned improvements to make Meaningful Message Check warnings more **actionable, evidence-backed, and machine-parsable** for both humans and AI agents.
+
+==== Goals
+
+1. Standardize diagnostic format across all rules
+2. Add stable rule codes for machine processing
+3. Include matched evidence in all warnings
+4. Provide small, safe fix hints
+5. Support verbose mode for detailed diagnostics
+6. Reference documentation anchors
+
+==== References
+
+* https://developers.google.com/tech-writing/error-messages[Google Error Message Guidelines]
+* https://checkstyle.sourceforge.io/config.html[Checkstyle Configuration]
+* https://clang.llvm.org/extra/clang-tidy/[Clang-Tidy Diagnostic Patterns]
+* https://eslint.org/docs/latest/extend/custom-rules[ESLint Custom Rules]
+
+=== Implementation Tasks
+
+==== Task 1: Add Rule Code Constants
+
+Status: DONE (v2026.0)
+
+Add stable short prefixes (MMDuplicate to MMMissingSubject) for machine-friendly identification.
+
+.New constants in MeaningfulMessageCheck.java
+[source,java]
+----
+// Rule codes for machine-parsable output (MM = Meaningful Message)
+public static final String CODE_DUPLICATE = "MMDuplicate";
+public static final String CODE_REDUNDANT_CLASS = "MMRedundantClassName";
+public static final String CODE_REDUNDANT_METHOD = "MMRedundantMethodName";
+public static final String CODE_REDUNDANT_LINE = "MMRedundantLineNumber";
+public static final String CODE_TRIVIAL_SUPPLIER = "MMTrivialSupplier";
+public static final String CODE_GENERIC = "MMGenericMessage";
+public static final String CODE_RESTATES_ASSERTION = "MMRestatesAssertion";
+public static final String CODE_INDEX_ONLY = "MMIndexOnly";
+public static final String CODE_CONTEXTLESS = "MMContextless";
+public static final String CODE_TOO_SHORT = "MMTooShort";
+public static final String CODE_TOO_LONG = "MMTooLong";
+public static final String CODE_LONG_WORD = "MMLongWord";
+
+public static final String CODE_DUPLICATES_INPUT = "MMDuplicatesInput";
+public static final String CODE_ASSERTALL_HEADING = "MMLowSignalAssertAllHeading";
+public static final String CODE_RESTATES_DERIVED = "MMRestatesDerivedAssertion";
+public static final String CODE_ASSERTJ_OVERRIDE = "MMAssertJGenericOverride";
+public static final String CODE_MISSING_COMPARISON_VALUES = "MMMissingComparisonValues";
+public static final String CODE_MISSING_STRING_VALUE = "MMMissingStringSearchValue";
+public static final String CODE_MISSING_LOOP_INDEX = "MMMissingLoopIndex";
+public static final String CODE_MISSING_SUBJECT = "MMMissingSubject";
+----
+
+==== Task 2: Standardize Message Format
+
+Status: DONE (v2026.0)
+
+Adopt consistent template: `[CODE] <Problem>. Why: <Evidence>. Fix: <Action>. Ref: <anchor>`
+
+.Updated messages.properties
+[source,properties]
+----
+# MMDuplicate Duplicate
+assert.message.duplicate=[MMDuplicate] Duplicate message "{0}". Why: first used at line {1}. Fix: describe the specific invariant at this site (subject + expected behaviour). Ref: assertion-messages.adoc#MMDuplicate
+
+# MMRedundantClassName Redundant class name
+assert.message.redundant.class=[MMRedundantClassName] Message "{0}" depends on class name "{1}". Why: {2}. Fix: add 2+ meaningful words that survive without the name. Ref: assertion-messages.adoc#MMRedundantClassName
+
+# MMRedundantMethodName Redundant method name
+assert.message.redundant.method=[MMRedundantMethodName] Message "{0}" depends on method name "{1}". Why: {2}. Fix: add 2+ meaningful words that survive without the name. Ref: assertion-messages.adoc#MMRedundantMethodName
+
+# MMRedundantLineNumber Redundant line number
+assert.message.redundant.line=[MMRedundantLineNumber] Message "{0}" contains line token "{1}". Why: stack traces show line numbers. Fix: remove and describe the invariant. Ref: assertion-messages.adoc#MMRedundantLineNumber
+
+# MMTrivialSupplier Trivial Supplier
+assert.message.trivial.supplier=[MMTrivialSupplier] Trivial Supplier "{0}". Why: simple or cheap supplier adds overhead with no benefit. Fix: use plain String or move construction into a helper. Ref: assertion-messages.adoc#MMTrivialSupplier
+
+# MMGenericMessage Generic
+assert.message.generic=[MMGenericMessage] Generic message "{0}". Why: no subject or expected behaviour. Fix: name what is checked and what should hold. Ref: assertion-messages.adoc#MMGenericMessage
+
+# MMRestatesAssertion Restates assertion
+assert.message.restates.assertion=[MMRestatesAssertion] Message "{0}" restates the assertion. Fix: explain expected behaviour, not assertion type. Ref: assertion-messages.adoc#MMRestatesAssertion
+
+# MMIndexOnly Index only
+assert.message.index.only=[MMIndexOnly] Index-only message "{0}". Fix: include what the element represents. Ref: assertion-messages.adoc#MMIndexOnly
+
+# MMContextless Contextless
+assert.message.contextless=[MMContextless] Contextless message "{0}". Fix: state what is compared and why it matters. Ref: assertion-messages.adoc#MMContextless
+
+# MMTooShort Too short
+assert.message.too.short=[MMTooShort] Message "{0}" too short. Why: words/placeholders={1} min={2}. Fix: add subject + expected behaviour. Hint: "<subject> should <behaviour>". Ref: assertion-messages.adoc#MMTooShort
+
+# MMTooFewMeaningfulWords Too few meaningful words
+assert.message.too.few.meaningful=[MMTooFewMeaningfulWords] Message "{0}" has too few meaningful words. Why: meaningful words/placeholders={1} min={2}. Fix: add meaningful words or placeholders to meet the minimum. Ref: assertion-messages.adoc#MMTooFewMeaningfulWords
+
+# MMTooLong Too long
+assert.message.too.long=[MMTooLong] Message "{0}" too long. Why: words={1} max={2}. Fix: keep invariant, move data to expected/actual. Ref: assertion-messages.adoc#MMTooLong
+
+# MMLongWord Long word
+assert.message.long.word=[MMLongWord] Message "{0}" contains long token "{1}" (>{2} chars). Fix: use short descriptive domain terms. Ref: assertion-messages.adoc#MMLongWord
+
+# MMDuplicatesInput Duplicates assertion input
+assert.message.duplicates.input=[MMDuplicatesInput] Message "{0}" duplicates assertion input "{1}". Fix: state what the value means in this test. Ref: assertion-messages.adoc#MMDuplicatesInput
+
+# MMLowSignalAssertAllHeading assertAll heading quality
+assert.message.assertall.heading=[MMLowSignalAssertAllHeading] assertAll heading "{0}" is low signal. Fix: summarise the scenario (e.g., "round-trip serialisation"). Ref: assertion-messages.adoc#MMLowSignalAssertAllHeading
+
+# MMRestatesDerivedAssertion Restates derived assertion
+assert.message.restates.derived=[MMRestatesDerivedAssertion] Message "{0}" restates the assertion. Fix: say *what* is {1} and why. Ref: assertion-messages.adoc#MMRestatesDerivedAssertion
+
+# MMAssertJGenericOverride AssertJ generic override
+assert.message.assertj.override=[MMAssertJGenericOverride] Generic AssertJ override message "{0}". Fix: prefer as(...) for context, or include specific diagnostic info. Ref: assertion-messages.adoc#MMAssertJGenericOverride
+
+# MMMissingComparisonValues Missing comparison values
+assert.message.missing.comparison.values=[MMMissingComparisonValues] Comparison "{0}" uses operands {1} and {2} but message is constant. Fix: include operand values in message. Ref: assertion-messages.adoc#MMMissingComparisonValues
+
+# MMMissingStringSearchValue Missing string search value
+assert.message.missing.string.value=[MMMissingStringSearchValue] String search {0}() on {1} with {2} but message is constant. Fix: include the string value in message. Ref: assertion-messages.adoc#MMMissingStringSearchValue
+
+# MMMissingLoopIndex Missing loop index
+assert.message.missing.loop.index=[MMMissingLoopIndex] Assertion in indexed loop but message doesn''t include index "{0}". Fix: include the loop index in message. Ref: assertion-messages.adoc#MMMissingLoopIndex
+
+# MMMissingSubject Missing subject
+assert.message.missing.subject=[MMMissingSubject] Message "{0}" starts with modal verb without subject. Fix: add subject before modal verb. Ref: assertion-messages.adoc#MMMissingSubject
+----
+
+==== Task 3: Extract Matched Tokens for Regex Rules
+
+Status: DONE (v2026.0)
+
+For regex-based rules, capture and report the actual matched substring.
+
+===== Changes Required
+
+1. **LINE_NUMBER_PATTERN**: Extract matched token (e.g., "L42", "line 42")
+2. **INDEX_ONLY_PATTERN**: Extract matched index (e.g., "0", "[5]")
+3. **CONTEXTLESS_PATTERN**: Extract matched phrase (e.g., "comparison")
+4. **RESTATES_ASSERTION_PATTERN**: Extract matched phrase (e.g., "should be true")
+
+.Implementation approach
+[source,java]
+----
+// Instead of just checking if pattern matches, extract the match
+private String extractMatch(Pattern pattern, String message) {
+    Matcher matcher = pattern.matcher(message);
+    if (matcher.find()) {
+        return matcher.group();
+    }
+    return null;
+}
+
+// In checkMessage():
+String lineMatch = extractMatch(LINE_NUMBER_PATTERN, message);
+if (lineMatch != null) {
+    log(lineNo, MSG_REDUNDANT_LINE, message, lineMatch);
+    warningFired = true;
+}
+----
+
+==== Task 4: Add Verbose Mode Property
+
+Status: DONE (v2026.0)
+
+Add configurable property for detailed local diagnostics.
+
+.New property
+[source,java]
+----
+/** Whether to include detailed diagnostic breakdown. */
+private boolean verbose = false;
+
+public void setVerbose(boolean verbose) {
+    this.verbose = verbose;
+}
+----
+
+.Verbose output additions
+[source,java]
+----
+// For substance analysis, append detailed breakdown when verbose=true
+if (verbose) {
+    // Include: meaningful words, filler words, removed name, counts
+    String details = String.format(
+        " Details: meaningful=[%s] filler=[%s] removed=[%s]",
+        String.join(",", analysis.meaningfulWords),
+        String.join(",", analysis.fillerWords),
+        matchedVariant
+    );
+    // Append to log message
+}
+----
+
+.Checkstyle configuration example
+[source,xml]
+----
+<module name="net.openhft.quality.MeaningfulMessageCheck">
+    <!-- Enable verbose mode for local development -->
+    <property name="verbose" value="true"/>
+</module>
+----
+
+==== Task 5: Fix "valid" Filler Word Inconsistency
+
+Status: DONE (v2026.0)
+
+The word "valid" is currently listed as a filler word but used as meaningful in examples.
+
+===== Decision: Remove "valid" from Filler Words
+
+Rationale: "valid" often carries domain meaning (e.g., "order should be valid after setting required fields").
+
+.Change in FILLER_WORDS set
+[source,java]
+----
+// REMOVE from filler words:
+// "valid" - carries domain meaning
+
+// KEEP as filler:
+// "null", "true", "false" - assertion-specific terms
+----
+
+.Update example in requirements doc
+[source,asciidoc]
+----
+// Example now consistent:
+assertTrue(result, "BytesStore should be valid");
+// → meaningful: [valid], filler: [should, be]
+// → 1 meaningful word, needs 2+
+----
+
+==== Task 6: Update SubstanceAnalysis for Verbose Output
+
+Status: DONE (v2026.0)
+
+Modify SubstanceAnalysis to store word lists for verbose output.
+
+.Enhanced SubstanceAnalysis class
+[source,java]
+----
+private static class SubstanceAnalysis {
+    final boolean hasSubstance;
+    final int fillerCount;
+    final int meaningfulCount;
+    final String diagnosis;
+
+    // NEW: Store actual word lists for verbose mode
+    final List<String> meaningfulWords;
+    final List<String> fillerWords;
+    final String removedName;
+
+    SubstanceAnalysis(boolean hasSubstance, int fillerCount, int meaningfulCount,
+                      String diagnosis, List<String> meaningfulWords,
+                      List<String> fillerWords, String removedName) {
+        this.hasSubstance = hasSubstance;
+        this.fillerCount = fillerCount;
+        this.meaningfulCount = meaningfulCount;
+        this.diagnosis = diagnosis;
+        this.meaningfulWords = meaningfulWords;
+        this.fillerWords = fillerWords;
+        this.removedName = removedName;
+    }
+}
+----
+
+==== Task 7: Create Assertion Messages Reference Document
+
+Status: DONE (v2026.0)
+
+Create a dedicated reference document with anchors for each rule.
+
+.New file: assertion-messages.adoc
+[source,asciidoc]
+----
+= Assertion Message Quality Guide
+:toc:
+
+== Quick Reference
+
+[cols="1,2,3"]
+|===
+|Code |Rule |Quick Fix
+
+|MMDuplicate |Duplicate |Make each message unique to its assertion site
+|MMRedundantClassName |Redundant class name |Add 2+ meaningful words beyond the class name
+|MMRedundantMethodName |Redundant method name |Add 2+ meaningful words beyond the method name
+|MMRedundantLineNumber |Redundant line number |Remove line reference, describe invariant
+|MMTrivialSupplier |Trivial Supplier |Use plain String or add dynamic content
+|MMGenericMessage |Generic message |Name subject + expected behaviour
+|MMRestatesAssertion |Restates assertion |Explain the invariant, not the assertion type
+|MMIndexOnly |Index only |Name what the indexed element represents
+|MMContextless |Contextless |State what is compared and why it matters
+|MMTooShort |Too short |Add subject + expected behaviour (see Rule 9 for minima)
+|MMTooFewMeaningfulWords |Too few meaningful words |Add meaningful words/placeholders to meet the minimum
+|MMTooLong |Too long |Keep invariant, move data to expected/actual
+|MMLongWord |Long word |Use short descriptive terms, not identifiers
+|MMDuplicatesInput |Duplicates input |State what the value means, don't repeat it
+|MMLowSignalAssertAllHeading |assertAll heading |Summarise the scenario being tested
+|MMRestatesDerivedAssertion |Restates derived |Say *what* is empty/present and why
+|MMAssertJGenericOverride |AssertJ override |Prefer as(...) over withFailMessage(...)
+|MMMissingComparisonValues |Missing comparison values |Include operand values in the message
+|MMMissingStringSearchValue |Missing string search value |Include the searched string value
+|MMMissingLoopIndex |Missing loop index |Include loop index in the message
+|MMMissingSubject |Missing subject |Add subject before should/must
+|===
+
+[#MMDuplicate]
+== MMDuplicate: Duplicate Message
+
+... detailed guidance ...
+
+[#MMRedundantClassName]
+== MMRedundantClassName: Redundant Class Name
+
+... detailed guidance ...
+----
+
+==== Task 9: Implement Additional Rules (Completed)
+
+Status: DONE (v2026.0)
+
+These additional rules are implemented in `MeaningfulMessageCheck` and documented below.
+
+===== MMDuplicatesInput: Message Duplicates Assertion Input
+
+Message duplicates a literal expected value, variable name, or exception class.
+
+.Examples
+[source,java]
+----
+// BAD - duplicates literal expected value
+assertEquals("AAPL", symbol, "AAPL");
+
+// BAD - duplicates variable name
+assertTrue(flag, "flag");
+
+// BAD - duplicates exception class
+assertThrows(IOException.class, () -> ..., "IOException");
+----
+
+.Detection approach
+* For common signatures, check if message literal equals:
+** A literal expected value
+** The simple identifier name of expected/actual
+** The simple exception class name in assertThrows
+
+===== MMLowSignalAssertAllHeading: assertAll Heading Quality
+
+JUnit `assertAll(String heading, ...)` includes the heading in failure reports.
+
+.Examples
+[source,java]
+----
+// BAD - low signal heading
+assertAll("assertAll",
+    () -> assertEquals(a, b),
+    () -> assertEquals(c, d));
+
+// GOOD - describes scenario
+assertAll("round-trip serialisation: header + trailer",
+    () -> assertEquals(a, b),
+    () -> assertEquals(c, d));
+----
+
+.Detection approach
+* Run headings through existing semantic rules (generic/restates/contextless/too-short)
+* If assertAll has N>=3 executables and heading is absent, emit suggestion (not error)
+
+===== MMRestatesDerivedAssertion: Restates Derived Assertion
+
+Expand "restates assertion" to common derived patterns that frameworks already show.
+
+.Patterns to detect
+----
+^(is )?empty$
+^not empty$
+^(is )?blank$
+^not blank$
+^(is )?present$
+^contains$
+^matches$
+----
+
+.Examples
+[source,java]
+----
+// BAD - framework already shows "empty"
+assertThat(list).as("empty").isEmpty();
+
+// GOOD - says what should be empty and why
+assertThat(list).as("filtered results after applying blacklist").isEmpty();
+----
+
+===== MMAssertJGenericOverride: AssertJ Generic Override
+
+AssertJ docs note that `as(...)` descriptions preserve rich diff output, while `withFailMessage()`/`overridingErrorMessage()` can hide context.
+
+.Detection approach
+* If `.withFailMessage(...)` or `.overridingErrorMessage(...)` message is generic/too-short/restates, suggest `.as(...)` instead
+
+.Reference
+* https://assertj.github.io/doc/[AssertJ documentation]
+
+===== MMMissingComparisonValues: Missing Comparison Values
+
+Constant messages for comparison assertions should include operand values.
+
+.Examples
+[source,java]
+----
+// BAD - constant message without operands
+assertTrue(a > b, "should be greater");
+----
+
+.Detection approach
+* If `assertTrue/assertFalse` uses a comparison expression and the message is constant, require operand values in the message.
+
+===== MMMissingStringSearchValue: Missing String Search Value
+
+String search assertions should include the searched string or the actual value.
+
+.Examples
+[source,java]
+----
+// BAD - missing string value
+assertTrue(text.contains("@"), "should contain @");
+----
+
+.Detection approach
+* For contains/startsWith/endsWith with constant messages, require the searched string or target value to appear in the message.
+
+===== MMMissingLoopIndex: Missing Loop Index
+
+Assertions inside indexed loops should include the loop index in the message.
+
+.Examples
+[source,java]
+----
+for (int i = 0; i < items.length; i++) {
+    assertNotNull(items[i], "item should be present");
+}
+----
+
+.Detection approach
+* If an assertion is inside an indexed loop and the message is constant, require the index variable in the message.
+
+===== MMMissingSubject: Missing Subject
+
+Messages starting with "should" or "must" need a subject.
+
+.Examples
+[source,java]
+----
+// BAD - missing subject
+assertTrue(ok, "should be true");
+----
+
+.Detection approach
+* If the message starts with a modal verb and lacks a subject, flag it.
+
+==== Task 10: Update Test Expectations
+
+Status: DONE (v2026.0)
+
+Tests are updated to match the new message format.
+
+.Test update pattern
+[source,java]
+----
+// Old expectation:
+"10: " + getCheckMessage(MSG_DUPLICATE, "test message", 5)
+
+// New expectation:
+"10: [MMDuplicate] Duplicate message \"test message\". Why: first used at line 5. Fix: describe the specific invariant at this site (subject + expected behaviour). Ref: assertion-messages.adoc#MMDuplicate"
+----
+
+=== Implementation Stage (v2026.0)
+
+All 2026.0 quality tool changes (checkstyle26, pmd26, spotbugs26) are delivered as a single stage. The list below summarises the Meaningful Message Check work that sits within that stage.
+
+[cols="1,1,2,1"]
+|===
+|Order |Item |Description |Effort
+
+|1
+|Task 1
+|Add rule code constants (MMDuplicate to MMMissingSubject)
+|Small
+
+|2
+|Task 5
+|Fix "valid" filler inconsistency
+|Small
+
+|3
+|Task 2
+|Update messages.properties with new format
+|Medium
+
+|4
+|Task 3
+|Extract matched tokens for regex rules
+|Medium
+
+|5
+|Task 6
+|Enhance SubstanceAnalysis for verbose
+|Small
+
+|6
+|Task 4
+|Add verbose mode property
+|Medium
+
+|7
+|Task 7
+|Create reference document with anchors
+|Medium
+
+|8
+|Task 10
+|Update all test expectations
+|Large
+
+|9
+|MMDuplicatesInput
+|Message duplicates assertion input
+|Medium
+
+|10
+|MMLowSignalAssertAllHeading
+|assertAll heading quality
+|Medium
+
+|11
+|MMRestatesDerivedAssertion
+|Restates derived assertion (empty/present/contains)
+|Small
+
+|12
+|MMMissingComparisonValues
+|Missing comparison values in message
+|Medium
+
+|13
+|MMMissingStringSearchValue
+|Missing string search value in message
+|Medium
+
+|14
+|MMMissingLoopIndex
+|Missing loop index
+|Small
+
+|15
+|MMMissingSubject
+|Missing subject (should/must)
+|Small
+
+|16
+|MMAssertJGenericOverride
+|AssertJ generic override (prefer as())
+|Medium
+
+|17
+|MMMissingMessage
+|Missing message (logs/annotations; inline comment allowed)
+|Small
+|===
+
+=== Diagnostic Contract
+
+==== Message Structure
+
+Every warning follows this structure:
+
+----
+[MMShortTitle] <Problem statement>. Why: <Evidence>. Fix: <Action>. Ref: <anchor>
+----
+
+.Components
+[cols="1,3"]
+|===
+|Component |Description
+
+|`[MMShortTitle]`
+|Rule code using MM prefix + TitleCase short title
+
+|Problem statement
+|What is wrong (present tense, concise)
+
+|Why
+|Evidence that triggered the rule (matched token, counts, breakdown)
+
+|Fix
+|Concrete action to resolve (imperative, safe suggestion)
+
+|Ref
+|Documentation anchor for detailed guidance
+|===
+
+==== Verbosity Levels
+
+[cols="1,2,2"]
+|===
+|Mode |Output |Use Case
+
+|`verbose=false` (default)
+|Single line with code, problem, why, fix, ref
+|CI logs, Maven output
+
+|`verbose=true`
+|Above + `Details:` suffix with full breakdown
+|Local development, debugging
+|===
+
+==== Sample Outputs
+
+===== CI Mode (default)
+----
+[WARNING] MyTest.java:[42] (extension) MeaningfulMessage: [MMRedundantMethodName] Message "BytesStore should be init" depends on method name "bytesStore". Why: only 1 meaningful word(s): init (filler: should, be). Fix: add 2+ meaningful words that survive without the name. Ref: assertion-messages.adoc#MMRedundantMethodName
+----
+
+===== Verbose Mode
+----
+[WARNING] MyTest.java:[42] (extension) MeaningfulMessage: [MMRedundantMethodName] Message "BytesStore should be init" depends on method name "bytesStore". Why: only 1 meaningful word(s): init (filler: should, be). Fix: add 2+ meaningful words that survive without the name. Ref: assertion-messages.adoc#MMRedundantMethodName Details: meaningful=[init] filler=[should,be] removed=[bytesStore] original=[BytesStore should be init]
+----
+
+=== Migration Notes
+
+==== Backward Compatibility
+
+* New message format is breaking change for any tooling parsing exact message text
+* Rule codes are additive and stable once assigned
+* Verbose property defaults to false (no change in default output length)
+
+==== Suppression Updates
+
+Existing suppressions continue to work (based on check name, not message text).
+
+==== AI Agent Integration
+
+AI agents can:
+
+1. Parse rule code to select appropriate rewrite strategy
+2. Use "Why" section to understand trigger condition
+3. Use "Fix" section as transformation hint
+4. Follow "Ref" anchor for detailed house style rules
+5. Enable verbose mode when debugging transformations
+
+=== Success Criteria (v2026.0 Stage)
+
+1. All 23 rules have stable MM TitleCase codes (including MMMissingMessage)
+2. All messages follow standard template: `[CODE] Problem. Why: Evidence. Fix: Action. Ref: anchor`
+3. Regex rules report matched token in "Why" section
+4. Verbose mode shows full breakdown (meaningful/filler/removed)
+5. Reference doc has anchors for all rules
+6. All tests updated and passing
+7. "valid" removed from filler words
+8. MMDuplicatesInput detects messages duplicating assertion inputs
+9. MMLowSignalAssertAllHeading validates assertAll heading quality
+10. MMRestatesDerivedAssertion catches derived assertion restatements (empty/present/contains)
+11. MMAssertJGenericOverride suggests as() over withFailMessage() for AssertJ
+12. MMTrivialSupplier covers cheap suppliers that should be plain strings
+
+== Exclusions
+
+The checker automatically excludes certain content that is not an assertion message:
+
+=== JSON and YAML Content
+
+[source,java]
+----
+// NOT flagged - JSON payload
+assertEquals(expected, actual, "{\"key\": \"value\"}");
+
+// NOT flagged - YAML data
+assertEquals(expected, actual, "!Type\nkey: value\nother: data");
+----
+
+=== Fully Qualified Class Names
+
+[source,java]
+----
+// NOT flagged - class name argument (not a message)
+assertClassesLoad("com.example.MyClass");
+----
+
+=== Array/List Values
+
+[source,java]
+----
+// NOT flagged - expected value, not message
+assertEquals("[a, b, c]", result.toString(), "array contents");
+----
+
+=== Generated Class Names
+
+[source,java]
+----
+// NOT flagged - expected value pattern
+assertEquals("MethodWriterClassNameGeneratorTestJustAnInterfaceYamlMethodWriter",
+    generator.generateClassName(iface));
+----
+
+=== Data Values
+
+Multi-line content with colons (`:`) or equals (`=`) signs suggests configuration or data, not messages.
+
+== Configuration
+
+=== Checkstyle Module Configuration
+
+[source,xml]
+----
+<module name="net.openhft.quality.MeaningfulMessageCheck">
+    <!-- Optional: skip assertThrows/throw message checks for listed exception types -->
+    <property name="ignoredExceptionClassNames"
+              value="UnsupportedOperationException,RequiredTagMissing,InvalidMessageException"/>
+</module>
+----
+
+`ignoredExceptionClassNames` applies to `assertThrows`/`assertThrowsExactly` and `throw new` message checks. Values are
+comma/space-separated class names; fully qualified names are accepted (simple name is used).
+The baseline Checkstyle configuration excludes `UnsupportedOperationException` by default.
+
+=== Constants (Hardcoded)
+
+The following values are currently hardcoded but could be made configurable:
+
+|===
+|Constant |Value |Description
+
+|`MIN_WORD_COUNT_ASSERTION`
+|4
+|Minimum total words/placeholders for assertions
+
+|`MIN_MEANINGFUL_WORD_COUNT_ASSERTION`
+|2
+|Minimum meaningful words/placeholders for assertions
+
+|`MIN_WORD_COUNT_PRECONDITION`
+|4
+|Minimum total words/placeholders for preconditions
+
+|`MIN_MEANINGFUL_WORD_COUNT_PRECONDITION`
+|2
+|Minimum meaningful words/placeholders for preconditions
+
+|`MIN_WORD_COUNT_THROW`
+|2
+|Minimum total words/placeholders for throws
+
+|`MIN_MEANINGFUL_WORD_COUNT_THROW`
+|1
+|Minimum meaningful words/placeholders for throws
+
+|`MIN_WORD_COUNT_ANNOTATION`
+|6
+|Minimum total words/placeholders for annotation reasons/names
+
+|`MIN_MEANINGFUL_WORD_COUNT_ANNOTATION`
+|4
+|Minimum meaningful words/placeholders for annotation reasons/names
+
+|`MIN_WORD_COUNT_LOG`
+|4
+|Minimum total words/placeholders for log templates
+
+|`MIN_MEANINGFUL_WORD_COUNT_LOG`
+|2
+|Minimum meaningful words/placeholders for log templates
+
+|`MAX_WORD_COUNT`
+|42
+|Maximum words/placeholders allowed in a message
+
+|`MAX_WORD_LENGTH`
+|42
+|Maximum characters per word before flagging
+
+|`MIN_NAME_LENGTH_FOR_CHECK`
+|5
+|Minimum class/method name length for substance checks
+
+|`MIN_WORDS_WITHOUT_NAME`
+|2
+|Minimum non-filler words required after removing name
+|===
+
+=== Suppression
+
+Suppressions can be configured via:
+
+1. Checkstyle suppression filters (file-level)
+2. `@SuppressWarnings("checkstyle:MeaningfulMessage")` to suppress the check entirely (method/class-level, legacy)
+3. `@SuppressWarnings("MM-all")` or `@SuppressWarnings("checkstyle:MM-all")` to suppress MeaningfulMessage rules only
+4. `@SuppressWarnings("MMTooShort")`, `@SuppressWarnings("MMGenericMessage")`, etc. for per-rule suppression
+5. Inline `// CHECKSTYLE:OFF` comments
+
+NOTE: `@SuppressWarnings` requires `SuppressWarningsFilter` under `Checker` and
+`SuppressWarningsHolder` under `TreeWalker` in the Checkstyle configuration. Use the `aliasList`
+property on `SuppressWarningsHolder` to map the MeaningfulMessage check to `MM-all` and avoid
+`@SuppressWarnings("all")`, which disables all Checkstyle checks.
+
+`MMShortTitle` in the diagnostic contract is a placeholder for the rule code format; use the
+actual rule code (for example, `MMTooShort`) in suppressions.
+
+MMMissingMessage can be suppressed, but should not be suppressed except as a last resort. Prefer
+fixing the call site or annotation to supply a message or a throwable. For log calls, prefer an
+inline `/* reason */` comment when a message must be omitted. Suppressing MMMissingMessage does not
+skip the message-quality rules when a message is present.
+
+== Supported Assertion Frameworks
+
+The checker recognizes assertion methods from:
+
+* *JUnit 4:* `org.junit.Assert.*`
+* *JUnit 5:* `org.junit.jupiter.api.Assertions.*`
+* *AssertJ:* `assertThat(...).as("message")`, `describedAs()`, `withFailMessage()`, `overridingErrorMessage()`
+* *Hamcrest:* `org.hamcrest.MatcherAssert.assertThat("reason", actual, matcher)`
+* *Java assert:* `assert condition : "message";`
+* *TestNG:* `org.testng.Assert.*`
+
+For JUnit assertions, message position follows the imported framework (JUnit 4 uses message first,
+JUnit 5 uses message last). If both are present in the same file, the check avoids ambiguous
+positions to reduce false positives.
+For AssertJ message methods, only the first argument is treated as the message (format arguments
+are ignored). For Hamcrest, the reason string is the first argument to `assertThat`.
+
+Detection is based on method name patterns:
+
+* Methods starting with `assert`
+* Methods starting with `require`
+* Method `fail`
+* AssertJ chaining methods: `as`, `describedAs`, `withFailMessage`, `overridingErrorMessage`
+
+Qualified calls are treated as assertions only when the qualifier resolves to a supported assertion
+class (imported or fully qualified). Qualified calls to other types are ignored, even if JUnit
+static wildcard imports are present. Prefer qualifying custom assertion helpers to avoid accidental
+JUnit matching.
+
+=== Excluded Methods
+
+The following assertion-like methods are excluded because their string arguments are class/package names, not messages:
+
+* `assertClassesLoad`
+* `assertPackagePresent`
+* `assertResourcePresent`
+
+== Good Message Characteristics
+
+Messages should ideally:
+
+1. *Explain the invariant being tested*
++
+[source,java]
+----
+assertEquals(5, count, "user list should contain 5 active users after filtering");
+----
+
+2. *Provide business context*
++
+[source,java]
+----
+assertTrue(order.isValid(), "order should be valid after setting all required fields");
+----
+
+3. *Specify the data being tested*
++
+[source,java]
+----
+assertEquals("AAPL", symbol, "first market data entry should be AAPL ticker");
+----
+
+4. *Describe the operation*
++
+[source,java]
+----
+assertEquals(original, deserialized, "object should round-trip through binary serialization");
+----
+
+5. *Include indices with context*
++
+[source,java]
+----
+assertEquals(expected, entries.get(0), "first entry should be header record");
+----
+
+== Detection Algorithm
+
+=== Pseudocode
+
+[source]
+----
+FOR each assertion method call in file:
+    message = extractMessageParameter(call)
+
+    IF message is missing or empty:
+        CONTINUE  // Handled by separate PMD rule
+
+    IF isExcludedContent(message):  // JSON, YAML, class names, etc.
+        CONTINUE
+
+    warningFired = false
+
+    IF message seen before in this file:
+        REPORT duplicate (with first occurrence line)
+        warningFired = true
+    ELSE:
+        record message occurrence
+
+    IF currentClassName exists:
+        variant = findNameVariant(message, currentClassName)
+        IF variant found:
+            analysis = analyzeSubstance(message, variant)
+            IF NOT analysis.hasSubstance:
+                REPORT redundant_class with diagnosis
+                warningFired = true
+
+    IF currentMethodName exists:
+        variant = findNameVariant(message, currentMethodName)
+        IF variant found:
+            analysis = analyzeSubstance(message, variant)
+            IF NOT analysis.hasSubstance:
+                REPORT redundant_method with diagnosis
+                warningFired = true
+
+    IF message matches line number pattern:
+        REPORT redundant_line
+        warningFired = true
+
+    IF message matches generic single-word pattern:
+        REPORT generic_message
+        warningFired = true
+
+    IF message matches assertion-type-repetition pattern:
+        REPORT restates_assertion
+        warningFired = true
+
+    IF message matches index-only pattern:
+        REPORT index_only
+        warningFired = true
+
+    IF message matches contextless-comparison pattern:
+        REPORT contextless
+        warningFired = true
+
+    // Word metrics (skip word count if semantic warning already fired)
+    FOR each word in message:
+        IF word.length > MAX_WORD_LENGTH AND word != className AND word != methodName:
+            REPORT long_word
+
+    IF NOT warningFired:
+        IF totalWordCount < minWordCount (per source):
+            REPORT too_short
+        ELSE IF totalWordCount > MAX_WORD_COUNT:
+            REPORT too_long
+        ELSE IF meaningfulWordCount < minMeaningfulWordCount (per source):
+            REPORT too_few_meaningful
+----
+
+=== Substance Analysis Algorithm
+
+[source]
+----
+FUNCTION analyzeSubstance(message, name):
+    // Remove name from message (case insensitive)
+    withoutName = message.replaceAll(name, " ")
+
+    // Split into words and categorize
+    filler = []
+    meaningful = []
+
+    FOR each word in withoutName:
+        IF word in FILLER_WORDS OR isNumeric(word) OR word.length < 2:
+            filler.add(word)
+        ELSE:
+            meaningful.add(word)
+
+    hasSubstance = meaningful.size >= MIN_WORDS_WITHOUT_NAME
+
+    // Generate diagnosis
+    IF meaningful.isEmpty AND filler.isEmpty:
+        diagnosis = "nothing remains after removing the name"
+    ELSE IF meaningful.isEmpty:
+        diagnosis = "only filler words remain: " + filler.join(", ")
+    ELSE IF filler.isEmpty:
+        diagnosis = "too short - only N word(s): " + meaningful.join(", ")
+    ELSE:
+        diagnosis = "only N meaningful word(s): " + meaningful.join(", ")
+                  + " (filler: " + filler.join(", ") + ")"
+
+    RETURN SubstanceAnalysis(hasSubstance, diagnosis)
+----
+
+== Examples
+
+=== Violations
+
+[source,java]
+----
+// VIOLATION: duplicate
+assertEquals(a, b, "check value");  // line 10
+assertEquals(c, d, "check value");  // line 20
+
+// VIOLATION: lacks substance without class name
+class BytesStoreTest {
+    void test() {
+        assertTrue(result, "BytesStore is valid");
+        // → only 1 meaningful word: "valid" (filler: is)
+    }
+}
+
+// VIOLATION: nothing remains without method name
+void testWriteBuffer() {
+    assertTrue(result, "testWriteBuffer");
+}
+
+// VIOLATION: generic single word
+assertEquals(expected, actual, "value");
+
+// VIOLATION: restates assertion
+assertTrue(flag, "should be true");
+
+// VIOLATION: line number
+assertEquals(5, count, "L42");
+
+// VIOLATION: index only
+assertEquals(expected, array[0], "0");
+
+// VIOLATION: contextless
+assertEquals(a, b, "comparison");
+
+// VIOLATION: too short
+assertEquals(a, b, "check");
+
+// VIOLATION: long word
+assertEquals(a, b, "ConfigurationManagerServiceFactory failed");
+
+// VIOLATION: trivial supplier
+assertEquals(1, 1, () -> "constant");
+----
+
+=== Good Messages
+
+[source,java]
+----
+// GOOD: explains invariant
+assertEquals(5, activeUsers.size(),
+    "active user count should be 5 after filtering inactive users");
+
+// GOOD: business context
+assertTrue(order.isValid(),
+    "order should pass validation after setting customer and items");
+
+// GOOD: specific data
+assertEquals("AAPL", quote.getSymbol(),
+    "market data feed should return AAPL as first symbol");
+
+// GOOD: operation description
+assertEquals(original, deserialized,
+    "Chronicle Wire serialization should preserve all fields");
+
+// GOOD: index with context
+assertEquals(HEADER_MAGIC, buffer.getInt(0),
+    "first 4 bytes should contain header magic number");
+
+// GOOD: non-trivial supplier (lazy evaluation justified)
+assertEquals(expected, actual,
+    () -> "mismatch at index " + index + ": expected " + formatValue(expected));
+----
+
+== Message Keys Reference
+
+[source,properties]
+----
+assert.message.duplicate=[MMDuplicate] Duplicate message "{0}". Why: first used at line {1}. Fix: describe the specific invariant at this site. Ref: assertion-messages.adoc#MMDuplicate
+
+assert.message.redundant.class=[MMRedundantClassName] Message "{0}" depends on class name "{1}". Why: {2}. Fix: add 2+ meaningful words that survive without the name. Ref: assertion-messages.adoc#MMRedundantClassName
+
+assert.message.redundant.method=[MMRedundantMethodName] Message "{0}" depends on method name "{1}". Why: {2}. Fix: add 2+ meaningful words that survive without the name. Ref: assertion-messages.adoc#MMRedundantMethodName
+
+assert.message.redundant.line=[MMRedundantLineNumber] Message "{0}" contains line token "{1}". Why: stack traces show line numbers. Fix: remove and describe the invariant. Ref: assertion-messages.adoc#MMRedundantLineNumber
+
+assert.message.trivial.supplier=[MMTrivialSupplier] Trivial Supplier "{0}". Why: simple or cheap supplier adds overhead with no benefit. Fix: use plain String or move construction into a helper. Ref: assertion-messages.adoc#MMTrivialSupplier
+
+assert.message.generic=[MMGenericMessage] Generic message "{0}". Why: no subject or expected behaviour. Fix: name what is checked and what should hold. Ref: assertion-messages.adoc#MMGenericMessage
+
+assert.message.restates.assertion=[MMRestatesAssertion] Message "{0}" restates the assertion. Fix: explain expected behaviour, not assertion type. Ref: assertion-messages.adoc#MMRestatesAssertion
+
+assert.message.index.only=[MMIndexOnly] Index-only message "{0}". Fix: include what the element represents. Ref: assertion-messages.adoc#MMIndexOnly
+
+assert.message.contextless=[MMContextless] Contextless message "{0}". Fix: state what is compared and why it matters. Ref: assertion-messages.adoc#MMContextless
+
+assert.message.too.short=[MMTooShort] Message "{0}" too short. Why: words/placeholders={1} min={2}. Fix: add subject + expected behaviour. Ref: assertion-messages.adoc#MMTooShort
+
+assert.message.too.few.meaningful=[MMTooFewMeaningfulWords] Message "{0}" has too few meaningful words. Why: meaningful words/placeholders={1} min={2}. Fix: add meaningful words or placeholders to meet the minimum. Ref: assertion-messages.adoc#MMTooFewMeaningfulWords
+
+assert.message.too.long=[MMTooLong] Message "{0}" too long. Why: words={1} max={2}. Fix: keep invariant, move data to expected/actual. Ref: assertion-messages.adoc#MMTooLong
+
+assert.message.long.word=[MMLongWord] Message "{0}" contains long token "{1}" (>{2} chars). Fix: use short descriptive domain terms. Ref: assertion-messages.adoc#MMLongWord
+
+assert.message.duplicates.input=[MMDuplicatesInput] Message "{0}" duplicates input "{1}". Why: message just echoes the expected value or variable name. Fix: explain the invariant, not the data. Ref: assertion-messages.adoc#MMDuplicatesInput
+
+assert.message.assertall.heading=[MMLowSignalAssertAllHeading] Low-signal assertAll heading "{0}". Why: heading should describe what the group validates. Fix: name the invariant being checked. Ref: assertion-messages.adoc#MMLowSignalAssertAllHeading
+
+assert.message.restates.derived=[MMRestatesDerivedAssertion] Message "{0}" restates derived assertion "{1}". Why: derived assertions like isEmpty() already show condition in output. Fix: explain why this property matters. Ref: assertion-messages.adoc#MMRestatesDerivedAssertion
+
+assert.message.assertj.override=[MMAssertJGenericOverride] Generic AssertJ override "{0}". Why: withFailMessage/overridingErrorMessage hides rich diff output. Fix: prefer as() for context, or include specific diagnostic info. Ref: assertion-messages.adoc#MMAssertJGenericOverride
+
+assert.message.missing.comparison.values=[MMMissingComparisonValues] Comparison "{0}" uses operands {1} and {2} but message is constant. Why: when assertion fails, you won''t see the actual values. Fix: include operand values in message, e.g. {1} + " {0} " + {2} + " because...". Ref: assertion-messages.adoc#MMMissingComparisonValues
+
+assert.message.missing.string.value=[MMMissingStringSearchValue] String search {0}() on {1} with {2} but message is constant. Why: when assertion fails, you won''t see the actual string. Fix: include the string value in message, e.g. {1} + " should contain " + {2}. Ref: assertion-messages.adoc#MMMissingStringSearchValue
+
+assert.message.missing.loop.index=[MMMissingLoopIndex] Assertion in indexed loop but message doesn''t include index "{0}". Why: when assertion fails, you won''t know which iteration failed. Fix: include the loop index in message, e.g. "at index " + {0}. Ref: assertion-messages.adoc#MMMissingLoopIndex
+
+assert.message.missing.subject=[MMMissingSubject] Message "{0}" starts with modal verb without subject. Why: reader cannot tell what is being tested. Fix: add subject before modal verb, e.g. "method should return X" instead of "should return X". Ref: assertion-messages.adoc#MMMissingSubject
+----
+
+== Testing Requirements
+
+Each rule has:
+
+1. Unit tests with `InputXxx.java` test fixtures demonstrating violations
+2. Unit tests verifying no false positives on good messages
+3. Integration tests against Chronicle codebase (smoke test)
+
+Test fixtures cover:
+
+* Multiple assertion frameworks (JUnit 4, JUnit 5, AssertJ)
+* Edge cases (empty strings, unicode, special characters)
+* Suppression mechanisms
+* Exclusion scenarios (JSON, YAML, class names)
+
+== Implementation Priority
+
+[cols="1,1,2"]
+|===
+|Priority |Rule |Status
+
+|DONE
+|Duplicate Messages
+|Implemented and tested
+
+|DONE
+|Redundant Class/Method Name
+|Implemented with substance analysis and filler word filtering
+
+|DONE
+|Redundant Line Number
+|Implemented with refined pattern to avoid false positives
+
+|DONE
+|Trivial Supplier
+|Implemented for constant strings and simple concatenations
+
+|DONE
+|Generic Single-Word
+|Implemented
+
+|DONE
+|Assertion Type Repetition
+|Implemented
+
+|DONE
+|Index-Only Messages
+|Implemented
+
+|DONE
+|Contextless Comparison
+|Implemented
+
+|DONE
+|Too Short / Too Long
+|Implemented with per-source minimums (assert/precondition 4/2, throw 2/1, annotation 6/4, log 4/2) and a 42 word/placeholders maximum
+
+|DONE
+|Long Word Detection
+|Implemented with 30 character threshold
+
+|DONE
+|Duplicates Input
+|Implemented
+
+|DONE
+|Low-Signal assertAll Heading
+|Implemented
+
+|DONE
+|Restates Derived Assertion
+|Implemented
+
+|DONE
+|AssertJ Generic Override
+|Implemented
+
+|DONE
+|Whitespace Run
+|Implemented
+
+|DONE
+|Missing Comparison Values
+|Implemented
+
+|DONE
+|Missing String Search Value
+|Implemented
+
+|DONE
+|Missing Loop Index
+|Implemented
+
+|DONE
+|Missing Subject
+|Implemented
+
+|SKIP
+|Missing Message
+|Will be enforced by PMD rule instead
+|===
+
+== References
+
+* Checkstyle Custom Check Development: https://checkstyle.org/writingchecks.html
+* JUnit 5 Assertions: https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/Assertions.html
+* AssertJ: https://assertj.github.io/doc/

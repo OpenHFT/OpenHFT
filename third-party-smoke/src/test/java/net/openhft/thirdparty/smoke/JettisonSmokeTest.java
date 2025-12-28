@@ -4,21 +4,23 @@
 package net.openhft.thirdparty.smoke;
 
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Smoke test for Jettison JSON handling.
+ * Smoke test verifying Jettison can parse and emit simple JSON objects.
  */
 class JettisonSmokeTest {
 
     /**
-     * Value used in assertions.
+     * Answer value used in JSON assertions for round-trip.
      */
     private static final int ANSWER = 42;
 
     @Test
+    @DisplayName("Jettison JSONObject should round-trip values")
     void jettisonJsonObjectRoundTrip() throws Exception {
         JSONObject obj = new JSONObject();
         obj.put("hello", "world");

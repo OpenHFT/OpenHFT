@@ -12,6 +12,7 @@ import org.apache.commons.mail.SimpleEmail;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class CliJsonHttpTimeEmailSmokeTest {
 
     @Test
+    @DisplayName("JCommander should parse and bind --name command-line argument")
     void jcommanderParsesArgument() {
         Args args = new Args();
         JCommander.newBuilder()
@@ -36,6 +38,7 @@ class CliJsonHttpTimeEmailSmokeTest {
     }
 
     @Test
+    @DisplayName("Gson should serialize and deserialize a map")
     void gsonCanSerializeAndDeserializeMap() {
         Gson gson = new Gson();
         Map<String, String> source =
@@ -47,6 +50,7 @@ class CliJsonHttpTimeEmailSmokeTest {
     }
 
     @Test
+    @DisplayName("Unirest HTTP client should build GET request without network execution")
     void unirestBuildsRequestWithoutExecuting() {
         HttpRequest request = Unirest.get("http://example.com")
                 .queryString("q", "x");
@@ -54,6 +58,7 @@ class CliJsonHttpTimeEmailSmokeTest {
     }
 
     @Test
+    @DisplayName("Joda-Time should format date as yyyy-MM-dd")
     void jodaTimeFormatsDate() {
         final int year = 2020;
         final int month = 1;
@@ -67,6 +72,7 @@ class CliJsonHttpTimeEmailSmokeTest {
     }
 
     @Test
+    @DisplayName("Commons Email should be configurable without sending")
     void commonsEmailCanBeConfiguredWithoutSending() throws Exception {
         SimpleEmail email = new SimpleEmail();
         email.setHostName("localhost");
@@ -78,11 +84,11 @@ class CliJsonHttpTimeEmailSmokeTest {
     }
 
     /**
-     * Command-line arguments container.
+     * Command-line arguments container used by JCommander for smoke-test parsing defaults.
      */
     static class Args {
         /**
-         * Name parameter parsed by JCommander.
+         * Name parameter parsed by JCommander for the sample request.
          */
         @Parameter(names = "--name")
         private String name = "default";

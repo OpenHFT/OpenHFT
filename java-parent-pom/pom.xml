@@ -36,7 +36,7 @@
         <license.owner>chronicle.software</license.owner>
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
-        <!-- TODO raise this to true -->
+        <!-- Default to non-blocking local builds; enable via -Pquality when needed -->
         <quality.enforced>false</quality.enforced>
         <quality.version>2026.0-SNAPSHOT</quality.version>
 
@@ -117,7 +117,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>@{argLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
+                    <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs} -Djvm.coverage=true</argLine>
                     <systemPropertyVariables>
                         <project.build.directory>${project.build.directory}</project.build.directory>
                     </systemPropertyVariables>
@@ -146,7 +146,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -186,7 +186,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <configLocation>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml</configLocation>
+                    <configLocation>net/openhft/quality/chronicle-baseline-checkstyle.xml</configLocation>
                     <failOnViolation>${quality.enforced}</failOnViolation>
                     <logViolationsToConsole>true</logViolationsToConsole>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -264,6 +264,7 @@
                     <skip>${pmd.skip}</skip>
                     <printFailingErrors>true</printFailingErrors>
                     <linkXRef>false</linkXRef>
+                    <outputFormat>xdoc</outputFormat>
                     <analysisCache>true</analysisCache>
                 </configuration>
                 <dependencies>
@@ -305,6 +306,15 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>quality</id>
+            <properties>
+                <quality.enforced>true</quality.enforced>
+            </properties>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>

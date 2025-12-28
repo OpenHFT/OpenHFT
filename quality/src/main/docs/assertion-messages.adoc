@@ -3,35 +3,50 @@
 :toclevels: 2
 :sectnums:
 
+The Meaningful Message Check applies these rules to assertion messages (JUnit, AssertJ, Hamcrest),
+Java `assert` statements, precondition messages (for example, `Objects.requireNonNull`), `throw new`
+exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated
+names, and disabled reasons). Log sites (SLF4J `trace/debug/info/warn/error`, Log4j2
+`trace/debug/info/warn/error/fatal`, JUL `java.util.logging.Logger`, `System.Logger`, and Chronicle
+`Jvm.*.on(...)`) are also in scope; see `meaningful-message-checker-requirements.adoc` for the
+log-specific rules.
+
+For `requireNonNull`/`requireNotNull`, a message that exactly matches the parameter name is treated
+as sufficient and the message rules are skipped for that call.
+
 == Quick Reference
 
 [cols="1,2,3"]
 |===
 |Code |Rule |Quick Fix
 
-|AMQ01 |Duplicate |Make each message unique to its assertion site
-|AMQ02 |Redundant class name |Add 2+ meaningful words beyond the class name
-|AMQ03 |Redundant method name |Add 2+ meaningful words beyond the method name
-|AMQ04 |Redundant line number |Remove line reference, describe invariant
-|AMQ05 |Trivial Supplier |Use plain String or add dynamic content
-|AMQ06 |Generic message |Name subject + expected behaviour
-|AMQ07 |Restates assertion |Explain the invariant, not the assertion type
-|AMQ08 |Index only |Name what the indexed element represents
-|AMQ09 |Contextless |State what is compared and why it matters
-|AMQ10 |Too short |Add subject + expected behaviour (3+ words)
-|AMQ11 |Too long |Keep invariant, move data to expected/actual
-|AMQ12 |Long word |Use short descriptive terms, not identifiers
-|AMQ13 |Duplicates input |Explain invariant, not the data
-|AMQ14 |Low-signal assertAll heading |Name what the group validates
-|AMQ15 |Restates derived assertion |Explain why the property matters
-|AMQ16 |AssertJ generic override |Prefer as() over withFailMessage()
-|AMQ17 |Cheap supplier |Use plain String for simple concatenation
-|AMQ18 |Missing comparison values |Include operand values in comparison assertions
-|AMQ19 |Missing string search value |Include string value in contains/startsWith/endsWith
+|MMDuplicate |Duplicate |Make each message unique to its assertion site
+|MMRedundantClassName |Redundant class name |Add 2+ meaningful words beyond the class name
+|MMRedundantMethodName |Redundant method name |Add 2+ meaningful words beyond the method name
+|MMRedundantLineNumber |Redundant line number |Remove line reference, describe invariant
+|MMTrivialSupplier |Trivial Supplier |Use plain String or add dynamic content
+|MMGenericMessage |Generic message |Name subject + expected behaviour
+|MMRestatesAssertion |Restates assertion |Explain the invariant, not the assertion type
+|MMIndexOnly |Index only |Name what the indexed element represents
+|MMContextless |Contextless |State what is compared and why it matters
+|MMMissingMessage |Missing message |Add a meaningful message, supply a Throwable, or use /* reason */
+|MMTooShort |Too short |Add subject + expected behaviour (see requirements for minima)
+|MMTooFewMeaningfulWords |Too few meaningful words |Add meaningful words/placeholders to meet the minimum
+|MMTooLong |Too long |Keep invariant, move data to expected/actual
+|MMWhitespaceRun |Whitespace run |Use single spaces
+|MMLongWord |Long word |Use short descriptive terms, not identifiers
+|MMDuplicatesInput |Duplicates input |Explain invariant, not the data
+|MMLowSignalAssertAllHeading |Low-signal assertAll heading |Name what the group validates
+|MMRestatesDerivedAssertion |Restates derived assertion |Explain why the property matters
+|MMAssertJGenericOverride |AssertJ generic override |Prefer as() over withFailMessage()
+|MMMissingComparisonValues |Missing comparison values |Include operand values in comparison assertions
+|MMMissingStringSearchValue |Missing string search value |Include string value in contains/startsWith/endsWith
+|MMMissingLoopIndex |Missing loop index |Include loop index in assertion message
+|MMMissingSubject |Missing subject |Add subject before modal verb (should/must)
 |===
 
-[#AMQ01]
-== AMQ01: Duplicate Message
+[#MMDuplicate]
+== MMDuplicate: Duplicate Message
 
 === Problem
 
@@ -59,8 +74,8 @@ assertEquals(5, users.size(), "user count after filtering inactive accounts");
 assertEquals("admin", users.get(0).getRole(), "first user should have admin role");
 ----
 
-[#AMQ02]
-== AMQ02: Redundant Class Name
+[#MMRedundantClassName]
+== MMRedundantClassName: Redundant Class Name
 
 === Problem
 
@@ -95,8 +110,8 @@ class BytesStoreTest {
 }
 ----
 
-[#AMQ03]
-== AMQ03: Redundant Method Name
+[#MMRedundantMethodName]
+== MMRedundantMethodName: Redundant Method Name
 
 === Problem
 
@@ -126,8 +141,8 @@ void testWriteBuffer() {
 }
 ----
 
-[#AMQ04]
-== AMQ04: Redundant Line Number
+[#MMRedundantLineNumber]
+== MMRedundantLineNumber: Redundant Line Number
 
 === Problem
 
@@ -154,42 +169,46 @@ assertEquals(5, count, "line 42 check");
 assertEquals(5, count, "active user count after filtering");
 ----
 
-[#AMQ05]
-== AMQ05: Trivial Supplier
+[#MMTrivialSupplier]
+== MMTrivialSupplier: Trivial Supplier
 
 === Problem
 
-A `Supplier<String>` lambda returns a constant string.
+A `Supplier<String>` lambda returns a constant string, a simple concatenation, or a cheap expression
+with no literals.
 
 === Why This Matters
 
-JUnit 5's message suppliers exist for lazy evaluation - to avoid expensive string construction when tests pass. A trivial supplier like `() -> "constant"` adds lambda overhead with no benefit.
+JUnit 5's message suppliers exist for lazy evaluation - to avoid expensive string construction when tests pass. A trivial supplier like `() -> "constant"`, `() -> "value: " + x`, or `() -> name` adds lambda overhead with no benefit.
 
 === How to Fix
 
-Use a plain String, or include dynamic content to justify lazy evaluation.
+Use a plain String for simple cases. If you need lazy evaluation, move the construction into a helper method.
 
 .Before
 [source,java]
 ----
 assertEquals(expected, actual, () -> "values should match");
+assertEquals(expected, actual, () -> "expected " + expected);
+assertEquals(expected, actual, () -> name);
 ----
 
 .After (plain String)
 [source,java]
 ----
 assertEquals(expected, actual, "values should match");
+assertEquals(expected, actual, "expected " + expected);
+assertEquals(expected, actual, name);
 ----
 
-.After (dynamic content)
+.After (helper method)
 [source,java]
 ----
-assertEquals(expected, actual,
-    () -> "mismatch at index " + i + ": expected " + expected);
+assertEquals(expected, actual, () -> buildMismatchMessage(expected, actual));
 ----
 
-[#AMQ06]
-== AMQ06: Generic Message
+[#MMGenericMessage]
+== MMGenericMessage: Generic Message
 
 === Problem
 
@@ -217,8 +236,8 @@ assertEquals(expected, actual, "order total after applying discount");
 assertTrue(condition, "user session should be active after login");
 ----
 
-[#AMQ07]
-== AMQ07: Restates Assertion
+[#MMRestatesAssertion]
+== MMRestatesAssertion: Restates Assertion
 
 === Problem
 
@@ -248,8 +267,8 @@ assertNotNull(obj, "connection pool should be initialized before first request")
 assertEquals(a, b, "serialized form should match original after round-trip");
 ----
 
-[#AMQ08]
-== AMQ08: Index Only
+[#MMIndexOnly]
+== MMIndexOnly: Index Only
 
 === Problem
 
@@ -277,8 +296,8 @@ assertEquals(expected, array[0], "first entry should be header record");
 assertEquals(expected, list.get(5), "sixth item should be the sentinel value");
 ----
 
-[#AMQ09]
-== AMQ09: Contextless Message
+[#MMContextless]
+== MMContextless: Contextless Message
 
 === Problem
 
@@ -306,12 +325,53 @@ assertEquals(a, b, "calculated tax should match expected rate");
 assertEquals(x, y, "cache entry should reflect database state");
 ----
 
-[#AMQ10]
-== AMQ10: Too Short
+[#MMMissingMessage]
+== MMMissingMessage: Missing Message
 
 === Problem
 
-The message has fewer than 3 words.
+No message was provided (null template or omitted reason), so there is nothing to assess.
+
+=== Why This Matters
+
+Missing messages remove the quickest path to understanding why an assertion, log, or test metadata
+failed, forcing a developer to open the code and reconstruct intent.
+
+=== How to Fix
+
+Provide a meaningful message or supply a Throwable when allowed. For log sites, use a stable
+message template; for annotations, add a clear reason. For JUnit `fail()` and `assertXxx(...)`,
+always supply a non-null message.
+
+For low-level or performance-sensitive cases (especially `throw new`), you may use an inline
+block comment with a short reason inside the argument list instead of a message literal. Empty
+comments and line comments do not suppress.
+
+[source,java]
+----
+throw new IllegalArgumentException(/* condition not met */);
+----
+
+.Before
+[source,java]
+----
+slf4j.warn((String) null);
+@Disabled
+----
+
+.After
+[source,java]
+----
+slf4j.warn("order should remain in pending state");
+@Disabled("awaiting fix for queue recovery")
+----
+
+[#MMTooShort]
+== MMTooShort: Too Short
+
+=== Problem
+
+The message has fewer than the source minimum words or placeholders.
 
 === Why This Matters
 
@@ -319,7 +379,8 @@ Very short messages rarely provide sufficient context to diagnose failures witho
 
 === How to Fix
 
-Add a subject (what) and expected behaviour (should what). Aim for 3-8 words.
+Add a subject (what) and expected behaviour (should what). Aim for the minimums in the
+requirements; for assertions/logs, 4-8 words is a useful default.
 
 .Pattern
 ----
@@ -340,12 +401,40 @@ assertEquals(5, count, "user count after filtering inactive");
 assertTrue(valid, "order should pass validation rules");
 ----
 
-[#AMQ11]
-== AMQ11: Too Long
+[#MMTooFewMeaningfulWords]
+== MMTooFewMeaningfulWords: Too Few Meaningful Words
 
 === Problem
 
-The message has more than 20 words.
+The message has fewer than the source minimum meaningful words or placeholders (filler words like
+"should", "be", "expected" do not count).
+
+=== Why This Matters
+
+Messages made up mostly of filler words are hard to interpret without reading the code.
+
+=== How to Fix
+
+Add meaningful words or data placeholders to meet the minimum.
+
+.Before
+[source,java]
+----
+assertTrue(valid, "should be ok");
+----
+
+.After
+[source,java]
+----
+assertTrue(valid, "order should be valid");
+----
+
+[#MMTooLong]
+== MMTooLong: Too Long
+
+=== Problem
+
+The message has more than 42 words.
 
 === Why This Matters
 
@@ -369,16 +458,43 @@ assertEquals(expected, actual, "computed result should match expected value");
 // Let the assertion framework show expected vs actual
 ----
 
-[#AMQ12]
-== AMQ12: Long Word
+[#MMWhitespaceRun]
+== MMWhitespaceRun: Whitespace Run
 
 === Problem
 
-The message contains a word exceeding 16 characters (likely a class or method name).
+The message contains two or more whitespace characters in a row.
 
 === Why This Matters
 
-Long identifiers like `ConfigurationManagerServiceFactory` suggest the message is restating code rather than describing the invariant in domain terms.
+Repeated whitespace often signals missing data or accidental formatting, which makes messages harder to read.
+
+=== How to Fix
+
+Collapse repeated whitespace to single spaces, or move dynamic values into expected/actual arguments.
+
+.Before
+[source,java]
+----
+assertEquals(expected, actual, "order  should persist");
+----
+
+.After
+[source,java]
+----
+assertEquals(expected, actual, "order should persist");
+----
+
+[#MMLongWord]
+== MMLongWord: Long Word
+
+=== Problem
+
+The message contains a word exceeding 42 characters (likely a class or method name).
+
+=== Why This Matters
+
+Long identifiers like `ConfigurationManagerServiceFactoryImpl` suggest the message is restating code rather than describing the invariant in domain terms.
 
 === How to Fix
 
@@ -387,7 +503,7 @@ Use short, descriptive domain terms instead of code identifiers.
 .Before
 [source,java]
 ----
-assertEquals(expected, actual, "ConfigurationManagerServiceFactory returned wrong value");
+assertEquals(expected, actual, "ConfigurationManagerServiceFactoryImpl returned wrong value");
 ----
 
 .After
@@ -396,8 +512,8 @@ assertEquals(expected, actual, "ConfigurationManagerServiceFactory returned wron
 assertEquals(expected, actual, "config service should return cached settings");
 ----
 
-[#AMQ13]
-== AMQ13: Duplicates Input
+[#MMDuplicatesInput]
+== MMDuplicatesInput: Duplicates Input
 
 === Problem
 
@@ -427,8 +543,8 @@ assertThrows(IllegalArgumentException.class, code, "negative quantity should be 
 assertEquals(expected, actual, "computed hash should match stored value");
 ----
 
-[#AMQ14]
-== AMQ14: Low-Signal assertAll Heading
+[#MMLowSignalAssertAllHeading]
+== MMLowSignalAssertAllHeading: Low-Signal assertAll Heading
 
 === Problem
 
@@ -470,8 +586,8 @@ assertAll("user should be properly initialized",
 );
 ----
 
-[#AMQ15]
-== AMQ15: Restates Derived Assertion
+[#MMRestatesDerivedAssertion]
+== MMRestatesDerivedAssertion: Restates Derived Assertion
 
 === Problem
 
@@ -501,8 +617,8 @@ assertThat(optional).as("authenticated user should have a session").isPresent();
 assertThat(text).as("email should have valid format").contains("@");
 ----
 
-[#AMQ16]
-== AMQ16: AssertJ Generic Override
+[#MMAssertJGenericOverride]
+== MMAssertJGenericOverride: AssertJ Generic Override
 
 === Problem
 
@@ -541,48 +657,8 @@ assertThat(response.getStatus())
     .isEqualTo(200);
 ----
 
-[#AMQ17]
-== AMQ17: Cheap Supplier
-
-=== Problem
-
-A `Supplier<String>` lambda contains only simple string concatenation with variable references.
-
-=== Why This Matters
-
-JUnit 5's message suppliers exist for lazy evaluation - to defer expensive string construction until the test actually fails. A "cheap" supplier like `() -> "value: " + x` adds lambda overhead without meaningful benefit, since simple concatenation is fast.
-
-This is distinct from AMQ05 (Trivial Supplier) which flags constant-only suppliers. Cheap suppliers have dynamic content, but the construction cost doesn't justify lazy evaluation.
-
-=== How to Fix
-
-Use plain String concatenation for simple cases. Reserve suppliers for expensive operations.
-
-.Before
-[source,java]
-----
-assertEquals(expected, actual, () -> "value: " + x);
-assertTrue(condition, () -> "failed for " + name);
-----
-
-.After
-[source,java]
-----
-assertEquals(expected, actual, "value: " + x);
-assertTrue(condition, "failed for " + name);
-----
-
-.When Supplier is appropriate
-[source,java]
-----
-// Use when message construction is expensive
-assertEquals(expected, actual, () -> "diff:\n" + computeDetailedDiff(expected, actual));
-assertTrue(valid, () -> "validation errors: " + validator.getErrors().stream()
-    .map(Error::getMessage).collect(Collectors.joining(", ")));
-----
-
-[#AMQ18]
-== AMQ18: Missing Comparison Values
+[#MMMissingComparisonValues]
+== MMMissingComparisonValues: Missing Comparison Values
 
 === Problem
 
@@ -629,8 +705,8 @@ This rule only triggers when:
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
-[#AMQ19]
-== AMQ19: Missing String Search Value
+[#MMMissingStringSearchValue]
+== MMMissingStringSearchValue: Missing String Search Value
 
 === Problem
 
@@ -677,6 +753,119 @@ This rule only triggers when:
 - The message is a constant string (no dynamic content)
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
+
+[#MMMissingLoopIndex]
+== MMMissingLoopIndex: Missing Loop Index
+
+=== Problem
+
+An assertion inside an indexed `for` loop uses a constant message that doesn't include the loop index variable.
+
+=== Why This Matters
+
+When an assertion fails inside a loop, you need to know which iteration failed. A constant message like `"value should match"` doesn't tell you whether it was the first, fifth, or hundredth iteration that failed. This makes debugging significantly harder, especially for large datasets.
+
+=== How to Fix
+
+Include the loop index variable in the message so you know which iteration failed.
+
+.Before
+[source,java]
+----
+for (int i = 0; i < items.size(); i++) {
+    assertEquals(expected, items.get(i), "item should match expected");
+}
+
+for (int row = 0; row < matrix.length; row++) {
+    assertTrue(matrix[row] != null, "row should not be null");
+}
+----
+
+.After
+[source,java]
+----
+for (int i = 0; i < items.size(); i++) {
+    assertEquals(expected, items.get(i), "item at index " + i + " should match expected");
+}
+
+for (int row = 0; row < matrix.length; row++) {
+    assertTrue(matrix[row] != null, "row " + row + " should not be null");
+}
+----
+
+.With additional context
+[source,java]
+----
+for (int i = 0; i < orders.size(); i++) {
+    Order order = orders.get(i);
+    assertTrue(order.isValid(),
+        "order " + i + " (id=" + order.getId() + ") should be valid");
+}
+----
+
+=== When This Rule Doesn't Apply
+
+This rule only triggers when:
+- The assertion is inside a traditional indexed `for` loop (with `int` or `long` index)
+- The loop has an initialization, condition, and update expression
+- The message is a constant string (no dynamic content)
+
+If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
+
+[#MMMissingSubject]
+== MMMissingSubject: Missing Subject
+
+=== Problem
+
+The assertion message starts with a modal verb (should, must, will, can, etc.) without a subject.
+
+=== Why This Matters
+
+Messages like `"should be valid"` don't tell you *what* should be valid. When reading test failures, especially in CI logs, you need to know what entity is being tested. The subject provides essential context.
+
+=== How to Fix
+
+Add a subject before the modal verb - name what is being tested.
+
+.Before
+[source,java]
+----
+assertTrue(result.isValid(), "should be valid");
+assertEquals(5, count, "should equal expected");
+assertNotNull(connection, "must not be null");
+----
+
+.After
+[source,java]
+----
+assertTrue(result.isValid(), "order should be valid after checkout");
+assertEquals(5, count, "item count should equal expected");
+assertNotNull(connection, "database connection must not be null");
+----
+
+.Pattern
+----
+"<subject> should/must <expected behaviour>"
+----
+
+=== Examples
+
+[cols="1,2"]
+|===
+|Bad |Good
+
+|"should be true"
+|"flag should be true after initialization"
+
+|"must be positive"
+|"balance must be positive after deposit"
+
+|"should contain item"
+|"cart should contain item after add"
+
+|"cannot be empty"
+|"user list cannot be empty after load"
+|===
 
 == Writing Good Messages
 

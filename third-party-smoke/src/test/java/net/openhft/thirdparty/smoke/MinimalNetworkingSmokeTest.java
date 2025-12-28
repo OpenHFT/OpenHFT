@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class MinimalNetworkingSmokeTest {
 
     @Test
-    @DisplayName("Undertow can build without starting")
+    @DisplayName("Undertow builder should create a server without starting")
     void undertowBuilds() {
         Undertow undertow = Undertow.builder()
                 .addHttpListener(0, "localhost")
@@ -46,10 +46,11 @@ class MinimalNetworkingSmokeTest {
     }
 
     @Test
-    @DisplayName("Jetty WebSocket client constructs")
+    @DisplayName("Jetty WebSocket client should construct cleanly")
     @SuppressWarnings("java:S1612") // Suppress "Utility classes should not have public constructors")
     void jettyClientConstructs() {
-        assertDoesNotThrow(() -> new WebSocketClient());
+        assertDoesNotThrow(() -> new WebSocketClient(),
+                "WebSocket client should construct");
     }
 
     @Test
@@ -67,7 +68,7 @@ class MinimalNetworkingSmokeTest {
     }
 
     @Test
-    @DisplayName("Netty bootstrap can be configured")
+    @DisplayName("Netty ServerBootstrap should allow configuration without binding")
     void nettyBootstrapConfigurable() {
         ServerBootstrap bootstrap = new ServerBootstrap();
         assertNotNull(bootstrap, "Netty ServerBootstrap should construct");
@@ -77,14 +78,14 @@ class MinimalNetworkingSmokeTest {
     @DisplayName("Grizzly HTTP server base class is available")
     void grizzlyServerAccessible() {
         FilterChainBuilder builder = FilterChainBuilder.stateless();
-        assertNotNull(builder, "Grizzly FilterChainBuilder should be constructible");
+        assertNotNull(builder, "Grizzly filter chain builder should be constructible");
     }
 
     @Test
     @DisplayName("MockWebServer can be constructed and closed")
     void mockWebServerLifecycle() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
-            assertNotNull(server, "MockWebServer should construct");
+            assertNotNull(server, "MockWebServer should construct cleanly");
         }
     }
 
@@ -110,7 +111,7 @@ class MinimalNetworkingSmokeTest {
     }
 
     @Test
-    @DisplayName("Undertow servlet deployment builds")
+    @DisplayName("Undertow servlet deployment should build with a name")
     void undertowServletDeploymentBuilds() {
         ServletInfo servlet = Servlets.servlet("helloServlet",
                         HelloServlet.class)
@@ -124,7 +125,7 @@ class MinimalNetworkingSmokeTest {
     }
 
     @Test
-    @DisplayName("Undertow WebSocket endpoint config builds")
+    @DisplayName("Undertow WebSocket endpoint config should build")
     void undertowWebsocketEndpointConfigBuilds() {
         javax.websocket.server.ServerEndpointConfig config =
                 javax.websocket.server.ServerEndpointConfig.Builder
