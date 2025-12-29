@@ -1,0 +1,143 @@
+= TODO Tracker: Project Requirements
+:toc: left
+:toclevels: 2
+:sectnums:
+:icons: font
+:source-highlighter: highlightjs
+
+== Overview
+
+Evolve TODO Tracker from a build-time checker into a task system optimized for CI gating, human readability, and AI/CLI automation.
+
+== Stakeholders (Summary)
+
+* Human developers: fast scan, clear blockers, useful build output
+* AI assistants: structured data, stable IDs, safe scope
+* CI/CD: reliable pass/fail, SARIF annotations, branch-aware gating
+* Maintainers: age and progress metrics, trend visibility
+* Orchestrators: leases, conflict handling, audit trail
+
+== Functional Requirements
+
+=== FR-1: Multi-Format Output
+
+* Output formats: Text, JSON, SARIF 2.1.0, NDJSON (multi-select)
+* JSON schema includes:
+** top-level: `schemaVersion`, `toolVersion`, `generatedAt`
+** `summary`: `total`, `byState`, `derived`
+** `tasks`: `id`, `uuid`, `state`, `priority`, `effort`, `text`, `file`, `line`, `context`, `depends`, `blocking`,
+`fileRefs`, `tags`, `created`, `ageDays`, `revision`, `claimedBy`, `leaseUntil`
+* Summary semantics: `byState` sums to total; `derived` may overlap (`ready`, `overdue`, `actionable`)
+* SARIF: single run, stable fingerprints, priority mapping (P1=error, P2=warning, P3=note)
+* Fingerprinting: `sha256(ruleId + ":" + taskId)` if ID, else `sha256(ruleId + ":" + normalizedText + ":" + context)`
+* NDJSON: one JSON object per line
+
+=== FR-2: Stable Task Identification
+
+* IDs optional by default
+* Human ID: `TDQ-0001`; UUID: RFC 4122
+* Syntax: `- [ ] (TDQ-0123) [P1] [E:M] Implement retry logic`
+* Metadata persistence (sidecar):
+** `.todo-tracker/state.json` committed (uuid, created, revision)
+** `.todo-tracker/attempts/` committed
+** `.todo-tracker/locks/` and `.todo-tracker/agents/` gitignored
+* Matching: ID first, else content hash + context + file path
+* Lock key: `{id}.lock` or `uuid-{uuid}.lock`
+* Feature gating: IDs required for claiming/leases, dependencies, state transitions, and stable SARIF fingerprints
+
+=== FR-3: Task State Model
+
+* States: open, in-progress, blocked, done, dropped
+* Dropped syntax: `[-]` (GFM); fallback `[x] [S:dropped]` if needed
+* Validation: blocked requires reason; in-progress should have owner; transitions enforced on write-back
+
+=== FR-4: Dependencies and Ordering
+
+* Syntax: `[D:TDQ-0107,TDQ-0110]`
+* Validate missing IDs and cycles
+* Deterministic ordering for ready tasks: priority -> ID -> file path -> line
+
+=== FR-5: Context and File References
+
+* Capture heading context via a stack (push on heading, pop on lower/equal level)
+* Format-specific patterns: Markdown `#`, AsciiDoc `=` (configurable)
+* File references validated (existence, range, path traversal)
+* Context and file refs included in JSON output
+
+=== FR-6: Branch/Profile Gating
+
+* Support warn vs fail modes by profile/property
+* Allow exceptions for local dev without weakening CI gates
+
+=== FR-7: Visualization
+
+* Mermaid dependency graph output (optional)
+
+=== FR-8: MCP Server Integration
+
+* Transports: STDIO and Streamable HTTP
+* Core tools: list/get/claim/release/update tasks and metadata
+* Resources: TODO files, state, and referenced files
+* Capability negotiation for versioned tool contracts
+
+=== FR-9: Multi-Agent Coordination
+
+* Lease-based claiming with TTL and renewal
+* Conflict detection and recovery rules
+* Audit trail of claims and outcomes
+
+=== FR-10: Attempt Logging (Reflexion)
+
+* Attempt records stored under `.todo-tracker/attempts/`
+* Include task ID/UUID, timestamps, outcome, and summary notes
+
+=== FR-11: Security
+
+* Treat TODO content as data (injection resistance)
+* Path traversal protections for file refs
+* Auth/token support for HTTP transport
+
+== Non-Functional Requirements (Summary)
+
+* Backward compatibility with existing TODO.md workflows
+* Performance suitable for CI gating
+* Maintainability: clear module boundaries and stable schemas
+* Error handling: actionable diagnostics, no crashes on malformed metadata
+* Testing: unit + integration + end-to-end coverage, with mutation testing via the `pitest` profile
+* Benchmarking: track baselines and regressions in CI
+
+== Implementation Architecture (Summary)
+
+* Parser: AST-based, stateful context tracking, robust error recovery
+* Modules: core (`todotracker.*`), Maven plugin (`todotracker.maven`), MCP server, CLI
+
+== Delivery Phases
+
+* Phase 1: Foundation (current + JSON)
+* Phase 2: Identity and State
+* Phase 3: GitHub Integration
+* Phase 4: Dependencies and Visualization
+* Phase 5: MCP Server (single-agent)
+* Phase 6: Multi-Agent Coordination
+* Phase 7: Advanced Features
+
+See `implementation-plan.adoc` for phase details.
+
+== References
+
+=== Specifications
+
+* https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html[SARIF 2.1.0 Specification]
+* https://modelcontextprotocol.io/specification/2025-03-26/basic/transports[MCP Transport Specification]
+* https://datatracker.ietf.org/doc/html/rfc4122[RFC 4122 - UUID]
+* https://www.rfc-editor.org/rfc/rfc8785.html[RFC 8785 - JSON Canonicalization]
+
+=== Guidance
+
+* https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning[GitHub SARIF Support]
+* https://owasp.org/www-project-top-10-for-large-language-model-applications/[OWASP Top 10 for LLM Applications]
+
+=== Libraries
+
+* https://github.com/vsch/flexmark-java[flexmark-java]
+* https://github.com/de-jcup/sarif-java[sarif-java]

@@ -1,0 +1,1188 @@
+= TODO Tracker: Architecture Decision Log
+:toc: left
+:toclevels: 2
+:sectnums:
+:icons: font
+
+== Introduction
+
+This document records significant architectural decisions for the TODO Tracker.
+Each decision captures context, decision, rationale, and consequences.
+
+---
+
+== ADR-001: Output Format Strategy
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+The plugin needs to serve multiple consumers:
+
+* Humans reading console output
+* AI tools (Claude Code, Gemini, Codex) needing structured data
+* GitHub code scanning requiring SARIF format
+* CI/CD pipelines needing machine-parseable results
+* Streaming scenarios with large task sets
+
+A single output format cannot optimally serve all consumers.
+
+=== Decision
+
+*Implement four output channels: Text, JSON, SARIF 2.1.0, and NDJSON*
+
+Configuration:
+
+[source,xml]
+----
+<outputFormats>text,json,sarif</outputFormats>
+<outputDirectory>${project.build.directory}</outputDirectory>
+----
+
+Output files:
+
+* Console: text (always)
+* `target/todo-tracker.json`
+* `target/todo-tracker.sarif`
+* `target/todo-tracker.ndjson` (streaming)
+
+=== Rationale
+
+* Text remains default for human developers
+* JSON provides stable API for AI orchestration tools
+* SARIF enables GitHub code scanning with zero additional tooling
+* NDJSON enables incremental processing for large task sets
+* All formats share the same internal model (single source of truth)
+
+=== Consequences
+
+* Positive: Each stakeholder gets optimized output
+* Positive: AI tools can parse JSON reliably across versions
+* Positive: GitHub PRs show inline annotations automatically
+* Negative: Must maintain four serializers
+* Negative: Schema versioning required for JSON stability
+
+---
+
+== ADR-002: SARIF Structure and Fingerprinting
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+GitHub Code Scanning uses SARIF for ingestion.
+Key constraints discovered through research:
+
+1. GitHub rejects SARIF with multiple runs for same tool+category (2025 change)
+2. Alerts are deduplicated using fingerprints
+3. Line-number-based fingerprints cause alert churn on refactoring
+
+=== Decision
+
+*Use single tool, single run, minimal rule set with content-based fingerprints*
+
+Structure:
+
+* One tool: `todo-tracker`
+* One run per invocation
+* Rules: `TODO.P1`, `TODO.P2`, `TODO.P3`, `TODO.BLOCKED`
+* Fingerprint:
+** With ID: `sha256(ruleId + ":" + taskId)` - path excluded for stability
+** Without ID: `sha256(ruleId + ":" + normalizedText + ":" + context)`
+
+=== Rationale
+
+* Single run avoids GitHub's multi-run rejection
+* Small rule set enables priority-based filtering without complexity
+* Content-based fingerprints survive line changes
+* Task IDs (when present) provide perfect stability
+* Excluding path from ID-based fingerprints ensures stability when files are moved/renamed
+
+=== Consequences
+
+* Positive: GitHub alerts remain stable across refactoring
+* Positive: Priority-based filtering works in GitHub UI
+* Positive: Compliant with 2025 SARIF handling changes
+* Negative: Fingerprint can change if task text is edited (acceptable)
+* Mitigation: Encourage task IDs for critical tasks
+
+---
+
+== ADR-003: Task State Machine Design
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+The current plugin only knows two states: complete (`[x]`) and incomplete (`[ ]`).
+Real projects need richer states:
+
+* Tasks blocked by external factors
+* Tasks actively being worked on
+* Tasks explicitly abandoned (vs. silently deleted)
+
+Taskwarrior and similar tools demonstrate the value of explicit states.
+
+=== Decision
+
+*Use inline state tags while preserving GFM checkbox semantics*
+
+[source,markdown]
+----
+- [ ] (TDQ-0123) [S:blocked] [B:waiting-on-api] Task description
+- [ ] (TDQ-0124) [S:in-progress] [O:@alice] Another task
+- [x] (TDQ-0125) Completed task
+- [-] (TDQ-0126) [S:dropped] Abandoned task
+----
+
+=== State Machine Implementation
+
+Use `enum State` + `EnumMap<State, EnumSet<State>>` for allowed transitions:
+
+[source,java]
+----
+enum State { OPEN, IN_PROGRESS, BLOCKED, DONE, DROPPED }
+
+Map<State, Set<State>> allowed = new EnumMap<>(State.class);
+allowed.put(OPEN, EnumSet.of(IN_PROGRESS, BLOCKED, DONE, DROPPED));
+allowed.put(IN_PROGRESS, EnumSet.of(OPEN, BLOCKED, DONE, DROPPED));
+allowed.put(BLOCKED, EnumSet.of(OPEN, IN_PROGRESS, DONE, DROPPED));
+// DONE and DROPPED are terminal (or allow reopen)
+----
+
+Validate transitions at write-back time, not during parsing.
+
+=== Consequences
+
+* Positive: Preserves GFM rendering (GitHub shows checkboxes correctly)
+* Positive: State tags are ignored by markdown renderers
+* Positive: Extensible: new states can be added without breaking existing files
+* Negative: Slightly noisier markdown
+* Mitigation: Tags are optional; simple projects can ignore them
+
+---
+
+== ADR-004: Task ID Policy
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+Stable identification is critical for:
+
+* SARIF fingerprinting
+* Dependency references
+* AI session continuity across context resets
+* Multi-agent coordination (claim/release)
+* Long-term tracking and metrics
+
+Line numbers are unstable.
+Text matching is fragile.
+
+=== Decision
+
+*Dual ID system: human-friendly ID + UUID*
+
+* **Human ID**: `TDQ-0123` (project prefix + 4-digit number) for grepping/UX
+* **UUID**: RFC 4122 UUID for global uniqueness in multi-agent creation
+
+Rules:
+
+1. Tasks without IDs work fine for simple tracking
+2. If ANY task uses `[D:...]`, ALL tasks MUST have human IDs
+3. Duplicate IDs are an error
+4. Auto-ID generation available as opt-in mode
+5. UUIDs assigned automatically when multi-agent mode enabled
+
+=== Rationale
+
+* Low friction for getting started (no IDs required)
+* Progressive complexity as project needs grow
+* Fixed-width human ID format enables easy grepping
+* UUIDs prevent collision in parallel multi-agent task creation
+
+=== Consequences
+
+* Positive: Backward compatible with existing files
+* Positive: Dependencies work reliably
+* Positive: Multi-agent coordination without ID collision
+* Negative: Must validate ID uniqueness
+* Negative: Manual ID assignment can be tedious
+
+---
+
+== ADR-005: Dependency Model and Graph Algorithms
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+Task ordering matters for:
+
+* AI agents selecting next work item
+* Humans understanding critical path
+* Build failures on dependency violations
+
+Taskwarrior demonstrates "blocked" vs "ready" as core workflow concepts.
+
+=== Decision
+
+*Explicit inline dependencies with two-phase algorithm*
+
+[source,markdown]
+----
+- [ ] (TDQ-0123) [D:TDQ-0107,TDQ-0110] Depends on two tasks
+----
+
+Graph algorithms:
+
+1. **Ordering**: Kahn's algorithm for topological sort (great for "a cycle exists" detection)
+2. **Cycle reporting**: If Kahn fails, run Tarjan SCC on remaining subgraph for precise cycle set
+
+Deterministic tie-break when multiple nodes ready:
+
+* Priority (P1 before P2)
+* Then ID lexical order
+
+=== Rationale
+
+* Kahn is simple and detects cycles
+* Tarjan provides exact cycle members for actionable error messages
+* Deterministic ordering prevents AI "next task" oscillations
+
+=== Critical Path Analysis
+
+Compute longest weighted path using effort tokens:
+
+* S = 1, M = 3, L = 8 (Fibonacci-ish)
+* Report critical chain and top 5 gating tasks
+
+=== Consequences
+
+* Positive: Clear dependency visualization
+* Positive: AI can select unblocked tasks only
+* Positive: Mermaid graphs auto-generated
+* Negative: ID requirement when using dependencies
+* Negative: Must implement cycle detection
+
+---
+
+== ADR-006: Branch-Aware Gating Strategy
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+Build failures on TODO items should be:
+
+* Strict on protected branches (main, release/*)
+* Lenient during development (feature branches)
+* Configurable per-project and per-CI
+
+GitHub protected branches require passing status checks.
+
+=== Decision
+
+*Use Maven profiles, configured externally; plugin stays pure*
+
+Profiles:
+
+* `todo-warn` - default, logs warnings only
+* `todo-gate` - fails build on incomplete tasks
+
+The plugin does NOT detect branches.
+CI workflow selects profile.
+
+[source,yaml]
+----
+# GitHub Actions example
+- name: Verify (gated)
+  if: github.ref == 'refs/heads/main'
+  run: mvn verify -Ptodo-gate
+
+- name: Verify (warning only)
+  if: github.ref != 'refs/heads/main'
+  run: mvn verify -Ptodo-warn
+----
+
+=== Exception Handling
+
+* `MojoFailureException`: checks failed (build should fail)
+* `MojoExecutionException`: plugin couldn't run (unexpected error)
+
+=== Consequences
+
+* Positive: Simple plugin implementation
+* Positive: Works with existing Maven profile mechanisms
+* Positive: CI has full control over behavior
+* Negative: Requires CI configuration (documented templates provided)
+
+=== GitHub Integration Notes
+
+* Required checks must pass within last 7 days to be selectable
+* Run `todo-gate` on schedule (weekly) to keep check "known"
+* Use unique job names to avoid ambiguous check requirements
+
+---
+
+== ADR-007: Markdown Parser Selection
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+The plugin needs to parse TODO.md files.
+Options:
+
+* Custom regex-based parsing (current)
+* Full markdown AST library
+
+Future needs include:
+
+* Source-accurate edits for auto-ID write-back
+* Error recovery (never fail to parse)
+* Extension points for metadata tokens
+
+=== Decision
+
+*Use flexmark-java for markdown parsing*
+
+Strategy:
+
+* Use flexmark for structure (lists, headings, task items)
+* Parse metadata tokens (`[P1]`, `[E:M]`, etc.) with micro-regex after AST extraction
+* Only formalize grammar (ANTLR/PEG) if metadata grows into nested constructs
+
+=== Error Recovery
+
+Follow "infallible/lossless" tree philosophy (Roslyn red/green tree):
+
+* Always produce syntax tree, even with errors
+* Attach error nodes/trivia for precise diagnostics
+* Never "fail to parse TODO.md"
+* Treat malformed metadata as validation finding, not parser crash
+
+=== Consequences
+
+* Positive: Source-accurate positions for write-back
+* Positive: Robust extension mechanism
+* Positive: Battle-tested library
+* Negative: Additional dependency
+* Mitigation: flexmark is widely used and actively maintained
+
+---
+
+== ADR-008: MCP Transport Architecture
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+The plugin needs to integrate with AI tools via MCP (Model Context Protocol).
+MCP defines two standard transports:
+
+* STDIO: local subprocess, newline-delimited JSON-RPC
+* Streamable HTTP: remote, HTTP POST/GET + optional SSE
+
+Different use cases need different transports.
+
+=== Decision
+
+*Support both STDIO and Streamable HTTP transports*
+
+Architecture:
+
+[source]
+----
+todo-tracker/
+├── todo-core/          # Shared library (parser, model, graph)
+├── todo-maven-plugin/  # Maven Mojo
+├── todo-mcp-stdio/     # STDIO transport server
+└── todo-mcp-http/      # Streamable HTTP transport server
+----
+
+Both servers share the same core logic; only transport differs.
+
+=== Transport Bridge
+
+For clients that only speak STDIO but need remote coordination:
+
+* Use `mcp-proxy` to bridge STDIO <-> Streamable HTTP
+* Document integration patterns
+
+=== Consequences
+
+* Positive: Works with any MCP-compatible client
+* Positive: Supports both local and remote scenarios
+* Positive: Core logic shared, minimal duplication
+* Negative: Two deployment modes to test
+* Mitigation: Transport is thin wrapper; bulk of testing is on core
+
+---
+
+== ADR-009: Multi-Agent Claim Protocol
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+When multiple AI agents work on the same project:
+
+* Two agents might try to work on the same task
+* An agent might crash mid-task, leaving it "locked"
+* Progress must be preserved across agent sessions
+
+=== Decision
+
+*Lease-based claiming inspired by SQS visibility timeout*
+
+Protocol:
+
+[source,java]
+----
+ClaimResult todo_claim(String taskId, int leaseSeconds);
+// Returns: {ok, leaseUntil, leaseToken, claimedBy}
+// Or: {alreadyClaimed, currentHolder, leaseUntil}
+
+void todo_renew(String taskId, String leaseToken, int additionalSeconds);
+void todo_release(String taskId, String leaseToken);
+void todo_update_state(String taskId, String leaseToken,
+                       State newState, int expectedRevision);
+----
+
+Rules:
+
+* Lease expires automatically if agent crashes (no stale locks)
+* All mutations require valid `leaseToken` (prevents stale agents overwriting)
+* Return monotonic `revision` for optimistic CAS
+* Agent must renew lease periodically for long-running work
+
+=== Agent Identification
+
+* `agent_family = clientInfo.name` (from MCP initialization)
+* `agent_instance = agent_family + ":" + random_suffix`
+* Log all state changes with agent instance for audit
+
+=== Consequences
+
+* Positive: Self-healing (no manual lock cleanup)
+* Positive: Clear ownership during work
+* Positive: Audit trail of who did what
+* Negative: Agents must implement renewal
+* Mitigation: Default lease long enough for typical tasks (10 minutes)
+
+---
+
+== ADR-010: Attempt Logging (Reflexion Pattern)
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+AI agents fail and retry.
+Without memory of past attempts:
+
+* Same mistakes repeated
+* No learning across sessions
+* No debugging information for humans
+
+Research shows episodic memory improves AI performance (Reflexion paper).
+
+=== Decision
+
+*Append-only attempt logs per task in `.todo-tracker/attempts/`*
+
+Structure:
+
+[source]
+----
+.todo-tracker/
+├── attempts/
+│   ├── TDQ-0123.md
+│   └── TDQ-0124.md
+├── agents/
+│   └── claude-abc123.json
+└── events.log
+----
+
+Attempt log format:
+
+[source,markdown]
+----
+## Attempt 1 - 2025-12-25T14:00:00Z
+Agent: claude-code:session-abc
+Duration: 5m32s
+Outcome: FAILED
+
+### What was tried
+- Modified src/main/java/Foo.java
+- Added retry logic
+
+### Errors encountered
+```
+java.lang.NullPointerException at Foo.java:45
+```
+
+### Blockers identified
+- Missing configuration
+
+---
+----
+
+=== Consequences
+
+* Positive: Failures become learning opportunities
+* Positive: Human-readable for debugging
+* Positive: Git-tracked for history
+* Negative: Disk space accumulates
+* Mitigation: Add retention policy (keep last N attempts, or prune after task done)
+
+---
+
+== ADR-011: Security Posture
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+The plugin handles:
+
+* User-authored task text (potential injection)
+* File system access (path traversal risk)
+* Network exposure (Streamable HTTP transport)
+
+OWASP identifies prompt injection and insecure output handling as top LLM risks.
+
+=== Decision
+
+*Defense in depth with explicit trust boundaries*
+
+==== Task Text as Untrusted Data
+
+* Plugin MUST NOT execute or interpret task content
+* AI tools should treat task text as data, not instructions
+* Structured prompts keep instructions separate from data
+
+==== File System Security
+
+* File references validated against path traversal (`../` patterns)
+* SARIF output uses repo-relative paths only
+* Atomic writes (write temp + atomic move) prevent corruption
+
+==== Streamable HTTP Security
+
+* MUST validate `Origin` header (DNS rebinding protection)
+* MUST bind to `127.0.0.1` for local-only mode
+* MUST require authentication for non-local endpoints
+* SHOULD use OAuth 2.1 per MCP authorization spec
+
+=== Consequences
+
+* Positive: Clear security model
+* Positive: Aligns with MCP security recommendations
+* Negative: Auth adds deployment complexity for HTTP mode
+* Mitigation: STDIO mode requires no auth (local trust)
+
+---
+
+== ADR-012: Incremental Build Support
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+Full re-parsing on every build is wasteful.
+Build systems like Gradle and Bazel demonstrate incremental approaches.
+
+=== Decision
+
+*Build-level incrementality with file hash cache*
+
+Cache key: `(path, size, lastModified)` or `(path, contentHash)`
+
+Store cache in `target/.todo-tracker-cache.json`
+
+For IDE integration, optionally use BuildContext (designed to be safe even outside Eclipse).
+
+=== Graph Incrementality
+
+For dependency graphs:
+
+* Maintain adjacency + indegree + "ready set"
+* On task change, update only affected nodes (reverse transitive closure)
+* Inspired by Bazel Skyframe incremental evaluation
+
+=== Consequences
+
+* Positive: Fast incremental builds
+* Positive: IDE-friendly
+* Negative: Cache invalidation complexity
+* Mitigation: Conservative invalidation (hash mismatch = re-parse)
+
+---
+
+== ADR-013: Testing Strategy
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+The plugin has multiple components requiring different testing approaches:
+
+* Parser (edge cases, malformed input)
+* Graph algorithms (cycles, ordering)
+* Serializers (JSON, SARIF output)
+* Maven integration (Mojo wiring)
+* End-to-end (real builds)
+
+=== Decision
+
+*Multi-level testing pyramid with specialized tools*
+
+[cols="1,2,2"]
+|===
+|Level |Tool |Purpose
+
+|Unit
+|JUnit 5 + jqwik
+|Parser, graph, serializers; property-based for edge cases
+
+|Integration
+|Maven Plugin Testing Harness
+|Mojo wiring, configuration
+
+|End-to-End
+|Maven Invoker Plugin
+|Real reactor builds
+
+|Mutation
+|PIT/pitest
+|Validate test quality
+
+|Approval
+|ApprovalTests
+|Golden-master for output formats
+
+|Fuzz
+|Jazzer
+|Parser robustness
+|===
+
+=== Mutation Testing
+
+Use the `pitest` profile for mutation testing:
+
+* Run with `mvn -Ppitest verify`
+* Tools: `pitest-maven` 1.22.0 and `pitest-junit5-plugin` 1.2.3
+* Scope: `net.openhft.todotracker.**`
+* Exclusions: `net.openhft.todotracker.maven.HelpMojo` (generated help output)
+* Thresholds: mutation 85%, coverage 95%
+* Output formats: HTML and XML under `target/pit-reports`
+* `fullMutationMatrix=true` for accurate test selection
+
+=== Property-Based Testing
+
+Use jqwik to generate:
+
+* Random TODO.md content (bullets, checkboxes, metadata tokens)
+* Random dependency graphs (with/without cycles)
+* Random malformed input
+
+Assert invariants:
+
+* Never crash on any input
+* Stable IDs preserved on round-trip
+* Valid graphs have valid topological order
+
+=== Consequences
+
+* Positive: Comprehensive coverage
+* Positive: Catches edge cases humans wouldn't write
+* Positive: Regression protection for output formats
+* Negative: More test infrastructure
+* Mitigation: Start with unit + invoker; add others incrementally
+
+---
+
+== Decision Summary
+
+[cols="1,3,1"]
+|===
+|ADR |Decision |Impact
+
+|001
+|Four output formats (Text, JSON, SARIF, NDJSON)
+|High
+
+|002
+|Content-based SARIF fingerprints, single run
+|Medium
+
+|003
+|Inline state tags preserving GFM
+|High
+
+|004
+|Dual ID system (human + UUID)
+|High
+
+|005
+|Kahn + Tarjan for dependencies, deterministic ordering
+|High
+
+|006
+|Maven profiles for branch-aware gating
+|Medium
+
+|007
+|flexmark-java for markdown parsing
+|Medium
+
+|008
+|Both STDIO and Streamable HTTP transports
+|High
+
+|009
+|Lease-based claiming with auto-expiry
+|High
+
+|010
+|Append-only attempt logs (Reflexion pattern)
+|Medium
+
+|011
+|Defense in depth security posture
+|High
+
+|012
+|File hash cache for incremental builds
+|Medium
+
+|013
+|Multi-level testing pyramid with property-based testing
+|Medium
+|===
+
+== ADR-014: Performance Benchmarking Strategy
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+The plugin competes with simple CLI workflows (`rg`, `git diff`, `sed`).
+Users need assurance that the tool adds value without significant performance penalty.
+Key questions:
+
+* Is the tool fast enough for interactive use?
+* Where does time go (Maven startup vs actual work)?
+* When should users prefer MCP daemon vs Maven goal?
+
+=== Decision
+
+*Three-layer benchmarking with CLI baseline comparisons*
+
+==== Layer 1: End-to-End (User-Visible)
+
+Use hyperfine for CLI command benchmarking:
+
+[source,bash]
+----
+# Compare against CLI baseline
+hyperfine --warmup 3 --runs 20 \
+  --export-json target/bench-list.json \
+  'rg -n "^- \[ \]" TODO.md' \
+  'mvn -q -DskipTests todo-tracker:list'
+----
+
+hyperfine provides:
+
+* Warmup runs for cache filling
+* Statistical analysis (mean, stddev, min, max)
+* JSON export for tracking
+* Outlier detection
+
+==== Layer 2: Maven Startup Tax Separation
+
+Use Maven profilers to isolate mojo time:
+
+* `takari/maven-profiler` for per-mojo timing
+* `maven-buildtime-extension` for goal duration logging
+
+If mojo is fast but `mvn` is slow, that signals:
+
+* Maven plugin for CI gating
+* MCP server or standalone CLI for interactive use
+
+==== Layer 3: Core Engine Microbenchmarks (JMH)
+
+Use JMH for JVM microbenchmarks:
+
+[source,java]
+----
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Warmup(iterations = 3)
+@Measurement(iterations = 5)
+public class ParserBenchmark {
+    @Benchmark
+    public List<TodoTask> parseTodoFile() {
+        return parser.parse(todoContent);
+    }
+}
+----
+
+Benchmark targets:
+
+* Parse TODO.md → tasks
+* Validate → diagnostics
+* Compute "ready tasks" (toposort + tie-break)
+* Generate JSON/SARIF/console rendering
+
+==== Layer 4: MCP Transport Benchmarks
+
+**STDIO mode**: Custom harness measuring round-trip latency per tool call (start server once, call N times, record p50/p95)
+
+**HTTP mode**: Use wrk/wrk2 for load testing:
+
+[source,bash]
+----
+wrk -t4 -c100 -d30s http://127.0.0.1:8080/mcp/todo_list
+----
+
+=== Decision Framework
+
+[cols="1,2"]
+|===
+|Scenario |Guidance
+
+|One-shot operation (list, check)
+|Must be within 2x of CLI baseline OR provide extra value
+
+|Repeated operations (agents polling)
+|Measure in persistent mode; must beat Maven spawn by 10x
+
+|Interactive actions
+|Push toward MCP/standalone CLI
+
+|CI gating
+|Keep in Maven for build lifecycle integration
+|===
+
+=== Profiling When Slow
+
+Use async-profiler for hotspot analysis:
+
+[source,bash]
+----
+java -agentpath:/path/to/libasyncProfiler.so=start,file=profile.html \
+     -jar target/benchmarks.jar
+----
+
+This reveals:
+
+* Markdown parsing overhead
+* Allocation hotspots (string churn, token objects)
+* File I/O bottlenecks
+
+=== Consequences
+
+* Positive: Clear performance expectations
+* Positive: Regression prevention
+* Positive: Data-driven transport/packaging decisions
+* Negative: Benchmark suite maintenance
+* Mitigation: Run benchmarks on CI, store baselines in repo
+
+---
+
+== ADR-015: Polish Roadmap and Implementation Order
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+Multiple enhancement areas identified:
+
+* Parser refinements
+* Developer experience (CLI goals)
+* CI/CD polish (hooks, PR comments)
+* IDE integration
+* Multi-agent coordination
+* Observability
+* Ecosystem expansion (Gradle, standalone CLI)
+
+Need to sequence these to maximize value with minimal rework.
+
+=== Decision
+
+*Ordered phases: Foundations → DX → CI → IDE → Multi-Agent → Ecosystem*
+
+==== Phase 1: Parser Foundation (Prerequisite for Everything)
+
+* Treat GFM task lists as reference dialect
+* Migrate from regex to flexmark-java AST
+* Core refinements:
+** Nested tasks (indent-aware context)
+** Ignore code fences (avoid false positives)
+** Cancelled tasks via strikethrough / `[S:dropped]`
+** Duplicate ID + orphan dependency validation
+
+Deliverable: `todo-tracker-core` module exporting `TodoTask`, parser, validators, report model.
+
+==== Phase 2: Developer Experience (Maven Goals)
+
+Add CLI-friendly goals:
+
+* `todo-tracker:list` (filters: `--state=open`, `--priority=P1`)
+* `todo-tracker:next` (deterministic ordering)
+* `todo-tracker:claim` / `:done` / `:release`
+* `todo-tracker:init` (templates)
+* `todo-tracker:doctor` (prints setup steps for Codex/Claude/Gemini)
+
+Use Maven's property binding (`@Parameter(property="task")`) for `-Dtask=TDQ-0123`.
+
+Optional: Lanterna for interactive TUI mode.
+
+Deliverable: "Everyday commands" section in user guide.
+
+==== Phase 3: CI/CD Polish
+
+* Git hooks: pre-commit/pre-push for claim validation
+* Merge driver: `.gitattributes` recommendation for TODO.md conflicts
+* PR comments via GitHub Actions `actions/github-script`
+* SARIF upload for inline PR annotations
+
+Deliverable: `docs/ci/github-actions.adoc` with copy/paste workflow.
+
+==== Phase 4: IDE Integration
+
+Start lightweight, grow to LSP:
+
+**VS Code (high ROI)**:
+
+* Tree view (`TreeDataProvider`)
+* Quick pick for claim/next/done
+* Low barrier to entry
+
+**IntelliJ (targeted)**:
+
+* Tool Window + basic actions
+* Custom language support for tags if needed
+
+**LSP (best long-term)**:
+
+* Use lsp4j for Java implementation
+* Enables autocomplete/hover across all editors
+
+Deliverable: Choose "VS Code first + LSP second".
+
+==== Phase 5: Multi-Agent / MCP Polish
+
+* Build on lease-based claim semantics
+* Add attempt logs for agent memory/handoff
+* Start with read-only MCP resources
+* Add claim/update tools with leaseToken enforcement
+* Document partitioned, claim-based, pipeline, and supervisor patterns
+
+Deliverable: MCP server (STDIO first, then HTTP) + `todo-tracker:doctor`.
+
+==== Phase 6: Observability (Sustain What You Add)
+
+* For MCP server/daemon: Micrometer Prometheus registry + scrape endpoint
+* For Maven plugin: file outputs (`target/todo-metrics.json`) rather than always-on endpoint
+* CI publishes metrics as build artefacts
+
+Deliverable: `target/todo-metrics.json` + optional Prometheus for MCP.
+
+==== Phase 7: Ecosystem Expansion (After Core Stable)
+
+**Issue tracker sync**:
+
+* Start one-way (TODO → GitHub issue) before bidirectional
+* Use GitHub REST API for issues/labels/assignees
+
+**Gradle plugin**:
+
+* Extract `todo-tracker-core` module
+* Create `todo-tracker-gradle-plugin` using Gradle plugin-development plugin
+
+**Standalone CLI**:
+
+* Use Picocli for argument parsing
+* GraalVM native-image for fast startup
+* NPM package for Node.js projects (wrapper)
+
+=== Rationale
+
+* Foundations first: parser stability unlocks everything else
+* DX before ecosystem: make Maven users happy first
+* CI polish keeps gating useful
+* IDE integration grows from lightweight to full LSP
+* Multi-agent coordination requires stable core primitives
+* Ecosystem expansion builds on proven core
+
+=== Consequences
+
+* Positive: Clear priorities, minimal rework
+* Positive: Each phase has clear deliverables
+* Positive: Users get value incrementally
+* Negative: Full vision takes time
+* Mitigation: Each phase is independently useful
+
+---
+
+== ADR-016: Core Module Extraction
+
+*Status:* Accepted +
+*Date:* 2025-12-25 +
+*Deciders:* Project maintainers
+
+=== Context
+
+Multiple delivery targets need the same core logic:
+
+* Maven plugin
+* Gradle plugin
+* MCP STDIO server
+* MCP HTTP server
+* Standalone CLI
+
+=== Decision
+
+*Extract `todo-tracker-core` as shared library*
+
+Module structure:
+
+[source]
+----
+todo-tracker/
+├── todo-tracker-core/          # Shared library (no Maven/Gradle deps)
+│   ├── parser/
+│   ├── model/
+│   ├── graph/
+│   ├── validators/
+│   └── serializers/
+├── todo-tracker/               # Maven Mojo (current, includes core)
+├── todo-tracker-gradle/        # Gradle task (future)
+├── todo-tracker-mcp/           # MCP servers (future)
+└── todo-tracker-cli/           # Standalone CLI (future)
+----
+
+=== Consequences
+
+* Positive: Single source of truth for parsing/validation
+* Positive: Enables Gradle, CLI, MCP without duplication
+* Positive: Core can be tested independently
+* Negative: Multi-module build complexity
+* Mitigation: Start with single module, extract when second consumer needed
+
+---
+
+== Decision Summary
+
+[cols="1,3,1"]
+|===
+|ADR |Decision |Impact
+
+|001
+|Four output formats (Text, JSON, SARIF, NDJSON)
+|High
+
+|002
+|Content-based SARIF fingerprints, single run
+|Medium
+
+|003
+|Inline state tags preserving GFM
+|High
+
+|004
+|Dual ID system (human + UUID)
+|High
+
+|005
+|Kahn + Tarjan for dependencies, deterministic ordering
+|High
+
+|006
+|Maven profiles for branch-aware gating
+|Medium
+
+|007
+|flexmark-java for markdown parsing
+|Medium
+
+|008
+|Both STDIO and Streamable HTTP transports
+|High
+
+|009
+|Lease-based claiming with auto-expiry
+|High
+
+|010
+|Append-only attempt logs (Reflexion pattern)
+|Medium
+
+|011
+|Defense in depth security posture
+|High
+
+|012
+|File hash cache for incremental builds
+|Medium
+
+|013
+|Multi-level testing pyramid with property-based testing
+|Medium
+
+|014
+|Three-layer benchmarking with CLI baselines
+|High
+
+|015
+|Ordered polish roadmap: Foundation → DX → CI → IDE → MCP → Ecosystem
+|High
+
+|016
+|Core module extraction for multi-platform delivery
+|High
+|===
+
+== Future Decisions Pending
+
+* *ADR-017*: Attempt log retention and cleanup policy
+* *ADR-018*: Multi-module aggregation strategy (reactor-aware)
+* *ADR-019*: Issue tracker synchronization approach
+* *ADR-020*: Metrics export format (Prometheus, OpenMetrics)
+* *ADR-021*: CRDT exploration for offline-first scenarios
+* *ADR-022*: Work-stealing scheduler for parallel agents

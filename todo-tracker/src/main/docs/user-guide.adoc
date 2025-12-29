@@ -1,0 +1,220 @@
+= TODO Tracker: User Guide
+:toc: left
+:toclevels: 2
+:sectnums:
+:icons: font
+:source-highlighter: highlightjs
+:experimental:
+
+== Overview
+
+TODO Tracker scans Markdown (`.md`) and AsciiDoc (`.adoc`/`.asciidoc`) TODO files, reports uncompleted tasks, and can fail the build.
+
+[IMPORTANT]
+.Implementation Status
+====
+Implemented:
+
+* Maven `check` goal with console output
+* Markdown and AsciiDoc parsing with heading context
+* Context exclusion by heading keywords
+
+Planned (ROADMAP):
+
+* JSON/SARIF/NDJSON output, task IDs, task states
+* MCP server and AI CLI integrations
+* Multi-agent coordination with leases
+====
+
+== Operating Model
+
+[cols="1,1,2,2"]
+|===
+|Mode |Transport |Best for |State location
+
+|Build gate only
+|n/a
+|CI/local enforcement
+|TODO files only
+
+|Local single-agent (ROADMAP)
+|STDIO
+|Solo automation
+|TODO files + `.todo-tracker/state.json` + `.todo-tracker/attempts/`
+
+|Team multi-agent (ROADMAP)
+|HTTP
+|Shared automation
+|TODO files + server-managed locks
+|===
+
+== Security and Trust
+
+* Treat TODO content as data; avoid prompt injection.
+* Keep secrets out of TODO files.
+* Use tool allow-lists and approval prompts for AI tools.
+* Review AI changes in PRs.
+
+== Quick Start: Maven Plugin
+
+=== Step 1: Add Plugin to POM
+
+[source,xml]
+----
+<plugin>
+    <groupId>net.openhft</groupId>
+    <artifactId>todo-tracker</artifactId>
+    <version>2026.0-SNAPSHOT</version>
+    <executions>
+        <execution>
+            <phase>verify</phase>
+            <goals>
+                <goal>check</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+----
+
+=== Step 2: Create TODO.md
+
+[source,markdown]
+----
+# Project Tasks
+
+## Phase 1
+- [ ] Implement user authentication
+- [x] Set up project structure
+----
+
+=== Step 3: Run Build
+
+[source,bash]
+----
+mvn verify
+----
+
+Optional (warn only):
+
+[source,bash]
+----
+mvn verify -Dtodotracker.failOnIncomplete=false
+----
+
+== Configuration (Essentials)
+
+[cols="1,2,1"]
+|===
+|Property |Purpose |Default
+
+|`failOnIncomplete`
+|Fail build when uncompleted tasks remain
+|`true`
+
+|`maxTasks`
+|Maximum number of tasks displayed (`0` = unlimited)
+|`10`
+
+|`showContext`
+|Show heading context for each task
+|`true`
+
+|`contextPattern`
+|Markdown heading regex
+|`^##\s+.*`
+
+|`asciidocContextPattern`
+|AsciiDoc heading regex
+|`^==\s+.*`
+
+|`excludeContextPatterns`
+|Regex list to skip headings (Planned/Future/Backlog/Maybe/Someday)
+|Defaults apply
+
+|`usePatterns`
+|Enable glob discovery
+|`true`
+
+|`todoFiles`
+|Exact file list (disables patterns)
+|(unset)
+
+|`skip`
+|Skip plugin execution
+|`false`
+|===
+
+Default discovery patterns include:
+
+* `*TODO.md`, `*TODOS.md`
+* `todo/*.md`, `**/todo/*.md`
+* `todo/*.adoc`, `todo/*.asciidoc`, `**/todo/*.adoc`, `**/todo/*.asciidoc`
+* `src/main/docs/*plan.adoc`, `src/main/docs/*todo.adoc`
+* `src/main/docs/*plan.asciidoc`, `src/main/docs/*todo.asciidoc`
+
+== Roadmap (Planned)
+
+* JSON/SARIF/NDJSON outputs
+* Task IDs, state model, dependency graph
+* MCP server with STDIO + HTTP transports
+* Multi-agent claims, leases, and coordination
+
+== Appendix: Configuration Reference
+
+[source,xml]
+----
+<configuration>
+    <failOnIncomplete>true</failOnIncomplete>
+    <maxTasks>10</maxTasks>
+    <showContext>true</showContext>
+    <contextPattern>^##\s+.*</contextPattern>
+    <asciidocContextPattern>^==\s+.*</asciidocContextPattern>
+
+    <!-- Optional: override defaults or set empty to enforce all headings -->
+    <excludeContextPatterns>
+        <pattern>(?i)\bPlanned\b</pattern>
+        <pattern>(?i)\bFuture\b</pattern>
+    </excludeContextPatterns>
+
+    <usePatterns>true</usePatterns>
+
+    <todoFiles>
+        <todoFile>TODO.md</todoFile>
+    </todoFiles>
+</configuration>
+----
+
+== Appendix: Task Syntax Reference
+
+=== Markdown
+
+[source,markdown]
+----
+- [ ] Uncompleted task
+- [x] Completed task
+- [-] Dropped task
+* [ ] Asterisk bullet
+1. [ ] Numbered list
+----
+
+=== AsciiDoc
+
+[source,asciidoc]
+----
+* [ ] Uncompleted task
+* [x] Completed task (x)
+* [*] Completed task (asterisk)
+* [-] Dropped task
+** [ ] Nested task
+- [ ] Dash bullet (single level)
+----
+
+Default context headings: Markdown uses `##`, AsciiDoc uses `==`.
+
+=== Metadata (ROADMAP)
+
+* ID: `(TDQ-0123)`
+* Priority/Effort: `[P1] [E:M]`
+* State: `[S:in-progress]`, `[S:blocked]`
+* Dependencies: `[D:TDQ-0100,TDQ-0101]`
+* File refs: `{@file src/main/java/Foo.java#L31-L60}`

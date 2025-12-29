@@ -1,0 +1,49 @@
+= TODO Tracker: Package Restructuring Plan
+:toc: left
+:toclevels: 2
+:sectnums:
+
+== Overview
+
+This plan separates core logic from Maven-specific wiring while keeping behavior stable.
+
+=== Current State
+
+[source]
+----
+artifactId: todo-tracker-maven-plugin
+package:    net.openhft.maven.todotracker
+
+Structure:
+net.openhft.maven.todotracker/
+├── CheckTodoMojo.java
+├── model/
+├── parser/
+├── locator/
+└── reporter/
+----
+
+=== Target State
+
+[source]
+----
+artifactId: todo-tracker
+package:    net.openhft.todotracker (core)
+            net.openhft.todotracker.maven (maven)
+
+Structure:
+net.openhft.todotracker/
+├── model/
+├── parser/
+├── locator/
+├── reporter/
+└── maven/
+    └── CheckTodoMojo.java
+----
+
+== Steps
+
+1. Update `pom.xml` (artifactId, name, description).
+2. Move classes to `net.openhft.todotracker` and `net.openhft.todotracker.maven`.
+3. Update imports and test packages.
+4. Run module tests to verify behavior remains unchanged.

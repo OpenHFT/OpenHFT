@@ -1,0 +1,81 @@
+= TODO Tracker: Implementation and Testing Plan
+:toc: left
+:toclevels: 2
+:sectnums:
+:icons: font
+:source-highlighter: highlightjs
+
+== Summary
+
+This plan outlines a phased path from the current MVP to a full multi-agent task coordination system, with tests defined per phase.
+
+== Current State
+
+* Markdown/AsciiDoc checkbox parsing
+* Priority/effort tag extraction
+* Heading context capture
+* Console output and Maven integration
+* 80%+ line and branch coverage
+
+== Target State
+
+* Multi-format output (Text, JSON, SARIF, NDJSON)
+* Stable IDs and task state model
+* Dependencies and visualization
+* MCP server with STDIO + HTTP transports
+* Multi-agent leases and coordination
+
+== Phases
+
+=== Phase 1: Parser Foundation
+
+* Replace regex parsing with AST-based parser (flexmark)
+* Preserve source positions and context
+* Ignore code fences
+
+Tests: unit tests on fixtures, property tests for line numbers.
+
+=== Phase 2: Identity and State
+
+* Parse human IDs and assign UUIDs
+* Implement state model: open, in-progress, blocked, done, dropped
+* Persist metadata in `.todo-tracker/state.json`
+
+Tests: model validation, persistence round-trips, migration checks.
+
+=== Phase 3: Output and GitHub Integration
+
+* JSON + SARIF output with stable fingerprints
+* NDJSON streaming output
+
+Tests: schema validation, snapshot tests, SARIF validator checks.
+
+=== Phase 4: Dependencies and Visualization
+
+* Dependency parsing and validation
+* Topological ordering
+* Mermaid graph output
+
+Tests: cycle detection, ordering correctness, graph serialization.
+
+=== Phase 5: MCP Server (Single-Agent)
+
+* STDIO transport
+* Core tools and resources
+* Attempt logging
+
+Tests: protocol conformance, CLI integration smoke tests.
+
+=== Phase 6: Multi-Agent Coordination
+
+* HTTP transport
+* Lease/claim protocol
+* Conflict handling and recovery
+
+Tests: concurrency stress tests, lock cleanup scenarios.
+
+=== Phase 7: Advanced Features
+
+* Branch-aware gating
+* Incremental scanning and caching
+* Performance baselines and regression alerts
