@@ -146,7 +146,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -264,6 +264,7 @@
                     <skip>${pmd.skip}</skip>
                     <printFailingErrors>true</printFailingErrors>
                     <linkXRef>false</linkXRef>
+                    <outputFormat>xml</outputFormat>
                     <analysisCache>true</analysisCache>
                 </configuration>
                 <dependencies>
@@ -305,6 +306,15 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>quality</id>
+            <properties>
+                <quality.enforced>true</quality.enforced>
+            </properties>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
