@@ -27,12 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * See {@code SMOKE-TEST-004} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
+@DisplayName("MinimalSerializationSmokeTest")
 class MinimalSerializationSmokeTest {
 
     @Test
-    @DisplayName("JSONAssert can compare payloads")
+    @DisplayName("JSONAssert should compare identical JSON payloads")
     void jsonAssertWorks() throws Exception {
-        JSONAssert.assertEquals("{\"key\":1}", "{\"key\":1}", false);
+        JSONAssert.assertEquals("JSONAssert reports no diff for identical payloads",
+                "{\"key\":1}", "{\"key\":1}", false);
     }
 
     @Test
@@ -40,17 +42,17 @@ class MinimalSerializationSmokeTest {
     void snakeYamlParses() {
         Yaml yaml = new Yaml();
         Map<?, ?> parsed = yaml.load("name: demo");
-        assertEquals("demo", parsed.get("name"));
+        assertEquals("demo", parsed.get("name"), "SnakeYAML should parse key/value");
     }
 
     @Test
-    @DisplayName("Gson can serialise and deserialise")
+    @DisplayName("Gson should serialise and deserialise a simple payload")
     void gsonRoundTrips() {
         Gson gson = new Gson();
         SimplePojo pojo = new SimplePojo("gson");
         String json = gson.toJson(pojo);
         SimplePojo read = gson.fromJson(json, SimplePojo.class);
-        assertEquals(pojo.value, read.value);
+        assertEquals(pojo.value, read.value, "Gson should round-trip SimplePojo");
     }
 
     @Test
@@ -59,7 +61,7 @@ class MinimalSerializationSmokeTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonSchemaGenerator generator = new JsonSchemaGenerator(mapper);
         JsonSchema schema = generator.generateSchema(SimplePojo.class);
-        assertNotNull(schema);
+        assertNotNull(schema, "Jackson jsonSchema should generate schema for SimplePojo");
     }
 
     @Test
@@ -67,7 +69,7 @@ class MinimalSerializationSmokeTest {
     void jettisonBuildsJson() throws Exception {
         JSONObject object = new JSONObject();
         object.put("hello", "world");
-        assertEquals("world", object.getString("hello"));
+        assertEquals("world", object.getString("hello"), "Jettison should read inserted value");
     }
 
     /**
@@ -80,7 +82,7 @@ class MinimalSerializationSmokeTest {
         private final String value;
 
         /**
-         * Creates a SimplePojo with the given value.
+         * Creates a new instance using the supplied text value.
          *
          * @param newValue textual value
          */
@@ -89,7 +91,7 @@ class MinimalSerializationSmokeTest {
         }
 
         /**
-         * Default constructor for deserialisation.
+         * Default constructor required for deserialisation by Jackson.
          */
         @SuppressWarnings("unused")
         SimplePojo() {

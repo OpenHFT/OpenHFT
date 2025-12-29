@@ -22,24 +22,25 @@ import static org.junit.jupiter.api.Assertions.*;
  * See {@code SMOKE-TEST-008} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
+@DisplayName("MinimalDatabaseSmokeTest")
 class MinimalDatabaseSmokeTest {
 
     @Test
-    @DisplayName("Mongo ConnectionString parses without network")
+    @DisplayName("Mongo ConnectionString should parse database name offline")
     void mongoConnectionStringParses() {
         ConnectionString connectionString = new ConnectionString(
                 "mongodb://localhost:27017/testdb"
         );
-        assertEquals("testdb", connectionString.getDatabase());
+        assertEquals("testdb", connectionString.getDatabase(), "Mongo ConnectionString should parse database name");
     }
 
     @Test
-    @DisplayName("Mongo BSON Document works offline")
+    @DisplayName("Mongo BSON Document should store fields offline")
     void mongoBsonDocument() {
         Document document = new Document("hello", "world")
                 .append("_id", new ObjectId());
-        assertEquals("world", document.getString("hello"));
-        assertTrue(document.containsKey("_id"));
+        assertEquals("world", document.getString("hello"), "BSON document should return stored string");
+        assertTrue(document.containsKey("_id"), "BSON document should contain generated _id");
     }
 
     @Test
@@ -51,7 +52,7 @@ class MinimalDatabaseSmokeTest {
                 .applyConnectionString(connectionString)
                 .build();
         try (MongoClient client = MongoClients.create(settings)) {
-            assertNotNull(client.getDatabase("smoke"));
+            assertNotNull(client.getDatabase("smoke"), "Mongo sync client should provide database handle");
         }
     }
 
@@ -59,6 +60,6 @@ class MinimalDatabaseSmokeTest {
     @DisplayName("Legacy mongo-java-driver classes are present")
     void legacyMongoDriverPresent() throws Exception {
         Class<?> clazz = Class.forName("com.mongodb.MongoClient");
-        assertNotNull(clazz);
+        assertNotNull(clazz, "Legacy MongoClient class should be loadable");
     }
 }

@@ -5,32 +5,37 @@ package net.openhft.thirdparty.smoke;
 
 import com.google.common.testing.EqualsTester;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Smoke test for JetBrains annotations and Guava testlib.
+ * Smoke test that verifies JetBrains annotations and Guava testlib are usable.
  */
+@DisplayName("AnnotationsAndGuavaTestlibSmokeTest")
 class AnnotationsAndGuavaTestlibSmokeTest {
 
     @Test
+    @DisplayName("JetBrains @NotNull should be visible via reflection")
     void jetbrainsNotNullIsVisibleViaReflection() throws Exception {
         Method method = Person.class.getDeclaredMethod("getName");
-        assertNotNull(method);
+        assertNotNull(method, "reflection should find Person#getName");
         // JetBrains annotations are CLASS-retention; presence of the type is
         // sufficient to show dependency resolution.
-        assertNotNull(NotNull.class.getName());
+        assertNotNull(NotNull.class.getName(), "JetBrains NotNull type should be loadable");
     }
 
     @Test
+    @DisplayName("Guava EqualsTester should validate Person equals and hashCode contract")
     void guavaEqualsTesterValidatesEqualsContract() {
-        new EqualsTester()
+        assertDoesNotThrow(() -> new EqualsTester()
                 .addEqualityGroup(new Person("Alice"), new Person("Alice"))
                 .addEqualityGroup(new Person("Bob"))
-                .testEquals();
+                .testEquals(), "Guava EqualsTester should verify equality groups without exception");
     }
 
     /**
@@ -38,7 +43,7 @@ class AnnotationsAndGuavaTestlibSmokeTest {
      */
     static class Person {
         /**
-         * Person name.
+         * Name string used to identify the sample entry in tests.
          */
         private final String name;
 

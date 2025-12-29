@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * See {@code SMOKE-TEST-003} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
+@DisplayName("MinimalObservabilitySmokeTest")
 class MinimalObservabilitySmokeTest {
 
     /**
@@ -33,7 +34,7 @@ class MinimalObservabilitySmokeTest {
     private static final double DELTA = 0.0001d;
 
     @Test
-    @DisplayName("Prometheus counters can be registered")
+    @DisplayName("Prometheus registry should register a usable counter")
     void prometheusCountersCollect() {
         CollectorRegistry registry = new CollectorRegistry();
         Counter counter = Counter.build()
@@ -44,12 +45,12 @@ class MinimalObservabilitySmokeTest {
         Double value = registry.getSampleValue(
                 "third_party_smoke_counter_total"
         );
-        assertNotNull(value);
-        assertEquals(1.0, value, DELTA);
+        assertNotNull(value, "Prometheus counter should be registered and readable");
+        assertEquals(1.0, value, DELTA, "Prometheus counter should increment once");
     }
 
     @Test
-    @DisplayName("OpenTelemetry tracer provider initialises")
+    @DisplayName("OpenTelemetry tracer provider should initialise and start spans")
     void openTelemetryInitialises() {
         SdkTracerProvider provider = SdkTracerProvider.builder()
                 .setResource(Resource.getDefault())
@@ -59,7 +60,7 @@ class MinimalObservabilitySmokeTest {
                 .build();
         assertNotNull(sdk.getTracer("smoke")
                 .spanBuilder("hello-span")
-                .startSpan());
+                .startSpan(), "OpenTelemetry tracer should start a span");
         provider.close();
     }
 
@@ -72,6 +73,7 @@ class MinimalObservabilitySmokeTest {
         SdkTracerProvider provider = SdkTracerProvider.builder()
                 .addSpanProcessor(SimpleSpanProcessor.create(exporter))
                 .build();
+        assertNotNull(provider, "OTLP exporter wiring should produce a tracer provider");
         // No spans exported; this simply exercises wiring and shutdown paths
         provider.close();
     }

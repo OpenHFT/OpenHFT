@@ -31,10 +31,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * See {@code SMOKE-TEST-007} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
+@DisplayName("MinimalUtilitiesSmokeTest")
 class MinimalUtilitiesSmokeTest {
 
     /**
-     * Test value.
+     * Reference value used for utility smoke assertions.
      */
     private static final int TEST_VAL = 100;
 
@@ -52,32 +53,23 @@ class MinimalUtilitiesSmokeTest {
     private static final Integer QUICK_SORT_THIRD = 2;
 
     /**
-     * Values used for Koloboke map assertions.
-     */
-    private static final int KOLOBOKE_KEY = 7;
-
-    /**
-     * Stored value for Koloboke map assertions.
-     */
-    private static final int KOLOBOKE_VALUE = 11;
-
-    /**
      * CLI flag value used for JCommander parsing.
      */
     private static final String FLAG_VALUE = "value";
 
     @Test
-    @DisplayName("Trove4j map can be used")
+    @DisplayName("Trove4j map should store and return values")
     void troveMapUsage() {
         TIntIntHashMap map = new TIntIntHashMap();
         map.put(1, TEST_VAL);
-        assertEquals(TEST_VAL, map.get(1));
+        assertEquals(TEST_VAL, map.get(1), "Trove4j map should return stored value");
     }
 
     @Test
     @DisplayName("Commons Lang StringUtils can be used")
     void commonsLangUsage() {
-        assertEquals("test", StringUtils.trim(" test "));
+        String joined = StringUtils.join(new String[]{"a", "b", "c"}, ",");
+        assertEquals("a,b,c", joined, "Commons Lang should join strings with delimiter");
     }
 
     @Test
@@ -85,7 +77,7 @@ class MinimalUtilitiesSmokeTest {
     void commonsCliUsage() {
         Options options = new Options();
         options.addOption("t", "test", false, "test option");
-        assertEquals(1, options.getOptions().size());
+        assertNotNull(options.getOption("t"), "Commons CLI should register option");
     }
 
     @Test
@@ -97,21 +89,23 @@ class MinimalUtilitiesSmokeTest {
         JavaFile javaFile = JavaFile.builder("com.example.helloworld",
                         helloWorld)
                 .build();
-        assertNotNull(javaFile.toString());
+        String source = javaFile.toString();
+        assertTrue(source.contains("class HelloWorld"),
+                source + " should contain class HelloWorld");
     }
 
     @Test
     @DisplayName("Joda-Time DateTime can be instantiated")
     void jodaTimeUsage() {
         DateTime dt = new DateTime();
-        assertNotNull(dt.toString());
+        assertNotNull(dt, "Joda-Time DateTime should instantiate");
     }
 
     @Test
-    @DisplayName("Commons Email can be instantiated")
-    void commonsEmailUsage() throws Exception {
+    @DisplayName("Commons Email should construct without network access")
+    void commonsEmailUsage() {
         SimpleEmail email = new SimpleEmail();
-        assertNotNull(email);
+        assertNotNull(email, "Commons Email should instantiate");
     }
 
     @Test
@@ -121,34 +115,36 @@ class MinimalUtilitiesSmokeTest {
         byte[] compressed = Snappy.compress(
                 input.getBytes(StandardCharsets.UTF_8));
         byte[] uncompressed = Snappy.uncompress(compressed);
-        assertEquals(input, new String(uncompressed, StandardCharsets.UTF_8));
+        assertEquals(input, new String(uncompressed, StandardCharsets.UTF_8),
+                "Snappy should round-trip compressed bytes");
     }
 
     @Test
-    @DisplayName("ClassGraph can scan")
+    @DisplayName("ClassGraph should scan the classpath for classes")
     void classGraphScans() {
         try (io.github.classgraph.ScanResult scanResult =
                      new io.github.classgraph.ClassGraph()
                              .enableClassInfo()
                              .scan()) {
-            assertFalse(scanResult.getAllClasses().isEmpty());
+            assertFalse(scanResult.getAllClasses().isEmpty(), "ClassGraph should find classes on classpath");
         }
     }
 
     @Test
-    @DisplayName("JNA Native class is accessible")
+    @DisplayName("JNA Native constants should be accessible")
     void jnaAccess() {
-        assertNotNull(com.sun.jna.Native.POINTER_SIZE);
+        int pointerSize = com.sun.jna.Native.POINTER_SIZE;
+        assertTrue(pointerSize > 0, "JNA POINTER_SIZE should be > 0 but was " + pointerSize);
     }
 
     @Test
-    @DisplayName("JNR Runtime is accessible")
+    @DisplayName("JNR Runtime should be accessible for ffi")
     void jnrUsage() {
-        assertNotNull(jnr.ffi.Runtime.getSystemRuntime());
+        assertNotNull(jnr.ffi.Runtime.getSystemRuntime(), "JNR Runtime should be accessible");
     }
 
     @Test
-    @DisplayName("Samskivert QuickSort sorts arrays")
+    @DisplayName("Samskivert QuickSort should sort integer arrays")
     void samskivertQuickSort() {
         Integer[] nums = {
                 QUICK_SORT_FIRST,
@@ -156,25 +152,25 @@ class MinimalUtilitiesSmokeTest {
                 QUICK_SORT_THIRD
         };
         QuickSort.sort(nums);
-        assertEquals(QUICK_SORT_SECOND, nums[0]);
-        assertEquals(QUICK_SORT_FIRST, nums[2]);
+        assertEquals(QUICK_SORT_SECOND, nums[0], "QuickSort should order smallest first");
+        assertEquals(QUICK_SORT_THIRD, nums[1], "QuickSort should order middle value second");
     }
 
     @Test
     @DisplayName("Koloboke map factory class is accessible")
     void kolobokeMapFactoryAccessible() {
-        assertNotNull(HashIntIntMaps.class.getName());
+        assertNotNull(HashIntIntMaps.class.getName(), "Koloboke factory class should be loadable");
     }
 
     @Test
-    @DisplayName("JCommander parses simple args")
+    @DisplayName("JCommander should parse simple flag arguments")
     void jCommanderParses() {
         CliArgs args = new CliArgs();
         JCommander.newBuilder()
                 .addObject(args)
                 .build()
                 .parse("-f", FLAG_VALUE);
-        assertEquals(FLAG_VALUE, args.flag);
+        assertEquals(FLAG_VALUE, args.flag, "JCommander should parse -f flag");
     }
 
     /**
@@ -182,7 +178,7 @@ class MinimalUtilitiesSmokeTest {
      */
     private static final class CliArgs {
         /**
-         * Sample flag parsed by JCommander.
+         * Sample flag parsed by JCommander for command-line coverage.
          */
         @Parameter(names = "-f")
         private String flag;

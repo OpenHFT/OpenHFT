@@ -11,6 +11,7 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import proguard.Configuration;
 import proguard.ProGuard;
@@ -18,8 +19,9 @@ import proguard.ProGuard;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Smoke tests for NIO/network stacks and ProGuard construction.
+ * Smoke tests verifying NIO network stacks and ProGuard configuration construction.
  */
+@DisplayName("NioAndNetworkStacksSmokeTest")
 class NioAndNetworkStacksSmokeTest {
 
     /**
@@ -28,21 +30,25 @@ class NioAndNetworkStacksSmokeTest {
     private static final int SINGLE_THREAD = 1;
 
     @Test
+    @DisplayName("Grizzly should build, start and shutdown transport")
     void grizzlyCanBuildStartAndShutdownTransport() throws Exception {
         TCPNIOTransport transport = TCPNIOTransportBuilder.newInstance()
                 .build();
+        assertNotNull(transport, "Grizzly transport should build");
         transport.start();
         transport.shutdownNow();
     }
 
     @Test
+    @DisplayName("Apache MINA should create and dispose acceptor")
     void minaCanCreateAndDisposeAcceptor() {
         IoAcceptor acceptor = new NioSocketAcceptor();
-        assertNotNull(acceptor);
+        assertNotNull(acceptor, "Apache MINA should construct an acceptor");
         acceptor.dispose();
     }
 
     @Test
+    @DisplayName("Netty should configure ServerBootstrap with NIO event loop groups")
     void nettyCanConfigureServerBootstrap() {
         EventLoopGroup bossGroup = new NioEventLoopGroup(SINGLE_THREAD);
         EventLoopGroup workerGroup = new NioEventLoopGroup(SINGLE_THREAD);
@@ -50,7 +56,7 @@ class NioAndNetworkStacksSmokeTest {
             ServerBootstrap bootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class);
-            assertNotNull(bootstrap);
+            assertNotNull(bootstrap, "Netty ServerBootstrap should be configurable");
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
@@ -58,9 +64,10 @@ class NioAndNetworkStacksSmokeTest {
     }
 
     @Test
+    @DisplayName("ProGuard Configuration and ProGuard should be constructible")
     void proguardConfigurationAndProGuardCanBeConstructed() {
         Configuration configuration = new Configuration();
         ProGuard proGuard = new ProGuard(configuration);
-        assertNotNull(proGuard);
+        assertNotNull(proGuard, "ProGuard should construct with configuration");
     }
 }

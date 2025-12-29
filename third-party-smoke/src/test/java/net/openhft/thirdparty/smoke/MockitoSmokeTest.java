@@ -3,6 +3,7 @@
  */
 package net.openhft.thirdparty.smoke;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -10,26 +11,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Smoke test for Mockito core (no instrumentation).
+ * Smoke test verifying Mockito core operates without bytecode instrumentation support.
  */
+@DisplayName("MockitoSmokeTest")
 class MockitoSmokeTest {
 
     /**
-     * Expected sum for the service compute result.
+     * Reference total used to validate calculator interaction through the service.
      */
     private static final int EXPECTED_SUM = 3;
 
     @Test
+    @DisplayName("Mockito settings and basic mocking should be available")
     void mockitoSettingsAreAvailable() {
         org.mockito.MockSettings settings = Mockito.withSettings();
-        assertNotNull(settings);
+        assertNotNull(settings, "Mockito.withSettings should return settings");
         Calculator calculator = new Calculator();
         Service service = new Service(calculator);
-        assertEquals(EXPECTED_SUM, service.compute());
+        assertEquals(EXPECTED_SUM, service.compute(), "Service should compute sum via calculator");
     }
 
     /**
-     * Simple calculator used for mocking.
+     * Simple calculator used for mocking service dependencies.
      */
     static class Calculator {
         int add(final int a, final int b) {
@@ -42,7 +45,7 @@ class MockitoSmokeTest {
      */
     static class Service {
         /**
-         * Calculator used by the service.
+         * Calculator instance supplied to the service under test.
          */
         private final Calculator serviceCalculator;
 

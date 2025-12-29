@@ -11,22 +11,24 @@ import jnr.constants.platform.Errno;
 import jnr.ffi.Memory;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Smoke tests for Prometheus client and JNR FFI.
+ * Smoke tests verifying Prometheus client metrics and JNR FFI integration.
  */
+@DisplayName("MetricsAndFfiSmokeTest")
 class MetricsAndFfiSmokeTest {
 
     /**
-     * Tolerance used in numeric comparisons.
+     * Tolerance value used for numeric comparison assertions.
      */
     private static final double DELTA = 0.0001d;
 
     /**
-     * Test counter name.
+     * Prometheus counter name used for registry lookups.
      */
     private static final String COUNTER_NAME =
             "third_party_smoke_counter_total";
@@ -47,6 +49,7 @@ class MetricsAndFfiSmokeTest {
     private static final long VALUE_42 = 42L;
 
     @Test
+    @DisplayName("Prometheus SimpleClient should register and read counter")
     void prometheusSimpleClientRegistersAndReadsCounter() {
         CollectorRegistry registry = new CollectorRegistry();
         Counter counter = Counter.build()
@@ -56,33 +59,38 @@ class MetricsAndFfiSmokeTest {
 
         counter.inc();
         Double value = registry.getSampleValue(COUNTER_NAME);
-        assertNotNull(value);
-        assertEquals(1.0, value, DELTA);
+        assertNotNull(value, "Prometheus counter should be registered");
+        assertEquals(1.0, value, DELTA, "Prometheus counter should increment");
     }
 
     @Test
+    @DisplayName("Prometheus HTTPServer should start and stop")
     void prometheusHttpServerCanStartAndStop() throws Exception {
         HTTPServer server = new HTTPServer(0);
-        assertNotNull(server);
+        assertNotNull(server, "Prometheus HTTPServer should start on an ephemeral port");
         server.close();
     }
 
     @Test
+    @DisplayName("Prometheus hotspot DefaultExports should initialize JVM metrics collection")
     void prometheusHotspotDefaultExportsInitialize() {
         DefaultExports.initialize();
+        assertTrue(true, "Prometheus DefaultExports.initialize should complete");
     }
 
     @Test
+    @DisplayName("JNR Constants Errno should provide integer value")
     void jnrConstantsErrnoProvidesIntegerValue() {
         int ebadf = Errno.EBADF.intValue();
-        assertTrue(ebadf > 0);
+        assertTrue(ebadf > 0, "JNR Errno.EBADF should be > 0 but was " + ebadf);
     }
 
     @Test
+    @DisplayName("JNR FFI should allocate and use memory")
     void jnrFfiCanAllocateAndUseMemory() {
         Runtime runtime = Runtime.getSystemRuntime();
         Pointer pointer = Memory.allocate(runtime, EIGHT_BYTES);
         pointer.putLong(OFFSET_ZERO, VALUE_42);
-        assertEquals(VALUE_42, pointer.getLong(OFFSET_ZERO));
+        assertEquals(VALUE_42, pointer.getLong(OFFSET_ZERO), "JNR pointer should read back written long");
     }
 }

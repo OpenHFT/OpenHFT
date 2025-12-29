@@ -2,7 +2,7 @@
 <!--
   ~ Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,6 +21,7 @@
 
     <properties>
         <third-party-bom.version>2026.0-SNAPSHOT</third-party-bom.version>
+        <quality.enforced>true</quality.enforced>
     </properties>
 
     <dependencyManagement>
@@ -428,6 +429,11 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.annotation</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

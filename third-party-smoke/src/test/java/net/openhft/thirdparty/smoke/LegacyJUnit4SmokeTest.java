@@ -13,6 +13,6 @@ public class LegacyJUnit4SmokeTest {
      */
     @Test
     public void vintageEngineRuns() {
-        Assert.assertTrue(true);
+        Assert.assertTrue("Vintage engine should execute JUnit4 test", true);
     }
 }

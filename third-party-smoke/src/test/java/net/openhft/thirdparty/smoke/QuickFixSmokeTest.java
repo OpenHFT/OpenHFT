@@ -3,6 +3,7 @@
  */
 package net.openhft.thirdparty.smoke;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import quickfix.Message;
 import quickfix.field.*;
@@ -12,11 +13,13 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Smoke test for QuickFIX/J bundle.
+ * Smoke test verifying QuickFIX/J bundle can build a basic order.
  */
+@DisplayName("QuickFixSmokeTest")
 class QuickFixSmokeTest {
 
     @Test
+    @DisplayName("QuickFIX/J should build a NewOrderSingle message")
     void canBuildNewOrderSingleMessage() throws Exception {
         quickfix.fix44.NewOrderSingle order =
                 new quickfix.fix44.NewOrderSingle(
@@ -31,7 +34,7 @@ class QuickFixSmokeTest {
 
         Message msg = order;
 
-        assertEquals("123", msg.getString(ClOrdID.FIELD));
-        assertEquals("AAPL", msg.getString(Symbol.FIELD));
+        assertEquals("123", msg.getString(ClOrdID.FIELD), "QuickFIX message should carry ClOrdID");
+        assertEquals("AAPL", msg.getString(Symbol.FIELD), "QuickFIX message should carry Symbol");
     }
 }

@@ -30,7 +30,7 @@ Developers can run locally before pushing.
 Impact & Consequences:: Contributors must keep tests green.
 Build time increases ~15-30 seconds.
 Version bumps that break Java 8 fail fast with clear error messages.
-Notes/Links:: Module path `/home/peter/Second/OpenHFT/third-party-smoke`.
+Notes/Links:: Module path `third-party-smoke`.
 See requirement `SMOKE-TEST-001` in project-requirements.adoc.
 
 === SMOKE-DEC-002 Separate class loading and usage tests

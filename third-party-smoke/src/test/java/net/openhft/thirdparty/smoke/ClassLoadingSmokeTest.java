@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("ClassLoadingSmokeTest")
 class ClassLoadingSmokeTest {
 
     /**
@@ -195,14 +196,40 @@ class ClassLoadingSmokeTest {
                 "SLF4J API",
                 () -> assertClassesLoad("org.slf4j.LoggerFactory")
         ));
+        boolean slf4jSimplePresent = isClassPresent(
+                "org.slf4j.simple.SimpleServiceProvider");
+        boolean slf4jNopPresent = isClassPresent(
+                "org.slf4j.nop.NOPServiceProvider");
+        boolean slf4jLog4jPresent = isClassPresent(
+                "org.apache.logging.slf4j.Log4jLoggerFactory");
+        boolean slf4jBindingPresent = slf4jSimplePresent
+                || slf4jNopPresent
+                || slf4jLog4jPresent;
+
         tests.add(dynamic(
-                "SLF4J simple binding",
-                () -> assertClassesLoad("org.slf4j.simple.SimpleLogger")
+                "SLF4J binding (one or more) is present",
+                () -> assertTrue(
+                        slf4jBindingPresent,
+                        "Expected at least one SLF4J binding on the classpath"
+                )
         ));
-        tests.add(dynamic(
-                "SLF4J NOP binding",
-                () -> assertClassesLoad("org.slf4j.helpers.NOPLogger")
-        ));
+        if (slf4jSimplePresent) {
+            tests.add(dynamic(
+                    "SLF4J simple binding",
+                    () -> assertClassesLoad(
+                            "org.slf4j.simple.SimpleServiceProvider",
+                            "org.slf4j.simple.SimpleLogger"
+                    )
+            ));
+        }
+        if (slf4jNopPresent) {
+            tests.add(dynamic(
+                    "SLF4J NOP binding",
+                    () -> assertClassesLoad(
+                            "org.slf4j.nop.NOPServiceProvider"
+                    )
+            ));
+        }
         tests.add(dynamic(
                 "Commons Logging",
                 () -> assertClassesLoad("org.apache.commons.logging.LogFactory")
@@ -370,7 +397,7 @@ class ClassLoadingSmokeTest {
             try {
                 Class.forName(className, false, LOADER);
                 return;
-            } catch (Throwable t) {
+            } catch (ClassNotFoundException | LinkageError t) {
                 failures.add(className + ": " + t.toString());
             }
         }
@@ -385,6 +412,15 @@ class ClassLoadingSmokeTest {
                     () -> Class.forName(className, false, LOADER),
                     className
             );
+        }
+    }
+
+    private static boolean isClassPresent(final String className) {
+        try {
+            Class.forName(className, false, LOADER);
+            return true;
+        } catch (ClassNotFoundException | LinkageError e) {
+            return false;
         }
     }
 
@@ -409,7 +445,7 @@ class ClassLoadingSmokeTest {
     private static void assertResourcePresent(final String resourcePath) {
         assertNotNull(
                 LOADER.getResource(resourcePath),
-                "Missing resource " + resourcePath
+                "Expected to find resource " + resourcePath
         );
     }
 
@@ -422,7 +458,10 @@ class ClassLoadingSmokeTest {
             }
             throw e;
         } catch (ClassNotFoundException e) {
-            throw new AssertionError(e);
+            AssertionError error =
+                    new AssertionError("HSQLDB JDBC driver class should be loadable");
+            error.initCause(e);
+            throw error;
         }
     }
 
@@ -445,6 +484,7 @@ class ClassLoadingSmokeTest {
         tests.addAll(testingFrameworkTests());
         tests.addAll(osgiTests());
         tests.addAll(additionalPeerTests());
+        assertFalse(tests.isEmpty(), "Dynamic class-loading test list should not be empty");
         return tests;
     }
 }

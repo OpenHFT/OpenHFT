@@ -4,6 +4,7 @@
 package net.openhft.thirdparty.smoke;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -14,11 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
 /**
- * Verifies the JUnit Platform launcher can execute a Jupiter class.
+ * Verifies the JUnit Platform launcher executes a Jupiter test class using discovery selectors.
  */
+@DisplayName("JUnitPlatformLauncherSmokeTest")
 class JUnitPlatformLauncherSmokeTest {
 
     @Test
+    @DisplayName("JUnit Platform Launcher should execute sample class")
     void canCreateLauncherAndExecuteSampleClass() {
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder
                 .request()
@@ -28,17 +31,19 @@ class JUnitPlatformLauncherSmokeTest {
         Launcher launcher = LauncherFactory.create();
         launcher.execute(request);
 
-        assertNotNull(launcher, "Launcher should be created");
+        assertNotNull(launcher, "platform launcher should initialise for execution");
     }
 
     /**
      * Jupiter sample executed by the platform launcher.
      */
+    @DisplayName("JUnitPlatformLauncherSmokeTest.LauncherSample")
     static class LauncherSample {
 
         @Test
+        @DisplayName("Launcher sample runs without failure")
         void sample() {
-            Assertions.assertTrue(true, "Launcher sample should pass");
+            Assertions.assertTrue(true, "Platform launcher test should pass");
         }
     }
 }

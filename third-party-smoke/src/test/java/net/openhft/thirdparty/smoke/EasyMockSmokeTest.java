@@ -4,23 +4,26 @@
 package net.openhft.thirdparty.smoke;
 
 import org.easymock.EasyMock;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Smoke test for EasyMock.
+ * Smoke test that verifies EasyMock can record, replay, and verify expectations.
  */
+@DisplayName("EasyMockSmokeTest")
 class EasyMockSmokeTest {
 
     @Test
+    @DisplayName("EasyMock should record, replay and verify expectations")
     void easyMockCanRecordReplayAndVerify() {
         GreetingService service = EasyMock.createMock(GreetingService.class);
         EasyMock.expect(service.greet("World")).andReturn("Hello World");
         EasyMock.replay(service);
 
         String result = service.greet("World");
-        assertEquals("Hello World", result);
+        assertEquals("Hello World", result, "EasyMock should replay expected greeting");
 
         EasyMock.verify(service);
     }

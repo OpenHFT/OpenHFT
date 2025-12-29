@@ -31,23 +31,28 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * See {@code SMOKE-TEST-005} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
+@DisplayName("MinimalNetworkingSmokeTest")
 class MinimalNetworkingSmokeTest {
 
     @Test
-    @DisplayName("Undertow can build without starting")
+    @DisplayName("Undertow builder should create a server without starting")
     void undertowBuilds() {
         Undertow undertow = Undertow.builder()
                 .addHttpListener(0, "localhost")
                 .setHandler(exchange ->
                         exchange.getResponseSender().send("ok"))
                 .build();
+        assertNotNull(undertow, "Undertow builder should create a server");
         undertow.stop();
     }
 
     @Test
-    @DisplayName("Jetty WebSocket client constructs")
+    @DisplayName("Jetty WebSocket client should construct cleanly")
+    @SuppressWarnings("java:S1612")
+    // Suppress "Utility classes should not have public constructors")
     void jettyClientConstructs() {
-        assertDoesNotThrow(() -> new WebSocketClient());
+        assertDoesNotThrow(() -> new WebSocketClient(),
+                "WebSocket client should construct");
     }
 
     @Test
@@ -59,29 +64,30 @@ class MinimalNetworkingSmokeTest {
         context.setContextPath("/");
         server.setHandler(context);
         context.addServlet(new ServletHolder(new HelloServlet()), "/hello");
+        assertNotNull(server, "Jetty server should construct");
         server.start();
         server.stop();
     }
 
     @Test
-    @DisplayName("Netty bootstrap can be configured")
+    @DisplayName("Netty ServerBootstrap should allow configuration without binding")
     void nettyBootstrapConfigurable() {
         ServerBootstrap bootstrap = new ServerBootstrap();
-        assertNotNull(bootstrap);
+        assertNotNull(bootstrap, "Netty ServerBootstrap should construct");
     }
 
     @Test
     @DisplayName("Grizzly HTTP server base class is available")
     void grizzlyServerAccessible() {
         FilterChainBuilder builder = FilterChainBuilder.stateless();
-        assertNotNull(builder);
+        assertNotNull(builder, "Grizzly filter chain builder should be constructible");
     }
 
     @Test
     @DisplayName("MockWebServer can be constructed and closed")
     void mockWebServerLifecycle() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
-            assertNotNull(server);
+            assertNotNull(server, "MockWebServer should construct cleanly");
         }
     }
 
@@ -101,12 +107,13 @@ class MinimalNetworkingSmokeTest {
                     }
                 })
                 .build();
+        assertNotNull(server, "Undertow server should build");
         server.start();
         server.stop();
     }
 
     @Test
-    @DisplayName("Undertow servlet deployment builds")
+    @DisplayName("Undertow servlet deployment should build with a name")
     void undertowServletDeploymentBuilds() {
         ServletInfo servlet = Servlets.servlet("helloServlet",
                         HelloServlet.class)
@@ -116,17 +123,17 @@ class MinimalNetworkingSmokeTest {
                 .setContextPath("/")
                 .setDeploymentName("hello.war")
                 .addServlet(servlet);
-        assertNotNull(deployment.getDeploymentName());
+        assertNotNull(deployment.getDeploymentName(), "Undertow deployment should have a name");
     }
 
     @Test
-    @DisplayName("Undertow WebSocket endpoint config builds")
+    @DisplayName("Undertow WebSocket endpoint config should build")
     void undertowWebsocketEndpointConfigBuilds() {
         javax.websocket.server.ServerEndpointConfig config =
                 javax.websocket.server.ServerEndpointConfig.Builder
                         .create(UndertowWebsocketEndpoint.class, "/ws")
                         .build();
-        assertNotNull(config);
+        assertNotNull(config, "Undertow websocket config should be built");
     }
 
     /**

@@ -8,16 +8,19 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Smoke test for OkHttp client and MockWebServer.
+ * Smoke test verifying OkHttp client can call MockWebServer and read response bodies.
  */
+@DisplayName("OkHttpSmokeTest")
 class OkHttpSmokeTest {
 
     @Test
+    @DisplayName("OkHttp client should call MockWebServer and read response body correctly")
     void okHttpCanCallMockWebServer() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
             server.enqueue(new MockResponse().setBody("hello"));
@@ -30,7 +33,7 @@ class OkHttpSmokeTest {
                     .build();
 
             try (Response response = client.newCall(request).execute()) {
-                assertEquals("hello", response.body().string());
+                assertEquals("hello", response.body().string(), "OkHttp should receive mocked response body");
             }
         }
     }

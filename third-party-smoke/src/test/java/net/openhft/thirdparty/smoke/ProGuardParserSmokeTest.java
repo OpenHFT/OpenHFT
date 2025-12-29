@@ -3,6 +3,7 @@
  */
 package net.openhft.thirdparty.smoke;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import proguard.Configuration;
 import proguard.ConfigurationParser;
@@ -10,8 +11,9 @@ import proguard.ConfigurationParser;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Smoke test for ProGuard configuration parsing.
+ * Smoke test verifying ProGuard configuration parser can parse minimal arguments.
  */
+@DisplayName("ProGuardParserSmokeTest")
 class ProGuardParserSmokeTest {
 
     /**
@@ -20,9 +22,10 @@ class ProGuardParserSmokeTest {
      * @throws Exception parsing failure
      */
     @Test
+    @DisplayName("ProGuard ConfigurationParser should parse trivial arguments")
     void proguardConfigurationParserParsesTrivialArgs() throws Exception {
         Configuration configuration = new Configuration();
-        String[] args = new String[]{"-dontoptimize"};
+        String[] args = {"-dontoptimize"};
 
         ConfigurationParser parser = new ConfigurationParser(
                 args, System.getProperties());
@@ -32,6 +35,6 @@ class ProGuardParserSmokeTest {
             parser.close();
         }
 
-        assertNotNull(configuration);
+        assertNotNull(configuration, "ProGuard parser should populate configuration");
     }
 }
