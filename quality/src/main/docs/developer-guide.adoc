@@ -1,0 +1,308 @@
+= MeaningfulMessageCheck Developer Guide
+:toc:
+:toclevels: 3
+
+== Architecture Overview
+
+The MeaningfulMessageCheck system enforces high-quality, informative messages in assertions, exceptions, logs, annotations, and Javadoc. It follows a pipeline architecture:
+
+[source]
+----
+AST Tokens
+    ↓
+[Extractors] → MessageCandidate → [RuleEngine] → Violation
+    ↓
+MeaningfulMessageProcessor (coordinator)
+    ↓
+Checkstyle violation output
+----
+
+=== Core Components
+
+[cols="1,3"]
+|===
+| Component | Responsibility
+
+| `MeaningfulMessageCheck`
+| Checkstyle `AbstractCheck` entry point. Configures processor and delegates token handling.
+
+| `MeaningfulMessageProcessor`
+| Per-file coordinator. Manages extractors, routes tokens, collects violations.
+
+| `AbstractMessageExtractor`
+| Base class for extractors. Provides `context()`, `sink()`, and `astSupport()` accessors.
+
+| `MessageCandidate`
+| Immutable description of an extracted message with metadata (source, line, placeholders, etc.).
+
+| `RuleEngine`
+| Evaluates candidates against all configured rules in priority order.
+
+| `AbstractMessageRule`
+| Base class for rules. Provides `requireMetrics()`, `record()`, and `recordWarning()` helpers.
+
+| `ViolationCollector`
+| Collects violations per line, keeping highest priority (lowest number wins).
+|===
+
+=== Message Flow
+
+1. **Token dispatch**: `MeaningfulMessageProcessor` receives AST tokens and dispatches to appropriate extractor
+2. **Extraction**: Extractor builds `MessageCandidate` with message text, source type, and metadata
+3. **Candidate emission**: Extractor calls `sink().emitCandidate(candidate)` or `sink().emitMissingMessage()`
+4. **Metrics calculation**: Processor computes `MessageMetrics` (word counts, meaningful words, long words)
+5. **Rule evaluation**: `RuleEngine` iterates rules by priority, each rule checks applicability and fires violations
+6. **Violation collection**: `ViolationCollector` de-duplicates, keeping highest priority per line
+7. **Reporting**: Violations logged via Checkstyle API
+
+== How to Add a New Rule
+
+=== Step 1: Create the Rule Class
+
+Create a new class in `net.openhft.quality.mm` extending `AbstractMessageRule`:
+
+[source,java]
+----
+package net.openhft.quality.mm;
+
+/**
+ * Flags messages that contain [describe the problem].
+ */
+public final class MMYourRuleName extends AbstractMessageRule {
+
+    /**
+     * Create the rule instance.
+     */
+    public MMYourRuleName() {
+        super(RuleId.YOUR_RULE);
+    }
+
+    @Override
+    protected void doEvaluate(MessageContext context, ViolationCollector collector,
+                              RuleEvaluationState state) {
+        // For rules that need metrics:
+        MessageMetrics metrics = requireMetrics(context, state);
+        if (metrics == null) {
+            return;
+        }
+
+        // Your rule logic here
+        MessageCandidate candidate = context.candidate();
+        String message = candidate.message();
+
+        if (/* violation condition */) {
+            record(context, collector, /* message args for messages.properties */);
+        }
+    }
+}
+----
+
+=== Step 2: Add Entry to RuleId Enum
+
+Edit `RuleId.java` to add your rule:
+
+[source,java]
+----
+public enum RuleId {
+    // ... existing rules ...
+
+    /** Your rule description. */
+    YOUR_RULE("MMYourRule", "assert.message.your.key", 15, MessageSource.ASSERTION, MessageSource.THROW),
+
+    // ...
+}
+----
+
+Parameters:
+- `code`: Short code for `@SuppressWarnings` (e.g., `MMYourRule`)
+- `messageKey`: Key in `messages.properties`
+- `priority`: Lower = higher priority (evaluated earlier, wins conflicts). Use 10-20 for most rules.
+- `sources`: Which `MessageSource` types this rule applies to
+
+=== Step 3: Add Message to messages.properties
+
+Edit `src/main/resources/net/openhft/quality/messages.properties`:
+
+[source,properties]
+----
+assert.message.your.key = [MMYourRule] Problem description. Why: {0}. Fix: Suggested action. Ref: your-rule-anchor
+----
+
+Placeholders `{0}`, `{1}`, etc. correspond to arguments passed to `record()`.
+
+=== Step 4: Add Test Input and Test Method
+
+Create test input file `src/test/resources/net/openhft/quality/InputYourRule.java`:
+
+[source,java]
+----
+package net.openhft.quality;
+
+public class InputYourRule {
+    void triggerViolation() {
+        // Code that triggers your rule violation
+        assert condition : "message that violates rule"; // violation
+    }
+
+    void noViolation() {
+        // Code that should NOT trigger your rule
+        assert condition : "message that passes rule";
+    }
+}
+----
+
+Add test method in `MeaningfulMessageCheckTest.java`:
+
+[source,java]
+----
+@Test
+public void testYourRule() throws Exception {
+    final DefaultConfiguration checkConfig =
+            createModuleConfig(MeaningfulMessageCheck.class);
+
+    final String[] expected = {
+        "7: " + getCheckMessage(RuleId.YOUR_RULE.messageKey(), "arg0"),
+    };
+
+    verify(checkConfig, getPath("InputYourRule.java"), expected);
+}
+----
+
+=== Step 5: Document in assertion-messages.adoc
+
+Add documentation for your rule in `src/main/docs/assertion-messages.adoc`.
+
+== How to Add a New Extractor
+
+=== Step 1: Create the Extractor Class
+
+Create a new class extending `AbstractMessageExtractor`:
+
+[source,java]
+----
+package net.openhft.quality.mm;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+
+/**
+ * Extracts message candidates from [describe source].
+ */
+public final class YourMessageExtractor extends AbstractMessageExtractor {
+
+    /**
+     * Create an extractor for [source] messages.
+     *
+     * @param context extraction context with imports and type information.
+     * @param sink sink to receive message candidates.
+     */
+    public YourMessageExtractor(MessageExtractionContext context, MessageCandidateSink sink) {
+        super(context, sink);
+    }
+
+    /**
+     * Handle a [describe token type].
+     *
+     * @param ast AST node for the element.
+     */
+    public void handleYourToken(DetailAST ast) {
+        // Use context() for extraction context
+        // Use astSupport() for AST utilities
+        // Use sink().emitCandidate() or sink().emitMissingMessage()
+
+        String message = /* extract message */;
+        if (message == null) {
+            sink().emitMissingMessage(ast.getLineNo(), MessageSource.YOUR_SOURCE);
+            return;
+        }
+
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .source(MessageSource.YOUR_SOURCE)
+                .lineNo(ast.getLineNo())
+                .message(message)
+                .normalisedMessage(MessageNormaliser.normalise(message))
+                .placeholderCount(0)
+                .keyValueLabelCount(0)
+                .build();
+        sink().emitCandidate(candidate);
+    }
+}
+----
+
+=== Step 2: Add MessageSource Entry (if needed)
+
+If you're extracting from a new source type, add it to `MessageSource.java`:
+
+[source,java]
+----
+public enum MessageSource {
+    // ... existing sources ...
+
+    /** Your source description. */
+    YOUR_SOURCE(4, 2),  // minWordCount, minMeaningfulWordCount
+
+    // ...
+}
+----
+
+=== Step 3: Register in MeaningfulMessageProcessor
+
+Edit `MeaningfulMessageProcessor.java` to:
+
+1. Add field for your extractor
+2. Instantiate in constructor
+3. Add token types to `getDefaultTokens()` and `getAcceptableTokens()`
+4. Add dispatch logic in `visitToken()`
+
+== Design Decisions
+
+Key architectural decisions are documented in `decision-log.adoc`. Notable choices:
+
+- **Priority-based conflict resolution**: When multiple rules match, lowest priority number wins
+- **Per-line deduplication**: Only one violation per line to avoid noise
+- **Flexible suppression**: `@SuppressWarnings`, inline comments, and Checkstyle `CHECKSTYLE:OFF` all supported
+- **Source-specific thresholds**: Different word count minimums per source type (assertions need more than throws)
+
+== Useful Helper Methods
+
+=== In AbstractMessageRule
+
+[source,java]
+----
+// Get metrics only if no prior warning fired (returns null otherwise)
+MessageMetrics metrics = requireMetrics(context, state);
+
+// Record a violation
+record(context, collector, arg1, arg2);
+
+// Record and mark warning fired
+recordWarning(context, collector, state, arg1, arg2);
+----
+
+=== In AbstractMessageExtractor
+
+[source,java]
+----
+// Access extraction context
+context().templateExtractor();
+context().getVariableType(name);
+context().resolveTypeName(typeName);
+
+// Access AST utilities
+astSupport().extractMethodName(methodCall);
+astSupport().collectArguments(elist);
+astSupport().unwrapExpr(expr);
+
+// Emit candidates
+sink().emitCandidate(candidate);
+sink().emitMissingMessage(lineNo, source);
+----
+
+=== In MessageAstSupport
+
+Commonly used methods:
+- `extractMethodName(DetailAST methodCall)` - Get method name from call
+- `collectArguments(DetailAST elist)` - Get list of argument expressions
+- `unwrapExpr(DetailAST expr)` - Remove EXPR wrapper
+- `isNullLiteral(DetailAST expr)` - Check for null
+- `findLambda(DetailAST expr)` - Find lambda in expression
+- `extractTypeName(DetailAST type)` - Get type name from TYPE node
