@@ -26,10 +26,15 @@
                   default="classpath:net/openhft/quality/checkstyle26/checkstyle-suppressions-tests.xml"/>
         <property name="optional" value="true"/>
     </module>
+    <module name="SuppressWarningsFilter"/>
 
     <module name="FileTabCharacter"/>
 
     <module name="TreeWalker">
+        <module name="SuppressWarningsHolder">
+            <property name="aliasList"
+                      value="net.openhft.quality.MeaningfulMessageCheck=MM-all"/>
+        </module>
         <module name="SuppressionCommentFilter"/>
         <module name="SingleLineJavadoc"/>
         <module name="NonEmptyAtclauseDescription"/>
@@ -82,5 +87,12 @@
         </module>
         <module name="ModifierOrder"/>
         <module name="CommentsIndentation"/>
+
+        <!-- Custom OpenHFT checks -->
+        <module name="net.openhft.quality.MeaningfulMessageCheck">
+            <!-- Comma/space-separated exception class names to skip for assertThrows message checks. -->
+            <property name="id" value="MeaningfulMessage"/>
+            <property name="ignoredExceptionClassNames" value="UnsupportedOperationException"/>
+        </module>
     </module>
 </module>

@@ -32,7 +32,6 @@
         <exclude name="AvoidAccessibilityAlteration"/>
         <exclude name="DoNotCallGarbageCollectionExplicitly"/>
         <exclude name="UseLocaleWithCaseConversions"/>
-        <exclude name="ImplicitSwitchFallThrough"/>
         <exclude name="UnnecessaryBooleanAssertion"/>
         <exclude name="DontImportSun"/>
         <exclude name="DetachedTestCase"/>
@@ -40,12 +39,10 @@
         <exclude name="DoNotTerminateVM"/>
         <exclude name="SimpleDateFormatNeedsLocale"/>
         <exclude name="NonSerializableClass"/>
-        <exclude name="FinalizeOverloaded"/>
         <exclude name="AvoidInstanceofChecksInCatchClause"/>
         <exclude name="DontUseFloatTypeForLoopIndices"/>
         <exclude name="ReplaceJavaUtilDate"/>
         <exclude name="TestClassWithoutTestCases"/>
-        <exclude name="AvoidUsingOctalValues"/>
     </rule>
 
     <rule ref="category/java/bestpractices.xml">
@@ -54,12 +51,12 @@
         <exclude name="UnusedLocalVariable"/>
         <exclude name="UnitTestContainsTooManyAsserts"/>
         <exclude name="UnusedFormalParameter"/>
-<!--        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>-->
+        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
         <exclude name="AvoidUsingHardCodedIP"/>
         <exclude name="AvoidPrintStackTrace"/>
         <exclude name="AccessorMethodGeneration"/>
         <exclude name="AccessorClassGeneration"/>
-<!--        <exclude name="UnitTestShouldIncludeAssert"/>-->
+        <exclude name="UnitTestShouldIncludeAssert"/>
         <exclude name="UnitTestShouldUseTestAnnotation"/>
         <exclude name="AvoidReassigningParameters"/>
         <exclude name="UseVarargs"/>

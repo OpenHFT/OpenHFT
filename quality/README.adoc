@@ -7,11 +7,21 @@
 This module packages shared quality configuration and documentation used across Chronicle projects.
 It provides:
 
-* Checkstyle rule sets and configuration files;
+* Checkstyle rule sets and custom checks (including the Meaningful Message Check);
 * SpotBugs include and exclude filters;
-* shared architectural, security and operations guidance that other modules can reference.
+* PMD rulesets and suppression guidance;
+* shared quality and diagnostics guidance that other modules can reference.
+
+Documentation under `src/main/docs` is provided for development context and is not packaged in the release JAR.
 
 The goal is to keep quality and compliance rules centralised so that individual repositories can reuse them with minimal boilerplate.
+
+== Project Documentation
+
+Key documentation under `src/main/docs`:
+
+* link:src/main/docs/project-requirements.adoc[Project requirements]
+* link:src/main/docs/decision-log.adoc[Decision log]
 
 == Maven Usage
 
@@ -48,7 +58,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.45.1</version>
+            <version>9.3</version>
         </dependency>
         <dependency>
             <groupId>net.openhft</groupId>
@@ -99,4 +109,92 @@ Parent POMs such as `root-parent-pom` and `chronicle-enterprise-root-pom` alread
 SpotBugs configuration (rule filters, effort and threshold settings) is also provided from this module and surfaced by the parent POMs.
 To consume it directly, add the `spotbugs-maven-plugin` with a dependency on `chronicle-quality-rules` in a similar fashion to the Checkstyle example above.
 
+=== JaCoCo Code Coverage
 
+This module enforces code coverage thresholds via JaCoCo:
+
+* *Line coverage*: 100%
+* *Branch coverage*: 89%
+
+Coverage is checked during the `verify` phase automatically.
+
+=== PIT Mutation Testing
+
+This module includes an opt-in PIT (pitest) mutation testing profile.
+Mutation testing measures test effectiveness by introducing faults into bytecode and checking whether tests detect them.
+
+To run mutation testing:
+
+[source,bash]
+----
+mvn -Ppitest verify
+----
+
+==== Configuration
+
+The `pitest` profile is configured with:
+
+[cols="1,2"]
+|===
+|Setting |Value
+
+|pitest-maven
+|1.22.0
+
+|pitest-junit5-plugin
+|1.2.1
+
+|Mutation threshold
+|90%
+
+|Coverage threshold
+|100%
+
+|Full mutation matrix
+|enabled
+|===
+
+==== Current Coverage
+
+[cols="1,1"]
+|===
+|Metric |Value
+
+|Line coverage
+|100% (93/93)
+
+|Mutation coverage
+|92% (54/59)
+|===
+
+==== Surviving Mutations
+
+Five mutations survive and are documented as acceptable:
+
+[cols="1,2,2,3"]
+|===
+|Line |Method |Mutation |Reason
+
+|78-80
+|`beginTree`
+|`clear()` calls removed (3 mutations)
+|PIT's coverage-based test selection does not detect direct unit tests as relevant to these void method calls
+
+|189
+|`isJUnit5TestAnnotation`
+|Return true for ParameterizedTest
+|Would require a non-JUnit5 `@ParameterizedTest` annotation with specific import pattern
+
+|234
+|`simpleName`
+|Boundary condition `>=` to `>`
+|Equivalent mutation: annotation names cannot start with `.` in valid Java
+|===
+
+==== JUnit 5 Compatibility
+
+This project uses JUnit Jupiter 5.10.5 with JUnit Platform 1.10.5 (defined in `third-party-bom`).
+The pitest-junit5-plugin 1.2.1 is compatible with these versions.
+
+NOTE: If upgrading pitest-junit5-plugin, version 1.2.2+ addresses a transitive dependency conflict with `junit-platform-launcher`.
+See https://github.com/pitest/pitest-junit5-plugin/releases[release notes] for details.

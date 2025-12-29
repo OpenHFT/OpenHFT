@@ -2,8 +2,8 @@
 <!--
   chronicle-spotbugs-include.xml
 
-  Include filter: restricts SpotBugs to ONLY the low-violation rules
-  listed in spotbugs-low-violation-report.adoc.
+  Include filter: restricts SpotBugs to the curated low-noise rules
+  used across Chronicle builds.
 
   - Use as <includeFilterFile> in the SpotBugs Maven plugin.
   - Each <Match> activates a single bug pattern.
@@ -24,9 +24,6 @@
     <Match><Bug pattern="DM_EXIT"/></Match>
     <Match><Bug pattern="DM_GC"/></Match>
     <Match><Bug pattern="DM_STRING_VOID_CTOR"/></Match>
-
-    <!-- DP_*: DoPrivileged / security -->
-    <Match><Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/></Match>
 
     <!-- EC_/EQ_: equals/compareTo contracts -->
     <Match><Bug pattern="EC_UNRELATED_CLASS_AND_INTERFACE"/></Match>

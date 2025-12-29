@@ -5,6 +5,10 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
+    <!-- Quality module's own checkstyle implementations follow checkstyle conventions -->
+    <suppress checks=".*" files=".*[\\/]net[\\/]openhft[\\/]quality[\\/](mm[\\/].*|MeaningfulMessageCheck\\.java|MeaningfulMessageCheckTest\\.java|QualityCheckstyleSelfTest\\.java|package-info\\.java)"/>
+    <suppress checks=".*" files=".*net\\.openhft\\.quality\\.(mm\\..*|MeaningfulMessageCheck|MeaningfulMessageCheckTest|QualityCheckstyleSelfTest|package-info).*"/>
+
     <!-- Chronicle-Core backward-compatibility shims -->
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]core[\\/]pool[\\/]ClassAliasPool\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]core[\\/]pool[\\/]ClassAliasPoolTest\\.java"/>
