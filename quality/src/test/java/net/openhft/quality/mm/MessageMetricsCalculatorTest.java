@@ -8,10 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for {@link MessageMetricsCalculator}.
@@ -19,6 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MessageMetricsCalculatorTest {
 
     private MessageMetricsCalculator calculator;
+
+    private static String repeat(char ch, int count) {
+        StringBuilder builder = new StringBuilder(count);
+        for (int i = 0; i < count; i++) {
+            builder.append(ch);
+        }
+        return builder.toString();
+    }
 
     @BeforeEach
     void setUp() {
@@ -38,7 +43,7 @@ class MessageMetricsCalculatorTest {
     @Test
     void wordAtMaxLengthNotFlaggedAsLong() {
         // Create a 42-character word - exactly at limit, should NOT be flagged
-        String word42 = "a".repeat(42);
+        String word42 = repeat('a', 42);
         MessageMetrics metrics = calculator.calculate(word42, 0, 0);
         assertTrue(metrics.longWords().isEmpty(), "42-char word should not be flagged as long");
     }
@@ -46,7 +51,7 @@ class MessageMetricsCalculatorTest {
     @Test
     void wordExceedingMaxLengthFlaggedAsLong() {
         // Create a 43-character word - exceeds limit, SHOULD be flagged
-        String word43 = "a".repeat(43);
+        String word43 = repeat('a', 43);
         MessageMetrics metrics = calculator.calculate(word43, 0, 0);
         assertEquals(1, metrics.longWords().size(), "43-char word should be flagged as long");
         assertEquals(word43, metrics.longWords().get(0), "long word content mismatch");
@@ -109,6 +114,16 @@ class MessageMetricsCalculatorTest {
         assertEquals(5, metrics.wordCount(), "wordCount should be 5");
         // "the", "is" are filler; "account", "balance", "updated" are meaningful
         assertEquals(3, metrics.meaningfulWordCount(), "meaningfulWordCount should be 3");
+    }
+
+    @Test
+    void calculateMeaningfulWordCountUsesUniqueWords() {
+        String message = "account account balance balance";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(4, metrics.wordCount(), "wordCount should include duplicates");
+        assertEquals(2, metrics.meaningfulWordCount(), "duplicates should not increase unique count");
+        assertEquals(java.util.Arrays.asList("account", "balance"), metrics.meaningfulWords(),
+                "meaningfulWords should preserve first-seen unique words");
     }
 
     @Test

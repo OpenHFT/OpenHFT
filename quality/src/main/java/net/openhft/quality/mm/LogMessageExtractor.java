@@ -24,6 +24,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
     private static final Set<String> JVM_LEVEL_METHODS = new HashSet<>(
             Arrays.asList("debug", "warn", "error", "startup", "perf")
     );
+
     /**
      * Create an extractor for logging messages.
      *

@@ -6,8 +6,10 @@
 
 <suppressions>
     <!-- Quality module's own checkstyle implementations follow checkstyle conventions -->
-    <suppress checks=".*" files=".*[\\/]net[\\/]openhft[\\/]quality[\\/](mm[\\/].*|MeaningfulMessageCheck\\.java|MeaningfulMessageCheckTest\\.java|QualityCheckstyleSelfTest\\.java|package-info\\.java)"/>
-    <suppress checks=".*" files=".*net\\.openhft\\.quality\\.(mm\\..*|MeaningfulMessageCheck|MeaningfulMessageCheckTest|QualityCheckstyleSelfTest|package-info).*"/>
+    <suppress checks=".*"
+              files=".*[\\/]net[\\/]openhft[\\/]quality[\\/](mm[\\/].*|MeaningfulMessageCheck\\.java|MeaningfulMessageCheckTest\\.java|QualityCheckstyleSelfTest\\.java|package-info\\.java)"/>
+    <suppress checks=".*"
+              files=".*net\\.openhft\\.quality\\.(mm\\..*|MeaningfulMessageCheck|MeaningfulMessageCheckTest|QualityCheckstyleSelfTest|package-info).*"/>
 
     <!-- Chronicle-Core backward-compatibility shims -->
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]core[\\/]pool[\\/]ClassAliasPool\\.java"/>
@@ -17,8 +19,10 @@
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]Bytes\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]internal[\\/]BytesInternal\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]BinaryWireCode\\.java"/>
-    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]ref[\\/]BinaryIntArrayReference\\.java"/>
-    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]ref[\\/]BinaryLongArrayReference\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]ref[\\/]BinaryIntArrayReference\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]ref[\\/]BinaryLongArrayReference\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]BytesMarshallable\\.java"/>
 
     <!-- Zero-Allocation-Hashing API-compatibility (method names) -->
@@ -41,15 +45,19 @@
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]Marshallable\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]ValueOut\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]SelfDescribingTriviallyCopyable\\.java"/>
-    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]marshallable[\\/]This0AsTransientTest\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]marshallable[\\/]This0AsTransientTest\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]ReadmeChapter1Test\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]TextWireTest\\.java"/>
 
     <!-- Chronicle-Map generated compiled contexts -->
-    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledReplicatedMapIterationContext\\.java"/>
-    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledReplicatedMapQueryContext\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledReplicatedMapIterationContext\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledReplicatedMapQueryContext\\.java"/>
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledMapQueryContext\\.java"/>
-    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledMapIterationContext\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledMapIterationContext\\.java"/>
 
     <suppress checks="CommentsIndentation" files=".*/src/test/.*"/>
     <suppress checks="VariableDeclarationUsageDistance" files=".*/src/test/.*"/>

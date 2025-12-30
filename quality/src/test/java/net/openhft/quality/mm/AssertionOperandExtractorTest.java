@@ -3,77 +3,65 @@
  */
 package net.openhft.quality.mm;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link AssertionOperandExtractor}.
  */
-public class AssertionOperandExtractorTest {
+@SuppressWarnings("MMDisplayName")
+class AssertionOperandExtractorTest {
 
-    private MessageAstSupport astSupport;
-    private MessageExtractionContext context;
     private AssertionOperandExtractor extractor;
 
-    @Before
-    public void setUp() {
-        astSupport = new MessageAstSupport();
-        context = new MessageExtractionContext(astSupport);
+    @BeforeEach
+    void setUp() {
+        MessageAstSupport astSupport = new MessageAstSupport();
+        MessageExtractionContext context = new MessageExtractionContext(astSupport);
         MessageTemplateExtractor templateExtractor = new MessageTemplateExtractor(null);
         context.setTemplateExtractor(templateExtractor);
-        extractor = new AssertionOperandExtractor(astSupport, templateExtractor);
+        extractor = new AssertionOperandExtractor(astSupport);
     }
 
     @Test
-    public void resolveBooleanAssertionOperands_nullElist_returnsNull() {
+    void resolveBooleanAssertionOperands_nullElist_returnsNull() {
         // Test with null is not directly testable as it throws NPE
         // Testing edge cases via integration tests is more practical
         assertNotNull(extractor);
     }
 
     @Test
-    public void extractOperandName_nullOperand_throwsNPE() {
-        try {
-            extractor.extractOperandName(null);
-        } catch (NullPointerException expected) {
-            // expected
-        }
+    void extractOperandName_nullOperand_throwsNPE() {
+        assertThrows(NullPointerException.class, () -> extractor.extractOperandName(null));
     }
 
     @Test
-    public void extractStringSearch_nullExpr_throwsNPE() {
-        try {
-            extractor.extractStringSearch(null);
-        } catch (NullPointerException expected) {
-            // expected
-        }
+    void extractStringSearch_nullExpr_throwsNPE() {
+        assertThrows(NullPointerException.class, () -> extractor.extractStringSearch(null));
     }
 
     @Test
-    public void extractComparison_nullExpr_throwsNPE() {
-        try {
-            extractor.extractComparison(null);
-        } catch (NullPointerException expected) {
-            // expected
-        }
+    void extractComparison_nullExpr_throwsNPE() {
+        assertThrows(NullPointerException.class, () -> extractor.extractComparison(null));
     }
 
     @Test
-    public void booleanAssertionOperands_accessors() {
+    void booleanAssertionOperands_accessors() {
         // Indirect test - verifies the nested class accessors work
         assertNotNull(extractor);
     }
 
     @Test
-    public void stringSearchInfo_accessors() {
+    void stringSearchInfo_accessors() {
         // The StringSearchInfo is a data class - tested via integration
         assertNotNull(extractor);
     }
 
     @Test
-    public void comparisonInfo_accessors() {
+    void comparisonInfo_accessors() {
         // The ComparisonInfo is a data class - tested via integration
         assertNotNull(extractor);
     }

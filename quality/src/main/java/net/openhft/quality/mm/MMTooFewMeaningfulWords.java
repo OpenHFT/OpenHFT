@@ -23,8 +23,12 @@ public final class MMTooFewMeaningfulWords extends AbstractMessageRule {
         }
         int minMeaningfulWordCount = context.candidate().source().minMeaningfulWordCount();
         if (metrics.effectiveMeaningfulWordCount() < minMeaningfulWordCount) {
+            String uniqueWords = metrics.meaningfulWords().isEmpty()
+                    ? "(none)"
+                    : String.join(", ", metrics.meaningfulWords());
             record(context, collector, context.candidate().message(),
-                    metrics.effectiveMeaningfulWordCount(), minMeaningfulWordCount);
+                    uniqueWords, metrics.effectiveMeaningfulWordCount(),
+                    minMeaningfulWordCount);
         }
     }
 }

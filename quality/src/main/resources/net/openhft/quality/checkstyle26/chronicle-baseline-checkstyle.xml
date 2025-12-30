@@ -65,7 +65,8 @@
         <module name="MissingSwitchDefault"/>
         <module name="OneStatementPerLine"/>
         <module name="VariableDeclarationUsageDistance">
-            <property name="ignoreVariablePattern" value="^(?:l[0-3](?:a)?|sourceOffset|otherOffset|position|offset|startTimeNs|ret)$"/>
+            <property name="ignoreVariablePattern"
+                      value="^(?:l[0-3](?:a)?|sourceOffset|otherOffset|position|offset|startTimeNs|ret)$"/>
         </module>
 
         <module name="LeftCurly"/>

@@ -29,6 +29,9 @@ public final class MessageExtractionContext {
 
     private String currentClassName;
     private String currentMethodName;
+    private boolean currentMethodIsTest;
+    private boolean currentMethodHasDisplayName;
+    private int currentMethodLineNo;
 
     /**
      * Create a context using the provided AST support helpers.
@@ -136,6 +139,9 @@ public final class MessageExtractionContext {
      */
     public void enterMethod(DetailAST methodAst) {
         currentMethodName = astSupport.extractName(methodAst);
+        currentMethodLineNo = methodAst.getLineNo();
+        currentMethodIsTest = false;
+        currentMethodHasDisplayName = false;
         methodVariableTypes.clear();
     }
 
@@ -144,7 +150,79 @@ public final class MessageExtractionContext {
      */
     public void leaveMethod() {
         currentMethodName = null;
+        currentMethodIsTest = false;
+        currentMethodHasDisplayName = false;
+        currentMethodLineNo = 0;
         methodVariableTypes.clear();
+    }
+
+    /**
+     * Mark the current method as a JUnit 5 test method.
+     */
+    public void markCurrentMethodAsTest() {
+        currentMethodIsTest = true;
+    }
+
+    /**
+     * Mark the current method as having a @DisplayName annotation.
+     */
+    public void markCurrentMethodHasDisplayName() {
+        currentMethodHasDisplayName = true;
+    }
+
+    /**
+     * Check whether the current method is a JUnit 5 test method.
+     *
+     * @return {@code true} if the current method is a test method.
+     */
+    public boolean isCurrentMethodTest() {
+        return currentMethodIsTest;
+    }
+
+    /**
+     * Check whether the current method has a @DisplayName annotation.
+     *
+     * @return {@code true} if the current method has @DisplayName.
+     */
+    public boolean currentMethodHasDisplayName() {
+        return currentMethodHasDisplayName;
+    }
+
+    /**
+     * Return the line number of the current method definition.
+     *
+     * @return current method line number, or 0 if not in a method.
+     */
+    public int currentMethodLineNo() {
+        return currentMethodLineNo;
+    }
+
+    /**
+     * Check whether the given annotation name is a JUnit 5 test annotation.
+     * Verifies that the annotation is from org.junit.jupiter package, not JUnit 4.
+     *
+     * @param annotationName simple annotation name like "Test".
+     * @return {@code true} if this is a JUnit 5 test annotation.
+     */
+    public boolean isJUnit5TestAnnotation(String annotationName) {
+        if (annotationName == null) {
+            return false;
+        }
+        // ParameterizedTest, RepeatedTest, TestFactory, TestTemplate are JUnit 5 only
+        if ("ParameterizedTest".equals(annotationName)
+                || "RepeatedTest".equals(annotationName)
+                || "TestFactory".equals(annotationName)
+                || "TestTemplate".equals(annotationName)) {
+            return true;
+        }
+        // For @Test, need to distinguish JUnit 4 from JUnit 5
+        if ("Test".equals(annotationName)) {
+            String fullName = importedClasses.get("Test");
+            // JUnit 5: org.junit.jupiter.api.Test
+            // JUnit 4: org.junit.Test
+            return fullName != null && fullName.startsWith("org.junit.jupiter");
+        }
+        return false;
     }
 
     /**

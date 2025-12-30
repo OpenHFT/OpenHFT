@@ -215,38 +215,21 @@ class SubInitUsesSubclass extends SuperInitUsesSubclass {
 
 class ConcurrencyExamples {
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final AtomicBoolean FLAG = new AtomicBoolean();
+    // LI_LAZY_INIT_STATIC: unsafe lazy init for static field
+    private static String lazyStatic;
     private final ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
     private final Set<String> set = new CopyOnWriteArraySet<>();
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition = lock.newCondition();
     private volatile int volatileCounter;
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final AtomicBoolean FLAG = new AtomicBoolean();
-
-    // LI_LAZY_INIT_STATIC: unsafe lazy init for static field
-    private static String lazyStatic;
 
     String lazyInit() {
         if (lazyStatic == null) {
             lazyStatic = "value";
         }
         return lazyStatic;
-    }
-
-    static class BrokenSingleton {
-        private static BrokenSingleton instance;
-
-        // SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR
-        BrokenSingleton() {
-        }
-
-        // SING_SINGLETON_GETTER_NOT_SYNCHRONIZED
-        static BrokenSingleton getInstance() {
-            if (instance == null) {
-                instance = new BrokenSingleton();
-            }
-            return instance;
-        }
     }
 
     void staticDateFormatUsage(String text) throws Exception {
@@ -285,6 +268,22 @@ class ConcurrencyExamples {
         // JLM_JSR166_UTILCONCURRENT_MONITORENTER
         synchronized (map) {
             map.put("k", "v");
+        }
+    }
+
+    static class BrokenSingleton {
+        private static BrokenSingleton instance;
+
+        // SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR
+        BrokenSingleton() {
+        }
+
+        // SING_SINGLETON_GETTER_NOT_SYNCHRONIZED
+        static BrokenSingleton getInstance() {
+            if (instance == null) {
+                instance = new BrokenSingleton();
+            }
+            return instance;
         }
     }
 }
@@ -571,33 +570,6 @@ class UselessExamples {
 
 class SerializationExamples {
 
-    static class BadSerial implements Serializable {
-        // SE_BAD_FIELD
-        public transient Object transientField;
-        private Object normalField;
-
-        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
-            // SE_TRANSIENT_FIELD_NOT_RESTORED
-        }
-    }
-
-    // SE_COMPARATOR_SHOULD_BE_SERIALIZABLE: Comparator not Serializable
-    static class NonSerializableComparator implements Comparator<String> {
-        @Override
-        public int compare(String o1, String o2) {
-            return o1.compareTo(o2);
-        }
-    }
-
-    enum BadEnum {
-        A, B;
-
-        // ME_ENUM_FIELD_SETTER
-        void setValue(int v) {
-        }
-    }
-
     int switchProblems(int code) {
         int result = 0;
         // SF_SWITCH_FALLTHROUGH
@@ -637,6 +609,33 @@ class SerializationExamples {
         buffer.append("a" + "b");
         return buffer.toString();
     }
+
+    enum BadEnum {
+        A, B;
+
+        // ME_ENUM_FIELD_SETTER
+        void setValue(int v) {
+        }
+    }
+
+    static class BadSerial implements Serializable {
+        // SE_BAD_FIELD
+        public transient Object transientField;
+        private Object normalField;
+
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            // SE_TRANSIENT_FIELD_NOT_RESTORED
+        }
+    }
+
+    // SE_COMPARATOR_SHOULD_BE_SERIALIZABLE: Comparator not Serializable
+    static class NonSerializableComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.compareTo(o2);
+        }
+    }
 }
 
 // -------------------------------------------------------------------------
@@ -674,7 +673,7 @@ class MiscCorrectnessExamples {
     // WMI_WRONG_MAP_ITERATOR
     int wrongMapIterator(Map<String, Integer> map) {
         int sum = 0;
-        for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
+        for (Iterator<String> it = map.keySet().iterator(); it.hasNext(); ) {
             String key = it.next();
             sum += map.get(key);
         }

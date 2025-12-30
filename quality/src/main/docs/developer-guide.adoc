@@ -4,7 +4,8 @@
 
 == Architecture Overview
 
-The MeaningfulMessageCheck system enforces high-quality, informative messages in assertions, exceptions, logs, annotations, and Javadoc. It follows a pipeline architecture:
+The MeaningfulMessageCheck system enforces high-quality, informative messages in assertions, exceptions, logs, annotations, and Javadoc.
+It follows a pipeline architecture:
 
 [source]
 ----
@@ -114,9 +115,9 @@ public enum RuleId {
 ----
 
 Parameters:
-- `code`: Short code for `@SuppressWarnings` (e.g., `MMYourRule`)
-- `messageKey`: Key in `messages.properties`
-- `priority`: Lower = higher priority (evaluated earlier, wins conflicts). Use 10-20 for most rules.
+- `code`: Short code for `@SuppressWarnings` (e.g., `MMYourRule`) - `messageKey`: Key in `messages.properties`
+- `priority`: Lower = higher priority (evaluated earlier, wins conflicts).
+Use 10-20 for most rules.
 - `sources`: Which `MessageSource` types this rule applies to
 
 === Step 3: Add Message to messages.properties
@@ -128,7 +129,7 @@ Edit `src/main/resources/net/openhft/quality/messages.properties`:
 assert.message.your.key = [MMYourRule] Problem description. Why: {0}. Fix: Suggested action. Ref: your-rule-anchor
 ----
 
-Placeholders `{0}`, `{1}`, etc. correspond to arguments passed to `record()`.
+Placeholders `\{0}`, `\{1}`, etc. correspond to arguments passed to `record()`.
 
 === Step 4: Add Test Input and Test Method
 
@@ -255,7 +256,8 @@ Edit `MeaningfulMessageProcessor.java` to:
 
 == Design Decisions
 
-Key architectural decisions are documented in `decision-log.adoc`. Notable choices:
+Key architectural decisions are documented in `decision-log.adoc`.
+Notable choices:
 
 - **Priority-based conflict resolution**: When multiple rules match, lowest priority number wins
 - **Per-line deduplication**: Only one violation per line to avoid noise
@@ -300,9 +302,4 @@ sink().emitMissingMessage(lineNo, source);
 === In MessageAstSupport
 
 Commonly used methods:
-- `extractMethodName(DetailAST methodCall)` - Get method name from call
-- `collectArguments(DetailAST elist)` - Get list of argument expressions
-- `unwrapExpr(DetailAST expr)` - Remove EXPR wrapper
-- `isNullLiteral(DetailAST expr)` - Check for null
-- `findLambda(DetailAST expr)` - Find lambda in expression
-- `extractTypeName(DetailAST type)` - Get type name from TYPE node
+- `extractMethodName(DetailAST methodCall)` - Get method name from call - `collectArguments(DetailAST elist)` - Get list of argument expressions - `unwrapExpr(DetailAST expr)` - Remove EXPR wrapper - `isNullLiteral(DetailAST expr)` - Check for null - `findLambda(DetailAST expr)` - Find lambda in expression - `extractTypeName(DetailAST type)` - Get type name from TYPE node

@@ -4,8 +4,11 @@
 package net.openhft.quality.mm;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -147,6 +150,7 @@ public final class MessageRuleSupport {
         String[] words = metricsCalculator.splitWords(withoutName);
         List<String> filler = new ArrayList<>();
         List<String> meaningful = new ArrayList<>();
+        Set<String> meaningfulSeen = new HashSet<>();
 
         for (String word : words) {
             if (word.isEmpty()) {
@@ -164,7 +168,10 @@ public final class MessageRuleSupport {
                 filler.add(word);
                 continue;
             }
-            meaningful.add(word);
+            String normalised = word.toLowerCase(Locale.ROOT);
+            if (meaningfulSeen.add(normalised)) {
+                meaningful.add(word);
+            }
         }
 
         boolean hasSubstance = meaningful.size() >= MIN_WORDS_WITHOUT_NAME;
@@ -181,9 +188,9 @@ public final class MessageRuleSupport {
             diagnosis = "only filler words remain: " + String.join(", ", filler);
         } else if (filler.isEmpty()) {
             diagnosis = "too short - only " + meaningful.size()
-                    + " word(s): " + String.join(", ", meaningful);
+                    + " unique word(s): " + String.join(", ", meaningful);
         } else {
-            diagnosis = "only " + meaningful.size() + " meaningful word(s): "
+            diagnosis = "only " + meaningful.size() + " unique meaningful word(s): "
                     + String.join(", ", meaningful)
                     + " (filler: " + String.join(", ", filler) + ")";
         }

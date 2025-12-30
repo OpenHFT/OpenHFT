@@ -7,12 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for {@link ViolationCollector}.
@@ -40,7 +40,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void higherPriorityReplacesExisting() throws Exception {
         // First record a low priority violation (higher number = lower priority)
         collector.record(10, RuleId.TOO_SHORT);  // priority 24
@@ -55,7 +54,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void lowerPriorityDoesNotReplaceExisting() throws Exception {
         // First record a high priority violation (lower number = higher priority)
         collector.record(10, RuleId.CONTEXTLESS);  // priority 1
@@ -69,7 +67,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void samePriorityShorterCodeWins() throws Exception {
         // Both have priority 0, but different code lengths
         // ASSERTJ_OVERRIDE has code "MMAssertJGenericOverride" (24 chars)
@@ -84,7 +81,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void samePriorityAndCodeLengthOrdinalWins() throws Exception {
         // Same priority (0), same code length - ordinal breaks the tie
         // Record the same rule twice (should be no-op)
@@ -97,7 +93,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void clearRemovesPendingViolations() throws Exception {
         collector.record(10, RuleId.TOO_SHORT);
         collector.record(20, RuleId.CONTEXTLESS);
@@ -109,7 +104,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void multipleViolationsOnDifferentLines() throws Exception {
         collector.record(10, RuleId.TOO_SHORT);
         collector.record(20, RuleId.TOO_LONG);
@@ -123,7 +117,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void recordPreservesArgs() throws Exception {
         collector.record(10, RuleId.LONG_WORD, "argumentOne", "argumentTwo");
 
@@ -148,7 +141,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void negativeLineNumberAllowed() throws Exception {
         collector.record(-1, RuleId.TOO_SHORT);
 
@@ -157,7 +149,6 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void zeroLineNumberAllowed() throws Exception {
         collector.record(0, RuleId.TOO_SHORT);
 
@@ -165,10 +156,115 @@ class ViolationCollectorTest {
         assertTrue(pending.containsKey(0), "zero line number should be allowed");
     }
 
+    // --- pending map state tests (flush behavior verification) ---
+
+    @Test
+    void pendingMapKeysAreSortable() throws Exception {
+        // Record violations out of order
+        collector.record(30, RuleId.TOO_SHORT);
+        collector.record(10, RuleId.TOO_LONG);
+        collector.record(20, RuleId.GENERIC);
+
+        // Verify we can sort the keys as flush() does
+        Map<Integer, Violation> pending = getPendingMap();
+        List<Integer> lines = new ArrayList<>(pending.keySet());
+        Collections.sort(lines);
+
+        assertEquals(3, lines.size(), "should have 3 lines");
+        assertEquals(10, lines.get(0).intValue(), "first should be 10");
+        assertEquals(20, lines.get(1).intValue(), "second should be 20");
+        assertEquals(30, lines.get(2).intValue(), "third should be 30");
+    }
+
+    @Test
+    void violationsHaveCorrectMessageKeys() throws Exception {
+        collector.record(10, RuleId.TOO_SHORT);
+
+        Map<Integer, Violation> pending = getPendingMap();
+        Violation violation = pending.get(10);
+
+        assertEquals(RuleId.TOO_SHORT.messageKey(), violation.ruleId().messageKey(),
+                "message key should match rule");
+    }
+
+    @Test
+    void violationsPreserveAllArgs() throws Exception {
+        collector.record(10, RuleId.LONG_WORD, "testArg1", "testArg2");
+
+        Map<Integer, Violation> pending = getPendingMap();
+        Violation violation = pending.get(10);
+        Object[] args = violation.args();
+
+        assertEquals(2, args.length, "should have 2 args");
+        assertEquals("testArg1", args[0], "first arg mismatch");
+        assertEquals("testArg2", args[1], "second arg mismatch");
+    }
+
+    @Test
+    void recordWithSuppressedRuleReturnsFalse() throws Exception {
+        // Create a suppression tracker with MM-all suppressed
+        SuppressionTracker tracker = new SuppressionTracker();
+        // Use reflection to push a scope with suppressAll = true
+        pushSuppressAllScope(tracker);
+
+        ViolationCollector collectorWithTracker = new ViolationCollector(tracker);
+        boolean recorded = collectorWithTracker.record(10, RuleId.TOO_SHORT);
+
+        assertFalse(recorded, "suppressed rule should not be recorded");
+    }
+
+    @Test
+    void recordWithSuppressedRuleDoesNotAddToPending() throws Exception {
+        // Create a suppression tracker with MM-all suppressed
+        SuppressionTracker tracker = new SuppressionTracker();
+        pushSuppressAllScope(tracker);
+
+        ViolationCollector collectorWithTracker = new ViolationCollector(tracker);
+        collectorWithTracker.record(10, RuleId.TOO_SHORT);
+
+        // Verify nothing was added
+        Field pendingField = ViolationCollector.class.getDeclaredField("pending");
+        pendingField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<Integer, Violation> pending =
+                (Map<Integer, Violation>) pendingField.get(collectorWithTracker);
+        assertTrue(pending.isEmpty(), "suppressed rule should not add to pending");
+    }
+
     @SuppressWarnings("unchecked")
     private Map<Integer, Violation> getPendingMap() throws Exception {
         Field pendingField = ViolationCollector.class.getDeclaredField("pending");
         pendingField.setAccessible(true);
         return (Map<Integer, Violation>) pendingField.get(collector);
+    }
+
+    private void pushSuppressAllScope(SuppressionTracker tracker) throws Exception {
+        // Use reflection to create and push a SuppressionScope with suppressAll = true
+        Class<?> scopeClass = null;
+        for (Class<?> innerClass : SuppressionTracker.class.getDeclaredClasses()) {
+            if (innerClass.getSimpleName().equals("SuppressionScope")) {
+                scopeClass = innerClass;
+                break;
+            }
+        }
+        if (scopeClass == null) {
+            throw new IllegalStateException("SuppressionScope inner class not found");
+        }
+
+        java.lang.reflect.Constructor<?> constructor = scopeClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        Object scope = constructor.newInstance();
+
+        // Set suppressAll = true
+        Field suppressAllField = scopeClass.getDeclaredField("suppressAll");
+        suppressAllField.setAccessible(true);
+        suppressAllField.setBoolean(scope, true);
+
+        // Push to the scopes stack
+        Field scopesField = SuppressionTracker.class.getDeclaredField("scopes");
+        scopesField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        java.util.Deque<Object> scopes = (java.util.Deque<Object>) scopesField.get(tracker);
+        scopes.push(scope);
     }
 }

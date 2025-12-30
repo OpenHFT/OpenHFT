@@ -6,6 +6,7 @@ class InputMultipleTestMethods { // violation
     @Test
     void test1() { // violation
     }
+
     @Test
     void test2() { // violation
     }

@@ -7,8 +7,7 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import net.openhft.quality.mm.RuleId;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,8 +22,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+@SuppressWarnings("MMDisplayName")
 public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
 
     static Stream<Arguments> provideStandardTestCases() {
@@ -92,9 +93,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                                 "only filler words remain: failed, at, line, 50"},
                         {109, RuleId.REDUNDANT_LINE, "testCombinedMethodAndLine error at L99", "L99"},
                         {114, RuleId.REDUNDANT_CLASS, "InputAllWarningTypes.testTripleCombined at line 42", "InputAllWarningTypes",
-                                "only 1 meaningful word(s): testTripleCombined (filler: at, line, 42)"},
+                                "only 1 unique meaningful word(s): testTripleCombined (filler: at, line, 42)"},
                         {146, RuleId.WHITESPACE_RUN, "order  should persist", "  "},
-                        {155, RuleId.TOO_FEW_MEANINGFUL, "expected value should match", 1, 2}
+                        {155, RuleId.TOO_FEW_MEANINGFUL, "expected value should match", "match", 1, 2}
                 }),
                 arguments("TrivialSupplier", "InputTrivialSupplier.java", new Object[][]{
                         {16, RuleId.TRIVIAL_SUPPLIER, "expected match"},
@@ -162,7 +163,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 arguments("WordMetrics", "InputWordMetrics.java", new Object[][]{
                         {16, RuleId.TOO_SHORT, "short", 1, 4},
                         {18, RuleId.TOO_SHORT, "too short", 2, 4},
-                        {27, RuleId.TOO_FEW_MEANINGFUL, "expected result ok value", 1, 2},
+                        {27, RuleId.TOO_FEW_MEANINGFUL, "expected result ok value", "ok", 1, 2},
                         {36, RuleId.TOO_LONG, "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twentyone twentytwo twentythree twentyfour twentyfive twentysix twentyseven twentyeight twentynine thirty thirtyone thirtytwo thirtythree thirtyfour thirtyfive thirtysix thirtyseven thirtyeight thirtynine forty fortyone fortytwo fortythree", 43, 42},
                         {45, RuleId.LONG_WORD, "error in SomeExtremelyVeryLongClassNameThatExceedsLimitHere here",
                                 "SomeExtremelyVeryLongClassNameThatExceedsLimitHere", 42},
@@ -208,7 +209,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 }),
                 arguments("HamcrestMessages", "InputHamcrestMessages.java", new Object[][]{
                         {13, RuleId.TOO_SHORT, "bad input", 2, 4},
-                        {14, RuleId.TOO_FEW_MEANINGFUL, "expected result should match", 1, 2}
+                        {14, RuleId.TOO_FEW_MEANINGFUL, "expected result should match", "match", 1, 2}
                 }),
                 arguments("MethodCallMessageTemplates", "InputMethodCallMessageTemplates.java", new Object[][]{
                         {14, RuleId.GENERIC, "expected"},
@@ -240,8 +241,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {24, RuleId.MISSING_COMPARISON_VALUES, "==", "a", "b"},
                         {25, RuleId.MISSING_COMPARISON_VALUES, "!=", "a", "b"},
                         {26, RuleId.MISSING_COMPARISON_VALUES, ">", "a", "b"},
-                        {39, RuleId.TOO_FEW_MEANINGFUL, "result should be valid", 1, 2},
-                        {40, RuleId.TOO_FEW_MEANINGFUL, "collection should not be empty", 1, 2}
+                        {39, RuleId.TOO_FEW_MEANINGFUL, "result should be valid", "valid", 1, 2},
+                        {40, RuleId.TOO_FEW_MEANINGFUL, "collection should not be empty", "collection", 1, 2}
                 }),
                 arguments("MissingStringSearchValues", "InputStringSearchValues.java", new Object[][]{
                         {19, RuleId.MISSING_STRING_VALUE, "contains", "text", "\"@\""},
@@ -279,7 +280,10 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {36, RuleId.GENERIC, "value"},
                         {40, RuleId.MISSING_MESSAGE},
                         {44, RuleId.MISSING_MESSAGE},
-                        {53, RuleId.WHITESPACE_RUN, "order  should persist", "  "}
+                        {53, RuleId.WHITESPACE_RUN, "order  should persist", "  "},
+                        {61, RuleId.TOO_FEW_MEANINGFUL,
+                                "suffix behaviour under expected input and output conditions",
+                                "suffix", 1, 4}
                 }),
                 arguments("LogMessages", "InputLogMessages.java", new Object[][]{
                         {16, RuleId.MISSING_MESSAGE},
@@ -295,7 +299,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {33, RuleId.MISSING_MESSAGE},
                         {35, RuleId.MISSING_SUBJECT, "should reconnect"},
                         {38, RuleId.MISSING_MESSAGE},
-                        {40, RuleId.TOO_FEW_MEANINGFUL, "expected value should match", 1, 2},
+                        {40, RuleId.TOO_FEW_MEANINGFUL, "expected value should match", "match", 1, 2},
                         {41, RuleId.TOO_SHORT, "", 1, 4},
                         {44, RuleId.MISSING_MESSAGE},
                         {46, RuleId.TOO_SHORT, "", 0, 4},
@@ -400,7 +404,14 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {107, RuleId.TRIVIAL_SUPPLIER, "instanceField"},
                         {112, RuleId.TRIVIAL_SUPPLIER, "prefix: {} ..."},
                         {117, RuleId.TRIVIAL_SUPPLIER, "this string is definitely longer than twelve characters: {} ..."}
-                })
+                }),
+                arguments("DisplayNameMessages", "InputDisplayNameMessages.java", new Object[][]{
+                        {18, RuleId.MISSING_DISPLAY_NAME, "testWithoutDisplayName"},
+                        {29, RuleId.MISSING_DISPLAY_NAME, "parameterizedWithoutDisplayName"}
+                }),
+                // Coverage-only input files - no expected violations
+                arguments("JavadocEdgeCases", "InputJavadocEdgeCases.java", new Object[][]{}),
+                arguments("AssertionRarePaths", "InputAssertionRarePaths.java", new Object[][]{})
         );
     }
 
@@ -443,10 +454,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
 
         verify(checkConfig, getPath("InputProcessorCoverage.java"), expected);
 
-        Assert.assertTrue("Extraction file missing: " + output, Files.exists(output));
+        assertTrue(Files.exists(output), "Extraction file missing: " + output);
         List<String> lines = Files.readAllLines(output, StandardCharsets.UTF_8);
-        Assert.assertTrue("Extraction file should contain header and data",
-                lines.size() >= 2);
+        assertTrue(lines.size() >= 2, "Extraction file should contain header and data");
     }
 
     @Test
@@ -509,18 +519,18 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
-    public void testRuleCodeNaming() throws Exception {
+    public void testRuleCodeNaming() {
         final List<String> codes = new ArrayList<>();
         for (RuleId ruleId : RuleId.values()) {
             codes.add(ruleId.code());
         }
 
-        Assert.assertFalse("No rule codes found", codes.isEmpty());
+        assertFalse(codes.isEmpty(), "No rule codes found");
         final Set<String> uniqueCodes = new HashSet<>(codes);
-        Assert.assertEquals("Duplicate rule codes detected", codes.size(), uniqueCodes.size());
+        assertEquals(codes.size(), uniqueCodes.size(), "Duplicate rule codes detected");
 
         for (String code : codes) {
-            Assert.assertTrue("Rule code format invalid: " + code, code.matches("MM[A-Z][A-Za-z]*"));
+            assertTrue(code.matches("MM[A-Z][A-Za-z]*"), "Rule code format invalid: " + code);
         }
     }
 }

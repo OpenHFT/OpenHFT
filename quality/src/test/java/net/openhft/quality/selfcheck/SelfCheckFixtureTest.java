@@ -3,9 +3,11 @@
  */
 package net.openhft.quality.selfcheck;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@SuppressWarnings("MMDisplayName")
 public class SelfCheckFixtureTest {
 
     @Test
@@ -31,11 +33,7 @@ public class SelfCheckFixtureTest {
         fixture.triggerDuplicateFirst(value);
         fixture.triggerDuplicateSecond(value);
 
-        try {
-            fixture.triggerMissingMessage();
-            Assert.fail("Expected IllegalStateException from triggerMissingMessage invocation");
-        } catch (IllegalStateException expected) {
-            // expected
-        }
+        assertThrows(IllegalStateException.class, fixture::triggerMissingMessage,
+                "Expected IllegalStateException from triggerMissingMessage invocation");
     }
 }

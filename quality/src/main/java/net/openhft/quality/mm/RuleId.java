@@ -140,7 +140,12 @@ public enum RuleId {
     TOO_SHORT("assert.message.too.short", "MMTooShort", 24,
             EnumSet.of(MessageSource.ASSERTION, MessageSource.PRECONDITION,
                     MessageSource.THROW, MessageSource.ANNOTATION, MessageSource.LOG,
-                    MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER));
+                    MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
+    /**
+     * Missing @DisplayName annotation on JUnit 5 test method.
+     */
+    MISSING_DISPLAY_NAME("assert.message.missing.display.name", "MMDisplayName", 25,
+            EnumSet.of(MessageSource.ANNOTATION));
 
     private final String messageKey;
     private final String code;

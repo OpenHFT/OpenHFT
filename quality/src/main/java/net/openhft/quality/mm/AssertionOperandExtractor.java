@@ -14,18 +14,14 @@ import java.util.Objects;
 public final class AssertionOperandExtractor {
 
     private final MessageAstSupport astSupport;
-    private final MessageTemplateExtractor templateExtractor;
 
     /**
      * Create an operand extractor.
      *
-     * @param astSupport        AST support utilities.
-     * @param templateExtractor template extractor for string literals.
+     * @param astSupport AST support utilities.
      */
-    public AssertionOperandExtractor(MessageAstSupport astSupport,
-                                     MessageTemplateExtractor templateExtractor) {
+    public AssertionOperandExtractor(MessageAstSupport astSupport) {
         this.astSupport = Objects.requireNonNull(astSupport);
-        this.templateExtractor = Objects.requireNonNull(templateExtractor);
     }
 
     /**

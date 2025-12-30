@@ -31,7 +31,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         this.loopAnalyzer = new LoopIndexAnalyzer(astSupport());
         this.lambdaExtractor = new LambdaMessageExtractor(context);
         this.typeAnalyzer = new ExpressionTypeAnalyzer(context);
-        this.operandExtractor = new AssertionOperandExtractor(astSupport(), context.templateExtractor());
+        this.operandExtractor = new AssertionOperandExtractor(astSupport());
     }
 
     /**
@@ -252,13 +252,9 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 if (source == MessageSource.ASSERTION
                         && (methodName.equals("assertTrue") || methodName.equals("assertFalse"))) {
                     AssertionOperandExtractor.BooleanAssertionOperands operands = operandExtractor.resolveBooleanAssertionOperands(elist, style);
-                    if (operands != null) {
-                        comparisonInfo = operandExtractor.extractComparison(operands.conditionExpr());
-                        searchInfo = operandExtractor.extractStringSearch(operands.conditionExpr());
-                        constantMessage = isConstantStringExpression(astSupport().unwrapExpr(operands.messageExpr()));
-                    } else {
-                        constantMessage = isConstantStringExpression(astSupport().unwrapExpr(messageExpr));
-                    }
+                    comparisonInfo = operandExtractor.extractComparison(operands.conditionExpr());
+                    searchInfo = operandExtractor.extractStringSearch(operands.conditionExpr());
+                    constantMessage = isConstantStringExpression(astSupport().unwrapExpr(operands.messageExpr()));
                 } else {
                     constantMessage = isConstantStringExpression(astSupport().unwrapExpr(messageExpr));
                 }

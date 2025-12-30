@@ -9,11 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link MessageRuleSupport}.
@@ -42,7 +38,7 @@ public class MessageRuleSupportTest {
             "ACTUAL", "Expected", "VALUE"
     })
     void isGenericMessageReturnsTrue(String message) {
-        assertTrue("Expected generic: " + message, ruleSupport.isGenericMessage(message));
+        assertTrue(ruleSupport.isGenericMessage(message), "Expected generic: " + message);
     }
 
     @ParameterizedTest
@@ -51,7 +47,7 @@ public class MessageRuleSupportTest {
             "file not found", "actual value differs"
     })
     void isGenericMessageReturnsFalse(String message) {
-        assertFalse("Expected not generic: " + message, ruleSupport.isGenericMessage(message));
+        assertFalse(ruleSupport.isGenericMessage(message), "Expected not generic: " + message);
     }
 
     @Test
@@ -72,7 +68,7 @@ public class MessageRuleSupportTest {
             "equals", "not null", "is null", "is true", "is false"
     })
     void isRestatesAssertionReturnsTrue(String message) {
-        assertTrue("Expected restates: " + message, ruleSupport.isRestatesAssertion(message));
+        assertTrue(ruleSupport.isRestatesAssertion(message), "Expected restates: " + message);
     }
 
     @ParameterizedTest
@@ -81,7 +77,7 @@ public class MessageRuleSupportTest {
             "connection should be established", "file must exist"
     })
     void isRestatesAssertionReturnsFalse(String message) {
-        assertFalse("Expected not restates: " + message, ruleSupport.isRestatesAssertion(message));
+        assertFalse(ruleSupport.isRestatesAssertion(message), "Expected not restates: " + message);
     }
 
     @Test
@@ -105,7 +101,7 @@ public class MessageRuleSupportTest {
             "indices should be valid", "config error rethrown"
     })
     void isContextlessReturnsTrue(String message) {
-        assertTrue("Expected contextless: " + message, ruleSupport.isContextless(message));
+        assertTrue(ruleSupport.isContextless(message), "Expected contextless: " + message);
     }
 
     @ParameterizedTest
@@ -115,7 +111,7 @@ public class MessageRuleSupportTest {
             "invalid email format detected"
     })
     void isContextlessReturnsFalse(String message) {
-        assertFalse("Expected not contextless: " + message, ruleSupport.isContextless(message));
+        assertFalse(ruleSupport.isContextless(message), "Expected not contextless: " + message);
     }
 
     @Test
@@ -240,6 +236,14 @@ public class MessageRuleSupportTest {
         assertFalse(result.hasSubstance());
         // Only 1 meaningful word, plus filler
         assertTrue(result.diagnosis().contains("meaningful word"));
+    }
+
+    @Test
+    void analyseSubstanceUsesUniqueMeaningfulWords() {
+        MessageRuleSupport.SubstanceAnalysis result =
+                ruleSupport.analyseSubstance("userName valid valid", "userName");
+        assertFalse(result.hasSubstance());
+        assertTrue(result.diagnosis().contains("unique"));
     }
 
     @Test

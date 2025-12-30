@@ -9,9 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for {@link MessageMetrics}.
@@ -34,6 +32,28 @@ class MessageMetricsTest {
     void meaningfulWordCountReturnsConstructorValue() {
         MessageMetrics metrics = new MessageMetrics(25, 5, 3, 6, 4, Collections.emptyList());
         assertEquals(3, metrics.meaningfulWordCount(), "meaningfulWordCount should return value");
+    }
+
+    @Test
+    void meaningfulWordsReturnsEmptyListWhenNotProvided() {
+        MessageMetrics metrics = new MessageMetrics(25, 5, 3, 6, 4, Collections.emptyList());
+        assertTrue(metrics.meaningfulWords().isEmpty(), "meaningfulWords should be empty when not provided");
+    }
+
+    @Test
+    void meaningfulWordsReturnsProvidedList() {
+        List<String> meaningful = Arrays.asList("account", "balance");
+        MessageMetrics metrics = new MessageMetrics(25, 5, 2, 6, 4, meaningful, Collections.emptyList());
+        assertEquals(meaningful, metrics.meaningfulWords(), "meaningfulWords should match provided list");
+    }
+
+    @Test
+    void meaningfulWordsReturnsUnmodifiableList() {
+        List<String> meaningful = Collections.singletonList("account");
+        MessageMetrics metrics = new MessageMetrics(25, 5, 1, 6, 4, meaningful, Collections.emptyList());
+        assertThrows(UnsupportedOperationException.class,
+                () -> metrics.meaningfulWords().add("balance"),
+                "meaningfulWords list should be unmodifiable");
     }
 
     @Test
@@ -65,7 +85,7 @@ class MessageMetricsTest {
 
     @Test
     void longWordsReturnsUnmodifiableList() {
-        List<String> longWordsList = Arrays.asList("identifier");
+        List<String> longWordsList = Collections.singletonList("identifier");
         MessageMetrics metrics = new MessageMetrics(20, 3, 1, 4, 2, longWordsList);
         assertThrows(UnsupportedOperationException.class,
                 () -> metrics.longWords().add("newWord"),

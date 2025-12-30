@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 /**
  * Test input for MMDisplayName rule validation.
  */
-@SuppressWarnings("MeaningfulMessage")
+@SuppressWarnings({"MMTooShort", "MMTooFewMeaningfulWords"})
 class InputDisplayNameMessages {
 
     // violation below: test method without @DisplayName

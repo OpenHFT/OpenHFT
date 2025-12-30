@@ -4,21 +4,15 @@
 package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link MeaningfulMessageProcessor}.
@@ -36,19 +30,19 @@ public class MeaningfulMessageProcessorTest {
 
     @Test
     void getDefaultTokensReturnsRequiredTokens() {
-        assertArrayEquals(processor.getRequiredTokens(), processor.getDefaultTokens());
+        Assertions.assertArrayEquals(processor.getRequiredTokens(), processor.getDefaultTokens());
     }
 
     @Test
     void getAcceptableTokensReturnsRequiredTokens() {
-        assertArrayEquals(processor.getRequiredTokens(), processor.getAcceptableTokens());
+        Assertions.assertArrayEquals(processor.getRequiredTokens(), processor.getAcceptableTokens());
     }
 
     @Test
     void getRequiredTokensContainsExpectedTypes() {
         int[] tokens = processor.getRequiredTokens();
         assertNotNull(tokens);
-        assertTrue("Should have tokens", tokens.length > 0);
+        assertTrue(tokens.length > 0, "Should have tokens");
 
         Set<Integer> tokenSet = new HashSet<>();
         for (int token : tokens) {
@@ -56,14 +50,14 @@ public class MeaningfulMessageProcessorTest {
         }
 
         // Verify key token types are present
-        assertTrue("Should include IMPORT", tokenSet.contains(TokenTypes.IMPORT));
-        assertTrue("Should include STATIC_IMPORT", tokenSet.contains(TokenTypes.STATIC_IMPORT));
-        assertTrue("Should include CLASS_DEF", tokenSet.contains(TokenTypes.CLASS_DEF));
-        assertTrue("Should include METHOD_DEF", tokenSet.contains(TokenTypes.METHOD_DEF));
-        assertTrue("Should include LITERAL_ASSERT", tokenSet.contains(TokenTypes.LITERAL_ASSERT));
-        assertTrue("Should include LITERAL_THROW", tokenSet.contains(TokenTypes.LITERAL_THROW));
-        assertTrue("Should include ANNOTATION", tokenSet.contains(TokenTypes.ANNOTATION));
-        assertTrue("Should include METHOD_CALL", tokenSet.contains(TokenTypes.METHOD_CALL));
+        assertTrue(tokenSet.contains(TokenTypes.IMPORT), "Should include IMPORT");
+        assertTrue(tokenSet.contains(TokenTypes.STATIC_IMPORT), "Should include STATIC_IMPORT");
+        assertTrue(tokenSet.contains(TokenTypes.CLASS_DEF), "Should include CLASS_DEF");
+        assertTrue(tokenSet.contains(TokenTypes.METHOD_DEF), "Should include METHOD_DEF");
+        assertTrue(tokenSet.contains(TokenTypes.LITERAL_ASSERT), "Should include LITERAL_ASSERT");
+        assertTrue(tokenSet.contains(TokenTypes.LITERAL_THROW), "Should include LITERAL_THROW");
+        assertTrue(tokenSet.contains(TokenTypes.ANNOTATION), "Should include ANNOTATION");
+        assertTrue(tokenSet.contains(TokenTypes.METHOD_CALL), "Should include METHOD_CALL");
     }
 
     // --- setMessageExtractionFile tests ---
@@ -185,7 +179,7 @@ public class MeaningfulMessageProcessorTest {
         Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("normalizeClassName", String.class);
         method.setAccessible(true);
 
-        assertEquals(null, method.invoke(processor, ""));
+        assertNull(method.invoke(processor, ""));
     }
 
     @Test
@@ -193,7 +187,7 @@ public class MeaningfulMessageProcessorTest {
         Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("normalizeClassName", String.class);
         method.setAccessible(true);
 
-        assertEquals(null, method.invoke(processor, "   "));
+        assertNull(method.invoke(processor, "   "));
     }
 
     // --- escapeForTsv tests via reflection ---

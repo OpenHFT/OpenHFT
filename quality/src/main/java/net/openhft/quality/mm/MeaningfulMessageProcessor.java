@@ -263,6 +263,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             case TokenTypes.METHOD_DEF:
             case TokenTypes.CTOR_DEF:
             case TokenTypes.COMPACT_CTOR_DEF:
+                checkMissingDisplayName();
                 context.leaveMethod();
                 suppressionTracker.leaveScope();
                 break;
@@ -275,6 +276,16 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void checkMissingDisplayName() {
+        if (context.isCurrentMethodTest() && !context.currentMethodHasDisplayName()) {
+            String methodName = context.currentMethodName();
+            int lineNo = context.currentMethodLineNo();
+            if (methodName != null && lineNo > 0) {
+                violationCollector.record(lineNo, RuleId.MISSING_DISPLAY_NAME, methodName);
+            }
         }
     }
 
@@ -403,7 +414,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private MessageMetrics computeMessageMetrics(String message, int placeholderCount, int keyValueLabelCount) {
         if (metricsCalculator == null) {
             return new MessageMetrics(0, 0, 0, placeholderCount,
-                    placeholderCount, java.util.Collections.emptyList());
+                    placeholderCount, java.util.Collections.emptyList(),
+                    java.util.Collections.emptyList());
         }
         return metricsCalculator.calculate(message, placeholderCount, keyValueLabelCount);
     }

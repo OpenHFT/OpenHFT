@@ -57,4 +57,8 @@ public class InputAnnotationMessages {
     @Disabled(/* awaiting lower-latency fix */)
     public void disabledMissingReasonWithComment() {
     }
+
+    @DisplayName("suffix behaviour under expected input and output conditions")
+    public void displayNameTooFewMeaningfulWords() {
+    }
 }

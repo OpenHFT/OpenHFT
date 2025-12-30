@@ -38,9 +38,11 @@ public final class MessageMetricsCalculator {
                     "null", "true", "false", "non", "empty",
                     "have", "has", "does", "contain", "contains", "exist", "exists",
                     "present", "set", "get", "first", "second", "one", "two",
-                    "more", "only", "all", "without", "within",
+                    "more", "only", "all", "without", "within", "under",
                     "line", "method", "class", "assertion", "occurred", "here",
-                    "call", "new", "instance", "created", "successfully"
+                    "call", "new", "instance", "created", "successfully",
+                    "input", "output", "conditions", "behaviour", "behavior",
+                    "behaviours"
             )
     );
 
@@ -62,7 +64,8 @@ public final class MessageMetricsCalculator {
         Objects.requireNonNull(message);
         String[] words = splitWords(message);
         int wordCount = 0;
-        int meaningfulWordCount = 0;
+        LinkedHashSet<String> uniqueMeaningfulWords = new LinkedHashSet<>();
+        List<String> meaningfulWords = new ArrayList<>();
         List<String> longWords = new ArrayList<>();
         for (String word : words) {
             if (word.isEmpty()) {
@@ -73,9 +76,13 @@ public final class MessageMetricsCalculator {
                 longWords.add(word);
             }
             if (!isFillerWord(word)) {
-                meaningfulWordCount++;
+                String normalised = word.toLowerCase(Locale.ROOT);
+                if (uniqueMeaningfulWords.add(normalised)) {
+                    meaningfulWords.add(word);
+                }
             }
         }
+        int meaningfulWordCount = meaningfulWords.size();
         int totalWordCount = wordCount + placeholderCount;
         int effectiveMeaningfulWordCount = meaningfulWordCount + placeholderCount;
         if (keyValueLabelCount > 0 && placeholderCount >= keyValueLabelCount) {
@@ -83,7 +90,7 @@ public final class MessageMetricsCalculator {
                     placeholderCount + keyValueLabelCount);
         }
         return new MessageMetrics(message.length(), wordCount, meaningfulWordCount,
-                totalWordCount, effectiveMeaningfulWordCount, longWords);
+                totalWordCount, effectiveMeaningfulWordCount, meaningfulWords, longWords);
     }
 
     /**

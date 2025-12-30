@@ -9,8 +9,7 @@ import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,6 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+@SuppressWarnings("MMDisplayName")
 public class QualityCheckstyleSelfTest {
 
     private static final String CONFIG_RESOURCE =
@@ -87,13 +89,13 @@ public class QualityCheckstyleSelfTest {
 
     private static Path resourcePath(final String resource) throws Exception {
         final URL url = QualityCheckstyleSelfTest.class.getClassLoader().getResource(resource);
-        Assert.assertNotNull("Missing required classpath resource: " + resource, url);
+        assertNotNull(url, "Missing required classpath resource: " + resource);
         return Paths.get(url.toURI());
     }
 
     private static Path locateBaseDir() throws Exception {
         final URL root = QualityCheckstyleSelfTest.class.getResource("/");
-        Assert.assertNotNull("Missing test classpath root.", root);
+        assertNotNull(root, "Missing test classpath root.");
         final Path testClasses = Paths.get(root.toURI());
         final Path targetDir = testClasses.getParent();
         if (targetDir != null) {
@@ -164,14 +166,14 @@ public class QualityCheckstyleSelfTest {
         final Path baseDir = locateBaseDir();
         final Path srcMainJava = baseDir.resolve("src/main/java");
         final Path srcTestJava = baseDir.resolve("src/test/java");
-        Assert.assertTrue("Missing src/main/java at " + srcMainJava, Files.isDirectory(srcMainJava));
-        Assert.assertTrue("Missing src/test/java at " + srcTestJava, Files.isDirectory(srcTestJava));
+        assertTrue(Files.isDirectory(srcMainJava), "Missing src/main/java at " + srcMainJava);
+        assertTrue(Files.isDirectory(srcTestJava), "Missing src/test/java at " + srcTestJava);
 
         final List<File> files = new ArrayList<>();
         files.addAll(collectJavaFiles(srcMainJava));
         files.addAll(collectJavaFiles(srcTestJava));
         files.sort(Comparator.comparing(File::getPath));
-        Assert.assertFalse("No Java sources under " + srcMainJava + " or " + srcTestJava, files.isEmpty());
+        assertFalse(files.isEmpty(), "No Java sources under " + srcMainJava + " or " + srcTestJava);
 
         final Configuration configuration = ConfigurationLoader.loadConfiguration(
                 resourcePath(CONFIG_RESOURCE).toString(),
@@ -196,13 +198,13 @@ public class QualityCheckstyleSelfTest {
         final String details = output.toString(StandardCharsets.UTF_8.name());
         final List<String> violations = extractViolationLines(details);
         if (violations.isEmpty()) {
-            Assert.fail("Expected " + EXPECTED_VIOLATION_COUNT
+            fail("Expected " + EXPECTED_VIOLATION_COUNT
                     + " baseline violations from SelfCheckFixture.");
         }
         final String violationDetails = String.join(System.lineSeparator(), violations);
         final String formatError = validateDetailFormat(violationDetails);
         if (formatError != null) {
-            Assert.fail("Checkstyle output format issue: " + formatError
+            fail("Checkstyle output format issue: " + formatError
                     + System.lineSeparator()
                     + violationDetails);
         }
@@ -215,21 +217,21 @@ public class QualityCheckstyleSelfTest {
             }
             Matcher matcher = RULE_CODE_PATTERN.matcher(line);
             if (!matcher.find()) {
-                Assert.fail("Checkstyle output missing rule code: " + line);
+                fail("Checkstyle output missing rule code: " + line);
             }
             String ruleCode = matcher.group(1);
             actualCounts.put(ruleCode, actualCounts.getOrDefault(ruleCode, 0) + 1);
         }
 
         if (!unexpected.isEmpty()) {
-            Assert.fail("Unexpected Checkstyle violations outside SelfCheckFixture:"
+            fail("Unexpected Checkstyle violations outside SelfCheckFixture:"
                     + System.lineSeparator()
                     + String.join(System.lineSeparator(), unexpected));
         }
 
         final int actualTotal = sumCounts(actualCounts);
         if (actualTotal != EXPECTED_VIOLATION_COUNT) {
-            Assert.fail("Unexpected number of Checkstyle violations. Expected "
+            fail("Unexpected number of Checkstyle violations. Expected "
                     + EXPECTED_VIOLATION_COUNT + " but saw " + actualTotal + "."
                     + System.lineSeparator()
                     + "Expected: " + formatCounts(EXPECTED_RULE_COUNTS)
@@ -243,7 +245,7 @@ public class QualityCheckstyleSelfTest {
             int expectedCount = EXPECTED_RULE_COUNTS.get(rule);
             int actualCount = actualCounts.getOrDefault(rule, 0);
             if (actualCount != expectedCount) {
-                Assert.fail("Unexpected Checkstyle violations for " + rule + ". Expected "
+                fail("Unexpected Checkstyle violations for " + rule + ". Expected "
                         + expectedCount + " but saw " + actualCount + "."
                         + System.lineSeparator()
                         + "Expected: " + formatCounts(EXPECTED_RULE_COUNTS)
@@ -255,14 +257,14 @@ public class QualityCheckstyleSelfTest {
         }
         for (String rule : actualCounts.keySet()) {
             if (!EXPECTED_RULE_COUNTS.containsKey(rule)) {
-                Assert.fail("Unexpected Checkstyle rule reported: " + rule
+                fail("Unexpected Checkstyle rule reported: " + rule
                         + System.lineSeparator()
                         + violationDetails);
             }
         }
 
         if (errorCount > 0) {
-            Assert.fail("Checkstyle reported " + errorCount + " error(s) but no details were captured.");
+            fail("Checkstyle reported " + errorCount + " error(s) but no details were captured.");
         }
     }
 }

@@ -31,12 +31,18 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
     public void handleAnnotation(DetailAST annotationAst) {
         String annotationName = Objects.requireNonNull(extractAnnotationName(annotationAst));
 
-        if (annotationName.equals("DisplayName")
-                || annotationName.equals("Disabled")
-                || annotationName.equals("Ignore")) {
+        // Track JUnit 5 test annotations (not JUnit 4)
+        if (context().isJUnit5TestAnnotation(annotationName)) {
+            context().markCurrentMethodAsTest();
+        }
+
+        // Track @DisplayName presence
+        if (annotationName.equals("DisplayName")) {
+            context().markCurrentMethodHasDisplayName();
+            checkAnnotationValue(annotationAst, "value");
+        } else if (annotationName.equals("Disabled") || annotationName.equals("Ignore")) {
             boolean hasValue = checkAnnotationValue(annotationAst, "value");
-            if (!hasValue
-                    && (annotationName.equals("Disabled") || annotationName.equals("Ignore"))) {
+            if (!hasValue) {
                 if (!context().hasInlineReasonComment(annotationAst)) {
                     sink().emitMissingMessage(annotationAst.getLineNo(), MessageSource.ANNOTATION);
                 }

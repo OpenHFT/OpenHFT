@@ -3,16 +3,13 @@
 :toclevels: 2
 :sectnums:
 
-The Meaningful Message Check applies these rules to assertion messages (JUnit, AssertJ, Hamcrest),
-Java `assert` statements, precondition messages (for example, `Objects.requireNonNull`), `throw new`
-exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated
-names, and disabled reasons). Log sites (SLF4J `trace/debug/info/warn/error`, Log4j2
+The Meaningful Message Check applies these rules to assertion messages (JUnit, AssertJ, Hamcrest), Java `assert` statements, precondition messages (for example, `Objects.requireNonNull`), `throw new`
+exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated names, and disabled reasons).
+Log sites (SLF4J `trace/debug/info/warn/error`, Log4j2
 `trace/debug/info/warn/error/fatal`, JUL `java.util.logging.Logger`, `System.Logger`, and Chronicle
-`Jvm.*.on(...)`) are also in scope; see `meaningful-message-checker-requirements.adoc` for the
-log-specific rules.
+`Jvm.*.on(...)`) are also in scope; see `meaningful-message-checker-requirements.adoc` for the log-specific rules.
 
-For `requireNonNull`/`requireNotNull`, a message that exactly matches the parameter name is treated
-as sufficient and the message rules are skipped for that call.
+For `requireNonNull`/`requireNotNull`, a message that exactly matches the parameter name is treated as sufficient and the message rules are skipped for that call.
 
 == Quick Reference
 
@@ -30,8 +27,9 @@ as sufficient and the message rules are skipped for that call.
 |MMIndexOnly |Index only |Name what the indexed element represents
 |MMContextless |Contextless |State what is compared and why it matters
 |MMMissingMessage |Missing message |Add a meaningful message, supply a Throwable, or use /* reason */
+|MMDisplayName |Missing display name |Add @DisplayName("descriptive name") to JUnit 5 test methods
 |MMTooShort |Too short |Add subject + expected behaviour (see requirements for minima)
-|MMTooFewMeaningfulWords |Too few meaningful words |Add meaningful words/placeholders to meet the minimum
+|MMTooFewMeaningfulWords |Too few unique meaningful words |Add meaningful words/placeholders to meet the minimum
 |MMTooLong |Too long |Keep invariant, move data to expected/actual
 |MMWhitespaceRun |Whitespace run |Use single spaces
 |MMLongWord |Long word |Use short descriptive terms, not identifiers
@@ -54,7 +52,8 @@ The same assertion message appears multiple times in the same file.
 
 === Why This Matters
 
-When a test fails, duplicate messages make it impossible to identify which specific assertion failed without looking at line numbers. Each assertion should have a unique message describing its specific invariant.
+When a test fails, duplicate messages make it impossible to identify which specific assertion failed without looking at line numbers.
+Each assertion should have a unique message describing its specific invariant.
 
 === How to Fix
 
@@ -83,7 +82,8 @@ The message contains the enclosing class name but lacks substance without it.
 
 === Why This Matters
 
-The class name already appears in the stack trace. A message that only repeats the class name (e.g., "BytesStore test") provides no additional diagnostic value.
+The class name already appears in the stack trace.
+A message that only repeats the class name (e.g., "BytesStore test") provides no additional diagnostic value.
 
 === How to Fix
 
@@ -119,7 +119,8 @@ The message contains the enclosing method name but lacks substance without it.
 
 === Why This Matters
 
-The method name already appears in the stack trace. A message like "testWriteBuffer" or "testWriteBuffer failed" adds no diagnostic value.
+The method name already appears in the stack trace.
+A message like "testWriteBuffer" or "testWriteBuffer failed" adds no diagnostic value.
 
 === How to Fix
 
@@ -150,7 +151,8 @@ The message contains a line number reference.
 
 === Why This Matters
 
-Line numbers are already shown in stack traces. Including them in messages ("L42", "line 42", "File.java:42") is redundant and becomes stale when code changes.
+Line numbers are already shown in stack traces.
+Including them in messages ("L42", "line 42", "File.java:42") is redundant and becomes stale when code changes.
 
 === How to Fix
 
@@ -174,16 +176,17 @@ assertEquals(5, count, "active user count after filtering");
 
 === Problem
 
-A `Supplier<String>` lambda returns a constant string, a simple concatenation, or a cheap expression
-with no literals.
+A `Supplier<String>` lambda returns a constant string, a simple concatenation, or a cheap expression with no literals.
 
 === Why This Matters
 
-JUnit 5's message suppliers exist for lazy evaluation - to avoid expensive string construction when tests pass. A trivial supplier like `() -> "constant"`, `() -> "value: " + x`, or `() -> name` adds lambda overhead with no benefit.
+JUnit 5's message suppliers exist for lazy evaluation - to avoid expensive string construction when tests pass.
+A trivial supplier like `() -> "constant"`, `() -> "value: " + x`, or `() -> name` adds lambda overhead with no benefit.
 
 === How to Fix
 
-Use a plain String for simple cases. If you need lazy evaluation, move the construction into a helper method.
+Use a plain String for simple cases.
+If you need lazy evaluation, move the construction into a helper method.
 
 .Before
 [source,java]
@@ -216,7 +219,8 @@ The message is a generic single word like "actual", "expected", "value", "test".
 
 === Why This Matters
 
-These words provide no context about what is being tested or what went wrong. They're often just variable names copied into the message.
+These words provide no context about what is being tested or what went wrong.
+They're often just variable names copied into the message.
 
 === How to Fix
 
@@ -245,7 +249,8 @@ The message just restates the assertion type ("should be true", "assertEquals", 
 
 === Why This Matters
 
-The assertion type is already clear from the method name. The message should explain *why* this condition matters, not repeat *what* is being checked.
+The assertion type is already clear from the method name.
+The message should explain *why* this condition matters, not repeat *what* is being checked.
 
 === How to Fix
 
@@ -334,18 +339,16 @@ No message was provided (null template or omitted reason), so there is nothing t
 
 === Why This Matters
 
-Missing messages remove the quickest path to understanding why an assertion, log, or test metadata
-failed, forcing a developer to open the code and reconstruct intent.
+Missing messages remove the quickest path to understanding why an assertion, log, or test metadata failed, forcing a developer to open the code and reconstruct intent.
 
 === How to Fix
 
-Provide a meaningful message or supply a Throwable when allowed. For log sites, use a stable
-message template; for annotations, add a clear reason. For JUnit `fail()` and `assertXxx(...)`,
-always supply a non-null message.
+Provide a meaningful message or supply a Throwable when allowed.
+For log sites, use a stable message template; for annotations, add a clear reason.
+For JUnit `fail()` and `assertXxx(...)`, always supply a non-null message.
 
-For low-level or performance-sensitive cases (especially `throw new`), you may use an inline
-block comment with a short reason inside the argument list instead of a message literal. Empty
-comments and line comments do not suppress.
+For low-level or performance-sensitive cases (especially `throw new`), you may use an inline block comment with a short reason inside the argument list instead of a message literal.
+Empty comments and line comments do not suppress.
 
 [source,java]
 ----
@@ -366,6 +369,39 @@ slf4j.warn("order should remain in pending state");
 @Disabled("awaiting fix for queue recovery")
 ----
 
+[#MMDisplayName]
+== MMDisplayName: Missing Display Name
+
+=== Problem
+
+A JUnit 5 test method does not declare @DisplayName.
+
+=== Why This Matters
+
+Readable display names make test reports actionable, especially in CI where method names alone rarely capture intent.
+They also keep results consistent with the rest of the message-quality rules.
+
+=== How to Fix
+
+Add @DisplayName with a short, descriptive sentence.
+
+.Before
+[source,java]
+----
+@Test
+void parsesTodoFiles() {
+}
+----
+
+.After
+[source,java]
+----
+@Test
+@DisplayName("Parses TODO files and reports incomplete tasks")
+void parsesTodoFiles() {
+}
+----
+
 [#MMTooShort]
 == MMTooShort: Too Short
 
@@ -379,8 +415,8 @@ Very short messages rarely provide sufficient context to diagnose failures witho
 
 === How to Fix
 
-Add a subject (what) and expected behaviour (should what). Aim for the minimums in the
-requirements; for assertions/logs, 4-8 words is a useful default.
+Add a subject (what) and expected behaviour (should what).
+Aim for the minimums in the requirements; for assertions/logs, 4-8 words is a useful default.
 
 .Pattern
 ----
@@ -406,8 +442,7 @@ assertTrue(valid, "order should pass validation rules");
 
 === Problem
 
-The message has fewer than the source minimum meaningful words or placeholders (filler words like
-"should", "be", "expected" do not count).
+The message has fewer than the source minimum unique meaningful words or placeholders (filler words like "should", "be", "expected" do not count and duplicates are ignored).
 
 === Why This Matters
 
@@ -521,7 +556,8 @@ The assertion message duplicates an input value (expected value, variable name, 
 
 === Why This Matters
 
-When the message just echoes the expected value or variable name, it provides no additional diagnostic value. The assertion framework already shows the expected and actual values.
+When the message just echoes the expected value or variable name, it provides no additional diagnostic value.
+The assertion framework already shows the expected and actual values.
 
 === How to Fix
 
@@ -552,7 +588,8 @@ The `assertAll` heading uses generic terms like "assertAll", "grouped assertions
 
 === Why This Matters
 
-The `assertAll` heading is meant to describe what the group of assertions validates. Generic headings provide no context about what invariant is being checked.
+The `assertAll` heading is meant to describe what the group of assertions validates.
+Generic headings provide no context about what invariant is being checked.
 
 === How to Fix
 
@@ -595,7 +632,8 @@ The message restates a derived assertion condition like "empty", "present", "con
 
 === Why This Matters
 
-Derived assertions like `isEmpty()`, `isPresent()`, or `contains()` already describe their condition clearly in framework output. Restating this in the message adds no value.
+Derived assertions like `isEmpty()`, `isPresent()`, or `contains()` already describe their condition clearly in framework output.
+Restating this in the message adds no value.
 
 === How to Fix
 
@@ -626,13 +664,15 @@ Using `withFailMessage()` or `overridingErrorMessage()` with a generic or low-qu
 
 === Why This Matters
 
-AssertJ's `withFailMessage()` and `overridingErrorMessage()` replace the entire failure output, including the rich diff that AssertJ normally provides. If the replacement message is generic or low-quality, you lose valuable diagnostic information.
+AssertJ's `withFailMessage()` and `overridingErrorMessage()` replace the entire failure output, including the rich diff that AssertJ normally provides.
+If the replacement message is generic or low-quality, you lose valuable diagnostic information.
 
 In contrast, `as()` adds context while preserving AssertJ's detailed failure output.
 
 === How to Fix
 
-Prefer `as()` for adding context. Only use `withFailMessage()` when you need to completely replace the output with specific diagnostic information.
+Prefer `as()` for adding context.
+Only use `withFailMessage()` when you need to completely replace the output with specific diagnostic information.
 
 .Before
 [source,java]
@@ -666,7 +706,8 @@ A `assertTrue` or `assertFalse` with a comparison expression (like `a > b`) uses
 
 === Why This Matters
 
-When a comparison assertion fails, you need to know what the actual values were to diagnose the problem. A constant message like `"should be greater"` doesn't tell you what `a` and `b` actually were.
+When a comparison assertion fails, you need to know what the actual values were to diagnose the problem.
+A constant message like `"should be greater"` doesn't tell you what `a` and `b` actually were.
 
 === How to Fix
 
@@ -700,8 +741,7 @@ assertTrue(count >= minCount,
 
 This rule only triggers when:
 - The assertion is `assertTrue` or `assertFalse`
-- The condition is a comparison (`>`, `<`, `>=`, `<=`, `==`, `!=`)
-- The message is a constant string (no dynamic content)
+- The condition is a comparison (`>`, `<`, `>=`, `<=`, `==`, `!=`) - The message is a constant string (no dynamic content)
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
@@ -714,7 +754,8 @@ A `assertTrue` or `assertFalse` with a string search method (`contains`, `starts
 
 === Why This Matters
 
-When a string search assertion fails, you need to see what the actual string was to understand why it didn't contain/start with/end with the expected value. A constant message like `"should contain pattern"` doesn't tell you what the string actually was.
+When a string search assertion fails, you need to see what the actual string was to understand why it didn't contain/start with/end with the expected value.
+A constant message like `"should contain pattern"` doesn't tell you what the string actually was.
 
 === How to Fix
 
@@ -763,7 +804,9 @@ An assertion inside an indexed `for` loop uses a constant message that doesn't i
 
 === Why This Matters
 
-When an assertion fails inside a loop, you need to know which iteration failed. A constant message like `"value should match"` doesn't tell you whether it was the first, fifth, or hundredth iteration that failed. This makes debugging significantly harder, especially for large datasets.
+When an assertion fails inside a loop, you need to know which iteration failed.
+A constant message like `"value should match"` doesn't tell you whether it was the first, fifth, or hundredth iteration that failed.
+This makes debugging significantly harder, especially for large datasets.
 
 === How to Fix
 
@@ -806,9 +849,7 @@ for (int i = 0; i < orders.size(); i++) {
 === When This Rule Doesn't Apply
 
 This rule only triggers when:
-- The assertion is inside a traditional indexed `for` loop (with `int` or `long` index)
-- The loop has an initialization, condition, and update expression
-- The message is a constant string (no dynamic content)
+- The assertion is inside a traditional indexed `for` loop (with `int` or `long` index) - The loop has an initialization, condition, and update expression - The message is a constant string (no dynamic content)
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
@@ -821,7 +862,9 @@ The assertion message starts with a modal verb (should, must, will, can, etc.) w
 
 === Why This Matters
 
-Messages like `"should be valid"` don't tell you *what* should be valid. When reading test failures, especially in CI logs, you need to know what entity is being tested. The subject provides essential context.
+Messages like `"should be valid"` don't tell you *what* should be valid.
+When reading test failures, especially in CI logs, you need to know what entity is being tested.
+The subject provides essential context.
 
 === How to Fix
 
