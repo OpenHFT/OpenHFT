@@ -16,37 +16,48 @@
 package net.openhft.todotracker.maven;
 
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Mojo should cover todo check plugin behaviour")
+@DisplayName("Todo check mojo validates Maven plugin execution path")
 class CheckTodoMojoTest {
 
     @TempDir
     Path tempDir;
     @Mock
     private MavenProject project;
+    @Mock
+    private Log log;
+    @Captor
+    private ArgumentCaptor<CharSequence> warnCaptor;
     private CheckTodoMojo mojo;
 
     @BeforeEach
     void setUp() {
         mojo = new CheckTodoMojo();
         mojo.setProject(project);
+        mojo.setLog(log);
         mojo.setContextPattern("^##\\s+.*");  // Set default context pattern
         mojo.setAsciidocContextPattern("^==\\s+.*");  // Set default AsciiDoc context pattern
         mojo.setFailOnIncomplete(true);  // Set default fail on incomplete
@@ -157,6 +168,9 @@ class CheckTodoMojoTest {
         // Should still fail, maxTasks only affects display
         assertThrows(MojoFailureException.class, mojo::execute,
                 "mojo should still fail even with maxTasks set");
+        List<String> warnings = warnLines();
+        assertTrue(warnings.stream().anyMatch(line -> line.contains("more task(s)")),
+                "mojo should report truncated task list when maxTasks is set");
     }
 
     @Test
@@ -168,6 +182,9 @@ class CheckTodoMojoTest {
         // Should still fail, showContext only affects display
         assertThrows(MojoFailureException.class, mojo::execute,
                 "mojo should still fail even when context hidden");
+        List<String> warnings = warnLines();
+        assertTrue(warnings.stream().noneMatch(line -> line.contains("Context:")),
+                "mojo should omit context lines when showContext is false");
     }
 
     @Test
@@ -178,6 +195,9 @@ class CheckTodoMojoTest {
 
         assertThrows(MojoFailureException.class, mojo::execute,
                 "mojo should fail when custom context pattern used");
+        List<String> warnings = warnLines();
+        assertTrue(warnings.stream().anyMatch(line -> line.contains("Context: Custom Header")),
+                "mojo should include custom header in context output");
     }
 
     @Test
@@ -259,6 +279,9 @@ class CheckTodoMojoTest {
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
                 "mojo should report 1 uncompleted task(s) with asciidoc context");
+        List<String> warnings = warnLines();
+        assertTrue(warnings.stream().anyMatch(line -> line.contains("Context: AsciiDoc Section")),
+                "mojo should include asciidoc header in context output");
     }
 
     @Test
@@ -427,6 +450,13 @@ class CheckTodoMojoTest {
     private void createFile(String relativePath, String content) throws IOException {
         Path path = tempDir.resolve(relativePath);
         Files.createDirectories(path.getParent());
-        Files.writeString(path, content);
+        Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private List<String> warnLines() {
+        verify(log, atLeastOnce()).warn(warnCaptor.capture());
+        return warnCaptor.getAllValues().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 }

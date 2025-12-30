@@ -27,8 +27,8 @@ import java.util.regex.Pattern;
  * <p>
  * Supports multiple patterns:
  * <ul>
- *   <li>Exact paths: {@code TODO.md}, {@code docs/TODO.md}</li>
- *   <li>Glob patterns: {@code *TODO.md}, {@code todo/*.md}, {@code todo/*.adoc}</li>
+ *   <li>Exact paths: {@code TODO.md}, {@code TODO.markdown}, {@code docs/TODO.md}</li>
+ *   <li>Glob patterns: {@code *TODO.md}, {@code *TODO.markdown}, {@code todo/*.md}, {@code todo/*.markdown}</li>
  *   <li>Recursive patterns: {@code **&#47;TODO.md} (searches all subdirectories)</li>
  * </ul>
  * <p>
@@ -36,14 +36,17 @@ import java.util.regex.Pattern;
  * <ul>
  *   <li>{@code **&#47;*TODO.md} - any file ending with TODO.md (case-insensitive)</li>
  *   <li>{@code **&#47;*TODOS.md} - any file ending with TODOS.md (case-insensitive)</li>
+ *   <li>{@code **&#47;*TODO.markdown} - any file ending with TODO.markdown (case-insensitive)</li>
+ *   <li>{@code **&#47;*TODOS.markdown} - any file ending with TODOS.markdown (case-insensitive)</li>
  *   <li>{@code todo/*.md} - any .md file in a todo/ directory</li>
+ *   <li>{@code todo/*.markdown} - any .markdown file in a todo/ directory</li>
  * </ul>
  * <p>
- * Default AsciiDoc patterns (both .adoc and .asciidoc extensions):
+ * Default AsciiDoc patterns (.ad, .adoc, and .asciidoc extensions):
  * <ul>
- *   <li>{@code todo/*.adoc}, {@code todo/*.asciidoc} - any AsciiDoc file in todo/</li>
- *   <li>{@code src/main/docs/*plan.adoc} - plan files in docs (case-insensitive)</li>
- *   <li>{@code src/main/docs/*todo.adoc} - todo files in docs (case-insensitive)</li>
+ *   <li>{@code todo/*.ad}, {@code todo/*.adoc}, {@code todo/*.asciidoc} - any AsciiDoc file in todo/</li>
+ *   <li>{@code src/main/docs/*plan.ad}, {@code src/main/docs/*plan.adoc}, {@code src/main/docs/*plan.asciidoc}</li>
+ *   <li>{@code src/main/docs/*todo.ad}, {@code src/main/docs/*todo.adoc}, {@code src/main/docs/*todo.asciidoc}</li>
  * </ul>
  */
 public final class TodoFileLocator {
@@ -54,14 +57,22 @@ public final class TodoFileLocator {
      * Markdown patterns:
      * <ul>
      *   <li>{@code *TODO.md}, {@code *TODOS.md} anywhere (case-insensitive)</li>
+     *   <li>{@code *TODO.markdown}, {@code *TODOS.markdown} anywhere (case-insensitive)</li>
      *   <li>{@code todo/*.md} - all .md files in todo/ directory</li>
+     *   <li>{@code todo/*.markdown} - all .markdown files in todo/ directory</li>
      * </ul>
      * <p>
      * AsciiDoc patterns:
      * <ul>
+     *   <li>{@code todo/*.ad} - all .ad files in todo/ directory</li>
      *   <li>{@code todo/*.adoc} - all .adoc files in todo/ directory</li>
+     *   <li>{@code todo/*.asciidoc} - all .asciidoc files in todo/ directory</li>
+     *   <li>{@code src/main/docs/*plan.ad} - plan files in docs (case-insensitive)</li>
+     *   <li>{@code src/main/docs/*todo.ad} - todo files in docs (case-insensitive)</li>
      *   <li>{@code src/main/docs/*plan.adoc} - plan files in docs (case-insensitive)</li>
      *   <li>{@code src/main/docs/*todo.adoc} - todo files in docs (case-insensitive)</li>
+     *   <li>{@code src/main/docs/*plan.asciidoc} - plan files in docs (case-insensitive)</li>
+     *   <li>{@code src/main/docs/*todo.asciidoc} - todo files in docs (case-insensitive)</li>
      * </ul>
      */
     private static final List<String> DEFAULT_PATTERNS = Arrays.asList(
@@ -70,16 +81,25 @@ public final class TodoFileLocator {
             "glob:**/*[Tt][Oo][Dd][Oo][Ss].md", // *TODOS.md or *todos.md anywhere
             "glob:todo/*.md",                    // todo/*.md in root
             "glob:**/todo/*.md",                 // todo/*.md anywhere
+            "glob:**/*[Tt][Oo][Dd][Oo].[Mm][Aa][Rr][Kk][Dd][Oo][Ww][Nn]",     // *TODO.markdown anywhere
+            "glob:**/*[Tt][Oo][Dd][Oo][Ss].[Mm][Aa][Rr][Kk][Dd][Oo][Ww][Nn]", // *TODOS.markdown anywhere
+            "glob:todo/*.[Mm][Aa][Rr][Kk][Dd][Oo][Ww][Nn]",                    // todo/*.markdown in root
+            "glob:**/todo/*.[Mm][Aa][Rr][Kk][Dd][Oo][Ww][Nn]",                 // todo/*.markdown anywhere
+            // AsciiDoc patterns (.ad)
+            "glob:todo/*.[Aa][Dd]",                                       // todo/*.ad in root
+            "glob:**/todo/*.[Aa][Dd]",                                    // todo/*.ad anywhere
+            "glob:src/main/docs/*[Pp][Ll][Aa][Nn].[Aa][Dd]",              // *plan.ad in docs
+            "glob:src/main/docs/*[Tt][Oo][Dd][Oo].[Aa][Dd]",              // *todo.ad in docs
             // AsciiDoc patterns (.adoc)
             "glob:todo/*.[Aa][Dd][Oo][Cc]",                              // todo/*.adoc in root
             "glob:**/todo/*.[Aa][Dd][Oo][Cc]",                           // todo/*.adoc anywhere
             "glob:src/main/docs/*[Pp][Ll][Aa][Nn].[Aa][Dd][Oo][Cc]",     // *plan.adoc in docs
             "glob:src/main/docs/*[Tt][Oo][Dd][Oo].[Aa][Dd][Oo][Cc]",     // *todo.adoc in docs
             // AsciiDoc patterns (.asciidoc - long extension)
-            "glob:todo/*.asciidoc",                                       // todo/*.asciidoc in root
-            "glob:**/todo/*.asciidoc",                                    // todo/*.asciidoc anywhere
-            "glob:src/main/docs/*[Pp][Ll][Aa][Nn].asciidoc",              // *plan.asciidoc in docs
-            "glob:src/main/docs/*[Tt][Oo][Dd][Oo].asciidoc"               // *todo.asciidoc in docs
+            "glob:todo/*.[Aa][Ss][Cc][Ii][Ii][Dd][Oo][Cc]",                                       // todo/*.asciidoc in root
+            "glob:**/todo/*.[Aa][Ss][Cc][Ii][Ii][Dd][Oo][Cc]",                                    // todo/*.asciidoc anywhere
+            "glob:src/main/docs/*[Pp][Ll][Aa][Nn].[Aa][Ss][Cc][Ii][Ii][Dd][Oo][Cc]",              // *plan.asciidoc in docs
+            "glob:src/main/docs/*[Tt][Oo][Dd][Oo].[Aa][Ss][Cc][Ii][Ii][Dd][Oo][Cc]"               // *todo.asciidoc in docs
     );
 
     /**
@@ -87,15 +107,22 @@ public final class TodoFileLocator {
      */
     private static final List<String> DEFAULT_TODO_FILES = Arrays.asList(
             "TODO.md",
-            "todo/TODO.md"
+            "todo/TODO.md",
+            "TODO.markdown",
+            "todo/TODO.markdown"
     );
 
     /**
      * Pattern to match TODO-like filenames (case-insensitive).
-     * Matches files ending in TODO.md, TODOS.md, or .adoc/.asciidoc files with TODO/PLAN in name.
+     * Matches files ending in TODO.md, TODOS.md, TODO.markdown, TODOS.markdown, or
+     * .ad/.adoc/.asciidoc files with TODO/PLAN in name.
      */
     private static final Pattern TODO_FILENAME_PATTERN = Pattern.compile(
-            ".*(?:todo[s]?\\.md|(?:todo|plan)\\.(?:adoc|asciidoc))$",
+            ".*(?:todo[s]?\\.(?:md|markdown)|(?:todo[s]?|plan)\\.(?:ad|adoc|asciidoc))$",
+            Pattern.CASE_INSENSITIVE
+    );
+    private static final Pattern TODO_EXTENSION_PATTERN = Pattern.compile(
+            ".*\\.(?:md|markdown|ad|adoc|asciidoc)$",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -105,7 +132,8 @@ public final class TodoFileLocator {
 
     /**
      * Creates a locator with default patterns.
-     * Searches for *TODO.md, *todo.md, and todo/*.md files.
+     * Searches for *TODO.md, *TODO.markdown, and todo/*.{md,markdown,ad,adoc,asciidoc},
+     * plus src/main/docs/*plan.* or src/main/docs/*todo.* AsciiDoc files.
      */
     public TodoFileLocator() {
         this.todoFiles = new ArrayList<>(DEFAULT_TODO_FILES);
@@ -223,7 +251,9 @@ public final class TodoFileLocator {
 
     /**
      * Checks if a file matches the TODO file criteria.
-     * Matches filenames ending with TODO.md or TODOS.md (case-insensitive).
+     * Matches filenames ending with TODO.md, TODOS.md, TODO.markdown, or TODOS.markdown,
+     * or AsciiDoc names ending in TODO/PLAN with .ad/.adoc/.asciidoc extensions.
+     * Also matches any Markdown/AsciiDoc file under a todo/ directory (case-insensitive).
      *
      * @param file the file to check
      * @return true if the file name suggests it's a TODO file
@@ -233,7 +263,14 @@ public final class TodoFileLocator {
             return false;
         }
         String name = file.getName();
-        return TODO_FILENAME_PATTERN.matcher(name).matches();
+        if (TODO_FILENAME_PATTERN.matcher(name).matches()) {
+            return true;
+        }
+        if (!TODO_EXTENSION_PATTERN.matcher(name).matches()) {
+            return false;
+        }
+        String normalisedPath = file.getPath().replace('\\', '/').toLowerCase();
+        return normalisedPath.contains("/todo/");
     }
 
     static final class PatternFileVisitor extends SimpleFileVisitor<Path> {
@@ -259,8 +296,11 @@ public final class TodoFileLocator {
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
             // Skip hidden directories and common non-source directories
-            String name = Objects.requireNonNull(dir.getFileName(),
-                    "directory path has no filename").toString();
+            Path fileName = dir.getFileName();
+            if (fileName == null) {
+                return FileVisitResult.CONTINUE;
+            }
+            String name = fileName.toString();
             if (name.startsWith(".") || name.equals("node_modules") ||
                     name.equals("target") || name.equals("build") ||
                     name.equals("out") || name.equals("dist")) {

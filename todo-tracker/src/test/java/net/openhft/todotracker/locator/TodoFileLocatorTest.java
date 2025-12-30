@@ -16,7 +16,6 @@
 package net.openhft.todotracker.locator;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -148,14 +147,20 @@ class TodoFileLocatorTest {
     @DisplayName("Locator should get todo file paths returns configured paths")
     void getTodoFilePaths_returnsConfiguredPaths() {
         List<String> paths = locator.getTodoFilePaths();
-        String rootTodo = "TODO.md";
-        String subTodo = "todo/TODO.md";
 
-        assertEquals(2, paths.size(), "locator should expose two configured todo paths");
+        assertEquals(4, paths.size(), "locator should expose four configured todo paths");
+        String rootTodo = "TODO.md";
         assertTrue(paths.contains(rootTodo),
                 "locator should include root path " + rootTodo + " in " + paths);
+        String subTodo = "todo/TODO.md";
         assertTrue(paths.contains(subTodo),
                 "locator should include todo subdirectory path " + subTodo + " in " + paths);
+        String rootMarkdown = "TODO.markdown";
+        assertTrue(paths.contains(rootMarkdown),
+                "locator should include root markdown path " + rootMarkdown + " in " + paths);
+        String subMarkdown = "todo/TODO.markdown";
+        assertTrue(paths.contains(subMarkdown),
+                "locator should include todo markdown path " + subMarkdown + " in " + paths);
     }
 
     @Test
@@ -165,7 +170,7 @@ class TodoFileLocatorTest {
         paths.clear();
 
         // Original should not be affected
-        assertEquals(2, locator.getTodoFilePaths().size(), "locator should return a defensive copy of paths");
+        assertEquals(4, locator.getTodoFilePaths().size(), "locator should return a defensive copy of paths");
     }
 
     @Test
@@ -173,6 +178,13 @@ class TodoFileLocatorTest {
     void isTodoFile_matchesTodoMd() throws IOException {
         File file = createFile("TODO.md");
         assertTrue(locator.isTodoFile(file), "locator should treat TODO.md as todo file");
+    }
+
+    @Test
+    @DisplayName("Locator should treat TODO markdown file as todo")
+    void isTodoFile_matchesTodoMarkdown() throws IOException {
+        File file = createFile("TODO.markdown");
+        assertTrue(locator.isTodoFile(file), "locator should treat TODO.markdown as todo file");
     }
 
     @Test
@@ -203,6 +215,24 @@ class TodoFileLocatorTest {
     }
 
     @Test
+    @DisplayName("Locator should treat todo directory markdown file as todo")
+    void isTodoFile_matchesTodoDirectoryMarkdownFile() throws IOException {
+        File backlog = createFile("todo/backlog.markdown");
+
+        assertTrue(locator.isTodoFile(backlog),
+                "locator should treat markdown files under todo directory as todo files");
+    }
+
+    @Test
+    @DisplayName("Locator should reject non markdown or asciidoc file under todo directory")
+    void isTodoFile_rejectsNonMarkdownUnderTodoDirectory() throws IOException {
+        File notes = createFile("todo/notes.txt");
+
+        assertFalse(locator.isTodoFile(notes),
+                "locator should reject non markdown/asciidoc files under todo directory");
+    }
+
+    @Test
     @DisplayName("Locator should reject null file in todo detection")
     void isTodoFile_rejectsNull() {
         assertFalse(locator.isTodoFile(null), "locator should return false for null file reference");
@@ -221,13 +251,19 @@ class TodoFileLocatorTest {
     @DisplayName("Locator should get default todo files returns defaults")
     void getDefaultTodoFiles_returnsDefaults() {
         List<String> defaults = TodoFileLocator.getDefaultTodoFiles();
-        String rootTodo = "TODO.md";
-        String subTodo = "todo/TODO.md";
 
+        String rootTodo = "TODO.md";
         assertTrue(defaults.contains(rootTodo),
                 "default list should include root path " + rootTodo + " in " + defaults);
+        String subTodo = "todo/TODO.md";
         assertTrue(defaults.contains(subTodo),
                 "default list should include subdirectory path " + subTodo + " in " + defaults);
+        String rootMarkdown = "TODO.markdown";
+        assertTrue(defaults.contains(rootMarkdown),
+                "default list should include root markdown path " + rootMarkdown + " in " + defaults);
+        String subMarkdown = "todo/TODO.markdown";
+        assertTrue(defaults.contains(subMarkdown),
+                "default list should include todo markdown path " + subMarkdown + " in " + defaults);
     }
 
     @Test
@@ -312,6 +348,27 @@ class TodoFileLocatorTest {
     }
 
     @Test
+    @DisplayName("Locator should find todo files pattern matching finds markdown extension")
+    void findTodoFiles_patternMatching_findsMarkdownExtension() throws IOException {
+        createFile("TODO.markdown");
+        createFile("upper/TODO.MARKDOWN");
+        createFile("todo/backlog.markdown");
+        createFile("todo/UPPER.MARKDOWN");
+
+        List<File> found = locator.findTodoFiles(tempDir.toFile());
+
+        assertTrue(found.size() >= 4, "locator should find todo files with markdown extension");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("TODO.markdown")),
+                "locator should include lower case TODO.markdown in pattern results");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("TODO.MARKDOWN")),
+                "locator should include upper case TODO.MARKDOWN in pattern results");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("backlog.markdown")),
+                "locator should include backlog.markdown from todo directory");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("UPPER.MARKDOWN")),
+                "locator should include UPPER.MARKDOWN from todo directory");
+    }
+
+    @Test
     @DisplayName("Locator should find todo files pattern matching finds files in todo directory")
     void findTodoFiles_patternMatching_findsFilesInTodoDirectory() throws IOException {
         createFile("todo/backlog.md");
@@ -386,7 +443,7 @@ class TodoFileLocatorTest {
     }
 
     @Test
-    @DisplayName("Locator should get default patterns returns patterns")
+    @DisplayName("Default locator patterns include glob entries")
     void getDefaultPatterns_returnsPatterns() {
         List<String> patterns = TodoFileLocator.getDefaultPatterns();
         assertFalse(patterns.isEmpty(), "static default patterns should not be empty");
@@ -429,15 +486,18 @@ class TodoFileLocatorTest {
     @DisplayName("Locator should find todo files finds adoc in todo directory")
     void findTodoFiles_findsAdocInTodoDirectory() throws IOException {
         createFile("todo/backlog.adoc");
-        createFile("todo/sprint.adoc");
+        createFile("todo/sprint.ad");
+        createFile("todo/notes.asciidoc");
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 2, "locator should find adoc files in todo directory");
+        assertTrue(found.size() >= 3, "locator should find ad, adoc, and asciidoc files in todo directory");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("backlog.adoc")),
                 "locator should include backlog.adoc from todo directory");
-        assertTrue(found.stream().anyMatch(f -> f.getName().equals("sprint.adoc")),
-                "locator should include sprint.adoc from todo directory");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("sprint.ad")),
+                "locator should include sprint.ad from todo directory");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("notes.asciidoc")),
+                "locator should include notes.asciidoc from todo directory");
     }
 
     @Test
@@ -454,20 +514,20 @@ class TodoFileLocatorTest {
     @Test
     @DisplayName("Locator should find todo files finds plan adoc in docs")
     void findTodoFiles_findsPlanAdocInDocs() throws IOException {
-        createFile("src/main/docs/release-plan.adoc");
+        createFile("src/main/docs/release-plan.ad");
         createFile("src/main/docs/sprint-plan.adoc");
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
         assertTrue(found.size() >= 2, "locator should find plan adoc files under docs");
-        assertTrue(found.stream().anyMatch(f -> f.getName().equals("release-plan.adoc")),
-                "locator should include release plan adoc in docs");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("release-plan.ad")),
+                "locator should include release plan ad file in docs");
     }
 
     @Test
     @DisplayName("Locator should find todo files finds todo adoc in docs")
     void findTodoFiles_findsTodoAdocInDocs() throws IOException {
-        createFile("src/main/docs/project-todo.adoc");
+        createFile("src/main/docs/project-todo.ad");
         createFile("src/main/docs/sprint-TODO.adoc");
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
@@ -479,12 +539,20 @@ class TodoFileLocatorTest {
     @DisplayName("Locator should find todo files finds adoc case insensitive")
     void findTodoFiles_findsAdocCaseInsensitive() throws IOException {
         // Create in different directories to avoid case collisions
-        createFile("todo/lower.adoc");
-        createFile("nestedtodo/todo/upper.ADOC");
+        createFile("todo/lower.ad");
+        createFile("nestedtodo/todo/upper.ASCIIDOC");
+        createFile("src/main/docs/plan.AD");
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 2, "locator should match adoc extensions case insensitively");
+        assertTrue(found.size() >= 3,
+                "locator should match ad and asciidoc extensions case insensitively");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("lower.ad")),
+                "locator should include lower.ad when matching case insensitive");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("upper.ASCIIDOC")),
+                "locator should include upper.ASCIIDOC when matching case insensitive");
+        assertTrue(found.stream().anyMatch(f -> f.getName().equals("plan.AD")),
+                "locator should include plan.AD in docs when matching case insensitive");
     }
 
     @Test
@@ -508,21 +576,24 @@ class TodoFileLocatorTest {
     @Test
     @DisplayName("Locator should is todo file matches adoc files")
     void isTodoFile_matchesAdocFiles() throws IOException {
+        File shortAd = createFile("docs/plan.ad");
+        assertTrue(locator.isTodoFile(shortAd), "locator should accept plan.ad file in docs");
         File planAdoc = createFile("docs/plan.adoc");
-        File todoAdoc = createFile("docs2/todo.adoc");
-
         assertTrue(locator.isTodoFile(planAdoc), "locator should accept plan.adoc file in docs");
+        File todoAdoc = createFile("docs2/todo.adoc");
         assertTrue(locator.isTodoFile(todoAdoc), "locator should accept todo.adoc file in docs");
+        File todoAsciidoc = createFile("docs3/todo.asciidoc");
+        assertTrue(locator.isTodoFile(todoAsciidoc), "locator should accept todo.asciidoc file in docs");
     }
 
     @Test
-    @DisplayName("Locator should is todo file matches adoc case insensitive")
+    @DisplayName("Locator should is todo file matches adoc extensions case insensitive")
     void isTodoFile_matchesAdocCaseInsensitive() throws IOException {
         File lower = createFile("docs/plan.adoc");
-        File upper = createFile("docs2/TODO.ADOC");
+        File upper = createFile("docs2/TODO.ASCIIDOC");
 
         assertTrue(locator.isTodoFile(lower), "locator should accept lower case adoc file");
-        assertTrue(locator.isTodoFile(upper), "locator should accept upper case adoc file");
+        assertTrue(locator.isTodoFile(upper), "locator should accept upper case asciidoc file");
     }
 
     @Test
@@ -538,8 +609,31 @@ class TodoFileLocatorTest {
     void getDefaultPatterns_includesAdocPatterns() {
         List<String> patterns = TodoFileLocator.getDefaultPatterns();
 
-        assertTrue(patterns.stream().anyMatch(p -> p.contains("[Aa][Dd][Oo][Cc]")),
-                "default patterns should include adoc glob entry");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("todo", "backlog.ad")),
+                "default patterns should match todo/backlog.ad");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("todo", "backlog.adoc")),
+                "default patterns should match todo/backlog.adoc");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("todo", "backlog.asciidoc")),
+                "default patterns should match todo/backlog.asciidoc");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("src", "main", "docs", "release-plan.ad")),
+                "default patterns should match src/main/docs/release-plan.ad");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("src", "main", "docs", "project-todo.adoc")),
+                "default patterns should match src/main/docs/project-todo.adoc");
+    }
+
+    @Test
+    @DisplayName("Locator should get default patterns includes markdown patterns")
+    void getDefaultPatterns_includesMarkdownPatterns() {
+        List<String> patterns = TodoFileLocator.getDefaultPatterns();
+
+        assertTrue(matchesAnyPattern(patterns, Paths.get("docs", "TODO.markdown")),
+                "default patterns should match docs/TODO.markdown");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("todo", "backlog.markdown")),
+                "default patterns should match todo/backlog.markdown");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("todo", "backlog.md")),
+                "default patterns should match todo/backlog.md");
+        assertTrue(matchesAnyPattern(patterns, Paths.get("docs", "SPRINT-TODO.md")),
+                "default patterns should match docs/SPRINT-TODO.md");
     }
 
     // === Directory skipping tests for remaining directories ===
@@ -632,31 +726,19 @@ class TodoFileLocatorTest {
         assertEquals(FileVisitResult.CONTINUE, result, "file visitor should continue after failure");
     }
 
-    // === Symlink handling tests ===
-
     @Test
-    @Disabled("Symlink behaviour is environment-specific; deferred")
-    @DisplayName("Locator should find todo files broken symlink matching pattern continues searching")
-    void findTodoFiles_brokenSymlinkMatchingPattern_continuesSearching() throws IOException {
-        // Create readable TODO file
-        createFile("readable/TODO.md");
+    @DisplayName("Locator should pattern file visitor handle root directory without name")
+    void patternFileVisitor_rootDirectoryWithoutName_continues() {
+        List<File> foundFiles = new ArrayList<>();
+        Path root = FileSystems.getDefault().getRootDirectories().iterator().next();
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*TODO.md");
+        TodoFileLocator.PatternFileVisitor visitor =
+                new TodoFileLocator.PatternFileVisitor(root, matcher, foundFiles);
 
-        // Create a broken symlink with a name that matches TODO patterns
-        // This should trigger visitFileFailed() when the walker tries to access it
-        Path brokenLink = tempDir.resolve("BROKEN-TODO.md");
-        try {
-            Files.createSymbolicLink(brokenLink, tempDir.resolve("nonexistent-target"));
-        } catch (UnsupportedOperationException | IOException e) {
-            // Skip test on platforms that don't support symlinks (e.g., Windows without admin)
-            return;
-        }
+        FileVisitResult result = visitor.preVisitDirectory(root, null);
 
-        List<File> found = locator.findTodoFiles(tempDir.toFile());
-
-        // Should still find the readable file despite broken symlink
-        assertEquals(1, found.size(), "locator should still return readable todo file");
-        assertEquals("TODO.md", found.get(0).getName(),
-                "locator should return readable TODO.md filename value");
+        assertEquals(FileVisitResult.CONTINUE, result,
+                "file visitor should continue when directory has no filename");
     }
 
     private File createFile(String relativePath) throws IOException {
@@ -664,5 +746,11 @@ class TodoFileLocatorTest {
         Files.createDirectories(path.getParent());
         Files.write(path, "# TODO\n- [ ] Task".getBytes(StandardCharsets.UTF_8));
         return path.toFile();
+    }
+
+    private boolean matchesAnyPattern(List<String> patterns, Path path) {
+        return patterns.stream()
+                .map(pattern -> FileSystems.getDefault().getPathMatcher(pattern))
+                .anyMatch(matcher -> matcher.matches(path));
     }
 }

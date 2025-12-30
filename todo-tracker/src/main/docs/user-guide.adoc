@@ -8,7 +8,7 @@
 
 == Overview
 
-TODO Tracker scans Markdown (`.md`) and AsciiDoc (`.adoc`/`.asciidoc`) TODO files, reports uncompleted tasks, and can fail the build.
+TODO Tracker scans Markdown (`.md`/`.markdown`, preferred) and AsciiDoc (`.ad`/`.adoc`/`.asciidoc`) TODO files, reports uncompleted tasks, and can fail the build.
 
 [IMPORTANT]
 .Implementation Status
@@ -76,7 +76,9 @@ Planned (ROADMAP):
 </plugin>
 ----
 
-=== Step 2: Create TODO.md
+=== Step 2: Create TODO.md or TODO.markdown (preferred)
+
+AsciiDoc TODO files (.ad, .adoc, .asciidoc) are also supported.
 
 [source,markdown]
 ----
@@ -146,9 +148,10 @@ mvn verify -Dtodotracker.failOnIncomplete=false
 
 Default discovery patterns include:
 
-* `*TODO.md`, `*TODOS.md`
-* `todo/*.md`, `**/todo/*.md`
-* `todo/*.adoc`, `todo/*.asciidoc`, `**/todo/*.adoc`, `**/todo/*.asciidoc`
+* `*TODO.md`, `*TODOS.md`, `*TODO.markdown`, `*TODOS.markdown`
+* `todo/*.md`, `**/todo/*.md`, `todo/*.markdown`, `**/todo/*.markdown`
+* `todo/*.ad`, `todo/*.adoc`, `todo/*.asciidoc`, `**/todo/*.ad`, `**/todo/*.adoc`, `**/todo/*.asciidoc`
+* `src/main/docs/*plan.ad`, `src/main/docs/*todo.ad`
 * `src/main/docs/*plan.adoc`, `src/main/docs/*todo.adoc`
 * `src/main/docs/*plan.asciidoc`, `src/main/docs/*todo.asciidoc`
 
@@ -180,6 +183,7 @@ Default discovery patterns include:
 
     <todoFiles>
         <todoFile>TODO.md</todoFile>
+        <todoFile>TODO.markdown</todoFile>
     </todoFiles>
 </configuration>
 ----

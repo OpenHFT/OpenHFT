@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Report should cover todo report behaviours")
+@DisplayName("Todo report aggregates tasks and counts totals")
 class TodoReportTest {
 
     private TodoReport report;
@@ -108,7 +108,7 @@ class TodoReportTest {
     }
 
     @Test
-    @DisplayName("Report should report uncompleted tasks when present")
+    @DisplayName("Report detects uncompleted tasks when present")
     void hasUncompletedTasks_returnsTrueWhenPresent() {
         report.addTask(new TodoTask("f.md", 1, "uncompleted", null, false));
         assertTrue(report.hasUncompletedTasks(), "report should report uncompleted tasks as present");
@@ -163,7 +163,7 @@ class TodoReportTest {
         List<TodoTask> tasks = report.getAllTasks();
 
         assertThrows(UnsupportedOperationException.class, () ->
-                tasks.add(new TodoTask("f.md", 2, "new", null, false)),
+                        tasks.add(new TodoTask("f.md", 2, "new", null, false)),
                 "report should not allow adding tasks to list");
     }
 

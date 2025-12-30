@@ -99,7 +99,7 @@ Evolve TODO Tracker from a build-time checker into a task system optimized for C
 
 == Non-Functional Requirements (Summary)
 
-* Backward compatibility with existing TODO.md workflows
+* Backward compatibility with existing Markdown TODO workflows (TODO.md or TODO.markdown, preferred) and support for AsciiDoc TODO workflows (.ad, .adoc, .asciidoc)
 * Performance suitable for CI gating
 * Maintainability: clear module boundaries and stable schemas
 * Error handling: actionable diagnostics, no crashes on malformed metadata

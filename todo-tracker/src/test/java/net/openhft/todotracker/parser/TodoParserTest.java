@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -461,9 +462,10 @@ class TodoParserTest {
     @Test
     @DisplayName("Parser should parse content preserves non ascii characters")
     void parseContent_preservesNonAsciiCharacters() {
-        TodoReport report = parser.parseContent("- [ ] Tsk with moji and hn t", "test.md");
+        String taskText = "caf\u00E9";
+        TodoReport report = parser.parseContent("- [ ] " + taskText, "test.md");
 
-        assertEquals("Tsk with moji and hn t",
+        assertEquals(taskText,
                 report.getUncompletedTasks().get(0).getText(), "parser should preserve non ascii task text");
     }
 
@@ -504,8 +506,12 @@ class TodoParserTest {
     void detectFormat_markdownByDefault() {
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("test.md"),
                 "parser should default to markdown for md extension");
+        assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("notes.markdown"),
+                "parser should default to markdown for markdown extension");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("TODO.md"),
                 "parser should default to markdown for TODO.md");
+        assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("TODO.MARKDOWN"),
+                "parser should default to markdown for upper case markdown extension");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("path/to/file.txt"),
                 "parser should default to markdown for unknown extension");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat(null),
@@ -515,6 +521,8 @@ class TodoParserTest {
     @Test
     @DisplayName("Parser should detect format asciidoc from extension")
     void detectFormat_asciidocFromExtension() {
+        assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("test.ad"),
+                "parser should detect asciidoc format from ad extension");
         assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("test.adoc"),
                 "parser should detect asciidoc format from adoc extension");
         assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("TODO.ADOC"),
@@ -663,13 +671,31 @@ class TodoParserTest {
     @DisplayName("Parser should parse asciidoc file detects format")
     void parse_asciidocFile_detectsFormat() throws IOException {
         Path path = tempDir.resolve("TODO.adoc");
-        Files.writeString(path, "* [ ] AsciiDoc file task\n* [*] Done task");
+        Files.write(path, "* [ ] AsciiDoc file task\n* [*] Done task"
+                .getBytes(StandardCharsets.UTF_8));
 
         TodoReport report = parser.parse(path.toFile());
 
         assertEquals(2, report.getTotalCount(), "parser should count total tasks in asciidoc file");
         assertEquals(1, report.getUncompletedCount(), "parser should count open tasks in asciidoc file");
         assertEquals(1, report.getCompletedCount(), "parser should count completed tasks in asciidoc file");
+    }
+
+    @Test
+    @DisplayName("Parser should parse asciidoc file with ad extension")
+    void parse_asciidocFile_adExtension() throws IOException {
+        Path path = tempDir.resolve("TODO.ad");
+        Files.write(path, "* [ ] Short extension task\n* [x] Done task"
+                .getBytes(StandardCharsets.UTF_8));
+
+        TodoReport report = parser.parse(path.toFile());
+
+        assertEquals(2, report.getTotalCount(),
+                "parser should count tasks in asciidoc ad extension file");
+        assertEquals(1, report.getUncompletedCount(),
+                "parser should count open tasks in asciidoc ad extension file");
+        assertEquals(1, report.getCompletedCount(),
+                "parser should count completed tasks in asciidoc ad extension file");
     }
 
     @Test
@@ -680,6 +706,19 @@ class TodoParserTest {
         TodoReport report = parser.parse(file);
 
         assertEquals(2, report.getTotalCount(), "parser should count tasks using markdown patterns");
+    }
+
+    @Test
+    @DisplayName("Parser should parse markdown file with markdown extension")
+    void parse_markdownFile_markdownExtension() throws IOException {
+        Path path = tempDir.resolve("TODO.markdown");
+        Files.write(path, "- [ ] Markdown extension task\n- [ ] Second task"
+                .getBytes(StandardCharsets.UTF_8));
+
+        TodoReport report = parser.parse(path.toFile());
+
+        assertEquals(2, report.getTotalCount(),
+                "parser should count tasks in markdown extension file");
     }
 
     // === Helper methods ===
@@ -852,7 +891,7 @@ class TodoParserTest {
 
     private File createTodoFile(String content) throws IOException {
         Path path = tempDir.resolve("TODO.md");
-        Files.writeString(path, content);
+        Files.write(path, content.getBytes(StandardCharsets.UTF_8));
         return path.toFile();
     }
 }

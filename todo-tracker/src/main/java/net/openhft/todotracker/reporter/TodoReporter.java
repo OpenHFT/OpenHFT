@@ -140,7 +140,7 @@ public final class TodoReporter {
         log.warn(line.toString());
 
         if (showContext && task.getContext() != null) {
-            log.warn("     Context: ## " + task.getContext());
+            log.warn("     Context: " + task.getContext());
         }
         log.warn("");
     }

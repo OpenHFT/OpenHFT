@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  * <p>
  * Also extracts priority tags [P1-3] and effort tags [E:S/M/L] from task text.
  * <p>
- * Note: Format is detected from file extension (.adoc/.asciidoc = AsciiDoc, else Markdown).
+ * Note: Format is detected from file extension (.ad/.adoc/.asciidoc = AsciiDoc, .md/.markdown = Markdown).
  */
 public final class TodoParser {
 
@@ -110,14 +110,14 @@ public final class TodoParser {
      * Detects the format based on file extension.
      *
      * @param filePath the file path to check
-     * @return ASCIIDOC for .adoc/.asciidoc files, MARKDOWN otherwise
+     * @return ASCIIDOC for .ad/.adoc/.asciidoc files, MARKDOWN otherwise
      */
     public static Format detectFormat(String filePath) {
         if (filePath == null) {
             return Format.MARKDOWN;
         }
         String lower = filePath.toLowerCase();
-        if (lower.endsWith(".adoc") || lower.endsWith(".asciidoc")) {
+        if (lower.endsWith(".ad") || lower.endsWith(".adoc") || lower.endsWith(".asciidoc")) {
             return Format.ASCIIDOC;
         }
         return Format.MARKDOWN;
@@ -132,7 +132,7 @@ public final class TodoParser {
      * @throws IOException if the file cannot be read
      */
     public TodoReport parse(File file) throws IOException {
-        Objects.requireNonNull(file, "input file must not be null");
+        Objects.requireNonNull(file, "todo source file path must not be null");
 
         Format format = detectFormat(file.getPath());
         TodoReport report = new TodoReport();

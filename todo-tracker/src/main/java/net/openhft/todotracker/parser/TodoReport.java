@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Aggregates TODO tasks from one or more files.
+ * Aggregates TODO tasks from one or more files and source directories.
  * Provides methods for accessing and filtering tasks.
  */
 public final class TodoReport {

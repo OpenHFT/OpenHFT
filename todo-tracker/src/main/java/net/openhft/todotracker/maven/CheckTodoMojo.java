@@ -86,10 +86,11 @@ public class CheckTodoMojo extends AbstractMojo {
     /**
      * Enable glob pattern matching to discover TODO files.
      * <p>
-     * Default Markdown patterns: **&#47;*TODO.md, **&#47;*TODOS.md, todo/*.md
+     * Default Markdown patterns: **&#47;*TODO.md, **&#47;*TODOS.md, **&#47;*TODO.markdown,
+     * **&#47;*TODOS.markdown, todo/*.md, todo/*.markdown
      * <p>
-     * Default AsciiDoc patterns: todo/*.adoc, todo/*.asciidoc,
-     * src/main/docs/*plan.adoc, src/main/docs/*todo.adoc
+     * Default AsciiDoc patterns: todo/*.ad, todo/*.adoc, todo/*.asciidoc,
+     * src/main/docs/*plan.ad, src/main/docs/*todo.ad
      * <p>
      * Set to false to use exact paths only (legacy behavior).
      */
@@ -246,6 +247,7 @@ public class CheckTodoMojo extends AbstractMojo {
         this.todoFiles = todoFiles;
     }
 
+    // TODO test skip=false
     void setSkip(boolean skip) {
         this.skip = skip;
     }

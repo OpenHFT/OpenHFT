@@ -42,9 +42,9 @@
         <maven-plugin-annotations.version>3.15.0</maven-plugin-annotations.version>
         <maven-plugin-plugin.version>3.15.0</maven-plugin-plugin.version>
 
-        <!-- Override coverage to 95% line / 90% branch for this module -->
-        <jacoco.line.coverage>0.95</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.90</jacoco.branch.coverage>
+        <!-- Override coverage to 99.05% line / 98.19% branch for this module -->
+        <jacoco.line.coverage>0.9905</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.9819</jacoco.branch.coverage>
 
         <!-- Enforce quality checks (Checkstyle/MM checker) for this module -->
         <quality.enforced>true</quality.enforced>
@@ -143,6 +143,14 @@
                     <excludeGeneratedSources>true</excludeGeneratedSources>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
 
             <!-- JaCoCo for code coverage -->
             <plugin>
@@ -196,6 +204,20 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs} -Djvm.coverage=true</argLine>
+                    <systemPropertyVariables>
+                        <project.build.directory>${project.build.directory}</project.build.directory>
+                    </systemPropertyVariables>
+                    <enableAssertions>true</enableAssertions>
+                    <parallel>classes</parallel>
+                    <threadCount>4</threadCount>
+                    <perCoreThreadCount>false</perCoreThreadCount>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -226,7 +248,10 @@
                                 <param>net.openhft.todotracker.maven.HelpMojo</param>
                             </excludedClasses>
                             <threads>4</threads>
-                            <timeoutFactor>1.25</timeoutFactor>
+                            <timeoutFactor>2</timeoutFactor>
+                            <jvmArgs>
+                                <param>-Xmx2g</param>
+                            </jvmArgs>
                             <outputFormats>
                                 <param>HTML</param>
                                 <param>XML</param>

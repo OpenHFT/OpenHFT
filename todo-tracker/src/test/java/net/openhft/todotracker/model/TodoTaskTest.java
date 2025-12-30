@@ -22,7 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Task should cover todo task behaviours")
+@DisplayName("Todo task model retains fields and status flags")
 class TodoTaskTest {
 
     @Test
@@ -74,7 +74,7 @@ class TodoTaskTest {
     @DisplayName("Task should constructor with invalid line number throws exception")
     void constructorWithInvalidLineNumber_throwsException(int lineNumber) {
         assertThrows(IllegalArgumentException.class, () ->
-                new TodoTask("file.md", lineNumber, "text", null, false),
+                        new TodoTask("file.md", lineNumber, "text", null, false),
                 "task should throw when line number is invalid");
     }
 
@@ -228,14 +228,14 @@ class TodoTaskTest {
     @DisplayName("Task instance should not equal a null object reference")
     void equals_null_returnsFalse() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false);
-        assertNotEquals(task, null, "task should not equal a null instance");
+        assertNotEquals(null, task, "task should not equal a null instance");
     }
 
     @Test
     @DisplayName("Task should not equal a different object type")
     void equals_differentType_returnsFalse() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false);
-        assertFalse(task.equals("not a task"), "task should not equal different object type");
+        assertNotEquals("not a task", task, "task should not equal different object type");
     }
 
     @Test
@@ -275,7 +275,7 @@ class TodoTaskTest {
     }
 
     @Test
-    @DisplayName("Task should allow empty task text")
+    @DisplayName("Blank task text is accepted by model")
     void emptyText_isAllowed() {
         TodoTask task = new TodoTask("file.md", 1, "", null, false);
         assertEquals("", task.getText(), "task should allow empty task text value");

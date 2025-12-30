@@ -120,6 +120,25 @@ class TodoReporterTest {
     }
 
     @Test
+    @DisplayName("Reporter should render context line without heading markup")
+    void reportUncompleted_contextLine_withoutHeadingMarkup() {
+        TodoReport report = new TodoReport();
+        String contextValue = "Phase 1";
+        report.addTask(new TodoTask("TODO.md", 5, "Task text", contextValue, false));
+
+        reporter.reportUncompleted(report);
+
+        verify(log, atLeastOnce()).warn(warnCaptor.capture());
+        String contextLine = warnCaptor.getAllValues().stream()
+                .filter(line -> line.contains("Context:"))
+                .findFirst().orElse("");
+
+        assertFalse(contextLine.isEmpty(), "reporter should emit context line for " + contextValue);
+        assertEquals("     Context: " + contextValue, contextLine,
+                "reporter should render exact context line without heading markup");
+    }
+
+    @Test
     @DisplayName("Reporter should report uncompleted show context false skips context")
     void reportUncompleted_showContextFalse_skipsContext() {
         TodoReporter noContextReporter = new TodoReporter(log, 10, false);

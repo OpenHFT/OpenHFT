@@ -345,7 +345,7 @@ CI workflow selects profile.
 
 === Context
 
-The plugin needs to parse TODO.md files.
+The plugin needs to parse TODO.md or TODO.markdown files (preferred), and should also support AsciiDoc TODO files (.ad, .adoc, .asciidoc).
 Options:
 
 * Custom regex-based parsing (current)
@@ -373,7 +373,7 @@ Follow "infallible/lossless" tree philosophy (Roslyn red/green tree):
 
 * Always produce syntax tree, even with errors
 * Attach error nodes/trivia for precise diagnostics
-* Never "fail to parse TODO.md"
+* Never "fail to parse Markdown TODO files"
 * Treat malformed metadata as validation finding, not parser crash
 
 === Consequences
@@ -710,7 +710,8 @@ Use the `pitest` profile for mutation testing:
 
 Use jqwik to generate:
 
-* Random TODO.md content (bullets, checkboxes, metadata tokens)
+* Random Markdown TODO content (TODO.md or TODO.markdown, preferred) with bullets, checkboxes, metadata tokens
+* Random AsciiDoc TODO content (.ad, .adoc, .asciidoc) with headings and task lists
 * Random dependency graphs (with/without cycles)
 * Random malformed input
 
@@ -818,9 +819,11 @@ Use hyperfine for CLI command benchmarking:
 # Compare against CLI baseline
 hyperfine --warmup 3 --runs 20 \
   --export-json target/bench-list.json \
-  'rg -n "^- \[ \]" TODO.md' \
+  'rg -n "^- \[ \]" TODO.md TODO.markdown' \
   'mvn -q -DskipTests todo-tracker:list'
 ----
+
+For AsciiDoc TODO files, use TODO.adoc or TODO.asciidoc in place of TODO.md or TODO.markdown.
 
 hyperfine provides:
 
@@ -861,7 +864,7 @@ public class ParserBenchmark {
 
 Benchmark targets:
 
-* Parse TODO.md → tasks
+* Parse TODO.md/TODO.markdown (preferred) and TODO.adoc/TODO.asciidoc -> tasks
 * Validate → diagnostics
 * Compute "ready tasks" (toposort + tie-break)
 * Generate JSON/SARIF/console rendering
@@ -977,7 +980,7 @@ Deliverable: "Everyday commands" section in user guide.
 ==== Phase 3: CI/CD Polish
 
 * Git hooks: pre-commit/pre-push for claim validation
-* Merge driver: `.gitattributes` recommendation for TODO.md conflicts
+* Merge driver: `.gitattributes` recommendation for TODO.md or TODO.markdown conflicts (preferred), with TODO.adoc/TODO.asciidoc as needed
 * PR comments via GitHub Actions `actions/github-script`
 * SARIF upload for inline PR annotations
 

@@ -62,6 +62,7 @@ void findTodoFiles_skipsOutDirectory_inIsolation() throws IOException {
 **Action**: Add test calling `getTodoFilePaths()` on locator created with custom paths
 
 ```java
+
 @Test
 void getTodoFilePaths_exactPathMode_returnsConfiguredPaths() {
     TodoFileLocator locator = new TodoFileLocator(Arrays.asList("A.md", "B.md"));
