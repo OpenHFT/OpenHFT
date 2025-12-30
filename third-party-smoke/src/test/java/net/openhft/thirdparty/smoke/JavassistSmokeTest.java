@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests class pool operations, dynamic class creation, and proxy factory functionality
  * to ensure the Javassist dependency is correctly resolved and functional.
  */
-@DisplayName("JavassistSmokeTest")
+@DisplayName("Smoke test verifies Javassist bytecode features work")
 class JavassistSmokeTest {
 
     @Test
     @DisplayName("Javassist ClassPool should create a new class from scratch")
-    void classPoolCanCreateNewClass() throws Exception {
+    void classPoolCanCreateNewClass() {
         ClassPool pool = ClassPool.getDefault();
         CtClass ctClass = pool.makeClass("net.openhft.smoke.GeneratedClass");
 

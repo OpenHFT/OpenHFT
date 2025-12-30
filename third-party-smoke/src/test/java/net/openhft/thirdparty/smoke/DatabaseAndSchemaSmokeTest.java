@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Smoke tests verifying HSQLDB connectivity and Jackson jsonSchema generation work together.
  */
-@DisplayName("DatabaseAndSchemaSmokeTest")
+@DisplayName("Smoke test verifies database and schema tooling loads")
 class DatabaseAndSchemaSmokeTest {
 
     @Test

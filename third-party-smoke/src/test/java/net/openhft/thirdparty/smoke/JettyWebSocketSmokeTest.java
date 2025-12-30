@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke tests verifying Jetty WebSocket client and server classes construct cleanly.
  */
-@DisplayName("JettyWebSocketSmokeTest")
+@DisplayName("Smoke test verifies Jetty WebSocket classes load")
 class JettyWebSocketSmokeTest {
 
     @Test

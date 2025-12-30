@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke test that verifies JetBrains annotations and Guava testlib are usable.
  */
-@DisplayName("AnnotationsAndGuavaTestlibSmokeTest")
+@DisplayName("Smoke test verifies annotations and Guava testlib availability")
 class AnnotationsAndGuavaTestlibSmokeTest {
 
     @Test

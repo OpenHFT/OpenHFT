@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke test verifying ProGuard configuration parser can parse minimal arguments.
  */
-@DisplayName("ProGuardParserSmokeTest")
+@DisplayName("Smoke test verifies ProGuard parser configuration loads")
 class ProGuardParserSmokeTest {
 
     /**

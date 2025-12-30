@@ -13,11 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("ClassLoadingSmokeTest")
+@DisplayName("Smoke test verifies third party classes load")
 class ClassLoadingSmokeTest {
 
     /**
@@ -398,16 +397,15 @@ class ClassLoadingSmokeTest {
                 Class.forName(className, false, LOADER);
                 return;
             } catch (ClassNotFoundException | LinkageError t) {
-                failures.add(className + ": " + t.toString());
+                failures.add(className + ": " + t);
             }
         }
         fail("Could not load any of " + names + " -> "
-                + failures.stream().collect(Collectors.joining("; ")));
+                + String.join("; ", failures));
     }
 
     private static void assertClassesLoad(final String... classNames) {
-        List<String> names = Arrays.asList(classNames);
-        for (String className : names) {
+        for (String className : classNames) {
             assertDoesNotThrow(
                     () -> Class.forName(className, false, LOADER),
                     className
@@ -460,6 +458,7 @@ class ClassLoadingSmokeTest {
         } catch (ClassNotFoundException e) {
             AssertionError error =
                     new AssertionError("HSQLDB JDBC driver class should be loadable");
+            //noinspection UnnecessaryInitCause
             error.initCause(e);
             throw error;
         }

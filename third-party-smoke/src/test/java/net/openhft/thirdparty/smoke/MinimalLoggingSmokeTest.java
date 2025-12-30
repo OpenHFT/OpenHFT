@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * See {@code SMOKE-TEST-006} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
-@DisplayName("MinimalLoggingSmokeTest")
+@DisplayName("Smoke test verifies minimal logging bindings load")
 class MinimalLoggingSmokeTest {
 
     @Test

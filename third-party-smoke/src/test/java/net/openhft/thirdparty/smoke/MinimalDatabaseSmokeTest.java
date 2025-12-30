@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * See {@code SMOKE-TEST-008} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
-@DisplayName("MinimalDatabaseSmokeTest")
+@DisplayName("Smoke test verifies minimal database clients load")
 class MinimalDatabaseSmokeTest {
 
     @Test

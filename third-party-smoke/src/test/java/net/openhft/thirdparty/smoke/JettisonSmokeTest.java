@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Smoke test verifying Jettison can parse and emit simple JSON objects.
  */
-@DisplayName("JettisonSmokeTest")
+@DisplayName("Smoke test verifies Jettison JSON round trip")
 class JettisonSmokeTest {
 
     /**

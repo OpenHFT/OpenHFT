@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Migration support smoke to ensure JUnit 4 rules work under Jupiter.
  */
 @EnableRuleMigrationSupport
-@DisplayName("JUnitMigrationSupportSmokeTest")
+@DisplayName("Smoke test verifies JUnit migration support works")
 class JUnitMigrationSupportSmokeTest {
 
     /**

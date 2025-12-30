@@ -22,7 +22,7 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 /**
  * Smoke tests covering OSGi APIs and Pax Exam URL artefacts.
  */
-@DisplayName("OsgiAndPaxSmokeTest")
+@DisplayName("Smoke test verifies OSGi and Pax components load")
 class OsgiAndPaxSmokeTest {
 
     @Test
@@ -50,7 +50,7 @@ class OsgiAndPaxSmokeTest {
         org.osgi.framework.launch.FrameworkFactory factory =
                 loader.iterator().next();
         Framework framework = factory.newFramework(
-                Collections.<String, String>emptyMap());
+                Collections.emptyMap());
         assertNotNull(framework, "FrameworkFactory should create a Framework instance");
     }
 

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Smoke test verifying javax.inject annotations are available at runtime for reflection.
  */
-@DisplayName("JavaxInjectSmokeTest")
+@DisplayName("Smoke test verifies javax.inject annotations load")
 class JavaxInjectSmokeTest {
 
     @Test

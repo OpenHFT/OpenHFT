@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests that OSGi bundle and versioning annotations can be loaded and used for
  * compile-time metadata generation in OSGi bundle projects.
  */
-@DisplayName("OsgiAnnotationsSmokeTest")
+@DisplayName("Smoke test verifies OSGi annotations load")
 class OsgiAnnotationsSmokeTest {
 
     @Test

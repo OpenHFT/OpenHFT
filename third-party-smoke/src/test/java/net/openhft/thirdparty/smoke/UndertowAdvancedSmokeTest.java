@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests PathHandler routing, handler chain composition, WebSocket protocol handler configuration,
  * and GracefulShutdownHandler to ensure deeper Undertow functionality is available and working.
  */
-@DisplayName("UndertowAdvancedSmokeTest")
+@DisplayName("Smoke test verifies Undertow advanced server wiring")
 class UndertowAdvancedSmokeTest {
 
     private static final String API_PATH = "/api";

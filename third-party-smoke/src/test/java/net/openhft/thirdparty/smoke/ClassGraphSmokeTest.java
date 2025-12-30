@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Additional smoke test that ensures ClassGraph can scan the test classpath.
  */
-@DisplayName("ClassGraphSmokeTest")
+@DisplayName("Smoke test verifies ClassGraph scans the classpath")
 class ClassGraphSmokeTest {
 
     @Test

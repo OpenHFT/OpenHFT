@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * See {@code SMOKE-TEST-003} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
-@DisplayName("MinimalObservabilitySmokeTest")
+@DisplayName("Smoke test verifies minimal observability tooling loads")
 class MinimalObservabilitySmokeTest {
 
     /**

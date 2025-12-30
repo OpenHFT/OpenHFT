@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Smoke tests verifying Trove collections and JNA native helpers load correctly.
  */
-@DisplayName("NativeAndCollectionsSmokeTest")
+@DisplayName("Smoke test verifies native and collections libraries load")
 class NativeAndCollectionsSmokeTest {
 
     /**

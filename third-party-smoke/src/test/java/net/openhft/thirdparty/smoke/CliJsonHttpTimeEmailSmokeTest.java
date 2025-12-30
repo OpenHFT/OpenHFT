@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke tests for CLI parsing, JSON, HTTP request building, time, and email.
  */
-@DisplayName("CliJsonHttpTimeEmailSmokeTest")
+@DisplayName("Smoke test verifies CLI JSON HTTP time email")
 class CliJsonHttpTimeEmailSmokeTest {
 
     @Test

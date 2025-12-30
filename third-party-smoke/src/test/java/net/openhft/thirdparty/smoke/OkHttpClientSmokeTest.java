@@ -4,6 +4,7 @@
 package net.openhft.thirdparty.smoke;
 
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests that the OkHttp client can be configured with timeouts, interceptors,
  * and connection pooling without requiring actual network calls.
  */
-@DisplayName("OkHttpClientSmokeTest")
+@DisplayName("Smoke test verifies OkHttp client configuration works")
 class OkHttpClientSmokeTest {
 
     /**
@@ -111,7 +112,7 @@ class OkHttpClientSmokeTest {
     static class LoggingInterceptor implements Interceptor {
 
         @Override
-        public Response intercept(final Chain chain) throws IOException {
+        public @NotNull Response intercept(final Chain chain) throws IOException {
             // In a real implementation, this would log request details
             return chain.proceed(chain.request());
         }

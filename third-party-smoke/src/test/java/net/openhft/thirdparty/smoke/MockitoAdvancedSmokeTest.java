@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
  * Tests ArgumentCaptor, spy objects, InOrder verification, stubbing chains, verification modes,
  * and BDD-style mocking to ensure deeper Mockito functionality is available and working.
  */
-@DisplayName("MockitoAdvancedSmokeTest")
+@DisplayName("Smoke test verifies advanced Mockito features work")
 class MockitoAdvancedSmokeTest {
 
     private static final String TEST_KEY = "testKey";
@@ -138,6 +138,7 @@ class MockitoAdvancedSmokeTest {
          *
          * @return the current count value
          */
+        // TODO add a tests for this method
         int getCount();
     }
 }

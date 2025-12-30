@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Smoke tests verifying Apache Commons Lang, CLI, and Logging integrations load correctly.
  */
-@DisplayName("CommonsLibrariesSmokeTest")
+@DisplayName("Smoke test verifies Apache Commons libraries load")
 class CommonsLibrariesSmokeTest {
 
     @Test

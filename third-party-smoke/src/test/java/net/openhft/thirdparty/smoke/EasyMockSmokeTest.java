@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Smoke test that verifies EasyMock can record, replay, and verify expectations.
  */
-@DisplayName("EasyMockSmokeTest")
+@DisplayName("Smoke test verifies EasyMock replay works")
 class EasyMockSmokeTest {
 
     @Test

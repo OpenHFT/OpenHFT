@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Smoke tests verifying Prometheus client metrics and JNR FFI integration.
  */
-@DisplayName("MetricsAndFfiSmokeTest")
+@DisplayName("Smoke test verifies metrics and FFI libraries load")
 class MetricsAndFfiSmokeTest {
 
     /**

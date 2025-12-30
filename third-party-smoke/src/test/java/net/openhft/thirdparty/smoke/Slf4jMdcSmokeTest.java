@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
  * depends on the SLF4J binding - with slf4j-simple the MDC operations are no-ops, but the
  * API should still be callable for code that uses MDC when a real binding is present.
  */
-@DisplayName("Slf4jMdcSmokeTest")
+@DisplayName("Smoke test verifies SLF4J MDC operations")
 class Slf4jMdcSmokeTest {
 
     private static final String REQUEST_ID_KEY = "requestId";

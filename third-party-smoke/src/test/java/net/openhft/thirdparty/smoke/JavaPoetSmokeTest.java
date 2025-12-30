@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Smoke test verifying JavaPoet can generate simple Java source files.
  */
-@DisplayName("JavaPoetSmokeTest")
+@DisplayName("Smoke test verifies JavaPoet generates source")
 class JavaPoetSmokeTest {
 
     @Test

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Basic Jupiter smoke to ensure JUnit 5 assertions execute properly.
  */
-@DisplayName("JupiterSmokeTest")
+@DisplayName("Smoke test verifies Jupiter basic assertions run")
 class JupiterSmokeTest {
 
     @Test

@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * See {@code SMOKE-TEST-004} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
-@DisplayName("MinimalSerializationSmokeTest")
+@DisplayName("Smoke test verifies minimal serialisation libraries load")
 class MinimalSerializationSmokeTest {
 
     @Test

@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * See {@code SMOKE-TEST-007} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
-@DisplayName("MinimalUtilitiesSmokeTest")
+@DisplayName("Smoke test verifies minimal utilities libraries load")
 class MinimalUtilitiesSmokeTest {
 
     /**

@@ -5,8 +5,6 @@ package net.openhft.thirdparty.smoke;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.undertow.Undertow;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.ServletInfo;
@@ -31,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * See {@code SMOKE-TEST-005} in
  * {@code src/main/docs/project-requirements.adoc}.
  */
-@DisplayName("MinimalNetworkingSmokeTest")
+@DisplayName("Smoke test verifies minimal networking stacks load")
 class MinimalNetworkingSmokeTest {
 
     @Test
@@ -48,8 +46,8 @@ class MinimalNetworkingSmokeTest {
 
     @Test
     @DisplayName("Jetty WebSocket client should construct cleanly")
-    @SuppressWarnings("java:S1612")
     // Suppress "Utility classes should not have public constructors")
+    @SuppressWarnings("java:S1612")
     void jettyClientConstructs() {
         assertDoesNotThrow(() -> new WebSocketClient(),
                 "WebSocket client should construct");
@@ -96,15 +94,11 @@ class MinimalNetworkingSmokeTest {
     void undertowStartsAndStops() {
         Undertow server = Undertow.builder()
                 .addHttpListener(0, "localhost")
-                .setHandler(new HttpHandler() {
-                    @Override
-                    public void handleRequest(
-                            final HttpServerExchange exchange) {
-                        exchange.getResponseHeaders()
-                                .put(Headers.CONTENT_TYPE, "text/plain");
-                        exchange.getResponseSender()
-                                .send("Hello Undertow");
-                    }
+                .setHandler(exchange -> {
+                    exchange.getResponseHeaders()
+                            .put(Headers.CONTENT_TYPE, "text/plain");
+                    exchange.getResponseSender()
+                            .send("Hello Undertow");
                 })
                 .build();
         assertNotNull(server, "Undertow server should build");

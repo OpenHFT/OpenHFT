@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests ByteBuf memory operations, ChannelPipeline handler composition, EmbeddedChannel for unit testing
  * handlers, and EventLoop scheduling to ensure deeper Netty functionality is available and working.
  */
-@DisplayName("NettyAdvancedSmokeTest")
+@DisplayName("Smoke test verifies advanced Netty pipeline behaviour")
 class NettyAdvancedSmokeTest {
 
     private static final int TEST_INT_VALUE = 42;
@@ -118,6 +118,7 @@ class NettyAdvancedSmokeTest {
     void eventLoopSchedulesDelayedTasks() {
         NioEventLoopGroup group = new NioEventLoopGroup(1);
         try {
+            // TODO test taskRun is true later
             AtomicBoolean taskRan = new AtomicBoolean(false);
 
             ScheduledFuture<?> future = group.schedule(

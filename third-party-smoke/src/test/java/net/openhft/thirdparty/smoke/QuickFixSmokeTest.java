@@ -5,7 +5,6 @@ package net.openhft.thirdparty.smoke;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import quickfix.Message;
 import quickfix.field.*;
 
 import java.util.Date;
@@ -15,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Smoke test verifying QuickFIX/J bundle can build a basic order.
  */
-@DisplayName("QuickFixSmokeTest")
+@DisplayName("Smoke test verifies QuickFIX messages retain fields")
 class QuickFixSmokeTest {
 
     @Test
@@ -32,9 +31,7 @@ class QuickFixSmokeTest {
                 HandlInst.AUTOMATED_EXECUTION_ORDER_PRIVATE));
         order.set(new Symbol("AAPL"));
 
-        Message msg = order;
-
-        assertEquals("123", msg.getString(ClOrdID.FIELD), "QuickFIX message should carry ClOrdID");
-        assertEquals("AAPL", msg.getString(Symbol.FIELD), "QuickFIX message should carry Symbol");
+        assertEquals("123", order.getString(ClOrdID.FIELD), "QuickFIX message should carry ClOrdID");
+        assertEquals("AAPL", order.getString(Symbol.FIELD), "QuickFIX message should carry Symbol");
     }
 }

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @SuppressWarnings({"java:S5786", "PMD.JUnit5TestShouldBePackagePrivate"})
 // JMH/JUnit rules disagree; JMH requires public
-@DisplayName("JmhSmokeTest")
+@DisplayName("Smoke test verifies JMH options build correctly")
 public class JmhSmokeTest {
 
     /**

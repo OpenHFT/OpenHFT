@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Note: The legacy NonNull and Nullable annotations are deprecated in favor of JSR-305/JSpecify,
  * so this test uses reflection to verify their presence without importing them directly.
  */
-@DisplayName("SpotBugsAnnotationsSmokeTest")
+@DisplayName("Smoke test verifies SpotBugs annotations are available")
 class SpotBugsAnnotationsSmokeTest {
 
     private static final String NON_NULL_CLASS = "edu.umd.cs.findbugs.annotations.NonNull";

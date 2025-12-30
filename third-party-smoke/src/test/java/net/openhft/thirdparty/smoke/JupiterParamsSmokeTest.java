@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * Exercises junit-jupiter-params using a simple value source for basic coverage.
  */
-@DisplayName("JupiterParamsSmokeTest")
+@DisplayName("Smoke test verifies Jupiter parameterised value sources")
 class JupiterParamsSmokeTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"a", "bb", "ccc"})
-    @DisplayName("Value source strings are non-empty")
+    @DisplayName("Value source strings provide non-empty samples")
     void stringsAreNotEmpty(final String value) {
-        assertFalse(value.isEmpty(), "value-source string should be non-empty");
+        assertFalse(value.isEmpty(), "value source should supply a non-empty sample string");
     }
 }

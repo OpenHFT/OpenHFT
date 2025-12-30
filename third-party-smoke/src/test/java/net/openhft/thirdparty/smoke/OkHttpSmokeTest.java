@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Smoke test verifying OkHttp client can call MockWebServer and read response bodies.
  */
-@DisplayName("OkHttpSmokeTest")
+@DisplayName("Smoke test verifies OkHttp response handling")
 class OkHttpSmokeTest {
 
     @Test

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke tests verifying NIO network stacks and ProGuard configuration construction.
  */
-@DisplayName("NioAndNetworkStacksSmokeTest")
+@DisplayName("Smoke test verifies NIO and network stacks load")
 class NioAndNetworkStacksSmokeTest {
 
     /**

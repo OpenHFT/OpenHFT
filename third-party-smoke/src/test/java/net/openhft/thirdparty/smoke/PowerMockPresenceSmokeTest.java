@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Presence-only smoke test to ensure Powermock classes resolve for dependency loading on classpath.
  */
-@DisplayName("PowerMockPresenceSmokeTest")
+@DisplayName("Smoke test verifies PowerMock classes are present")
 class PowerMockPresenceSmokeTest {
 
     /**

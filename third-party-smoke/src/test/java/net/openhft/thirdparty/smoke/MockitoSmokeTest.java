@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * Smoke test verifying Mockito core operates without bytecode instrumentation support.
  */
-@DisplayName("MockitoSmokeTest")
+@DisplayName("Smoke test verifies Mockito basic stubbing works")
 class MockitoSmokeTest {
 
     /**
