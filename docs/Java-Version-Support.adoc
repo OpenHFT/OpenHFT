@@ -26,6 +26,18 @@ When starting a JVM explicitly using the `java` command, the follow command line
 
 TIP: Even though not all of them are strictly required, we recommend providing the same command line options for Java 11 as for Java 17 and Java 21 as this will remove some warnings in the output logs.
 
+== Maven build arguments
+
+The root parent POM appends `jvm.requiredArgs` to the Surefire `argLine` so tests run with the needed module exports.
+If you need additional JVM flags, set `jvm.extraArgs` to keep the defaults and add your own arguments.
+
+[source,shell script]
+----
+mvn -Djvm.extraArgs="--add-opens=java.base/java.net=ALL-UNNAMED" test
+----
+
+If you override Surefire `argLine` in a child POM, include both `jvm.requiredArgs` and `jvm.extraArgs`.
+
 == Compiles and Runs on Java 8, 11, 17 and 21.
 
 Almost all libraries are built in Java 8 and are subsequently tested under Java 8, Java 11, Java 17 and Java 21 as a part of our continuous integration process.

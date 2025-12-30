@@ -69,6 +69,7 @@
             contain the arguments necessary to run the Chronicle libraries
         -->
         <jvm.requiredArgs/>
+        <jvm.extraArgs/>
         <!-- Define the target coverage thresholds as properties -->
         <jacoco.line.coverage>0.9</jacoco.line.coverage>
         <jacoco.branch.coverage>0.8</jacoco.branch.coverage>
@@ -316,7 +317,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>@{argLine} ${jvm.requiredArgs}</argLine>
+                    <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs}</argLine>
                 </configuration>
             </plugin>
         </plugins>
@@ -335,7 +336,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>@{argLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
+                            <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs} -Djvm.coverage=true</argLine>
                             <forkCount>1</forkCount>
                             <reuseForks>false</reuseForks>
                         </configuration>
