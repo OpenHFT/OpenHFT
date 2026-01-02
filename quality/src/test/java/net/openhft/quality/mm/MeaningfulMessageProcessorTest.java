@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -156,103 +155,67 @@ public class MeaningfulMessageProcessorTest {
         // Should not throw
     }
 
-    // --- normalizeClassName tests via reflection ---
+    // --- normalizeClassName tests ---
 
     @Test
-    void normalizeClassNameSimple() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertEquals("IOException", method.invoke(processor, "IOException"));
+    void normalizeClassNameSimple() {
+        assertEquals("IOException", processor.normalizeClassName("IOException"));
     }
 
     @Test
-    void normalizeClassNameFullyQualified() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertEquals("IOException", method.invoke(processor, "java.io.IOException"));
+    void normalizeClassNameFullyQualified() {
+        assertEquals("IOException", processor.normalizeClassName("java.io.IOException"));
     }
 
     @Test
-    void normalizeClassNameEmpty() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertNull(method.invoke(processor, ""));
+    void normalizeClassNameEmpty() {
+        assertNull(processor.normalizeClassName(""));
     }
 
     @Test
-    void normalizeClassNameWhitespace() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertNull(method.invoke(processor, "   "));
+    void normalizeClassNameWhitespace() {
+        assertNull(processor.normalizeClassName("   "));
     }
 
-    // --- escapeForTsv tests via reflection ---
+    // --- escapeForTsv tests ---
 
     @Test
-    void escapeForTsvNull() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("", method.invoke(processor, (String) null));
+    void escapeForTsvNull() {
+        assertEquals("", processor.escapeForTsv(null));
     }
 
     @Test
-    void escapeForTsvEmpty() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("", method.invoke(processor, ""));
+    void escapeForTsvEmpty() {
+        assertEquals("", processor.escapeForTsv(""));
     }
 
     @Test
-    void escapeForTsvSimple() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("hello world", method.invoke(processor, "hello world"));
+    void escapeForTsvSimple() {
+        assertEquals("hello world", processor.escapeForTsv("hello world"));
     }
 
     @Test
-    void escapeForTsvWithTab() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("hello\\tworld", method.invoke(processor, "hello\tworld"));
+    void escapeForTsvWithTab() {
+        assertEquals("hello\\tworld", processor.escapeForTsv("hello\tworld"));
     }
 
     @Test
-    void escapeForTsvWithNewline() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("hello\\nworld", method.invoke(processor, "hello\nworld"));
+    void escapeForTsvWithNewline() {
+        assertEquals("hello\\nworld", processor.escapeForTsv("hello\nworld"));
     }
 
     @Test
-    void escapeForTsvWithCarriageReturn() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("hello\\rworld", method.invoke(processor, "hello\rworld"));
+    void escapeForTsvWithCarriageReturn() {
+        assertEquals("hello\\rworld", processor.escapeForTsv("hello\rworld"));
     }
 
     @Test
-    void escapeForTsvWithBackslash() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("hello\\\\world", method.invoke(processor, "hello\\world"));
+    void escapeForTsvWithBackslash() {
+        assertEquals("hello\\\\world", processor.escapeForTsv("hello\\world"));
     }
 
     @Test
-    void escapeForTsvWithMultipleSpecialChars() throws Exception {
-        Method method = MeaningfulMessageProcessor.class.getDeclaredMethod("escapeForTsv", String.class);
-        method.setAccessible(true);
-
-        assertEquals("a\\tb\\nc\\rd\\\\e", method.invoke(processor, "a\tb\nc\rd\\e"));
+    void escapeForTsvWithMultipleSpecialChars() {
+        assertEquals("a\\tb\\nc\\rd\\\\e", processor.escapeForTsv("a\tb\nc\rd\\e"));
     }
 }

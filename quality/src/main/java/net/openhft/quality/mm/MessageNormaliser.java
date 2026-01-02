@@ -3,7 +3,7 @@
  */
 package net.openhft.quality.mm;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Normalises message text for comparison and de-duplication.
@@ -20,7 +20,7 @@ public final class MessageNormaliser {
      * @return normalised message text.
      */
     public static String normalise(String message) {
-        Objects.requireNonNull(message);
+        requireNonNull(message);
         String trimmed = message.trim();
         if (trimmed.isEmpty()) {
             return "";

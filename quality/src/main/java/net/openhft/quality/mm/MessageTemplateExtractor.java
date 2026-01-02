@@ -5,11 +5,11 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Extracts message templates and placeholder counts from expressions.
@@ -35,7 +35,7 @@ public final class MessageTemplateExtractor {
      * @return extracted template, or {@code null} if none is found.
      */
     public MessageTemplate extractMessageTemplate(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         DetailAST content = unwrapExpr(expr);
         if (content != null && content.getType() == TokenTypes.METHOD_CALL) {
             MessageTemplate template = extractTemplateFromMethodCall(content);
@@ -69,7 +69,7 @@ public final class MessageTemplateExtractor {
      * @return string literal content, or {@code null} if not found.
      */
     public String extractStringLiteral(DetailAST expr, boolean allowMethodCall) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         DetailAST content = expr;
         if (content.getType() == TokenTypes.EXPR && content.getChildCount() == 1) {
             content = content.getFirstChild();
@@ -105,7 +105,7 @@ public final class MessageTemplateExtractor {
      * @return {@code true} if the expression is a constant string.
      */
     public boolean isConstantStringExpression(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.STRING_LITERAL) {
             return true;
         }
@@ -124,7 +124,7 @@ public final class MessageTemplateExtractor {
      * @return constant string value, or {@code null} if not constant.
      */
     public String extractConstantString(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.STRING_LITERAL) {
             String text = expr.getText();
             if (text.length() >= 2) {
@@ -151,7 +151,7 @@ public final class MessageTemplateExtractor {
      * @return number of placeholder tokens.
      */
     public int countPlaceholderTokens(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.STRING_LITERAL) {
             return 0;
         }
@@ -268,7 +268,7 @@ public final class MessageTemplateExtractor {
 
     private MessageTemplate extractTemplateFromMethodCall(DetailAST methodCall) {
         String methodName = extractMethodName(methodCall);
-        Objects.requireNonNull(methodName);
+        requireNonNull(methodName);
         if ("formatted".equals(methodName)) {
             return extractFormattedTemplate(methodCall);
         }
@@ -300,9 +300,9 @@ public final class MessageTemplateExtractor {
 
     private MessageTemplate extractFormattedTemplate(DetailAST methodCall) {
         DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
-        Objects.requireNonNull(dot);
+        requireNonNull(dot);
         DetailAST receiver = dot.getFirstChild();
-        Objects.requireNonNull(receiver);
+        requireNonNull(receiver);
         String template = extractStringLiteral(receiver, false);
         if (template == null) {
             return null;
@@ -312,7 +312,7 @@ public final class MessageTemplateExtractor {
     }
 
     private DetailAST unwrapExpr(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.EXPR && expr.getChildCount() == 1) {
             return expr.getFirstChild();
         }
@@ -345,9 +345,9 @@ public final class MessageTemplateExtractor {
     }
 
     private DetailAST findRightmostIdent(DetailAST dot) {
-        Objects.requireNonNull(dot);
+        requireNonNull(dot);
         DetailAST lastChild = dot.getLastChild();
-        Objects.requireNonNull(lastChild);
+        requireNonNull(lastChild);
         if (lastChild.getType() == TokenTypes.IDENT) {
             return lastChild;
         }
@@ -362,7 +362,7 @@ public final class MessageTemplateExtractor {
     }
 
     private String extractConstantStringParts(DetailAST expr, boolean allowPlaceholder) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.EXPR && expr.getChildCount() == 1) {
             return extractConstantStringParts(expr.getFirstChild(), allowPlaceholder);
         }
@@ -377,8 +377,8 @@ public final class MessageTemplateExtractor {
             return "";
         }
         if (expr.getType() == TokenTypes.PLUS) {
-            String left = Objects.requireNonNull(extractConstantStringParts(expr.getFirstChild(), true));
-            String right = Objects.requireNonNull(extractConstantStringParts(expr.getLastChild(), true));
+            String left = requireNonNull(extractConstantStringParts(expr.getFirstChild(), true));
+            String right = requireNonNull(extractConstantStringParts(expr.getLastChild(), true));
             return left + right;
         }
         if (allowPlaceholder) {
@@ -400,7 +400,7 @@ public final class MessageTemplateExtractor {
     }
 
     private DetailAST findStringLiteral(DetailAST ast) {
-        Objects.requireNonNull(ast);
+        requireNonNull(ast);
         if (ast.getType() == TokenTypes.STRING_LITERAL) {
             return ast;
         }

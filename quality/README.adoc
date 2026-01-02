@@ -100,7 +100,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
 </plugins>
 ----
 
-NOTE: `quality.enforced` will be true by default but can be override in a consuming project's properties to disable enforcement (for example, during development).
+NOTE: In Chronicle parent POMs the quality checks are bound to the `quality` profile and only run when `-Pquality` is enabled. The profile sets `quality.enforced` to true by default, but it can be overridden in a consuming project's properties if warning-only output is preferred.
 
 Parent POMs such as `root-parent-pom` and `chronicle-enterprise-root-pom` already wire this plugin; most Chronicle modules should prefer that route rather than duplicating configuration.
 

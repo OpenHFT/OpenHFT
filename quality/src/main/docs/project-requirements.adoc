@@ -44,11 +44,11 @@ Implementation: `quality/src/test/java/net/openhft/quality/QualityCheckstyleSelf
 *QUALITY-NF-O-001* Centralised reuse :: Parent POMs and downstream builds should consume configuration resources from this module to avoid duplicated rule sets and drift.
 
 *QUALITY-NF-O-002* Configurable enforcement :: Quality plugins must support the
-`quality.enforced` property to switch between warning-only and build-breaking enforcement.
+`quality.enforced` property to switch between warning-only and build-breaking enforcement, and parent POMs must bind the checks under a `quality` profile so they only run when explicitly enabled.
 
 *QUALITY-NF-O-003* Documentation currency :: When rule sets or guidance change, update documentation in `src/main/docs` in the same change set.
 
 == Toolchain Expectations
 
 * Maven builds using Checkstyle, SpotBugs, and PMD
-* Chronicle parent POMs wire configuration paths and `quality.enforced` gating
+* Chronicle parent POMs wire configuration paths and gate checks under the `quality` profile using `quality.enforced`

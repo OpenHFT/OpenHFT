@@ -6,7 +6,7 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Extracts message content from lambda expressions and suppliers.
@@ -22,7 +22,7 @@ public final class LambdaMessageExtractor {
      * @param context extraction context with template extractor.
      */
     public LambdaMessageExtractor(MessageExtractionContext context) {
-        this.context = Objects.requireNonNull(context);
+        this.context = requireNonNull(context);
         this.astSupport = context.astSupport();
     }
 
@@ -48,9 +48,9 @@ public final class LambdaMessageExtractor {
      */
     public String extractTrivialLambdaMessage(DetailAST expr) {
         DetailAST lambda = astSupport.findLambda(expr);
-        Objects.requireNonNull(lambda);
+        requireNonNull(lambda);
         DetailAST body = lambda.getLastChild();
-        Objects.requireNonNull(body);
+        requireNonNull(body);
         if (body.getType() == TokenTypes.EXPR) {
             body = body.getFirstChild();
         }
@@ -130,7 +130,7 @@ public final class LambdaMessageExtractor {
     }
 
     private void describeCheapExpressionPart(DetailAST expr, StringBuilder sb) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         switch (expr.getType()) {
             case TokenTypes.IDENT:
                 sb.append(expr.getText());

@@ -5,9 +5,10 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.*;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Analyzes loop index usage in assertion messages.
@@ -22,7 +23,7 @@ public final class LoopIndexAnalyzer {
      * @param astSupport AST support utilities.
      */
     public LoopIndexAnalyzer(MessageAstSupport astSupport) {
-        this.astSupport = Objects.requireNonNull(astSupport);
+        this.astSupport = requireNonNull(astSupport);
     }
 
     /**
@@ -34,9 +35,9 @@ public final class LoopIndexAnalyzer {
      * @return loop index info, or {@code null} if not in a loop.
      */
     public LoopIndexInfo findLoopIndexInfo(DetailAST methodCall, DetailAST messageExpr, String message) {
-        Objects.requireNonNull(methodCall);
-        Objects.requireNonNull(messageExpr);
-        Objects.requireNonNull(message);
+        requireNonNull(methodCall);
+        requireNonNull(messageExpr);
+        requireNonNull(message);
         String methodName = astSupport.extractMethodName(methodCall);
         if (!AssertionMethodClassifier.isLoopIndexAssertionMethod(methodName)) {
             return null;
@@ -63,7 +64,7 @@ public final class LoopIndexAnalyzer {
     }
 
     private void collectLoopIndexNamesFromFor(DetailAST forAst, Set<String> names) {
-        Objects.requireNonNull(forAst);
+        requireNonNull(forAst);
         DetailAST forEachClause = forAst.findFirstToken(TokenTypes.FOR_EACH_CLAUSE);
         if (forEachClause != null) {
             DetailAST varDef = forEachClause.findFirstToken(TokenTypes.VARIABLE_DEF);
@@ -106,10 +107,10 @@ public final class LoopIndexAnalyzer {
     }
 
     private boolean messageContainsLoopIndex(String message, Set<String> loopNames) {
-        Objects.requireNonNull(message);
-        Objects.requireNonNull(loopNames);
+        requireNonNull(message);
+        requireNonNull(loopNames);
         for (String name : loopNames) {
-            Objects.requireNonNull(name);
+            requireNonNull(name);
             if (name.isEmpty()) {
                 continue;
             }
@@ -125,14 +126,14 @@ public final class LoopIndexAnalyzer {
     }
 
     private boolean expressionContainsLoopIndex(DetailAST expr, Set<String> loopNames) {
-        Objects.requireNonNull(expr);
-        Objects.requireNonNull(loopNames);
+        requireNonNull(expr);
+        requireNonNull(loopNames);
         DetailAST content = astSupport.unwrapExpr(expr);
         return containsLoopIndexInAst(content, loopNames);
     }
 
     private boolean containsLoopIndexInAst(DetailAST ast, Set<String> loopNames) {
-        Objects.requireNonNull(ast);
+        requireNonNull(ast);
         if (ast.getType() == TokenTypes.IDENT && loopNames.contains(ast.getText())) {
             return true;
         }

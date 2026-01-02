@@ -3,7 +3,7 @@
  */
 package net.openhft.quality;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 public class InputThrowNewMessages {
 
@@ -17,12 +17,12 @@ public class InputThrowNewMessages {
     }
 
     public void testRequireNonNull(Object value) {
-        Objects.requireNonNull(value, "expected");
+        requireNonNull(value, "expected");
     }
 
     public void testRequireNonNullDuplicates(Object left, Object right) {
-        Objects.requireNonNull(left, "user id must be present");
-        Objects.requireNonNull(right, "user id must be present");
+        requireNonNull(left, "user id must be present");
+        requireNonNull(right, "user id must be present");
     }
 
     public void testThrowDuplicates() {

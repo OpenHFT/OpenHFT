@@ -3,8 +3,9 @@
  */
 package net.openhft.quality.mm;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Prefilters messages that are obviously not user-facing text.
@@ -33,7 +34,7 @@ public final class MessagePrefilter {
      * @return {@code true} if the message should be skipped.
      */
     public boolean shouldSkip(String message) {
-        Objects.requireNonNull(message);
+        requireNonNull(message);
         String trimmed = message.trim();
         if (trimmed.isEmpty()) {
             return false;

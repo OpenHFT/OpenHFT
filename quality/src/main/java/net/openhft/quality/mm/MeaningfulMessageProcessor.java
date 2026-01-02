@@ -7,7 +7,6 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Coordinates extraction and evaluation of message candidates for a single file.
@@ -301,7 +302,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      */
     @Override
     public void emitCandidate(MessageCandidate candidate) {
-        Objects.requireNonNull(candidate);
+        requireNonNull(candidate);
         String message = candidate.message();
         MessageMetrics metrics = null;
         if (message != null) {
@@ -420,7 +421,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         return metricsCalculator.calculate(message, placeholderCount, keyValueLabelCount);
     }
 
-    private String escapeForTsv(String value) {
+    String escapeForTsv(String value) {
         if (value == null || value.isEmpty()) {
             return "";
         }
@@ -431,8 +432,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         return escaped;
     }
 
-    private String normalizeClassName(String className) {
-        Objects.requireNonNull(className);
+    String normalizeClassName(String className) {
+        requireNonNull(className);
         String trimmed = className.trim();
         if (trimmed.isEmpty()) {
             return null;

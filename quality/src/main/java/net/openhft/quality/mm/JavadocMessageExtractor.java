@@ -7,12 +7,12 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Extracts the first paragraph from Javadoc comments.
@@ -116,7 +116,7 @@ public final class JavadocMessageExtractor extends AbstractMessageExtractor {
     }
 
     private void emitCandidate(TextBlock javadoc, MessageSource source) {
-        Objects.requireNonNull(javadoc);
+        requireNonNull(javadoc);
         String paragraph = extractFirstParagraph(javadoc);
         if (paragraph == null) {
             return;

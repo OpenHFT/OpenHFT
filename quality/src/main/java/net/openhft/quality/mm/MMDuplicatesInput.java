@@ -4,7 +4,8 @@
 package net.openhft.quality.mm;
 
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Flags messages that duplicate input values.
@@ -27,7 +28,7 @@ public final class MMDuplicatesInput extends AbstractMessageRule {
         }
         String messageLower = message.toLowerCase().trim();
         for (String input : inputValues) {
-            Objects.requireNonNull(input);
+            requireNonNull(input);
             if (input.isEmpty()) {
                 continue;
             }

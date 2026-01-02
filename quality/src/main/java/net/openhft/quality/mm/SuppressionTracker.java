@@ -5,8 +5,9 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Tracks @SuppressWarnings tokens for MeaningfulMessage rule suppression.
@@ -59,7 +60,7 @@ public final class SuppressionTracker {
      * @return {@code true} if the rule is suppressed.
      */
     public boolean isSuppressed(RuleId ruleId) {
-        Objects.requireNonNull(ruleId);
+        requireNonNull(ruleId);
         SuppressionScope scope = scopes.peek();
         if (scope == null) {
             return false;
@@ -71,7 +72,7 @@ public final class SuppressionTracker {
     }
 
     private List<String> extractSuppressWarnings(DetailAST scopeAst) {
-        Objects.requireNonNull(scopeAst);
+        requireNonNull(scopeAst);
         DetailAST modifiers = scopeAst.findFirstToken(TokenTypes.MODIFIERS);
         if (modifiers == null) {
             return java.util.Collections.emptyList();
@@ -95,7 +96,7 @@ public final class SuppressionTracker {
 
     private void collectStringValues(DetailAST expr, List<String> tokens) {
         DetailAST content = unwrapExpr(expr);
-        Objects.requireNonNull(content);
+        requireNonNull(content);
         if (content.getType() == TokenTypes.EXPR) {
             DetailAST child = content.getFirstChild();
             while (child != null) {
@@ -122,7 +123,7 @@ public final class SuppressionTracker {
     }
 
     private DetailAST unwrapExpr(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.EXPR && expr.getChildCount() == 1) {
             return expr.getFirstChild();
         }
@@ -179,15 +180,15 @@ public final class SuppressionTracker {
         return current != null && current.getType() == TokenTypes.IDENT ? current : null;
     }
 
-    private String stripQuotes(String text) {
-        Objects.requireNonNull(text);
+    String stripQuotes(String text) {
+        requireNonNull(text);
         if (text.length() >= 2 && text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"') {
             return text.substring(1, text.length() - 1);
         }
         return text;
     }
 
-    private static final class SuppressionScope {
+    static final class SuppressionScope {
         final Set<String> suppressedCodes = new HashSet<>();
         boolean suppressAll;
 
@@ -200,7 +201,7 @@ public final class SuppressionTracker {
         }
 
         void addToken(String token) {
-            Objects.requireNonNull(token);
+            requireNonNull(token);
             String cleaned = cleanToken(token);
             if (cleaned.isEmpty()) {
                 return;
@@ -215,12 +216,16 @@ public final class SuppressionTracker {
             }
         }
 
-        private String cleanToken(String token) {
+        String cleanToken(String token) {
             String trimmed = token.trim();
             if (trimmed.startsWith(CHECKSTYLE_PREFIX)) {
                 return trimmed.substring(CHECKSTYLE_PREFIX.length());
             }
             return trimmed;
         }
+    }
+
+    void pushScopeForTesting(SuppressionScope scope) {
+        scopes.push(scope);
     }
 }

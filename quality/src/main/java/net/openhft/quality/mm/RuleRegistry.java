@@ -6,7 +6,8 @@ package net.openhft.quality.mm;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Registry for mapping rule codes to rule identifiers.
@@ -33,7 +34,7 @@ public final class RuleRegistry {
      * @return matching rule identifier, or {@code null} if unknown.
      */
     public static RuleId forCode(String code) {
-        Objects.requireNonNull(code);
+        requireNonNull(code);
         return BY_CODE.get(code);
     }
 }

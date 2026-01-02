@@ -4,7 +4,8 @@
 package net.openhft.quality.mm;
 
 import java.util.Map;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Flags duplicate messages within the same file.
@@ -26,6 +27,9 @@ public final class MMDuplicate extends AbstractMessageRule {
     protected void doEvaluate(MessageContext context, ViolationCollector collector,
                               RuleEvaluationState state) {
         MessageCandidate candidate = context.candidate();
+        if (candidate.argumentNameMessage()) {
+            return;
+        }
         String message = candidate.message();
         if (message == null || message.isEmpty()) {
             return;
@@ -34,7 +38,7 @@ public final class MMDuplicate extends AbstractMessageRule {
         if (suppressionTracker != null && suppressionTracker.isSuppressed(ruleId())) {
             return;
         }
-        String normalised = Objects.requireNonNull(candidate.normalisedMessage());
+        String normalised = requireNonNull(candidate.normalisedMessage());
         if (normalised.isEmpty()) {
             normalised = MessageNormaliser.normalise(message);
         }

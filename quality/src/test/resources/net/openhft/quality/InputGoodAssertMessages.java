@@ -3,9 +3,8 @@
  */
 package net.openhft.quality;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
-
-import java.util.Objects;
 
 public class InputGoodAssertMessages {
     public void test() {
@@ -15,6 +14,6 @@ public class InputGoodAssertMessages {
     }
 
     public void testRequireNonNull(Object value) {
-        Objects.requireNonNull(value, "value");
+        requireNonNull(value);
     }
 }

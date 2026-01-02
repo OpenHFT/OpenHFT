@@ -5,10 +5,10 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Helper methods for traversing Checkstyle AST nodes during message extraction.
@@ -27,7 +27,7 @@ public final class MessageAstSupport {
      * @return identifier text, or {@code null} if none is present.
      */
     public String extractName(DetailAST ast) {
-        Objects.requireNonNull(ast);
+        requireNonNull(ast);
         DetailAST ident = ast.findFirstToken(TokenTypes.IDENT);
         return ident != null ? ident.getText() : null;
     }
@@ -50,7 +50,7 @@ public final class MessageAstSupport {
      * @return type name, or {@code null} if not available.
      */
     public String extractTypeName(DetailAST typeAst) {
-        Objects.requireNonNull(typeAst);
+        requireNonNull(typeAst);
         DetailAST dot = typeAst.findFirstToken(TokenTypes.DOT);
         if (dot != null) {
             return flattenDot(dot);
@@ -123,7 +123,7 @@ public final class MessageAstSupport {
      */
     public List<DetailAST> collectArguments(DetailAST elist) {
         List<DetailAST> args = new ArrayList<>();
-        Objects.requireNonNull(elist);
+        requireNonNull(elist);
         DetailAST child = elist.getFirstChild();
         while (child != null) {
             if (child.getType() == TokenTypes.EXPR || child.getType() == TokenTypes.LAMBDA) {
@@ -141,7 +141,7 @@ public final class MessageAstSupport {
      * @return unwrapped child or the original node.
      */
     public DetailAST unwrapExpr(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.EXPR && expr.getChildCount() == 1) {
             return expr.getFirstChild();
         }
@@ -156,7 +156,7 @@ public final class MessageAstSupport {
      */
     public boolean isNullLiteral(DetailAST expr) {
         DetailAST content = unwrapExpr(expr);
-        Objects.requireNonNull(content);
+        requireNonNull(content);
         if (content.getType() == TokenTypes.LITERAL_NULL) {
             return true;
         }
@@ -173,7 +173,7 @@ public final class MessageAstSupport {
      * @return the lambda node, or {@code null} if none is found.
      */
     public DetailAST findLambda(DetailAST ast) {
-        Objects.requireNonNull(ast);
+        requireNonNull(ast);
         if (ast.getType() == TokenTypes.LAMBDA) {
             return ast;
         }
@@ -195,7 +195,7 @@ public final class MessageAstSupport {
      * @return {@code true} if a string literal is found.
      */
     public boolean containsStringLiteral(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.STRING_LITERAL) {
             return true;
         }
@@ -219,7 +219,7 @@ public final class MessageAstSupport {
      * @return {@code true} if a string literal is found.
      */
     public boolean containsStringLiteralDeep(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.STRING_LITERAL) {
             return true;
         }
@@ -240,7 +240,7 @@ public final class MessageAstSupport {
      * @return plus node, or {@code null} if not found.
      */
     public DetailAST findPlus(DetailAST ast) {
-        Objects.requireNonNull(ast);
+        requireNonNull(ast);
         if (ast.getType() == TokenTypes.PLUS) {
             return ast;
         }
@@ -267,7 +267,7 @@ public final class MessageAstSupport {
      * @return matching expression node, or {@code null} if none is found.
      */
     public DetailAST findFirstStringArgument(DetailAST elist, MessageTemplateExtractor templateExtractor) {
-        Objects.requireNonNull(elist);
+        requireNonNull(elist);
         DetailAST child = elist.getFirstChild();
         while (child != null) {
             if (child.getType() == TokenTypes.EXPR) {
@@ -289,8 +289,8 @@ public final class MessageAstSupport {
      * @return the expression to treat as a string argument, or {@code null}.
      */
     public DetailAST findStringArgumentExpression(DetailAST expr, MessageTemplateExtractor templateExtractor) {
-        Objects.requireNonNull(expr);
-        Objects.requireNonNull(templateExtractor);
+        requireNonNull(expr);
+        requireNonNull(templateExtractor);
         DetailAST content = expr;
         if (content.getType() == TokenTypes.EXPR && content.getChildCount() == 1) {
             content = content.getFirstChild();
@@ -312,7 +312,7 @@ public final class MessageAstSupport {
      * @return simple or qualified class name, or {@code null} if not found.
      */
     public String extractNewClassName(DetailAST literalNew) {
-        Objects.requireNonNull(literalNew);
+        requireNonNull(literalNew);
         DetailAST child = literalNew.getFirstChild();
         while (child != null) {
             if (child.getType() == TokenTypes.IDENT) {
@@ -337,7 +337,7 @@ public final class MessageAstSupport {
      * @return class literal name, or {@code null} if not found.
      */
     public String extractClassLiteralName(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         DetailAST content = expr;
         if (content.getType() == TokenTypes.EXPR && content.getChildCount() == 1) {
             content = content.getFirstChild();
@@ -346,7 +346,7 @@ public final class MessageAstSupport {
             DetailAST lastChild = content.getLastChild();
             if (lastChild != null && "class".equals(lastChild.getText())) {
                 DetailAST left = content.getFirstChild();
-                Objects.requireNonNull(left);
+                requireNonNull(left);
                 DetailAST ident = left.getType() == TokenTypes.IDENT
                         ? left
                         : findRightmostIdent(left);
@@ -363,7 +363,7 @@ public final class MessageAstSupport {
      * @return identifier text, or {@code null} if not available.
      */
     public String extractAssignedIdent(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.IDENT) {
             return expr.getText();
         }

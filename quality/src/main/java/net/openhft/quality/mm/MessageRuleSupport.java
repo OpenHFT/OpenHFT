@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides helper routines for analysing message content.
@@ -114,8 +115,8 @@ public final class MessageRuleSupport {
      * @return matched variant, or {@code null} if none is found.
      */
     public String findNameVariant(String text, String name) {
-        Objects.requireNonNull(text);
-        Objects.requireNonNull(name);
+        requireNonNull(text);
+        requireNonNull(name);
         if (name.length() < MIN_NAME_LENGTH_FOR_CHECK) {
             return null;
         }
@@ -200,8 +201,8 @@ public final class MessageRuleSupport {
     }
 
     private boolean containsNameExact(String text, String name) {
-        Objects.requireNonNull(text);
-        Objects.requireNonNull(name);
+        requireNonNull(text);
+        requireNonNull(name);
         if (name.isEmpty()) {
             return false;
         }

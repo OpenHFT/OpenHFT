@@ -5,8 +5,9 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Extracts message candidates from logging calls (SLF4J, Log4j2, JUL, System.Logger, Jvm).
@@ -41,7 +42,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
      * @param methodCall AST node for the method call.
      */
     public void handleMethodCall(DetailAST methodCall) {
-        String methodName = Objects.requireNonNull(astSupport().extractMethodName(methodCall));
+        String methodName = requireNonNull(astSupport().extractMethodName(methodCall));
         if (checkJvmLogCall(methodCall, methodName)) {
             return;
         }
@@ -233,9 +234,9 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return resolveLoggerKindFromType(typeName);
     }
 
-    private LoggerKind resolveLoggerKindFromType(String typeName) {
+    LoggerKind resolveLoggerKindFromType(String typeName) {
         String resolved = context().resolveTypeName(typeName);
-        Objects.requireNonNull(resolved);
+        requireNonNull(resolved);
         switch (resolved) {
             case "org.slf4j.Logger":
                 return LoggerKind.SLF4J;
@@ -257,7 +258,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
             return null;
         }
         DetailAST left = dot.getFirstChild();
-        Objects.requireNonNull(left);
+        requireNonNull(left);
         if (left.getType() == TokenTypes.METHOD_CALL) {
             return null;
         }
@@ -270,7 +271,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return null;
     }
 
-    private boolean isLogMethod(LoggerKind loggerKind, String methodName) {
+    boolean isLogMethod(LoggerKind loggerKind, String methodName) {
         switch (loggerKind) {
             case SLF4J:
                 return SLF4J_LEVEL_METHODS.contains(methodName);
@@ -285,7 +286,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         }
     }
 
-    private boolean containsThrowable(List<DetailAST> args) {
+    boolean containsThrowable(List<DetailAST> args) {
         for (DetailAST arg : args) {
             if (isThrowableExpression(arg)) {
                 return true;
@@ -294,9 +295,9 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
-    private boolean isThrowableExpression(DetailAST expr) {
+    boolean isThrowableExpression(DetailAST expr) {
         DetailAST content = astSupport().unwrapExpr(expr);
-        Objects.requireNonNull(content);
+        requireNonNull(content);
         if (content.getType() == TokenTypes.LITERAL_NEW) {
             String className = astSupport().extractNewClassName(content);
             return isThrowableTypeName(className);
@@ -308,7 +309,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
-    private boolean isThrowableTypeName(String typeName) {
+    boolean isThrowableTypeName(String typeName) {
         if (typeName == null) {
             return false;
         }
@@ -328,12 +329,12 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
     }
 
     private int countLogPlaceholders(String message) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.countLogPlaceholders(message);
     }
 
     private int countFormatPlaceholders(String message) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.countFormatPlaceholders(message);
     }
 
@@ -356,7 +357,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
                 body = body.getFirstChild();
             }
         }
-        Objects.requireNonNull(body);
+        requireNonNull(body);
         MessageTemplateExtractor templateExtractor = context().templateExtractor();
         if (body.getType() == TokenTypes.METHOD_CALL) {
             MessageTemplate template = templateExtractor.extractMessageTemplate(body);
@@ -371,26 +372,26 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
     }
 
     private boolean isConstantStringExpression(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.isConstantStringExpression(expr);
     }
 
     private String extractConstantString(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.extractConstantString(expr);
     }
 
     private MessageTemplate extractMessageTemplate(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.extractMessageTemplate(expr);
     }
 
     private int countKeyValueLabels(String constantParts) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.countKeyValueLabels(constantParts);
     }
 
-    private boolean isBlankMessage(String message) {
+    boolean isBlankMessage(String message) {
         return message == null || message.trim().isEmpty();
     }
 
@@ -407,7 +408,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         sink().emitCandidate(candidate);
     }
 
-    private boolean isSupplierTypedExpression(DetailAST expr) {
+    boolean isSupplierTypedExpression(DetailAST expr) {
         if (expr == null) {
             return false;
         }
@@ -427,7 +428,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
-    private boolean isSupplierTypeName(String typeName) {
+    boolean isSupplierTypeName(String typeName) {
         if (typeName == null) {
             return false;
         }
@@ -440,7 +441,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
                 || resolved.endsWith(".Supplier");
     }
 
-    private enum LoggerKind {
+    enum LoggerKind {
         SLF4J,
         LOG4J2,
         JUL,

@@ -6,7 +6,6 @@ package net.openhft.quality.mm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,13 +39,13 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void higherPriorityReplacesExisting() throws Exception {
+    void higherPriorityReplacesExisting() {
         // First record a low priority violation (higher number = lower priority)
         collector.record(10, RuleId.TOO_SHORT);  // priority 24
         // Then record a higher priority (lower number)
         collector.record(10, RuleId.CONTEXTLESS);  // priority 1
 
-        // Use reflection to verify the pending map
+        // Verify the pending map after replacement
         Map<Integer, Violation> pending = getPendingMap();
         Violation violation = pending.get(10);
         assertEquals(RuleId.CONTEXTLESS, violation.ruleId(),
@@ -54,7 +53,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void lowerPriorityDoesNotReplaceExisting() throws Exception {
+    void lowerPriorityDoesNotReplaceExisting() {
         // First record a high priority violation (lower number = higher priority)
         collector.record(10, RuleId.CONTEXTLESS);  // priority 1
         // Then try to record a lower priority (higher number)
@@ -67,7 +66,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void samePriorityShorterCodeWins() throws Exception {
+    void samePriorityShorterCodeWins() {
         // Both have priority 0, but different code lengths
         // ASSERTJ_OVERRIDE has code "MMAssertJGenericOverride" (24 chars)
         // MISSING_LOOP_INDEX has code "MMMissingLoopIndex" (18 chars)
@@ -81,7 +80,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void samePriorityAndCodeLengthOrdinalWins() throws Exception {
+    void samePriorityAndCodeLengthOrdinalWins() {
         // Same priority (0), same code length - ordinal breaks the tie
         // Record the same rule twice (should be no-op)
         collector.record(10, RuleId.MISSING_MESSAGE);
@@ -93,7 +92,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void clearRemovesPendingViolations() throws Exception {
+    void clearRemovesPendingViolations() {
         collector.record(10, RuleId.TOO_SHORT);
         collector.record(20, RuleId.CONTEXTLESS);
 
@@ -104,7 +103,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void multipleViolationsOnDifferentLines() throws Exception {
+    void multipleViolationsOnDifferentLines() {
         collector.record(10, RuleId.TOO_SHORT);
         collector.record(20, RuleId.TOO_LONG);
         collector.record(30, RuleId.GENERIC);
@@ -117,7 +116,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void recordPreservesArgs() throws Exception {
+    void recordPreservesArgs() {
         collector.record(10, RuleId.LONG_WORD, "argumentOne", "argumentTwo");
 
         Map<Integer, Violation> pending = getPendingMap();
@@ -141,7 +140,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void negativeLineNumberAllowed() throws Exception {
+    void negativeLineNumberAllowed() {
         collector.record(-1, RuleId.TOO_SHORT);
 
         Map<Integer, Violation> pending = getPendingMap();
@@ -149,7 +148,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void zeroLineNumberAllowed() throws Exception {
+    void zeroLineNumberAllowed() {
         collector.record(0, RuleId.TOO_SHORT);
 
         Map<Integer, Violation> pending = getPendingMap();
@@ -159,7 +158,7 @@ class ViolationCollectorTest {
     // --- pending map state tests (flush behavior verification) ---
 
     @Test
-    void pendingMapKeysAreSortable() throws Exception {
+    void pendingMapKeysAreSortable() {
         // Record violations out of order
         collector.record(30, RuleId.TOO_SHORT);
         collector.record(10, RuleId.TOO_LONG);
@@ -177,7 +176,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void violationsHaveCorrectMessageKeys() throws Exception {
+    void violationsHaveCorrectMessageKeys() {
         collector.record(10, RuleId.TOO_SHORT);
 
         Map<Integer, Violation> pending = getPendingMap();
@@ -188,7 +187,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void violationsPreserveAllArgs() throws Exception {
+    void violationsPreserveAllArgs() {
         collector.record(10, RuleId.LONG_WORD, "testArg1", "testArg2");
 
         Map<Integer, Violation> pending = getPendingMap();
@@ -201,10 +200,10 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void recordWithSuppressedRuleReturnsFalse() throws Exception {
+    void recordWithSuppressedRuleReturnsFalse() {
         // Create a suppression tracker with MM-all suppressed
         SuppressionTracker tracker = new SuppressionTracker();
-        // Use reflection to push a scope with suppressAll = true
+        // Push a scope with suppressAll = true
         pushSuppressAllScope(tracker);
 
         ViolationCollector collectorWithTracker = new ViolationCollector(tracker);
@@ -214,7 +213,7 @@ class ViolationCollectorTest {
     }
 
     @Test
-    void recordWithSuppressedRuleDoesNotAddToPending() throws Exception {
+    void recordWithSuppressedRuleDoesNotAddToPending() {
         // Create a suppression tracker with MM-all suppressed
         SuppressionTracker tracker = new SuppressionTracker();
         pushSuppressAllScope(tracker);
@@ -223,48 +222,17 @@ class ViolationCollectorTest {
         collectorWithTracker.record(10, RuleId.TOO_SHORT);
 
         // Verify nothing was added
-        Field pendingField = ViolationCollector.class.getDeclaredField("pending");
-        pendingField.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Map<Integer, Violation> pending =
-                (Map<Integer, Violation>) pendingField.get(collectorWithTracker);
+        Map<Integer, Violation> pending = collectorWithTracker.pendingForTesting();
         assertTrue(pending.isEmpty(), "suppressed rule should not add to pending");
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<Integer, Violation> getPendingMap() throws Exception {
-        Field pendingField = ViolationCollector.class.getDeclaredField("pending");
-        pendingField.setAccessible(true);
-        return (Map<Integer, Violation>) pendingField.get(collector);
+    private Map<Integer, Violation> getPendingMap() {
+        return collector.pendingForTesting();
     }
 
-    private void pushSuppressAllScope(SuppressionTracker tracker) throws Exception {
-        // Use reflection to create and push a SuppressionScope with suppressAll = true
-        Class<?> scopeClass = null;
-        for (Class<?> innerClass : SuppressionTracker.class.getDeclaredClasses()) {
-            if (innerClass.getSimpleName().equals("SuppressionScope")) {
-                scopeClass = innerClass;
-                break;
-            }
-        }
-        if (scopeClass == null) {
-            throw new IllegalStateException("SuppressionScope inner class not found");
-        }
-
-        java.lang.reflect.Constructor<?> constructor = scopeClass.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Object scope = constructor.newInstance();
-
-        // Set suppressAll = true
-        Field suppressAllField = scopeClass.getDeclaredField("suppressAll");
-        suppressAllField.setAccessible(true);
-        suppressAllField.setBoolean(scope, true);
-
-        // Push to the scopes stack
-        Field scopesField = SuppressionTracker.class.getDeclaredField("scopes");
-        scopesField.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        java.util.Deque<Object> scopes = (java.util.Deque<Object>) scopesField.get(tracker);
-        scopes.push(scope);
+    private void pushSuppressAllScope(SuppressionTracker tracker) {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("MM-all");
+        tracker.pushScopeForTesting(scope);
     }
 }

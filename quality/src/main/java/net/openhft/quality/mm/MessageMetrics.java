@@ -5,7 +5,8 @@ package net.openhft.quality.mm;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Immutable metrics describing a message's content.
@@ -38,9 +39,9 @@ public final class MessageMetrics {
         this.meaningfulWordCount = meaningfulWordCount;
         this.totalWordCount = totalWordCount;
         this.effectiveMeaningfulWordCount = effectiveMeaningfulWordCount;
-        Objects.requireNonNull(meaningfulWords);
+        requireNonNull(meaningfulWords);
         this.meaningfulWords = Collections.unmodifiableList(meaningfulWords);
-        Objects.requireNonNull(longWords);
+        requireNonNull(longWords);
         this.longWords = Collections.unmodifiableList(longWords);
     }
 

@@ -281,6 +281,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {40, RuleId.MISSING_MESSAGE},
                         {44, RuleId.MISSING_MESSAGE},
                         {53, RuleId.WHITESPACE_RUN, "order  should persist", "  "},
+                        {57, RuleId.MISSING_MESSAGE},
                         {61, RuleId.TOO_FEW_MEANINGFUL,
                                 "suffix behaviour under expected input and output conditions",
                                 "suffix", 1, 4}
@@ -341,8 +342,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {15, RuleId.MISSING_MESSAGE},
                         {16, RuleId.MISSING_MESSAGE},
                         {17, RuleId.MISSING_MESSAGE},
-                        {23, RuleId.MISSING_MESSAGE},
-                        {24, RuleId.MISSING_MESSAGE},
+                        {18, RuleId.MISSING_MESSAGE},
+                        {19, RuleId.MISSING_MESSAGE},
                         {25, RuleId.MISSING_MESSAGE},
                         {26, RuleId.MISSING_MESSAGE},
                         {27, RuleId.MISSING_MESSAGE},
@@ -350,12 +351,16 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {29, RuleId.MISSING_MESSAGE},
                         {30, RuleId.MISSING_MESSAGE},
                         {31, RuleId.MISSING_MESSAGE},
+                        {32, RuleId.MISSING_MESSAGE},
                         {33, RuleId.MISSING_MESSAGE},
+                        {34, RuleId.MISSING_MESSAGE},
                         {35, RuleId.MISSING_MESSAGE},
+                        {37, RuleId.MISSING_MESSAGE},
                         {39, RuleId.MISSING_MESSAGE},
                         {43, RuleId.MISSING_MESSAGE},
-                        {50, RuleId.MISSING_MESSAGE},
-                        {54, RuleId.MISSING_MESSAGE}
+                        {47, RuleId.MISSING_MESSAGE},
+                        {54, RuleId.MISSING_MESSAGE},
+                        {58, RuleId.MISSING_MESSAGE}
                 }),
                 arguments("LoopAssignmentIndex", "InputLoopAssignmentIndex.java", new Object[][]{
                         {14, RuleId.MISSING_LOOP_INDEX, "position"}

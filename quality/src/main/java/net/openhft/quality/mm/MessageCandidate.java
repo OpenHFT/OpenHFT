@@ -30,6 +30,7 @@ public final class MessageCandidate {
     private final String stringSearchMethod;
     private final String stringSearchTarget;
     private final String stringSearchArg;
+    private final boolean argumentNameMessage;
 
     private MessageCandidate(Builder builder) {
         this.source = builder.source;
@@ -56,6 +57,7 @@ public final class MessageCandidate {
         this.stringSearchMethod = builder.stringSearchMethod;
         this.stringSearchTarget = builder.stringSearchTarget;
         this.stringSearchArg = builder.stringSearchArg;
+        this.argumentNameMessage = builder.argumentNameMessage;
     }
 
     /**
@@ -239,6 +241,15 @@ public final class MessageCandidate {
     }
 
     /**
+     * Return whether the message mirrors the first argument for requireNonNull/requireNotNull.
+     *
+     * @return {@code true} when the message matches the first argument text.
+     */
+    public boolean argumentNameMessage() {
+        return argumentNameMessage;
+    }
+
+    /**
      * Fluent builder for {@link MessageCandidate}.
      */
     public static final class Builder {
@@ -262,6 +273,7 @@ public final class MessageCandidate {
         private String stringSearchMethod;
         private String stringSearchTarget;
         private String stringSearchArg;
+        private boolean argumentNameMessage;
 
         /**
          * Create a new builder instance.
@@ -398,6 +410,17 @@ public final class MessageCandidate {
          */
         public Builder inputValues(List<String> inputValues) {
             this.inputValues = inputValues;
+            return this;
+        }
+
+        /**
+         * Set whether the message mirrors the first argument for requireNonNull/requireNotNull.
+         *
+         * @param argumentNameMessage {@code true} when the message matches the first argument text.
+         * @return this builder for chaining.
+         */
+        public Builder argumentNameMessage(boolean argumentNameMessage) {
+            this.argumentNameMessage = argumentNameMessage;
             return this;
         }
 

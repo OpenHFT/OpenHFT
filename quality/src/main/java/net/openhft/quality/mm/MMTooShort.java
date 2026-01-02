@@ -17,6 +17,9 @@ public final class MMTooShort extends AbstractMessageRule {
     @Override
     protected void doEvaluate(MessageContext context, ViolationCollector collector,
                               RuleEvaluationState state) {
+        if (context.candidate().argumentNameMessage()) {
+            return;
+        }
         MessageMetrics metrics = requireMetrics(context, state);
         if (metrics == null) {
             return;

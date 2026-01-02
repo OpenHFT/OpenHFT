@@ -8,9 +8,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -31,301 +29,196 @@ public class LogMessageExtractorTest {
         extractor = new LogMessageExtractor(context, sink);
     }
 
-    // --- isBlankMessage tests via reflection ---
+    // --- isBlankMessage tests ---
 
     @Test
-    void isBlankMessageNull() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isBlankMessage", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, (String) null));
+    void isBlankMessageNull() {
+        assertTrue(extractor.isBlankMessage(null));
     }
 
     @Test
-    void isBlankMessageEmpty() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isBlankMessage", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, ""));
+    void isBlankMessageEmpty() {
+        assertTrue(extractor.isBlankMessage(""));
     }
 
     @Test
-    void isBlankMessageWhitespace() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isBlankMessage", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "   "));
+    void isBlankMessageWhitespace() {
+        assertTrue(extractor.isBlankMessage("   "));
     }
 
     @Test
-    void isBlankMessageWithContent() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isBlankMessage", String.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(extractor, "hello"));
+    void isBlankMessageWithContent() {
+        assertFalse(extractor.isBlankMessage("hello"));
     }
 
-    // --- isThrowableTypeName tests via reflection ---
+    // --- isThrowableTypeName tests ---
 
     @Test
-    void isThrowableTypeNameNull() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(extractor, (String) null));
+    void isThrowableTypeNameNull() {
+        assertFalse(extractor.isThrowableTypeName(null));
     }
 
     @Test
-    void isThrowableTypeNameThrowable() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "Throwable"));
+    void isThrowableTypeNameThrowable() {
+        assertTrue(extractor.isThrowableTypeName("Throwable"));
     }
 
     @Test
-    void isThrowableTypeNameException() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "IOException"));
-        assertTrue((Boolean) method.invoke(extractor, "RuntimeException"));
-        assertTrue((Boolean) method.invoke(extractor, "IllegalStateException"));
+    void isThrowableTypeNameException() {
+        assertTrue(extractor.isThrowableTypeName("IOException"));
+        assertTrue(extractor.isThrowableTypeName("RuntimeException"));
+        assertTrue(extractor.isThrowableTypeName("IllegalStateException"));
     }
 
     @Test
-    void isThrowableTypeNameError() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "OutOfMemoryError"));
-        assertTrue((Boolean) method.invoke(extractor, "StackOverflowError"));
+    void isThrowableTypeNameError() {
+        assertTrue(extractor.isThrowableTypeName("OutOfMemoryError"));
+        assertTrue(extractor.isThrowableTypeName("StackOverflowError"));
     }
 
     @Test
-    void isThrowableTypeNameStackTrace() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "StackTrace"));
+    void isThrowableTypeNameStackTrace() {
+        assertTrue(extractor.isThrowableTypeName("StackTrace"));
     }
 
     @Test
-    void isThrowableTypeNameFullyQualified() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "java.lang.RuntimeException"));
-        assertTrue((Boolean) method.invoke(extractor, "java.io.IOException"));
+    void isThrowableTypeNameFullyQualified() {
+        assertTrue(extractor.isThrowableTypeName("java.lang.RuntimeException"));
+        assertTrue(extractor.isThrowableTypeName("java.io.IOException"));
     }
 
     @Test
-    void isThrowableTypeNameNotThrowable() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(extractor, "String"));
-        assertFalse((Boolean) method.invoke(extractor, "Integer"));
-        assertFalse((Boolean) method.invoke(extractor, "List"));
+    void isThrowableTypeNameNotThrowable() {
+        assertFalse(extractor.isThrowableTypeName("String"));
+        assertFalse(extractor.isThrowableTypeName("Integer"));
+        assertFalse(extractor.isThrowableTypeName("List"));
     }
 
-    // --- isSupplierTypeName tests via reflection ---
+    // --- isSupplierTypeName tests ---
 
     @Test
-    void isSupplierTypeNameNull() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isSupplierTypeName", String.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(extractor, (String) null));
+    void isSupplierTypeNameNull() {
+        assertFalse(extractor.isSupplierTypeName(null));
     }
 
     @Test
-    void isSupplierTypeNameSupplier() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isSupplierTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "Supplier"));
+    void isSupplierTypeNameSupplier() {
+        assertTrue(extractor.isSupplierTypeName("Supplier"));
     }
 
     @Test
-    void isSupplierTypeNameFullyQualified() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isSupplierTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(extractor, "java.util.function.Supplier"));
+    void isSupplierTypeNameFullyQualified() {
+        assertTrue(extractor.isSupplierTypeName("java.util.function.Supplier"));
     }
 
     @Test
-    void isSupplierTypeNameEndingWithDotSupplier() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isSupplierTypeName", String.class);
-        method.setAccessible(true);
-
-        // Must end with ".Supplier" not just "Supplier"
-        assertTrue((Boolean) method.invoke(extractor, "com.example.Supplier"));
-        assertFalse((Boolean) method.invoke(extractor, "com.example.MySupplier"));
+    void isSupplierTypeNameEndingWithDotSupplier() {
+        assertTrue(extractor.isSupplierTypeName("com.example.Supplier"));
+        assertFalse(extractor.isSupplierTypeName("com.example.MySupplier"));
     }
 
     @Test
-    void isSupplierTypeNameNotSupplier() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod("isSupplierTypeName", String.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(extractor, "String"));
-        assertFalse((Boolean) method.invoke(extractor, "Consumer"));
+    void isSupplierTypeNameNotSupplier() {
+        assertFalse(extractor.isSupplierTypeName("String"));
+        assertFalse(extractor.isSupplierTypeName("Consumer"));
     }
 
-    // --- resolveLoggerKindFromType tests via reflection ---
+    // --- resolveLoggerKindFromType tests ---
 
     @Test
-    void resolveLoggerKindFromType_slf4j() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "resolveLoggerKindFromType", String.class);
-        method.setAccessible(true);
-
-        Object result = method.invoke(extractor, "org.slf4j.Logger");
-        assertEquals("SLF4J", result.toString());
+    void resolveLoggerKindFromType_slf4j() {
+        assertEquals(LogMessageExtractor.LoggerKind.SLF4J,
+                extractor.resolveLoggerKindFromType("org.slf4j.Logger"));
     }
 
     @Test
-    void resolveLoggerKindFromType_log4j2() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "resolveLoggerKindFromType", String.class);
-        method.setAccessible(true);
-
-        Object result = method.invoke(extractor, "org.apache.logging.log4j.Logger");
-        assertEquals("LOG4J2", result.toString());
+    void resolveLoggerKindFromType_log4j2() {
+        assertEquals(LogMessageExtractor.LoggerKind.LOG4J2,
+                extractor.resolveLoggerKindFromType("org.apache.logging.log4j.Logger"));
     }
 
     @Test
-    void resolveLoggerKindFromType_jul() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "resolveLoggerKindFromType", String.class);
-        method.setAccessible(true);
-
-        Object result = method.invoke(extractor, "java.util.logging.Logger");
-        assertEquals("JUL", result.toString());
+    void resolveLoggerKindFromType_jul() {
+        assertEquals(LogMessageExtractor.LoggerKind.JUL,
+                extractor.resolveLoggerKindFromType("java.util.logging.Logger"));
     }
 
     @Test
-    void resolveLoggerKindFromType_systemLogger() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "resolveLoggerKindFromType", String.class);
-        method.setAccessible(true);
-
-        Object result = method.invoke(extractor, "java.lang.System.Logger");
-        assertEquals("SYSTEM", result.toString());
+    void resolveLoggerKindFromType_systemLogger() {
+        assertEquals(LogMessageExtractor.LoggerKind.SYSTEM,
+                extractor.resolveLoggerKindFromType("java.lang.System.Logger"));
     }
 
     @Test
-    void resolveLoggerKindFromType_systemLoggerShort() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "resolveLoggerKindFromType", String.class);
-        method.setAccessible(true);
-
-        Object result = method.invoke(extractor, "System.Logger");
-        assertEquals("SYSTEM", result.toString());
+    void resolveLoggerKindFromType_systemLoggerShort() {
+        assertEquals(LogMessageExtractor.LoggerKind.SYSTEM,
+                extractor.resolveLoggerKindFromType("System.Logger"));
     }
 
     @Test
-    void resolveLoggerKindFromType_unknown() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "resolveLoggerKindFromType", String.class);
-        method.setAccessible(true);
-
-        Object result = method.invoke(extractor, "com.example.CustomLogger");
-        assertEquals("UNKNOWN", result.toString());
+    void resolveLoggerKindFromType_unknown() {
+        assertEquals(LogMessageExtractor.LoggerKind.UNKNOWN,
+                extractor.resolveLoggerKindFromType("com.example.CustomLogger"));
     }
 
-    // --- isLogMethod tests via reflection ---
+    // --- isLogMethod tests ---
 
     @Test
-    void isLogMethod_slf4jTrace() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isLogMethod", getLoggerKindClass(), String.class);
-        method.setAccessible(true);
-
-        Object slf4j = getLoggerKindValue("SLF4J");
-        assertTrue((Boolean) method.invoke(extractor, slf4j, "trace"));
-        assertTrue((Boolean) method.invoke(extractor, slf4j, "debug"));
-        assertTrue((Boolean) method.invoke(extractor, slf4j, "info"));
-        assertTrue((Boolean) method.invoke(extractor, slf4j, "warn"));
-        assertTrue((Boolean) method.invoke(extractor, slf4j, "error"));
-        assertFalse((Boolean) method.invoke(extractor, slf4j, "fatal"));
+    void isLogMethod_slf4jTrace() {
+        LogMessageExtractor.LoggerKind slf4j = LogMessageExtractor.LoggerKind.SLF4J;
+        assertTrue(extractor.isLogMethod(slf4j, "trace"));
+        assertTrue(extractor.isLogMethod(slf4j, "debug"));
+        assertTrue(extractor.isLogMethod(slf4j, "info"));
+        assertTrue(extractor.isLogMethod(slf4j, "warn"));
+        assertTrue(extractor.isLogMethod(slf4j, "error"));
+        assertFalse(extractor.isLogMethod(slf4j, "fatal"));
     }
 
     @Test
-    void isLogMethod_log4j2Fatal() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isLogMethod", getLoggerKindClass(), String.class);
-        method.setAccessible(true);
-
-        Object log4j2 = getLoggerKindValue("LOG4J2");
-        assertTrue((Boolean) method.invoke(extractor, log4j2, "fatal"));
+    void isLogMethod_log4j2Fatal() {
+        LogMessageExtractor.LoggerKind log4j2 = LogMessageExtractor.LoggerKind.LOG4J2;
+        assertTrue(extractor.isLogMethod(log4j2, "fatal"));
     }
 
     @Test
-    void isLogMethod_julLog() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isLogMethod", getLoggerKindClass(), String.class);
-        method.setAccessible(true);
-
-        Object jul = getLoggerKindValue("JUL");
-        assertTrue((Boolean) method.invoke(extractor, jul, "log"));
-        assertTrue((Boolean) method.invoke(extractor, jul, "severe"));
-        assertTrue((Boolean) method.invoke(extractor, jul, "warning"));
+    void isLogMethod_julLog() {
+        LogMessageExtractor.LoggerKind jul = LogMessageExtractor.LoggerKind.JUL;
+        assertTrue(extractor.isLogMethod(jul, "log"));
+        assertTrue(extractor.isLogMethod(jul, "severe"));
+        assertTrue(extractor.isLogMethod(jul, "warning"));
     }
 
     @Test
-    void isLogMethod_systemLog() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isLogMethod", getLoggerKindClass(), String.class);
-        method.setAccessible(true);
-
-        Object system = getLoggerKindValue("SYSTEM");
-        assertTrue((Boolean) method.invoke(extractor, system, "log"));
-        assertFalse((Boolean) method.invoke(extractor, system, "info"));
+    void isLogMethod_systemLog() {
+        LogMessageExtractor.LoggerKind system = LogMessageExtractor.LoggerKind.SYSTEM;
+        assertTrue(extractor.isLogMethod(system, "log"));
+        assertFalse(extractor.isLogMethod(system, "info"));
     }
 
     @Test
-    void isLogMethod_unknownReturnsFalse() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isLogMethod", getLoggerKindClass(), String.class);
-        method.setAccessible(true);
-
-        Object unknown = getLoggerKindValue("UNKNOWN");
-        assertFalse((Boolean) method.invoke(extractor, unknown, "info"));
+    void isLogMethod_unknownReturnsFalse() {
+        LogMessageExtractor.LoggerKind unknown = LogMessageExtractor.LoggerKind.UNKNOWN;
+        assertFalse(extractor.isLogMethod(unknown, "info"));
     }
 
-    // --- isSupplierTypedExpression tests via reflection ---
+    // --- isSupplierTypedExpression tests ---
 
     @Test
-    void isSupplierTypedExpression_nullReturnsFlse() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isSupplierTypedExpression", DetailAST.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(extractor, (DetailAST) null));
+    void isSupplierTypedExpression_nullReturnsFlse() {
+        assertFalse(extractor.isSupplierTypedExpression(null));
     }
 
     @Test
-    void isSupplierTypedExpression_identWithUnknownType() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isSupplierTypedExpression", DetailAST.class);
-        method.setAccessible(true);
-
+    void isSupplierTypedExpression_identWithUnknownType() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
         when(ident.getText()).thenReturn("unknownVar");
 
-        assertFalse((Boolean) method.invoke(extractor, ident));
+        assertFalse(extractor.isSupplierTypedExpression(ident));
     }
 
     @Test
-    void isSupplierTypedExpression_dotWithUnknownRightmostIdent() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isSupplierTypedExpression", DetailAST.class);
-        method.setAccessible(true);
-
+    void isSupplierTypedExpression_dotWithUnknownRightmostIdent() {
         // Create a DOT node with an IDENT as last child (which findRightmostIdent returns)
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -336,95 +229,53 @@ public class LogMessageExtractorTest {
         when(dot.getLastChild()).thenReturn(ident);
 
         // Context has no type for this variable, so returns false
-        assertFalse((Boolean) method.invoke(extractor, dot));
+        assertFalse(extractor.isSupplierTypedExpression(dot));
     }
 
     @Test
-    void isSupplierTypedExpression_typecastWithoutType() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isSupplierTypedExpression", DetailAST.class);
-        method.setAccessible(true);
-
+    void isSupplierTypedExpression_typecastWithoutType() {
         DetailAST typecast = mock(DetailAST.class);
         when(typecast.getType()).thenReturn(TokenTypes.TYPECAST);
         when(typecast.findFirstToken(TokenTypes.TYPE)).thenReturn(null);
 
-        assertFalse((Boolean) method.invoke(extractor, typecast));
+        assertFalse(extractor.isSupplierTypedExpression(typecast));
     }
 
     @Test
-    void isSupplierTypedExpression_literalReturnsFalse() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isSupplierTypedExpression", DetailAST.class);
-        method.setAccessible(true);
-
+    void isSupplierTypedExpression_literalReturnsFalse() {
         DetailAST literal = mock(DetailAST.class);
         when(literal.getType()).thenReturn(TokenTypes.STRING_LITERAL);
 
-        assertFalse((Boolean) method.invoke(extractor, literal));
+        assertFalse(extractor.isSupplierTypedExpression(literal));
     }
 
-    // --- containsThrowable tests via reflection ---
+    // --- containsThrowable tests ---
 
     @Test
-    void containsThrowable_emptyList() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "containsThrowable", List.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(extractor, Collections.emptyList()));
+    void containsThrowable_emptyList() {
+        assertFalse(extractor.containsThrowable(Collections.emptyList()));
     }
 
     // --- isThrowableExpression edge cases ---
 
     @Test
-    void isThrowableExpression_literalNewWithException() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isThrowableExpression", DetailAST.class);
-        method.setAccessible(true);
-
+    void isThrowableExpression_literalNewWithException() {
         DetailAST expr = mock(DetailAST.class);
         when(expr.getType()).thenReturn(TokenTypes.LITERAL_NEW);
         when(expr.getFirstChild()).thenReturn(null);
 
         // When extractNewClassName returns null
-        assertFalse((Boolean) method.invoke(extractor, expr));
+        assertFalse(extractor.isThrowableExpression(expr));
     }
 
     @Test
-    void isThrowableExpression_identWithNullType() throws Exception {
-        Method method = LogMessageExtractor.class.getDeclaredMethod(
-                "isThrowableExpression", DetailAST.class);
-        method.setAccessible(true);
-
+    void isThrowableExpression_identWithNullType() {
         DetailAST expr = mock(DetailAST.class);
         when(expr.getType()).thenReturn(TokenTypes.IDENT);
         when(expr.getText()).thenReturn("unknownVar");
 
         // Context has no type for this variable
-        assertFalse((Boolean) method.invoke(extractor, expr));
-    }
-
-    // --- Helper methods for enum access ---
-
-    private Class<?> getLoggerKindClass() {
-        for (Class<?> innerClass : LogMessageExtractor.class.getDeclaredClasses()) {
-            if (innerClass.getSimpleName().equals("LoggerKind")) {
-                return innerClass;
-            }
-        }
-        throw new IllegalStateException("LoggerKind enum not found");
-    }
-
-    @SuppressWarnings("unchecked")
-    private Object getLoggerKindValue(String name) {
-        Class<?> enumClass = getLoggerKindClass();
-        for (Object constant : enumClass.getEnumConstants()) {
-            if (constant.toString().equals(name)) {
-                return constant;
-            }
-        }
-        throw new IllegalArgumentException("Unknown LoggerKind: " + name);
+        assertFalse(extractor.isThrowableExpression(expr));
     }
 
     /**

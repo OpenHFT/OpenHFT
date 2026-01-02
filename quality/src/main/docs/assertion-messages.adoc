@@ -3,13 +3,15 @@
 :toclevels: 2
 :sectnums:
 
-The Meaningful Message Check applies these rules to assertion messages (JUnit, AssertJ, Hamcrest), Java `assert` statements, precondition messages (for example, `Objects.requireNonNull`), `throw new`
-exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated names, and disabled reasons).
+The Meaningful Message Check applies these rules to assertion messages (JUnit, AssertJ, Hamcrest), JUnit assumptions
+(`assumeTrue`/`assumeFalse`), Java `assert` statements, precondition messages (for example, `requireNonNull`),
+`throw new` exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated names, and
+disabled reasons).
 Log sites (SLF4J `trace/debug/info/warn/error`, Log4j2
 `trace/debug/info/warn/error/fatal`, JUL `java.util.logging.Logger`, `System.Logger`, and Chronicle
 `Jvm.*.on(...)`) are also in scope; see `meaningful-message-checker-requirements.adoc` for the log-specific rules.
 
-For `requireNonNull`/`requireNotNull`, a message that exactly matches the parameter name is treated as sufficient and the message rules are skipped for that call.
+For `requireNonNull` and `requireNotNull`, a message is optional. If one is supplied it should be meaningful, but a message that matches the first argument (for example, `requireNonNull(in, "in")` or `requireNonNull(a.getIn(), "a.getIn()")`) is acceptable.
 
 == Quick Reference
 

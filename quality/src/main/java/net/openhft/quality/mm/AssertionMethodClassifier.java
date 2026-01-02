@@ -25,6 +25,7 @@ public final class AssertionMethodClassifier {
             return false;
         }
         return methodName.startsWith("assert")
+                || methodName.startsWith("assume")
                 || methodName.startsWith("require")
                 || methodName.equals("fail")
                 || methodName.equals("as")
@@ -82,7 +83,19 @@ public final class AssertionMethodClassifier {
      */
     public static boolean isBooleanAssertionMethod(String methodName) {
         return methodName.equals("assertTrue")
-                || methodName.equals("assertFalse");
+                || methodName.equals("assertFalse")
+                || methodName.equals("assumeTrue")
+                || methodName.equals("assumeFalse");
+    }
+
+    /**
+     * Check if the method name is an assumption method.
+     *
+     * @param methodName method name to check.
+     * @return {@code true} if the method is an assumption method.
+     */
+    public static boolean isAssumptionMethod(String methodName) {
+        return methodName.startsWith("assume");
     }
 
     /**
@@ -176,6 +189,8 @@ public final class AssertionMethodClassifier {
      */
     public static boolean isLoopIndexAssertionMethod(String methodName) {
         return methodName != null
-                && (methodName.startsWith("assert") || methodName.equals("fail"));
+                && (methodName.startsWith("assert")
+                || methodName.startsWith("assume")
+                || methodName.equals("fail"));
     }
 }

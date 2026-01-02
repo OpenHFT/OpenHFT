@@ -6,10 +6,6 @@ package net.openhft.quality.mm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Deque;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,253 +49,165 @@ class SuppressionTrackerTest {
                 "should still return false after leaveScope on empty stack");
     }
 
-    // --- Reflection tests for private methods ---
+    // --- stripQuotes tests ---
 
     @Test
-    void stripQuotes_normalString() throws Exception {
-        Method method = SuppressionTracker.class
-                .getDeclaredMethod("stripQuotes", String.class);
-        method.setAccessible(true);
-
-        assertEquals("test", method.invoke(tracker, "\"test\""),
+    void stripQuotes_normalString() {
+        assertEquals("test", tracker.stripQuotes("\"test\""),
                 "should strip surrounding quotes");
     }
 
     @Test
-    void stripQuotes_noQuotes() throws Exception {
-        Method method = SuppressionTracker.class
-                .getDeclaredMethod("stripQuotes", String.class);
-        method.setAccessible(true);
-
-        assertEquals("test", method.invoke(tracker, "test"),
+    void stripQuotes_noQuotes() {
+        assertEquals("test", tracker.stripQuotes("test"),
                 "should return unchanged if no quotes");
     }
 
     @Test
-    void stripQuotes_emptyQuotes() throws Exception {
-        Method method = SuppressionTracker.class
-                .getDeclaredMethod("stripQuotes", String.class);
-        method.setAccessible(true);
-
-        assertEquals("", method.invoke(tracker, "\"\""),
+    void stripQuotes_emptyQuotes() {
+        assertEquals("", tracker.stripQuotes("\"\""),
                 "should return empty string for empty quotes");
     }
 
     @Test
-    void stripQuotes_singleChar() throws Exception {
-        Method method = SuppressionTracker.class
-                .getDeclaredMethod("stripQuotes", String.class);
-        method.setAccessible(true);
-
-        assertEquals("x", method.invoke(tracker, "x"),
+    void stripQuotes_singleChar() {
+        assertEquals("x", tracker.stripQuotes("x"),
                 "should return unchanged for single char");
     }
 
-    // --- SuppressionScope inner class tests via reflection ---
+    // --- SuppressionScope inner class tests ---
 
     @Test
-    void suppressionScope_addToken_mmAll_setsFlag() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_mmAll_setsFlag() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("MM-all");
 
-        addToken.invoke(scope, "MM-all");
-
-        Field suppressAll = scope.getClass().getDeclaredField("suppressAll");
-        suppressAll.setAccessible(true);
-        assertTrue((Boolean) suppressAll.get(scope),
+        assertTrue(scope.suppressAll,
                 "MM-all should set suppressAll flag");
     }
 
     @Test
-    void suppressionScope_addToken_meaningfulMessage_setsFlag() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_meaningfulMessage_setsFlag() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("MeaningfulMessage");
 
-        addToken.invoke(scope, "MeaningfulMessage");
-
-        Field suppressAll = scope.getClass().getDeclaredField("suppressAll");
-        suppressAll.setAccessible(true);
-        assertTrue((Boolean) suppressAll.get(scope),
+        assertTrue(scope.suppressAll,
                 "MeaningfulMessage should set suppressAll flag");
     }
 
     @Test
-    void suppressionScope_addToken_meaningfulMessageCheck_setsFlag() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_meaningfulMessageCheck_setsFlag() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("MeaningfulMessageCheck");
 
-        addToken.invoke(scope, "MeaningfulMessageCheck");
-
-        Field suppressAll = scope.getClass().getDeclaredField("suppressAll");
-        suppressAll.setAccessible(true);
-        assertTrue((Boolean) suppressAll.get(scope),
+        assertTrue(scope.suppressAll,
                 "MeaningfulMessageCheck should set suppressAll flag");
     }
 
     @Test
-    void suppressionScope_addToken_knownCode_addsToSet() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_knownCode_addsToSet() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("MMTooShort");
 
-        addToken.invoke(scope, "MMTooShort");
-
-        Field suppressedCodes = scope.getClass().getDeclaredField("suppressedCodes");
-        suppressedCodes.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Set<String> codes = (Set<String>) suppressedCodes.get(scope);
+        Set<String> codes = scope.suppressedCodes;
         assertTrue(codes.contains("MMTooShort"),
                 "known code should be added to suppressedCodes");
     }
 
     @Test
-    void suppressionScope_addToken_unknownCode_notAdded() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_unknownCode_notAdded() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("UnknownCode");
 
-        addToken.invoke(scope, "UnknownCode");
-
-        Field suppressedCodes = scope.getClass().getDeclaredField("suppressedCodes");
-        suppressedCodes.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Set<String> codes = (Set<String>) suppressedCodes.get(scope);
+        Set<String> codes = scope.suppressedCodes;
         assertFalse(codes.contains("UnknownCode"),
                 "unknown code should not be added");
     }
 
     @Test
-    void suppressionScope_addToken_emptyString_notAdded() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_emptyString_notAdded() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("");
 
-        addToken.invoke(scope, "");
-
-        Field suppressedCodes = scope.getClass().getDeclaredField("suppressedCodes");
-        suppressedCodes.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Set<String> codes = (Set<String>) suppressedCodes.get(scope);
+        Set<String> codes = scope.suppressedCodes;
         assertTrue(codes.isEmpty(),
                 "empty string should not be added");
     }
 
     @Test
-    void suppressionScope_addToken_checkstylePrefix_stripped() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_checkstylePrefix_stripped() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("checkstyle:MMTooShort");
 
-        addToken.invoke(scope, "checkstyle:MMTooShort");
-
-        Field suppressedCodes = scope.getClass().getDeclaredField("suppressedCodes");
-        suppressedCodes.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Set<String> codes = (Set<String>) suppressedCodes.get(scope);
+        Set<String> codes = scope.suppressedCodes;
         assertTrue(codes.contains("MMTooShort"),
                 "checkstyle: prefix should be stripped");
     }
 
     @Test
-    void suppressionScope_addToken_whitespace_trimmed() throws Exception {
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
+    void suppressionScope_addToken_whitespace_trimmed() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("  MMTooShort  ");
 
-        addToken.invoke(scope, "  MMTooShort  ");
-
-        Field suppressedCodes = scope.getClass().getDeclaredField("suppressedCodes");
-        suppressedCodes.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Set<String> codes = (Set<String>) suppressedCodes.get(scope);
+        Set<String> codes = scope.suppressedCodes;
         assertTrue(codes.contains("MMTooShort"),
                 "whitespace should be trimmed");
     }
 
     @Test
-    void suppressionScope_copyConstructor_inheritsCodes() throws Exception {
-        Object parentScope = createSuppressionScope();
-        Method addToken = parentScope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
-        addToken.invoke(parentScope, "MMTooShort");
+    void suppressionScope_copyConstructor_inheritsCodes() {
+        SuppressionTracker.SuppressionScope parentScope = new SuppressionTracker.SuppressionScope();
+        parentScope.addToken("MMTooShort");
 
-        Object childScope = createSuppressionScopeWithParent(parentScope);
+        SuppressionTracker.SuppressionScope childScope = new SuppressionTracker.SuppressionScope(parentScope);
 
-        Field suppressedCodes = childScope.getClass().getDeclaredField("suppressedCodes");
-        suppressedCodes.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Set<String> codes = (Set<String>) suppressedCodes.get(childScope);
+        Set<String> codes = childScope.suppressedCodes;
         assertTrue(codes.contains("MMTooShort"),
                 "child scope should inherit parent codes");
     }
 
     @Test
-    void suppressionScope_copyConstructor_inheritsSuppressAll() throws Exception {
-        Object parentScope = createSuppressionScope();
-        Method addToken = parentScope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
-        addToken.invoke(parentScope, "MM-all");
+    void suppressionScope_copyConstructor_inheritsSuppressAll() {
+        SuppressionTracker.SuppressionScope parentScope = new SuppressionTracker.SuppressionScope();
+        parentScope.addToken("MM-all");
 
-        Object childScope = createSuppressionScopeWithParent(parentScope);
+        SuppressionTracker.SuppressionScope childScope = new SuppressionTracker.SuppressionScope(parentScope);
 
-        Field suppressAll = childScope.getClass().getDeclaredField("suppressAll");
-        suppressAll.setAccessible(true);
-        assertTrue((Boolean) suppressAll.get(childScope),
+        assertTrue(childScope.suppressAll,
                 "child scope should inherit suppressAll flag");
     }
 
     @Test
-    void cleanToken_stripsCheckstylePrefix() throws Exception {
-        Class<?> scopeClass = getScopeClass();
-        Object scope = createSuppressionScope();
-        Method cleanToken = scopeClass.getDeclaredMethod("cleanToken", String.class);
-        cleanToken.setAccessible(true);
+    void cleanToken_stripsCheckstylePrefix() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
 
-        assertEquals("MMTooShort", cleanToken.invoke(scope, "checkstyle:MMTooShort"),
+        assertEquals("MMTooShort", scope.cleanToken("checkstyle:MMTooShort"),
                 "should strip checkstyle: prefix");
     }
 
     @Test
-    void cleanToken_trimsWhitespace() throws Exception {
-        Class<?> scopeClass = getScopeClass();
-        Object scope = createSuppressionScope();
-        Method cleanToken = scopeClass.getDeclaredMethod("cleanToken", String.class);
-        cleanToken.setAccessible(true);
+    void cleanToken_trimsWhitespace() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
 
-        assertEquals("MMTooShort", cleanToken.invoke(scope, "  MMTooShort  "),
+        assertEquals("MMTooShort", scope.cleanToken("  MMTooShort  "),
                 "should trim whitespace");
     }
 
     @Test
-    void cleanToken_preservesNonPrefixed() throws Exception {
-        Class<?> scopeClass = getScopeClass();
-        Object scope = createSuppressionScope();
-        Method cleanToken = scopeClass.getDeclaredMethod("cleanToken", String.class);
-        cleanToken.setAccessible(true);
+    void cleanToken_preservesNonPrefixed() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
 
-        assertEquals("MMTooShort", cleanToken.invoke(scope, "MMTooShort"),
+        assertEquals("MMTooShort", scope.cleanToken("MMTooShort"),
                 "should preserve non-prefixed token");
     }
 
     // --- Test isSuppressed with manually manipulated scope stack ---
 
     @Test
-    void isSuppressed_withSuppressAll_returnsTrue() throws Exception {
-        // Access the scopes field and add a scope with suppressAll = true
-        Field scopesField = SuppressionTracker.class.getDeclaredField("scopes");
-        scopesField.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Deque<Object> scopes = (Deque<Object>) scopesField.get(tracker);
-
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
-        addToken.invoke(scope, "MM-all");
-
-        scopes.push(scope);
+    void isSuppressed_withSuppressAll_returnsTrue() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("MM-all");
+        tracker.pushScopeForTesting(scope);
 
         assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT),
                 "should return true when suppressAll is set");
@@ -308,47 +216,14 @@ class SuppressionTrackerTest {
     }
 
     @Test
-    void isSuppressed_withSpecificCode_returnsTrueForMatch() throws Exception {
-        Field scopesField = SuppressionTracker.class.getDeclaredField("scopes");
-        scopesField.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Deque<Object> scopes = (Deque<Object>) scopesField.get(tracker);
-
-        Object scope = createSuppressionScope();
-        Method addToken = scope.getClass().getDeclaredMethod("addToken", String.class);
-        addToken.setAccessible(true);
-        addToken.invoke(scope, "MMTooShort");
-
-        scopes.push(scope);
+    void isSuppressed_withSpecificCode_returnsTrueForMatch() {
+        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        scope.addToken("MMTooShort");
+        tracker.pushScopeForTesting(scope);
 
         assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT),
                 "should return true for suppressed rule");
         assertFalse(tracker.isSuppressed(RuleId.TOO_LONG),
                 "should return false for non-suppressed rule");
-    }
-
-    // --- Helper methods ---
-
-    private Object createSuppressionScope() throws Exception {
-        Class<?> scopeClass = getScopeClass();
-        Constructor<?> constructor = scopeClass.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        return constructor.newInstance();
-    }
-
-    private Object createSuppressionScopeWithParent(Object parent) throws Exception {
-        Class<?> scopeClass = getScopeClass();
-        Constructor<?> constructor = scopeClass.getDeclaredConstructor(scopeClass);
-        constructor.setAccessible(true);
-        return constructor.newInstance(parent);
-    }
-
-    private Class<?> getScopeClass() {
-        for (Class<?> innerClass : SuppressionTracker.class.getDeclaredClasses()) {
-            if (innerClass.getSimpleName().equals("SuppressionScope")) {
-                return innerClass;
-            }
-        }
-        throw new IllegalStateException("SuppressionScope inner class not found");
     }
 }

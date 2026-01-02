@@ -9,7 +9,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -256,292 +255,294 @@ class MessageExtractionContextTest {
         assertNull(context.currentMethodName());
     }
 
-    // --- Reflection tests for private methods ---
+    // --- isLocaleExpression ---
 
     @Test
-    void recordStaticJUnitImport_junit4Specific() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("recordStaticJUnitImport", String.class, String.class, boolean.class);
-        method.setAccessible(true);
+    void isLocaleExpression_identWithLocaleType() {
+        recordVariableType("localeVar", "Locale");
+        DetailAST ident = ident("localeVar");
 
-        method.invoke(context, "org.junit.Assert.assertEquals", "org.junit.Assert", true);
+        assertTrue(context.isLocaleExpression(ident));
+    }
+
+    @Test
+    void isLocaleExpression_identWithoutLocaleType() {
+        DetailAST ident = ident("other");
+
+        assertFalse(context.isLocaleExpression(ident));
+    }
+
+    @Test
+    void isLocaleExpression_dotWithLocalePrefix() {
+        DetailAST dot = dot(ident("Locale"), ident("US"));
+
+        assertTrue(context.isLocaleExpression(dot));
+    }
+
+    @Test
+    void isLocaleExpression_dotWithTypedQualifier() {
+        recordVariableType("localeVar", "java.util.Locale");
+        DetailAST dot = dot(ident("localeVar"), ident("US"));
+
+        assertTrue(context.isLocaleExpression(dot));
+    }
+
+    @Test
+    void isLocaleExpression_literalNewLocale() {
+        DetailAST literalNew = literalNew(ident("Locale"));
+
+        assertTrue(context.isLocaleExpression(literalNew));
+    }
+
+    @Test
+    void isLocaleExpression_methodCallQualifierLocale() {
+        DetailAST dot = dot(ident("Locale"), ident("getDefault"));
+        DetailAST methodCall = methodCall(dot);
+
+        assertTrue(context.isLocaleExpression(methodCall));
+    }
+
+    @Test
+    void isLocaleExpression_methodCallQualifierTyped() {
+        recordVariableType("localeVar", "Locale");
+        DetailAST dot = dot(ident("localeVar"), ident("getDefault"));
+        DetailAST methodCall = methodCall(dot);
+
+        assertTrue(context.isLocaleExpression(methodCall));
+    }
+
+    @Test
+    void isLocaleExpression_methodCallQualifierUnknown() {
+        DetailAST dot = dot(ident("other"), ident("getDefault"));
+        DetailAST methodCall = methodCall(dot);
+
+        assertFalse(context.isLocaleExpression(methodCall));
+    }
+
+    // --- package-local accessors ---
+
+    @Test
+    void recordStaticJUnitImport_junit4Specific() {
+        context.recordStaticJUnitImportForTesting("org.junit.Assert.assertEquals", "org.junit.Assert", true);
         assertTrue(context.isStaticJUnit4Method("assertEquals"));
         assertFalse(context.isStaticJUnit5Method("assertEquals"));
     }
 
     @Test
-    void recordStaticJUnitImport_junit4Wildcard() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("recordStaticJUnitImport", String.class, String.class, boolean.class);
-        method.setAccessible(true);
-
-        method.invoke(context, "org.junit.Assert.*", "org.junit.Assert", true);
+    void recordStaticJUnitImport_junit4Wildcard() {
+        context.recordStaticJUnitImportForTesting("org.junit.Assert.*", "org.junit.Assert", true);
         assertTrue(context.isStaticJUnit4Method("anyMethod"));
     }
 
     @Test
-    void recordStaticJUnitImport_junit5Specific() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("recordStaticJUnitImport", String.class, String.class, boolean.class);
-        method.setAccessible(true);
-
-        method.invoke(context, "org.junit.jupiter.api.Assertions.assertThrows",
+    void recordStaticJUnitImport_junit5Specific() {
+        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertThrows",
                 "org.junit.jupiter.api.Assertions", false);
         assertTrue(context.isStaticJUnit5Method("assertThrows"));
         assertFalse(context.isStaticJUnit4Method("assertThrows"));
     }
 
     @Test
-    void recordStaticJUnitImport_junit5Wildcard() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("recordStaticJUnitImport", String.class, String.class, boolean.class);
-        method.setAccessible(true);
-
-        method.invoke(context, "org.junit.jupiter.api.Assertions.*",
+    void recordStaticJUnitImport_junit5Wildcard() {
+        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.*",
                 "org.junit.jupiter.api.Assertions", false);
         assertTrue(context.isStaticJUnit5Method("anyMethod"));
     }
 
     @Test
-    void recordStaticJUnitImport_wrongPrefix() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("recordStaticJUnitImport", String.class, String.class, boolean.class);
-        method.setAccessible(true);
-
-        method.invoke(context, "org.other.Assert.assertEquals", "org.junit.Assert", true);
+    void recordStaticJUnitImport_wrongPrefix() {
+        context.recordStaticJUnitImportForTesting("org.other.Assert.assertEquals", "org.junit.Assert", true);
         assertFalse(context.isStaticJUnit4Method("assertEquals"));
     }
 
     @Test
-    void recordStaticJUnitImport_emptySuffix() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("recordStaticJUnitImport", String.class, String.class, boolean.class);
-        method.setAccessible(true);
-
-        method.invoke(context, "org.junit.Assert.", "org.junit.Assert", true);
+    void recordStaticJUnitImport_emptySuffix() {
+        context.recordStaticJUnitImportForTesting("org.junit.Assert.", "org.junit.Assert", true);
         assertFalse(context.isStaticJUnit4Method(""));
     }
 
     @Test
-    void normalizeClassName_simple() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertEquals("ClassName", method.invoke(context, "ClassName"));
+    void normalizeClassName_simple() {
+        assertEquals("ClassName", context.normalizeClassNameForTesting("ClassName"));
     }
 
     @Test
-    void normalizeClassName_qualified() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertEquals("ClassName", method.invoke(context, "com.example.ClassName"));
+    void normalizeClassName_qualified() {
+        assertEquals("ClassName", context.normalizeClassNameForTesting("com.example.ClassName"));
     }
 
     @Test
-    void normalizeClassName_whitespace() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertEquals("ClassName", method.invoke(context, "  com.example.ClassName  "));
+    void normalizeClassName_whitespace() {
+        assertEquals("ClassName", context.normalizeClassNameForTesting("  com.example.ClassName  "));
     }
 
     @Test
-    void normalizeClassName_emptyAfterTrim() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("normalizeClassName", String.class);
-        method.setAccessible(true);
-
-        assertNull(method.invoke(context, "  "));
+    void normalizeClassName_emptyAfterTrim() {
+        assertNull(context.normalizeClassNameForTesting("  "));
     }
 
     @Test
-    void isLocaleTypeName_null() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isLocaleTypeName", String.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(context, (Object) null));
+    void isLocaleTypeName_null() {
+        assertFalse(context.isLocaleTypeNameForTesting(null));
     }
 
     @Test
-    void isLocaleTypeName_locale() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isLocaleTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(context, "Locale"));
+    void isLocaleTypeName_locale() {
+        assertTrue(context.isLocaleTypeNameForTesting("Locale"));
     }
 
     @Test
-    void isLocaleTypeName_fullyQualified() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isLocaleTypeName", String.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(context, "java.util.Locale"));
+    void isLocaleTypeName_fullyQualified() {
+        assertTrue(context.isLocaleTypeNameForTesting("java.util.Locale"));
     }
 
     @Test
-    void isLocaleTypeName_other() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isLocaleTypeName", String.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(context, "String"));
+    void isLocaleTypeName_other() {
+        assertFalse(context.isLocaleTypeNameForTesting("String"));
     }
 
     @Test
-    void isBefore_lineBefore() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isBefore", int.class, int.class, int.class, int.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(context, 1, 1, 2, 1));
+    void isBefore_lineBefore() {
+        assertTrue(context.isBeforeForTesting(1, 1, 2, 1));
     }
 
     @Test
-    void isBefore_colBefore() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isBefore", int.class, int.class, int.class, int.class);
-        method.setAccessible(true);
-
-        assertTrue((Boolean) method.invoke(context, 1, 1, 1, 2));
+    void isBefore_colBefore() {
+        assertTrue(context.isBeforeForTesting(1, 1, 1, 2));
     }
 
     @Test
-    void isBefore_lineAfter() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isBefore", int.class, int.class, int.class, int.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(context, 2, 1, 1, 1));
+    void isBefore_lineAfter() {
+        assertFalse(context.isBeforeForTesting(2, 1, 1, 1));
     }
 
     @Test
-    void isBefore_colAfter() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isBefore", int.class, int.class, int.class, int.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(context, 1, 2, 1, 1));
+    void isBefore_colAfter() {
+        assertFalse(context.isBeforeForTesting(1, 2, 1, 1));
     }
 
     @Test
-    void isBefore_same() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isBefore", int.class, int.class, int.class, int.class);
-        method.setAccessible(true);
-
-        assertFalse((Boolean) method.invoke(context, 1, 1, 1, 1));
+    void isBefore_same() {
+        assertFalse(context.isBeforeForTesting(1, 1, 1, 1));
     }
 
-    // --- blockCommentHasWord tests via reflection ---
+    // --- blockCommentHasWord tests ---
 
     @Test
-    void blockCommentHasWord_emptyLines() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("blockCommentHasWord", TextBlock.class);
-        method.setAccessible(true);
-
+    void blockCommentHasWord_emptyLines() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{});
-        assertFalse((Boolean) method.invoke(context, block));
+        assertFalse(context.blockCommentHasWordForTesting(block));
     }
 
     @Test
-    void blockCommentHasWord_noLetters() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("blockCommentHasWord", TextBlock.class);
-        method.setAccessible(true);
-
+    void blockCommentHasWord_noLetters() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{"/* 123 */"});
-        assertFalse((Boolean) method.invoke(context, block));
+        assertFalse(context.blockCommentHasWordForTesting(block));
     }
 
     @Test
-    void blockCommentHasWord_hasLetters() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("blockCommentHasWord", TextBlock.class);
-        method.setAccessible(true);
-
+    void blockCommentHasWord_hasLetters() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{"/* reason */"});
-        assertTrue((Boolean) method.invoke(context, block));
+        assertTrue(context.blockCommentHasWordForTesting(block));
     }
 
     @Test
-    void blockCommentHasWord_multiLine() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("blockCommentHasWord", TextBlock.class);
-        method.setAccessible(true);
-
+    void blockCommentHasWord_multiLine() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{"/*", " * reason", " */"});
-        assertTrue((Boolean) method.invoke(context, block));
+        assertTrue(context.blockCommentHasWordForTesting(block));
     }
 
-    // --- isInMethodOrCtor tests via reflection ---
+    // --- isInMethodOrCtor tests ---
 
     @Test
-    void isInMethodOrCtor_methodDef() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isInMethodOrCtor", DetailAST.class);
-        method.setAccessible(true);
-
+    void isInMethodOrCtor_methodDef() {
         DetailAST parent = mock(DetailAST.class);
         when(parent.getType()).thenReturn(TokenTypes.METHOD_DEF);
 
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertTrue((Boolean) method.invoke(context, ast));
+        assertTrue(context.isInMethodOrCtorForTesting(ast));
     }
 
     @Test
-    void isInMethodOrCtor_ctorDef() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isInMethodOrCtor", DetailAST.class);
-        method.setAccessible(true);
-
+    void isInMethodOrCtor_ctorDef() {
         DetailAST parent = mock(DetailAST.class);
         when(parent.getType()).thenReturn(TokenTypes.CTOR_DEF);
 
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertTrue((Boolean) method.invoke(context, ast));
+        assertTrue(context.isInMethodOrCtorForTesting(ast));
     }
 
     @Test
-    void isInMethodOrCtor_classDef() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isInMethodOrCtor", DetailAST.class);
-        method.setAccessible(true);
-
+    void isInMethodOrCtor_classDef() {
         DetailAST parent = mock(DetailAST.class);
         when(parent.getType()).thenReturn(TokenTypes.CLASS_DEF);
 
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertFalse((Boolean) method.invoke(context, ast));
+        assertFalse(context.isInMethodOrCtorForTesting(ast));
     }
 
     @Test
-    void isInMethodOrCtor_nullParent() throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("isInMethodOrCtor", DetailAST.class);
-        method.setAccessible(true);
-
+    void isInMethodOrCtor_nullParent() {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(null);
 
-        assertFalse((Boolean) method.invoke(context, ast));
+        assertFalse(context.isInMethodOrCtorForTesting(ast));
     }
 
+    private void recordVariableType(String name, String typeName) {
+        DetailAST varDef = mock(DetailAST.class);
+        DetailAST type = mock(DetailAST.class);
+        DetailAST ident = mock(DetailAST.class);
+        DetailAST typeIdent = mock(DetailAST.class);
+
+        when(varDef.findFirstToken(TokenTypes.TYPE)).thenReturn(type);
+        when(varDef.findFirstToken(TokenTypes.IDENT)).thenReturn(ident);
+        when(varDef.getParent()).thenReturn(null);
+        when(ident.getText()).thenReturn(name);
+        when(type.findFirstToken(TokenTypes.DOT)).thenReturn(null);
+        when(type.findFirstToken(TokenTypes.IDENT)).thenReturn(typeIdent);
+        when(typeIdent.getText()).thenReturn(typeName);
+
+        context.recordVariableType(varDef);
+    }
+
+    private static DetailAST ident(String text) {
+        DetailAST ident = mock(DetailAST.class);
+        when(ident.getType()).thenReturn(TokenTypes.IDENT);
+        when(ident.getText()).thenReturn(text);
+        return ident;
+    }
+
+    private static DetailAST dot(DetailAST left, DetailAST right) {
+        DetailAST dot = mock(DetailAST.class);
+        when(dot.getType()).thenReturn(TokenTypes.DOT);
+        when(dot.getFirstChild()).thenReturn(left);
+        when(dot.getLastChild()).thenReturn(right);
+        return dot;
+    }
+
+    private static DetailAST methodCall(DetailAST dot) {
+        DetailAST methodCall = mock(DetailAST.class);
+        when(methodCall.getType()).thenReturn(TokenTypes.METHOD_CALL);
+        when(methodCall.findFirstToken(TokenTypes.DOT)).thenReturn(dot);
+        return methodCall;
+    }
+
+    private static DetailAST literalNew(DetailAST firstChild) {
+        DetailAST literalNew = mock(DetailAST.class);
+        when(literalNew.getType()).thenReturn(TokenTypes.LITERAL_NEW);
+        when(literalNew.getFirstChild()).thenReturn(firstChild);
+        when(firstChild.getNextSibling()).thenReturn(null);
+        return literalNew;
+    }
 }

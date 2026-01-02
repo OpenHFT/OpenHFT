@@ -5,8 +5,9 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Extracts message candidates from assertion and precondition calls.
@@ -14,6 +15,8 @@ import java.util.*;
 public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     private static final String JUNIT4_ASSERTIONS = "org.junit.Assert";
     private static final String JUNIT5_ASSERTIONS = "org.junit.jupiter.api.Assertions";
+    private static final String JUNIT4_ASSUME = "org.junit.Assume";
+    private static final String JUNIT5_ASSUMPTIONS = "org.junit.jupiter.api.Assumptions";
 
     private final LoopIndexAnalyzer loopAnalyzer;
     private final LambdaMessageExtractor lambdaExtractor;
@@ -40,7 +43,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
      * @param assertAst AST node for the {@code assert} statement.
      */
     public void handleJavaAssert(DetailAST assertAst) {
-        DetailAST expr = Objects.requireNonNull(assertAst.findFirstToken(TokenTypes.EXPR));
+        DetailAST expr = requireNonNull(assertAst.findFirstToken(TokenTypes.EXPR));
         DetailAST nextExpr = expr.getNextSibling();
         while (nextExpr != null) {
             if (nextExpr.getType() == TokenTypes.EXPR) {
@@ -62,7 +65,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
      * @param methodCall AST node for the method call.
      */
     public void handleMethodCall(DetailAST methodCall) {
-        String methodName = Objects.requireNonNull(astSupport().extractMethodName(methodCall));
+        String methodName = requireNonNull(astSupport().extractMethodName(methodCall));
 
         if (AssertionMethodClassifier.isAssertionMethod(methodName)) {
             DetailAST elist = methodCall.findFirstToken(TokenTypes.ELIST);
@@ -84,20 +87,22 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         if (dot != null) {
             String fullCall = astSupport().flattenDot(dot);
             if (fullCall != null) {
-                if (fullCall.startsWith(JUNIT4_ASSERTIONS + ".")) {
+                if (fullCall.startsWith(JUNIT4_ASSERTIONS + ".")
+                        || fullCall.startsWith(JUNIT4_ASSUME + ".")) {
                     return AssertionOperandExtractor.AssertionStyle.JUNIT4;
                 }
-                if (fullCall.startsWith(JUNIT5_ASSERTIONS + ".")) {
+                if (fullCall.startsWith(JUNIT5_ASSERTIONS + ".")
+                        || fullCall.startsWith(JUNIT5_ASSUMPTIONS + ".")) {
                     return AssertionOperandExtractor.AssertionStyle.JUNIT5;
                 }
             }
             String qualifier = astSupport().extractQualifierIdent(dot);
             if (qualifier != null) {
                 String importName = context().importedClass(qualifier);
-                if (JUNIT4_ASSERTIONS.equals(importName)) {
+                if (JUNIT4_ASSERTIONS.equals(importName) || JUNIT4_ASSUME.equals(importName)) {
                     return AssertionOperandExtractor.AssertionStyle.JUNIT4;
                 }
-                if (JUNIT5_ASSERTIONS.equals(importName)) {
+                if (JUNIT5_ASSERTIONS.equals(importName) || JUNIT5_ASSUMPTIONS.equals(importName)) {
                     return AssertionOperandExtractor.AssertionStyle.JUNIT5;
                 }
                 return AssertionOperandExtractor.AssertionStyle.UNKNOWN;
@@ -208,11 +213,6 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 trivialLambdaMessage = lambdaExtractor.extractTrivialLambdaMessage(lastLambda.getParent());
             }
             if (trivialLambdaMessage != null) {
-                if (source == MessageSource.PRECONDITION
-                        && AssertionMethodClassifier.isRequireNotNullMethod(methodName)
-                        && isParameterNameMessage(trivialLambdaMessage, args, exprToInputValue)) {
-                    return;
-                }
                 MessageCandidate candidate = new MessageCandidate.Builder()
                         .source(source)
                         .lineNo(lineNo)
@@ -234,11 +234,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         if (messageExpr != null) {
             MessageTemplate template = extractMessageTemplate(messageExpr);
             if (template != null) {
-                if (source == MessageSource.PRECONDITION
-                        && AssertionMethodClassifier.isRequireNotNullMethod(methodName)
-                        && isParameterNameMessage(template, args, exprToInputValue)) {
-                    return;
-                }
+                boolean argumentNameMessage = isRequireNonNullArgumentMessage(methodName, source, args, template);
                 List<String> inputValues = new ArrayList<>();
                 for (Map.Entry<DetailAST, String> entry : exprToInputValue.entrySet()) {
                     if (entry.getKey() != messageExpr) {
@@ -269,6 +265,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                         .placeholderCount(template.placeholderCount())
                         .keyValueLabelCount(keyValueLabelCount)
                         .inputValues(inputValues)
+                        .argumentNameMessage(argumentNameMessage)
                         .constantMessage(constantMessage)
                         .trivialSupplierDescription(cheapSupplierDesc);
                 if (loopIndexInfo != null) {
@@ -394,6 +391,89 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         return message.equals(inputValue);
     }
 
+    private boolean isRequireNonNullArgumentMessage(String methodName, MessageSource source,
+                                                    List<DetailAST> args, MessageTemplate template) {
+        if (template == null || template.placeholderCount() != 0) {
+            return false;
+        }
+        return isRequireNonNullArgumentMessage(methodName, source, args, template.message());
+    }
+
+    private boolean isRequireNonNullArgumentMessage(String methodName, MessageSource source,
+                                                    List<DetailAST> args, String message) {
+        if (source != MessageSource.PRECONDITION) {
+            return false;
+        }
+        if (!AssertionMethodClassifier.isRequireNotNullMethod(methodName)) {
+            return false;
+        }
+        if (message == null || args.isEmpty()) {
+            return false;
+        }
+        String argText = extractArgumentText(args.get(0));
+        if (argText == null) {
+            return false;
+        }
+        return normaliseExpressionText(message).equals(normaliseExpressionText(argText));
+    }
+
+    private String extractArgumentText(DetailAST expr) {
+        requireNonNull(expr);
+        DetailAST content = astSupport().unwrapExpr(expr);
+        return renderArgumentExpression(content);
+    }
+
+    private String renderArgumentExpression(DetailAST expr) {
+        if (expr == null) {
+            return null;
+        }
+        switch (expr.getType()) {
+            case TokenTypes.IDENT:
+                return expr.getText();
+            case TokenTypes.LITERAL_THIS:
+                return "this";
+            case TokenTypes.DOT:
+                return renderDotExpression(expr);
+            case TokenTypes.METHOD_CALL:
+                return renderMethodCallExpression(expr);
+            default:
+                return null;
+        }
+    }
+
+    private String renderDotExpression(DetailAST dot) {
+        if (dot == null || dot.getType() != TokenTypes.DOT) {
+            return null;
+        }
+        String left = renderArgumentExpression(dot.getFirstChild());
+        String right = renderArgumentExpression(dot.getLastChild());
+        if (left == null || right == null) {
+            return null;
+        }
+        return left + "." + right;
+    }
+
+    private String renderMethodCallExpression(DetailAST methodCall) {
+        if (methodCall == null || methodCall.getType() != TokenTypes.METHOD_CALL) {
+            return null;
+        }
+        DetailAST elist = methodCall.findFirstToken(TokenTypes.ELIST);
+        if (elist != null && elist.getFirstChild() != null) {
+            return null;
+        }
+        DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
+        if (dot != null) {
+            String qualified = renderDotExpression(dot);
+            return qualified == null ? null : qualified + "()";
+        }
+        DetailAST ident = methodCall.findFirstToken(TokenTypes.IDENT);
+        return ident == null ? null : ident.getText() + "()";
+    }
+
+    private String normaliseExpressionText(String text) {
+        return text == null ? null : text.replaceAll("\\s+", "");
+    }
+
     private boolean isMissingAssertionMessage(String methodName, AssertionOperandExtractor.AssertionStyle style, List<DetailAST> args) {
         if (style == AssertionOperandExtractor.AssertionStyle.UNKNOWN) {
             return false;
@@ -411,7 +491,8 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             }
             return !isMessageArgumentPresent(args.get(0));
         }
-        if (!methodName.startsWith("assert")) {
+        if (!methodName.startsWith("assert")
+                && !AssertionMethodClassifier.isAssumptionMethod(methodName)) {
             return false;
         }
         if (methodName.equals("assertAll")) {
@@ -497,11 +578,11 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     }
 
     private boolean isMessageArgumentPresent(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (astSupport().isNullLiteral(expr)) {
             return false;
         }
-        DetailAST content = Objects.requireNonNull(astSupport().unwrapExpr(expr));
+        DetailAST content = requireNonNull(astSupport().unwrapExpr(expr));
         if (content.getType() == TokenTypes.LAMBDA
                 || content.getType() == TokenTypes.METHOD_REF) {
             return true;
@@ -513,22 +594,22 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     }
 
     private boolean isConstantStringExpression(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.isConstantStringExpression(expr);
     }
 
     private MessageTemplate extractMessageTemplate(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.extractMessageTemplate(expr);
     }
 
     private String extractStringLiteral(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.extractStringLiteral(expr, true);
     }
 
     private int countKeyValueLabels(String constantParts) {
-        MessageTemplateExtractor templateExtractor = Objects.requireNonNull(context().templateExtractor());
+        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.countKeyValueLabels(constantParts);
     }
 
@@ -546,7 +627,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     }
 
     private String extractInputValue(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
 
         DetailAST content = expr;
         if (content.getType() == TokenTypes.EXPR && content.getChildCount() == 1) {
@@ -586,7 +667,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     }
 
     private String extractExceptionClassLiteral(DetailAST elist) {
-        Objects.requireNonNull(elist);
+        requireNonNull(elist);
         DetailAST child = elist.getFirstChild();
         while (child != null) {
             if (child.getType() == TokenTypes.EXPR) {

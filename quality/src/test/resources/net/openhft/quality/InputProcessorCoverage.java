@@ -3,14 +3,13 @@
  */
 package net.openhft.quality;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.Objects;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+
+import static java.util.Objects.requireNonNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InputProcessorCoverage {
 
@@ -30,7 +29,7 @@ public class InputProcessorCoverage {
     }
 
     public void preconditionMessage(Object input) {
-        Objects.requireNonNull(input, "cache entry should be ready for retention");
+        requireNonNull(input, "cache entry should be ready for retention");
     }
 
     public void throwMessage() {

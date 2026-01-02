@@ -6,7 +6,7 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Extracts message candidates and missing-message signals from annotations.
@@ -29,7 +29,7 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
      * @param annotationAst annotation AST node.
      */
     public void handleAnnotation(DetailAST annotationAst) {
-        String annotationName = Objects.requireNonNull(extractAnnotationName(annotationAst));
+        String annotationName = requireNonNull(extractAnnotationName(annotationAst));
 
         // Track JUnit 5 test annotations (not JUnit 4)
         if (context().isJUnit5TestAnnotation(annotationName)) {
@@ -43,9 +43,7 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
         } else if (annotationName.equals("Disabled") || annotationName.equals("Ignore")) {
             boolean hasValue = checkAnnotationValue(annotationAst, "value");
             if (!hasValue) {
-                if (!context().hasInlineReasonComment(annotationAst)) {
-                    sink().emitMissingMessage(annotationAst.getLineNo(), MessageSource.ANNOTATION);
-                }
+                sink().emitMissingMessage(annotationAst.getLineNo(), MessageSource.ANNOTATION);
             }
         }
 

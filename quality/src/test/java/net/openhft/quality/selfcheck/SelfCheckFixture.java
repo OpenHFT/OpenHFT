@@ -3,9 +3,10 @@
  */
 package net.openhft.quality.selfcheck;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Intentional MeaningfulMessage violations for QualityCheckstyleSelfTest.
@@ -32,19 +33,19 @@ public final class SelfCheckFixture {
     }
 
     public String triggerRestatesDerived(String value) {
-        return Objects.requireNonNull(value, "empty");
+        return requireNonNull(value, "empty");
     }
 
     public String triggerContextless(String value) {
-        return Objects.requireNonNull(value, "validation");
+        return requireNonNull(value, "validation");
     }
 
     public String triggerIndexOnly(String value) {
-        return Objects.requireNonNull(value, "index 7");
+        return requireNonNull(value, "index 7");
     }
 
     public String triggerLongWord(String value) {
-        return Objects.requireNonNull(value,
+        return requireNonNull(value,
                 "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghi");
     }
 
@@ -53,7 +54,7 @@ public final class SelfCheckFixture {
     }
 
     public String triggerGeneric(String value) {
-        return Objects.requireNonNull(value, "expected");
+        return requireNonNull(value, "expected");
     }
 
     public void triggerRedundantClass(boolean ok) {
@@ -73,15 +74,15 @@ public final class SelfCheckFixture {
     }
 
     public String triggerWhitespaceRun(String value) {
-        return Objects.requireNonNull(value, "cache  entry missing");
+        return requireNonNull(value, "cache  entry missing");
     }
 
     public String triggerTooShort(String value) {
-        return Objects.requireNonNull(value, "message body missing");
+        return requireNonNull(value, "message body missing");
     }
 
     public String triggerTooLong(String value) {
-        return Objects.requireNonNull(value,
+        return requireNonNull(value,
                 "word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 "
                         + "word11 word12 word13 word14 word15 word16 word17 word18 word19 word20 "
                         + "word21 word22 word23 word24 word25 word26 word27 word28 word29 word30 "
@@ -90,7 +91,7 @@ public final class SelfCheckFixture {
     }
 
     public String triggerTooFewMeaningful(String value) {
-        return Objects.requireNonNull(value, "expected value should match");
+        return requireNonNull(value, "expected value should match");
     }
 
     public void triggerMissingSubjectLog() {
@@ -98,10 +99,10 @@ public final class SelfCheckFixture {
     }
 
     public String triggerDuplicateFirst(String value) {
-        return Objects.requireNonNull(value, "cache entry expired unexpectedly");
+        return requireNonNull(value, "cache entry expired unexpectedly");
     }
 
     public String triggerDuplicateSecond(String value) {
-        return Objects.requireNonNull(value, "cache entry expired unexpectedly");
+        return requireNonNull(value, "cache entry expired unexpectedly");
     }
 }

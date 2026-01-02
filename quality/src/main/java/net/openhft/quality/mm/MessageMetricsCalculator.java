@@ -6,6 +6,8 @@ package net.openhft.quality.mm;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Calculates word and placeholder metrics for message strings.
  */
@@ -61,7 +63,7 @@ public final class MessageMetricsCalculator {
      * @return computed metrics.
      */
     public MessageMetrics calculate(String message, int placeholderCount, int keyValueLabelCount) {
-        Objects.requireNonNull(message);
+        requireNonNull(message);
         String[] words = splitWords(message);
         int wordCount = 0;
         LinkedHashSet<String> uniqueMeaningfulWords = new LinkedHashSet<>();
@@ -118,7 +120,7 @@ public final class MessageMetricsCalculator {
      * @return {@code true} if the word is treated as filler.
      */
     public boolean isFillerWord(String word) {
-        Objects.requireNonNull(word);
+        requireNonNull(word);
         return FILLER_WORDS.contains(word.toLowerCase());
     }
 
@@ -129,7 +131,7 @@ public final class MessageMetricsCalculator {
      * @return array of words.
      */
     public String[] splitWords(String message) {
-        Objects.requireNonNull(message);
+        requireNonNull(message);
         return WORD_SPLITTER.split(message);
     }
 }

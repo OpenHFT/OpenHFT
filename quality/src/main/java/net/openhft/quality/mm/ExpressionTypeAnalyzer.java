@@ -6,7 +6,7 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Analyzes expression types to determine if they are String or Supplier types.
@@ -22,7 +22,7 @@ public final class ExpressionTypeAnalyzer {
      * @param context extraction context with type information.
      */
     public ExpressionTypeAnalyzer(MessageExtractionContext context) {
-        this.context = Objects.requireNonNull(context);
+        this.context = requireNonNull(context);
         this.astSupport = context.astSupport();
     }
 
@@ -45,7 +45,7 @@ public final class ExpressionTypeAnalyzer {
      * @return {@code true} if the expression has String type.
      */
     public boolean isStringTypedExpression(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.STRING_LITERAL) {
             return true;
         }
@@ -69,7 +69,7 @@ public final class ExpressionTypeAnalyzer {
      * @return {@code true} if the expression has Supplier type.
      */
     public boolean isSupplierTypedExpression(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         if (expr.getType() == TokenTypes.IDENT) {
             return isSupplierTypeName(context.getVariableType(expr.getText()));
         }

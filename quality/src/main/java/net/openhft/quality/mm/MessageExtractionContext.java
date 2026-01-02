@@ -7,8 +7,9 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Holds per-file extraction state such as imports, variable types, and comments.
@@ -249,7 +250,7 @@ public final class MessageExtractionContext {
      * @param importAst import AST node.
      */
     public void recordImport(DetailAST importAst) {
-        String importText = Objects.requireNonNull(astSupport.extractImportText(importAst));
+        String importText = requireNonNull(astSupport.extractImportText(importAst));
         if (importText.endsWith(".*")) {
             return;
         }
@@ -267,9 +268,11 @@ public final class MessageExtractionContext {
      * @param importAst import AST node.
      */
     public void recordStaticImport(DetailAST importAst) {
-        String importText = Objects.requireNonNull(astSupport.extractImportText(importAst));
+        String importText = requireNonNull(astSupport.extractImportText(importAst));
         recordStaticJUnitImport(importText, "org.junit.Assert", true);
+        recordStaticJUnitImport(importText, "org.junit.Assume", true);
         recordStaticJUnitImport(importText, "org.junit.jupiter.api.Assertions", false);
+        recordStaticJUnitImport(importText, "org.junit.jupiter.api.Assumptions", false);
     }
 
     /**
@@ -278,9 +281,9 @@ public final class MessageExtractionContext {
      * @param varDef variable definition AST node.
      */
     public void recordVariableType(DetailAST varDef) {
-        Objects.requireNonNull(varDef);
-        DetailAST type = Objects.requireNonNull(varDef.findFirstToken(TokenTypes.TYPE));
-        DetailAST ident = Objects.requireNonNull(varDef.findFirstToken(TokenTypes.IDENT));
+        requireNonNull(varDef);
+        DetailAST type = requireNonNull(varDef.findFirstToken(TokenTypes.TYPE));
+        DetailAST ident = requireNonNull(varDef.findFirstToken(TokenTypes.IDENT));
         String typeName = astSupport.extractTypeName(type);
         if (typeName == null) {
             return;
@@ -333,7 +336,7 @@ public final class MessageExtractionContext {
      * @return resolved fully qualified name, or the input if unchanged.
      */
     public String resolveTypeName(String typeName) {
-        Objects.requireNonNull(typeName);
+        requireNonNull(typeName);
         if (typeName.contains(".")) {
             return typeName;
         }
@@ -362,7 +365,7 @@ public final class MessageExtractionContext {
      * @return {@code true} if the expression represents a Locale.
      */
     public boolean isLocaleExpression(DetailAST expr) {
-        DetailAST content = Objects.requireNonNull(astSupport.unwrapExpr(expr));
+        DetailAST content = requireNonNull(astSupport.unwrapExpr(expr));
         if (content.getType() == TokenTypes.IDENT) {
             return isLocaleTypeName(getVariableType(content.getText()));
         }
@@ -407,8 +410,8 @@ public final class MessageExtractionContext {
      * @return {@code true} if a suitable inline reason comment is found.
      */
     public boolean hasInlineReasonComment(DetailAST nodeWithParens) {
-        Objects.requireNonNull(nodeWithParens);
-        Objects.requireNonNull(fileContents);
+        requireNonNull(nodeWithParens);
+        requireNonNull(fileContents);
         int[] range = findArgumentListRange(nodeWithParens, fileContents);
         if (range == null) {
             return false;
@@ -424,7 +427,7 @@ public final class MessageExtractionContext {
 
         for (List<TextBlock> commentBlocks : blockComments.values()) {
             for (TextBlock block : commentBlocks) {
-                Objects.requireNonNull(block);
+                requireNonNull(block);
                 if (intersectsRange(block, startLine, startCol, endLine, endCol)
                         && blockCommentHasWord(block)) {
                     return true;
@@ -432,6 +435,30 @@ public final class MessageExtractionContext {
             }
         }
         return false;
+    }
+
+    void recordStaticJUnitImportForTesting(String importText, String prefix, boolean junit4) {
+        recordStaticJUnitImport(importText, prefix, junit4);
+    }
+
+    String normalizeClassNameForTesting(String className) {
+        return normalizeClassName(className);
+    }
+
+    boolean isLocaleTypeNameForTesting(String typeName) {
+        return isLocaleTypeName(typeName);
+    }
+
+    boolean isBeforeForTesting(int leftLine, int leftCol, int rightLine, int rightCol) {
+        return isBefore(leftLine, leftCol, rightLine, rightCol);
+    }
+
+    boolean blockCommentHasWordForTesting(TextBlock block) {
+        return blockCommentHasWord(block);
+    }
+
+    boolean isInMethodOrCtorForTesting(DetailAST ast) {
+        return isInMethodOrCtor(ast);
     }
 
     private void recordStaticJUnitImport(String importText, String prefix, boolean junit4) {
@@ -484,7 +511,7 @@ public final class MessageExtractionContext {
     }
 
     private String normalizeClassName(String className) {
-        Objects.requireNonNull(className);
+        requireNonNull(className);
         String trimmed = className.trim();
         if (trimmed.isEmpty()) {
             return null;
@@ -550,7 +577,7 @@ public final class MessageExtractionContext {
 
         for (int line = scanLine - 1; line < lines.length; line++) {
             String text = lines[line];
-            Objects.requireNonNull(text);
+            requireNonNull(text);
             int index = line == scanLine - 1 ? Math.min(startIndex, text.length()) : 0;
             while (index < text.length()) {
                 char current = text.charAt(index);
@@ -659,9 +686,9 @@ public final class MessageExtractionContext {
 
     private boolean blockCommentHasWord(TextBlock block) {
         String[] text = block.getText();
-        Objects.requireNonNull(text);
+        requireNonNull(text);
         for (String line : text) {
-            Objects.requireNonNull(line);
+            requireNonNull(line);
             for (int i = 0; i < line.length(); i++) {
                 if (Character.isLetter(line.charAt(i))) {
                     return true;

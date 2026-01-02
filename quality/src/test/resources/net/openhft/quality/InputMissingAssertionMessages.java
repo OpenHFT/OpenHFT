@@ -1,5 +1,5 @@
 /*
- * Test input for missing JUnit assertion messages.
+ * Test input for missing JUnit assertion and assumption messages.
  */
 package net.openhft.quality;
 
@@ -8,6 +8,8 @@ public class InputMissingAssertionMessages {
     public void junit4Missing() {
         org.junit.Assert.assertTrue(true);
         org.junit.Assert.assertFalse(false);
+        org.junit.Assume.assumeTrue(true);
+        org.junit.Assume.assumeFalse(false);
         org.junit.Assert.assertEquals(1, 1);
         org.junit.Assert.assertEquals(1.0, 1.0, 0.1);
         org.junit.Assert.assertNull(null);
@@ -22,6 +24,8 @@ public class InputMissingAssertionMessages {
     public void junit5Missing() {
         org.junit.jupiter.api.Assertions.assertTrue(true);
         org.junit.jupiter.api.Assertions.assertFalse(false);
+        org.junit.jupiter.api.Assumptions.assumeTrue(true);
+        org.junit.jupiter.api.Assumptions.assumeFalse(false);
         org.junit.jupiter.api.Assertions.assertEquals(1, 1);
         org.junit.jupiter.api.Assertions.assertEquals(1.0, 1.0, 0.1);
         org.junit.jupiter.api.Assertions.assertNull(null);

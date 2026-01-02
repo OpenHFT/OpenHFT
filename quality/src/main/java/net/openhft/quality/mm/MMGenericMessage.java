@@ -17,6 +17,9 @@ public final class MMGenericMessage extends AbstractMessageRule {
     @Override
     protected void doEvaluate(MessageContext context, ViolationCollector collector,
                               RuleEvaluationState state) {
+        if (context.candidate().argumentNameMessage()) {
+            return;
+        }
         String message = context.candidate().message();
         if (context.ruleSupport().isGenericMessage(message)) {
             recordWarning(context, collector, state, message);

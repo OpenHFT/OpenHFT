@@ -4,8 +4,9 @@
 package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
-
 import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Collects per-line violations and emits the highest priority ones.
@@ -32,7 +33,7 @@ public final class ViolationCollector {
      * @return {@code true} if the violation is recorded.
      */
     public boolean record(int lineNo, RuleId ruleId, Object... args) {
-        Objects.requireNonNull(ruleId, "ruleId is null");
+        requireNonNull(ruleId, "ruleId is null");
         if (suppressionTracker != null && suppressionTracker.isSuppressed(ruleId)) {
             return false;
         }
@@ -69,9 +70,13 @@ public final class ViolationCollector {
         pending.clear();
     }
 
+    Map<Integer, Violation> pendingForTesting() {
+        return new HashMap<>(pending);
+    }
+
     private boolean isHigherPriority(RuleId candidate, RuleId existing) {
-        Objects.requireNonNull(existing);
-        Objects.requireNonNull(candidate);
+        requireNonNull(existing);
+        requireNonNull(candidate);
         if (candidate.priority() != existing.priority()) {
             return candidate.priority() < existing.priority();
         }

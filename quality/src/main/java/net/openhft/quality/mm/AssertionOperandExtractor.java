@@ -6,7 +6,7 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Extracts operand information from comparison and string search expressions.
@@ -21,7 +21,7 @@ public final class AssertionOperandExtractor {
      * @param astSupport AST support utilities.
      */
     public AssertionOperandExtractor(MessageAstSupport astSupport) {
-        this.astSupport = Objects.requireNonNull(astSupport);
+        this.astSupport = requireNonNull(astSupport);
     }
 
     /**
@@ -50,8 +50,8 @@ public final class AssertionOperandExtractor {
             child = child.getNextSibling();
         }
 
-        Objects.requireNonNull(firstExpr);
-        Objects.requireNonNull(secondExpr);
+        requireNonNull(firstExpr);
+        requireNonNull(secondExpr);
         if (style == AssertionStyle.JUNIT4) {
             return new BooleanAssertionOperands(secondExpr, firstExpr);
         }
@@ -65,7 +65,7 @@ public final class AssertionOperandExtractor {
      * @return string search info, or {@code null} if not a string search.
      */
     public StringSearchInfo extractStringSearch(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
 
         DetailAST content = expr;
         if (content.getType() == TokenTypes.EXPR && content.getChildCount() > 0) {
@@ -108,9 +108,12 @@ public final class AssertionOperandExtractor {
         if (elist != null) {
             DetailAST argExpr = elist.getFirstChild();
             if (argExpr != null && argExpr.getType() == TokenTypes.EXPR) {
-                String extracted = extractOperandName(argExpr.getFirstChild());
-                if (extracted != null) {
-                    searchArg = extracted;
+                DetailAST argChild = argExpr.getFirstChild();
+                if (argChild != null) {
+                    String extracted = extractOperandName(argChild);
+                    if (extracted != null) {
+                        searchArg = extracted;
+                    }
                 }
             }
         }
@@ -125,7 +128,7 @@ public final class AssertionOperandExtractor {
      * @return comparison info, or {@code null} if not a comparison.
      */
     public ComparisonInfo extractComparison(DetailAST expr) {
-        Objects.requireNonNull(expr);
+        requireNonNull(expr);
         DetailAST content = expr;
         if (content.getType() == TokenTypes.EXPR && content.getChildCount() > 0) {
             content = content.getFirstChild();
@@ -186,9 +189,9 @@ public final class AssertionOperandExtractor {
      * @return operand name, or {@code null} if not extractable.
      */
     public String extractOperandName(DetailAST operand) {
-        Objects.requireNonNull(operand);
+        requireNonNull(operand);
         DetailAST content = astSupport.unwrapExpr(operand);
-        Objects.requireNonNull(content);
+        requireNonNull(content);
 
         if (content.getType() == TokenTypes.IDENT) {
             return content.getText();
