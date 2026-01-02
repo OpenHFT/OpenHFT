@@ -16,10 +16,11 @@
 package net.openhft.todotracker.parser;
 
 import net.openhft.todotracker.model.TodoTask;
-
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Aggregates TODO tasks from one or more files and source directories.
@@ -41,7 +42,7 @@ public final class TodoReport {
      * @param task the task to add (must not be null)
      */
     public void addTask(TodoTask task) {
-        tasks.add(Objects.requireNonNull(task, "report task must not be null"));
+        tasks.add(requireNonNull(task, "report task must not be null"));
     }
 
     /**
@@ -50,7 +51,7 @@ public final class TodoReport {
      * @param filePath the path of the processed file
      */
     public void addFileProcessed(String filePath) {
-        filesProcessed.add(Objects.requireNonNull(filePath, "report file path must not be null"));
+        filesProcessed.add(requireNonNull(filePath, "report file path must not be null"));
     }
 
     /**
@@ -59,7 +60,7 @@ public final class TodoReport {
      * @param other the report to merge
      */
     public void merge(TodoReport other) {
-        Objects.requireNonNull(other, "other report must not be null");
+        requireNonNull(other, "other report must not be null");
         tasks.addAll(other.tasks);
         filesProcessed.addAll(other.filesProcessed);
     }

@@ -17,7 +17,7 @@ Target: Increase coverage by testing or removing unreachable code
 
 ### 2. Line 197: `getFileName() != null` (1 branch)
 
-**Status**: Already changed to `Objects.requireNonNull`
+**Status**: Already changed to `requireNonNull`
 **Action**: Verify the change compiled - stale report may show old code
 **Impact**: Branch removed by code change
 

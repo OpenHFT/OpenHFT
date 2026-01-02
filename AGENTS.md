@@ -233,6 +233,11 @@ The document overview goes here.
 - JDK 21+ test runs use `root-parent-pom` `java21` profile to keep logs clean (dynamic-agent warnings).
 - Quality plugins are non-blocking by default in parent POMs; enable enforcement via `-Pquality` when needed.
 
+## Quality module practices
+- Keep `quality` tests in the same package as the code under test and use package-local accessors instead of reflection.
+- If a helper needs coverage, prefer a package-local wrapper or small helper class rather than `java.lang.reflect`.
+- When changing quality rules, update the matching docs under `quality/src/main/docs/`.
+
 ## Reviewability for large changes (mechanical sweeps)
 - Declare the transformation rule in one sentence ("X -> Y") and avoid exceptions.
 - Layer commits to match review: prep (optional) -> mechanical sweep -> tidy-up -> verification-only.

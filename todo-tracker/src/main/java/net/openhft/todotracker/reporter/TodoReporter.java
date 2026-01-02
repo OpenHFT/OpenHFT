@@ -18,10 +18,11 @@ package net.openhft.todotracker.reporter;
 import net.openhft.todotracker.model.TodoTask;
 import net.openhft.todotracker.parser.TodoReport;
 import org.apache.maven.plugin.logging.Log;
-
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Formats and outputs TODO task reports to the Maven build log console.
@@ -45,7 +46,7 @@ public final class TodoReporter {
      * @param showContext whether to show section header context
      */
     public TodoReporter(Log log, int maxTasks, boolean showContext) {
-        this.log = Objects.requireNonNull(log, "reporter log must not be null");
+        this.log = requireNonNull(log, "reporter log must not be null");
         this.maxTasks = maxTasks;
         this.showContext = showContext;
     }
@@ -66,7 +67,7 @@ public final class TodoReporter {
      * @param excludePatterns patterns to exclude based on context heading
      */
     public void reportUncompleted(TodoReport report, Collection<Pattern> excludePatterns) {
-        Objects.requireNonNull(report, "task report must not be null");
+        requireNonNull(report, "task report must not be null");
 
         List<TodoTask> uncompleted = report.getUncompletedTasks(excludePatterns);
         if (uncompleted.isEmpty()) {
@@ -152,7 +153,7 @@ public final class TodoReporter {
      * @return summary string
      */
     public String generateSummary(TodoReport report) {
-        Objects.requireNonNull(report, "summary report must not be null");
+        requireNonNull(report, "summary report must not be null");
 
         int total = report.getTotalCount();
         int completed = report.getCompletedCount();

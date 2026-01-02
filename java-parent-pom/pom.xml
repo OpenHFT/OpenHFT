@@ -36,8 +36,7 @@
         <license.owner>chronicle.software</license.owner>
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
-        <!-- TODO raise this to true -->
-        <quality.enforced>false</quality.enforced>
+        <quality.enforced>true</quality.enforced>
         <quality.version>2026.0-SNAPSHOT</quality.version>
 
         <pmd.targetJdk>1.8</pmd.targetJdk>
@@ -182,140 +181,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <configLocation>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml</configLocation>
-                    <failOnViolation>${quality.enforced}</failOnViolation>
-                    <logViolationsToConsole>true</logViolationsToConsole>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <violationSeverity>warning</violationSeverity>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>9.3</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>net.openhft</groupId>
-                        <artifactId>quality</artifactId>
-                        <version>${quality.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <!-- SpotBugs 4.9 line that requires Java 11+ -->
-                <version>4.8.6.6</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <threshold>Low</threshold>
-                    <includeTests>true</includeTests>
-                    <failOnError>${quality.enforced}</failOnError>
-                    <!-- Shared SpotBugs filters from quality rules -->
-                    <includeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-include.xml</includeFilterFile>
-                    <excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml</excludeFilterFile>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>net.openhft</groupId>
-                        <artifactId>quality</artifactId>
-                        <version>${quality.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>spotbugs-main</id>
-                        <!-- Run after compilation of main and test classes, and gate on findings -->
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.28.0</version>
-                <configuration>
-                    <rulesets>
-                        <ruleset>${pmd.ruleset}</ruleset>
-                    </rulesets>
-                    <excludeRoots>
-                        <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
-                        <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
-                        <excludeRoot>${project.build.directory}/classes</excludeRoot>
-                        <excludeRoot>${project.build.directory}/test-classes</excludeRoot>
-                    </excludeRoots>
-                    <excludes>
-                        <exclude>**/target/**</exclude>
-                        <exclude>**/build/**</exclude>
-                        <exclude>**/out/**</exclude>
-                        <exclude>**/generated/**</exclude>
-                    </excludes>
-                    <includeTests>${pmd.includeTests}</includeTests>
-                    <failOnViolation>${quality.enforced}</failOnViolation>
-                    <targetJdk>${pmd.targetJdk}</targetJdk>
-                    <skip>${pmd.skip}</skip>
-                    <printFailingErrors>true</printFailingErrors>
-                    <linkXRef>false</linkXRef>
-                    <format>xml</format>
-                    <outputFormat>xdoc</outputFormat>
-                    <skipEmptyReport>true</skipEmptyReport>
-                    <analysisCache>true</analysisCache>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>net.sourceforge.pmd</groupId>
-                        <artifactId>pmd-core</artifactId>
-                        <version>${pmdVersion}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>net.sourceforge.pmd</groupId>
-                        <artifactId>pmd-java</artifactId>
-                        <version>${pmdVersion}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>net.openhft</groupId>
-                        <artifactId>quality</artifactId>
-                        <version>${quality.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>pmd-check</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>cpd-check</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>cpd-check</goal>
-                        </goals>
-                        <configuration>
-                            <failOnViolation>${quality.enforced}</failOnViolation>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -325,6 +190,143 @@
             <properties>
                 <quality.enforced>true</quality.enforced>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>validate</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <configLocation>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml</configLocation>
+                            <failOnViolation>${quality.enforced}</failOnViolation>
+                            <logViolationsToConsole>true</logViolationsToConsole>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <violationSeverity>warning</violationSeverity>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.puppycrawl.tools</groupId>
+                                <artifactId>checkstyle</artifactId>
+                                <version>9.3</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>net.openhft</groupId>
+                                <artifactId>quality</artifactId>
+                                <version>${quality.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <!-- SpotBugs 4.9 line with Java 25 bytecode support -->
+                        <version>4.9.7.0</version>
+                        <configuration>
+                            <effort>Max</effort>
+                            <threshold>Low</threshold>
+                            <includeTests>true</includeTests>
+                            <failOnError>${quality.enforced}</failOnError>
+                            <!-- Shared SpotBugs filters from quality rules -->
+                            <includeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-include.xml</includeFilterFile>
+                            <excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml</excludeFilterFile>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>net.openhft</groupId>
+                                <artifactId>quality</artifactId>
+                                <version>${quality.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>spotbugs-main</id>
+                                <!-- Run after compilation of main and test classes, and gate on findings -->
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <version>3.28.0</version>
+                        <configuration>
+                            <rulesets>
+                                <ruleset>${pmd.ruleset}</ruleset>
+                            </rulesets>
+                            <excludeRoots>
+                                <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
+                                <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
+                                <excludeRoot>${project.build.directory}/classes</excludeRoot>
+                                <excludeRoot>${project.build.directory}/test-classes</excludeRoot>
+                            </excludeRoots>
+                            <excludes>
+                                <exclude>**/target/**</exclude>
+                                <exclude>**/build/**</exclude>
+                                <exclude>**/out/**</exclude>
+                                <exclude>**/generated/**</exclude>
+                            </excludes>
+                            <includeTests>${pmd.includeTests}</includeTests>
+                            <failOnViolation>${quality.enforced}</failOnViolation>
+                            <targetJdk>${pmd.targetJdk}</targetJdk>
+                            <skip>${pmd.skip}</skip>
+                            <printFailingErrors>true</printFailingErrors>
+                            <linkXRef>false</linkXRef>
+                            <format>xml</format>
+                            <outputFormat>xdoc</outputFormat>
+                            <skipEmptyReport>true</skipEmptyReport>
+                            <analysisCache>true</analysisCache>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>net.sourceforge.pmd</groupId>
+                                <artifactId>pmd-core</artifactId>
+                                <version>${pmdVersion}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>net.sourceforge.pmd</groupId>
+                                <artifactId>pmd-java</artifactId>
+                                <version>${pmdVersion}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>net.openhft</groupId>
+                                <artifactId>quality</artifactId>
+                                <version>${quality.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>pmd-check</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>cpd-check</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>cpd-check</goal>
+                                </goals>
+                                <configuration>
+                                    <failOnViolation>${quality.enforced}</failOnViolation>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>jacoco</id>

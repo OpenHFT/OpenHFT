@@ -22,6 +22,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Locates TODO files in Markdown or AsciiDoc across a project directory tree.
  * <p>
@@ -149,7 +151,7 @@ public final class TodoFileLocator {
      */
     public TodoFileLocator(List<String> todoFiles) {
         this.todoFiles = new ArrayList<>(
-                Objects.requireNonNull(todoFiles, "todo file path list must not be null"));
+                requireNonNull(todoFiles, "todo file path list must not be null"));
         this.patterns = new ArrayList<>();
         this.usePatterns = false;
     }
@@ -175,7 +177,7 @@ public final class TodoFileLocator {
      * @return list of existing TODO files (deduplicated, discovery order)
      */
     public List<File> findTodoFiles(File basedir) {
-        Objects.requireNonNull(basedir, "base directory must not be null");
+        requireNonNull(basedir, "base directory must not be null");
 
         Set<File> foundFiles = new LinkedHashSet<>();
 

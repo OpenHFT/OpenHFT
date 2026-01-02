@@ -16,12 +16,12 @@
 package net.openhft.todotracker.parser;
 
 import net.openhft.todotracker.model.TodoTask;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Parses TODO files in Markdown or AsciiDoc to extract checkbox tasks and context headings.
@@ -103,7 +103,7 @@ public final class TodoParser {
      */
     public TodoParser(String contextPatternRegex) {
         this.contextPattern = Pattern.compile(
-                Objects.requireNonNull(contextPatternRegex, "context pattern regex must not be null"));
+                requireNonNull(contextPatternRegex, "context pattern regex must not be null"));
     }
 
     /**
@@ -132,7 +132,7 @@ public final class TodoParser {
      * @throws IOException if the file cannot be read
      */
     public TodoReport parse(File file) throws IOException {
-        Objects.requireNonNull(file, "todo source file path must not be null");
+        requireNonNull(file, "todo source file path must not be null");
 
         Format format = detectFormat(file.getPath());
         TodoReport report = new TodoReport();
@@ -252,9 +252,9 @@ public final class TodoParser {
      * @return a TodoReport containing all found tasks
      */
     public TodoReport parseContent(String content, String sourcePath, Format format) {
-        Objects.requireNonNull(content, "content text must not be null");
-        Objects.requireNonNull(sourcePath, "source path must not be null");
-        Objects.requireNonNull(format, "parse format must not be null");
+        requireNonNull(content, "content text must not be null");
+        requireNonNull(sourcePath, "source path must not be null");
+        requireNonNull(format, "parse format must not be null");
 
         TodoReport report = new TodoReport();
         report.addFileProcessed(sourcePath);

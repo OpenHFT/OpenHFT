@@ -17,6 +17,8 @@ package net.openhft.todotracker.model;
 
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Immutable representation of a single TODO task from a markdown file.
  * Supports priority tags [P1-3] and effort tags [E:S/M/L].
@@ -45,12 +47,12 @@ public final class TodoTask {
     public TodoTask(String filePath, int lineNumber, String text,
                     String context, boolean completed,
                     Integer priority, Character effort) {
-        this.filePath = Objects.requireNonNull(filePath, "task file path must not be null");
+        this.filePath = requireNonNull(filePath, "task file path must not be null");
         if (lineNumber < 1) {
             throw new IllegalArgumentException("lineNumber must be positive, got: " + lineNumber);
         }
         this.lineNumber = lineNumber;
-        this.text = Objects.requireNonNull(text, "task text must not be null");
+        this.text = requireNonNull(text, "task text must not be null");
         this.context = context;
         this.completed = completed;
         this.priority = priority;
