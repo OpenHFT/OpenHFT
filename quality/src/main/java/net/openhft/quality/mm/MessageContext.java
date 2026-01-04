@@ -6,7 +6,7 @@ package net.openhft.quality.mm;
 /**
  * Context passed to rules during evaluation of a message candidate.
  */
-public final class MessageContext {
+public class MessageContext {
     private final MessageCandidate candidate;
     private final MessageMetrics metrics;
     private final String currentClassName;

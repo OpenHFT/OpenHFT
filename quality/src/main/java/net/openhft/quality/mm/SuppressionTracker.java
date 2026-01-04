@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Tracks @SuppressWarnings tokens for MeaningfulMessage rule suppression.
  */
-public final class SuppressionTracker {
+public class SuppressionTracker {
 
     private static final String SUPPRESS_WARNINGS = "SuppressWarnings";
     private static final String CHECKSTYLE_PREFIX = "checkstyle:";

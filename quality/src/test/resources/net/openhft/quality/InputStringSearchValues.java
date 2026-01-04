@@ -23,6 +23,11 @@ public class InputStringSearchValues {
         assertFalse(name.startsWith("Mrs"), "name should not have wrong title");
         assertFalse(path.endsWith(".tmp"), "path should not be temp file");
 
+        // These are OK - constant message includes the literal search value
+        assertTrue(text.contains("@"), "email address should contain @ symbol");
+        assertTrue(name.startsWith("Mr"), "name should start with Mr prefix");
+        assertTrue(path.endsWith(".txt"), "path should end with .txt suffix");
+
         // These are OK - message includes dynamic values
         assertTrue(text.contains("@"), text + " should contain at symbol");
         assertTrue(name.startsWith("Mr"), name + " should start with Mr prefix");

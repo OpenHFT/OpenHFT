@@ -71,6 +71,23 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    void isFillerWordTreatsDomainTokensAsMeaningful() {
+        assertFalse(calculator.isFillerWord("Wire"), "Wire should be a meaningful word");
+        assertFalse(calculator.isFillerWord("YAML"), "YAML should be a meaningful word");
+        assertFalse(calculator.isFillerWord("JSON"), "JSON should be a meaningful word");
+        assertFalse(calculator.isFillerWord("UUID"), "UUID should be a meaningful word");
+        assertFalse(calculator.isFillerWord("DTO"), "DTO should be a meaningful word");
+    }
+
+    @Test
+    void calculateCountsDomainTokensAsMeaningful() {
+        String message = "wire yaml json uuid dto";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(5, metrics.wordCount(), "wordCount should include all tokens");
+        assertEquals(5, metrics.meaningfulWordCount(), "domain tokens should count as meaningful words");
+    }
+
+    @Test
     void isFillerWordRejectsNull() {
         assertThrows(NullPointerException.class,
                 () -> calculator.isFillerWord(null),

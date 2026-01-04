@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Immutable description of a message candidate extracted from source.
  */
-public final class MessageCandidate {
+public class MessageCandidate {
     private final MessageSource source;
     private final int lineNo;
     private final String message;

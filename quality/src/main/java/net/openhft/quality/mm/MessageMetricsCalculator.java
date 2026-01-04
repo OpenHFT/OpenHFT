@@ -47,6 +47,11 @@ public final class MessageMetricsCalculator {
                     "behaviours"
             )
     );
+    private static final Set<String> NON_FILLER_WORDS = new HashSet<>(
+            java.util.Arrays.asList(
+                    "wire", "yaml", "json", "uuid", "dto"
+            )
+    );
 
     /**
      * Create a metrics calculator.
@@ -121,7 +126,11 @@ public final class MessageMetricsCalculator {
      */
     public boolean isFillerWord(String word) {
         requireNonNull(word);
-        return FILLER_WORDS.contains(word.toLowerCase());
+        String normalised = word.toLowerCase(Locale.ROOT);
+        if (NON_FILLER_WORDS.contains(normalised)) {
+            return false;
+        }
+        return FILLER_WORDS.contains(normalised);
     }
 
     /**

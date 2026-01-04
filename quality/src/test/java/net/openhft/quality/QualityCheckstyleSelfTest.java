@@ -198,8 +198,8 @@ public class QualityCheckstyleSelfTest {
         final String details = output.toString(StandardCharsets.UTF_8.name());
         final List<String> violations = extractViolationLines(details);
         if (violations.isEmpty()) {
-            fail("Expected " + EXPECTED_VIOLATION_COUNT
-                    + " baseline violations from SelfCheckFixture.");
+            fail("SelfCheckFixture should produce " + EXPECTED_VIOLATION_COUNT
+                    + " baseline violations.");
         }
         final String violationDetails = String.join(System.lineSeparator(), violations);
         final String formatError = validateDetailFormat(violationDetails);

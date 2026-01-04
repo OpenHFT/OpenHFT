@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 public class InputGoodAssertMessages {
     public void test() {
-        assertEquals("expected positive range value", 1, 1);
+        assertEquals("value should be in positive range", 1, 1);
         assertEquals("array contents should be empty", 0, 0);
         assertEquals("connection should be open", true, true);
     }

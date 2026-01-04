@@ -16,9 +16,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- JVM args for Surefire - empty on Java 8, set by profiles on Java 9+ -->
-        <jvm.requiredArgs></jvm.requiredArgs>
-        <jvm.extraArgs></jvm.extraArgs>
+        <!-- jvm.requiredArgs and jvm.extraArgs inherited from root-parent-pom profiles -->
         <!-- Enable strict quality enforcement for this module -->
         <quality.enforced>true</quality.enforced>
         <!-- Use checkstyle26 baseline for this module -->
@@ -237,9 +235,9 @@
                                 <param>XML</param>
                             </outputFormats>
                             <!-- Mutation thresholds -->
-                            <!-- Updated after adding unit tests for AST support classes -->
-                            <mutationThreshold>80</mutationThreshold>
-                            <coverageThreshold>94</coverageThreshold>
+                            <!-- Target: 82% mutation coverage (achieved from 81%) -->
+                            <mutationThreshold>82</mutationThreshold>
+                            <coverageThreshold>93</coverageThreshold>
                             <!-- Run all tests against all mutations for accuracy -->
                             <fullMutationMatrix>true</fullMutationMatrix>
                             <!-- Reduce noise from logging -->

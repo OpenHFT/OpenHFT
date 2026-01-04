@@ -278,6 +278,86 @@ public class LogMessageExtractorTest {
         assertFalse(extractor.isThrowableExpression(expr));
     }
 
+    // --- isLogMethod return true mutations tests ---
+
+    @Test
+    void isLogMethod_slf4jNonLogMethodReturnsFalse() {
+        LogMessageExtractor.LoggerKind slf4j = LogMessageExtractor.LoggerKind.SLF4J;
+        assertFalse(extractor.isLogMethod(slf4j, "getName"));
+        assertFalse(extractor.isLogMethod(slf4j, "isDebugEnabled"));
+        assertFalse(extractor.isLogMethod(slf4j, ""));
+        assertFalse(extractor.isLogMethod(slf4j, "log"));
+    }
+
+    @Test
+    void isLogMethod_log4j2NonLogMethodReturnsFalse() {
+        LogMessageExtractor.LoggerKind log4j2 = LogMessageExtractor.LoggerKind.LOG4J2;
+        assertFalse(extractor.isLogMethod(log4j2, "getName"));
+        assertFalse(extractor.isLogMethod(log4j2, "isInfoEnabled"));
+        assertFalse(extractor.isLogMethod(log4j2, "log"));
+    }
+
+    @Test
+    void isLogMethod_julLogMethod() {
+        LogMessageExtractor.LoggerKind jul = LogMessageExtractor.LoggerKind.JUL;
+        assertTrue(extractor.isLogMethod(jul, "log"));
+        assertFalse(extractor.isLogMethod(jul, "getName"));
+    }
+
+    @Test
+    void isLogMethod_systemNonLogMethodReturnsFalse() {
+        LogMessageExtractor.LoggerKind system = LogMessageExtractor.LoggerKind.SYSTEM;
+        assertFalse(extractor.isLogMethod(system, "getName"));
+        assertFalse(extractor.isLogMethod(system, "trace"));
+        assertFalse(extractor.isLogMethod(system, "debug"));
+    }
+
+    // --- extractQualifierNameForLog edge cases ---
+
+    @Test
+    void containsThrowable_singleThrowableElement() {
+        DetailAST throwableArg = mock(DetailAST.class);
+        when(throwableArg.getType()).thenReturn(TokenTypes.EXPR);
+
+        DetailAST literalNew = mock(DetailAST.class);
+        when(literalNew.getType()).thenReturn(TokenTypes.LITERAL_NEW);
+        when(throwableArg.getFirstChild()).thenReturn(literalNew);
+        when(throwableArg.getChildCount()).thenReturn(1);
+
+        DetailAST className = mock(DetailAST.class);
+        when(className.getType()).thenReturn(TokenTypes.IDENT);
+        when(className.getText()).thenReturn("RuntimeException");
+        when(literalNew.getFirstChild()).thenReturn(className);
+
+        assertTrue(extractor.containsThrowable(Collections.singletonList(throwableArg)));
+    }
+
+    @Test
+    void containsThrowable_noThrowableElement() {
+        DetailAST stringArg = mock(DetailAST.class);
+        when(stringArg.getType()).thenReturn(TokenTypes.EXPR);
+
+        DetailAST strLiteral = mock(DetailAST.class);
+        when(strLiteral.getType()).thenReturn(TokenTypes.STRING_LITERAL);
+        when(strLiteral.getText()).thenReturn("\"test\"");
+        when(stringArg.getFirstChild()).thenReturn(strLiteral);
+        when(stringArg.getChildCount()).thenReturn(1);
+
+        assertFalse(extractor.containsThrowable(Collections.singletonList(stringArg)));
+    }
+
+    // --- isBlankMessage edge cases ---
+
+    @Test
+    void isBlankMessage_tabsAndNewlines() {
+        assertTrue(extractor.isBlankMessage("\t\n\r"));
+    }
+
+    @Test
+    void isBlankMessage_singleSpace() {
+        assertTrue(extractor.isBlankMessage(" "));
+    }
+
     /**
      * Test sink for capturing emitted candidates.
      */

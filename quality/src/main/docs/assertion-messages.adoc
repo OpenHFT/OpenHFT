@@ -794,6 +794,7 @@ This rule only triggers when:
 - The assertion is `assertTrue` or `assertFalse`
 - The condition is a call to `contains()`, `startsWith()`, or `endsWith()`
 - The message is a constant string (no dynamic content)
+- The string search target is not a literal already mentioned in the message
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 

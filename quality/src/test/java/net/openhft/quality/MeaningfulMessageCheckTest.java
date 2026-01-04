@@ -31,6 +31,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     static Stream<Arguments> provideStandardTestCases() {
         return Stream.of(
                 arguments("DuplicateMessages", "InputDuplicateAssertMessages.java", new Object[][]{
+                        {12, RuleId.MISSING_SUBJECT, "expected checksum should match"},
                         {18, RuleId.DUPLICATE, "expected checksum should match", 12}
                 }),
                 arguments("AssertionBranchCoverage", "InputAssertionBranchCoverage.java", new Object[][]{
@@ -67,6 +68,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 arguments("RequireNonNullParameterName", "InputRequireNonNullParamName.java", new Object[][]{}),
                 arguments("QualifiedNonJUnitAssertions", "InputQualifiedNonJUnitAssertions.java", new Object[][]{}),
                 arguments("DuplicateRedundantAndWordQualityWarnings", "InputAllWarningTypes.java", new Object[][]{
+                        {17, RuleId.MISSING_SUBJECT, "expected checksum digest value"},
                         {19, RuleId.DUPLICATE, "expected checksum digest value", 17},
                         {24, RuleId.DUPLICATE, "expected checksum digest value", 17},
                         {31, RuleId.DUPLICATE, "condition must always hold", 29},
@@ -94,8 +96,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {109, RuleId.REDUNDANT_LINE, "testCombinedMethodAndLine error at L99", "L99"},
                         {114, RuleId.REDUNDANT_CLASS, "InputAllWarningTypes.testTripleCombined at line 42", "InputAllWarningTypes",
                                 "only 1 unique meaningful word(s): testTripleCombined (filler: at, line, 42)"},
+                        {123, RuleId.MISSING_SUBJECT, "expected positive range value"},
                         {146, RuleId.WHITESPACE_RUN, "order  should persist", "  "},
-                        {155, RuleId.TOO_FEW_MEANINGFUL, "expected value should match", "match", 1, 2}
+                        {155, RuleId.MISSING_SUBJECT, "expected value should match"}
                 }),
                 arguments("TrivialSupplier", "InputTrivialSupplier.java", new Object[][]{
                         {16, RuleId.TRIVIAL_SUPPLIER, "expected match"},
@@ -163,7 +166,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 arguments("WordMetrics", "InputWordMetrics.java", new Object[][]{
                         {16, RuleId.TOO_SHORT, "short", 1, 4},
                         {18, RuleId.TOO_SHORT, "too short", 2, 4},
-                        {27, RuleId.TOO_FEW_MEANINGFUL, "expected result ok value", "ok", 1, 2},
+                        {27, RuleId.MISSING_SUBJECT, "expected result ok value"},
                         {36, RuleId.TOO_LONG, "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twentyone twentytwo twentythree twentyfour twentyfive twentysix twentyseven twentyeight twentynine thirty thirtyone thirtytwo thirtythree thirtyfour thirtyfive thirtysix thirtyseven thirtyeight thirtynine forty fortyone fortytwo fortythree", 43, 42},
                         {45, RuleId.LONG_WORD, "error in SomeExtremelyVeryLongClassNameThatExceedsLimitHere here",
                                 "SomeExtremelyVeryLongClassNameThatExceedsLimitHere", 42},
@@ -209,7 +212,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 }),
                 arguments("HamcrestMessages", "InputHamcrestMessages.java", new Object[][]{
                         {13, RuleId.TOO_SHORT, "bad input", 2, 4},
-                        {14, RuleId.TOO_FEW_MEANINGFUL, "expected result should match", "match", 1, 2}
+                        {14, RuleId.MISSING_SUBJECT, "expected result should match"}
                 }),
                 arguments("MethodCallMessageTemplates", "InputMethodCallMessageTemplates.java", new Object[][]{
                         {14, RuleId.GENERIC, "expected"},
@@ -248,7 +251,6 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {19, RuleId.MISSING_STRING_VALUE, "contains", "text", "\"@\""},
                         {20, RuleId.MISSING_STRING_VALUE, "startsWith", "name", "\"Mr\""},
                         {21, RuleId.MISSING_STRING_VALUE, "endsWith", "path", "\".txt\""},
-                        {22, RuleId.MISSING_STRING_VALUE, "contains", "text", "\"spam\""},
                         {23, RuleId.MISSING_STRING_VALUE, "startsWith", "name", "\"Mrs\""},
                         {24, RuleId.MISSING_STRING_VALUE, "endsWith", "path", "\".tmp\""}
                 }),
@@ -300,7 +302,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {33, RuleId.MISSING_MESSAGE},
                         {35, RuleId.MISSING_SUBJECT, "should reconnect"},
                         {38, RuleId.MISSING_MESSAGE},
-                        {40, RuleId.TOO_FEW_MEANINGFUL, "expected value should match", "match", 1, 2},
+                        {40, RuleId.MISSING_SUBJECT, "expected value should match"},
                         {41, RuleId.TOO_SHORT, "", 1, 4},
                         {44, RuleId.MISSING_MESSAGE},
                         {46, RuleId.TOO_SHORT, "", 0, 4},
@@ -318,7 +320,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {59, RuleId.CONTEXTLESS, "comparison"},
                         {60, RuleId.INDEX_ONLY, "0"},
                         {62, RuleId.MISSING_MESSAGE},
-                        {72, RuleId.MISSING_MESSAGE}
+                        {72, RuleId.MISSING_MESSAGE},
+                        {78, RuleId.MISSING_SUBJECT, "Expected more retries"},
+                        {79, RuleId.MISSING_SUBJECT, "expected: more retries"}
                 }),
                 arguments("LogMessageTypeResolutionGaps", "InputLogUnknownThrowableType.java", new Object[][]{}),
                 arguments("LogSupplierBranches", "InputLogSupplierBranches.java", new Object[][]{
@@ -402,7 +406,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 }),
                 arguments("CoveragePaths", "InputCoveragePaths.java", new Object[][]{
                         {48, RuleId.TRIVIAL_SUPPLIER, "this is a very long string that exceeds twelve characters for truncation test {} ..."},
-                        {70, RuleId.TOO_SHORT, "expected comparison", 2, 4},
+                        {70, RuleId.MISSING_SUBJECT, "expected comparison"},
                         {75, RuleId.MISSING_MESSAGE},
                         {91, RuleId.TRIVIAL_SUPPLIER, "index: {} is valid ..."},
                         {96, RuleId.TRIVIAL_SUPPLIER, "value is %d"},

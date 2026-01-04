@@ -74,5 +74,8 @@ public class InputLogMessages {
                 "Breaking out of send loop after " + System.currentTimeMillis() + " ms.");
         // Exception-only logging should be allowed.
         slf4j.error("", throwable);
+
+        slf4j.info("Expected more retries");
+        slf4j.info("expected: more retries");
     }
 }

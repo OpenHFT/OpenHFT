@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Collects per-line violations and emits the highest priority ones.
  */
-public final class ViolationCollector {
+public class ViolationCollector {
     private final Map<Integer, Violation> pending = new HashMap<>();
     private final SuppressionTracker suppressionTracker;
 

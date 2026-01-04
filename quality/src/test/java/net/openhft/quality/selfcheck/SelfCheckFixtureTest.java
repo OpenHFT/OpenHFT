@@ -34,6 +34,6 @@ public class SelfCheckFixtureTest {
         fixture.triggerDuplicateSecond(value);
 
         assertThrows(IllegalStateException.class, fixture::triggerMissingMessage,
-                "Expected IllegalStateException from triggerMissingMessage invocation");
+                "triggerMissingMessage should throw IllegalStateException");
     }
 }

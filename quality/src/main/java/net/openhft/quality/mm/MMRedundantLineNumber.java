@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
  */
 public final class MMRedundantLineNumber extends AbstractMessageRule {
     private static final Pattern LINE_NUMBER_PATTERN = Pattern.compile(
-            "(?i)(?:"
-                    + "\\bline\\s+#?\\d+|"
-                    + "\\bL\\d+\\b|"
+            "(?:"
+                    + "\\b(?i:line)\\s+#?\\d+|"
+                    + "\\bL\\d{2,}\\b|"
                     + "\\.java:\\d+|"
                     + "\\.kt:\\d+|"
                     + "\\.scala:\\d+"
