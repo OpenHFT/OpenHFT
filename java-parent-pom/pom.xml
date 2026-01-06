@@ -38,6 +38,7 @@
         <license.skip>false</license.skip>
         <quality.enforced>true</quality.enforced>
         <quality.version>2026.0-SNAPSHOT</quality.version>
+        <slf4j.version>2.0.17</slf4j.version>
 
         <pmd.targetJdk>1.8</pmd.targetJdk>
         <pmd.includeTests>true</pmd.includeTests>
@@ -55,6 +56,15 @@
         <pitest.timeoutFactor>2</pitest.timeoutFactor>
         <pitest.jvmArgs>-Xmx2g</pitest.jvmArgs>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

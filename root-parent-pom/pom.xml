@@ -140,6 +140,12 @@
                 </plugin>
 
                 <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>4.9.7.0</version>
+                </plugin>
+
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>3.3.0</version>
@@ -504,6 +510,8 @@
                     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
                     --add-opens=java.base/java.util=ALL-UNNAMED
                     --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+                    --enable-native-access=ALL-UNNAMED
+                    -XX:+EnableDynamicAgentLoading
                 </jvm.requiredArgs>
             </properties>
         </profile>

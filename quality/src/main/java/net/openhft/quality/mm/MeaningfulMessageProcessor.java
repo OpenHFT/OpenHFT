@@ -181,6 +181,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      */
     public void finishTree(AbstractCheck check) {
         if (violationCollector != null) {
+            if (verbose) {
+                emitRuleSummary();
+            }
             violationCollector.flush(check);
             violationCollector.clear();
         }
@@ -410,6 +413,41 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to write message extraction record", e);
         }
+    }
+
+    private void emitRuleSummary() {
+        Map<RuleId, Integer> summary = violationCollector == null
+                ? java.util.Collections.emptyMap()
+                : violationCollector.summaryCounts();
+        if (summary.isEmpty()) {
+            return;
+        }
+        FileContents contents = context == null ? null : context.fileContents();
+        String fileName = contents == null ? "unknown" : contents.getFileName();
+        String summaryText = formatRuleSummary(summary);
+        System.out.println("MeaningfulMessage summary: file=" + fileName + " " + summaryText);
+    }
+
+    private String formatRuleSummary(Map<RuleId, Integer> summary) {
+        List<Map.Entry<RuleId, Integer>> entries = new ArrayList<>(summary.entrySet());
+        entries.sort(Comparator
+                .comparingInt((Map.Entry<RuleId, Integer> entry) -> entry.getValue())
+                .reversed()
+                .thenComparing(entry -> entry.getKey().code()));
+        int total = 0;
+        StringBuilder builder = new StringBuilder(128);
+        for (Map.Entry<RuleId, Integer> entry : entries) {
+            total += entry.getValue();
+        }
+        builder.append("total=").append(total).append(" rules=");
+        for (int i = 0; i < entries.size(); i++) {
+            Map.Entry<RuleId, Integer> entry = entries.get(i);
+            if (i > 0) {
+                builder.append(", ");
+            }
+            builder.append(entry.getKey().code()).append('=').append(entry.getValue());
+        }
+        return builder.toString();
     }
 
     private MessageMetrics computeMessageMetrics(String message, int placeholderCount, int keyValueLabelCount) {

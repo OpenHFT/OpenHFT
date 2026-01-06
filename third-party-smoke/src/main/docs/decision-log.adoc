@@ -134,30 +134,29 @@ Notes/Links:: See `maven-enforcer-plugin` configuration in pom.xml.
 Documented in version-issues.adoc.
 See requirement `SMOKE-NF-O-001` in project-requirements.adoc.
 
-=== SMOKE-DEC-006 Multiple SLF4J bindings tolerated
+=== SMOKE-DEC-006 Single SLF4J binding in tests
 
 Date:: 2025-11-29
-Context:: Test classpath includes multiple SLF4J implementations (slf4j-simple, slf4j-nop) to validate all bindings resolve correctly.
-This triggers SLF4J warnings: "Multiple bindings were found on the class path".
-Decision Statement:: Tolerate SLF4J binding warnings during test execution to validate all bindings load correctly without failures.
+Context:: Tests need an SLF4J binding on the classpath, but multiple bindings create noisy warnings that do not add coverage value.
+Keep slf4j-nop version-managed in third-party-bom for consumers, but do not include it in smoke tests.
+Decision Statement:: Use slf4j-simple as the only SLF4J binding in third-party-smoke tests.
 Alternatives Considered::
-* Single binding per test:
-** *Pros:* Clean test output, no warnings.
-** *Cons:* Doesn't validate that multiple bindings can coexist, misses downstream classpath scenarios.
-* Exclude extra bindings:
-** *Pros:* Eliminates warnings.
-** *Cons:* Reduces test coverage, doesn't validate binding resolution.
-* Separate test profiles per binding:
-** *Pros:* Isolated validation.
-** *Cons:* Complex configuration, slower CI, maintenance burden.
-Rationale for Decision:: Validates each binding resolves correctly.
-Mirrors potential downstream classpath conflicts.
-Warnings are informational, not failures.
-Tests remain deterministic despite warnings.
-Impact & Consequences:: Noisy test output with SLF4J warnings during execution.
-Acceptable for smoke testing.
-Developers must distinguish warnings from actual failures.
-Future: may separate test execution groups if noise becomes problematic.
-Notes/Links:: See pom.xml lines 213-237 for SLF4J dependencies.
+* Multiple bindings in one test run:
+** *Description:* Include slf4j-simple and slf4j-nop together.
+** *Pros:* Exercises binding selection with conflicting classpath entries.
+** *Cons:* Produces warnings and hides real issues in logs.
+* No explicit binding:
+** *Description:* Rely on whatever binding arrives transitively.
+** *Pros:* Less configuration.
+** *Cons:* Unreliable tests and harder to reproduce failures.
+* Separate profiles per binding:
+** *Description:* Run smoke tests once per binding.
+** *Pros:* Coverage without conflicts.
+** *Cons:* More build complexity and longer CI times.
+Rationale for Decision:: A single binding keeps logs readable while still validating core SLF4J behaviour.
+slf4j-simple is lightweight and stable on Java 8.
+Impact & Consequences:: SLF4J multiple-binding warnings should stop in third-party-smoke runs.
+If a second binding needs validation, add a dedicated profile or targeted test.
+Notes/Links:: See third-party-smoke pom.xml SLF4J dependencies.
 Documented in version-issues.adoc.
 See `MinimalLoggingSmokeTest` for SLF4J validation.

@@ -31,18 +31,15 @@ Action: confirm whether the non-classified jar can be removed from dependencies.
 * *org.mongodb:bson-record-codec* :: Compiled for Java 17 (uses Java records).
 Action: confirm whether this is still resolved transitively with the 4.11.1 driver set; exclude if unused.
 
-== SLF4J Binding Conflicts
+== SLF4J Binding
 
-The test classpath intentionally includes multiple SLF4J implementations (pom.xml lines 220-227, 230-237):
+The test classpath uses a single SLF4J binding:
 
 * `slf4j-simple`
-* `slf4j-nop`
 
-This configuration triggers SLF4J warnings: "Multiple bindings were found on the class path"
+`slf4j-nop` remains version-managed in `third-party-bom`, but is not included in smoke tests.
 
-*Decision*: Warnings are tolerated to validate all bindings load correctly without failures (see SMOKE-DEC-006 in decision-log.adoc).
-
-*Future*: Consider separate test execution groups if warning noise becomes problematic for developers.
+*Decision*: Use one binding to avoid multiple-binding warnings (see SMOKE-DEC-006 in decision-log.adoc).
 
 == Resolved Hardcoded Versions (now BOM-managed)
 

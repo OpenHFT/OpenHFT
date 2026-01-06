@@ -70,6 +70,17 @@ public class ViolationCollector {
         pending.clear();
     }
 
+    Map<RuleId, Integer> summaryCounts() {
+        if (pending.isEmpty()) {
+            return java.util.Collections.emptyMap();
+        }
+        Map<RuleId, Integer> summary = new EnumMap<>(RuleId.class);
+        for (Violation violation : pending.values()) {
+            summary.merge(violation.ruleId(), 1, Integer::sum);
+        }
+        return summary;
+    }
+
     Map<Integer, Violation> pendingForTesting() {
         return new HashMap<>(pending);
     }

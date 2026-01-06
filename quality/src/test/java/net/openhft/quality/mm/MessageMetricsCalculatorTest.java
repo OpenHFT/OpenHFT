@@ -208,9 +208,9 @@ class MessageMetricsCalculatorTest {
     @Test
     void multipleFillerWordsCountedCorrectly() {
         // All these are filler words
-        String message = "the value is null and empty";
+        String message = "the value is null and empty error failed";
         MessageMetrics metrics = calculator.calculate(message, 0, 0);
-        assertEquals(6, metrics.wordCount(), "6 words total");
+        assertEquals(8, metrics.wordCount(), "8 words total");
         assertEquals(0, metrics.meaningfulWordCount(), "all words are fillers");
     }
 

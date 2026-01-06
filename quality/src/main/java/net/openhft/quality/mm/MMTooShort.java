@@ -24,12 +24,34 @@ public final class MMTooShort extends AbstractMessageRule {
         if (metrics == null) {
             return;
         }
-        int minWordCount = context.candidate().source().minWordCount();
+        MessageSource source = context.candidate().source();
+        int minWordCount = source.minWordCount();
         if (metrics.totalWordCount() < minWordCount) {
             if (record(context, collector, context.candidate().message(),
-                    metrics.totalWordCount(), minWordCount)) {
+                    metrics.totalWordCount(), minWordCount, fixFor(source))) {
                 state.requestStopProcessing();
             }
+        }
+    }
+
+    private static String fixFor(MessageSource source) {
+        switch (source) {
+            case ASSERTION:
+                return "add subject + expected behaviour, include key values if relevant";
+            case PRECONDITION:
+                return "name parameter + constraint + unit where relevant";
+            case THROW:
+                return "state operation + input/state + failure reason";
+            case ANNOTATION:
+                return "describe scenario + expected outcome";
+            case LOG:
+                return "include action + subject + identifier or outcome";
+            case JAVADOC_CLASS:
+                return "state responsibility + lifecycle, thread-safety, or performance intent";
+            case JAVADOC_MEMBER:
+                return "state contract + units, edge cases, or side effects";
+            default:
+                return "add subject + expected behaviour";
         }
     }
 }

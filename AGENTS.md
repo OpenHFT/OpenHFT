@@ -229,7 +229,7 @@ The document overview goes here.
 
 ## Key repo-specific checks
 - `third-party-smoke` validates dependencies on Java 8 and Java 21.
-    - Default SLF4J binding is `-Pslf4j-simple`; alternate is `-Pslf4j-nop` (run both when changing logging/BOM).
+    - Default SLF4J binding is `slf4j-simple` for tests.
 - JDK 21+ test runs use `root-parent-pom` `java21` profile to keep logs clean (dynamic-agent warnings).
 - Quality plugins are non-blocking by default in parent POMs; enable enforcement via `-Pquality` when needed.
 

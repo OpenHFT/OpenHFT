@@ -44,6 +44,7 @@
         <osgi.annotation.version>8.1.0</osgi.annotation.version>
         <okhttp.version>5.3.0</okhttp.version>
         <slf4j.version>2.0.17</slf4j.version>
+        <javassist.version>3.29.2-GA</javassist.version>
         <spotbugs.annotations.version>4.9.8</spotbugs.annotations.version>
         <junit.jupiter.version>5.10.5</junit.jupiter.version>
         <junit.platform.provider.version>1.10.5</junit.platform.provider.version>
@@ -356,6 +357,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-nop</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
             </dependency>
 
             <dependency>

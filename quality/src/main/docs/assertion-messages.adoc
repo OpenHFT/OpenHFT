@@ -30,7 +30,7 @@ For `requireNonNull` and `requireNotNull`, a message is optional. If one is supp
 |MMContextless |Contextless |State what is compared and why it matters
 |MMMissingMessage |Missing message |Add a meaningful message, supply a Throwable, or use /* reason */
 |MMDisplayName |Missing display name |Add @DisplayName("descriptive name") to JUnit 5 test methods
-|MMTooShort |Too short |Add subject + expected behaviour (see requirements for minima)
+|MMTooShort |Too short |Use source-specific guidance (assertion/log/javadoc/throw/annotation)
 |MMTooFewMeaningfulWords |Too few unique meaningful words |Add meaningful words/placeholders to meet the minimum
 |MMTooLong |Too long |Keep invariant, move data to expected/actual
 |MMWhitespaceRun |Whitespace run |Use single spaces
@@ -44,6 +44,25 @@ For `requireNonNull` and `requireNotNull`, a message is optional. If one is supp
 |MMMissingLoopIndex |Missing loop index |Include loop index in assertion message
 |MMMissingSubject |Missing subject |Add subject before modal verb (should/must)
 |===
+
+[#fix-examples]
+== Fix Example Library
+
+Use these short patterns as building blocks. Replace nouns and values with local context.
+
+[cols="1,2",options="header"]
+|===
+|Pattern |Example
+|Subject + expected behaviour |"order should remain valid after validation"
+|Operation + input + failure reason |"parse should reject empty header"
+|Comparison with values |"balance should equal expected after debit: expected=" + expected
+|State change after action |"tailer index should advance after read"
+|Log action + context |"retry connection for shard %d"
+|===
+
+== Verbose Mode
+
+When `verbose=true`, the checker adds diagnostic details to some warnings and prints a per-file rule summary to standard output.
 
 [#MMDuplicate]
 == MMDuplicate: Duplicate Message
@@ -417,8 +436,34 @@ Very short messages rarely provide sufficient context to diagnose failures witho
 
 === How to Fix
 
-Add a subject (what) and expected behaviour (should what).
-Aim for the minimums in the requirements; for assertions/logs, 4-8 words is a useful default.
+The fix depends on the message source. Use the guidance below, then meet the minimums in the requirements.
+For assertions and logs, 4-8 words is a useful default.
+
+[cols="1,2"]
+|===
+|Source |Fix guidance
+
+|Assertion
+|Add subject + expected behaviour, include key values if relevant
+
+|Precondition
+|Name parameter + constraint + unit where relevant
+
+|Throw message
+|State operation + input/state + failure reason
+
+|Annotation
+|Describe scenario + expected outcome
+
+|Log message
+|Include action + subject + identifier or outcome
+
+|Javadoc class
+|State responsibility + lifecycle, thread-safety, or performance intent
+
+|Javadoc member
+|State contract + units, edge cases, or side effects
+|===
 
 .Pattern
 ----
@@ -444,7 +489,7 @@ assertTrue(valid, "order should pass validation rules");
 
 === Problem
 
-The message has fewer than the source minimum unique meaningful words or placeholders (filler words like "should", "be", "expected" do not count and duplicates are ignored).
+The message has fewer than the source minimum unique meaningful words or placeholders (filler words like "should", "be", "expected", "error", "failed" do not count and duplicates are ignored). The warning lists the filler words present so it is clear which words did not count.
 
 === Why This Matters
 
