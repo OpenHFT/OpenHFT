@@ -205,7 +205,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>validate</id>
@@ -238,8 +237,7 @@
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
-                        <!-- SpotBugs 4.9 line with Java 25 bytecode support -->
-                        <version>4.9.7.0</version>
+                        <!-- SpotBugs 4.8 line for Java 8 compatibility -->
                         <configuration>
                             <effort>Max</effort>
                             <threshold>Low</threshold>
@@ -270,7 +268,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
-                        <version>3.28.0</version>
                         <configuration>
                             <rulesets>
                                 <ruleset>${pmd.ruleset}</ruleset>
