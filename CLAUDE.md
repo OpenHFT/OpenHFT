@@ -67,3 +67,23 @@ From `AGENTS.md`:
 - `AGENTS.md` - Detailed AI agent guidelines and documentation standards
 - `quality/README.adoc` - Quality rules configuration guide
 - `docs/Anatomy.adoc` - Visual dependency graph of all projects
+
+## Development Guidelines
+
+### Test Development
+
+- **Never delete reasonable tests that fail** - add `@Disabled("reason")` with a meaningful message instead. Failing tests may indicate genuine bugs rather than test setup issues.
+- **Run tests early and frequently** - verify existing tests pass before making changes; run tests after each significant change rather than batching at the end.
+- **Use the full test cycle** - run `mvn test` to catch issues, not just compilation.
+
+### Code Exploration
+
+- **Avoid excessive codebase exploration** - gather requirements and understand the task scope before deep-diving into code.
+- **Start with interfaces and contracts** - understand the public API before implementation details.
+- **Read test files alongside implementation** - they document expected behaviour and edge cases.
+
+### Implementation Workflow
+
+- **Log key decisions** - when multiple approaches exist, document the choice and rationale.
+- **Incremental verification** - verify each step works before proceeding to the next.
+- **Build on existing patterns** - look for similar implementations in the codebase to maintain consistency.
