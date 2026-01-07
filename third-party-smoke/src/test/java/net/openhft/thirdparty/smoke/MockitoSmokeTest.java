@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoByteBuddyAgent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -24,6 +25,7 @@ class MockitoSmokeTest {
     @Test
     @DisplayName("Mockito settings and basic mocking should be available")
     void mockitoSettingsAreAvailable() {
+        skipIfNoByteBuddyAgent();
         org.mockito.MockSettings settings = Mockito.withSettings();
         assertNotNull(settings, "Mockito.withSettings should return settings");
         Calculator calculator = new Calculator();
@@ -45,7 +47,7 @@ class MockitoSmokeTest {
      */
     static class Service {
         /**
-         * Calculator instance supplied to the service under test.
+         * Calculator dependency component supplied to the service under test.
          */
         private final Calculator serviceCalculator;
 

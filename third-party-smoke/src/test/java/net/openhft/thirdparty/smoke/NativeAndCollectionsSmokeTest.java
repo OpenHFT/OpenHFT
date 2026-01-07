@@ -9,6 +9,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoJna;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -48,6 +49,7 @@ class NativeAndCollectionsSmokeTest {
     @Test
     @DisplayName("JNA Native should report native size")
     void jnaNativeCanReportNativeSize() {
+        skipIfNoJna();
         int size = Native.getNativeSize(Integer.TYPE);
         assertTrue(size == SIZE_TWO || size == SIZE_FOUR || size == SIZE_EIGHT,
                 "JNA should report an expected native int size");
@@ -56,6 +58,7 @@ class NativeAndCollectionsSmokeTest {
     @Test
     @DisplayName("JNA Platform FileUtils should be instantiable")
     void jnaPlatformFileUtilsCanBeInstantiated() {
+        skipIfNoJna();
         FileUtils utils = FileUtils.getInstance();
         assertNotNull(utils, "JNA FileUtils should be instantiable");
     }

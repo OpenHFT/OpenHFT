@@ -4,7 +4,14 @@
 package net.openhft.thirdparty.smoke;
 
 import com.beust.jcommander.Parameter;
+import com.sun.jna.Native;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.bytebuddy.agent.ByteBuddyAgent;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assumptions;
+
+import java.io.IOException;
+import java.net.ServerSocket;
 
 /**
  * Shared test fixtures for smoke tests providing reusable POJO classes used across multiple test files.
@@ -18,6 +25,8 @@ public final class SmokeTestFixtures {
      * Shared empty value used by fixture defaults.
      */
     private static final String EMPTY_VALUE = "";
+    private static volatile boolean byteBuddyChecked;
+    private static volatile String byteBuddyFailure;
 
     private SmokeTestFixtures() {
         // Utility class - prevent instantiation
@@ -31,6 +40,85 @@ public final class SmokeTestFixtures {
      */
     public static Person person(final String name) {
         return new Person(name);
+    }
+
+    /**
+     * Skips tests when socket operations are unavailable in the runtime environment.
+     */
+    public static void skipIfNoSockets() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            socket.getLocalPort();
+        } catch (IOException | SecurityException ex) {
+            Assumptions.assumeTrue(false,
+                    "Socket operations not permitted: " + ex.getClass().getSimpleName() + ": "
+                            + ex.getMessage());
+        }
+    }
+
+    /**
+     * Skips tests when JNA native loading is blocked by the environment.
+     */
+    public static void skipIfNoJna() {
+        try {
+            int size = Native.getNativeSize(Integer.TYPE);
+            Assumptions.assumeTrue(size > 0, "JNA native access not available");
+        } catch (Throwable ex) {
+            Assumptions.assumeTrue(false,
+                    "JNA native access not available: " + ex.getClass().getSimpleName() + ": "
+                            + ex.getMessage());
+        }
+    }
+
+    /**
+     * Skips tests when Byte Buddy agent attachment is blocked by the environment.
+     */
+    public static void skipIfNoByteBuddyAgent() {
+        if (!byteBuddyChecked) {
+            synchronized (SmokeTestFixtures.class) {
+                if (!byteBuddyChecked) {
+                    if (!isSelfAttachAllowed()) {
+                        byteBuddyFailure = "self-attach disabled (set -Djdk.attach.allowAttachSelf=true)";
+                        byteBuddyChecked = true;
+                    } else {
+                        try {
+                            ByteBuddyAgent.install();
+                        } catch (Throwable ex) {
+                            byteBuddyFailure = ex.getClass().getSimpleName() + ": "
+                                    + ex.getMessage();
+                        } finally {
+                            byteBuddyChecked = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (byteBuddyFailure != null) {
+            Assumptions.assumeTrue(false, "Byte Buddy agent not available: " + byteBuddyFailure);
+        }
+    }
+
+    private static boolean isSelfAttachAllowed() {
+        int version = javaMajorVersion();
+        if (version >= 9) {
+            return "true".equalsIgnoreCase(System.getProperty("jdk.attach.allowAttachSelf"));
+        }
+        return true;
+    }
+
+    private static int javaMajorVersion() {
+        String version = System.getProperty("java.specification.version", "8");
+        if (version.startsWith("1.")) {
+            version = version.substring(2);
+        }
+        int dot = version.indexOf('.');
+        if (dot > 0) {
+            version = version.substring(0, dot);
+        }
+        try {
+            return Integer.parseInt(version);
+        } catch (NumberFormatException ex) {
+            return 8;
+        }
     }
 
     /**
@@ -106,7 +194,11 @@ public final class SmokeTestFixtures {
          * Name parameter parsed by JCommander for the sample request.
          */
         @Parameter(names = "--name")
-        private String name = "default";
+        @SuppressFBWarnings(
+                value = "SS_SHOULD_BE_STATIC",
+                justification = "JCommander binds instance fields via reflection for smoke tests."
+        )
+        private final String name = "default";
 
         /**
          * Returns the parsed name value from JCommander command-line argument parsing.

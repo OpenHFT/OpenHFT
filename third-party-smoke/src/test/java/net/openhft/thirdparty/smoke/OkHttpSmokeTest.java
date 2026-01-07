@@ -11,6 +11,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoSockets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -24,6 +25,7 @@ class OkHttpSmokeTest {
     void okHttpCanCallMockWebServer() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
             server.enqueue(new MockResponse().setBody("hello"));
+            skipIfNoSockets();
             server.start();
 
             String baseUrl = server.url("/hello").toString();

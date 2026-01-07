@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class AnnotationsAndGuavaTestlibSmokeTest {
 
     @Test
-    @DisplayName("JetBrains @NotNull should be visible via reflection")
+    @DisplayName("JetBrains @NotNull annotation should be visible via reflection")
     void jetbrainsNotNullIsVisibleViaReflection() throws Exception {
         Method method = Person.class.getDeclaredMethod("getName");
         assertNotNull(method, "reflection should find Person#getName");

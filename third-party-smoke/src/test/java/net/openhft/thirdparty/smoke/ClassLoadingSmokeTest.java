@@ -209,7 +209,7 @@ class ClassLoadingSmokeTest {
                 "SLF4J binding (one or more) is present",
                 () -> assertTrue(
                         slf4jBindingPresent,
-                        "Expected at least one SLF4J binding on the classpath"
+                        "SLF4J binding should be present on the classpath"
                 )
         ));
         if (slf4jSimplePresent) {
@@ -385,7 +385,10 @@ class ClassLoadingSmokeTest {
     ) {
         return DynamicTest.dynamicTest(
                 name,
-                () -> assertDoesNotThrow(executable::run, name)
+                () -> assertDoesNotThrow(
+                        executable::run,
+                        "Smoke test should not throw: " + name
+                )
         );
     }
 
@@ -408,7 +411,7 @@ class ClassLoadingSmokeTest {
         for (String className : classNames) {
             assertDoesNotThrow(
                     () -> Class.forName(className, false, LOADER),
-                    className
+                    "Class should load: " + className
             );
         }
     }
@@ -435,7 +438,7 @@ class ClassLoadingSmokeTest {
             String representative = scan.getAllClasses().get(0).getName();
             assertDoesNotThrow(
                     () -> Class.forName(representative, false, LOADER),
-                    representative
+                    "Package scan should yield a loadable class: " + representative
             );
         }
     }
@@ -443,7 +446,7 @@ class ClassLoadingSmokeTest {
     private static void assertResourcePresent(final String resourcePath) {
         assertNotNull(
                 LOADER.getResource(resourcePath),
-                "Expected to find resource " + resourcePath
+                "Resource should be present on the classpath: " + resourcePath
         );
     }
 
@@ -454,13 +457,9 @@ class ClassLoadingSmokeTest {
             if (isJava8()) {
                 return;
             }
-            throw e;
+            fail("HSQLDB JDBC driver should be loadable on this runtime", e);
         } catch (ClassNotFoundException e) {
-            AssertionError error =
-                    new AssertionError("HSQLDB JDBC driver class should be loadable");
-            //noinspection UnnecessaryInitCause
-            error.initCause(e);
-            throw error;
+            fail("HSQLDB JDBC driver class should be loadable", e);
         }
     }
 

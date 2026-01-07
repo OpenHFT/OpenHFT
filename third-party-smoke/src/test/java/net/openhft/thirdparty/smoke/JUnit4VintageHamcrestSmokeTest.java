@@ -6,12 +6,14 @@ package net.openhft.thirdparty.smoke;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * Vintage engine smoke to ensure JUnit 4 and Hamcrest remain usable.
  */
+@DisplayName("Smoke test verifies JUnit 4 Hamcrest runs via vintage engine")
 public class JUnit4VintageHamcrestSmokeTest {
 
     /**
@@ -33,6 +35,7 @@ public class JUnit4VintageHamcrestSmokeTest {
      * Ensures basic JUnit 4 execution via the vintage engine.
      */
     @Test
+    @DisplayName("Verify junit 4 vintage hamcrest smoke vintage runs basic test")
     public void vintageRunsBasicTest() {
         assertEquals("JUnit4 vintage engine should execute assertions", EXPECTED_SUM, 2 + 2);
     }
@@ -41,6 +44,7 @@ public class JUnit4VintageHamcrestSmokeTest {
      * Ensures Hamcrest matchers run under the vintage engine.
      */
     @Test
+    @DisplayName("Verify junit 4 vintage hamcrest smoke hamcrest matchers work")
     public void hamcrestMatchersWork() {
         MatcherAssert.assertThat("Hamcrest matcher should verify string prefix correctly",
                 "hello", Matchers.startsWith("he"));

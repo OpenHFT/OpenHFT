@@ -5,10 +5,12 @@ package net.openhft.thirdparty.smoke;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.mockito.ArgumentCaptor;
 import org.mockito.BDDMockito;
 import org.mockito.InOrder;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoByteBuddyAgent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -25,6 +27,11 @@ class MockitoAdvancedSmokeTest {
     private static final String TEST_VALUE = "testValue";
     private static final String FIRST_VALUE = "first";
     private static final String SECOND_VALUE = "second";
+
+    @BeforeAll
+    static void ensureByteBuddyAgentAvailable() {
+        skipIfNoByteBuddyAgent();
+    }
 
     @Test
     @DisplayName("Mockito ArgumentCaptor should capture method arguments for later verification")

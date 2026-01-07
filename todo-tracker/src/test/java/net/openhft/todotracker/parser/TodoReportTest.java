@@ -17,10 +17,10 @@ package net.openhft.todotracker.parser;
 
 import net.openhft.todotracker.model.TodoTask;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.*;
 

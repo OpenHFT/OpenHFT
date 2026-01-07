@@ -21,6 +21,7 @@ import org.xerial.snappy.Snappy;
 import javax.lang.model.element.Modifier;
 import java.nio.charset.StandardCharsets;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoJna;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -133,6 +134,7 @@ class MinimalUtilitiesSmokeTest {
     @Test
     @DisplayName("JNA Native constants should be accessible")
     void jnaAccess() {
+        skipIfNoJna();
         int pointerSize = com.sun.jna.Native.POINTER_SIZE;
         assertTrue(pointerSize > 0, "JNA POINTER_SIZE should be > 0 but was " + pointerSize);
     }

@@ -14,6 +14,7 @@ import jnr.ffi.Runtime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoSockets;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -66,6 +67,7 @@ class MetricsAndFfiSmokeTest {
     @Test
     @DisplayName("Prometheus HTTPServer should start and stop")
     void prometheusHttpServerCanStartAndStop() throws Exception {
+        skipIfNoSockets();
         HTTPServer server = new HTTPServer(0);
         assertNotNull(server, "Prometheus HTTPServer should start on an ephemeral port");
         server.close();

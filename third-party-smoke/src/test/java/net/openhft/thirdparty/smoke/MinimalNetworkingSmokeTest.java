@@ -18,6 +18,7 @@ import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoSockets;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -56,6 +57,7 @@ class MinimalNetworkingSmokeTest {
     @Test
     @DisplayName("Embedded Jetty server starts and stops on port 0")
     void jettyServerStartsAndStops() throws Exception {
+        skipIfNoSockets();
         Server server = new Server(0);
         ServletContextHandler context = new ServletContextHandler(
                 ServletContextHandler.NO_SESSIONS);
@@ -92,6 +94,7 @@ class MinimalNetworkingSmokeTest {
     @Test
     @DisplayName("Undertow server starts and stops on port 0")
     void undertowStartsAndStops() {
+        skipIfNoSockets();
         Undertow server = Undertow.builder()
                 .addHttpListener(0, "localhost")
                 .setHandler(exchange -> {

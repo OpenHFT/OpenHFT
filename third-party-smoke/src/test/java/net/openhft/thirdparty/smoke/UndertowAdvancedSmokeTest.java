@@ -16,6 +16,7 @@ import io.undertow.websockets.spi.WebSocketHttpExchange;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoSockets;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -95,6 +96,7 @@ class UndertowAdvancedSmokeTest {
     @Test
     @DisplayName("Undertow GracefulShutdownHandler should wrap handler and provide shutdown control")
     void gracefulShutdownHandlerWrapsInnerHandler() throws InterruptedException {
+        skipIfNoSockets();
         TrackingHandler innerHandler = new TrackingHandler();
         GracefulShutdownHandler shutdownHandler = new GracefulShutdownHandler(innerHandler);
 

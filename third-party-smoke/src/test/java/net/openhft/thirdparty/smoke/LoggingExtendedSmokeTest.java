@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Extended logging smoke to cover bridges and JUL integration behaviour.
+ * Extended logging smoke covers Log4j, SLF4J bridges, and JUL integration behaviour.
  */
 @DisplayName("Smoke test verifies extended logging bindings load")
 class LoggingExtendedSmokeTest {

@@ -64,7 +64,7 @@ class NioAndNetworkStacksSmokeTest {
     }
 
     @Test
-    @DisplayName("ProGuard Configuration and ProGuard should be constructible")
+    @DisplayName("ProGuard configuration and ProGuard runtime should be constructible")
     void proguardConfigurationAndProGuardCanBeConstructed() {
         Configuration configuration = new Configuration();
         ProGuard proGuard = new ProGuard(configuration);
