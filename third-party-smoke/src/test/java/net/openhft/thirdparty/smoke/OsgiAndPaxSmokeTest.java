@@ -68,8 +68,10 @@ class OsgiAndPaxSmokeTest {
     @Test
     @DisplayName("Pax URL handler classes should be loadable")
     void paxUrlHandlersClassesCanBeLoaded() throws Exception {
+        // Load mvn handler via reflection.
         Class<?> mvnHandler = Class.forName(
                 "org.ops4j.pax.url.mvn.Handler");
+        // Load reference handler via reflection.
         Class<?> refHandler = Class.forName(
                 "org.ops4j.pax.url.reference.Handler");
         assertNotNull(mvnHandler, "Pax URL mvn handler class should load");

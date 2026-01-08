@@ -50,6 +50,7 @@ public class JmhSmokeTest {
     @Test
     @DisplayName("JMH core benchmarks JAR should be on classpath")
     void coreBenchmarksJarIsOnClasspath() throws Exception {
+        // Load benchmark class via reflection.
         Class<?> clazz = Class.forName(
                 "org.openjdk.jmh.benchmarks.BlackholeConsumeCPUBench");
         assertNotNull(clazz, "JMH core benchmarks should be present on classpath");

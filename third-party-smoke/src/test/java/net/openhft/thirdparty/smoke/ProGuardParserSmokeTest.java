@@ -28,7 +28,7 @@ class ProGuardParserSmokeTest {
         String[] args = {"-dontoptimize"};
 
         ConfigurationParser parser = new ConfigurationParser(
-                args, System.getProperties());
+                args, System.getProperties()); // use system properties for parser defaults
         try {
             parser.parse(configuration);
         } finally {

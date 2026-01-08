@@ -26,6 +26,7 @@ class SpotBugsAnnotationsSmokeTest {
     @Test
     @DisplayName("SpotBugs @NonNull annotation class should be loadable from classpath via reflection")
     void spotBugsNonNullAnnotationIsPresent() throws Exception {
+        // Load NonNull annotation via reflection.
         Class<?> nonNullAnnotation = Class.forName(NON_NULL_CLASS);
 
         assertNotNull(nonNullAnnotation,
@@ -37,6 +38,7 @@ class SpotBugsAnnotationsSmokeTest {
     @Test
     @DisplayName("SpotBugs @Nullable annotation class should be loadable from classpath via reflection")
     void spotBugsNullableAnnotationIsPresent() throws Exception {
+        // Load Nullable annotation via reflection.
         Class<?> nullableAnnotation = Class.forName(NULLABLE_CLASS);
 
         assertNotNull(nullableAnnotation,

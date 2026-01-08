@@ -113,7 +113,6 @@
                 </executions>
             </plugin>
 
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -125,7 +124,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
-                    <failOnWarning>true</failOnWarning>
+                    <failOnWarning>${quality.enforced}</failOnWarning>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <proc>none</proc>

@@ -306,6 +306,7 @@ public final class TodoParser {
         if (matcher.find()) {
             return Integer.parseInt(matcher.group(1));
         }
+        // No priority tag found.
         return null;
     }
 
@@ -320,6 +321,7 @@ public final class TodoParser {
         if (matcher.find()) {
             return matcher.group(1).charAt(0);
         }
+        // No effort tag found.
         return null;
     }
 

@@ -90,6 +90,7 @@ class MetricsAndFfiSmokeTest {
     @Test
     @DisplayName("JNR FFI should allocate and use memory")
     void jnrFfiCanAllocateAndUseMemory() {
+        // Use JNR runtime for allocation.
         Runtime runtime = Runtime.getSystemRuntime();
         Pointer pointer = Memory.allocate(runtime, EIGHT_BYTES);
         pointer.putLong(OFFSET_ZERO, VALUE_42);

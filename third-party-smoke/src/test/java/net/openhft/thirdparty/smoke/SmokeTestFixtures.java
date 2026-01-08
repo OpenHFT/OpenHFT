@@ -100,12 +100,14 @@ public final class SmokeTestFixtures {
     private static boolean isSelfAttachAllowed() {
         int version = javaMajorVersion();
         if (version >= 9) {
+            // Read attach self flag.
             return "true".equalsIgnoreCase(System.getProperty("jdk.attach.allowAttachSelf"));
         }
         return true;
     }
 
     private static int javaMajorVersion() {
+        // Read Java specification version.
         String version = System.getProperty("java.specification.version", "8");
         if (version.startsWith("1.")) {
             version = version.substring(2);

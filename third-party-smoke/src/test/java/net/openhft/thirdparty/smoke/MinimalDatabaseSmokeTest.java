@@ -59,6 +59,7 @@ class MinimalDatabaseSmokeTest {
     @Test
     @DisplayName("Legacy mongo-java-driver classes are present")
     void legacyMongoDriverPresent() throws Exception {
+        // Load legacy driver via reflection.
         Class<?> clazz = Class.forName("com.mongodb.MongoClient");
         assertNotNull(clazz, "Legacy MongoClient class should be loadable");
     }

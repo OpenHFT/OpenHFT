@@ -397,6 +397,7 @@ class ClassLoadingSmokeTest {
         List<String> failures = new ArrayList<>();
         for (String className : names) {
             try {
+                // Validate class loading via reflection.
                 Class.forName(className, false, LOADER);
                 return;
             } catch (ClassNotFoundException | LinkageError t) {
@@ -410,7 +411,7 @@ class ClassLoadingSmokeTest {
     private static void assertClassesLoad(final String... classNames) {
         for (String className : classNames) {
             assertDoesNotThrow(
-                    () -> Class.forName(className, false, LOADER),
+                    () -> Class.forName(className, false, LOADER), // check class loading via reflection
                     "Class should load: " + className
             );
         }
@@ -418,6 +419,7 @@ class ClassLoadingSmokeTest {
 
     private static boolean isClassPresent(final String className) {
         try {
+            // Probe class loading via reflection.
             Class.forName(className, false, LOADER);
             return true;
         } catch (ClassNotFoundException | LinkageError e) {
@@ -437,7 +439,7 @@ class ClassLoadingSmokeTest {
             );
             String representative = scan.getAllClasses().get(0).getName();
             assertDoesNotThrow(
-                    () -> Class.forName(representative, false, LOADER),
+                    () -> Class.forName(representative, false, LOADER), // check representative class loads
                     "Package scan should yield a loadable class: " + representative
             );
         }
@@ -452,6 +454,7 @@ class ClassLoadingSmokeTest {
 
     private static void assertHsqldbDriver() {
         try {
+            // Ensure driver class loads.
             Class.forName("org.hsqldb.jdbc.JDBCDriver", false, LOADER);
         } catch (UnsupportedClassVersionError e) {
             if (isJava8()) {
@@ -464,6 +467,7 @@ class ClassLoadingSmokeTest {
     }
 
     private static boolean isJava8() {
+        // Read Java specification version.
         String spec = System.getProperty("java.specification.version", "");
         return spec.startsWith("1.8") || "8".equals(spec);
     }

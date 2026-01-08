@@ -13,3 +13,4 @@ compat_reports
 # maven
 target
 
+logs/
