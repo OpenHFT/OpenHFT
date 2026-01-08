@@ -29,6 +29,16 @@
     <module name="SuppressWarningsFilter"/>
 
     <module name="FileTabCharacter"/>
+    <module name="NewlineAtEndOfFile"/>
+    <module name="RegexpMultiline">
+        <property name="format" value="\r?\n[\t ]*\r?\n[\t ]*\r?\n"/>
+        <property name="message" value="Avoid multiple consecutive blank lines"/>
+    </module>
+    <module name="RegexpMultiline">
+        <property name="format" value="(\r?\n)[\t ]*(\r?\n)+\z"/>
+        <property name="message"
+                  value="Remove trailing blank lines at end of file (leave exactly one newline)"/>
+    </module>
 
     <module name="TreeWalker">
         <module name="SuppressWarningsHolder">

@@ -16,6 +16,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <license.year>2013-2025</license.year>
+        <license.owner>chronicle.software</license.owner>
+        <license.spdx>Apache-2.0</license.spdx>
+        <license.skip>false</license.skip>
         <!-- jvm.requiredArgs and jvm.extraArgs inherited from root-parent-pom profiles -->
         <!-- Enable strict quality enforcement for this module -->
         <quality.enforced>true</quality.enforced>
@@ -105,7 +109,53 @@
     </dependencies>
 
     <build>
+
         <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.6</version>
+                <configuration>
+                    <skip>${license.skip}</skip>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <strictCheck>true</strictCheck>
+                    <defaultProperties>
+                        <year>${license.year}</year>
+                        <owner>${license.owner}</owner>
+                        <spdx>${license.spdx}</spdx>
+                    </defaultProperties>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                        <sh>SCRIPT_STYLE</sh>
+                    </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <inlineHeader><![CDATA[Copyright ${license.year} ${license.owner}; SPDX-License-Identifier: ${license.spdx}]]></inlineHeader>
+                            <includes>
+                                <include>**/*.java</include>
+                                <include>**/*.sh</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/target/**</exclude>
+                                <exclude>**/generated-sources/**</exclude>
+                                <exclude>**/build/generated/**</exclude>
+                                <exclude>**/src/test/resources/**</exclude>
+                                <exclude>**/src/main/resources/**</exclude>
+                            </excludes>
+                            <useDefaultExcludes>true</useDefaultExcludes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>license-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- JaCoCo for code coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>

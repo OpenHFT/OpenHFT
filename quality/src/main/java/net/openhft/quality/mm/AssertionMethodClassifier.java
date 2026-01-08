@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 Higher Frequency Trading; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.quality.mm;
 
@@ -179,6 +179,24 @@ public final class AssertionMethodClassifier {
     public static boolean isAssertJOverrideMethod(String methodName) {
         return methodName.equals("withFailMessage")
                 || methodName.equals("overridingErrorMessage");
+    }
+
+    /**
+     * Check if the assertion method is recognised by the extractor.
+     *
+     * @param methodName method name to check.
+     * @return {@code true} if the method is a known assertion signature.
+     */
+    public static boolean isRecognisedAssertionMethod(String methodName) {
+        return isFailMethod(methodName)
+                || isAssertThatMethod(methodName)
+                || isAssertThrowsMethod(methodName)
+                || isTimeoutAssertionMethod(methodName)
+                || isDoesNotThrowMethod(methodName)
+                || isBooleanAssertionMethod(methodName)
+                || isNullnessAssertionMethod(methodName)
+                || isEqualityAssertionMethod(methodName)
+                || methodName.equals("assertAll");
     }
 
     /**

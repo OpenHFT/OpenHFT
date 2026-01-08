@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 Higher Frequency Trading; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.quality.mm;
 
@@ -27,6 +27,10 @@ public enum MessageSource {
      * Log messages.
      */
     LOG(4, 2),
+    /**
+     * Reason comments attached to non-idiomatic statements.
+     */
+    COMMENT(4, 2),
     /**
      * First top-level class Javadoc first paragraph.
      */

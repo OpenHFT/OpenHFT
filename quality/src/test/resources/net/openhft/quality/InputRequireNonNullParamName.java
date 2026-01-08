@@ -29,7 +29,7 @@ public class InputRequireNonNullParamName {
 
     static final class Holder {
         Object getIn() {
-            return null;
+            return null; // return null for parameter name case
         }
     }
 }

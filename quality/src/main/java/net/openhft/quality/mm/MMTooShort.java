@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 Higher Frequency Trading; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.quality.mm;
 
@@ -24,17 +24,19 @@ public final class MMTooShort extends AbstractMessageRule {
         if (metrics == null) {
             return;
         }
-        MessageSource source = context.candidate().source();
+        MessageCandidate candidate = context.candidate();
+        MessageSource source = candidate.source();
         int minWordCount = source.minWordCount();
         if (metrics.totalWordCount() < minWordCount) {
-            if (record(context, collector, context.candidate().message(),
-                    metrics.totalWordCount(), minWordCount, fixFor(source))) {
+            if (record(context, collector, candidate.message(),
+                    metrics.totalWordCount(), minWordCount, fixFor(candidate))) {
                 state.requestStopProcessing();
             }
         }
     }
 
-    private static String fixFor(MessageSource source) {
+    private static String fixFor(MessageCandidate candidate) {
+        MessageSource source = candidate.source();
         switch (source) {
             case ASSERTION:
                 return "add subject + expected behaviour, include key values if relevant";
@@ -46,6 +48,21 @@ public final class MMTooShort extends AbstractMessageRule {
                 return "describe scenario + expected outcome";
             case LOG:
                 return "include action + subject + identifier or outcome";
+            case COMMENT:
+                MissingMessageKind kind = candidate.missingMessageKind();
+                if (kind != null) {
+                    switch (kind) {
+                        case RETURN_NULL:
+                            return "explain why returning null is required";
+                        case SYSTEM_CALL:
+                            return "explain why java.lang.System is required here";
+                        case RUNTIME_CALL:
+                            return "explain why java.lang.Runtime is required here";
+                        default:
+                            break;
+                    }
+                }
+                return "explain why the non-idiomatic statement is required";
             case JAVADOC_CLASS:
                 return "state responsibility + lifecycle, thread-safety, or performance intent";
             case JAVADOC_MEMBER:

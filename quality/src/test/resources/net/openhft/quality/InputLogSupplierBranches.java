@@ -10,7 +10,7 @@ public class InputLogSupplierBranches {
     private final Supplier<String> fieldSupplier = this::buildMessage;
 
     public void testSupplierBranches() {
-        System.Logger systemLogger = System.getLogger("test");
+        System.Logger systemLogger = System.getLogger("test"); // use system logger for coverage
         Supplier<String> localSupplier =
                 () -> "cache entry should be ready for replay";
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 Higher Frequency Trading; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.quality.mm;
 
@@ -20,8 +20,32 @@ public final class MMMissingMessage extends AbstractMessageRule {
         if (!context.candidate().missingMessage()) {
             return;
         }
-        if (record(context, collector)) {
+        if (record(context, collector, fixFor(context.candidate()))) {
             state.requestStopProcessing();
         }
+    }
+
+    private String fixFor(MessageCandidate candidate) {
+        if (candidate.source() == MessageSource.COMMENT) {
+            MissingMessageKind kind = candidate.missingMessageKind();
+            if (kind != null) {
+                switch (kind) {
+                    case RETURN_NULL:
+                        return "add a single-line comment on the line before explaining why "
+                                + "returning null is required";
+                    case SYSTEM_CALL:
+                        return "add a single-line comment on the line before explaining why "
+                                + "java.lang.System is required here";
+                    case RUNTIME_CALL:
+                        return "add a single-line comment on the line before explaining why "
+                                + "java.lang.Runtime is required here";
+                    default:
+                        break;
+                }
+            }
+            return "add a single-line comment on the line before explaining why this is required";
+        }
+        return "add a meaningful message, supply a Throwable, or add a /* reason */ comment "
+                + "inside the argument list when a message must be omitted";
     }
 }
