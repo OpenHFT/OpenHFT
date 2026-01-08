@@ -6,6 +6,7 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link AssertionOperandExtractor}.
  */
 @SuppressWarnings("MMDisplayName")
+@DisplayName("Assertion operand extractor tests scenario case")
 class AssertionOperandExtractorTest {
 
     private AssertionOperandExtractor extractor;
@@ -30,6 +32,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Resolve boolean assertion operands null elist returns null")
     void resolveBooleanAssertionOperands_nullElist_returnsNull() {
         // Test with null is not directly testable as it throws NPE
         // Testing edge cases via integration tests is more practical
@@ -37,33 +40,39 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract operand name null operand throws NPE")
     void extractOperandName_nullOperand_throwsNPE() {
         assertThrows(NullPointerException.class, () -> extractor.extractOperandName(null));
     }
 
     @Test
+    @DisplayName("Extract string search null expr throws NPE")
     void extractStringSearch_nullExpr_throwsNPE() {
         assertThrows(NullPointerException.class, () -> extractor.extractStringSearch(null));
     }
 
     @Test
+    @DisplayName("Extract comparison null expr throws NPE")
     void extractComparison_nullExpr_throwsNPE() {
         assertThrows(NullPointerException.class, () -> extractor.extractComparison(null));
     }
 
     @Test
+    @DisplayName("Boolean assertion operands accessors scenario case")
     void booleanAssertionOperands_accessors() {
         // Indirect test - verifies the nested class accessors work
         assertNotNull(extractor);
     }
 
     @Test
+    @DisplayName("String search info accessors scenario case")
     void stringSearchInfo_accessors() {
         // The StringSearchInfo is a data class - tested via integration
         assertNotNull(extractor);
     }
 
     @Test
+    @DisplayName("Comparison info accessors scenario case detail")
     void comparisonInfo_accessors() {
         // The ComparisonInfo is a data class - tested via integration
         assertNotNull(extractor);
@@ -72,6 +81,7 @@ class AssertionOperandExtractorTest {
     // --- Tests targeting boundary mutations in extractStringSearch and extractComparison ---
 
     @Test
+    @DisplayName("Extract string search expr with zero children returns null")
     void extractStringSearch_exprWithZeroChildren_returnsNull() {
         DetailAST expr = mock(DetailAST.class);
         when(expr.getType()).thenReturn(TokenTypes.EXPR);
@@ -82,6 +92,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract string search non method call content returns null")
     void extractStringSearch_nonMethodCallContent_returnsNull() {
         DetailAST content = mock(DetailAST.class);
         when(content.getType()).thenReturn(TokenTypes.IDENT);
@@ -96,6 +107,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract string search method call without dot returns null")
     void extractStringSearch_methodCallWithoutDot_returnsNull() {
         DetailAST methodCall = mock(DetailAST.class);
         when(methodCall.getType()).thenReturn(TokenTypes.METHOD_CALL);
@@ -110,6 +122,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract string search method call with non string method returns null scenario")
     void extractStringSearch_methodCallWithNonStringMethod_returnsNull() {
         // Create a proper DOT structure for findRightmostIdent
         DetailAST methodIdent = mock(DetailAST.class);
@@ -134,6 +147,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract comparison expr with zero children returns null")
     void extractComparison_exprWithZeroChildren_returnsNull() {
         DetailAST expr = mock(DetailAST.class);
         when(expr.getType()).thenReturn(TokenTypes.EXPR);
@@ -144,6 +158,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract comparison non comparison content returns null scenario")
     void extractComparison_nonComparisonContent_returnsNull() {
         DetailAST content = mock(DetailAST.class);
         when(content.getType()).thenReturn(TokenTypes.IDENT);
@@ -157,6 +172,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract comparison comparison with null operands returns null scenario")
     void extractComparison_comparisonWithNullOperands_returnsNull() {
         DetailAST left = mock(DetailAST.class);
         when(left.getType()).thenReturn(TokenTypes.PLUS); // Non-extractable
@@ -180,6 +196,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract comparison valid equality returns comparison info")
     void extractComparison_validEquality_returnsComparisonInfo() {
         DetailAST leftIdent = mock(DetailAST.class);
         when(leftIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -212,6 +229,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract operand name num int returns text")
     void extractOperandName_numInt_returnsText() {
         DetailAST numInt = mock(DetailAST.class);
         when(numInt.getType()).thenReturn(TokenTypes.NUM_INT);
@@ -223,6 +241,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract operand name string literal returns text")
     void extractOperandName_stringLiteral_returnsText() {
         DetailAST strLit = mock(DetailAST.class);
         when(strLit.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -234,6 +253,7 @@ class AssertionOperandExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract operand name method call with ident returns method name")
     void extractOperandName_methodCallWithIdent_returnsMethodName() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);

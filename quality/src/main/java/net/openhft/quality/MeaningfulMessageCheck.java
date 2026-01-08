@@ -44,6 +44,15 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     }
 
     /**
+     * Enable warnings for unhandled extraction cases.
+     *
+     * @param emitUnhandled {@code true} to emit unhandled warnings.
+     */
+    public void setEmitUnhandled(boolean emitUnhandled) {
+        processor.setEmitUnhandled(emitUnhandled);
+    }
+
+    /**
      * Configure an optional output file for extracted message data.
      *
      * @param messageExtractionFile path to the extraction file, or {@code null} to disable.
@@ -79,21 +88,48 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     @SuppressWarnings("deprecation")
     @Override
     public void beginTree(DetailAST rootAST) {
-        processor.beginTree(getFileContents());
+        try {
+            processor.beginTree(getFileContents());
+        } catch (RuntimeException e) {
+            logUnexpected(rootAST, e);
+        }
     }
 
     @Override
     public void finishTree(DetailAST rootAST) {
-        processor.finishTree(this);
+        try {
+            processor.finishTree(this);
+        } catch (RuntimeException e) {
+            logUnexpected(rootAST, e);
+        }
     }
 
     @Override
     public void visitToken(DetailAST ast) {
-        processor.visitToken(ast);
+        try {
+            processor.visitToken(ast);
+        } catch (RuntimeException e) {
+            logUnexpected(ast, e);
+        }
     }
 
     @Override
     public void leaveToken(DetailAST ast) {
-        processor.leaveToken(ast);
+        try {
+            processor.leaveToken(ast);
+        } catch (RuntimeException e) {
+            logUnexpected(ast, e);
+        }
+    }
+
+    private void logUnexpected(DetailAST ast, RuntimeException exception) {
+        String message = exception.getClass().getSimpleName();
+        String detail = exception.getMessage();
+        if (detail != null && !detail.isEmpty()) {
+            message = message + ": " + detail;
+        }
+        int lineNo = ast == null ? 0 : ast.getLineNo();
+        int resolvedLine = lineNo > 0 ? lineNo : 1;
+        log(resolvedLine, "assert.message.unexpected.exception", message);
     }
 }

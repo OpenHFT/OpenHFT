@@ -13,6 +13,7 @@ import static org.mockito.Mockito.*;
  * Unit tests for MMLowSignalAssertAllHeading to improve mutation coverage.
  * Targets the surviving mutations for record() conditional and requestStopProcessing().
  */
+@DisplayName("MM low signal assert all heading tests")
 class MMLowSignalAssertAllHeadingTest {
 
     private MessageCandidate createCandidate(String message, boolean assertAllHeading, int lineNo) {
@@ -31,7 +32,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("requestStopProcessing should be called when low-signal heading is recorded")
+    @DisplayName("Request stop processing called when recorded")
     void requestStopProcessing_calledWhenRecorded() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
         MessageCandidate candidate = createCandidate("assertAll", true, 10);
@@ -49,7 +50,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("requestStopProcessing should NOT be called when recording is suppressed")
+    @DisplayName("Request stop processing not called when suppressed")
     void requestStopProcessing_notCalledWhenSuppressed() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
         MessageCandidate candidate = createCandidate("checks", true, 20);
@@ -71,7 +72,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("doEvaluate should skip when candidate is not assertAllHeading")
+    @DisplayName("Do evaluate skips when not assert all heading")
     void doEvaluate_skipsWhenNotAssertAllHeading() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
         MessageCandidate candidate = createCandidate("assertAll", false, 30);
@@ -89,7 +90,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("doEvaluate should skip when message is null")
+    @DisplayName("Do evaluate skips when message null")
     void doEvaluate_skipsWhenMessageNull() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
         MessageCandidate candidate = createCandidate(null, true, 40);
@@ -105,7 +106,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("doEvaluate should skip when message does not match low-signal pattern")
+    @DisplayName("Do evaluate skips when no match")
     void doEvaluate_skipsWhenNoMatch() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
         MessageCandidate candidate = createCandidate("meaningful heading with context", true, 50);
@@ -121,7 +122,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("doEvaluate should match various low-signal patterns")
+    @DisplayName("Do evaluate matches various patterns scenario")
     void doEvaluate_matchesVariousPatterns() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
         String[] lowSignalPatterns = {"assertAll", "assertions", "checks", "validation", "test"};
@@ -144,7 +145,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("rule should return correct ruleId")
+    @DisplayName("Rule id returns correct value scenario")
     void ruleId_returnsCorrectValue() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
         assertEquals(RuleId.ASSERTALL_HEADING, rule.ruleId(),
@@ -152,7 +153,7 @@ class MMLowSignalAssertAllHeadingTest {
     }
 
     @Test
-    @DisplayName("rule should not apply to non-ASSERTION sources")
+    @DisplayName("Evaluate skips non assertion sources scenario")
     void evaluate_skipsNonAssertionSources() {
         MMLowSignalAssertAllHeading rule = new MMLowSignalAssertAllHeading();
 

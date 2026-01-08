@@ -9,6 +9,7 @@ import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("MMDisplayName")
+@DisplayName("Quality checkstyle self tests scenario case")
 public class QualityCheckstyleSelfTest {
 
     private static final String CONFIG_RESOURCE =
@@ -43,7 +45,8 @@ public class QualityCheckstyleSelfTest {
     private static final int EXPECTED_VIOLATION_COUNT;
 
     static {
-        EXPECTED_RULE_COUNTS.put("MMMissingMessage", 1);
+        EXPECTED_RULE_COUNTS.put("MMUnhandled", 0);
+        EXPECTED_RULE_COUNTS.put("MMMissingMessage", 3);
         EXPECTED_RULE_COUNTS.put("MMRestatesDerivedAssertion", 1);
         EXPECTED_RULE_COUNTS.put("MMContextless", 1);
         EXPECTED_RULE_COUNTS.put("MMIndexOnly", 1);
@@ -104,7 +107,7 @@ public class QualityCheckstyleSelfTest {
                 return baseDir;
             }
         }
-        return Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
+        return Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize(); // use working directory property
     }
 
     private static String validateDetailFormat(final String details) {
@@ -118,7 +121,7 @@ public class QualityCheckstyleSelfTest {
                 return "Checkstyle output missing location or rule information: " + trimmed;
             }
         }
-        return null;
+        return null; // no format issues detected
     }
 
     private static List<String> extractViolationLines(final String details) {
@@ -162,6 +165,7 @@ public class QualityCheckstyleSelfTest {
     }
 
     @Test
+    @DisplayName("Test main sources respect baseline scenario")
     public void testMainSourcesRespectBaseline() throws Exception {
         final Path baseDir = locateBaseDir();
         final Path srcMainJava = baseDir.resolve("src/main/java");
@@ -197,15 +201,16 @@ public class QualityCheckstyleSelfTest {
 
         final String details = output.toString(StandardCharsets.UTF_8.name());
         final List<String> violations = extractViolationLines(details);
+        final String newline = System.lineSeparator(); // platform newline for diagnostics
         if (violations.isEmpty()) {
             fail("SelfCheckFixture should produce " + EXPECTED_VIOLATION_COUNT
                     + " baseline violations.");
         }
-        final String violationDetails = String.join(System.lineSeparator(), violations);
+        final String violationDetails = String.join(newline, violations);
         final String formatError = validateDetailFormat(violationDetails);
         if (formatError != null) {
             fail("Checkstyle output format issue: " + formatError
-                    + System.lineSeparator()
+                    + newline
                     + violationDetails);
         }
 
@@ -225,19 +230,19 @@ public class QualityCheckstyleSelfTest {
 
         if (!unexpected.isEmpty()) {
             fail("Unexpected Checkstyle violations outside SelfCheckFixture:"
-                    + System.lineSeparator()
-                    + String.join(System.lineSeparator(), unexpected));
+                    + newline
+                    + String.join(newline, unexpected));
         }
 
         final int actualTotal = sumCounts(actualCounts);
         if (actualTotal != EXPECTED_VIOLATION_COUNT) {
             fail("Unexpected number of Checkstyle violations. Expected "
                     + EXPECTED_VIOLATION_COUNT + " but saw " + actualTotal + "."
-                    + System.lineSeparator()
+                    + newline
                     + "Expected: " + formatCounts(EXPECTED_RULE_COUNTS)
-                    + System.lineSeparator()
+                    + newline
                     + "Actual: " + formatCounts(actualCounts)
-                    + System.lineSeparator()
+                    + newline
                     + violationDetails);
         }
 
@@ -247,18 +252,18 @@ public class QualityCheckstyleSelfTest {
             if (actualCount != expectedCount) {
                 fail("Unexpected Checkstyle violations for " + rule + ". Expected "
                         + expectedCount + " but saw " + actualCount + "."
-                        + System.lineSeparator()
+                        + newline
                         + "Expected: " + formatCounts(EXPECTED_RULE_COUNTS)
-                        + System.lineSeparator()
+                        + newline
                         + "Actual: " + formatCounts(actualCounts)
-                        + System.lineSeparator()
+                        + newline
                         + violationDetails);
             }
         }
         for (String rule : actualCounts.keySet()) {
             if (!EXPECTED_RULE_COUNTS.containsKey(rule)) {
                 fail("Unexpected Checkstyle rule reported: " + rule
-                        + System.lineSeparator()
+                        + newline
                         + violationDetails);
             }
         }

@@ -14,7 +14,12 @@ public enum RuleId {
      */
     MISSING_MESSAGE("assert.message.missing.message", "MMMissingMessage", -1,
             EnumSet.of(MessageSource.ASSERTION, MessageSource.THROW,
-                    MessageSource.ANNOTATION, MessageSource.LOG)),
+                    MessageSource.ANNOTATION, MessageSource.LOG, MessageSource.COMMENT)),
+    /**
+     * Throw statement uses a null literal.
+     */
+    THROW_NULL("assert.message.throw.null", "MMThrowNull", -2,
+            EnumSet.of(MessageSource.THROW)),
     /**
      * Generic AssertJ override message.
      */
@@ -111,7 +116,7 @@ public enum RuleId {
     TOO_FEW_MEANINGFUL("assert.message.too.few.meaningful", "MMTooFewMeaningfulWords", 19,
             EnumSet.of(MessageSource.ASSERTION, MessageSource.PRECONDITION,
                     MessageSource.THROW, MessageSource.ANNOTATION, MessageSource.LOG,
-                    MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
+                    MessageSource.COMMENT, MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
     /**
      * Missing comparison values in the message.
      */
@@ -126,26 +131,36 @@ public enum RuleId {
      * Missing subject in message text.
      */
     MISSING_SUBJECT("assert.message.missing.subject", "MMMissingSubject", 22,
-            EnumSet.of(MessageSource.ASSERTION, MessageSource.LOG)),
+            EnumSet.of(MessageSource.ASSERTION, MessageSource.LOG, MessageSource.COMMENT)),
     /**
      * Duplicate message within the same file.
      */
     DUPLICATE("assert.message.duplicate", "MMDuplicate", 23,
             EnumSet.of(MessageSource.ASSERTION, MessageSource.PRECONDITION,
                     MessageSource.THROW, MessageSource.ANNOTATION, MessageSource.LOG,
-                    MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
+                    MessageSource.COMMENT, MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
     /**
      * Message is too short.
      */
     TOO_SHORT("assert.message.too.short", "MMTooShort", 24,
             EnumSet.of(MessageSource.ASSERTION, MessageSource.PRECONDITION,
                     MessageSource.THROW, MessageSource.ANNOTATION, MessageSource.LOG,
-                    MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
+                    MessageSource.COMMENT, MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
     /**
      * Missing @DisplayName annotation on JUnit 5 test method.
      */
     MISSING_DISPLAY_NAME("assert.message.missing.display.name", "MMDisplayName", 25,
-            EnumSet.of(MessageSource.ANNOTATION));
+            EnumSet.of(MessageSource.ANNOTATION)),
+    /**
+     * @Test annotation should appear first on test methods.
+     */
+    TEST_ANNOTATION_ORDER("assert.message.test.annotation.order", "MMTestAnnotationOrder", 26,
+            EnumSet.of(MessageSource.ANNOTATION)),
+    /**
+     * Unhandled extraction case, reported unless disabled.
+     */
+    UNHANDLED("assert.message.unhandled", "MMUnhandled", 1000,
+            EnumSet.allOf(MessageSource.class));
 
     private final String messageKey;
     private final String code;

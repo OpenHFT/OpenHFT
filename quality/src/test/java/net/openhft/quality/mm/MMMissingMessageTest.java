@@ -4,6 +4,7 @@
 package net.openhft.quality.mm;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for {@link MMMissingMessage}.
  */
+@DisplayName("MM missing message tests scenario case")
 class MMMissingMessageTest {
 
     private MMMissingMessage rule;
@@ -25,11 +27,13 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Rule id is missing message scenario")
     void ruleIdIsMissingMessage() {
         assertEquals(RuleId.MISSING_MESSAGE, rule.ruleId(), "ruleId should be MISSING_MESSAGE");
     }
 
     @Test
+    @DisplayName("Evaluate does nothing when message present scenario")
     void evaluateDoesNothingWhenMessagePresent() {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .lineNo(10)
@@ -45,6 +49,7 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Evaluate records and stops when message missing")
     void evaluateRecordsAndStopsWhenMessageMissing() {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .lineNo(10)
@@ -60,6 +65,7 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Evaluate skips non applicable source scenario")
     void evaluateSkipsNonApplicableSource() {
         // MISSING_MESSAGE applies to ASSERTION, THROW, ANNOTATION, LOG
         // Create a source that is NOT in this list
@@ -78,6 +84,7 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Evaluate applies to throw source scenario")
     void evaluateAppliesToThrowSource() {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .lineNo(15)
@@ -93,6 +100,7 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Evaluate applies to annotation source scenario")
     void evaluateAppliesToAnnotationSource() {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .lineNo(20)
@@ -108,6 +116,7 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Evaluate applies to log source scenario")
     void evaluateAppliesToLogSource() {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .lineNo(25)
@@ -123,6 +132,7 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Evaluate does not stop for javadoc member")
     void evaluateDoesNotStopForJavadocMember() {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .lineNo(30)
@@ -139,6 +149,7 @@ class MMMissingMessageTest {
     }
 
     @Test
+    @DisplayName("Evaluate does not stop for precondition scenario")
     void evaluateDoesNotStopForPrecondition() {
         // MISSING_MESSAGE does NOT apply to PRECONDITION according to RuleId
         MessageCandidate candidate = new MessageCandidate.Builder()

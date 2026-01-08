@@ -4,6 +4,7 @@
 package net.openhft.quality.mm;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for {@link MessageMetricsCalculator}.
  */
+@DisplayName("Message metrics calculator tests scenario case")
 class MessageMetricsCalculatorTest {
 
     private MessageMetricsCalculator calculator;
@@ -31,16 +33,19 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Max word count returns 42 scenario")
     void maxWordCountReturns42() {
         assertEquals(42, calculator.maxWordCount(), "maxWordCount should be 42");
     }
 
     @Test
+    @DisplayName("Max word length returns 42 scenario")
     void maxWordLengthReturns42() {
         assertEquals(42, calculator.maxWordLength(), "maxWordLength should be 42");
     }
 
     @Test
+    @DisplayName("Word at max length not flagged as long")
     void wordAtMaxLengthNotFlaggedAsLong() {
         // Create a 42-character word - exactly at limit, should NOT be flagged
         String word42 = repeat('a', 42);
@@ -49,6 +54,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Word exceeding max length flagged as long")
     void wordExceedingMaxLengthFlaggedAsLong() {
         // Create a 43-character word - exceeds limit, SHOULD be flagged
         String word43 = repeat('a', 43);
@@ -57,6 +63,7 @@ class MessageMetricsCalculatorTest {
         assertEquals(word43, metrics.longWords().get(0), "long word content mismatch");
     }
 
+    @DisplayName("Is filler word case insensitive scenario")
     @ParameterizedTest
     @ValueSource(strings = {"THE", "The", "the", "tHe"})
     void isFillerWordCaseInsensitive(String word) {
@@ -64,6 +71,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Is filler word returns false for non filler scenario case")
     void isFillerWordReturnsFalseForNonFiller() {
         assertFalse(calculator.isFillerWord("configuration"), "configuration is not a filler word");
         assertFalse(calculator.isFillerWord("database"), "database is not a filler word");
@@ -71,6 +79,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Is filler word treats domain tokens as meaningful")
     void isFillerWordTreatsDomainTokensAsMeaningful() {
         assertFalse(calculator.isFillerWord("Wire"), "Wire should be a meaningful word");
         assertFalse(calculator.isFillerWord("YAML"), "YAML should be a meaningful word");
@@ -80,6 +89,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate counts domain tokens as meaningful")
     void calculateCountsDomainTokensAsMeaningful() {
         String message = "wire yaml json uuid dto";
         MessageMetrics metrics = calculator.calculate(message, 0, 0);
@@ -88,6 +98,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Is filler word rejects null scenario")
     void isFillerWordRejectsNull() {
         assertThrows(NullPointerException.class,
                 () -> calculator.isFillerWord(null),
@@ -95,6 +106,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate rejects null message scenario case")
     void calculateRejectsNullMessage() {
         assertThrows(NullPointerException.class,
                 () -> calculator.calculate(null, 0, 0),
@@ -102,6 +114,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Split words rejects null scenario case")
     void splitWordsRejectsNull() {
         assertThrows(NullPointerException.class,
                 () -> calculator.splitWords(null),
@@ -109,6 +122,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate char count matches message length")
     void calculateCharCountMatchesMessageLength() {
         String message = "user account balance";
         MessageMetrics metrics = calculator.calculate(message, 0, 0);
@@ -116,6 +130,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate word count excludes empty strings")
     void calculateWordCountExcludesEmptyStrings() {
         // Multiple spaces create empty strings when split
         String message = "user  account   balance";
@@ -124,6 +139,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate meaningful word count excludes fillers")
     void calculateMeaningfulWordCountExcludesFillers() {
         // "the" and "is" are filler words, "account" and "balance" are meaningful
         String message = "the account balance is updated";
@@ -134,6 +150,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate meaningful word count uses unique words")
     void calculateMeaningfulWordCountUsesUniqueWords() {
         String message = "account account balance balance";
         MessageMetrics metrics = calculator.calculate(message, 0, 0);
@@ -144,6 +161,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate total word count includes placeholders")
     void calculateTotalWordCountIncludesPlaceholders() {
         String message = "balance updated";
         MessageMetrics metrics = calculator.calculate(message, 2, 0);
@@ -152,6 +170,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Calculate effective meaningful includes placeholders scenario")
     void calculateEffectiveMeaningfulIncludesPlaceholders() {
         String message = "the value"; // "the" is filler, "value" is filler too
         MessageMetrics metrics = calculator.calculate(message, 1, 0);
@@ -160,6 +179,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Key value labels affect effective meaningful count")
     void keyValueLabelsAffectEffectiveMeaningfulCount() {
         // When keyValueLabelCount > 0 and placeholders >= keyValueLabelCount,
         // effectiveMeaningful = max(meaningfulWordCount + placeholderCount, placeholderCount + keyValueLabelCount)
@@ -171,6 +191,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Key value labels ignored when placeholders less than labels")
     void keyValueLabelsIgnoredWhenPlaceholdersLessThanLabels() {
         String message = "status";
         MessageMetrics metrics = calculator.calculate(message, 1, 3);
@@ -180,6 +201,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Key value labels zero has no effect")
     void keyValueLabelsZeroHasNoEffect() {
         String message = "status";
         MessageMetrics metrics = calculator.calculate(message, 2, 0);
@@ -189,6 +211,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Split words uses non alphanumeric delimiters")
     void splitWordsUsesNonAlphanumericDelimiters() {
         String[] words = calculator.splitWords("hello-world_test.example:value");
         // Split on non-alphanumeric: "-", "_", ".", ":"
@@ -198,6 +221,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Empty message produces zero metrics scenario")
     void emptyMessageProducesZeroMetrics() {
         MessageMetrics metrics = calculator.calculate("", 0, 0);
         assertEquals(0, metrics.charCount(), "empty message has 0 chars");
@@ -206,6 +230,7 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Multiple filler words counted correctly scenario")
     void multipleFillerWordsCountedCorrectly() {
         // All these are filler words
         String message = "the value is null and empty error failed";
@@ -215,11 +240,54 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Mixed filler and meaningful words scenario")
     void mixedFillerAndMeaningfulWords() {
         // "account" and "balance" are meaningful, "the" and "is" are fillers
         String message = "account balance";
         MessageMetrics metrics = calculator.calculate(message, 0, 0);
         assertEquals(2, metrics.wordCount(), "2 words total");
         assertEquals(2, metrics.meaningfulWordCount(), "2 meaningful words");
+    }
+
+    // --- Boundary mutation killing tests ---
+
+    @Test
+    @DisplayName("Key value labels equal to placeholders applies adjustment boundary")
+    void keyValueLabelsEqualToPlaceholders_appliesAdjustment() {
+        // Boundary test: placeholderCount == keyValueLabelCount should STILL apply adjustment
+        // This kills the mutation that changes >= to >
+        String message = "status";  // "status" is meaningful
+        // placeholderCount = keyValueLabelCount = 2
+        MessageMetrics metrics = calculator.calculate(message, 2, 2);
+        // meaningfulWordCount = 1, placeholderCount = 2, keyValueLabelCount = 2
+        // effectiveMeaningful = max(1 + 2, 2 + 2) = max(3, 4) = 4
+        assertEquals(4, metrics.effectiveMeaningfulWordCount(),
+                "keyValueLabels should apply when placeholders == labels");
+    }
+
+    @Test
+    @DisplayName("Key value labels one and placeholders one boundary case")
+    void keyValueLabelsOne_placeholdersOne_boundaryCase() {
+        // Boundary test: keyValueLabelCount > 0 (exactly 1)
+        // This kills the mutation that changes > to >=
+        String message = "status";  // "status" is meaningful
+        // placeholderCount = 1, keyValueLabelCount = 1
+        MessageMetrics metrics = calculator.calculate(message, 1, 1);
+        // meaningfulWordCount = 1, placeholderCount = 1, keyValueLabelCount = 1
+        // effectiveMeaningful = max(1 + 1, 1 + 1) = max(2, 2) = 2
+        assertEquals(2, metrics.effectiveMeaningfulWordCount(),
+                "boundary case with both counts at 1");
+    }
+
+    @Test
+    @DisplayName("Negative key value label count not expected")
+    void negativeKeyValueLabelCount_behavesAsZero() {
+        // Verify negative values behave as if keyValueLabelCount <= 0
+        String message = "status";
+        MessageMetrics metrics = calculator.calculate(message, 2, -1);
+        // keyValueLabelCount = -1 < 0, so adjustment skipped
+        // effectiveMeaningful = 1 + 2 = 3
+        assertEquals(3, metrics.effectiveMeaningfulWordCount(),
+                "negative keyValueLabelCount should skip adjustment");
     }
 }

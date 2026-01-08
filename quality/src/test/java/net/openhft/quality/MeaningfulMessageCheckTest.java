@@ -7,6 +7,7 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import net.openhft.quality.mm.RuleId;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @SuppressWarnings("MMDisplayName")
+@DisplayName("Meaningful message check tests scenario case")
 public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     private static final String FIX_TOO_SHORT_ASSERTION =
             "add subject + expected behaviour, include key values if relevant";
@@ -37,6 +39,13 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
             "include action + subject + identifier or outcome";
     private static final String FIX_TOO_SHORT_JAVADOC_MEMBER =
             "state contract + units, edge cases, or side effects";
+    private static final String FIX_TOO_FEW_MEANINGFUL_ASSERTION =
+            "add unique words: subject + expected behaviour, include key values";
+    private static final String FIX_TOO_FEW_MEANINGFUL_ANNOTATION =
+            "add unique words: scenario + expected outcome";
+    private static final String FIX_MISSING_MESSAGE_DEFAULT =
+            "add a meaningful message, supply a Throwable, or add a /* reason */ comment "
+                    + "inside the argument list when a message must be omitted";
 
     static Stream<Arguments> provideStandardTestCases() {
         return Stream.of(
@@ -70,7 +79,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                                 "only filler words remain: class"},
                         {11, RuleId.TOO_SHORT, "Does stuff.", 2, 6, FIX_TOO_SHORT_JAVADOC_MEMBER},
                         {17, RuleId.DUPLICATE, "Does stuff.", 11},
-                        {23, RuleId.TOO_SHORT, "Uses {} now.", 3, 6, FIX_TOO_SHORT_JAVADOC_MEMBER},
+                        {23, RuleId.TOO_SHORT, "Uses {@code} now.", 3, 6, FIX_TOO_SHORT_JAVADOC_MEMBER},
                         {29, RuleId.REDUNDANT_METHOD, "methodNamed method class method check method.", "methodNamed",
                                 "only filler words remain: method, class, method, check, method"}
                 }),
@@ -221,6 +230,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {12, RuleId.ASSERTJ_OVERRIDE, "expected %s"}
                 }),
                 arguments("HamcrestMessages", "InputHamcrestMessages.java", new Object[][]{
+                        {12, RuleId.MISSING_MESSAGE},
                         {13, RuleId.TOO_SHORT, "bad input", 2, 4, FIX_TOO_SHORT_ASSERTION},
                         {14, RuleId.MISSING_SUBJECT, "expected result should match"}
                 }),
@@ -245,7 +255,10 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {17, RuleId.CONTEXTLESS, "comparison"},
                         {18, RuleId.TOO_SHORT, "value {0}", 3, 4, FIX_TOO_SHORT_ASSERTION}
                 }),
-                arguments("TemplateVariablesInThrowStatements", "InputThrowTemplateVariables.java", new Object[][]{}),
+                arguments("TemplateVariablesInThrowStatements", "InputThrowTemplateVariables.java", new Object[][]{
+                        {9, RuleId.MISSING_MESSAGE},
+                        {13, RuleId.MISSING_MESSAGE}
+                }),
                 arguments("MissingComparisonValues", "InputComparisonValues.java", new Object[][]{
                         {20, RuleId.MISSING_COMPARISON_VALUES, ">", "a", "b"},
                         {21, RuleId.MISSING_COMPARISON_VALUES, ">=", "a", "b"},
@@ -255,9 +268,10 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {25, RuleId.MISSING_COMPARISON_VALUES, "!=", "a", "b"},
                         {26, RuleId.MISSING_COMPARISON_VALUES, ">", "a", "b"},
                         {39, RuleId.TOO_FEW_MEANINGFUL, "result should be valid",
-                                "valid", "result, should, be", 1, 2},
+                                "valid", "result, should, be", 1, 2, FIX_TOO_FEW_MEANINGFUL_ASSERTION},
                         {40, RuleId.TOO_FEW_MEANINGFUL, "collection should not be empty",
-                                "collection", "should, not, be, empty", 1, 2}
+                                "collection", "should, not, be, empty", 1, 2,
+                                FIX_TOO_FEW_MEANINGFUL_ASSERTION}
                 }),
                 arguments("MissingStringSearchValues", "InputStringSearchValues.java", new Object[][]{
                         {19, RuleId.MISSING_STRING_VALUE, "contains", "text", "\"@\""},
@@ -272,6 +286,10 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {20, RuleId.MISSING_STRING_VALUE, "startsWith", "\"token\"", "\"a\""},
                         {25, RuleId.MISSING_STRING_VALUE, "contains", "text", "token()"},
                         {33, RuleId.MISSING_MESSAGE}
+                }),
+                arguments("AssertionMessageVariables", "InputAssertionMessageVariables.java", new Object[][]{
+                        {10, RuleId.TOO_SHORT, "dump: {}", 2, 4, FIX_TOO_SHORT_ASSERTION},
+                        {15, RuleId.TOO_SHORT, "snapshot: {}", 2, 4, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("MissingLoopIndex", "InputMissingLoopIndex.java", new Object[][]{
                         {18, RuleId.MISSING_LOOP_INDEX, "i"},
@@ -298,7 +316,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {57, RuleId.MISSING_MESSAGE},
                         {61, RuleId.TOO_FEW_MEANINGFUL,
                                 "suffix behaviour under expected input and output conditions",
-                                "suffix", "behaviour, under, expected, input, and, output, conditions", 1, 4}
+                                "suffix", "behaviour, under, expected, input, and, output, conditions", 1, 4,
+                                FIX_TOO_FEW_MEANINGFUL_ANNOTATION}
                 }),
                 arguments("LogMessages", "InputLogMessages.java", new Object[][]{
                         {16, RuleId.MISSING_MESSAGE},
@@ -334,9 +353,12 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {62, RuleId.MISSING_MESSAGE},
                         {72, RuleId.MISSING_MESSAGE},
                         {78, RuleId.MISSING_SUBJECT, "Expected more retries"},
-                        {79, RuleId.MISSING_SUBJECT, "expected: more retries"}
+                        {79, RuleId.MISSING_SUBJECT, "expected: more retries"},
+                        {83, RuleId.MISSING_MESSAGE}
                 }),
-                arguments("LogMessageTypeResolutionGaps", "InputLogUnknownThrowableType.java", new Object[][]{}),
+                arguments("LogMessageTypeResolutionGaps", "InputLogUnknownThrowableType.java", new Object[][]{
+                        {13, RuleId.MISSING_MESSAGE}
+                }),
                 arguments("LogSupplierBranches", "InputLogSupplierBranches.java", new Object[][]{
                         {17, RuleId.TOO_SHORT, "", 1, 4, FIX_TOO_SHORT_LOG},
                         {18, RuleId.TOO_SHORT, "", 1, 4, FIX_TOO_SHORT_LOG},
@@ -388,9 +410,14 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {37, RuleId.REDUNDANT_LINE, "line 42", "line 42"},
                         {41, RuleId.MISSING_MESSAGE}
                 }),
+                arguments("ThrowNullLiteral", "InputThrowNull.java", new Object[][]{
+                        {9, RuleId.THROW_NULL}
+                }),
                 arguments("ThrowCauseMessages", "InputThrowCauseMessages.java", new Object[][]{
                         {9, RuleId.MISSING_MESSAGE},
-                        {13, RuleId.MISSING_MESSAGE}
+                        {13, RuleId.MISSING_MESSAGE},
+                        {21, RuleId.MISSING_MESSAGE},
+                        {25, RuleId.MISSING_MESSAGE}
                 }),
                 arguments("AssertionExtractorCoverage", "InputAssertionExtractorCoverage.java", new Object[][]{
                         {19, RuleId.MISSING_LOOP_INDEX, "idx"},
@@ -417,18 +444,32 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {21, RuleId.TOO_SHORT, "alpha beta gamma", 3, 4, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("CoveragePaths", "InputCoveragePaths.java", new Object[][]{
+                        {20, RuleId.MISSING_MESSAGE},
+                        {26, RuleId.MISSING_MESSAGE},
+                        {32, RuleId.MISSING_MESSAGE},
+                        {37, RuleId.MISSING_MESSAGE},
+                        {43, RuleId.MISSING_MESSAGE},
                         {48, RuleId.TRIVIAL_SUPPLIER, "this is a very long string that exceeds twelve characters for truncation test {} ..."},
+                        {54, RuleId.MISSING_MESSAGE},
+                        {60, RuleId.MISSING_MESSAGE},
+                        {65, RuleId.MISSING_MESSAGE},
                         {70, RuleId.MISSING_SUBJECT, "expected comparison"},
                         {75, RuleId.MISSING_MESSAGE},
+                        {80, RuleId.MISSING_MESSAGE},
+                        {85, RuleId.MISSING_MESSAGE},
                         {91, RuleId.TRIVIAL_SUPPLIER, "index: {} is valid ..."},
                         {96, RuleId.TRIVIAL_SUPPLIER, "value is %d"},
-                        {107, RuleId.TRIVIAL_SUPPLIER, "instanceField"},
+                        {102, RuleId.MISSING_MESSAGE},
+                        {107, RuleId.MISSING_MESSAGE},
                         {112, RuleId.TRIVIAL_SUPPLIER, "prefix: {} ..."},
                         {117, RuleId.TRIVIAL_SUPPLIER, "this string is definitely longer than twelve characters: {} ..."}
                 }),
                 arguments("DisplayNameMessages", "InputDisplayNameMessages.java", new Object[][]{
                         {18, RuleId.MISSING_DISPLAY_NAME, "testWithoutDisplayName"},
                         {29, RuleId.MISSING_DISPLAY_NAME, "parameterizedWithoutDisplayName"}
+                }),
+                arguments("TestAnnotationOrder", "InputTestAnnotationOrder.java", new Object[][]{
+                        {16, RuleId.TEST_ANNOTATION_ORDER, "DisplayName", "testAnnotationOrderViolation"}
                 }),
                 // Coverage-only input files - no expected violations
                 arguments("JavadocEdgeCases", "InputJavadocEdgeCases.java", new Object[][]{}),
@@ -442,10 +483,12 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @ParameterizedTest(name = "{0}")
+    @DisplayName("Test meaningful message scenario case detail")
     @MethodSource("provideStandardTestCases")
     void testMeaningfulMessage(String testName, String inputFile, Object[][] violations) throws Exception {
         final DefaultConfiguration checkConfig =
                 createModuleConfig(MeaningfulMessageCheck.class);
+        checkConfig.addProperty("emitUnhandled", "false");
 
         final String[] expected = buildExpectedViolations(violations);
         verify(checkConfig, getPath(inputFile), expected);
@@ -457,13 +500,17 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
             int line = (Integer) v[0];
             RuleId rule = (RuleId) v[1];
             Object[] args = new Object[v.length - 2];
-            System.arraycopy(v, 2, args, 0, args.length);
+            System.arraycopy(v, 2, args, 0, args.length); // copy violation args for message
+            if (rule == RuleId.MISSING_MESSAGE && args.length == 0) {
+                args = new Object[]{FIX_MISSING_MESSAGE_DEFAULT};
+            }
             result.add(line + ": " + getCheckMessage(rule.messageKey(), args));
         }
         return result.toArray(new String[0]);
     }
 
     @Test
+    @DisplayName("Test message extraction file scenario case")
     public void testMessageExtractionFile() throws Exception {
         final DefaultConfiguration checkConfig =
                 createModuleConfig(MeaningfulMessageCheck.class);
@@ -481,6 +528,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    @DisplayName("Test verbose property scenario case detail")
     public void testVerboseProperty() throws Exception {
         final DefaultConfiguration checkConfig =
                 createModuleConfig(MeaningfulMessageCheck.class);
@@ -499,6 +547,49 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    @DisplayName("Test unhandled cases logged by default")
+    public void testUnhandledCasesLoggedByDefault() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(MeaningfulMessageCheck.class);
+
+        final String[] expected = {
+                "10: " + getCheckMessage(RuleId.UNHANDLED.messageKey(),
+                        "Lambda message argument not recognised for assertTrue",
+                        "InputUnhandledCases#unhandledLambdaMessage")
+        };
+
+        verify(checkConfig, getPath("InputUnhandledCases.java"), expected);
+    }
+
+    @Test
+    @DisplayName("Test unhandled cases can be disabled")
+    public void testUnhandledCasesCanBeDisabled() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(MeaningfulMessageCheck.class);
+        checkConfig.addProperty("emitUnhandled", "false");
+
+        final String[] expected = {};
+
+        verify(checkConfig, getPath("InputUnhandledCases.java"), expected);
+    }
+
+    @Test
+    @DisplayName("Test extraction file failure is reported scenario")
+    public void testExtractionFileFailureIsReported() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(MeaningfulMessageCheck.class);
+        checkConfig.addProperty("messageExtractionFile", "target");
+
+        final String[] expected = {
+                "1: " + getCheckMessage("assert.message.extraction.failure",
+                        "Unable to open message extraction file: target")
+        };
+
+        verify(checkConfig, getPath("InputGoodAssertMessages.java"), expected);
+    }
+
+    @Test
+    @DisplayName("Test suppress warnings scenario case detail")
     public void testSuppressWarnings() throws Exception {
         final DefaultConfiguration checkConfig =
                 createModuleConfig(MeaningfulMessageCheck.class);
@@ -523,6 +614,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    @DisplayName("Test ignored exception class names scenario")
     public void testIgnoredExceptionClassNames() throws Exception {
         final DefaultConfiguration checkConfig =
                 createModuleConfig(MeaningfulMessageCheck.class);
@@ -540,6 +632,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    @DisplayName("Test rule code naming scenario case")
     public void testRuleCodeNaming() {
         final List<String> codes = new ArrayList<>();
         for (RuleId ruleId : RuleId.values()) {

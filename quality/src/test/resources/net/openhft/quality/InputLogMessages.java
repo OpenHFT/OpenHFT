@@ -9,7 +9,7 @@ public class InputLogMessages {
         org.slf4j.Logger slf4j = org.slf4j.LoggerFactory.getLogger(InputLogMessages.class);
         org.apache.logging.log4j.Logger log4j = org.apache.logging.log4j.LogManager.getLogger(InputLogMessages.class);
         java.util.logging.Logger jul = java.util.logging.Logger.getLogger(InputLogMessages.class.getName());
-        System.Logger systemLogger = System.getLogger("test");
+        System.Logger systemLogger = System.getLogger("test"); // use system logger for coverage
         Throwable throwable = new RuntimeException("boom");
 
         // SLF4J
@@ -77,5 +77,9 @@ public class InputLogMessages {
 
         slf4j.info("Expected more retries");
         slf4j.info("expected: more retries");
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("dump: ").append(7);
+        net.openhft.chronicle.core.Jvm.startup().on(getClass(), builder.toString());
     }
 }

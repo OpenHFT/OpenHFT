@@ -10,12 +10,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link LoopIndexAnalyzer}.
  * Targets surviving mutations in containsLoopIndexInAst.
  */
+@DisplayName("Loop index analyzer tests scenario case")
 class LoopIndexAnalyzerTest {
 
     private LoopIndexAnalyzer analyzer;
@@ -28,13 +30,13 @@ class LoopIndexAnalyzerTest {
     }
 
     @Test
-    @DisplayName("constructor requires non-null astSupport")
+    @DisplayName("Constructor requires non null ast support")
     void constructor_requiresNonNullAstSupport() {
         assertThrows(NullPointerException.class, () -> new LoopIndexAnalyzer(null));
     }
 
     @Test
-    @DisplayName("findLoopIndexInfo returns null for non-loop assertion methods")
+    @DisplayName("Find loop index info returns null for non loop assertion methods")
     void findLoopIndexInfo_returnsNullForNonLoopAssertionMethods() {
         // Create a mock method call for assertNotNull (not a loop index method)
         DetailAST methodCall = createMethodCall("assertNotNull");
@@ -47,7 +49,7 @@ class LoopIndexAnalyzerTest {
     }
 
     @Test
-    @DisplayName("findLoopIndexInfo returns null when not in a loop")
+    @DisplayName("Find loop index info returns null when not in loop")
     void findLoopIndexInfo_returnsNullWhenNotInLoop() {
         DetailAST methodCall = createMethodCall("assertEquals");
         DetailAST messageExpr = createStringLiteralExpr("test");
@@ -62,7 +64,7 @@ class LoopIndexAnalyzerTest {
     }
 
     @Test
-    @DisplayName("findLoopIndexInfo detects loop index in message text")
+    @DisplayName("Find loop index info detects loop index in message text")
     void findLoopIndexInfo_detectsLoopIndexInMessageText() {
         DetailAST forLoop = createForLoopWithIndex("i");
         DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
@@ -76,7 +78,7 @@ class LoopIndexAnalyzerTest {
     }
 
     @Test
-    @DisplayName("findLoopIndexInfo detects missing loop index")
+    @DisplayName("Find loop index info detects missing loop index")
     void findLoopIndexInfo_detectsMissingLoopIndex() {
         DetailAST forLoop = createForLoopWithIndex("i");
         DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
@@ -92,7 +94,7 @@ class LoopIndexAnalyzerTest {
     }
 
     @Test
-    @DisplayName("findLoopIndexInfo detects loop index with key-value format")
+    @DisplayName("Find loop index info detects loop index with key value format")
     void findLoopIndexInfo_detectsLoopIndexWithKeyValueFormat() {
         DetailAST forLoop = createForLoopWithIndex("idx");
         DetailAST methodCall = createMethodCallInForLoop("assertTrue", forLoop);
@@ -106,7 +108,7 @@ class LoopIndexAnalyzerTest {
     }
 
     @Test
-    @DisplayName("findLoopIndexInfo detects loop index with colon format")
+    @DisplayName("Find loop index info detects loop index with colon format")
     void findLoopIndexInfo_detectsLoopIndexWithColonFormat() {
         DetailAST forLoop = createForLoopWithIndex("j");
         DetailAST methodCall = createMethodCallInForLoop("assertFalse", forLoop);
@@ -120,7 +122,7 @@ class LoopIndexAnalyzerTest {
     }
 
     @Test
-    @DisplayName("LoopIndexInfo accessor methods work correctly")
+    @DisplayName("Loop index info accessor methods scenario")
     void loopIndexInfo_accessorMethods() {
         DetailAST forLoop = createForLoopWithIndex("counter");
         DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
@@ -132,6 +134,110 @@ class LoopIndexAnalyzerTest {
         assertNotNull(result);
         assertNotNull(result.loopNames());
         assertTrue(result.loopNames().contains("counter"));
+    }
+
+    @Test
+    @DisplayName("Find loop index info for enhanced for loop scenario")
+    void findLoopIndexInfo_enhancedForLoop() {
+        DetailAST forEachLoop = createEnhancedForLoopWithVariable("item");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forEachLoop);
+        DetailAST messageExpr = createStringLiteralExpr("checking item value");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "checking item value");
+
+        assertNotNull(result);
+        assertFalse(result.isMissing(), "Loop variable 'item' should be found in message");
+    }
+
+    @Test
+    @DisplayName("Find loop index info for assignment init scenario")
+    void findLoopIndexInfo_assignmentInit() {
+        DetailAST forLoop = createForLoopWithAssignInit("idx");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createStringLiteralExpr("checking");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "checking");
+
+        assertNotNull(result);
+        assertTrue(result.isMissing(), "Loop index 'idx' should be missing from message");
+        assertTrue(result.loopNames().contains("idx"));
+    }
+
+    @Test
+    @DisplayName("Find loop index info with empty name skips scenario")
+    void findLoopIndexInfo_emptyLoopNameSkipped() {
+        DetailAST forLoop = createForLoopWithIndex("");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createStringLiteralExpr("test message");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "test message");
+
+        // Empty names should be skipped, so should still check for missing
+        assertNotNull(result);
+    }
+
+    @Test
+    @DisplayName("Find loop index info detects index in expression")
+    void findLoopIndexInfo_detectsIndexInExpression() {
+        DetailAST forLoop = createForLoopWithIndex("i");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createExprWithIdent("i");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "test");
+
+        assertNotNull(result);
+        assertFalse(result.isMissing(), "Loop index should be found in expression");
+    }
+
+    @Test
+    @DisplayName("Find loop index info nested for loops")
+    void findLoopIndexInfo_nestedForLoops() {
+        DetailAST outerLoop = createForLoopWithIndex("i");
+        DetailAST innerLoop = createForLoopWithIndex("j");
+        when(innerLoop.getParent()).thenReturn(outerLoop);
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", innerLoop);
+        DetailAST messageExpr = createStringLiteralExpr("i and j");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "i and j");
+
+        assertNotNull(result);
+        assertFalse(result.isMissing(), "Both loop indices should be found");
+        assertEquals(2, result.loopNames().size());
+    }
+
+    @Test
+    @DisplayName("Find loop index info with null message throws NPE")
+    void findLoopIndexInfo_nullMessageThrowsNPE() {
+        DetailAST forLoop = createForLoopWithIndex("i");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createStringLiteralExpr("test");
+
+        assertThrows(NullPointerException.class,
+                () -> analyzer.findLoopIndexInfo(methodCall, messageExpr, null));
+    }
+
+    @Test
+    @DisplayName("Find loop index info with null method call throws NPE")
+    void findLoopIndexInfo_nullMethodCallThrowsNPE() {
+        DetailAST messageExpr = createStringLiteralExpr("test");
+
+        assertThrows(NullPointerException.class,
+                () -> analyzer.findLoopIndexInfo(null, messageExpr, "test"));
+    }
+
+    @Test
+    @DisplayName("Find loop index info with null message expr throws NPE")
+    void findLoopIndexInfo_nullMessageExprThrowsNPE() {
+        DetailAST forLoop = createForLoopWithIndex("i");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+
+        assertThrows(NullPointerException.class,
+                () -> analyzer.findLoopIndexInfo(methodCall, null, "test"));
     }
 
     // --- Helper methods ---
@@ -193,5 +299,249 @@ class LoopIndexAnalyzerTest {
         DetailAST methodCall = createMethodCall(methodName);
         when(methodCall.getParent()).thenReturn(forLoop);
         return methodCall;
+    }
+
+    private DetailAST createEnhancedForLoopWithVariable(String varName) {
+        // Create IDENT for variable
+        DetailAST ident = mock(DetailAST.class);
+        when(ident.getType()).thenReturn(TokenTypes.IDENT);
+        when(ident.getText()).thenReturn(varName);
+
+        // Create VARIABLE_DEF
+        DetailAST varDef = mock(DetailAST.class);
+        when(varDef.getType()).thenReturn(TokenTypes.VARIABLE_DEF);
+        when(varDef.findFirstToken(TokenTypes.IDENT)).thenReturn(ident);
+
+        // Create FOR_EACH_CLAUSE
+        DetailAST forEachClause = mock(DetailAST.class);
+        when(forEachClause.getType()).thenReturn(TokenTypes.FOR_EACH_CLAUSE);
+        when(forEachClause.findFirstToken(TokenTypes.VARIABLE_DEF)).thenReturn(varDef);
+
+        // Create FOR loop with FOR_EACH_CLAUSE
+        DetailAST forLoop = mock(DetailAST.class);
+        when(forLoop.getType()).thenReturn(TokenTypes.LITERAL_FOR);
+        when(forLoop.findFirstToken(TokenTypes.FOR_EACH_CLAUSE)).thenReturn(forEachClause);
+        when(forLoop.findFirstToken(TokenTypes.FOR_INIT)).thenReturn(null);
+        when(forLoop.getParent()).thenReturn(null);
+
+        return forLoop;
+    }
+
+    private DetailAST createForLoopWithAssignInit(String varName) {
+        // Create IDENT for left side of assignment
+        DetailAST ident = mock(DetailAST.class);
+        when(ident.getType()).thenReturn(TokenTypes.IDENT);
+        when(ident.getText()).thenReturn(varName);
+
+        // Create ASSIGN
+        DetailAST assign = mock(DetailAST.class);
+        when(assign.getType()).thenReturn(TokenTypes.ASSIGN);
+        when(assign.getFirstChild()).thenReturn(ident);
+
+        // Create FOR_INIT with ASSIGN
+        DetailAST forInit = mock(DetailAST.class);
+        when(forInit.getType()).thenReturn(TokenTypes.FOR_INIT);
+        when(forInit.getFirstChild()).thenReturn(assign);
+
+        // Create FOR loop
+        DetailAST forLoop = mock(DetailAST.class);
+        when(forLoop.getType()).thenReturn(TokenTypes.LITERAL_FOR);
+        when(forLoop.findFirstToken(TokenTypes.FOR_INIT)).thenReturn(forInit);
+        when(forLoop.findFirstToken(TokenTypes.FOR_EACH_CLAUSE)).thenReturn(null);
+        when(forLoop.getParent()).thenReturn(null);
+
+        return forLoop;
+    }
+
+    private DetailAST createExprWithIdent(String identName) {
+        DetailAST ident = mock(DetailAST.class);
+        when(ident.getType()).thenReturn(TokenTypes.IDENT);
+        when(ident.getText()).thenReturn(identName);
+
+        DetailAST expr = mock(DetailAST.class);
+        when(expr.getType()).thenReturn(TokenTypes.EXPR);
+        when(expr.getFirstChild()).thenReturn(ident);
+        when(expr.getChildCount()).thenReturn(1);
+
+        return expr;
+    }
+
+    // --- Mutation killing tests for containsLoopIndexInAst ---
+
+    @Test
+    @DisplayName("Find loop index info ident not matching loop name returns missing")
+    void findLoopIndexInfo_identNotMatchingLoopName_returnsMissing() {
+        // This test kills the "negated conditional" mutation on IDENT type check
+        // The expr contains an IDENT "x" but loop index is "i"
+        DetailAST forLoop = createForLoopWithIndex("i");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createExprWithIdent("x"); // Different from loop index
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "test");
+
+        assertNotNull(result);
+        assertTrue(result.isMissing(), "Loop index 'i' should be missing when expr has 'x'");
+    }
+
+    @Test
+    @DisplayName("Find loop index info method call with dot and loop index in qualifier")
+    void findLoopIndexInfo_methodCallWithDotAndLoopIndex() {
+        // This test kills the "negated conditional" on DOT type check
+        DetailAST forLoop = createForLoopWithIndex("item");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createExprWithDotMethodCall("item", "toString");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "test");
+
+        assertNotNull(result);
+        assertFalse(result.isMissing(), "Loop index should be found in method call qualifier");
+    }
+
+    @Test
+    @DisplayName("Find loop index info method call with elist containing loop index")
+    void findLoopIndexInfo_methodCallWithElistContainingLoopIndex() {
+        // This test kills the "replaced boolean return" mutation on ELIST handling
+        DetailAST forLoop = createForLoopWithIndex("idx");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createExprWithMethodCallWithArg("format", "idx");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "test");
+
+        assertNotNull(result);
+        assertFalse(result.isMissing(), "Loop index should be found in method call arguments");
+    }
+
+    @Test
+    @DisplayName("Find loop index info recursion returns false when nothing matches")
+    void findLoopIndexInfo_recursionReturnsFalse() {
+        // This test kills the "replaced return false with true" mutation
+        DetailAST forLoop = createForLoopWithIndex("i");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createExprWithNestedNonMatchingContent();
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "no index here");
+
+        assertNotNull(result);
+        assertTrue(result.isMissing(), "Loop index should be missing when no content matches");
+    }
+
+    @Test
+    @DisplayName("Find loop index info method call without dot target")
+    void findLoopIndexInfo_methodCallWithoutDotTarget() {
+        // Method call where first child is not DOT (e.g., simple method call)
+        DetailAST forLoop = createForLoopWithIndex("j");
+        DetailAST methodCall = createMethodCallInForLoop("assertEquals", forLoop);
+        DetailAST messageExpr = createExprWithSimpleMethodCall("getValue");
+
+        LoopIndexAnalyzer.LoopIndexInfo result = analyzer.findLoopIndexInfo(
+                methodCall, messageExpr, "test");
+
+        assertNotNull(result);
+        assertTrue(result.isMissing(), "Loop index should be missing for simple method call");
+    }
+
+    private DetailAST createExprWithDotMethodCall(String qualifierName, String methodName) {
+        // Create: qualifier.method() where qualifier is an IDENT matching loop index
+        DetailAST qualifierIdent = mock(DetailAST.class);
+        when(qualifierIdent.getType()).thenReturn(TokenTypes.IDENT);
+        when(qualifierIdent.getText()).thenReturn(qualifierName);
+        when(qualifierIdent.getFirstChild()).thenReturn(null);
+
+        DetailAST methodIdent = mock(DetailAST.class);
+        when(methodIdent.getType()).thenReturn(TokenTypes.IDENT);
+        when(methodIdent.getText()).thenReturn(methodName);
+
+        DetailAST dot = mock(DetailAST.class);
+        when(dot.getType()).thenReturn(TokenTypes.DOT);
+        when(dot.getFirstChild()).thenReturn(qualifierIdent);
+
+        DetailAST elist = mock(DetailAST.class);
+        when(elist.getType()).thenReturn(TokenTypes.ELIST);
+        when(elist.getFirstChild()).thenReturn(null);
+
+        DetailAST innerMethodCall = mock(DetailAST.class);
+        when(innerMethodCall.getType()).thenReturn(TokenTypes.METHOD_CALL);
+        when(innerMethodCall.getFirstChild()).thenReturn(dot);
+        when(innerMethodCall.findFirstToken(TokenTypes.ELIST)).thenReturn(elist);
+
+        DetailAST expr = mock(DetailAST.class);
+        when(expr.getType()).thenReturn(TokenTypes.EXPR);
+        when(expr.getFirstChild()).thenReturn(innerMethodCall);
+
+        return expr;
+    }
+
+    private DetailAST createExprWithMethodCallWithArg(String methodName, String argName) {
+        // Create: method(argIdent) where argIdent matches loop index
+        DetailAST argIdent = mock(DetailAST.class);
+        when(argIdent.getType()).thenReturn(TokenTypes.IDENT);
+        when(argIdent.getText()).thenReturn(argName);
+        when(argIdent.getFirstChild()).thenReturn(null);
+
+        DetailAST elist = mock(DetailAST.class);
+        when(elist.getType()).thenReturn(TokenTypes.ELIST);
+        when(elist.getFirstChild()).thenReturn(argIdent);
+
+        DetailAST methodIdent = mock(DetailAST.class);
+        when(methodIdent.getType()).thenReturn(TokenTypes.IDENT);
+        when(methodIdent.getText()).thenReturn(methodName);
+        when(methodIdent.getFirstChild()).thenReturn(null);
+
+        DetailAST innerMethodCall = mock(DetailAST.class);
+        when(innerMethodCall.getType()).thenReturn(TokenTypes.METHOD_CALL);
+        when(innerMethodCall.getFirstChild()).thenReturn(methodIdent);
+        when(innerMethodCall.findFirstToken(TokenTypes.ELIST)).thenReturn(elist);
+
+        DetailAST expr = mock(DetailAST.class);
+        when(expr.getType()).thenReturn(TokenTypes.EXPR);
+        when(expr.getFirstChild()).thenReturn(innerMethodCall);
+
+        return expr;
+    }
+
+    private DetailAST createExprWithNestedNonMatchingContent() {
+        // Create nested structure with no matching loop index
+        DetailAST literalStr = mock(DetailAST.class);
+        when(literalStr.getType()).thenReturn(TokenTypes.STRING_LITERAL);
+        when(literalStr.getText()).thenReturn("\"constant\"");
+        when(literalStr.getFirstChild()).thenReturn(null);
+
+        DetailAST plus = mock(DetailAST.class);
+        when(plus.getType()).thenReturn(TokenTypes.PLUS);
+        when(plus.getFirstChild()).thenReturn(literalStr);
+        when(literalStr.getNextSibling()).thenReturn(null);
+
+        DetailAST expr = mock(DetailAST.class);
+        when(expr.getType()).thenReturn(TokenTypes.EXPR);
+        when(expr.getFirstChild()).thenReturn(plus);
+
+        return expr;
+    }
+
+    private DetailAST createExprWithSimpleMethodCall(String methodName) {
+        // Method call without DOT (just IDENT as first child)
+        DetailAST methodIdent = mock(DetailAST.class);
+        when(methodIdent.getType()).thenReturn(TokenTypes.IDENT);
+        when(methodIdent.getText()).thenReturn(methodName);
+        when(methodIdent.getFirstChild()).thenReturn(null);
+
+        DetailAST elist = mock(DetailAST.class);
+        when(elist.getType()).thenReturn(TokenTypes.ELIST);
+        when(elist.getFirstChild()).thenReturn(null);
+
+        DetailAST innerMethodCall = mock(DetailAST.class);
+        when(innerMethodCall.getType()).thenReturn(TokenTypes.METHOD_CALL);
+        when(innerMethodCall.getFirstChild()).thenReturn(methodIdent);
+        when(innerMethodCall.findFirstToken(TokenTypes.ELIST)).thenReturn(elist);
+
+        DetailAST expr = mock(DetailAST.class);
+        when(expr.getType()).thenReturn(TokenTypes.EXPR);
+        when(expr.getFirstChild()).thenReturn(innerMethodCall);
+
+        return expr;
     }
 }

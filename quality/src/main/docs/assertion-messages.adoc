@@ -3,15 +3,63 @@
 :toclevels: 2
 :sectnums:
 
-The Meaningful Message Check applies these rules to assertion messages (JUnit, AssertJ, Hamcrest), JUnit assumptions
-(`assumeTrue`/`assumeFalse`), Java `assert` statements, precondition messages (for example, `requireNonNull`),
-`throw new` exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated names, and
-disabled reasons).
+The Meaningful Message Check applies these rules to assertion messages (JUnit, AssertJ, Hamcrest), JUnit assumptions (`assumeTrue`/`assumeFalse`), Java `assert` statements, precondition messages (for example, `requireNonNull`),
+`throw new` exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated names, and disabled reasons).
 Log sites (SLF4J `trace/debug/info/warn/error`, Log4j2
 `trace/debug/info/warn/error/fatal`, JUL `java.util.logging.Logger`, `System.Logger`, and Chronicle
 `Jvm.*.on(...)`) are also in scope; see `meaningful-message-checker-requirements.adoc` for the log-specific rules.
 
-For `requireNonNull` and `requireNotNull`, a message is optional. If one is supplied it should be meaningful, but a message that matches the first argument (for example, `requireNonNull(in, "in")` or `requireNonNull(a.getIn(), "a.getIn()")`) is acceptable.
+For `requireNonNull` and `requireNotNull`, a message is optional.
+If one is supplied it should be meaningful, but a message that matches the first argument (for example, `requireNonNull(in, "in")` or `requireNonNull(a.getIn(), "a.getIn()")`) is acceptable.
+
+== Reason Comments for Non-Idiomatic Code
+
+Some statements require a short reason comment on the same line or the line immediately before.
+The comment text is evaluated like a message: at least 4 words with 2 meaningful words.
+This applies to `return null;` and to uses of `java.lang.Runtime` or `java.lang.System`
+(excluding `currentTimeMillis()`, `nanoTime()`, `lineSeparator()`, `getLogger()`, `System.Logger`,
+`out`, and `err`).
+Additional cases include:
+
+* `Thread.stop()`, `Thread.suspend()`, `Thread.resume()`, `Thread.yield()`, `Thread.setPriority(...)`,
+  and `Thread.sleep(...)`.
+* `ThreadLocal.set(...)` and `InheritableThreadLocal.set(...)`.
+* `Object.wait()`, `Object.notify()`, and `Object.notifyAll()`.
+* `Class.forName(...)`.
+* `ProcessBuilder.start()`.
+* `String.intern()`.
+
+The extracted comment text is also checked for missing subjects and duplicates.
+Comments may be on the same line or on one or more immediately preceding comment lines
+(including block comments), as long as no non-comment line appears between them.
+If multiple comments appear in that region, the checker assumes sufficient context
+and does not evaluate the comment text.
+
+.Allowed comment placement
+[source,java]
+----
+// legacy case requires null
+return null;
+
+/* legacy case requires null */
+return null;
+
+return null; // legacy case requires null
+----
+
+== Rule Categories
+
+The checker reports two kinds of output: message-quality rules and operational warnings.
+Message-quality rules focus on how the message reads.
+Operational warnings highlight checker limitations or configuration issues and are not about message wording.
+
+[cols="1,3,2",options="header"]
+|===
+|Category |When to Use |Default
+|MMUnexpected |Uncaught RuntimeException in the checker (true bugs) |Always emit
+|MMUnhandled |Known limitation in extraction |Emit by default, suppressible (`emitUnhandled=false`)
+|MMExtractionFile |Message extraction output configuration or I/O failure |Emit by default
+|===
 
 == Quick Reference
 
@@ -29,7 +77,9 @@ For `requireNonNull` and `requireNotNull`, a message is optional. If one is supp
 |MMIndexOnly |Index only |Name what the indexed element represents
 |MMContextless |Contextless |State what is compared and why it matters
 |MMMissingMessage |Missing message |Add a meaningful message, supply a Throwable, or use /* reason */
+|MMThrowNull |Throw null literal |Replace with `throw new UnsupportedOperationException()`
 |MMDisplayName |Missing display name |Add @DisplayName("descriptive name") to JUnit 5 test methods
+|MMTestAnnotationOrder |@Test annotation order |Place @Test first on JUnit 5 test methods
 |MMTooShort |Too short |Use source-specific guidance (assertion/log/javadoc/throw/annotation)
 |MMTooFewMeaningfulWords |Too few unique meaningful words |Add meaningful words/placeholders to meet the minimum
 |MMTooLong |Too long |Keep invariant, move data to expected/actual
@@ -45,10 +95,13 @@ For `requireNonNull` and `requireNotNull`, a message is optional. If one is supp
 |MMMissingSubject |Missing subject |Add subject before modal verb (should/must)
 |===
 
+Operational warnings are documented in the MMUnexpected, MMUnhandled, and MMExtractionFile sections.
+
 [#fix-examples]
 == Fix Example Library
 
-Use these short patterns as building blocks. Replace nouns and values with local context.
+Use these short patterns as building blocks.
+Replace nouns and values with local context.
 
 [cols="1,2",options="header"]
 |===
@@ -390,6 +443,35 @@ slf4j.warn("order should remain in pending state");
 @Disabled("awaiting fix for queue recovery")
 ----
 
+[#MMThrowNull]
+== MMThrowNull: Throw Null Literal
+
+=== Problem
+
+The code throws a null literal, which obscures the intent and produces a confusing
+NullPointerException at runtime.
+
+=== Why This Matters
+
+A null throw does not describe the unsupported path and makes it harder to reason
+about failure modes during triage.
+
+=== How to Fix
+
+Replace the null literal with an explicit exception type.
+
+.Before
+[source,java]
+----
+throw null;
+----
+
+.After
+[source,java]
+----
+throw new UnsupportedOperationException();
+----
+
 [#MMDisplayName]
 == MMDisplayName: Missing Display Name
 
@@ -423,6 +505,39 @@ void parsesTodoFiles() {
 }
 ----
 
+[#MMTestAnnotationOrder]
+== MMTestAnnotationOrder: @Test Annotation Order
+
+=== Problem
+
+A JUnit 5 test method declares @Test but it is not the first annotation in the block.
+
+=== Why This Matters
+
+Placing @Test first keeps annotation blocks consistent and makes the test intent obvious at a glance.
+
+=== How to Fix
+
+Move @Test above other annotations such as @DisplayName, @Tag, or @Disabled.
+
+.Before
+[source,java]
+----
+@DisplayName("Parses TODO files and reports incomplete tasks")
+@Test
+void parsesTodoFiles() {
+}
+----
+
+.After
+[source,java]
+----
+@Test
+@DisplayName("Parses TODO files and reports incomplete tasks")
+void parsesTodoFiles() {
+}
+----
+
 [#MMTooShort]
 == MMTooShort: Too Short
 
@@ -436,7 +551,8 @@ Very short messages rarely provide sufficient context to diagnose failures witho
 
 === How to Fix
 
-The fix depends on the message source. Use the guidance below, then meet the minimums in the requirements.
+The fix depends on the message source.
+Use the guidance below, then meet the minimums in the requirements.
 For assertions and logs, 4-8 words is a useful default.
 
 [cols="1,2"]
@@ -489,7 +605,8 @@ assertTrue(valid, "order should pass validation rules");
 
 === Problem
 
-The message has fewer than the source minimum unique meaningful words or placeholders (filler words like "should", "be", "expected", "error", "failed" do not count and duplicates are ignored). The warning lists the filler words present so it is clear which words did not count.
+The message has fewer than the source minimum unique meaningful words or placeholders (filler words like "should", "be", "expected", "error", "failed" do not count and duplicates are ignored).
+The warning lists the filler words present so it is clear which words did not count.
 
 === Why This Matters
 
@@ -788,7 +905,8 @@ assertTrue(count >= minCount,
 
 This rule only triggers when:
 - The assertion is `assertTrue` or `assertFalse`
-- The condition is a comparison (`>`, `<`, `>=`, `<=`, `==`, `!=`) - The message is a constant string (no dynamic content)
+- The condition is a comparison (`>`, `<`, `>=`, `<=`, `==`, `!=`)
+- The message is a constant string (no dynamic content)
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
@@ -897,7 +1015,9 @@ for (int i = 0; i < orders.size(); i++) {
 === When This Rule Doesn't Apply
 
 This rule only triggers when:
-- The assertion is inside a traditional indexed `for` loop (with `int` or `long` index) - The loop has an initialization, condition, and update expression - The message is a constant string (no dynamic content)
+- The assertion is inside a traditional indexed `for` loop (with `int` or `long` index)
+- The loop has an initialization, condition, and update expression
+- The message is a constant string (no dynamic content)
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
@@ -958,7 +1078,69 @@ assertNotNull(connection, "database connection must not be null");
 |"user list cannot be empty after load"
 |===
 
+[#MMUnexpected]
+== MMUnexpected: Checker Exception
+
+=== Problem
+
+The checker threw a RuntimeException while analysing a file.
+
+=== Why This Matters
+
+This indicates a defect in the quality check or an unexpected AST shape.
+The checker cannot reliably evaluate that file until the bug is fixed.
+
+=== How to Fix
+
+Reduce the failing code to a minimal example and update the quality check to handle the AST shape.
+If the failure is caused by the optional extraction output file, address it as an MMExtractionFile issue instead.
+
+[#MMUnhandled]
+== MMUnhandled: Unhandled Extraction
+
+=== Problem
+
+The checker encountered a message pattern it does not yet understand.
+
+=== Why This Matters
+
+Unhandled patterns mean the rule set is incomplete for that style of message, so the expected quality checks are not applied.
+
+=== How to Fix
+
+Extend the relevant extractor or add a rule for the missing pattern.
+If needed, suppress temporarily with `emitUnhandled=false` in the checkstyle configuration
+or `@SuppressWarnings("MMUnhandled")` on the affected code.
+
+[#MMExtractionFile]
+== MMExtractionFile: Extraction Output Failure
+
+=== Problem
+
+The optional message extraction output could not be opened, written, or closed.
+
+=== Why This Matters
+
+Extraction data is missing, so reports based on the output file are incomplete.
+This is not a message-quality issue.
+
+=== How to Fix
+
+Set `messageExtractionFile` (or the `mm.extract.file` system property) to a writable file path, or disable extraction if you do not need the output.
+
 == Writing Good Messages
+
+=== What Makes a Message Meaningful
+
+A meaningful message tells you what failed, what should have happened, and why it matters.
+It should be understandable without opening the code.
+
+Checklist:
+- Name the subject (what is being checked).
+- State the expected behaviour or invariant.
+- Include context when it changes the meaning (after X, when Y, for Z).
+- Include key values when the failure needs data to diagnose (expected/actual, identifiers, or indices).
+- Keep it concise and avoid repeating class names, method names, or line numbers.
 
 === The Pattern
 

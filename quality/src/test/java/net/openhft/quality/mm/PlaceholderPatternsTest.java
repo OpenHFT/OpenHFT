@@ -3,6 +3,7 @@
  */
 package net.openhft.quality.mm;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -11,8 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Unit tests for {@link PlaceholderPatterns}.
  */
+@DisplayName("Placeholder patterns tests scenario case detail")
 public class PlaceholderPatternsTest {
 
+    @DisplayName("Log pattern scenario case detail path")
     @ParameterizedTest
     @CsvSource({
             "'{}', true",
@@ -28,6 +31,7 @@ public class PlaceholderPatternsTest {
         assertEquals(shouldMatch, PlaceholderPatterns.LOG.matcher(input).find());
     }
 
+    @DisplayName("String format pattern scenario case detail")
     @ParameterizedTest
     @CsvSource({
             "'%s', true",
@@ -47,6 +51,7 @@ public class PlaceholderPatternsTest {
         assertEquals(shouldMatch, PlaceholderPatterns.STRING_FORMAT.matcher(input).find());
     }
 
+    @DisplayName("Message format pattern scenario case detail")
     @ParameterizedTest
     @CsvSource({
             "'{0}', true",
@@ -62,6 +67,7 @@ public class PlaceholderPatternsTest {
         assertEquals(shouldMatch, PlaceholderPatterns.MESSAGE_FORMAT.matcher(input).find());
     }
 
+    @DisplayName("Key value label pattern scenario case")
     @ParameterizedTest
     @CsvSource({
             "'index:', true",
@@ -81,6 +87,7 @@ public class PlaceholderPatternsTest {
         assertEquals(shouldMatch, PlaceholderPatterns.KEY_VALUE_LABEL.matcher(input).find());
     }
 
+    @DisplayName("Annotation pattern scenario case detail path")
     @ParameterizedTest
     @CsvSource({
             "'{value}', true",

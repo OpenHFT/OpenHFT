@@ -5,7 +5,11 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -52,14 +56,20 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         }
         DetailAST elist = methodCall.findFirstToken(TokenTypes.ELIST);
         if (elist == null) {
+            emitUnhandled(methodCall, "Log call without argument list: " + methodName);
             return;
         }
         List<DetailAST> args = astSupport().collectArguments(elist);
         if (args.isEmpty()) {
+            emitUnhandled(methodCall, "Log call without arguments: " + methodName);
             return;
         }
         int messageIndex = resolveMessageIndex(loggerKind, methodName, args);
         if (messageIndex < 0 || messageIndex >= args.size()) {
+            emitUnhandled(methodCall, "Log message index " + messageIndex
+                    + " out of range for " + methodName
+                    + " (args=" + args.size()
+                    + ", logger=" + loggerKind + ")");
             return;
         }
         DetailAST messageExpr = args.get(messageIndex);
@@ -71,14 +81,14 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         }
 
         if (loggerKind == LoggerKind.SYSTEM && "log".equals(methodName)) {
-            checkSystemLoggerCall(methodCall.getLineNo(), messageExpr, extraArgs, hasThrowable);
+            checkSystemLoggerCall(methodCall, methodCall.getLineNo(), messageExpr, extraArgs, hasThrowable);
             return;
         }
 
-        checkStandardLogCall(methodCall.getLineNo(), messageExpr, extraArgs, hasThrowable);
+        checkStandardLogCall(methodCall, methodCall.getLineNo(), messageExpr, extraArgs, hasThrowable);
     }
 
-    private void checkStandardLogCall(int lineNo, DetailAST messageExpr,
+    private void checkStandardLogCall(DetailAST methodCall, int lineNo, DetailAST messageExpr,
                                       List<DetailAST> extraArgs,
                                       boolean hasThrowable) {
         if (astSupport().isNullLiteral(messageExpr)) {
@@ -91,6 +101,9 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
 
         MessageTemplate template = extractMessageTemplate(messageExpr);
         if (template == null) {
+            if (!context().hasInlineReasonComment(methodCall)) {
+                sink().emitMissingMessage(lineNo, MessageSource.LOG);
+            }
             return;
         }
         if (hasThrowable && isBlankMessage(template.message())) {
@@ -102,7 +115,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         emitMessageCandidate(template.message(), lineNo, placeholderCount, keyValueLabelCount);
     }
 
-    private void checkSystemLoggerCall(int lineNo, DetailAST messageExpr,
+    private void checkSystemLoggerCall(DetailAST methodCall, int lineNo, DetailAST messageExpr,
                                        List<DetailAST> extraArgs,
                                        boolean hasThrowable) {
         if (astSupport().isNullLiteral(messageExpr)) {
@@ -122,7 +135,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
             hasSupplier = isSupplierTypedExpression(content);
         }
         if (!hasSupplier) {
-            checkStandardLogCall(lineNo, messageExpr, extraArgs, hasThrowable);
+            checkStandardLogCall(methodCall, lineNo, messageExpr, extraArgs, hasThrowable);
             return;
         }
 
@@ -197,6 +210,9 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
 
         MessageTemplate template = extractMessageTemplate(messageExpr);
         if (template == null) {
+            if (!context().hasInlineReasonComment(methodCall)) {
+                sink().emitMissingMessage(methodCall.getLineNo(), MessageSource.LOG);
+            }
             return true;
         }
         if (hasThrowable && isBlankMessage(template.message())) {
@@ -382,8 +398,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
     }
 
     private MessageTemplate extractMessageTemplate(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
-        return templateExtractor.extractMessageTemplate(expr);
+        return context().extractMessageTemplate(expr);
     }
 
     private int countKeyValueLabels(String constantParts) {

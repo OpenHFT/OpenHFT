@@ -3,9 +3,11 @@
  */
 package net.openhft.quality.mm;
 
+import com.puppycrawl.tools.checkstyle.DetailAstImpl;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link MessageAstSupport}.
  */
 @SuppressWarnings("MMDisplayName")
+@DisplayName("Message ast support tests scenario case")
 class MessageAstSupportTest {
 
     private MessageAstSupport support;
@@ -30,6 +33,7 @@ class MessageAstSupportTest {
     // --- extractName tests ---
 
     @Test
+    @DisplayName("Extract name with ident returns text")
     void extractName_withIdent_returnsText() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -42,6 +46,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract name no ident returns null scenario")
     void extractName_noIdent_returnsNull() {
         DetailAST ast = mock(DetailAST.class);
         when(ast.findFirstToken(TokenTypes.IDENT)).thenReturn(null);
@@ -50,6 +55,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract name null throws NPE scenario")
     void extractName_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.extractName(null));
     }
@@ -57,6 +63,7 @@ class MessageAstSupportTest {
     // --- flattenDot tests ---
 
     @Test
+    @DisplayName("Flatten dot non dot node returns text")
     void flattenDot_nonDotNode_returnsText() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -66,6 +73,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Flatten dot simple dot returns concatenated")
     void flattenDot_simpleDot_returnsConcatenated() {
         DetailAST left = mock(DetailAST.class);
         when(left.getType()).thenReturn(TokenTypes.IDENT);
@@ -86,6 +94,7 @@ class MessageAstSupportTest {
     // --- findRightmostIdent tests ---
 
     @Test
+    @DisplayName("Find rightmost ident simple ident returns ident")
     void findRightmostIdent_simpleIdent_returnsIdent() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -94,6 +103,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find rightmost ident dot chain returns rightmost")
     void findRightmostIdent_dotChain_returnsRightmost() {
         DetailAST rightIdent = mock(DetailAST.class);
         when(rightIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -107,6 +117,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find rightmost ident not ident returns null scenario")
     void findRightmostIdent_notIdent_returnsNull() {
         DetailAST literal = mock(DetailAST.class);
         when(literal.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -117,6 +128,7 @@ class MessageAstSupportTest {
     // --- extractTypeName tests ---
 
     @Test
+    @DisplayName("Extract type name with dot flattens dot")
     void extractTypeName_withDot_flattensDot() {
         DetailAST left = mock(DetailAST.class);
         when(left.getType()).thenReturn(TokenTypes.IDENT);
@@ -138,6 +150,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract type name simple ident returns text")
     void extractTypeName_simpleIdent_returnsText() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -151,6 +164,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract type name no ident no dot returns null")
     void extractTypeName_noIdentNoDot_returnsNull() {
         DetailAST typeAst = mock(DetailAST.class);
         when(typeAst.findFirstToken(TokenTypes.DOT)).thenReturn(null);
@@ -160,6 +174,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract type name null throws NPE")
     void extractTypeName_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.extractTypeName(null));
     }
@@ -167,6 +182,7 @@ class MessageAstSupportTest {
     // --- unwrapExpr tests ---
 
     @Test
+    @DisplayName("Unwrap expr single child returns child")
     void unwrapExpr_singleChild_returnsChild() {
         DetailAST child = mock(DetailAST.class);
         when(child.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -180,6 +196,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Unwrap expr multiple children returns self")
     void unwrapExpr_multipleChildren_returnsSelf() {
         DetailAST expr = mock(DetailAST.class);
         when(expr.getType()).thenReturn(TokenTypes.EXPR);
@@ -189,6 +206,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Unwrap expr not expr returns self scenario")
     void unwrapExpr_notExpr_returnsSelf() {
         DetailAST literal = mock(DetailAST.class);
         when(literal.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -198,6 +216,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Unwrap expr null throws NPE scenario")
     void unwrapExpr_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.unwrapExpr(null));
     }
@@ -205,6 +224,7 @@ class MessageAstSupportTest {
     // --- isNullLiteral tests ---
 
     @Test
+    @DisplayName("Is null literal literal null returns true scenario case detail")
     void isNullLiteral_literalNull_returnsTrue() {
         DetailAST nullLit = mock(DetailAST.class);
         when(nullLit.getType()).thenReturn(TokenTypes.LITERAL_NULL);
@@ -213,6 +233,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Is null literal casted null returns true scenario case")
     void isNullLiteral_castedNull_returnsTrue() {
         DetailAST nullLit = mock(DetailAST.class);
         when(nullLit.getType()).thenReturn(TokenTypes.LITERAL_NULL);
@@ -226,6 +247,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Is null literal not null returns false scenario case detail")
     void isNullLiteral_notNull_returnsFalse() {
         DetailAST stringLit = mock(DetailAST.class);
         when(stringLit.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -234,6 +256,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Is null literal wrapped expr unwraps")
     void isNullLiteral_wrappedExpr_unwraps() {
         DetailAST nullLit = mock(DetailAST.class);
         when(nullLit.getType()).thenReturn(TokenTypes.LITERAL_NULL);
@@ -249,6 +272,7 @@ class MessageAstSupportTest {
     // --- containsStringLiteral tests ---
 
     @Test
+    @DisplayName("Contains string literal direct string literal returns true scenario")
     void containsStringLiteral_directStringLiteral_returnsTrue() {
         DetailAST stringLit = mock(DetailAST.class);
         when(stringLit.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -258,6 +282,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Contains string literal method call returns false scenario case")
     void containsStringLiteral_methodCall_returnsFalse() {
         DetailAST methodCall = mock(DetailAST.class);
         when(methodCall.getType()).thenReturn(TokenTypes.METHOD_CALL);
@@ -266,6 +291,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Contains string literal nested string literal returns true scenario")
     void containsStringLiteral_nestedStringLiteral_returnsTrue() {
         DetailAST stringLit = mock(DetailAST.class);
         when(stringLit.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -280,6 +306,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Contains string literal no string literal returns false scenario case")
     void containsStringLiteral_noStringLiteral_returnsFalse() {
         DetailAST numInt = mock(DetailAST.class);
         when(numInt.getType()).thenReturn(TokenTypes.NUM_INT);
@@ -289,6 +316,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Contains string literal null throws NPE")
     void containsStringLiteral_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.containsStringLiteral(null));
     }
@@ -296,6 +324,7 @@ class MessageAstSupportTest {
     // --- containsStringLiteralDeep tests ---
 
     @Test
+    @DisplayName("Contains string literal deep inside method call returns true")
     void containsStringLiteralDeep_insideMethodCall_returnsTrue() {
         DetailAST stringLit = mock(DetailAST.class);
         when(stringLit.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -310,6 +339,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Contains string literal deep null throws NPE")
     void containsStringLiteralDeep_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.containsStringLiteralDeep(null));
     }
@@ -317,6 +347,7 @@ class MessageAstSupportTest {
     // --- findLambda tests ---
 
     @Test
+    @DisplayName("Find lambda direct lambda returns lambda scenario")
     void findLambda_directLambda_returnsLambda() {
         DetailAST lambda = mock(DetailAST.class);
         when(lambda.getType()).thenReturn(TokenTypes.LAMBDA);
@@ -325,6 +356,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find lambda nested lambda finds it")
     void findLambda_nestedLambda_findsIt() {
         DetailAST lambda = mock(DetailAST.class);
         when(lambda.getType()).thenReturn(TokenTypes.LAMBDA);
@@ -339,6 +371,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find lambda no lambda returns null scenario case")
     void findLambda_noLambda_returnsNull() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -348,6 +381,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find lambda null throws NPE scenario")
     void findLambda_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.findLambda(null));
     }
@@ -355,6 +389,7 @@ class MessageAstSupportTest {
     // --- findPlus tests ---
 
     @Test
+    @DisplayName("Find plus direct plus returns plus scenario")
     void findPlus_directPlus_returnsPlus() {
         DetailAST plus = mock(DetailAST.class);
         when(plus.getType()).thenReturn(TokenTypes.PLUS);
@@ -363,6 +398,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find plus inside method call returns null scenario")
     void findPlus_insideMethodCall_returnsNull() {
         DetailAST methodCall = mock(DetailAST.class);
         when(methodCall.getType()).thenReturn(TokenTypes.METHOD_CALL);
@@ -371,6 +407,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find plus nested plus finds it")
     void findPlus_nestedPlus_findsIt() {
         DetailAST plus = mock(DetailAST.class);
         when(plus.getType()).thenReturn(TokenTypes.PLUS);
@@ -385,6 +422,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Find plus null throws NPE scenario")
     void findPlus_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.findPlus(null));
     }
@@ -392,6 +430,7 @@ class MessageAstSupportTest {
     // --- collectArguments tests ---
 
     @Test
+    @DisplayName("Collect arguments expr children collects exprs")
     void collectArguments_exprChildren_collectsExprs() {
         DetailAST expr1 = mock(DetailAST.class);
         when(expr1.getType()).thenReturn(TokenTypes.EXPR);
@@ -410,6 +449,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Collect arguments lambda child collects lambda")
     void collectArguments_lambdaChild_collectsLambda() {
         DetailAST lambda = mock(DetailAST.class);
         when(lambda.getType()).thenReturn(TokenTypes.LAMBDA);
@@ -424,6 +464,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Collect arguments comma child skips comma")
     void collectArguments_commaChild_skipsComma() {
         DetailAST expr = mock(DetailAST.class);
         when(expr.getType()).thenReturn(TokenTypes.EXPR);
@@ -441,6 +482,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Collect arguments empty elist returns empty list")
     void collectArguments_emptyElist_returnsEmptyList() {
         DetailAST elist = mock(DetailAST.class);
         when(elist.getFirstChild()).thenReturn(null);
@@ -451,6 +493,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Collect arguments null throws NPE scenario")
     void collectArguments_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.collectArguments(null));
     }
@@ -458,6 +501,7 @@ class MessageAstSupportTest {
     // --- extractMethodName tests ---
 
     @Test
+    @DisplayName("Extract method name with dot returns rightmost")
     void extractMethodName_withDot_returnsRightmost() {
         DetailAST rightIdent = mock(DetailAST.class);
         when(rightIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -474,6 +518,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract method name no dot returns ident")
     void extractMethodName_noDot_returnsIdent() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -489,6 +534,7 @@ class MessageAstSupportTest {
     // --- extractQualifierIdent tests ---
 
     @Test
+    @DisplayName("Extract qualifier ident simple qualifier returns text")
     void extractQualifierIdent_simpleQualifier_returnsText() {
         DetailAST qualifier = mock(DetailAST.class);
         when(qualifier.getType()).thenReturn(TokenTypes.IDENT);
@@ -501,6 +547,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract qualifier ident nested dot traverses to bottom")
     void extractQualifierIdent_nestedDot_traversesToBottom() {
         DetailAST deepIdent = mock(DetailAST.class);
         when(deepIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -519,6 +566,7 @@ class MessageAstSupportTest {
     // --- extractNewClassName tests ---
 
     @Test
+    @DisplayName("Extract new class name simple ident returns name")
     void extractNewClassName_simpleIdent_returnsName() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -532,6 +580,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract new class name qualified name returns rightmost")
     void extractNewClassName_qualifiedName_returnsRightmost() {
         DetailAST rightIdent = mock(DetailAST.class);
         when(rightIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -549,6 +598,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract new class name stops at lparen")
     void extractNewClassName_stopsAtLparen() {
         DetailAST lparen = mock(DetailAST.class);
         when(lparen.getType()).thenReturn(TokenTypes.LPAREN);
@@ -560,6 +610,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract new class name stops at elist")
     void extractNewClassName_stopsAtElist() {
         DetailAST elist = mock(DetailAST.class);
         when(elist.getType()).thenReturn(TokenTypes.ELIST);
@@ -571,6 +622,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract new class name null throws NPE")
     void extractNewClassName_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.extractNewClassName(null));
     }
@@ -578,6 +630,7 @@ class MessageAstSupportTest {
     // --- extractClassLiteralName tests ---
 
     @Test
+    @DisplayName("Extract class literal name simple class returns name")
     void extractClassLiteralName_simpleClass_returnsName() {
         DetailAST classIdent = mock(DetailAST.class);
         when(classIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -596,6 +649,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract class literal name not class literal returns null scenario")
     void extractClassLiteralName_notClassLiteral_returnsNull() {
         DetailAST methodIdent = mock(DetailAST.class);
         when(methodIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -609,6 +663,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract class literal name wrapped expr unwraps")
     void extractClassLiteralName_wrappedExpr_unwraps() {
         DetailAST classIdent = mock(DetailAST.class);
         when(classIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -632,6 +687,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract class literal name null throws NPE")
     void extractClassLiteralName_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.extractClassLiteralName(null));
     }
@@ -639,6 +695,7 @@ class MessageAstSupportTest {
     // --- extractAssignedIdent tests ---
 
     @Test
+    @DisplayName("Extract assigned ident ident returns text")
     void extractAssignedIdent_ident_returnsText() {
         DetailAST ident = mock(DetailAST.class);
         when(ident.getType()).thenReturn(TokenTypes.IDENT);
@@ -648,6 +705,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract assigned ident dot returns rightmost")
     void extractAssignedIdent_dot_returnsRightmost() {
         DetailAST rightIdent = mock(DetailAST.class);
         when(rightIdent.getType()).thenReturn(TokenTypes.IDENT);
@@ -661,6 +719,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract assigned ident other type returns null")
     void extractAssignedIdent_otherType_returnsNull() {
         DetailAST literal = mock(DetailAST.class);
         when(literal.getType()).thenReturn(TokenTypes.STRING_LITERAL);
@@ -669,6 +728,7 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract assigned ident null throws NPE")
     void extractAssignedIdent_null_throwsNPE() {
         assertThrows(NullPointerException.class, () -> support.extractAssignedIdent(null));
     }
@@ -676,6 +736,7 @@ class MessageAstSupportTest {
     // --- extractImportText tests ---
 
     @Test
+    @DisplayName("Extract import text simple dot returns flattened")
     void extractImportText_simpleDot_returnsFlattened() {
         DetailAST left = mock(DetailAST.class);
         when(left.getType()).thenReturn(TokenTypes.IDENT);
@@ -697,11 +758,102 @@ class MessageAstSupportTest {
     }
 
     @Test
+    @DisplayName("Extract import text no dot throws NPE")
     void extractImportText_noDot_throwsNPE() {
         DetailAST importAst = mock(DetailAST.class);
         when(importAst.findFirstToken(TokenTypes.DOT)).thenReturn(null);
 
         // extractImportText calls flattenDot(null) which throws NPE
         assertThrows(NullPointerException.class, () -> support.extractImportText(importAst));
+    }
+
+    @Test
+    @DisplayName("Find first string argument skips non expr nodes")
+    void findFirstStringArgument_skipsNonExprNodes() {
+        MessageTemplateExtractor extractor = new MessageTemplateExtractor(expr -> false);
+
+        DetailAstImpl elist = new DetailAstImpl();
+        elist.setType(TokenTypes.ELIST);
+
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+        elist.addChild(lambda);
+
+        DetailAstImpl stringExpr = createExpr(createStringLiteral("alpha"));
+        elist.addChild(stringExpr);
+
+        DetailAST match = support.findFirstStringArgument(elist, extractor);
+        assertEquals(stringExpr, match, "Should return first matching string expression");
+    }
+
+    @Test
+    @DisplayName("Find string argument expression returns direct string literal expr")
+    void findStringArgumentExpression_directLiteral_returnsExpr() {
+        MessageTemplateExtractor extractor = new MessageTemplateExtractor(expr -> false);
+        DetailAstImpl expr = createExpr(createStringLiteral("text"));
+
+        DetailAST match = support.findStringArgumentExpression(expr, extractor);
+        assertEquals(expr, match, "Should return the expression containing the string literal");
+    }
+
+    @Test
+    @DisplayName("Find string argument expression unwraps new expression arguments")
+    void findStringArgumentExpression_unwrapsNewExpressionArguments() {
+        MessageTemplateExtractor extractor = new MessageTemplateExtractor(expr -> false);
+
+        DetailAstImpl stringExpr = createExpr(createStringLiteral("message"));
+        DetailAstImpl elist = createElist(stringExpr);
+        DetailAstImpl literalNew = createNewWithElist(elist);
+        DetailAstImpl expr = createExpr(literalNew);
+
+        DetailAST match = support.findStringArgumentExpression(expr, extractor);
+        assertEquals(stringExpr, match, "Should return nested string argument expression");
+    }
+
+    @Test
+    @DisplayName("Find string argument expression returns null for non string")
+    void findStringArgumentExpression_nonString_returnsNull() {
+        MessageTemplateExtractor extractor = new MessageTemplateExtractor(expr -> false);
+        DetailAstImpl expr = createExpr(createIdent("value"));
+
+        DetailAST match = support.findStringArgumentExpression(expr, extractor);
+        assertNull(match, "Should return null when no string literal is found");
+    }
+
+    private DetailAstImpl createExpr(DetailAstImpl child) {
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        expr.addChild(child);
+        return expr;
+    }
+
+    private DetailAstImpl createElist(DetailAstImpl... exprs) {
+        DetailAstImpl elist = new DetailAstImpl();
+        elist.setType(TokenTypes.ELIST);
+        for (DetailAstImpl expr : exprs) {
+            elist.addChild(expr);
+        }
+        return elist;
+    }
+
+    private DetailAstImpl createNewWithElist(DetailAstImpl elist) {
+        DetailAstImpl literalNew = new DetailAstImpl();
+        literalNew.setType(TokenTypes.LITERAL_NEW);
+        literalNew.addChild(elist);
+        return literalNew;
+    }
+
+    private DetailAstImpl createStringLiteral(String text) {
+        DetailAstImpl literal = new DetailAstImpl();
+        literal.setType(TokenTypes.STRING_LITERAL);
+        literal.setText("\"" + text + "\"");
+        return literal;
+    }
+
+    private DetailAstImpl createIdent(String name) {
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText(name);
+        return ident;
     }
 }

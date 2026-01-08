@@ -13,6 +13,7 @@ import java.util.Map;
 public final class RuleEngine {
     private final MessageRuleSupport ruleSupport;
     private final AbstractMessageRule missingMessageRule;
+    private final AbstractMessageRule throwNullRule;
     private final List<AbstractMessageRule> rules;
 
     /**
@@ -24,6 +25,7 @@ public final class RuleEngine {
     public RuleEngine(MessageRuleSupport ruleSupport, Map<String, Integer> messageOccurrences) {
         this.ruleSupport = ruleSupport;
         this.missingMessageRule = new MMMissingMessage();
+        this.throwNullRule = new MMThrowNull();
         this.rules = buildRules(messageOccurrences);
     }
 
@@ -52,6 +54,10 @@ public final class RuleEngine {
                 currentMethodName, verbose, ruleSupport, suppressionTracker);
         RuleEvaluationState state = new RuleEvaluationState();
 
+        if (candidate.throwNull()) {
+            throwNullRule.evaluate(context, collector, state);
+            return;
+        }
         if (candidate.missingMessage()) {
             missingMessageRule.evaluate(context, collector, state);
             return;

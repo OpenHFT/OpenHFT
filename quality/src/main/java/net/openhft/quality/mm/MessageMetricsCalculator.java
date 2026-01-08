@@ -27,6 +27,7 @@ public final class MessageMetricsCalculator {
     private static final int MAX_WORD_LENGTH = 42;
 
     private static final Pattern WORD_SPLITTER = Pattern.compile("[^a-zA-Z0-9]+");
+    private static final Pattern INLINE_TAG_PLACEHOLDER = Pattern.compile("\\{@[^}]*\\}");
 
     private static final Set<String> FILLER_WORDS = new HashSet<>(
             java.util.Arrays.asList(
@@ -141,6 +142,7 @@ public final class MessageMetricsCalculator {
      */
     public String[] splitWords(String message) {
         requireNonNull(message);
-        return WORD_SPLITTER.split(message);
+        String cleaned = INLINE_TAG_PLACEHOLDER.matcher(message).replaceAll(" ");
+        return WORD_SPLITTER.split(cleaned);
     }
 }

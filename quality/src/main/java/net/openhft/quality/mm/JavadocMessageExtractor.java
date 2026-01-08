@@ -18,7 +18,8 @@ import static java.util.Objects.requireNonNull;
  * Extracts the first paragraph from Javadoc comments.
  */
 public final class JavadocMessageExtractor extends AbstractMessageExtractor {
-    private static final Pattern INLINE_TAG_PATTERN = Pattern.compile("\\{@[^}]*\\}");
+    private static final Pattern INLINE_TAG_PATTERN = Pattern.compile("\\{@\\s*([^\\s}]+)[^}]*\\}");
+    private static final String INLINE_TAG_PLACEHOLDER = "{@}";
     private static final Pattern PARAGRAPH_TAG_PATTERN = Pattern.compile("(?i)<p\\b[^>]*>");
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]+>");
 
@@ -143,7 +144,12 @@ public final class JavadocMessageExtractor extends AbstractMessageExtractor {
         int placeholderCount = 0;
         while (matcher.find()) {
             placeholderCount++;
-            matcher.appendReplacement(sb, "{}");
+            String tagName = matcher.group(1);
+            String replacement = INLINE_TAG_PLACEHOLDER;
+            if (tagName != null && !tagName.isEmpty()) {
+                replacement = "{@" + tagName + "}";
+            }
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
         }
         matcher.appendTail(sb);
         String withoutInline = sb.toString();

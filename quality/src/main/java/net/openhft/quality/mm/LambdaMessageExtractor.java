@@ -33,7 +33,14 @@ public final class LambdaMessageExtractor {
      * @return description string, or {@code null} if not a cheap supplier.
      */
     public String extractCheapSupplierDescription(DetailAST lambda) {
-        DetailAST body = lambda.findFirstToken(TokenTypes.EXPR).getFirstChild();
+        DetailAST expr = lambda.findFirstToken(TokenTypes.EXPR);
+        if (expr == null) {
+            return null;
+        }
+        DetailAST body = expr.getFirstChild();
+        if (body == null) {
+            return null;
+        }
         if (isCheapConcatenation(body)) {
             return describeCheapExpression(body);
         }
@@ -64,7 +71,14 @@ public final class LambdaMessageExtractor {
      * @return message string, or {@code null} if not extractable.
      */
     public String extractTrivialLambdaMessageDirect(DetailAST lambda) {
-        DetailAST body = lambda.findFirstToken(TokenTypes.EXPR).getFirstChild();
+        DetailAST expr = lambda.findFirstToken(TokenTypes.EXPR);
+        if (expr == null) {
+            return null;
+        }
+        DetailAST body = expr.getFirstChild();
+        if (body == null) {
+            return null;
+        }
         MessageTemplateExtractor templateExtractor = context.templateExtractor();
         if (body.getType() == TokenTypes.METHOD_CALL) {
             MessageTemplate template = templateExtractor.extractMessageTemplate(body);

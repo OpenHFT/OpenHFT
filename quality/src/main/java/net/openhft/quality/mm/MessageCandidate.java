@@ -18,6 +18,8 @@ public class MessageCandidate {
     private final int keyValueLabelCount;
     private final boolean constantMessage;
     private final boolean missingMessage;
+    private final MissingMessageKind missingMessageKind;
+    private final boolean throwNull;
     private final boolean assertAllHeading;
     private final boolean assertJOverride;
     private final String trivialSupplierDescription;
@@ -41,6 +43,8 @@ public class MessageCandidate {
         this.keyValueLabelCount = builder.keyValueLabelCount;
         this.constantMessage = builder.constantMessage;
         this.missingMessage = builder.missingMessage;
+        this.missingMessageKind = builder.missingMessageKind;
+        this.throwNull = builder.throwNull;
         this.assertAllHeading = builder.assertAllHeading;
         this.assertJOverride = builder.assertJOverride;
         this.trivialSupplierDescription = builder.trivialSupplierDescription;
@@ -130,6 +134,24 @@ public class MessageCandidate {
      */
     public boolean missingMessage() {
         return missingMessage;
+    }
+
+    /**
+     * Return the missing message kind for fix guidance.
+     *
+     * @return missing message kind, or {@code null} when unspecified.
+     */
+    public MissingMessageKind missingMessageKind() {
+        return missingMessageKind;
+    }
+
+    /**
+     * Return whether the throw statement uses a null literal.
+     *
+     * @return {@code true} if the throw statement is a null literal.
+     */
+    public boolean throwNull() {
+        return throwNull;
     }
 
     /**
@@ -261,6 +283,8 @@ public class MessageCandidate {
         private int keyValueLabelCount;
         private boolean constantMessage;
         private boolean missingMessage;
+        private MissingMessageKind missingMessageKind;
+        private boolean throwNull;
         private boolean assertAllHeading;
         private boolean assertJOverride;
         private String trivialSupplierDescription;
@@ -366,6 +390,28 @@ public class MessageCandidate {
          */
         public Builder missingMessage(boolean missingMessage) {
             this.missingMessage = missingMessage;
+            return this;
+        }
+
+        /**
+         * Set the missing message kind for fix guidance.
+         *
+         * @param missingMessageKind missing message kind to guide fixes.
+         * @return this builder for chaining.
+         */
+        public Builder missingMessageKind(MissingMessageKind missingMessageKind) {
+            this.missingMessageKind = missingMessageKind;
+            return this;
+        }
+
+        /**
+         * Set whether the throw statement uses a null literal.
+         *
+         * @param throwNull {@code true} when the throw statement is a null literal.
+         * @return this builder for chaining.
+         */
+        public Builder throwNull(boolean throwNull) {
+            this.throwNull = throwNull;
             return this;
         }
 

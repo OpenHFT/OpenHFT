@@ -31,10 +31,24 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
     public void handleThrowStatement(DetailAST throwAst) {
         DetailAST expr = throwAst.findFirstToken(TokenTypes.EXPR);
         if (expr == null) {
+            emitUnhandled(throwAst, "Throw statement missing expression");
+            return;
+        }
+        if (astSupport().isNullLiteral(expr)) {
+            MessageCandidate candidate = new MessageCandidate.Builder()
+                    .source(MessageSource.THROW)
+                    .lineNo(throwAst.getLineNo())
+                    .throwNull(true)
+                    .build();
+            sink().emitCandidate(candidate);
             return;
         }
         DetailAST literalNew = expr.findFirstToken(TokenTypes.LITERAL_NEW);
         if (literalNew == null) {
+            if (isThrowableRethrow(expr)) {
+                return;
+            }
+            emitUnhandled(throwAst, "Throw statement does not construct new exception");
             return;
         }
         String exceptionClassName = astSupport().extractNewClassName(literalNew);
@@ -43,35 +57,28 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         }
         DetailAST elist = literalNew.findFirstToken(TokenTypes.ELIST);
         if (elist == null) {
+            emitUnhandled(literalNew, "Thrown exception has no argument list");
             return;
         }
         List<DetailAST> args = astSupport().collectArguments(elist);
-        boolean hasMessageArg = false;
-        for (DetailAST arg : args) {
-            if (astSupport().isNullLiteral(arg)) {
-                continue;
-            }
-            if (!isThrowableExpression(arg)) {
-                hasMessageArg = true;
-                break;
-            }
-        }
-        if (!hasMessageArg) {
+        DetailAST messageExpr = findMessageExpression(args);
+        if (messageExpr == null) {
             if (!context().hasInlineReasonComment(literalNew)) {
                 sink().emitMissingMessage(throwAst.getLineNo(), MessageSource.THROW);
             }
             return;
         }
-        MessageTemplateExtractor templateExtractor = context().templateExtractor();
-        DetailAST messageExpr = astSupport().findFirstStringArgument(elist, templateExtractor);
-        if (messageExpr == null) {
-            return;
-        }
-        MessageTemplate template = templateExtractor.extractMessageTemplate(messageExpr);
+        MessageTemplate template = extractMessageTemplate(messageExpr);
         if (template == null) {
+            if (isThrowableMessageCall(messageExpr)) {
+                return;
+            }
+            if (!context().hasInlineReasonComment(literalNew)) {
+                sink().emitMissingMessage(throwAst.getLineNo(), MessageSource.THROW);
+            }
             return;
         }
-        int keyValueLabelCount = templateExtractor.countKeyValueLabels(template.message());
+        int keyValueLabelCount = context().templateExtractor().countKeyValueLabels(template.message());
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(MessageSource.THROW)
                 .lineNo(messageExpr.getLineNo())
@@ -96,7 +103,87 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             String typeName = context().getVariableType(content.getText());
             return isThrowableTypeName(typeName);
         }
+        if (content.getType() == TokenTypes.DOT) {
+            DetailAST ident = astSupport().findRightmostIdent(content);
+            if (ident == null) {
+                return false;
+            }
+            String typeName = context().getVariableType(ident.getText());
+            if (isThrowableTypeName(typeName)) {
+                return true;
+            }
+            String qualifier = astSupport().extractQualifierIdent(content);
+            return isThrowableTypeName(qualifier);
+        }
         return false;
+    }
+
+    private DetailAST findMessageExpression(List<DetailAST> args) {
+        for (DetailAST arg : args) {
+            if (astSupport().isNullLiteral(arg)) {
+                continue;
+            }
+            if (isThrowableExpression(arg)) {
+                continue;
+            }
+            if (extractMessageTemplate(arg) != null) {
+                return arg;
+            }
+            if (isThrowableMessageCall(arg)) {
+                return arg;
+            }
+        }
+        return null;
+    }
+
+    private MessageTemplate extractMessageTemplate(DetailAST expr) {
+        return context().extractMessageTemplate(expr);
+    }
+
+    private boolean isThrowableRethrow(DetailAST expr) {
+        DetailAST content = astSupport().unwrapExpr(expr);
+        if (content == null) {
+            return false;
+        }
+        if (content.getType() == TokenTypes.TYPECAST) {
+            DetailAST type = content.findFirstToken(TokenTypes.TYPE);
+            if (type != null) {
+                String typeName = astSupport().extractTypeName(type);
+                if (isThrowableTypeName(typeName)) {
+                    return true;
+                }
+            }
+            DetailAST castExpr = content.getLastChild();
+            return castExpr != null && isThrowableExpression(castExpr);
+        }
+        if (content.getType() == TokenTypes.METHOD_CALL) {
+            return true;
+        }
+        if (content.getType() == TokenTypes.IDENT || content.getType() == TokenTypes.DOT) {
+            return isThrowableExpression(content);
+        }
+        return false;
+    }
+
+    private boolean isThrowableMessageCall(DetailAST expr) {
+        DetailAST content = astSupport().unwrapExpr(expr);
+        if (content == null || content.getType() != TokenTypes.METHOD_CALL) {
+            return false;
+        }
+        String methodName = astSupport().extractMethodName(content);
+        if (!"getMessage".equals(methodName)) {
+            return false;
+        }
+        DetailAST dot = content.findFirstToken(TokenTypes.DOT);
+        if (dot == null) {
+            return false;
+        }
+        String qualifier = astSupport().extractQualifierIdent(dot);
+        if (qualifier == null || qualifier.isEmpty()) {
+            return false;
+        }
+        String typeName = context().getVariableType(qualifier);
+        return isThrowableTypeName(typeName);
     }
 
     private boolean isThrowableTypeName(String typeName) {

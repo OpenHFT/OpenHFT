@@ -6,6 +6,7 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,324 +17,10 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link MessageTemplateExtractor}.
  */
 @SuppressWarnings("MMDisplayName")
+@DisplayName("Message template extractor tests scenario case")
 class MessageTemplateExtractorTest {
 
     private MessageTemplateExtractor extractor;
-
-    @BeforeEach
-    void setUp() {
-        extractor = new MessageTemplateExtractor(null);
-    }
-
-    @Test
-    void constructorWithNullLocaleDetector() {
-        MessageTemplateExtractor ext = new MessageTemplateExtractor(null);
-        assertNotNull(ext, "should create extractor with null locale detector");
-    }
-
-    @Test
-    void constructorWithLocaleDetector() {
-        MessageTemplateExtractor ext = new MessageTemplateExtractor(expr -> true);
-        assertNotNull(ext, "should create extractor with locale detector");
-    }
-
-    // --- countKeyValueLabels tests ---
-
-    @Test
-    void countKeyValueLabels_null_returnsZero() {
-        assertEquals(0, extractor.countKeyValueLabels(null),
-                "null should return 0");
-    }
-
-    @Test
-    void countKeyValueLabels_empty_returnsZero() {
-        assertEquals(0, extractor.countKeyValueLabels(""),
-                "empty string should return 0");
-    }
-
-    @Test
-    void countKeyValueLabels_noLabels_returnsZero() {
-        assertEquals(0, extractor.countKeyValueLabels("some text without labels"),
-                "text without labels should return 0");
-    }
-
-    @Test
-    void countKeyValueLabels_oneLabel() {
-        assertEquals(1, extractor.countKeyValueLabels("key="),
-                "one label should return 1");
-    }
-
-    @Test
-    void countKeyValueLabels_oneLabel_withColon() {
-        assertEquals(1, extractor.countKeyValueLabels("key:"),
-                "one label with colon should return 1");
-    }
-
-    @Test
-    void countKeyValueLabels_multipleLabels() {
-        assertEquals(2, extractor.countKeyValueLabels("index= size="),
-                "two labels should return 2");
-    }
-
-    // --- countAnnotationPlaceholders tests ---
-
-    @Test
-    void countAnnotationPlaceholders_null_returnsZero() {
-        assertEquals(0, extractor.countAnnotationPlaceholders(null),
-                "null should return 0");
-    }
-
-    @Test
-    void countAnnotationPlaceholders_empty_returnsZero() {
-        assertEquals(0, extractor.countAnnotationPlaceholders(""),
-                "empty string should return 0");
-    }
-
-    @Test
-    void countAnnotationPlaceholders_noPlaceholders_returnsZero() {
-        assertEquals(0, extractor.countAnnotationPlaceholders("some text"),
-                "text without placeholders should return 0");
-    }
-
-    @Test
-    void countAnnotationPlaceholders_indexPlaceholder() {
-        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{index}]"),
-                "one {index} should return 1");
-    }
-
-    @Test
-    void countAnnotationPlaceholders_displayNamePlaceholder() {
-        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{displayName}]"),
-                "one {displayName} should return 1");
-    }
-
-    @Test
-    void countAnnotationPlaceholders_argumentsPlaceholder() {
-        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{arguments}]"),
-                "one {arguments} should return 1");
-    }
-
-    @Test
-    void countAnnotationPlaceholders_numberedPlaceholder() {
-        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{0}]"),
-                "one {0} should return 1");
-    }
-
-    @Test
-    void countAnnotationPlaceholders_multiplePlaceholders() {
-        assertEquals(2, extractor.countAnnotationPlaceholders("Test [{index}] [{displayName}]"),
-                "two placeholders should return 2");
-    }
-
-    // --- countLogPlaceholders tests ---
-
-    @Test
-    void countLogPlaceholders_null_returnsZero() {
-        assertEquals(0, extractor.countLogPlaceholders(null),
-                "null should return 0");
-    }
-
-    @Test
-    void countLogPlaceholders_empty_returnsZero() {
-        assertEquals(0, extractor.countLogPlaceholders(""),
-                "empty string should return 0");
-    }
-
-    @Test
-    void countLogPlaceholders_noPlaceholders_returnsZero() {
-        assertEquals(0, extractor.countLogPlaceholders("some text without placeholders"),
-                "text without placeholders should return 0");
-    }
-
-    @Test
-    void countLogPlaceholders_slf4jStyle() {
-        assertEquals(1, extractor.countLogPlaceholders("Value is {}"),
-                "one {} should return 1");
-    }
-
-    @Test
-    void countLogPlaceholders_multipleSlf4j() {
-        assertEquals(3, extractor.countLogPlaceholders("a={} b={} c={}"),
-                "three {} should return 3");
-    }
-
-    // --- countFormatPlaceholders tests ---
-
-    @Test
-    void countFormatPlaceholders_null_returnsZero() {
-        assertEquals(0, extractor.countFormatPlaceholders(null),
-                "null should return 0");
-    }
-
-    @Test
-    void countFormatPlaceholders_empty_returnsZero() {
-        assertEquals(0, extractor.countFormatPlaceholders(""),
-                "empty string should return 0");
-    }
-
-    @Test
-    void countFormatPlaceholders_noPlaceholders_returnsZero() {
-        assertEquals(0, extractor.countFormatPlaceholders("some text"),
-                "text without placeholders should return 0");
-    }
-
-    @Test
-    void countFormatPlaceholders_percentS() {
-        assertEquals(1, extractor.countFormatPlaceholders("Value is %s"),
-                "one %s should return 1");
-    }
-
-    @Test
-    void countFormatPlaceholders_percentD() {
-        assertEquals(1, extractor.countFormatPlaceholders("Count: %d"),
-                "one %d should return 1");
-    }
-
-    @Test
-    void countFormatPlaceholders_percentF() {
-        assertEquals(1, extractor.countFormatPlaceholders("Value: %f"),
-                "one %f should return 1");
-    }
-
-    @Test
-    void countFormatPlaceholders_multipleStringFormat() {
-        assertEquals(3, extractor.countFormatPlaceholders("a=%s b=%d c=%f"),
-                "three format placeholders should return 3");
-    }
-
-    @Test
-    void countFormatPlaceholders_messageFormat() {
-        assertEquals(1, extractor.countFormatPlaceholders("Value is {0}"),
-                "one {0} should return 1");
-    }
-
-    @Test
-    void countFormatPlaceholders_multipleMessageFormat() {
-        assertEquals(3, extractor.countFormatPlaceholders("a={0} b={1} c={2}"),
-                "three {n} should return 3");
-    }
-
-    @Test
-    void countFormatPlaceholders_mixedFormats_returnsMax() {
-        // If mixed, returns max of either style
-        assertEquals(2, extractor.countFormatPlaceholders("{0} {1} %s"),
-                "should return max count between styles");
-    }
-
-    @Test
-    void countFormatPlaceholders_escapedPercent() {
-        // Note: the pattern may still match if % is followed by valid format chars
-        // Testing that first % is skipped when followed by another %
-        assertEquals(0, extractor.countFormatPlaceholders("progress is %%"),
-                "escaped %% should not count when nothing follows");
-    }
-
-    // --- extractStringLiteral null handling ---
-
-    @Test
-    void extractStringLiteral_null_throwsNPE() {
-        assertThrows(NullPointerException.class,
-                () -> extractor.extractStringLiteral(null),
-                "should throw NPE for null");
-    }
-
-    @Test
-    void extractStringLiteral_allowMethodCall_null_throwsNPE() {
-        assertThrows(NullPointerException.class,
-                () -> extractor.extractStringLiteral(null, true),
-                "should throw NPE for null");
-    }
-
-    // --- isConstantStringExpression null handling ---
-
-    @Test
-    void isConstantStringExpression_null_throwsNPE() {
-        assertThrows(NullPointerException.class,
-                () -> extractor.isConstantStringExpression(null),
-                "should throw NPE for null");
-    }
-
-    // --- extractConstantString null handling ---
-
-    @Test
-    void extractConstantString_null_throwsNPE() {
-        assertThrows(NullPointerException.class,
-                () -> extractor.extractConstantString(null),
-                "should throw NPE for null");
-    }
-
-    // --- countPlaceholderTokens null handling ---
-
-    @Test
-    void countPlaceholderTokens_null_throwsNPE() {
-        assertThrows(NullPointerException.class,
-                () -> extractor.countPlaceholderTokens(null),
-                "should throw NPE for null");
-    }
-
-    // --- extractMessageTemplate null handling ---
-
-    @Test
-    void extractMessageTemplate_null_throwsNPE() {
-        assertThrows(NullPointerException.class,
-                () -> extractor.extractMessageTemplate(null),
-                "should throw NPE for null");
-    }
-
-    @Test
-    void extractMessageTemplate_formatWithLocaleUsesSecondArgument() {
-        DetailAST localeExpr = exprWithIdent("locale");
-        DetailAST templateExpr = exprWithString("value %s");
-        DetailAST extraExpr = exprWithIdent("count");
-        DetailAST elist = elist(localeExpr, templateExpr, extraExpr);
-        DetailAST dot = dot(ident("String"), ident("format"));
-        DetailAST methodCall = methodCall(dot, elist);
-
-        MessageTemplateExtractor localExtractor = new MessageTemplateExtractor(expr -> expr == localeExpr);
-        MessageTemplate template = localExtractor.extractMessageTemplate(methodCall);
-
-        assertNotNull(template, "format call should produce a template");
-        assertEquals("value %s", template.message(), "template should use format string argument");
-        assertEquals(1, template.placeholderCount(), "template should count format placeholders");
-        assertTrue(template.fromFormatCall(), "template should be marked as format call");
-    }
-
-    @Test
-    void extractMessageTemplate_formattedUsesReceiverTemplate() {
-        DetailAST receiver = stringLiteral("count %d");
-        DetailAST dot = dot(receiver, ident("formatted"));
-        DetailAST methodCall = methodCall(dot, null);
-
-        MessageTemplate template = extractor.extractMessageTemplate(methodCall);
-
-        assertNotNull(template, "formatted call should produce a template");
-        assertEquals("count %d", template.message(), "template should use receiver string");
-        assertEquals(1, template.placeholderCount(), "template should count format placeholders");
-        assertTrue(template.fromFormatCall(), "formatted template should be marked as format call");
-    }
-
-    @Test
-    void extractMessageTemplate_concatenationProducesPlaceholder() {
-        DetailAST plus = plus(stringLiteral("value "), ident("count"));
-        DetailAST expr = expr(plus);
-
-        MessageTemplate template = extractor.extractMessageTemplate(expr);
-
-        assertNotNull(template, "concatenation should produce a template");
-        assertEquals("value {}", template.message(), "template should include placeholder for concatenated value");
-        assertEquals(1, template.placeholderCount(), "template should count concatenation placeholder");
-        assertFalse(template.fromFormatCall(), "concatenation template should not be marked as format call");
-    }
-
-    @Test
-    void extractMessageTemplate_nonFormatMethodCallReturnsNull() {
-        DetailAST dot = dot(ident("value"), ident("toString"));
-        DetailAST methodCall = methodCall(dot, null);
-
-        MessageTemplate template = extractor.extractMessageTemplate(methodCall);
-
-        assertNull(template, "non-format method call should not produce a template");
-    }
 
     private static DetailAST expr(DetailAST child) {
         DetailAST expr = mock(DetailAST.class);
@@ -351,6 +38,8 @@ class MessageTemplateExtractorTest {
     private static DetailAST exprWithIdent(String name) {
         return expr(ident(name));
     }
+
+    // --- countKeyValueLabels tests ---
 
     private static DetailAST stringLiteral(String text) {
         DetailAST literal = mock(DetailAST.class);
@@ -402,5 +91,360 @@ class MessageTemplateExtractorTest {
         when(exprs[exprs.length - 1].getNextSibling()).thenReturn(null);
         when(elist.getFirstChild()).thenReturn(exprs[0]);
         return elist;
+    }
+
+    // --- countAnnotationPlaceholders tests ---
+
+    @BeforeEach
+    void setUp() {
+        extractor = new MessageTemplateExtractor(null);
+    }
+
+    @Test
+    @DisplayName("Constructor with null locale detector scenario")
+    void constructorWithNullLocaleDetector() {
+        MessageTemplateExtractor ext = new MessageTemplateExtractor(null);
+        assertNotNull(ext, "should create extractor with null locale detector");
+    }
+
+    @Test
+    @DisplayName("Constructor with locale detector scenario case")
+    void constructorWithLocaleDetector() {
+        MessageTemplateExtractor ext = new MessageTemplateExtractor(expr -> true);
+        assertNotNull(ext, "should create extractor with locale detector");
+    }
+
+    @Test
+    @DisplayName("Count key value labels null returns zero")
+    void countKeyValueLabels_null_returnsZero() {
+        assertEquals(0, extractor.countKeyValueLabels(null),
+                "null should return 0");
+    }
+
+    @Test
+    @DisplayName("Count key value labels empty returns zero")
+    void countKeyValueLabels_empty_returnsZero() {
+        assertEquals(0, extractor.countKeyValueLabels(""),
+                "empty string should return 0");
+    }
+
+    @Test
+    @DisplayName("Count key value labels no labels returns zero")
+    void countKeyValueLabels_noLabels_returnsZero() {
+        assertEquals(0, extractor.countKeyValueLabels("some text without labels"),
+                "text without labels should return 0");
+    }
+
+    @Test
+    @DisplayName("Count key value labels one label")
+    void countKeyValueLabels_oneLabel() {
+        assertEquals(1, extractor.countKeyValueLabels("key="),
+                "one label should return 1");
+    }
+
+    @Test
+    @DisplayName("Count key value labels one label with colon")
+    void countKeyValueLabels_oneLabel_withColon() {
+        assertEquals(1, extractor.countKeyValueLabels("key:"),
+                "one label with colon should return 1");
+    }
+
+    // --- countLogPlaceholders tests ---
+
+    @Test
+    @DisplayName("Count key value labels multiple labels")
+    void countKeyValueLabels_multipleLabels() {
+        assertEquals(2, extractor.countKeyValueLabels("index= size="),
+                "two labels should return 2");
+    }
+
+    @Test
+    @DisplayName("Count annotation placeholders null returns zero")
+    void countAnnotationPlaceholders_null_returnsZero() {
+        assertEquals(0, extractor.countAnnotationPlaceholders(null),
+                "null should return 0");
+    }
+
+    @Test
+    @DisplayName("Count annotation placeholders empty returns zero")
+    void countAnnotationPlaceholders_empty_returnsZero() {
+        assertEquals(0, extractor.countAnnotationPlaceholders(""),
+                "empty string should return 0");
+    }
+
+    @Test
+    @DisplayName("Count annotation placeholders no placeholders returns zero")
+    void countAnnotationPlaceholders_noPlaceholders_returnsZero() {
+        assertEquals(0, extractor.countAnnotationPlaceholders("some text"),
+                "text without placeholders should return 0");
+    }
+
+    @Test
+    @DisplayName("Count annotation placeholders index placeholder scenario")
+    void countAnnotationPlaceholders_indexPlaceholder() {
+        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{index}]"),
+                "one {index} should return 1");
+    }
+
+    // --- countFormatPlaceholders tests ---
+
+    @Test
+    @DisplayName("Count annotation placeholders display name placeholder")
+    void countAnnotationPlaceholders_displayNamePlaceholder() {
+        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{displayName}]"),
+                "one {displayName} should return 1");
+    }
+
+    @Test
+    @DisplayName("Count annotation placeholders arguments placeholder scenario")
+    void countAnnotationPlaceholders_argumentsPlaceholder() {
+        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{arguments}]"),
+                "one {arguments} should return 1");
+    }
+
+    @Test
+    @DisplayName("Count annotation placeholders numbered placeholder scenario")
+    void countAnnotationPlaceholders_numberedPlaceholder() {
+        assertEquals(1, extractor.countAnnotationPlaceholders("Test [{0}]"),
+                "one {0} should return 1");
+    }
+
+    @Test
+    @DisplayName("Count annotation placeholders multiple placeholders scenario")
+    void countAnnotationPlaceholders_multiplePlaceholders() {
+        assertEquals(2, extractor.countAnnotationPlaceholders("Test [{index}] [{displayName}]"),
+                "two placeholders should return 2");
+    }
+
+    @Test
+    @DisplayName("Count log placeholders null returns zero")
+    void countLogPlaceholders_null_returnsZero() {
+        assertEquals(0, extractor.countLogPlaceholders(null),
+                "null should return 0");
+    }
+
+    @Test
+    @DisplayName("Count log placeholders empty returns zero")
+    void countLogPlaceholders_empty_returnsZero() {
+        assertEquals(0, extractor.countLogPlaceholders(""),
+                "empty string should return 0");
+    }
+
+    @Test
+    @DisplayName("Count log placeholders no placeholders returns zero")
+    void countLogPlaceholders_noPlaceholders_returnsZero() {
+        assertEquals(0, extractor.countLogPlaceholders("some text without placeholders"),
+                "text without placeholders should return 0");
+    }
+
+    @Test
+    @DisplayName("Count log placeholders slf 4 j style")
+    void countLogPlaceholders_slf4jStyle() {
+        assertEquals(1, extractor.countLogPlaceholders("Value is {}"),
+                "one {} should return 1");
+    }
+
+    @Test
+    @DisplayName("Count log placeholders multiple slf 4 j")
+    void countLogPlaceholders_multipleSlf4j() {
+        assertEquals(3, extractor.countLogPlaceholders("a={} b={} c={}"),
+                "three {} should return 3");
+    }
+
+    @Test
+    @DisplayName("Count format placeholders null returns zero")
+    void countFormatPlaceholders_null_returnsZero() {
+        assertEquals(0, extractor.countFormatPlaceholders(null),
+                "null should return 0");
+    }
+
+    @Test
+    @DisplayName("Count format placeholders empty returns zero")
+    void countFormatPlaceholders_empty_returnsZero() {
+        assertEquals(0, extractor.countFormatPlaceholders(""),
+                "empty string should return 0");
+    }
+
+    // --- extractStringLiteral null handling ---
+
+    @Test
+    @DisplayName("Count format placeholders no placeholders returns zero")
+    void countFormatPlaceholders_noPlaceholders_returnsZero() {
+        assertEquals(0, extractor.countFormatPlaceholders("some text"),
+                "text without placeholders should return 0");
+    }
+
+    @Test
+    @DisplayName("Count format placeholders percent S scenario")
+    void countFormatPlaceholders_percentS() {
+        assertEquals(1, extractor.countFormatPlaceholders("Value is %s"),
+                "one %s should return 1");
+    }
+
+    // --- isConstantStringExpression null handling ---
+
+    @Test
+    @DisplayName("Count format placeholders percent D scenario")
+    void countFormatPlaceholders_percentD() {
+        assertEquals(1, extractor.countFormatPlaceholders("Count: %d"),
+                "one %d should return 1");
+    }
+
+    // --- extractConstantString null handling ---
+
+    @Test
+    @DisplayName("Count format placeholders percent F scenario")
+    void countFormatPlaceholders_percentF() {
+        assertEquals(1, extractor.countFormatPlaceholders("Value: %f"),
+                "one %f should return 1");
+    }
+
+    // --- countPlaceholderTokens null handling ---
+
+    @Test
+    @DisplayName("Count format placeholders multiple string format")
+    void countFormatPlaceholders_multipleStringFormat() {
+        assertEquals(3, extractor.countFormatPlaceholders("a=%s b=%d c=%f"),
+                "three format placeholders should return 3");
+    }
+
+    // --- extractMessageTemplate null handling ---
+
+    @Test
+    @DisplayName("Count format placeholders message format scenario")
+    void countFormatPlaceholders_messageFormat() {
+        assertEquals(1, extractor.countFormatPlaceholders("Value is {0}"),
+                "one {0} should return 1");
+    }
+
+    @Test
+    @DisplayName("Count format placeholders multiple message format")
+    void countFormatPlaceholders_multipleMessageFormat() {
+        assertEquals(3, extractor.countFormatPlaceholders("a={0} b={1} c={2}"),
+                "three {n} should return 3");
+    }
+
+    @Test
+    @DisplayName("Count format placeholders mixed formats returns max")
+    void countFormatPlaceholders_mixedFormats_returnsMax() {
+        // If mixed, returns max of either style
+        assertEquals(2, extractor.countFormatPlaceholders("{0} {1} %s"),
+                "should return max count between styles");
+    }
+
+    @Test
+    @DisplayName("Count format placeholders escaped percent scenario")
+    void countFormatPlaceholders_escapedPercent() {
+        // Note: the pattern may still match if % is followed by valid format chars
+        // Testing that first % is skipped when followed by another %
+        assertEquals(0, extractor.countFormatPlaceholders("progress is %%"),
+                "escaped %% should not count when nothing follows");
+    }
+
+    @Test
+    @DisplayName("Extract string literal null throws NPE")
+    void extractStringLiteral_null_throwsNPE() {
+        assertThrows(NullPointerException.class,
+                () -> extractor.extractStringLiteral(null),
+                "should throw NPE for null");
+    }
+
+    @Test
+    @DisplayName("Extract string literal allow method call null throws NPE")
+    void extractStringLiteral_allowMethodCall_null_throwsNPE() {
+        assertThrows(NullPointerException.class,
+                () -> extractor.extractStringLiteral(null, true),
+                "should throw NPE for null");
+    }
+
+    @Test
+    @DisplayName("Is constant string expression null throws NPE")
+    void isConstantStringExpression_null_throwsNPE() {
+        assertThrows(NullPointerException.class,
+                () -> extractor.isConstantStringExpression(null),
+                "should throw NPE for null");
+    }
+
+    @Test
+    @DisplayName("Extract constant string null throws NPE")
+    void extractConstantString_null_throwsNPE() {
+        assertThrows(NullPointerException.class,
+                () -> extractor.extractConstantString(null),
+                "should throw NPE for null");
+    }
+
+    @Test
+    @DisplayName("Count placeholder tokens null throws NPE")
+    void countPlaceholderTokens_null_throwsNPE() {
+        assertThrows(NullPointerException.class,
+                () -> extractor.countPlaceholderTokens(null),
+                "should throw NPE for null");
+    }
+
+    @Test
+    @DisplayName("Extract message template null throws NPE")
+    void extractMessageTemplate_null_throwsNPE() {
+        assertThrows(NullPointerException.class,
+                () -> extractor.extractMessageTemplate(null),
+                "should throw NPE for null");
+    }
+
+    @Test
+    @DisplayName("Extract message template format with locale uses second argument")
+    void extractMessageTemplate_formatWithLocaleUsesSecondArgument() {
+        DetailAST localeExpr = exprWithIdent("locale");
+        DetailAST templateExpr = exprWithString("value %s");
+        DetailAST extraExpr = exprWithIdent("count");
+        DetailAST elist = elist(localeExpr, templateExpr, extraExpr);
+        DetailAST dot = dot(ident("String"), ident("format"));
+        DetailAST methodCall = methodCall(dot, elist);
+
+        MessageTemplateExtractor localExtractor = new MessageTemplateExtractor(expr -> expr == localeExpr);
+        MessageTemplate template = localExtractor.extractMessageTemplate(methodCall);
+
+        assertNotNull(template, "format call should produce a template");
+        assertEquals("value %s", template.message(), "template should use format string argument");
+        assertEquals(1, template.placeholderCount(), "template should count format placeholders");
+        assertTrue(template.fromFormatCall(), "template should be marked as format call");
+    }
+
+    @Test
+    @DisplayName("Extract message template formatted uses receiver template")
+    void extractMessageTemplate_formattedUsesReceiverTemplate() {
+        DetailAST receiver = stringLiteral("count %d");
+        DetailAST dot = dot(receiver, ident("formatted"));
+        DetailAST methodCall = methodCall(dot, null);
+
+        MessageTemplate template = extractor.extractMessageTemplate(methodCall);
+
+        assertNotNull(template, "formatted call should produce a template");
+        assertEquals("count %d", template.message(), "template should use receiver string");
+        assertEquals(1, template.placeholderCount(), "template should count format placeholders");
+        assertTrue(template.fromFormatCall(), "formatted template should be marked as format call");
+    }
+
+    @Test
+    @DisplayName("Extract message template concatenation produces placeholder")
+    void extractMessageTemplate_concatenationProducesPlaceholder() {
+        DetailAST plus = plus(stringLiteral("value "), ident("count"));
+        DetailAST expr = expr(plus);
+
+        MessageTemplate template = extractor.extractMessageTemplate(expr);
+
+        assertNotNull(template, "concatenation should produce a template");
+        assertEquals("value {}", template.message(), "template should include placeholder for concatenated value");
+        assertEquals(1, template.placeholderCount(), "template should count concatenation placeholder");
+        assertFalse(template.fromFormatCall(), "concatenation template should not be marked as format call");
+    }
+
+    @Test
+    @DisplayName("Extract message template non format method call returns null")
+    void extractMessageTemplate_nonFormatMethodCallReturnsNull() {
+        DetailAST dot = dot(ident("value"), ident("toString"));
+        DetailAST methodCall = methodCall(dot, null);
+
+        MessageTemplate template = extractor.extractMessageTemplate(methodCall);
+
+        assertNull(template, "non-format method call should not produce a template");
     }
 }

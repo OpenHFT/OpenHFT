@@ -7,6 +7,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+
 import java.util.*;
 
 import static java.util.Objects.requireNonNull;
@@ -19,6 +20,8 @@ public final class MessageExtractionContext {
     private final Map<String, String> importedClasses = new HashMap<>();
     private final Map<String, String> fieldTypes = new HashMap<>();
     private final Map<String, String> methodVariableTypes = new HashMap<>();
+    private final Map<String, MessageTemplate> fieldStringTemplates = new HashMap<>();
+    private final Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
     private final Set<String> junit4StaticMethods = new HashSet<>();
     private final Set<String> junit5StaticMethods = new HashSet<>();
     private MessageTemplateExtractor templateExtractor;
@@ -33,6 +36,10 @@ public final class MessageExtractionContext {
     private boolean currentMethodIsTest;
     private boolean currentMethodHasDisplayName;
     private int currentMethodLineNo;
+    private String currentMethodFirstAnnotationName;
+    private int currentMethodFirstAnnotationLine;
+    private boolean currentMethodHasTestAnnotation;
+    private int currentMethodTestAnnotationLine;
 
     /**
      * Create a context using the provided AST support helpers.
@@ -89,6 +96,8 @@ public final class MessageExtractionContext {
         importedClasses.clear();
         fieldTypes.clear();
         methodVariableTypes.clear();
+        fieldStringTemplates.clear();
+        methodStringTemplates.clear();
         junit4StaticMethods.clear();
         junit5StaticMethods.clear();
         junit4StaticWildcard = false;
@@ -143,7 +152,12 @@ public final class MessageExtractionContext {
         currentMethodLineNo = methodAst.getLineNo();
         currentMethodIsTest = false;
         currentMethodHasDisplayName = false;
+        currentMethodFirstAnnotationName = null;
+        currentMethodFirstAnnotationLine = 0;
+        currentMethodHasTestAnnotation = false;
+        currentMethodTestAnnotationLine = 0;
         methodVariableTypes.clear();
+        methodStringTemplates.clear();
     }
 
     /**
@@ -154,7 +168,12 @@ public final class MessageExtractionContext {
         currentMethodIsTest = false;
         currentMethodHasDisplayName = false;
         currentMethodLineNo = 0;
+        currentMethodFirstAnnotationName = null;
+        currentMethodFirstAnnotationLine = 0;
+        currentMethodHasTestAnnotation = false;
+        currentMethodTestAnnotationLine = 0;
         methodVariableTypes.clear();
+        methodStringTemplates.clear();
     }
 
     /**
@@ -169,6 +188,26 @@ public final class MessageExtractionContext {
      */
     public void markCurrentMethodHasDisplayName() {
         currentMethodHasDisplayName = true;
+    }
+
+    /**
+     * Record an annotation applied to the current method.
+     *
+     * @param annotationName annotation simple name.
+     * @param lineNo         annotation line number.
+     */
+    public void recordMethodAnnotation(String annotationName, int lineNo) {
+        if (currentMethodName == null || annotationName == null) {
+            return;
+        }
+        if (currentMethodFirstAnnotationName == null) {
+            currentMethodFirstAnnotationName = annotationName;
+            currentMethodFirstAnnotationLine = lineNo;
+        }
+        if (isJUnit5TestAnnotation(annotationName)) {
+            currentMethodHasTestAnnotation = true;
+            currentMethodTestAnnotationLine = lineNo;
+        }
     }
 
     /**
@@ -187,6 +226,42 @@ public final class MessageExtractionContext {
      */
     public boolean currentMethodHasDisplayName() {
         return currentMethodHasDisplayName;
+    }
+
+    /**
+     * Check whether the current method declares a JUnit 5 @Test annotation.
+     *
+     * @return {@code true} if the current method has @Test.
+     */
+    public boolean currentMethodHasTestAnnotation() {
+        return currentMethodHasTestAnnotation;
+    }
+
+    /**
+     * Return the first annotation name recorded for the current method.
+     *
+     * @return first annotation name, or {@code null} if none recorded.
+     */
+    public String currentMethodFirstAnnotationName() {
+        return currentMethodFirstAnnotationName;
+    }
+
+    /**
+     * Return the line number where the first annotation was recorded.
+     *
+     * @return line number, or 0 if unknown.
+     */
+    public int currentMethodFirstAnnotationLine() {
+        return currentMethodFirstAnnotationLine;
+    }
+
+    /**
+     * Return the line number where @Test was recorded for the current method.
+     *
+     * @return line number, or 0 if @Test not recorded.
+     */
+    public int currentMethodTestAnnotationLine() {
+        return currentMethodTestAnnotationLine;
     }
 
     /**
@@ -292,11 +367,13 @@ public final class MessageExtractionContext {
         if (name == null || name.isEmpty()) {
             return;
         }
-        if (isInMethodOrCtor(varDef)) {
+        boolean inMethodOrCtor = isInMethodOrCtor(varDef);
+        if (inMethodOrCtor) {
             methodVariableTypes.put(name, typeName);
         } else {
             fieldTypes.put(name, typeName);
         }
+        recordStringTemplate(varDef, name, typeName, inMethodOrCtor);
     }
 
     /**
@@ -342,6 +419,84 @@ public final class MessageExtractionContext {
         }
         String imported = importedClasses.get(typeName);
         return imported != null ? imported : typeName;
+    }
+
+    private void recordStringTemplate(DetailAST varDef, String name, String typeName, boolean inMethodOrCtor) {
+        if (templateExtractor == null) {
+            return;
+        }
+        if (!isStringTypeName(typeName)) {
+            return;
+        }
+        DetailAST assign = varDef.findFirstToken(TokenTypes.ASSIGN);
+        if (assign == null) {
+            return;
+        }
+        DetailAST expr = assign.getLastChild();
+        if (expr == null) {
+            return;
+        }
+        MessageTemplate template = templateExtractor.extractMessageTemplate(expr);
+        if (template == null) {
+            return;
+        }
+        if (inMethodOrCtor) {
+            methodStringTemplates.put(name, template);
+        } else {
+            fieldStringTemplates.put(name, template);
+        }
+    }
+
+    private MessageTemplate resolveStringTemplate(String name) {
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        MessageTemplate template = methodStringTemplates.get(name);
+        if (template != null) {
+            return template;
+        }
+        return fieldStringTemplates.get(name);
+    }
+
+    /**
+     * Resolve a message template from a string variable reference.
+     *
+     * @param expr expression node.
+     * @return resolved message template, or {@code null} if not available.
+     */
+    public MessageTemplate resolveMessageTemplate(DetailAST expr) {
+        if (expr == null) {
+            return null;
+        }
+        DetailAST content = astSupport.unwrapExpr(expr);
+        if (content == null) {
+            return null;
+        }
+        if (content.getType() == TokenTypes.IDENT) {
+            return resolveStringTemplate(content.getText());
+        }
+        if (content.getType() == TokenTypes.DOT) {
+            DetailAST ident = astSupport.findRightmostIdent(content);
+            return ident == null ? null : resolveStringTemplate(ident.getText());
+        }
+        return null;
+    }
+
+    /**
+     * Extract a message template using variable templates and direct expression parsing.
+     *
+     * @param expr expression node.
+     * @return extracted message template, or {@code null} if not available.
+     */
+    public MessageTemplate extractMessageTemplate(DetailAST expr) {
+        MessageTemplate resolved = resolveMessageTemplate(expr);
+        if (resolved != null) {
+            return resolved;
+        }
+        if (templateExtractor == null) {
+            return null;
+        }
+        return templateExtractor.extractMessageTemplate(expr);
     }
 
     /**
@@ -508,6 +663,14 @@ public final class MessageExtractionContext {
         }
         String resolved = resolveTypeName(typeName);
         return "java.util.Locale".equals(resolved) || "Locale".equals(resolved);
+    }
+
+    private boolean isStringTypeName(String typeName) {
+        if (typeName == null) {
+            return false;
+        }
+        String resolved = resolveTypeName(typeName);
+        return "java.lang.String".equals(resolved) || "String".equals(resolved);
     }
 
     private String normalizeClassName(String className) {

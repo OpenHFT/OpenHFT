@@ -3,14 +3,17 @@
  */
 package net.openhft.quality.selfcheck;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("MMDisplayName")
+@DisplayName("Self check fixture tests scenario case")
 public class SelfCheckFixtureTest {
 
     @Test
+    @DisplayName("Test fixture usage scenario case detail")
     public void testFixtureUsage() {
         SelfCheckFixture fixture = new SelfCheckFixture();
         String value = "value";

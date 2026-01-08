@@ -4,15 +4,15 @@
 package net.openhft.quality.mm;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("MM missing loop index tests scenario")
 class MMMissingLoopIndexTest {
 
     private MMMissingLoopIndex rule;
@@ -27,6 +27,7 @@ class MMMissingLoopIndexTest {
     }
 
     @Test
+    @DisplayName("Evaluate skips when missing loop index false")
     void evaluateSkipsWhenMissingLoopIndexFalse() {
         MessageCandidate candidate = baseCandidate()
                 .missingLoopIndex(false)
@@ -38,9 +39,10 @@ class MMMissingLoopIndexTest {
     }
 
     @Test
+    @DisplayName("Evaluate skips when loop names empty")
     void evaluateSkipsWhenLoopNamesEmpty() {
         MessageCandidate candidate = baseCandidate()
-                .loopNames(Collections.<String>emptyList())
+                .loopNames(Collections.emptyList())
                 .missingLoopIndex(true)
                 .build();
 
@@ -50,6 +52,7 @@ class MMMissingLoopIndexTest {
     }
 
     @Test
+    @DisplayName("Evaluate records when loop names present")
     void evaluateRecordsWhenLoopNamesPresent() {
         MessageCandidate candidate = baseCandidate()
                 .missingLoopIndex(true)

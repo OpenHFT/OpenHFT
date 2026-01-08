@@ -3,6 +3,8 @@
  */
 package net.openhft.quality.mm;
 
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+
 /**
  * Base class for message extractors providing common context and sink access.
  */
@@ -40,6 +42,16 @@ public abstract class AbstractMessageExtractor {
      */
     protected final MessageCandidateSink sink() {
         return sink;
+    }
+
+    /**
+     * Emit a debug signal for an unhandled extraction case.
+     *
+     * @param ast    AST node related to the unhandled case.
+     * @param reason description of the unhandled case.
+     */
+    protected final void emitUnhandled(DetailAST ast, String reason) {
+        sink.emitUnhandled(ast, reason);
     }
 
     /**

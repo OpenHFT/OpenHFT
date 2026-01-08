@@ -30,6 +30,7 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
      */
     public void handleAnnotation(DetailAST annotationAst) {
         String annotationName = requireNonNull(extractAnnotationName(annotationAst));
+        context().recordMethodAnnotation(annotationName, annotationAst.getLineNo());
 
         // Track JUnit 5 test annotations (not JUnit 4)
         if (context().isJUnit5TestAnnotation(annotationName)) {
@@ -63,6 +64,7 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
         MessageTemplateExtractor templateExtractor = context().templateExtractor();
         String message = templateExtractor.extractStringLiteral(expr);
         if (message == null) {
+            emitUnhandled(expr, "Annotation attribute " + attributeName + " is not a string literal");
             return true;
         }
         int placeholderCount = templateExtractor.countAnnotationPlaceholders(message);

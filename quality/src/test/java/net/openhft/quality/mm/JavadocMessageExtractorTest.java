@@ -15,6 +15,7 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link JavadocMessageExtractor}.
  * Focuses on the isField method to improve mutation coverage.
  */
+@DisplayName("Javadoc message extractor tests scenario case")
 class JavadocMessageExtractorTest {
 
     private JavadocMessageExtractor extractor;
@@ -30,7 +31,7 @@ class JavadocMessageExtractorTest {
     // --- isField tests via handleField ---
 
     @Test
-    @DisplayName("handleField skips variable inside METHOD_DEF")
+    @DisplayName("Handle field skips variable inside method def")
     void handleField_skipsVariableInsideMethodDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.METHOD_DEF);
 
@@ -41,7 +42,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField skips variable inside CTOR_DEF")
+    @DisplayName("Handle field skips variable inside ctor def")
     void handleField_skipsVariableInsideCtorDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.CTOR_DEF);
 
@@ -52,7 +53,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField skips variable inside COMPACT_CTOR_DEF")
+    @DisplayName("Handle field skips variable inside compact ctor def")
     void handleField_skipsVariableInsideCompactCtorDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.COMPACT_CTOR_DEF);
 
@@ -62,7 +63,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField processes variable in CLASS_DEF")
+    @DisplayName("Handle field processes variable in class def")
     void handleField_processesVariableInClassDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.CLASS_DEF);
 
@@ -72,7 +73,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField processes variable in INTERFACE_DEF")
+    @DisplayName("Handle field processes variable in interface def")
     void handleField_processesVariableInInterfaceDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.INTERFACE_DEF);
 
@@ -82,7 +83,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField processes variable in ENUM_DEF")
+    @DisplayName("Handle field processes variable in enum def")
     void handleField_processesVariableInEnumDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.ENUM_DEF);
 
@@ -92,7 +93,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField processes variable in ANNOTATION_DEF")
+    @DisplayName("Handle field processes variable in annotation def")
     void handleField_processesVariableInAnnotationDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.ANNOTATION_DEF);
 
@@ -102,7 +103,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField processes variable in RECORD_DEF")
+    @DisplayName("Handle field processes variable in record def")
     void handleField_processesVariableInRecordDef() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.RECORD_DEF);
 
@@ -112,7 +113,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField processes variable in OBJBLOCK")
+    @DisplayName("Handle field processes variable in objblock")
     void handleField_processesVariableInObjblock() {
         DetailAST varDef = createVariableDefWithParent(TokenTypes.OBJBLOCK);
 
@@ -122,7 +123,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField returns false for orphan variable")
+    @DisplayName("Handle field returns false for orphan variable")
     void handleField_returnsFalseForOrphanVariable() {
         DetailAST varDef = mock(DetailAST.class);
         when(varDef.getType()).thenReturn(TokenTypes.VARIABLE_DEF);
@@ -136,7 +137,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField walks parent chain to find class")
+    @DisplayName("Handle field walks parent chain to find class")
     void handleField_walksParentChainToFindClass() {
         // Create: varDef -> SLIST -> METHOD_DEF
         DetailAST slist = mock(DetailAST.class);
@@ -158,7 +159,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField walks parent chain to find OBJBLOCK then CLASS_DEF")
+    @DisplayName("Handle field walks to objblock then class")
     void handleField_walksToObjblockThenClass() {
         // Create: varDef -> OBJBLOCK (stops here)
         DetailAST objblock = mock(DetailAST.class);
@@ -176,7 +177,7 @@ class JavadocMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("handleField with nested structure - local in lambda")
+    @DisplayName("Handle field local in lambda scenario")
     void handleField_localInLambda() {
         // varDef -> SLIST -> LAMBDA -> something -> METHOD_DEF
         DetailAST methodDef = mock(DetailAST.class);

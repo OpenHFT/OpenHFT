@@ -5,7 +5,11 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
@@ -52,6 +56,8 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                     int keyValueLabelCount = countKeyValueLabels(template.message());
                     emitMessageCandidate(template.message(), nextExpr.getLineNo(),
                             template.placeholderCount(), keyValueLabelCount);
+                } else {
+                    emitUnhandled(nextExpr, "Java assert message expression not recognised");
                 }
                 break;
             }
@@ -78,6 +84,8 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                         : AssertionOperandExtractor.AssertionStyle.UNKNOWN;
                 checkAssertionArguments(methodCall, elist, methodName, methodCall.getLineNo(),
                         source, style);
+            } else {
+                emitUnhandled(methodCall, "Assertion call without argument list: " + methodName);
             }
         }
     }
@@ -137,6 +145,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         int lastStringArgIndex = -1;
         int lastLambdaArgIndex = -1;
         Map<DetailAST, String> exprToInputValue = new IdentityHashMap<>();
+        Map<DetailAST, MessageTemplate> messageTemplates = new IdentityHashMap<>();
 
         DetailAST child = elist.getFirstChild();
         while (child != null) {
@@ -153,8 +162,16 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                         lastLambda = innerLambda;
                         lastLambdaArgIndex = argCount;
                     } else {
-                        String strLiteral = extractStringLiteral(child);
-                        if (strLiteral != null) {
+                        DetailAST content = astSupport().unwrapExpr(child);
+                        MessageTemplate template = extractMessageTemplate(child);
+                        boolean stringCandidate = template != null;
+                        if (!stringCandidate && content != null && typeAnalyzer.isStringTypedExpression(content)) {
+                            stringCandidate = true;
+                        }
+                        if (stringCandidate) {
+                            if (template != null) {
+                                messageTemplates.put(child, template);
+                            }
                             if (firstStringExpr == null) {
                                 firstStringExpr = child;
                                 firstStringArgIndex = argCount;
@@ -207,7 +224,9 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         }
 
         String cheapSupplierDesc = null;
-        if (lastLambda != null && lastLambdaArgIndex == argCount) {
+        boolean lambdaIsMessageArgument = isLambdaMessageArgument(methodName, style, argCount,
+                firstStringArgIndex, lastLambdaArgIndex);
+        if (lastLambda != null && lambdaIsMessageArgument) {
             String trivialLambdaMessage = lambdaExtractor.extractTrivialLambdaMessageDirect(lastLambda);
             if (trivialLambdaMessage == null) {
                 trivialLambdaMessage = lambdaExtractor.extractTrivialLambdaMessage(lastLambda.getParent());
@@ -226,13 +245,19 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 return;
             }
             cheapSupplierDesc = lambdaExtractor.extractCheapSupplierDescription(lastLambda);
+            if (cheapSupplierDesc == null) {
+                emitUnhandled(lastLambda, "Lambda message argument not recognised for " + methodName);
+            }
         }
 
-        DetailAST messageExpr = selectMessageExpression(methodName, argCount,
+        DetailAST messageExpr = selectMessageExpression(methodName, argCount, args,
                 firstStringExpr, firstStringArgIndex, lastStringExpr, lastStringArgIndex, source, style);
 
         if (messageExpr != null) {
-            MessageTemplate template = extractMessageTemplate(messageExpr);
+            MessageTemplate template = messageTemplates.get(messageExpr);
+            if (template == null) {
+                template = extractMessageTemplate(messageExpr);
+            }
             if (template != null) {
                 boolean argumentNameMessage = isRequireNonNullArgumentMessage(methodName, source, args, template);
                 List<String> inputValues = new ArrayList<>();
@@ -283,6 +308,10 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                             .stringSearchArg(searchInfo.searchArg());
                 }
                 sink().emitCandidate(builder.build());
+            } else {
+                if (!context().hasInlineReasonComment(methodCall)) {
+                    sink().emitMissingMessage(lineNo, source);
+                }
             }
         } else if (cheapSupplierDesc != null) {
             MessageCandidate candidate = new MessageCandidate.Builder()
@@ -291,13 +320,58 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                     .trivialSupplierDescription(cheapSupplierDesc)
                     .build();
             sink().emitCandidate(candidate);
+        } else if (firstStringExpr != null) {
+            if (source == MessageSource.ASSERTION && style == AssertionOperandExtractor.AssertionStyle.UNKNOWN) {
+                boolean missingMessage = false;
+                if (AssertionMethodClassifier.isEqualityAssertionMethod(methodName)) {
+                    missingMessage = argCount < 3;
+                } else if (AssertionMethodClassifier.isAssertThatMethod(methodName)) {
+                    missingMessage = argCount < 3;
+                } else if (AssertionMethodClassifier.isAssertThrowsMethod(methodName)
+                        || AssertionMethodClassifier.isTimeoutAssertionMethod(methodName)) {
+                    missingMessage = argCount < 3;
+                } else if (AssertionMethodClassifier.isDoesNotThrowMethod(methodName)
+                        || AssertionMethodClassifier.isBooleanAssertionMethod(methodName)
+                        || AssertionMethodClassifier.isNullnessAssertionMethod(methodName)) {
+                    missingMessage = argCount < 2;
+                } else if (methodName.startsWith("assert")) {
+                    missingMessage = argCount < 2;
+                }
+                if (missingMessage) {
+                    if (!context().hasInlineReasonComment(methodCall)) {
+                        sink().emitMissingMessage(lineNo, source);
+                    }
+                    return;
+                }
+            }
+            if (source == MessageSource.PRECONDITION && argCount < 2) {
+                if (!context().hasInlineReasonComment(methodCall)) {
+                    sink().emitMissingMessage(lineNo, source);
+                }
+                return;
+            }
+            if (source == MessageSource.ASSERTION
+                    && style == AssertionOperandExtractor.AssertionStyle.UNKNOWN
+                    && methodName.startsWith("assert")
+                    && !AssertionMethodClassifier.isRecognisedAssertionMethod(methodName)) {
+                return;
+            }
+            emitUnhandled(methodCall, "Unable to resolve message argument for " + methodName
+                    + " (argCount=" + argCount
+                    + ", firstStringIndex=" + firstStringArgIndex
+                    + ", lastStringIndex=" + lastStringArgIndex
+                    + ", style=" + style + ")");
         }
     }
 
-    private DetailAST selectMessageExpression(String methodName, int argCount,
+    private DetailAST selectMessageExpression(String methodName, int argCount, List<DetailAST> args,
                                               DetailAST firstStringExpr, int firstStringArgIndex,
                                               DetailAST lastStringExpr, int lastStringArgIndex,
                                               MessageSource source, AssertionOperandExtractor.AssertionStyle style) {
+        if (source == MessageSource.ASSERTION
+                && style == AssertionOperandExtractor.AssertionStyle.JUNIT4) {
+            return selectJUnit4MessageExpression(methodName, argCount, args);
+        }
         if (firstStringExpr == null) {
             return null;
         }
@@ -305,7 +379,13 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             if (argCount < 2) {
                 return null;
             }
-            return lastStringArgIndex == argCount ? lastStringExpr : null;
+            if (lastStringArgIndex == argCount) {
+                return lastStringExpr;
+            }
+            if (argCount == 2 && firstStringArgIndex == 1) {
+                return firstStringExpr;
+            }
+            return null;
         }
         if (source != MessageSource.ASSERTION) {
             return null;
@@ -322,6 +402,11 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         if (AssertionMethodClassifier.isAssertThrowsMethod(methodName)) {
             if (argCount < 3) {
                 return null;
+            }
+            if (style == AssertionOperandExtractor.AssertionStyle.JUNIT4
+                    || (style == AssertionOperandExtractor.AssertionStyle.UNKNOWN
+                    && firstStringArgIndex == 1)) {
+                return firstStringArgIndex == 1 ? firstStringExpr : null;
             }
             return lastStringArgIndex == argCount ? lastStringExpr : null;
         }
@@ -346,6 +431,38 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 lastStringExpr, lastStringArgIndex, argCount);
     }
 
+    private DetailAST selectJUnit4MessageExpression(String methodName, int argCount, List<DetailAST> args) {
+        if (args == null || args.isEmpty()) {
+            return null;
+        }
+        if (AssertionMethodClassifier.isFailMethod(methodName)) {
+            return argCount >= 1 ? args.get(0) : null;
+        }
+        if (AssertionMethodClassifier.isAssertThatMethod(methodName)) {
+            return argCount >= 3 ? args.get(0) : null;
+        }
+        if (AssertionMethodClassifier.isAssertThrowsMethod(methodName)) {
+            return argCount >= 3 ? args.get(0) : null;
+        }
+        if (AssertionMethodClassifier.isTimeoutAssertionMethod(methodName)) {
+            return argCount >= 3 ? args.get(0) : null;
+        }
+        if (AssertionMethodClassifier.isDoesNotThrowMethod(methodName)) {
+            return argCount >= 2 ? args.get(0) : null;
+        }
+        if (AssertionMethodClassifier.isBooleanAssertionMethod(methodName)
+                || AssertionMethodClassifier.isNullnessAssertionMethod(methodName)) {
+            return argCount >= 2 ? args.get(0) : null;
+        }
+        if (AssertionMethodClassifier.isEqualityAssertionMethod(methodName)) {
+            return argCount >= 3 ? args.get(0) : null;
+        }
+        if (methodName.startsWith("assert")) {
+            return argCount >= 2 ? args.get(0) : null;
+        }
+        return null;
+    }
+
     private DetailAST selectByStyle(AssertionOperandExtractor.AssertionStyle style, DetailAST firstStringExpr, int firstStringArgIndex,
                                     DetailAST lastStringExpr, int lastStringArgIndex, int argCount) {
         if (style == AssertionOperandExtractor.AssertionStyle.JUNIT4) {
@@ -366,6 +483,23 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             return lastStringExpr;
         }
         return null;
+    }
+
+    private boolean isLambdaMessageArgument(String methodName, AssertionOperandExtractor.AssertionStyle style,
+                                            int argCount, int firstStringArgIndex, int lastLambdaArgIndex) {
+        if (lastLambdaArgIndex != argCount) {
+            return false;
+        }
+        if (!AssertionMethodClassifier.isAssertThrowsMethod(methodName)) {
+            return true;
+        }
+        if (style == AssertionOperandExtractor.AssertionStyle.JUNIT4) {
+            return false;
+        }
+        if (style == AssertionOperandExtractor.AssertionStyle.JUNIT5) {
+            return argCount >= 3;
+        }
+        return argCount >= 3 && firstStringArgIndex != 1;
     }
 
     private boolean isParameterNameMessage(MessageTemplate template, List<DetailAST> args,
@@ -599,8 +733,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     }
 
     private MessageTemplate extractMessageTemplate(DetailAST expr) {
-        MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
-        return templateExtractor.extractMessageTemplate(expr);
+        return context().extractMessageTemplate(expr);
     }
 
     private String extractStringLiteral(DetailAST expr) {

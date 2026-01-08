@@ -7,6 +7,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -35,10 +36,15 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private AnnotationMessageExtractor annotationExtractor;
     private LogMessageExtractor logExtractor;
     private JavadocMessageExtractor javadocExtractor;
+    private CommentMessageExtractor commentExtractor;
 
     private boolean verbose;
+    private boolean emitUnhandled = true;
     private String messageExtractionFile;
     private BufferedWriter messageExtractionWriter;
+    private String messageExtractionTarget;
+    private int messageExtractionFailureLine;
+    private String messageExtractionFailureDetail;
 
     private Set<String> ignoredExceptionClassNames = java.util.Collections.emptySet();
 
@@ -55,6 +61,15 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
+    }
+
+    /**
+     * Enable warnings for unhandled extraction cases.
+     *
+     * @param emitUnhandled {@code true} to emit unhandled warnings.
+     */
+    public void setEmitUnhandled(boolean emitUnhandled) {
+        this.emitUnhandled = emitUnhandled;
     }
 
     /**
@@ -140,6 +155,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 TokenTypes.ENUM_CONSTANT_DEF,
                 TokenTypes.RECORD_COMPONENT_DEF,
                 TokenTypes.LITERAL_ASSERT,
+                TokenTypes.LITERAL_RETURN,
                 TokenTypes.LITERAL_THROW,
                 TokenTypes.ANNOTATION,
                 TokenTypes.METHOD_CALL
@@ -170,7 +186,11 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         annotationExtractor = new AnnotationMessageExtractor(context, this);
         logExtractor = new LogMessageExtractor(context, this);
         javadocExtractor = new JavadocMessageExtractor(context, this);
+        commentExtractor = new CommentMessageExtractor(context, this);
         javadocExtractor.reset();
+        messageExtractionFailureLine = 0;
+        messageExtractionFailureDetail = null;
+        messageExtractionTarget = null;
         openMessageExtractionWriter();
     }
 
@@ -188,6 +208,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             violationCollector.clear();
         }
         closeMessageExtractionWriter();
+        emitMessageExtractionFailure(check);
         if (context != null) {
             context.reset(null);
         }
@@ -242,6 +263,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             case TokenTypes.LITERAL_ASSERT:
                 assertionExtractor.handleJavaAssert(ast);
                 break;
+            case TokenTypes.LITERAL_RETURN:
+                commentExtractor.handleReturnStatement(ast);
+                break;
             case TokenTypes.LITERAL_THROW:
                 throwExtractor.handleThrowStatement(ast);
                 break;
@@ -251,6 +275,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             case TokenTypes.METHOD_CALL:
                 assertionExtractor.handleMethodCall(ast);
                 logExtractor.handleMethodCall(ast);
+                commentExtractor.handleMethodCall(ast);
                 break;
             default:
                 break;
@@ -268,6 +293,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             case TokenTypes.CTOR_DEF:
             case TokenTypes.COMPACT_CTOR_DEF:
                 checkMissingDisplayName();
+                checkTestAnnotationOrder();
                 context.leaveMethod();
                 suppressionTracker.leaveScope();
                 break;
@@ -291,6 +317,27 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 violationCollector.record(lineNo, RuleId.MISSING_DISPLAY_NAME, methodName);
             }
         }
+    }
+
+    private void checkTestAnnotationOrder() {
+        if (!context.currentMethodHasTestAnnotation()) {
+            return;
+        }
+        String firstAnnotation = context.currentMethodFirstAnnotationName();
+        if (firstAnnotation == null || context.isJUnit5TestAnnotation(firstAnnotation)) {
+            return;
+        }
+        int lineNo = context.currentMethodTestAnnotationLine();
+        if (lineNo <= 0) {
+            lineNo = context.currentMethodLineNo();
+        }
+        if (lineNo <= 0) {
+            lineNo = 1;
+        }
+        String methodName = context.currentMethodName();
+        String name = methodName == null ? "unknown" : methodName;
+        violationCollector.record(lineNo, RuleId.TEST_ANNOTATION_ORDER,
+                firstAnnotation, name);
     }
 
     private boolean isTopLevelType(DetailAST ast) {
@@ -333,12 +380,35 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      */
     @Override
     public void emitMissingMessage(int lineNo, MessageSource source) {
+        emitMissingMessage(lineNo, source, null);
+    }
+
+    @Override
+    public void emitMissingMessage(int lineNo, MessageSource source,
+                                   MissingMessageKind missingMessageKind) {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(source)
                 .lineNo(lineNo)
                 .missingMessage(true)
+                .missingMessageKind(missingMessageKind)
                 .build();
         emitCandidate(candidate);
+    }
+
+    @Override
+    public void emitUnhandled(DetailAST ast, String reason) {
+        if (!emitUnhandled || violationCollector == null) {
+            return;
+        }
+        int lineNo = ast == null ? 0 : ast.getLineNo();
+        if (lineNo <= 0 && context != null) {
+            lineNo = context.currentMethodLineNo();
+        }
+        if (lineNo <= 0) {
+            lineNo = 1;
+        }
+        String detail = reason == null || reason.trim().isEmpty() ? "unknown" : reason;
+        violationCollector.record(lineNo, RuleId.UNHANDLED, detail, buildScope());
     }
 
     private void openMessageExtractionWriter() {
@@ -354,6 +424,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             return;
         }
         Path outputPath = Paths.get(trimmed);
+        messageExtractionTarget = outputPath.toString();
         boolean writeHeader;
         try {
             writeHeader = !Files.exists(outputPath) || Files.size(outputPath) == 0L;
@@ -365,7 +436,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 messageExtractionWriter.flush();
             }
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to open message extraction file: " + outputPath, e);
+            recordMessageExtractionFailure(1, "Unable to open message extraction file: " + outputPath);
         }
     }
 
@@ -377,7 +448,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             messageExtractionWriter.flush();
             messageExtractionWriter.close();
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to close message extraction file: " + messageExtractionFile, e);
+            recordMessageExtractionFailure(1, "Unable to close message extraction file: " + extractionTarget());
         } finally {
             messageExtractionWriter = null;
         }
@@ -386,7 +457,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private void writeMessageExtractionRecord(String message, int lineNo,
                                               MessageMetrics metrics, int placeholderCount,
                                               int keyValueLabelCount, MessageSource source) {
-        if (messageExtractionWriter == null) {
+        if (messageExtractionWriter == null || messageExtractionFailureDetail != null) {
             return;
         }
         MessageMetrics resolvedMetrics = metrics;
@@ -411,8 +482,40 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             messageExtractionWriter.write(line.toString());
             messageExtractionWriter.newLine();
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to write message extraction record", e);
+            recordMessageExtractionFailure(lineNo,
+                    "Unable to write message extraction record: " + extractionTarget());
         }
+    }
+
+    private void recordMessageExtractionFailure(int lineNo, String detail) {
+        if (messageExtractionFailureDetail != null) {
+            return;
+        }
+        String resolvedDetail = detail == null || detail.trim().isEmpty() ? "unknown" : detail;
+        messageExtractionFailureDetail = resolvedDetail;
+        messageExtractionFailureLine = lineNo > 0 ? lineNo : 1;
+        messageExtractionWriter = null;
+    }
+
+    private void emitMessageExtractionFailure(AbstractCheck check) {
+        if (messageExtractionFailureDetail == null || check == null) {
+            return;
+        }
+        int lineNo = messageExtractionFailureLine > 0 ? messageExtractionFailureLine : 1;
+        check.log(lineNo, "assert.message.extraction.failure", messageExtractionFailureDetail);
+        messageExtractionFailureDetail = null;
+        messageExtractionFailureLine = 0;
+    }
+
+    private String extractionTarget() {
+        if (messageExtractionTarget != null && !messageExtractionTarget.isEmpty()) {
+            return messageExtractionTarget;
+        }
+        if (messageExtractionFile != null && !messageExtractionFile.trim().isEmpty()) {
+            return messageExtractionFile.trim();
+        }
+        String fromProperty = System.getProperty("mm.extract.file");
+        return fromProperty == null || fromProperty.trim().isEmpty() ? "unknown" : fromProperty.trim();
     }
 
     private void emitRuleSummary() {
@@ -457,6 +560,21 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                     java.util.Collections.emptyList());
         }
         return metricsCalculator.calculate(message, placeholderCount, keyValueLabelCount);
+    }
+
+    private String buildScope() {
+        if (context == null) {
+            return "unknown";
+        }
+        String className = context.currentClassName();
+        String methodName = context.currentMethodName();
+        if (className == null || className.isEmpty()) {
+            return methodName == null || methodName.isEmpty() ? "unknown" : methodName;
+        }
+        if (methodName == null || methodName.isEmpty()) {
+            return className;
+        }
+        return className + "#" + methodName;
     }
 
     String escapeForTsv(String value) {

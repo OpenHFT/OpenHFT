@@ -4,14 +4,14 @@
 package net.openhft.quality.mm;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("MM missing string search value tests")
 class MMMissingStringSearchValueTest {
 
     private MMMissingStringSearchValue rule;
@@ -26,6 +26,7 @@ class MMMissingStringSearchValueTest {
     }
 
     @Test
+    @DisplayName("Evaluate skips when message not constant")
     void evaluateSkipsWhenMessageNotConstant() {
         MessageCandidate candidate = baseCandidate()
                 .constantMessage(false)
@@ -37,6 +38,7 @@ class MMMissingStringSearchValueTest {
     }
 
     @Test
+    @DisplayName("Evaluate skips when search method missing")
     void evaluateSkipsWhenSearchMethodMissing() {
         MessageCandidate candidate = baseCandidate()
                 .stringSearchMethod(null)
@@ -48,6 +50,7 @@ class MMMissingStringSearchValueTest {
     }
 
     @Test
+    @DisplayName("Evaluate skips when message null scenario")
     void evaluateSkipsWhenMessageNull() {
         MessageCandidate candidate = baseCandidate()
                 .message(null)
@@ -59,6 +62,7 @@ class MMMissingStringSearchValueTest {
     }
 
     @Test
+    @DisplayName("Evaluate skips when message contains search literal")
     void evaluateSkipsWhenMessageContainsSearchLiteral() {
         MessageCandidate candidate = baseCandidate()
                 .message("value should contain abc")
@@ -70,6 +74,7 @@ class MMMissingStringSearchValueTest {
     }
 
     @Test
+    @DisplayName("Evaluate records when literal is single character")
     void evaluateRecordsWhenLiteralIsSingleCharacter() {
         MessageCandidate candidate = baseCandidate()
                 .stringSearchArg("\"x\"")
@@ -85,6 +90,7 @@ class MMMissingStringSearchValueTest {
     }
 
     @Test
+    @DisplayName("Evaluate records when literal not quoted")
     void evaluateRecordsWhenLiteralNotQuoted() {
         MessageCandidate candidate = baseCandidate()
                 .stringSearchArg("abc")

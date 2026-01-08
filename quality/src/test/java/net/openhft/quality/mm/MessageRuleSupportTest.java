@@ -4,6 +4,7 @@
 package net.openhft.quality.mm;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for {@link MessageRuleSupport}.
  */
+@DisplayName("Message rule support tests scenario case")
 public class MessageRuleSupportTest {
 
     private MessageRuleSupport ruleSupport;
@@ -24,12 +26,14 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Metrics calculator not null scenario case")
     void metricsCalculatorNotNull() {
         assertNotNull(ruleSupport.metricsCalculator());
     }
 
     // --- isGenericMessage tests ---
 
+    @DisplayName("Is generic message returns true scenario case")
     @ParameterizedTest
     @ValueSource(strings = {
             "actual", "expected", "value", "result", "data", "object",
@@ -41,6 +45,7 @@ public class MessageRuleSupportTest {
         assertTrue(ruleSupport.isGenericMessage(message), "Expected generic: " + message);
     }
 
+    @DisplayName("Is generic message returns false scenario case")
     @ParameterizedTest
     @ValueSource(strings = {
             "user account balance", "connection timeout", "invalid input",
@@ -51,12 +56,14 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Is generic message with null scenario case")
     void isGenericMessageWithNull() {
         assertFalse(ruleSupport.isGenericMessage(null));
     }
 
     // --- isRestatesAssertion tests ---
 
+    @DisplayName("Is restates assertion returns true scenario case detail")
     @ParameterizedTest
     @ValueSource(strings = {
             "assertEquals", "assertTrue", "assertFalse", "assertNull",
@@ -71,6 +78,7 @@ public class MessageRuleSupportTest {
         assertTrue(ruleSupport.isRestatesAssertion(message), "Expected restates: " + message);
     }
 
+    @DisplayName("Is restates assertion returns false scenario case detail")
     @ParameterizedTest
     @ValueSource(strings = {
             "user should have valid email", "balance must be positive",
@@ -81,12 +89,14 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Is restates assertion with null scenario case detail")
     void isRestatesAssertionWithNull() {
         assertFalse(ruleSupport.isRestatesAssertion(null));
     }
 
     // --- isContextless tests ---
 
+    @DisplayName("Is contextless returns true scenario case detail")
     @ParameterizedTest
     @ValueSource(strings = {
             "comparison", "check", "validation", "equality", "verify", "test",
@@ -104,6 +114,7 @@ public class MessageRuleSupportTest {
         assertTrue(ruleSupport.isContextless(message), "Expected contextless: " + message);
     }
 
+    @DisplayName("Is contextless returns false scenario case detail")
     @ParameterizedTest
     @ValueSource(strings = {
             "user balance should equal expected amount",
@@ -115,6 +126,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Is contextless with null scenario case detail")
     void isContextlessWithNull() {
         assertFalse(ruleSupport.isContextless(null));
     }
@@ -122,72 +134,86 @@ public class MessageRuleSupportTest {
     // --- findNameVariant tests ---
 
     @Test
+    @DisplayName("Find name variant exact match scenario")
     void findNameVariantExactMatch() {
         assertEquals("userName", ruleSupport.findNameVariant("Check userName is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant swapped case scenario")
     void findNameVariantSwappedCase() {
         assertEquals("UserName", ruleSupport.findNameVariant("Check UserName is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant lower case scenario")
     void findNameVariantLowerCase() {
         assertEquals("username", ruleSupport.findNameVariant("Check username is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant upper case scenario")
     void findNameVariantUpperCase() {
         assertEquals("USERNAME", ruleSupport.findNameVariant("Check USERNAME is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant not found scenario")
     void findNameVariantNotFound() {
         assertNull(ruleSupport.findNameVariant("Check value is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant too short scenario")
     void findNameVariantTooShort() {
         assertNull(ruleSupport.findNameVariant("Check name is valid", "name"));
     }
 
     @Test
+    @DisplayName("Find name variant exactly min length")
     void findNameVariantExactlyMinLength() {
         assertEquals("names", ruleSupport.findNameVariant("Check names is valid", "names"));
     }
 
     @Test
+    @DisplayName("Find name variant boundary at start")
     void findNameVariantBoundaryAtStart() {
         assertEquals("userName", ruleSupport.findNameVariant("userName is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant boundary at end")
     void findNameVariantBoundaryAtEnd() {
         assertEquals("userName", ruleSupport.findNameVariant("Check userName", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant not bounded left")
     void findNameVariantNotBoundedLeft() {
         assertNull(ruleSupport.findNameVariant("CheckuserName is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant not bounded right")
     void findNameVariantNotBoundedRight() {
         assertNull(ruleSupport.findNameVariant("Check userNameValue is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant with underscore scenario")
     void findNameVariantWithUnderscore() {
         assertNull(ruleSupport.findNameVariant("Check user_name is valid", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant upper case only when different")
     void findNameVariantUpperCaseOnlyWhenDifferent() {
         // When name is already uppercase, we should still find it
         assertEquals("VALUE", ruleSupport.findNameVariant("Check VALUE here", "value"));
     }
 
     @Test
+    @DisplayName("Find name variant lower case matches different from swapped")
     void findNameVariantLowerCaseMatchesDifferentFromSwapped() {
         // lowercase differs from swapped case for names starting with lowercase
         assertEquals("email", ruleSupport.findNameVariant("Check email address", "Email"));
@@ -196,6 +222,7 @@ public class MessageRuleSupportTest {
     // --- analyseSubstance tests ---
 
     @Test
+    @DisplayName("Analyse substance with enough words scenario")
     void analyseSubstanceWithEnoughWords() {
         // "balance" and "positive" are meaningful (not filler)
         MessageRuleSupport.SubstanceAnalysis result =
@@ -206,6 +233,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance with only filler scenario")
     void analyseSubstanceWithOnlyFiller() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName the a is", "userName");
@@ -214,6 +242,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance with nothing scenario case")
     void analyseSubstanceWithNothing() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName", "userName");
@@ -222,6 +251,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance with too few words")
     void analyseSubstanceWithTooFewWords() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName valid", "userName");
@@ -230,6 +260,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance with mixed words scenario")
     void analyseSubstanceWithMixedWords() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName the valid", "userName");
@@ -239,6 +270,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance uses unique meaningful words")
     void analyseSubstanceUsesUniqueMeaningfulWords() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName valid valid", "userName");
@@ -247,6 +279,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance with numeric words scenario")
     void analyseSubstanceWithNumericWords() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName 123 456", "userName");
@@ -255,6 +288,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance with single char words")
     void analyseSubstanceWithSingleCharWords() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName a b c", "userName");
@@ -263,6 +297,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance verbose details scenario case")
     void analyseSubstanceVerboseDetails() {
         // "validate" is meaningful, "should" is filler
         MessageRuleSupport.SubstanceAnalysis result =
@@ -274,6 +309,7 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance removes case insensitive scenario")
     void analyseSubstanceRemovesCaseInsensitive() {
         // Verify the name is removed case-insensitively
         // "balance" and "positive" are meaningful
@@ -284,6 +320,7 @@ public class MessageRuleSupportTest {
 
     // --- Edge cases ---
 
+    @DisplayName("Find name variant min length boundary")
     @ParameterizedTest
     @CsvSource({
             "'', false",
@@ -305,13 +342,67 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Analyse substance empty message after removal")
     void analyseSubstanceEmptyMessageAfterRemoval() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("value", "value");
         assertFalse(result.hasSubstance());
     }
 
+    // --- Boundary mutation killing tests ---
+
     @Test
+    @DisplayName("Analyse substance boundary word length exactly two chars meaningful")
+    void analyseSubstanceBoundaryWordLengthTwoChars() {
+        // Word length boundary: < 2 means 1-char words are filler, 2-char words are meaningful
+        // "to" is 2 chars - should be counted as meaningful if not filler
+        // "ab" and "cd" are 2-char meaningful words
+        MessageRuleSupport.SubstanceAnalysis result =
+                ruleSupport.analyseSubstance("userName ab cd", "userName");
+        // 2 meaningful 2-char words = hasSubstance
+        assertTrue(result.hasSubstance(), "two 2-char meaningful words should be substance");
+    }
+
+    @Test
+    @DisplayName("Analyse substance boundary single char as filler")
+    void analyseSubstanceBoundarySingleCharAsFiller() {
+        // Verify single char words are treated as filler
+        MessageRuleSupport.SubstanceAnalysis result =
+                ruleSupport.analyseSubstance("userName x y z", "userName");
+        assertFalse(result.hasSubstance(), "single char words should be filler");
+    }
+
+    @Test
+    @DisplayName("Analyse substance boundary numeric word as filler")
+    void analyseSubstanceBoundaryNumericWordAsFiller() {
+        // Verify numeric words are treated as filler even if > 1 char
+        MessageRuleSupport.SubstanceAnalysis result =
+                ruleSupport.analyseSubstance("userName 99 100", "userName");
+        assertFalse(result.hasSubstance(), "numeric words should be filler");
+    }
+
+    @Test
+    @DisplayName("Analyse substance meaningful empty and filler empty diagnosis")
+    void analyseSubstanceMeaningfulEmptyFillerEmptyDiagnosis() {
+        // Both meaningful and filler empty - tests the boundary condition
+        MessageRuleSupport.SubstanceAnalysis result =
+                ruleSupport.analyseSubstance("userName", "userName");
+        assertTrue(result.diagnosis().contains("nothing remains"),
+                "diagnosis should indicate nothing remains");
+    }
+
+    @Test
+    @DisplayName("Analyse substance meaningful not empty filler not empty diagnosis")
+    void analyseSubstanceMeaningfulNotEmptyFillerNotEmptyDiagnosis() {
+        // Both meaningful and filler not empty
+        MessageRuleSupport.SubstanceAnalysis result =
+                ruleSupport.analyseSubstance("userName valid the", "userName");
+        assertTrue(result.diagnosis().contains("meaningful") && result.diagnosis().contains("filler"),
+                "diagnosis should mention both meaningful and filler");
+    }
+
+    @Test
+    @DisplayName("Analyse substance with only meaningful no filler")
     void analyseSubstanceWithOnlyMeaningfulNoFiller() {
         MessageRuleSupport.SubstanceAnalysis result =
                 ruleSupport.analyseSubstance("userName valid", "userName");
@@ -321,19 +412,45 @@ public class MessageRuleSupportTest {
     }
 
     @Test
+    @DisplayName("Find name variant with empty text")
     void findNameVariantWithEmptyText() {
         assertNull(ruleSupport.findNameVariant("", "userName"));
     }
 
     @Test
+    @DisplayName("Find name variant already lower case")
     void findNameVariantAlreadyLowerCase() {
         // When the name is already lowercase and text has it lowercase
         assertEquals("username", ruleSupport.findNameVariant("Check username", "username"));
     }
 
     @Test
+    @DisplayName("Find name variant already upper case")
     void findNameVariantAlreadyUpperCase() {
         // When the name is already uppercase
         assertEquals("USERNAME", ruleSupport.findNameVariant("Check USERNAME", "USERNAME"));
+    }
+
+    @Test
+    @DisplayName("Find name variant swapped case found verifies non empty return")
+    void findNameVariantSwappedCaseFoundVerifiesReturn() {
+        // This test kills the "replaced return with empty string" mutation on swapFirstLetterCase
+        // We pass "userName" but text contains "UserName" (swapped case)
+        // swapFirstLetterCase("userName") returns "UserName" which should be found
+        String result = ruleSupport.findNameVariant("Check UserName is valid", "userName");
+        assertNotNull(result, "should find swapped case variant");
+        assertEquals("UserName", result, "should return the swapped case variant");
+        assertFalse(result.isEmpty(), "result should not be empty");
+    }
+
+    @Test
+    @DisplayName("Find name variant swapped case uppercase to lower verifies return")
+    void findNameVariantSwappedCaseUpperToLower() {
+        // Starting with uppercase, swap to lowercase
+        // swapFirstLetterCase("UserName") returns "userName"
+        String result = ruleSupport.findNameVariant("Check userName is valid", "UserName");
+        assertNotNull(result, "should find swapped case variant");
+        assertEquals("userName", result, "should return lowercase first letter variant");
+        assertFalse(result.isEmpty(), "result should not be empty");
     }
 }
