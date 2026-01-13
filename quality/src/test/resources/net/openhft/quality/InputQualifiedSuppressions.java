@@ -10,7 +10,7 @@ public class InputQualifiedSuppressions {
     @java.lang.SuppressWarnings({"MMTooShort", "checkstyle:MMContextless"})
     public void suppressedQualifiedArray() {
         assertTrue(false, "alpha beta gamma");
-        assertTrue(false, "indices should be valid");
+        assertTrue(false, "indices should be valid because bounds are enforced");
     }
 
     @java.lang.SuppressWarnings(value = {"MMTooShort"})

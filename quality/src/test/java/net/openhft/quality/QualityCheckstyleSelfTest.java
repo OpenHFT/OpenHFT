@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("MMDisplayName")
-@DisplayName("Quality checkstyle self tests scenario case")
+@DisplayName("Quality checkstyle self tests because diagnostics matter so that reports stay clear")
 public class QualityCheckstyleSelfTest {
 
     private static final String CONFIG_RESOURCE =

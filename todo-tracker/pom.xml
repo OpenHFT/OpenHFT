@@ -252,8 +252,8 @@
                                 <param>HTML</param>
                                 <param>XML</param>
                             </outputFormats>
-                            <mutationThreshold>85</mutationThreshold>
-                            <coverageThreshold>95</coverageThreshold>
+                            <mutationThreshold>92</mutationThreshold>
+                            <coverageThreshold>99</coverageThreshold>
                             <fullMutationMatrix>true</fullMutationMatrix>
                             <avoidCallsTo>
                                 <avoidCallsTo>java.util.logging</avoidCallsTo>

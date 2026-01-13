@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 /**
- * Exercises rules for AssertJ overrides and trivial supplier messages in tests.
+ * Exercises rules for AssertJ overrides and trivial supplier messages because diagnostics need context, thus failures stay readable.
  */
 public class InputAssertJAndSupplierRules {
 

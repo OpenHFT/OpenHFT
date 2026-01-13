@@ -367,6 +367,56 @@ public class LogMessageExtractorTest {
     // --- extractQualifierNameForLog edge cases ---
 
     @Test
+    @DisplayName("Extract qualifier name returns null when dot missing")
+    void extractQualifierNameReturnsNullWhenDotMissing() throws Exception {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+
+        assertNull(invokeExtractQualifierNameForLog(methodCall));
+    }
+
+    @Test
+    @DisplayName("Extract qualifier name returns null for method call qualifier")
+    void extractQualifierNameReturnsNullForMethodCallQualifier() throws Exception {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        methodCall.addChild(dot);
+        dot.addChild(createMethodCall("LoggerFactory", "getLogger"));
+        dot.addChild(createIdent("info"));
+
+        assertNull(invokeExtractQualifierNameForLog(methodCall));
+    }
+
+    @Test
+    @DisplayName("Extract qualifier name returns ident qualifier")
+    void extractQualifierNameReturnsIdentQualifier() throws Exception {
+        DetailAstImpl methodCall = createMethodCall("logger", "info");
+
+        assertEquals("logger", invokeExtractQualifierNameForLog(methodCall));
+    }
+
+    @Test
+    @DisplayName("Extract qualifier name returns rightmost ident for dotted qualifier")
+    void extractQualifierNameReturnsRightmostIdentForDottedQualifier() throws Exception {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        methodCall.addChild(dot);
+
+        DetailAstImpl qualifier = new DetailAstImpl();
+        qualifier.setType(TokenTypes.DOT);
+        qualifier.addChild(createIdent("System"));
+        qualifier.addChild(createIdent("out"));
+        dot.addChild(qualifier);
+        dot.addChild(createIdent("println"));
+
+        assertEquals("out", invokeExtractQualifierNameForLog(methodCall));
+    }
+
+    @Test
     @DisplayName("Contains throwable single throwable element scenario")
     void containsThrowable_singleThrowableElement() {
         DetailAST throwableArg = mock(DetailAST.class);
@@ -429,16 +479,172 @@ public class LogMessageExtractorTest {
         assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning");
     }
 
+    @Test
+    @DisplayName("Jvm log call returns false when method is not on")
+    void jvmLogCallReturnsFalseWhenMethodIsNotOn() throws Exception {
+        DetailAstImpl methodCall = createMethodCall("Jvm", "warn");
+        assertFalse(invokeCheckJvmLogCall(methodCall, "warn"));
+    }
+
+    @Test
+    @DisplayName("Jvm log call returns false when owner is not method call")
+    void jvmLogCallReturnsFalseWhenOwnerIsNotMethodCall() throws Exception {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        methodCall.addChild(dot);
+        dot.addChild(createIdent("Jvm"));
+        dot.addChild(createIdent("on"));
+
+        assertFalse(invokeCheckJvmLogCall(methodCall, "on"));
+    }
+
+    @Test
+    @DisplayName("Jvm log call returns false when qualifier is not Jvm")
+    void jvmLogCallReturnsFalseWhenQualifierIsNotJvm() throws Exception {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        methodCall.addChild(dot);
+        dot.addChild(createMethodCall("Logger", "warn"));
+        dot.addChild(createIdent("on"));
+        DetailAstImpl elist = new DetailAstImpl();
+        elist.setType(TokenTypes.ELIST);
+        methodCall.addChild(elist);
+        elist.addChild(createExpr(createIdent("first")));
+        elist.addChild(createExpr(createIdent("second")));
+
+        assertFalse(invokeCheckJvmLogCall(methodCall, "on"));
+    }
+
+    @Test
+    @DisplayName("Jvm log call returns false when args fewer than two")
+    void jvmLogCallReturnsFalseWhenArgsFewerThanTwo() throws Exception {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        methodCall.addChild(dot);
+        dot.addChild(createJvmLevelCall("warn"));
+        dot.addChild(createIdent("on"));
+        DetailAstImpl elist = new DetailAstImpl();
+        elist.setType(TokenTypes.ELIST);
+        methodCall.addChild(elist);
+        elist.addChild(createExpr(createIdent("only")));
+
+        assertFalse(invokeCheckJvmLogCall(methodCall, "on"));
+    }
+
+    @Test
+    @DisplayName("Jvm log with null message emits missing message")
+    void jvmLogWithNullMessageEmitsMissingMessage() {
+        DetailAstImpl methodCall = createJvmOnCall(
+                "warn",
+                createExpr(createIdent("context")),
+                createExpr(createNullLiteral())
+        );
+
+        extractor.handleMethodCall(methodCall);
+
+        assertEquals(1, sink.missingMessages.size(), "Should emit missing message");
+        assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning");
+    }
+
+    @Test
+    @DisplayName("Jvm log with throwable only does not emit missing message")
+    void jvmLogWithThrowableOnlyDoesNotEmitMissingMessage() {
+        DetailAstImpl methodCall = createJvmOnCall(
+                "warn",
+                createExpr(createIdent("context")),
+                createExpr(createLiteralNew("RuntimeException"))
+        );
+
+        extractor.handleMethodCall(methodCall);
+
+        assertTrue(sink.missingMessages.isEmpty(), "Should not emit missing message");
+        assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning");
+    }
+
+    @Test
+    @DisplayName("Jvm log call returns true for message template")
+    void jvmLogCallReturnsTrueForMessageTemplate() throws Exception {
+        DetailAstImpl methodCall = createJvmOnCall(
+                "warn",
+                createExpr(createIdent("context")),
+                createExpr(createStringLiteral("\"value {}\""))
+        );
+        methodCall.setLineNo(7);
+
+        assertTrue(invokeCheckJvmLogCall(methodCall, "on"),
+                "Jvm.on should return true when message template present");
+        assertTrue(sink.missingMessages.isEmpty(), "Should not emit missing message");
+    }
+
+    @Test
+    @DisplayName("Jvm log call returns true for null message with throwable")
+    void jvmLogCallReturnsTrueForNullMessageWithThrowable() throws Exception {
+        DetailAstImpl methodCall = createJvmOnCall(
+                "error",
+                createExpr(createIdent("context")),
+                createExpr(createNullLiteral()),
+                createExpr(createLiteralNew("RuntimeException"))
+        );
+        methodCall.setLineNo(9);
+
+        assertTrue(invokeCheckJvmLogCall(methodCall, "on"),
+                "Jvm.on should return true when message is null");
+        assertTrue(sink.missingMessages.isEmpty(), "Throwable should suppress missing message");
+    }
+
+    @Test
+    @DisplayName("Count placeholder helpers return expected values")
+    void countPlaceholderHelpersReturnExpectedValues() throws Exception {
+        assertEquals(2, invokeCountLogPlaceholders("value {} for {}"));
+        assertEquals(1, invokeCountFormatPlaceholders("value %s"));
+        assertEquals(1, invokeCountKeyValueLabels("index= value"));
+    }
+
+    @Test
+    @DisplayName("Extract constant supplier message returns literal")
+    void extractConstantSupplierMessageReturnsLiteral() throws Exception {
+        DetailAstImpl lambda = createLambdaWithExpr(createStringLiteral("\"hello\""), false);
+        DetailAstImpl expr = createExpr(lambda);
+
+        assertEquals("hello", invokeExtractConstantSupplierMessage(expr));
+    }
+
+    @Test
+    @DisplayName("Extract constant supplier message returns format template")
+    void extractConstantSupplierMessageReturnsFormatTemplate() throws Exception {
+        DetailAstImpl formatCall = createMethodCall("String", "format");
+        DetailAstImpl elist = (DetailAstImpl) formatCall.findFirstToken(TokenTypes.ELIST);
+        elist.addChild(createExpr(createStringLiteral("\"value %s\"")));
+        DetailAstImpl lambda = createLambdaWithExpr(formatCall, false);
+
+        assertEquals("value %s", invokeExtractConstantSupplierMessage(lambda));
+    }
+
+    @Test
+    @DisplayName("Extract constant supplier message returns null for parameterised lambda")
+    void extractConstantSupplierMessageReturnsNullForParameterisedLambda() throws Exception {
+        DetailAstImpl lambda = createLambdaWithExpr(createStringLiteral("\"ignored\""), true);
+
+        assertNull(invokeExtractConstantSupplierMessage(lambda));
+    }
+
     /**
      * Test sink for capturing emitted candidates.
      */
     private static class TestMessageSink implements MessageCandidateSink {
+        final List<MessageCandidate> candidates = new java.util.ArrayList<>();
         final List<MessageSource> missingMessages = new java.util.ArrayList<>();
         final List<String> unhandledReasons = new java.util.ArrayList<>();
 
         @Override
         public void emitCandidate(MessageCandidate candidate) {
-            // No-op for testing
+            candidates.add(candidate);
         }
 
         @Override
@@ -469,6 +675,14 @@ public class LogMessageExtractorTest {
         methodCall.addChild(elist);
         elist.addChild(firstArg);
         elist.addChild(secondArg);
+        return methodCall;
+    }
+
+    private DetailAstImpl createJvmOnCall(String levelMethod, DetailAstImpl firstArg,
+                                          DetailAstImpl secondArg, DetailAstImpl thirdArg) {
+        DetailAstImpl methodCall = createJvmOnCall(levelMethod, firstArg, secondArg);
+        DetailAstImpl elist = (DetailAstImpl) methodCall.findFirstToken(TokenTypes.ELIST);
+        elist.addChild(thirdArg);
         return methodCall;
     }
 
@@ -512,11 +726,90 @@ public class LogMessageExtractorTest {
         return dot;
     }
 
+    private DetailAstImpl createLiteralNew(String className) {
+        DetailAstImpl literalNew = new DetailAstImpl();
+        literalNew.setType(TokenTypes.LITERAL_NEW);
+        literalNew.addChild(createIdent(className));
+        return literalNew;
+    }
+
+    private DetailAstImpl createNullLiteral() {
+        DetailAstImpl literal = new DetailAstImpl();
+        literal.setType(TokenTypes.LITERAL_NULL);
+        literal.setText("null");
+        return literal;
+    }
+
     private DetailAstImpl createIdent(String name) {
         DetailAstImpl ident = new DetailAstImpl();
         ident.setType(TokenTypes.IDENT);
         ident.setText(name);
         return ident;
+    }
+
+    private DetailAstImpl createStringLiteral(String text) {
+        DetailAstImpl literal = new DetailAstImpl();
+        literal.setType(TokenTypes.STRING_LITERAL);
+        literal.setText(text);
+        return literal;
+    }
+
+    private DetailAstImpl createLambdaWithExpr(DetailAstImpl body, boolean withParams) {
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+        DetailAstImpl parameters = new DetailAstImpl();
+        parameters.setType(TokenTypes.PARAMETERS);
+        if (withParams) {
+            parameters.addChild(createIdent("value"));
+        }
+        lambda.addChild(parameters);
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        expr.addChild(body);
+        lambda.addChild(expr);
+        return lambda;
+    }
+
+    private boolean invokeCheckJvmLogCall(DetailAST methodCall, String methodName) throws Exception {
+        java.lang.reflect.Method method = LogMessageExtractor.class
+                .getDeclaredMethod("checkJvmLogCall", DetailAST.class, String.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, methodCall, methodName);
+    }
+
+    private String invokeExtractQualifierNameForLog(DetailAST methodCall) throws Exception {
+        java.lang.reflect.Method method = LogMessageExtractor.class
+                .getDeclaredMethod("extractQualifierNameForLog", DetailAST.class);
+        method.setAccessible(true);
+        return (String) method.invoke(extractor, methodCall);
+    }
+
+    private String invokeExtractConstantSupplierMessage(DetailAST expr) throws Exception {
+        java.lang.reflect.Method method = LogMessageExtractor.class
+                .getDeclaredMethod("extractConstantSupplierMessage", DetailAST.class);
+        method.setAccessible(true);
+        return (String) method.invoke(extractor, expr);
+    }
+
+    private int invokeCountLogPlaceholders(String message) throws Exception {
+        java.lang.reflect.Method method = LogMessageExtractor.class
+                .getDeclaredMethod("countLogPlaceholders", String.class);
+        method.setAccessible(true);
+        return (int) method.invoke(extractor, message);
+    }
+
+    private int invokeCountFormatPlaceholders(String message) throws Exception {
+        java.lang.reflect.Method method = LogMessageExtractor.class
+                .getDeclaredMethod("countFormatPlaceholders", String.class);
+        method.setAccessible(true);
+        return (int) method.invoke(extractor, message);
+    }
+
+    private int invokeCountKeyValueLabels(String message) throws Exception {
+        java.lang.reflect.Method method = LogMessageExtractor.class
+                .getDeclaredMethod("countKeyValueLabels", String.class);
+        method.setAccessible(true);
+        return (int) method.invoke(extractor, message);
     }
 
     private DetailAstImpl createExpr(DetailAstImpl child) {

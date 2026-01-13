@@ -50,8 +50,8 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should locate one root TODO file");
-        assertEquals("TODO.md", found.get(0).getName(), "locator should return TODO.md filename for root file");
+        assertEquals(1, found.size(), "check should locate one root TODO file");
+        assertEquals("TODO.md", found.get(0).getName(), "check should return TODO.md filename for root file");
     }
 
     @Test
@@ -61,8 +61,8 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should locate one todo file in subdirectory");
-        assertTrue(found.get(0).getPath().contains("todo"), "locator should include todo path segment for subdirectory match");
+        assertEquals(1, found.size(), "check should locate one todo file in subdirectory");
+        assertTrue(found.get(0).getPath().contains("todo"), "check should include todo path segment for subdirectory match");
     }
 
     @Test
@@ -73,7 +73,7 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(2, found.size(), "locator should locate todo files in root and subdirectory");
+        assertEquals(2, found.size(), "check should locate todo files in root and subdirectory");
     }
 
     @Test
@@ -81,7 +81,8 @@ class TodoFileLocatorTest {
     void findTodoFiles_emptyDirectory_returnsEmptyList() {
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.isEmpty(), "locator should return empty list for empty directory");
+        assertTrue(found.isEmpty(),
+                "check should return empty list for empty directory because no matches exist");
     }
 
     @Test
@@ -92,14 +93,15 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.isEmpty(), "locator should return empty list when no todo files exist");
+        assertTrue(found.isEmpty(),
+                "check should return empty list when no todo files exist because there is nothing to scan");
     }
 
     @Test
     @DisplayName("Locator should find todo files null basedir throws exception")
     void findTodoFiles_nullBasedir_throwsException() {
         assertThrows(NullPointerException.class, () -> locator.findTodoFiles(null),
-                "locator should reject null base directory for search");
+                "check should reject null base directory for search because traversal needs a root");
     }
 
     @Test
@@ -110,7 +112,8 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.isEmpty(), "locator should ignore directories named like TODO.md");
+        assertTrue(found.isEmpty(),
+                "check should ignore directories named like TODO.md because directories are not files");
     }
 
     @Test
@@ -122,8 +125,8 @@ class TodoFileLocatorTest {
 
         List<File> found = customLocator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should locate one file from custom paths");
-        assertEquals("TASKS.md", found.get(0).getName(), "locator should return TASKS.md filename for custom path");
+        assertEquals(1, found.size(), "check should locate one file from custom paths");
+        assertEquals("TASKS.md", found.get(0).getName(), "check should return TASKS.md filename for custom path");
     }
 
     @Test
@@ -133,14 +136,14 @@ class TodoFileLocatorTest {
 
         List<File> found = emptyLocator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.isEmpty(), "locator should return empty list for empty path config");
+        assertTrue(found.isEmpty(), "check should return empty list for empty path config");
     }
 
     @Test
     @DisplayName("Locator should constructor with null list throws exception")
     void constructor_withNullList_throwsException() {
         assertThrows(NullPointerException.class, () -> new TodoFileLocator(null),
-                "locator should throw when custom paths list is null");
+                "check should throw when custom paths list is null");
     }
 
     @Test
@@ -148,19 +151,19 @@ class TodoFileLocatorTest {
     void getTodoFilePaths_returnsConfiguredPaths() {
         List<String> paths = locator.getTodoFilePaths();
 
-        assertEquals(4, paths.size(), "locator should expose four configured todo paths");
+        assertEquals(4, paths.size(), "check should expose four configured todo paths");
         String rootTodo = "TODO.md";
         assertTrue(paths.contains(rootTodo),
-                "locator should include root path " + rootTodo + " in " + paths);
+                "check should include root path " + rootTodo + " in " + paths);
         String subTodo = "todo/TODO.md";
         assertTrue(paths.contains(subTodo),
-                "locator should include todo subdirectory path " + subTodo + " in " + paths);
+                "check should include todo subdirectory path " + subTodo + " in " + paths);
         String rootMarkdown = "TODO.markdown";
         assertTrue(paths.contains(rootMarkdown),
-                "locator should include root markdown path " + rootMarkdown + " in " + paths);
+                "check should include root markdown path " + rootMarkdown + " in " + paths);
         String subMarkdown = "todo/TODO.markdown";
         assertTrue(paths.contains(subMarkdown),
-                "locator should include todo markdown path " + subMarkdown + " in " + paths);
+                "check should include todo markdown path " + subMarkdown + " in " + paths);
     }
 
     @Test
@@ -170,28 +173,29 @@ class TodoFileLocatorTest {
         paths.clear();
 
         // Original should not be affected
-        assertEquals(4, locator.getTodoFilePaths().size(), "locator should return a defensive copy of paths");
+        assertEquals(4, locator.getTodoFilePaths().size(),
+                "check should return a defensive copy of paths because callers may mutate the list");
     }
 
     @Test
     @DisplayName("Locator should is todo file matches todo md")
     void isTodoFile_matchesTodoMd() throws IOException {
         File file = createFile("TODO.md");
-        assertTrue(locator.isTodoFile(file), "locator should treat TODO.md as todo file");
+        assertTrue(locator.isTodoFile(file), "check should treat TODO.md as todo file");
     }
 
     @Test
     @DisplayName("Locator should treat TODO markdown file as todo")
     void isTodoFile_matchesTodoMarkdown() throws IOException {
         File file = createFile("TODO.markdown");
-        assertTrue(locator.isTodoFile(file), "locator should treat TODO.markdown as todo file");
+        assertTrue(locator.isTodoFile(file), "check should treat TODO.markdown as todo file");
     }
 
     @Test
     @DisplayName("Locator should is todo file matches todos md")
     void isTodoFile_matchesTodosMd() throws IOException {
         File file = createFile("TODOS.md");
-        assertTrue(locator.isTodoFile(file), "locator should treat TODOS.md as todo file");
+        assertTrue(locator.isTodoFile(file), "check should treat TODOS.md as todo file");
     }
 
     @Test
@@ -200,8 +204,8 @@ class TodoFileLocatorTest {
         File lower = createFile("todo.md");
         File upper = createFile("sub/TODO.MD");
 
-        assertTrue(locator.isTodoFile(lower), "locator should accept lower case todo.md filename");
-        assertTrue(locator.isTodoFile(upper), "locator should accept upper case TODO.MD filename");
+        assertTrue(locator.isTodoFile(lower), "check should accept lower case todo.md filename");
+        assertTrue(locator.isTodoFile(upper), "check should accept upper case TODO.MD filename");
     }
 
     @Test
@@ -210,8 +214,8 @@ class TodoFileLocatorTest {
         File readme = createFile("README.md");
         File other = createFile("other.txt");
 
-        assertFalse(locator.isTodoFile(readme), "locator should reject README.md as todo file");
-        assertFalse(locator.isTodoFile(other), "locator should reject other.txt as todo file");
+        assertFalse(locator.isTodoFile(readme), "check should reject README.md as todo file");
+        assertFalse(locator.isTodoFile(other), "check should reject other.txt as todo file");
     }
 
     @Test
@@ -220,7 +224,7 @@ class TodoFileLocatorTest {
         File backlog = createFile("todo/backlog.markdown");
 
         assertTrue(locator.isTodoFile(backlog),
-                "locator should treat markdown files under todo directory as todo files");
+                "check should treat markdown files under todo directory as todo files");
     }
 
     @Test
@@ -229,13 +233,14 @@ class TodoFileLocatorTest {
         File notes = createFile("todo/notes.txt");
 
         assertFalse(locator.isTodoFile(notes),
-                "locator should reject non markdown/asciidoc files under todo directory");
+                "check should reject non markdown/asciidoc files under todo directory");
     }
 
     @Test
     @DisplayName("Locator should reject null file in todo detection")
     void isTodoFile_rejectsNull() {
-        assertFalse(locator.isTodoFile(null), "locator should return false for null file reference");
+        assertFalse(locator.isTodoFile(null),
+                "check should return false for null file reference because no path is available");
     }
 
     @Test
@@ -244,7 +249,7 @@ class TodoFileLocatorTest {
         Path dir = tempDir.resolve("todo.md");
         Files.createDirectories(dir);
 
-        assertFalse(locator.isTodoFile(dir.toFile()), "locator should return false for todo named directory");
+        assertFalse(locator.isTodoFile(dir.toFile()), "check should return false for todo named directory");
     }
 
     @Test
@@ -288,7 +293,7 @@ class TodoFileLocatorTest {
 
         List<File> found = customLocator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(2, found.size(), "locator should resolve two matching custom paths");
+        assertEquals(2, found.size(), "check should resolve two matching custom paths");
     }
 
     // === Pattern matching tests ===
@@ -302,11 +307,11 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(2, found.size(), "locator should locate prefixed TODO files with patterns");
+        assertEquals(2, found.size(), "check should locate prefixed TODO files with patterns");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("SPRINT-TODO.md")),
-                "locator should include SPRINT-TODO.md entry in results");
+                "check should include SPRINT-TODO.md entry in results");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("BACKLOG-TODO.md")),
-                "locator should include BACKLOG-TODO.md entry in results");
+                "check should include BACKLOG-TODO.md entry in results");
     }
 
     @Test
@@ -318,7 +323,7 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 3, "locator should locate todo files across subdirectories");
+        assertTrue(found.size() >= 3, "check should locate todo files across subdirectories");
     }
 
     @Test
@@ -332,7 +337,7 @@ class TodoFileLocatorTest {
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
         // All three should be found (in separate directories)
-        assertTrue(found.size() >= 3, "locator should find todo files regardless of case");
+        assertTrue(found.size() >= 3, "check should find todo files regardless of case");
     }
 
     @Test
@@ -344,7 +349,7 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 2, "locator should find TODOS.md files with suffix");
+        assertTrue(found.size() >= 2, "check should find TODOS.md files with suffix");
     }
 
     @Test
@@ -357,15 +362,15 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 4, "locator should find todo files with markdown extension");
+        assertTrue(found.size() >= 4, "check should find todo files with markdown extension");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("TODO.markdown")),
-                "locator should include lower case TODO.markdown in pattern results");
+                "check should include lower case TODO.markdown in pattern results");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("TODO.MARKDOWN")),
-                "locator should include upper case TODO.MARKDOWN in pattern results");
+                "check should include upper case TODO.MARKDOWN in pattern results");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("backlog.markdown")),
-                "locator should include backlog.markdown from todo directory");
+                "check should include backlog.markdown from todo directory");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("UPPER.MARKDOWN")),
-                "locator should include UPPER.MARKDOWN from todo directory");
+                "check should include UPPER.MARKDOWN from todo directory");
     }
 
     @Test
@@ -377,9 +382,9 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 3, "locator should find markdown files under todo directory");
+        assertTrue(found.size() >= 3, "check should find markdown files under todo directory");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("backlog.md")),
-                "locator should include backlog.md from todo directory");
+                "check should include backlog.md from todo directory");
     }
 
     @Test
@@ -391,8 +396,8 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should ignore hidden directories during search");
-        assertTrue(found.get(0).getPath().contains("visible"), "locator should keep visible directory matches");
+        assertEquals(1, found.size(), "check should ignore hidden directories during search");
+        assertTrue(found.get(0).getPath().contains("visible"), "check should keep visible directory matches");
     }
 
     @Test
@@ -403,8 +408,9 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should skip target directory when scanning");
-        assertTrue(found.get(0).getPath().contains("src"), "locator should keep src directory matches");
+        assertEquals(1, found.size(),
+                "check should skip target directory when scanning because build output is excluded");
+        assertTrue(found.get(0).getPath().contains("src"), "check should keep src directory matches");
     }
 
     @Test
@@ -415,8 +421,9 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should skip node_modules directory matches");
-        assertTrue(found.get(0).getPath().contains("app"), "locator should keep app directory matches");
+        assertEquals(1, found.size(),
+                "check should skip node_modules directory matches because dependencies are out of scope");
+        assertTrue(found.get(0).getPath().contains("app"), "check should keep app directory matches");
     }
 
     @Test
@@ -455,14 +462,14 @@ class TodoFileLocatorTest {
     @DisplayName("Locator should is todo file matches prefixed todo")
     void isTodoFile_matchesPrefixedTodo() throws IOException {
         File file = createFile("SPRINT-TODO.md");
-        assertTrue(locator.isTodoFile(file), "locator should accept prefixed TODO file name");
+        assertTrue(locator.isTodoFile(file), "check should accept prefixed TODO file name");
     }
 
     @Test
     @DisplayName("Locator should is todo file matches mixed case")
     void isTodoFile_matchesMixedCase() throws IOException {
         File file = createFile("SpRiNt-ToDo.md");
-        assertTrue(locator.isTodoFile(file), "locator should accept mixed case TODO file name");
+        assertTrue(locator.isTodoFile(file), "check should accept mixed case TODO file name");
     }
 
     @Test
@@ -477,7 +484,8 @@ class TodoFileLocatorTest {
         long todoCount = found.stream()
                 .filter(f -> f.getName().equals("TODO.md"))
                 .count();
-        assertEquals(1, todoCount, "locator should deduplicate TODO.md matches");
+        assertEquals(1, todoCount,
+                "check should deduplicate TODO.md matches because duplicate paths add noise");
     }
 
     // === AsciiDoc discovery tests ===
@@ -491,13 +499,13 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 3, "locator should find ad, adoc, and asciidoc files in todo directory");
+        assertTrue(found.size() >= 3, "check should find ad, adoc, and asciidoc files in todo directory");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("backlog.adoc")),
-                "locator should include backlog.adoc from todo directory");
+                "check should include backlog.adoc from todo directory");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("sprint.ad")),
-                "locator should include sprint.ad from todo directory");
+                "check should include sprint.ad from todo directory");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("notes.asciidoc")),
-                "locator should include notes.asciidoc from todo directory");
+                "check should include notes.asciidoc from todo directory");
     }
 
     @Test
@@ -508,7 +516,7 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 2, "locator should find adoc files in nested todo directories");
+        assertTrue(found.size() >= 2, "check should find adoc files in nested todo directories");
     }
 
     @Test
@@ -519,9 +527,9 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 2, "locator should find plan adoc files under docs");
+        assertTrue(found.size() >= 2, "check should find plan adoc files under docs");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("release-plan.ad")),
-                "locator should include release plan ad file in docs");
+                "check should include release plan ad file in docs");
     }
 
     @Test
@@ -532,7 +540,7 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertTrue(found.size() >= 2, "locator should find todo adoc files under docs");
+        assertTrue(found.size() >= 2, "check should find todo adoc files under docs");
     }
 
     @Test
@@ -546,13 +554,13 @@ class TodoFileLocatorTest {
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
         assertTrue(found.size() >= 3,
-                "locator should match ad and asciidoc extensions case insensitively");
+                "check should match ad and asciidoc extensions case insensitively");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("lower.ad")),
-                "locator should include lower.ad when matching case insensitive");
+                "check should include lower.ad when matching case insensitive");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("upper.ASCIIDOC")),
-                "locator should include upper.ASCIIDOC when matching case insensitive");
+                "check should include upper.ASCIIDOC when matching case insensitive");
         assertTrue(found.stream().anyMatch(f -> f.getName().equals("plan.AD")),
-                "locator should include plan.AD in docs when matching case insensitive");
+                "check should include plan.AD in docs when matching case insensitive");
     }
 
     @Test
@@ -566,24 +574,24 @@ class TodoFileLocatorTest {
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
         // Should find all 4 files
-        assertTrue(found.size() >= 4, "locator should find markdown and adoc files together");
+        assertTrue(found.size() >= 4, "check should find markdown and adoc files together");
         assertTrue(found.stream().anyMatch(f -> f.getName().endsWith(".md")),
-                "locator should include markdown files in results");
+                "check should include markdown files in results");
         assertTrue(found.stream().anyMatch(f -> f.getName().endsWith(".adoc")),
-                "locator should include adoc files in results");
+                "check should include adoc files in results");
     }
 
     @Test
     @DisplayName("Locator should is todo file matches adoc files")
     void isTodoFile_matchesAdocFiles() throws IOException {
         File shortAd = createFile("docs/plan.ad");
-        assertTrue(locator.isTodoFile(shortAd), "locator should accept plan.ad file in docs");
+        assertTrue(locator.isTodoFile(shortAd), "check should accept plan.ad file in docs");
         File planAdoc = createFile("docs/plan.adoc");
-        assertTrue(locator.isTodoFile(planAdoc), "locator should accept plan.adoc file in docs");
+        assertTrue(locator.isTodoFile(planAdoc), "check should accept plan.adoc file in docs");
         File todoAdoc = createFile("docs2/todo.adoc");
-        assertTrue(locator.isTodoFile(todoAdoc), "locator should accept todo.adoc file in docs");
+        assertTrue(locator.isTodoFile(todoAdoc), "check should accept todo.adoc file in docs");
         File todoAsciidoc = createFile("docs3/todo.asciidoc");
-        assertTrue(locator.isTodoFile(todoAsciidoc), "locator should accept todo.asciidoc file in docs");
+        assertTrue(locator.isTodoFile(todoAsciidoc), "check should accept todo.asciidoc file in docs");
     }
 
     @Test
@@ -592,8 +600,8 @@ class TodoFileLocatorTest {
         File lower = createFile("docs/plan.adoc");
         File upper = createFile("docs2/TODO.ASCIIDOC");
 
-        assertTrue(locator.isTodoFile(lower), "locator should accept lower case adoc file");
-        assertTrue(locator.isTodoFile(upper), "locator should accept upper case asciidoc file");
+        assertTrue(locator.isTodoFile(lower), "check should accept lower case adoc file");
+        assertTrue(locator.isTodoFile(upper), "check should accept upper case asciidoc file");
     }
 
     @Test
@@ -601,7 +609,7 @@ class TodoFileLocatorTest {
     void isTodoFile_rejectsNonTodoAdoc() throws IOException {
         File other = createFile("docs/readme.adoc");
 
-        assertFalse(locator.isTodoFile(other), "locator should reject non todo adoc file");
+        assertFalse(locator.isTodoFile(other), "check should reject non todo adoc file");
     }
 
     @Test
@@ -646,8 +654,9 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should skip build directory when scanning");
-        assertTrue(found.get(0).getPath().contains("src"), "locator should keep src match when build skipped");
+        assertEquals(1, found.size(),
+                "check should skip build directory when scanning because build output is ignored");
+        assertTrue(found.get(0).getPath().contains("src"), "check should keep src match when build skipped");
     }
 
     @Test
@@ -658,8 +667,9 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should skip out directory when scanning");
-        assertTrue(found.get(0).getPath().contains("src"), "locator should keep src match when out skipped");
+        assertEquals(1, found.size(),
+                "check should skip out directory when scanning because generated output is ignored");
+        assertTrue(found.get(0).getPath().contains("src"), "check should keep src match when out skipped");
     }
 
     @Test
@@ -670,8 +680,9 @@ class TodoFileLocatorTest {
 
         List<File> found = locator.findTodoFiles(tempDir.toFile());
 
-        assertEquals(1, found.size(), "locator should skip dist directory when scanning");
-        assertTrue(found.get(0).getPath().contains("src"), "locator should keep src match when dist skipped");
+        assertEquals(1, found.size(),
+                "check should skip dist directory when scanning because distribution artefacts are ignored");
+        assertTrue(found.get(0).getPath().contains("src"), "check should keep src match when dist skipped");
     }
 
     // === Exact-path mode tests ===
@@ -686,11 +697,11 @@ class TodoFileLocatorTest {
 
         List<String> paths = exactPathLocator.getTodoFilePaths();
 
-        assertEquals(2, paths.size(), "locator should return configured exact path list");
+        assertEquals(2, paths.size(), "check should return configured exact path list");
         assertTrue(paths.contains(docsTasks),
-                "locator should include docs tasks path " + docsTasks + " in " + paths);
+                "check should include docs tasks path " + docsTasks + " in " + paths);
         assertTrue(paths.contains(plansTodo),
-                "locator should include plans todo path " + plansTodo + " in " + paths);
+                "check should include plans todo path " + plansTodo + " in " + paths);
     }
 
     @Test
@@ -707,8 +718,8 @@ class TodoFileLocatorTest {
         List<File> found = exactPathLocator.findTodoFiles(tempDir.toFile());
 
         // Only the real file should be found, not the directory
-        assertEquals(1, found.size(), "locator should ignore directory that matches todo path");
-        assertEquals("real-TODO.md", found.get(0).getName(), "locator should return only real todo file");
+        assertEquals(1, found.size(), "check should ignore directory that matches todo path");
+        assertEquals("real-TODO.md", found.get(0).getName(), "check should return only real todo file");
     }
 
     // === File visitor tests ===

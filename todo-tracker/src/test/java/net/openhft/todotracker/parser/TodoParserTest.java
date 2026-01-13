@@ -51,10 +51,10 @@ class TodoParserTest {
     void parseContent_dashCheckboxUncompleted() {
         TodoReport report = parser.parseContent("- [ ] Do something", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for dash checkbox");
-        assertEquals(1, report.getUncompletedCount(), "parser should mark dash checkbox task as uncompleted");
+        assertEquals(1, report.getTotalCount(), "input should count one task for dash checkbox");
+        assertEquals(1, report.getUncompletedCount(), "input should mark dash checkbox task as uncompleted");
         assertEquals("Do something", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture task text for dash checkbox");
+                "input should capture task text for dash checkbox");
     }
 
     @Test
@@ -62,9 +62,9 @@ class TodoParserTest {
     void parseContent_dashCheckboxCompleted_lowercase() {
         TodoReport report = parser.parseContent("- [x] Done task", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for lowercase done");
-        assertEquals(1, report.getCompletedCount(), "parser should mark lowercase x checkbox completed");
-        assertEquals(0, report.getUncompletedCount(), "parser should have zero uncompleted tasks for done");
+        assertEquals(1, report.getTotalCount(), "input should count one task for lowercase done");
+        assertEquals(1, report.getCompletedCount(), "input should mark lowercase x checkbox completed");
+        assertEquals(0, report.getUncompletedCount(), "input should have zero uncompleted tasks for done");
     }
 
     @Test
@@ -72,8 +72,8 @@ class TodoParserTest {
     void parseContent_dashCheckboxCompleted_uppercase() {
         TodoReport report = parser.parseContent("- [X] Done task", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for uppercase done");
-        assertEquals(1, report.getCompletedCount(), "parser should mark uppercase X checkbox completed");
+        assertEquals(1, report.getTotalCount(), "input should count one task for uppercase done");
+        assertEquals(1, report.getCompletedCount(), "input should mark uppercase X checkbox completed");
     }
 
     @Test
@@ -81,9 +81,9 @@ class TodoParserTest {
     void parseContent_asteriskCheckboxUncompleted() {
         TodoReport report = parser.parseContent("* [ ] Asterisk task", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for asterisk checkbox");
+        assertEquals(1, report.getTotalCount(), "input should count one task for asterisk checkbox");
         assertEquals("Asterisk task", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture task text for asterisk checkbox");
+                "input should capture task text for asterisk checkbox");
     }
 
     @Test
@@ -91,8 +91,8 @@ class TodoParserTest {
     void parseContent_asteriskCheckboxCompleted() {
         TodoReport report = parser.parseContent("* [x] Asterisk done", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for asterisk done");
-        assertEquals(1, report.getCompletedCount(), "parser should mark asterisk checkbox completed");
+        assertEquals(1, report.getTotalCount(), "input should count one task for asterisk done");
+        assertEquals(1, report.getCompletedCount(), "input should mark asterisk checkbox completed");
     }
 
     @Test
@@ -100,9 +100,9 @@ class TodoParserTest {
     void parseContent_numberedListUncompleted() {
         TodoReport report = parser.parseContent("1. [ ] First item", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for numbered list");
+        assertEquals(1, report.getTotalCount(), "input should count one task for numbered list");
         assertEquals("First item", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture task text for numbered list");
+                "input should capture task text for numbered list");
     }
 
     @Test
@@ -110,8 +110,8 @@ class TodoParserTest {
     void parseContent_numberedListCompleted() {
         TodoReport report = parser.parseContent("2. [x] Second item", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for numbered done");
-        assertEquals(1, report.getCompletedCount(), "parser should mark numbered checkbox completed");
+        assertEquals(1, report.getTotalCount(), "input should count one task for numbered done");
+        assertEquals(1, report.getCompletedCount(), "input should mark numbered checkbox completed");
     }
 
     // === Dropped state (GFM extension) ===
@@ -121,10 +121,10 @@ class TodoParserTest {
     void parseContent_droppedTask_dashBullet() {
         TodoReport report = parser.parseContent("- [-] Dropped task", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one dropped task for dash bullet");
+        assertEquals(1, report.getTotalCount(), "input should count one dropped task for dash bullet");
         assertEquals(1, report.getCompletedCount(),
-                "parser should treat dropped dash task as completed"); // Dropped counts as completed (no action needed)
-        assertEquals(0, report.getUncompletedCount(), "parser should have zero uncompleted for dropped dash");
+                "input should treat dropped dash task as completed"); // Dropped counts as completed (no action needed)
+        assertEquals(0, report.getUncompletedCount(), "input should have zero uncompleted for dropped dash");
     }
 
     @Test
@@ -132,8 +132,8 @@ class TodoParserTest {
     void parseContent_droppedTask_asteriskBullet() {
         TodoReport report = parser.parseContent("* [-] Cancelled task", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one dropped task for asterisk bullet");
-        assertEquals(1, report.getCompletedCount(), "parser should treat dropped asterisk task as completed");
+        assertEquals(1, report.getTotalCount(), "input should count one dropped task for asterisk bullet");
+        assertEquals(1, report.getCompletedCount(), "input should treat dropped asterisk task as completed");
     }
 
     @Test
@@ -141,8 +141,8 @@ class TodoParserTest {
     void parseContent_droppedTask_numberedList() {
         TodoReport report = parser.parseContent("1. [-] Abandoned item", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one dropped task for numbered list");
-        assertEquals(1, report.getCompletedCount(), "parser should treat dropped numbered task as completed");
+        assertEquals(1, report.getTotalCount(), "input should count one dropped task for numbered list");
+        assertEquals(1, report.getCompletedCount(), "input should treat dropped numbered task as completed");
     }
 
     @Test
@@ -151,11 +151,11 @@ class TodoParserTest {
         String content = "- [ ] Open task\n- [x] Done task\n- [-] Dropped task\n";
         TodoReport report = parser.parseContent(content, "test.md");
 
-        assertEquals(3, report.getTotalCount(), "parser should count three tasks for mixed states");
+        assertEquals(3, report.getTotalCount(), "input should count three tasks for mixed states");
         assertEquals(2, report.getCompletedCount(),
-                "parser should count two completed tasks for mixed states"); // done + dropped
+                "input should count two completed tasks for mixed states"); // done + dropped
         assertEquals(1, report.getUncompletedCount(),
-                "parser should count one open task for mixed states"); // only open
+                "input should count one open task for mixed states"); // only open
     }
 
     @Test
@@ -163,9 +163,9 @@ class TodoParserTest {
     void parseContent_multiDigitNumberedList() {
         TodoReport report = parser.parseContent("123. [ ] Task 123", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for multi digit list");
+        assertEquals(1, report.getTotalCount(), "input should count one task for multi digit list");
         assertEquals("Task 123", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture task text for multi digit list");
+                "input should capture task text for multi digit list");
     }
 
     // === Indentation ===
@@ -175,9 +175,9 @@ class TodoParserTest {
     void parseContent_indentedDashCheckbox() {
         TodoReport report = parser.parseContent("  - [ ] Indented task", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for indented dash");
+        assertEquals(1, report.getTotalCount(), "input should count one task for indented dash");
         assertEquals("Indented task", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture task text for indented dash");
+                "input should capture task text for indented dash");
     }
 
     @Test
@@ -185,7 +185,7 @@ class TodoParserTest {
     void parseContent_indentedNumberedList() {
         TodoReport report = parser.parseContent("    1. [ ] Deeply indented", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for indented numbered list");
+        assertEquals(1, report.getTotalCount(), "input should count one task for indented numbered list");
     }
 
     // === Priority and effort extraction ===
@@ -196,9 +196,9 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] [P1] High priority task", "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertTrue(task.hasPriority(), "parser should mark task as having priority tag");
-        assertEquals(1, task.getPriority(), "parser should read priority value from task tag");
-        assertEquals("High priority task", task.getText(), "parser should strip priority tag from task text");
+        assertTrue(task.hasPriority(), "input should mark task as having priority tag");
+        assertEquals(1, task.getPriority(), "input should read priority value from task tag");
+        assertEquals("High priority task", task.getText(), "input should strip priority tag from task text");
     }
 
     @ParameterizedTest
@@ -211,7 +211,7 @@ class TodoParserTest {
     void parseContent_priorityValues(String line, int expectedPriority) {
         TodoReport report = parser.parseContent(line, "test.md");
         assertEquals(expectedPriority, report.getUncompletedTasks().get(0).getPriority(),
-                "parser should parse priority value from tag");
+                "input should parse priority value from tag");
     }
 
     @Test
@@ -220,9 +220,9 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] [E:M] Medium effort", "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertTrue(task.hasEffort(), "parser should mark task as having effort tag");
-        assertEquals('M', task.getEffort(), "parser should read effort value from task tag");
-        assertEquals("Medium effort", task.getText(), "parser should strip effort tag from task text");
+        assertTrue(task.hasEffort(), "input should mark task as having effort tag");
+        assertEquals('M', task.getEffort(), "input should read effort value from task tag");
+        assertEquals("Medium effort", task.getText(), "input should strip effort tag from task text");
     }
 
     @ParameterizedTest
@@ -235,7 +235,7 @@ class TodoParserTest {
     void parseContent_effortValues(String line, char expectedEffort) {
         TodoReport report = parser.parseContent(line, "test.md");
         assertEquals(expectedEffort, report.getUncompletedTasks().get(0).getEffort(),
-                "parser should parse effort value from tag");
+                "input should parse effort value from tag");
     }
 
     @Test
@@ -244,9 +244,9 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] [P1] [E:L] Complex task", "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertEquals(1, task.getPriority(), "parser should read priority when effort also present");
-        assertEquals('L', task.getEffort(), "parser should read effort when priority also present");
-        assertEquals("Complex task", task.getText(), "parser should strip both priority and effort tags");
+        assertEquals(1, task.getPriority(), "input should read priority when effort also present");
+        assertEquals('L', task.getEffort(), "input should read effort when priority also present");
+        assertEquals("Complex task", task.getText(), "input should strip both priority and effort tags");
     }
 
     @Test
@@ -255,8 +255,8 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] [E:S] [P2] Task", "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertEquals(2, task.getPriority(), "parser should read priority when tags are swapped");
-        assertEquals('S', task.getEffort(), "parser should read effort when tags are swapped");
+        assertEquals(2, task.getPriority(), "input should read priority when tags are swapped");
+        assertEquals('S', task.getEffort(), "input should read effort when tags are swapped");
     }
 
     @Test
@@ -265,8 +265,8 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] Simple task", "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertFalse(task.hasPriority(), "parser should report no priority when tag absent");
-        assertFalse(task.hasEffort(), "parser should report no effort when tag absent");
+        assertFalse(task.hasPriority(), "input should report no priority when tag absent");
+        assertFalse(task.hasEffort(), "input should report no effort when tag absent");
     }
 
     // === Context extraction ===
@@ -278,7 +278,7 @@ class TodoParserTest {
         TodoReport report = parser.parseContent(content, "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertEquals("Phase 1: Setup", task.getContext(), "parser should capture context from header line");
+        assertEquals("Phase 1: Setup", task.getContext(), "input should capture context from header line");
     }
 
     @Test
@@ -288,8 +288,8 @@ class TodoParserTest {
         TodoReport report = parser.parseContent(content, "test.md");
 
         List<TodoTask> tasks = report.getUncompletedTasks();
-        assertEquals("Phase 1", tasks.get(0).getContext(), "parser should set context from first header");
-        assertEquals("Phase 2", tasks.get(1).getContext(), "parser should update context for second header");
+        assertEquals("Phase 1", tasks.get(0).getContext(), "input should set context from first header");
+        assertEquals("Phase 2", tasks.get(1).getContext(), "input should update context for second header");
     }
 
     @Test
@@ -299,7 +299,7 @@ class TodoParserTest {
         TodoReport report = parser.parseContent(content, "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertNull(task.getContext(), "parser should not set context from H1 header");
+        assertNull(task.getContext(), "input should not set context from H1 header");
     }
 
     @Test
@@ -310,7 +310,7 @@ class TodoParserTest {
         TodoReport report = customParser.parseContent(content, "test.md");
 
         assertEquals("Captured Header", report.getUncompletedTasks().get(0).getContext(),
-                "parser should capture context using custom pattern");
+                "input should capture context using custom pattern");
     }
 
     // === Line numbers ===
@@ -322,7 +322,7 @@ class TodoParserTest {
         TodoReport report = parser.parseContent(content, "test.md");
 
         assertEquals(3, report.getUncompletedTasks().get(0).getLineNumber(),
-                "parser should report line number for task");
+                "input should report line number for task");
     }
 
     @Test
@@ -332,9 +332,9 @@ class TodoParserTest {
         TodoReport report = parser.parseContent(content, "test.md");
 
         List<TodoTask> tasks = report.getUncompletedTasks();
-        assertEquals(1, tasks.get(0).getLineNumber(), "parser should report line number for first task");
-        assertEquals(2, tasks.get(1).getLineNumber(), "parser should report line number for second task");
-        assertEquals(4, tasks.get(2).getLineNumber(), "parser should report line number for third task");
+        assertEquals(1, tasks.get(0).getLineNumber(), "input should report line number for first task");
+        assertEquals(2, tasks.get(1).getLineNumber(), "input should report line number for second task");
+        assertEquals(4, tasks.get(2).getLineNumber(), "input should report line number for third task");
     }
 
     // === Non-matching lines ===
@@ -344,8 +344,8 @@ class TodoParserTest {
     void parseContent_emptyContent_returnsEmptyReport() {
         TodoReport report = parser.parseContent("", "test.md");
 
-        assertEquals(0, report.getTotalCount(), "parser should return zero tasks for empty content");
-        assertTrue(report.hasFilesProcessed(), "parser should mark files processed for empty content");
+        assertEquals(0, report.getTotalCount(), "input should return zero tasks for empty content");
+        assertTrue(report.hasFilesProcessed(), "input should mark files processed for empty content");
     }
 
     @Test
@@ -354,7 +354,7 @@ class TodoParserTest {
         String content = "# Header\n\nSome regular text here.\n\n- Regular list item without checkbox\n* Another list item\n1. Numbered without checkbox\n";
         TodoReport report = parser.parseContent(content, "test.md");
 
-        assertEquals(0, report.getTotalCount(), "parser should return zero tasks when no checkboxes exist");
+        assertEquals(0, report.getTotalCount(), "input should return zero tasks when no checkboxes exist");
     }
 
     @Test
@@ -364,7 +364,7 @@ class TodoParserTest {
         String content = "-[ ] No space after dash\n- [] No space in brackets\n-[] Both missing\n[ ] Missing bullet\n";
         TodoReport report = parser.parseContent(content, "test.md");
 
-        assertEquals(0, report.getTotalCount(), "parser should ignore malformed checkbox markers");
+        assertEquals(0, report.getTotalCount(), "input should ignore malformed checkbox markers");
     }
 
     @Test
@@ -373,7 +373,7 @@ class TodoParserTest {
         String content = "# Header 1\n## Header 2\n### Header 3\n";
         TodoReport report = parser.parseContent(content, "test.md");
 
-        assertEquals(0, report.getTotalCount(), "parser should return zero tasks when only headers");
+        assertEquals(0, report.getTotalCount(), "input should return zero tasks when only headers");
     }
 
     // === Mixed content ===
@@ -384,7 +384,7 @@ class TodoParserTest {
         String content = "- [ ] Dash task\n* [ ] Asterisk task\n1. [ ] Numbered task\n";
         TodoReport report = parser.parseContent(content, "test.md");
 
-        assertEquals(3, report.getTotalCount(), "parser should count tasks across mixed bullet styles");
+        assertEquals(3, report.getTotalCount(), "input should count tasks across mixed bullet styles");
     }
 
     @Test
@@ -393,9 +393,9 @@ class TodoParserTest {
         String content = "- [ ] Uncompleted\n- [x] Completed 1\n* [ ] Uncompleted 2\n* [X] Completed 2\n1. [ ] Uncompleted 3\n2. [x] Completed 3\n";
         TodoReport report = parser.parseContent(content, "test.md");
 
-        assertEquals(6, report.getTotalCount(), "parser should count total tasks for mixed completion");
-        assertEquals(3, report.getUncompletedCount(), "parser should count open tasks for mixed completion");
-        assertEquals(3, report.getCompletedCount(), "parser should count completed tasks for mixed completion");
+        assertEquals(6, report.getTotalCount(), "input should count total tasks for mixed completion");
+        assertEquals(3, report.getUncompletedCount(), "input should count open tasks for mixed completion");
+        assertEquals(3, report.getCompletedCount(), "input should count completed tasks for mixed completion");
     }
 
     // === File parsing ===
@@ -406,11 +406,11 @@ class TodoParserTest {
         File file = createTodoFile("- [ ] File task\n- [x] Done task");
         TodoReport report = parser.parse(file);
 
-        assertEquals(2, report.getTotalCount(), "parser should read total count from file");
-        assertEquals(1, report.getUncompletedCount(), "parser should read uncompleted count from file");
-        assertEquals(1, report.getCompletedCount(), "parser should read completed count from file");
+        assertEquals(2, report.getTotalCount(), "input should read total count from file");
+        assertEquals(1, report.getUncompletedCount(), "input should read uncompleted count from file");
+        assertEquals(1, report.getCompletedCount(), "input should read completed count from file");
         assertTrue(report.getFilesProcessed().get(0).endsWith("TODO.md"),
-                "parser should record processed file path");
+                "input should record processed file path");
     }
 
     @Test
@@ -419,8 +419,8 @@ class TodoParserTest {
         File file = createTodoFile("");
         TodoReport report = parser.parse(file);
 
-        assertEquals(0, report.getTotalCount(), "parser should return zero tasks for empty file");
-        assertTrue(report.hasFilesProcessed(), "parser should record empty file as processed");
+        assertEquals(0, report.getTotalCount(), "input should return zero tasks for empty file");
+        assertTrue(report.hasFilesProcessed(), "input should record empty file as processed");
     }
 
     @Test
@@ -428,14 +428,14 @@ class TodoParserTest {
     void parse_fileNotFound_throwsException() {
         File nonExistent = new File(tempDir.toFile(), "nonexistent.md");
         assertThrows(IOException.class, () -> parser.parse(nonExistent),
-                "parser should throw when todo file is missing");
+                "input should throw when todo file is missing");
     }
 
     @Test
     @DisplayName("Parser should parse null file throws exception")
     void parse_nullFile_throwsException() {
         assertThrows(NullPointerException.class, () -> parser.parse(null),
-                "parser should throw when todo file is null");
+                "input should throw when todo file path is null");
     }
 
     // === Edge cases ===
@@ -445,8 +445,8 @@ class TodoParserTest {
     void parseContent_taskWithEmptyText() {
         TodoReport report = parser.parseContent("- [ ] ", "test.md");
 
-        assertEquals(1, report.getTotalCount(), "parser should count task even with empty text");
-        assertEquals("", report.getUncompletedTasks().get(0).getText(), "parser should preserve empty task text");
+        assertEquals(1, report.getTotalCount(), "input should count task even with empty text");
+        assertEquals("", report.getUncompletedTasks().get(0).getText(), "input should preserve empty task text");
     }
 
     @Test
@@ -455,8 +455,8 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] [P1]", "test.md");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertEquals(1, task.getPriority(), "parser should read priority from tag only");
-        assertEquals("", task.getText(), "parser should return empty text when only tags");
+        assertEquals(1, task.getPriority(), "input should read priority from tag only");
+        assertEquals("", task.getText(), "input should return empty text when only tags");
     }
 
     @Test
@@ -466,7 +466,7 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] " + taskText, "test.md");
 
         assertEquals(taskText,
-                report.getUncompletedTasks().get(0).getText(), "parser should preserve non ascii task text");
+                report.getUncompletedTasks().get(0).getText(), "input should preserve non ascii task text");
     }
 
     @Test
@@ -475,28 +475,28 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("- [ ] [P1]  [E:M]   Task  with   spaces", "test.md");
 
         assertEquals("Task with spaces", report.getUncompletedTasks().get(0).getText(),
-                "parser should collapse repeated spaces in task text");
+                "input should collapse repeated spaces in task text");
     }
 
     @Test
     @DisplayName("Parser should parse content null content throws exception")
     void parseContent_nullContent_throwsException() {
         assertThrows(NullPointerException.class, () -> parser.parseContent(null, "test.md"),
-                "parser should throw when content is null");
+                "input should throw when content text is null");
     }
 
     @Test
     @DisplayName("Parser should parse content null source path throws exception")
     void parseContent_nullSourcePath_throwsException() {
         assertThrows(NullPointerException.class, () -> parser.parseContent("content", null),
-                "parser should throw when source path is null");
+                "input should throw when source path is null");
     }
 
     @Test
     @DisplayName("Parser should constructor null context pattern throws exception")
     void constructor_nullContextPattern_throwsException() {
         assertThrows(NullPointerException.class, () -> new TodoParser(null),
-                "parser should throw when context pattern is null");
+                "input should throw when context pattern is null");
     }
 
     // === AsciiDoc format detection ===
@@ -505,32 +505,32 @@ class TodoParserTest {
     @DisplayName("Parser should detect format markdown by default")
     void detectFormat_markdownByDefault() {
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("test.md"),
-                "parser should default to markdown for md extension");
+                "input should default to markdown for md extension");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("notes.markdown"),
-                "parser should default to markdown for markdown extension");
+                "input should default to markdown for markdown extension");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("TODO.md"),
-                "parser should default to markdown for TODO.md");
+                "input should default to markdown for TODO.md");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("TODO.MARKDOWN"),
-                "parser should default to markdown for upper case markdown extension");
+                "input should default to markdown for upper case markdown extension");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat("path/to/file.txt"),
-                "parser should default to markdown for unknown extension");
+                "input should default to markdown for unknown extension");
         assertEquals(TodoParser.Format.MARKDOWN, TodoParser.detectFormat(null),
-                "parser should default to markdown when path is null");
+                "input should default to markdown when path is null");
     }
 
     @Test
     @DisplayName("Parser should detect format asciidoc from extension")
     void detectFormat_asciidocFromExtension() {
         assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("test.ad"),
-                "parser should detect asciidoc format from ad extension");
+                "input should detect asciidoc format from ad extension");
         assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("test.adoc"),
-                "parser should detect asciidoc format from adoc extension");
+                "input should detect asciidoc format from adoc extension");
         assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("TODO.ADOC"),
-                "parser should detect asciidoc format from upper case extension");
+                "input should detect asciidoc format from upper case extension");
         assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("path/to/file.asciidoc"),
-                "parser should detect asciidoc format from asciidoc extension");
+                "input should detect asciidoc format from asciidoc extension");
         assertEquals(TodoParser.Format.ASCIIDOC, TodoParser.detectFormat("test.AsciiDoc"),
-                "parser should detect asciidoc format from mixed case");
+                "input should detect asciidoc format from mixed case");
     }
 
     // === AsciiDoc checkbox parsing ===
@@ -540,9 +540,9 @@ class TodoParserTest {
     void parseContent_asciidoc_asteriskCheckboxUncompleted() {
         TodoReport report = parser.parseContent("* [ ] AsciiDoc task", "test.adoc");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for asciidoc asterisk");
+        assertEquals(1, report.getTotalCount(), "input should count one task for asciidoc asterisk");
         assertEquals("AsciiDoc task", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture task text for asciidoc asterisk");
+                "input should capture task text for asciidoc asterisk");
     }
 
     @Test
@@ -550,8 +550,8 @@ class TodoParserTest {
     void parseContent_asciidoc_asteriskCheckboxCompleted_x() {
         TodoReport report = parser.parseContent("* [x] Done task", "test.adoc");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for asciidoc done x");
-        assertEquals(1, report.getCompletedCount(), "parser should mark asciidoc x checkbox completed");
+        assertEquals(1, report.getTotalCount(), "input should count one task for asciidoc done x");
+        assertEquals(1, report.getCompletedCount(), "input should mark asciidoc x checkbox completed");
     }
 
     @Test
@@ -560,8 +560,8 @@ class TodoParserTest {
         // AsciiDoc uses [*] as alternative completed marker
         TodoReport report = parser.parseContent("* [*] Done task", "test.adoc");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for asciidoc done star");
-        assertEquals(1, report.getCompletedCount(), "parser should mark asciidoc star checkbox completed");
+        assertEquals(1, report.getTotalCount(), "input should count one task for asciidoc done star");
+        assertEquals(1, report.getCompletedCount(), "input should mark asciidoc star checkbox completed");
     }
 
     @Test
@@ -570,7 +570,7 @@ class TodoParserTest {
         String content = "* [ ] Level 1\n** [ ] Level 2\n*** [ ] Level 3";
         TodoReport report = parser.parseContent(content, "test.adoc");
 
-        assertEquals(3, report.getTotalCount(), "parser should count tasks in nested asciidoc bullets");
+        assertEquals(3, report.getTotalCount(), "input should count tasks in nested asciidoc bullets");
     }
 
     @Test
@@ -578,9 +578,9 @@ class TodoParserTest {
     void parseContent_asciidoc_dashCheckboxUncompleted() {
         TodoReport report = parser.parseContent("- [ ] Dash task", "test.adoc");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one task for asciidoc dash");
+        assertEquals(1, report.getTotalCount(), "input should count one task for asciidoc dash");
         assertEquals("Dash task", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture task text for asciidoc dash");
+                "input should capture task text for asciidoc dash");
     }
 
     @Test
@@ -588,9 +588,9 @@ class TodoParserTest {
     void parseContent_asciidoc_droppedTask() {
         TodoReport report = parser.parseContent("* [-] Dropped task", "test.adoc");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one dropped task for asciidoc");
+        assertEquals(1, report.getTotalCount(), "input should count one dropped task for asciidoc");
         assertEquals(1, report.getCompletedCount(),
-                "parser should treat dropped asciidoc task as completed"); // Dropped counts as completed
+                "input should treat dropped asciidoc task as completed"); // Dropped counts as completed
     }
 
     // === AsciiDoc context extraction ===
@@ -603,9 +603,9 @@ class TodoParserTest {
         String content = "== Phase 1: Setup\n\n* [ ] First task";
         TodoReport report = adocParser.parseContent(content, "test.adoc");
 
-        assertEquals(1, report.getTotalCount(), "parser should count one asciidoc task under header");
+        assertEquals(1, report.getTotalCount(), "input should count one asciidoc task under header");
         assertEquals("Phase 1: Setup", report.getUncompletedTasks().get(0).getContext(),
-                "parser should capture asciidoc context from header");
+                "input should capture asciidoc context from header");
     }
 
     @Test
@@ -616,8 +616,8 @@ class TodoParserTest {
         TodoReport report = adocParser.parseContent(content, "test.adoc");
 
         List<TodoTask> tasks = report.getUncompletedTasks();
-        assertEquals("Phase 1", tasks.get(0).getContext(), "parser should set asciidoc context from first header");
-        assertEquals("Phase 2", tasks.get(1).getContext(), "parser should update asciidoc context for second header");
+        assertEquals("Phase 1", tasks.get(0).getContext(), "input should set asciidoc context from first header");
+        assertEquals("Phase 2", tasks.get(1).getContext(), "input should update asciidoc context for second header");
     }
 
     @Test
@@ -628,7 +628,7 @@ class TodoParserTest {
         TodoReport report = adocParser.parseContent(content, "test.adoc");
 
         assertNull(report.getUncompletedTasks().get(0).getContext(),
-                "parser should not set context from asciidoc H1");
+                "input should not set context from asciidoc H1");
     }
 
     // === AsciiDoc mixed content ===
@@ -639,7 +639,7 @@ class TodoParserTest {
         String content = "* [ ] Asterisk task\n** [ ] Nested task\n- [ ] Dash task\n";
         TodoReport report = parser.parseContent(content, "test.adoc");
 
-        assertEquals(3, report.getTotalCount(), "parser should count tasks for mixed asciidoc bullets");
+        assertEquals(3, report.getTotalCount(), "input should count tasks for mixed asciidoc bullets");
     }
 
     @Test
@@ -648,10 +648,10 @@ class TodoParserTest {
         String content = "* [ ] Open\n* [x] Done\n* [*] Also done\n* [-] Dropped\n";
         TodoReport report = parser.parseContent(content, "test.adoc");
 
-        assertEquals(4, report.getTotalCount(), "parser should count four tasks for asciidoc states");
+        assertEquals(4, report.getTotalCount(), "input should count four tasks for asciidoc states");
         assertEquals(3, report.getCompletedCount(),
-                "parser should count completed tasks for asciidoc states"); // x, *, - are all completed
-        assertEquals(1, report.getUncompletedCount(), "parser should count open tasks for asciidoc states");
+                "input should count completed tasks for asciidoc states"); // x, *, - are all completed
+        assertEquals(1, report.getUncompletedCount(), "input should count open tasks for asciidoc states");
     }
 
     @Test
@@ -660,9 +660,9 @@ class TodoParserTest {
         TodoReport report = parser.parseContent("* [ ] [P1] [E:L] Complex task", "test.adoc");
 
         TodoTask task = report.getUncompletedTasks().get(0);
-        assertEquals(1, task.getPriority(), "parser should read priority from asciidoc task tags");
-        assertEquals('L', task.getEffort(), "parser should read effort from asciidoc task tags");
-        assertEquals("Complex task", task.getText(), "parser should strip asciidoc task tags from text");
+        assertEquals(1, task.getPriority(), "input should read priority from asciidoc task tags");
+        assertEquals('L', task.getEffort(), "input should read effort from asciidoc task tags");
+        assertEquals("Complex task", task.getText(), "input should strip asciidoc task tags from text");
     }
 
     // === File parsing with format detection ===
@@ -676,9 +676,9 @@ class TodoParserTest {
 
         TodoReport report = parser.parse(path.toFile());
 
-        assertEquals(2, report.getTotalCount(), "parser should count total tasks in asciidoc file");
-        assertEquals(1, report.getUncompletedCount(), "parser should count open tasks in asciidoc file");
-        assertEquals(1, report.getCompletedCount(), "parser should count completed tasks in asciidoc file");
+        assertEquals(2, report.getTotalCount(), "input should count total tasks in asciidoc file");
+        assertEquals(1, report.getUncompletedCount(), "input should count open tasks in asciidoc file");
+        assertEquals(1, report.getCompletedCount(), "input should count completed tasks in asciidoc file");
     }
 
     @Test
@@ -691,11 +691,11 @@ class TodoParserTest {
         TodoReport report = parser.parse(path.toFile());
 
         assertEquals(2, report.getTotalCount(),
-                "parser should count tasks in asciidoc ad extension file");
+                "input should count tasks in asciidoc ad extension file");
         assertEquals(1, report.getUncompletedCount(),
-                "parser should count open tasks in asciidoc ad extension file");
+                "input should count open tasks in asciidoc ad extension file");
         assertEquals(1, report.getCompletedCount(),
-                "parser should count completed tasks in asciidoc ad extension file");
+                "input should count completed tasks in asciidoc ad extension file");
     }
 
     @Test
@@ -705,7 +705,7 @@ class TodoParserTest {
         File file = createTodoFile("- [ ] Markdown task\n* [ ] Asterisk task");
         TodoReport report = parser.parse(file);
 
-        assertEquals(2, report.getTotalCount(), "parser should count tasks using markdown patterns");
+        assertEquals(2, report.getTotalCount(), "input should count tasks using markdown patterns");
     }
 
     @Test
@@ -718,7 +718,7 @@ class TodoParserTest {
         TodoReport report = parser.parse(path.toFile());
 
         assertEquals(2, report.getTotalCount(),
-                "parser should count tasks in markdown extension file");
+                "input should count tasks in markdown extension file");
     }
 
     // === Helper methods ===
@@ -726,42 +726,42 @@ class TodoParserTest {
     @Test
     @DisplayName("Parser should extract priority finds priority")
     void extractPriority_findsPriority() {
-        assertEquals(1, parser.extractPriority("[P1] Task"), "parser should parse P1 priority from tag");
-        assertEquals(2, parser.extractPriority("Task [P2] here"), "parser should parse P2 priority from tag");
-        assertEquals(3, parser.extractPriority("Task [P3]"), "parser should parse P3 priority from tag");
+        assertEquals(1, parser.extractPriority("[P1] Task"), "input should parse P1 priority from tag");
+        assertEquals(2, parser.extractPriority("Task [P2] here"), "input should parse P2 priority from tag");
+        assertEquals(3, parser.extractPriority("Task [P3]"), "input should parse P3 priority from tag");
     }
 
     @Test
     @DisplayName("Parser should extract priority returns null when not found")
     void extractPriority_returnsNullWhenNotFound() {
-        assertNull(parser.extractPriority("No priority here"), "parser should return null when priority is missing");
-        assertNull(parser.extractPriority("[P4] Invalid priority"), "parser should return null for invalid priority tag");
-        assertNull(parser.extractPriority("[P0] Invalid priority"), "parser should return null for zero priority tag");
+        assertNull(parser.extractPriority("No priority here"), "input should return null when priority is missing");
+        assertNull(parser.extractPriority("[P4] Invalid priority"), "input should return null for invalid priority tag");
+        assertNull(parser.extractPriority("[P0] Invalid priority"), "input should return null for zero priority tag");
     }
 
     @Test
     @DisplayName("Parser should extract effort finds effort")
     void extractEffort_findsEffort() {
-        assertEquals('S', parser.extractEffort("[E:S] Task"), "parser should parse small effort from tag");
-        assertEquals('M', parser.extractEffort("Task [E:M] here"), "parser should parse medium effort from tag");
-        assertEquals('L', parser.extractEffort("Task [E:L]"), "parser should parse large effort from tag");
+        assertEquals('S', parser.extractEffort("[E:S] Task"), "input should parse small effort from tag");
+        assertEquals('M', parser.extractEffort("Task [E:M] here"), "input should parse medium effort from tag");
+        assertEquals('L', parser.extractEffort("Task [E:L]"), "input should parse large effort from tag");
     }
 
     @Test
     @DisplayName("Parser should extract effort returns null when not found")
     void extractEffort_returnsNullWhenNotFound() {
-        assertNull(parser.extractEffort("No effort here"), "parser should return null when effort is missing");
-        assertNull(parser.extractEffort("[E:X] Invalid effort"), "parser should return null for invalid effort tag");
+        assertNull(parser.extractEffort("No effort here"), "input should return null when effort is missing");
+        assertNull(parser.extractEffort("[E:X] Invalid effort"), "input should return null for invalid effort tag");
     }
 
     @Test
     @DisplayName("Parser should clean task text removes tags and trims")
     void cleanTaskText_removesTagsAndTrims() {
-        assertEquals("Task", parser.cleanTaskText("[P1] Task"), "parser should remove priority tag from task text");
-        assertEquals("Task", parser.cleanTaskText("[P1] [E:M] Task"), "parser should remove priority and effort tags");
-        assertEquals("Task", parser.cleanTaskText("Task [P2]"), "parser should remove trailing priority tag");
+        assertEquals("Task", parser.cleanTaskText("[P1] Task"), "input should remove priority tag from task text");
+        assertEquals("Task", parser.cleanTaskText("[P1] [E:M] Task"), "input should remove priority and effort tags");
+        assertEquals("Task", parser.cleanTaskText("Task [P2]"), "input should remove trailing priority tag");
         assertEquals("Do something", parser.cleanTaskText("[P1]  Do   something  [E:L]"),
-                "parser should trim and collapse spaced task text");
+                "input should trim and collapse spaced task text");
     }
 
     // === Format-specific parsing with explicit format ===
@@ -772,9 +772,9 @@ class TodoParserTest {
         String content = "## Header\n- [ ] Task";
         TodoReport report = parser.parseContent(content, "test.txt", TodoParser.Format.MARKDOWN);
 
-        assertEquals(1, report.getTotalCount(), "parser should count task in explicit markdown format");
+        assertEquals(1, report.getTotalCount(), "input should count task in explicit markdown format");
         assertEquals("Header", report.getUncompletedTasks().get(0).getContext(),
-                "parser should capture markdown context with explicit format");
+                "input should capture markdown context with explicit format");
     }
 
     @Test
@@ -784,9 +784,9 @@ class TodoParserTest {
         String content = "== Header\n* [ ] Task";
         TodoReport report = adocParser.parseContent(content, "test.txt", TodoParser.Format.ASCIIDOC);
 
-        assertEquals(1, report.getTotalCount(), "parser should count task in explicit asciidoc format");
+        assertEquals(1, report.getTotalCount(), "input should count task in explicit asciidoc format");
         assertEquals("Header", report.getUncompletedTasks().get(0).getContext(),
-                "parser should capture asciidoc context with explicit format");
+                "input should capture asciidoc context with explicit format");
     }
 
     @Test
@@ -794,7 +794,7 @@ class TodoParserTest {
     void parseContent_nullFormat_throwsException() {
         assertThrows(NullPointerException.class,
                 () -> parser.parseContent("- [ ] Task", "test.md", null),
-                "parser should throw when format argument is null");
+                "input should throw when format argument is null");
     }
 
     // === Individual checkbox marker tests ===
@@ -803,35 +803,35 @@ class TodoParserTest {
     @DisplayName("Parser should parse content checkbox marker space is uncompleted")
     void parseContent_checkboxMarkerSpace_isUncompleted() {
         TodoReport report = parser.parseContent("- [ ] Task", "test.md");
-        assertEquals(1, report.getUncompletedCount(), "parser should treat space checkbox marker as open");
+        assertEquals(1, report.getUncompletedCount(), "input should treat space checkbox marker as open");
     }
 
     @Test
     @DisplayName("Parser should parse content checkbox marker lowercase x is completed")
     void parseContent_checkboxMarkerLowercaseX_isCompleted() {
         TodoReport report = parser.parseContent("- [x] Task", "test.md");
-        assertEquals(1, report.getCompletedCount(), "parser should treat lowercase x as completed marker");
+        assertEquals(1, report.getCompletedCount(), "input should treat lowercase x as completed marker");
     }
 
     @Test
     @DisplayName("Parser should parse content checkbox marker uppercase x is completed")
     void parseContent_checkboxMarkerUppercaseX_isCompleted() {
         TodoReport report = parser.parseContent("- [X] Task", "test.md");
-        assertEquals(1, report.getCompletedCount(), "parser should treat uppercase X as completed marker");
+        assertEquals(1, report.getCompletedCount(), "input should treat uppercase X as completed marker");
     }
 
     @Test
     @DisplayName("Parser should parse content checkbox marker dash is completed")
     void parseContent_checkboxMarkerDash_isCompleted() {
         TodoReport report = parser.parseContent("- [-] Task", "test.md");
-        assertEquals(1, report.getCompletedCount(), "parser should treat dash marker as dropped completed");
+        assertEquals(1, report.getCompletedCount(), "input should treat dash marker as dropped completed");
     }
 
     @Test
     @DisplayName("Parser should parse content asciidoc checkbox marker asterisk is completed")
     void parseContent_asciidoc_checkboxMarkerAsterisk_isCompleted() {
         TodoReport report = parser.parseContent("* [*] Task", "test.adoc");
-        assertEquals(1, report.getCompletedCount(), "parser should treat asterisk marker as completed");
+        assertEquals(1, report.getCompletedCount(), "input should treat asterisk marker as completed");
     }
 
     // === AsciiDoc specific branch coverage ===
@@ -841,9 +841,9 @@ class TodoParserTest {
     void parseContent_asciidoc_dashBulletOnly() {
         // Test that dash bullet in AsciiDoc is recognized separately from asterisk
         TodoReport report = parser.parseContent("- [ ] Dash only task", "test.adoc");
-        assertEquals(1, report.getTotalCount(), "parser should count dash bullet task in asciidoc");
+        assertEquals(1, report.getTotalCount(), "input should count dash bullet task in asciidoc");
         assertEquals("Dash only task", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture dash bullet task text");
+                "input should capture dash bullet task text");
     }
 
     @Test
@@ -851,9 +851,9 @@ class TodoParserTest {
     void parseContent_asciidoc_asteriskBulletOnly() {
         // Test asterisk bullet separately
         TodoReport report = parser.parseContent("* [ ] Asterisk only task", "test.adoc");
-        assertEquals(1, report.getTotalCount(), "parser should count asterisk bullet task in asciidoc");
+        assertEquals(1, report.getTotalCount(), "input should count asterisk bullet task in asciidoc");
         assertEquals("Asterisk only task", report.getUncompletedTasks().get(0).getText(),
-                "parser should capture asterisk bullet task text");
+                "input should capture asterisk bullet task text");
     }
 
     @Test
@@ -861,7 +861,7 @@ class TodoParserTest {
     void parseContent_asciidoc_noMatchingTasks() {
         // Test when no tasks match AsciiDoc patterns
         TodoReport report = parser.parseContent("Regular text\nMore text", "test.adoc");
-        assertEquals(0, report.getTotalCount(), "parser should return zero tasks for non matching text");
+        assertEquals(0, report.getTotalCount(), "input should return zero tasks for non matching text");
     }
 
     @Test
@@ -870,9 +870,9 @@ class TodoParserTest {
         // Header that doesn't match the context pattern (# vs ##)
         String content = "# H1 Header\n- [ ] Task";
         TodoReport report = parser.parseContent(content, "test.md");
-        assertEquals(1, report.getTotalCount(), "parser should parse task when header pattern mismatches");
+        assertEquals(1, report.getTotalCount(), "input should parse task when header pattern mismatches");
         assertNull(report.getUncompletedTasks().get(0).getContext(),
-                "parser should leave context null for mismatched markdown header");
+                "input should leave context null for mismatched markdown header");
     }
 
     @Test
@@ -882,9 +882,9 @@ class TodoParserTest {
         TodoParser adocParser = new TodoParser("^==\\s+.*");
         String content = "= H1 Header\n* [ ] Task";
         TodoReport report = adocParser.parseContent(content, "test.adoc");
-        assertEquals(1, report.getTotalCount(), "parser should parse task when asciidoc header mismatches");
+        assertEquals(1, report.getTotalCount(), "input should parse task when asciidoc header mismatches");
         assertNull(report.getUncompletedTasks().get(0).getContext(),
-                "parser should leave context null for mismatched asciidoc header");
+                "input should leave context null for mismatched asciidoc header");
     }
 
     // === File helper ===

@@ -70,7 +70,8 @@ class CheckTodoMojoTest {
     @DisplayName("Mojo should execute no todo files passes with message")
     void execute_noTodoFiles_passesWithMessage() {
         // No TODO files exist
-        assertDoesNotThrow(mojo::execute, "mojo should not throw when no todo files exist");
+        assertDoesNotThrow(mojo::execute,
+                "check should not throw when no todo files exist because scan results are empty");
     }
 
     @Test
@@ -78,7 +79,7 @@ class CheckTodoMojoTest {
     void execute_allTasksCompleted_passes() throws Exception {
         createFile("TODO.md", "# Tasks\n- [x] Completed task 1\n- [x] Completed task 2\n");
 
-        assertDoesNotThrow(mojo::execute, "mojo should not throw when all tasks completed");
+        assertDoesNotThrow(mojo::execute, "check should not throw when all tasks completed");
     }
 
     @Test
@@ -87,10 +88,10 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "# Tasks\n- [ ] Uncompleted task\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when uncompleted task exists by default");
+                mojo::execute, "check should fail when uncompleted task exists by default");
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) by default");
+                "check should report 1 uncompleted task(s) by default");
     }
 
     @Test
@@ -99,7 +100,8 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "# Tasks\n- [ ] Uncompleted task\n");
         mojo.setFailOnIncomplete(false);
 
-        assertDoesNotThrow(mojo::execute, "mojo should not throw when failOnIncomplete is false");
+        assertDoesNotThrow(mojo::execute,
+                "check should not throw when failOnIncomplete is false because warnings are allowed");
     }
 
     @Test
@@ -108,7 +110,7 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "# Tasks\n- [ ] Uncompleted task\n");
         mojo.setSkip(true);
 
-        assertDoesNotThrow(mojo::execute, "mojo should not throw when mojo is skipped");
+        assertDoesNotThrow(mojo::execute, "check should not throw when mojo is skipped");
     }
 
     @Test
@@ -118,10 +120,10 @@ class CheckTodoMojoTest {
         createFile("todo/TODO.md", "# Tasks\n- [ ] Task in todo folder\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when todo file in subdirectory");
+                mojo::execute, "check should fail when todo file in subdirectory");
 
         assertTrue(exception.getMessage().contains("uncompleted task(s)"),
-                "mojo should report uncompleted task(s) for subdirectory file");
+                "check should report uncompleted task(s) for subdirectory file");
     }
 
     @Test
@@ -131,7 +133,7 @@ class CheckTodoMojoTest {
         mojo.setTodoFiles(Collections.singletonList("TASKS.md"));
 
         assertThrows(MojoFailureException.class, mojo::execute,
-                "mojo should fail when custom todo file has open tasks");
+                "check should fail when custom todo file has open tasks");
     }
 
     @Test
@@ -142,7 +144,7 @@ class CheckTodoMojoTest {
         mojo.setTodoFiles(Collections.singletonList("TASKS.md"));
 
         // Should pass because we're only checking TASKS.md which has no uncompleted tasks
-        assertDoesNotThrow(mojo::execute, "mojo should ignore default files when custom list set");
+        assertDoesNotThrow(mojo::execute, "check should ignore default files when custom list set");
     }
 
     @Test
@@ -153,10 +155,10 @@ class CheckTodoMojoTest {
         createFile("todo/TODO.md", "- [ ] Task 3\n- [ ] Task 4\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when multiple files have open tasks");
+                mojo::execute, "check should fail when multiple files have open tasks");
 
         assertTrue(exception.getMessage().contains("3 uncompleted task(s)"),
-                "mojo should report 3 uncompleted task(s) across files");
+                "check should report 3 uncompleted task(s) across files");
     }
 
     @Test
@@ -167,10 +169,10 @@ class CheckTodoMojoTest {
 
         // Should still fail, maxTasks only affects display
         assertThrows(MojoFailureException.class, mojo::execute,
-                "mojo should still fail even with maxTasks set");
+                "check should still fail even with maxTasks set");
         List<String> warnings = warnLines();
         assertTrue(warnings.stream().anyMatch(line -> line.contains("more task(s)")),
-                "mojo should report truncated task list when maxTasks is set");
+                "check should report truncated task list when maxTasks is set");
     }
 
     @Test
@@ -181,10 +183,10 @@ class CheckTodoMojoTest {
 
         // Should still fail, showContext only affects display
         assertThrows(MojoFailureException.class, mojo::execute,
-                "mojo should still fail even when context hidden");
+                "check should still fail even when context hidden");
         List<String> warnings = warnLines();
         assertTrue(warnings.stream().noneMatch(line -> line.contains("Context:")),
-                "mojo should omit context lines when showContext is false");
+                "check should omit context lines when showContext is false");
     }
 
     @Test
@@ -194,10 +196,10 @@ class CheckTodoMojoTest {
         mojo.setContextPattern("^###\\s+.*");
 
         assertThrows(MojoFailureException.class, mojo::execute,
-                "mojo should fail when custom context pattern used");
+                "check should fail when custom context pattern used");
         List<String> warnings = warnLines();
         assertTrue(warnings.stream().anyMatch(line -> line.contains("Context: Custom Header")),
-                "mojo should include custom header in context output");
+                "check should include custom header in context output");
     }
 
     @Test
@@ -206,10 +208,10 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "- [ ] Dash task\n* [ ] Asterisk task\n1. [ ] Numbered task\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when tasks found for all bullet styles");
+                mojo::execute, "check should fail when tasks found for all bullet styles");
 
         assertTrue(exception.getMessage().contains("3 uncompleted task(s)"),
-                "mojo should report 3 uncompleted task(s) from bullet styles");
+                "check should report 3 uncompleted task(s) from bullet styles");
     }
 
     @Test
@@ -218,10 +220,10 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "- [ ] [P1] [E:M] High priority medium effort\n- [ ] [P2] [E:L] Medium priority large effort\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when tasks include priority and effort");
+                mojo::execute, "check should fail when tasks include priority and effort");
 
         assertTrue(exception.getMessage().contains("2 uncompleted task(s)"),
-                "mojo should report 2 uncompleted task(s) with tags");
+                "check should report 2 uncompleted task(s) with tags");
     }
 
     @Test
@@ -229,7 +231,7 @@ class CheckTodoMojoTest {
     void execute_emptyTodoFile_passes() throws Exception {
         createFile("TODO.md", "");
 
-        assertDoesNotThrow(mojo::execute, "mojo should not throw for empty todo file");
+        assertDoesNotThrow(mojo::execute, "check should not throw for empty todo file");
     }
 
     @Test
@@ -237,7 +239,7 @@ class CheckTodoMojoTest {
     void execute_todoFileWithOnlyHeaders_passes() throws Exception {
         createFile("TODO.md", "# Main Header\n## Section 1\n### Subsection\n");
 
-        assertDoesNotThrow(mojo::execute, "mojo should not throw for headers only file");
+        assertDoesNotThrow(mojo::execute, "check should not throw for headers only file");
     }
 
     @Test
@@ -246,10 +248,10 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "- [x] Completed 1\n- [ ] Uncompleted 1\n- [x] Completed 2\n- [ ] Uncompleted 2\n- [x] Completed 3\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when open tasks remain");
+                mojo::execute, "check should fail when open tasks remain");
 
         assertTrue(exception.getMessage().contains("2 uncompleted task(s)"),
-                "mojo should report 2 uncompleted task(s) only");
+                "check should report 2 uncompleted task(s) only");
     }
 
     // === AsciiDoc format tests ===
@@ -261,10 +263,10 @@ class CheckTodoMojoTest {
         createFile("todo/sprint.adoc", "== Sprint Tasks\n* [ ] AsciiDoc uncompleted task\n* [*] AsciiDoc completed task\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when asciidoc file has open task");
+                mojo::execute, "check should fail when asciidoc file has open task");
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) in asciidoc");
+                "check should report 1 uncompleted task(s) in asciidoc");
     }
 
     @Test
@@ -275,13 +277,13 @@ class CheckTodoMojoTest {
 
         // By default, the mojo uses ^==\s+.* for AsciiDoc context
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when asciidoc context uses pattern");
+                mojo::execute, "check should fail when asciidoc context uses pattern");
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) with asciidoc context");
+                "check should report 1 uncompleted task(s) with asciidoc context");
         List<String> warnings = warnLines();
         assertTrue(warnings.stream().anyMatch(line -> line.contains("Context: AsciiDoc Section")),
-                "mojo should include asciidoc header in context output");
+                "check should include asciidoc header in context output");
     }
 
     @Test
@@ -291,10 +293,10 @@ class CheckTodoMojoTest {
         createFile("todo/sprint.adoc", "* [ ] AsciiDoc task\n");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when mixed formats have open tasks");
+                mojo::execute, "check should fail when mixed formats have open tasks");
 
         assertTrue(exception.getMessage().contains("2 uncompleted task(s)"),
-                "mojo should report 2 uncompleted task(s) across formats");
+                "check should report 2 uncompleted task(s) across formats");
     }
 
     // === Context exclusion tests ===
@@ -307,11 +309,11 @@ class CheckTodoMojoTest {
         createFile("TODO.md", content);
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail only on current tasks when future excluded");
+                mojo::execute, "check should fail only on current tasks when future excluded");
 
         // Only 1 task should cause failure (the current one, not the planned one)
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) for current work");
+                "check should report 1 uncompleted task(s) for current work");
     }
 
     @Test
@@ -322,10 +324,10 @@ class CheckTodoMojoTest {
         createFile("TODO.md", content);
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail only on current tasks by default");
+                mojo::execute, "check should fail only on current tasks by default");
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) for future exclusion");
+                "check should report 1 uncompleted task(s) for future exclusion");
     }
 
     @Test
@@ -335,7 +337,7 @@ class CheckTodoMojoTest {
         String content = "## Future Enhancements (Planned)\n- [ ] Future task 1\n- [ ] Future task 2\n";
         createFile("TODO.md", content);
 
-        assertDoesNotThrow(mojo::execute, "mojo should not throw when all tasks are planned");
+        assertDoesNotThrow(mojo::execute, "check should not throw when all tasks are planned");
     }
 
     @Test
@@ -349,11 +351,11 @@ class CheckTodoMojoTest {
         mojo.setExcludeContextPatterns(java.util.Collections.emptyList());
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when exclusions are cleared");
+                mojo::execute, "check should fail when exclusions are cleared");
 
         // Both tasks should cause failure when no exclusions
         assertTrue(exception.getMessage().contains("2 uncompleted task(s)"),
-                "mojo should report 2 uncompleted task(s) with no exclusions");
+                "check should report 2 uncompleted task(s) with no exclusions");
     }
 
     // === Default patterns mode tests ===
@@ -366,10 +368,10 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "- [ ] Task found by pattern");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when patterns find open task");
+                mojo::execute, "check should fail when patterns find open task");
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) for pattern match");
+                "check should report 1 uncompleted task(s) for pattern match");
     }
 
     @Test
@@ -380,10 +382,10 @@ class CheckTodoMojoTest {
         createFile("SPRINT-TODO.md", "- [ ] Sprint task");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when prefixed todo file found");
+                mojo::execute, "check should fail when prefixed todo file found");
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) for prefixed file");
+                "check should report 1 uncompleted task(s) for prefixed file");
     }
 
     @Test
@@ -394,10 +396,10 @@ class CheckTodoMojoTest {
         createFile("todo/sprint.adoc", "== Sprint Tasks\n* [ ] AsciiDoc task\n* [*] Completed");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class,
-                mojo::execute, "mojo should fail when asciidoc parser finds open task");
+                mojo::execute, "check should fail when asciidoc parser finds open task");
 
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) from asciidoc parser");
+                "check should report 1 uncompleted task(s) from asciidoc parser");
     }
 
     // === Legacy mode tests ===
@@ -413,9 +415,9 @@ class CheckTodoMojoTest {
         createFile("TODO.md", "- [ ] Legacy mode task");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class, mojo::execute,
-                "mojo should fail when legacy mode finds open tasks");
+                "check should fail when legacy mode finds open tasks");
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) in legacy mode");
+                "check should report 1 uncompleted task(s) in legacy mode");
     }
 
     @Test
@@ -428,7 +430,7 @@ class CheckTodoMojoTest {
         createFile("SPRINT-TODO.md", "- [ ] Should be ignored in legacy mode");
 
         // Should pass - file not at default exact path
-        assertDoesNotThrow(mojo::execute, "mojo should ignore pattern matched files in legacy mode");
+        assertDoesNotThrow(mojo::execute, "check should ignore pattern matched files in legacy mode");
     }
 
     @Test
@@ -442,9 +444,9 @@ class CheckTodoMojoTest {
         createFile("todo/TODO.md", "- [ ] Task in todo subfolder");
 
         MojoFailureException exception = assertThrows(MojoFailureException.class, mojo::execute,
-                "mojo should fail when legacy mode finds subdir todo task");
+                "check should fail when legacy mode finds subdir todo task");
         assertTrue(exception.getMessage().contains("1 uncompleted task(s)"),
-                "mojo should report 1 uncompleted task(s) in legacy subdir");
+                "check should report 1 uncompleted task(s) in legacy subdir");
     }
 
     private void createFile(String relativePath, String content) throws IOException {

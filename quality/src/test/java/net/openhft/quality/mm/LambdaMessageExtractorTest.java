@@ -6,7 +6,6 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.DetailAstImpl;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -104,6 +103,16 @@ class LambdaMessageExtractorTest {
     }
 
     @Test
+    @DisplayName("Extract cheap supplier description plus ident returns description")
+    void extractCheapSupplierDescription_plusIdent_returnsDescription() {
+        DetailAstImpl lambda = createLambdaWithPlus(createIdent("alpha"), createIdent("beta"));
+
+        String result = extractor.extractCheapSupplierDescription(lambda);
+
+        assertEquals("alpha + beta", result, "Should describe cheap concatenation");
+    }
+
+    @Test
     @DisplayName("Extract cheap supplier description block body returns null")
     void extractCheapSupplierDescription_blockBody_returnsNull() {
         // Lambda with block body: () -> { return "msg"; }
@@ -155,7 +164,6 @@ class LambdaMessageExtractorTest {
     }
 
     @Test
-    @Disabled("NPE in MessageTemplateExtractor.extractTemplateFromMethodCall - incomplete METHOD_CALL AST structure")
     @DisplayName("Extract trivial lambda message direct with method call")
     void extractTrivialLambdaMessageDirect_methodCall_handlesGracefully() {
         // Lambda with method call: () -> String.format(...)
@@ -175,9 +183,29 @@ class LambdaMessageExtractorTest {
         ident.setText("format");
         methodCall.addChild(ident);
 
+        // METHOD_CALL requires ELIST child for argument list
+        DetailAstImpl elist = new DetailAstImpl();
+        elist.setType(TokenTypes.ELIST);
+        methodCall.addChild(elist);
+
         String result = extractor.extractTrivialLambdaMessageDirect(lambda);
         // May be null or message depending on method call structure
-        // Main point is graceful handling
+        // Main point is graceful handling without NPE
+        assertNull(result, "Method call without string literal should return null");
+    }
+
+    @Test
+    @DisplayName("Extract trivial lambda message returns summarised string")
+    void extractTrivialLambdaMessage_returnsSummarisedString() {
+        DetailAstImpl lambda = createLambdaWithPlus(createStringLiteral("prefix"), createIdent("value"));
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        expr.addChild(lambda);
+
+        String result = extractor.extractTrivialLambdaMessage(expr);
+
+        assertNotNull(result, "Should return a summarised message");
+        assertTrue(result.endsWith("..."), "Should end with ellipsis");
     }
 
     // --- Helper methods ---
@@ -196,5 +224,35 @@ class LambdaMessageExtractorTest {
         expr.addChild(literal);
 
         return lambda;
+    }
+
+    private DetailAstImpl createLambdaWithPlus(DetailAstImpl left, DetailAstImpl right) {
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        lambda.addChild(expr);
+
+        DetailAstImpl plus = new DetailAstImpl();
+        plus.setType(TokenTypes.PLUS);
+        plus.addChild(left);
+        plus.addChild(right);
+        expr.addChild(plus);
+        return lambda;
+    }
+
+    private DetailAstImpl createIdent(String name) {
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText(name);
+        return ident;
+    }
+
+    private DetailAstImpl createStringLiteral(String value) {
+        DetailAstImpl literal = new DetailAstImpl();
+        literal.setType(TokenTypes.STRING_LITERAL);
+        literal.setText("\"" + value + "\"");
+        return literal;
     }
 }

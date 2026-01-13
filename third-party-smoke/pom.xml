@@ -22,6 +22,7 @@
     <properties>
         <third-party-bom.version>2026.0-SNAPSHOT</third-party-bom.version>
         <quality.enforced>true</quality.enforced>
+        <bytebuddy.attachArgs/>
     </properties>
 
     <dependencyManagement>
@@ -534,10 +535,29 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs} ${bytebuddy.attachArgs} -Djvm.coverage=true</argLine>
+                    <systemPropertyVariables>
+                        <jdk.attach.allowAttachSelf>true</jdk.attach.allowAttachSelf>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <profiles>
+        <profile>
+            <id>bytebuddy-attach</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <bytebuddy.attachArgs>--add-modules=jdk.attach</bytebuddy.attachArgs>
+            </properties>
+        </profile>
         <profile>
             <id>quality</id>
             <activation>

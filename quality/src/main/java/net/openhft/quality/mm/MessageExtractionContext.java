@@ -24,10 +24,14 @@ public final class MessageExtractionContext {
     private final Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
     private final Set<String> junit4StaticMethods = new HashSet<>();
     private final Set<String> junit5StaticMethods = new HashSet<>();
+    private final Set<String> declaredMethodNames = new HashSet<>();
     private MessageTemplateExtractor templateExtractor;
     private FileContents fileContents;
     private boolean junit4StaticWildcard;
     private boolean junit5StaticWildcard;
+    private boolean junit4ImportWildcard;
+    private boolean junit5ImportWildcard;
+    private boolean junit5ParamsImportWildcard;
 
     private Set<String> ignoredExceptionClassNames = java.util.Collections.emptySet();
 
@@ -40,6 +44,11 @@ public final class MessageExtractionContext {
     private int currentMethodFirstAnnotationLine;
     private boolean currentMethodHasTestAnnotation;
     private int currentMethodTestAnnotationLine;
+    private boolean junit4AnnotationUsage;
+    private int junit4AnnotationLine;
+    private String junit4AnnotationName;
+    private boolean junit4AssertionUsage;
+    private int junit4AssertionLine;
 
     /**
      * Create a context using the provided AST support helpers.
@@ -102,8 +111,39 @@ public final class MessageExtractionContext {
         junit5StaticMethods.clear();
         junit4StaticWildcard = false;
         junit5StaticWildcard = false;
+        junit4ImportWildcard = false;
+        junit5ImportWildcard = false;
+        junit5ParamsImportWildcard = false;
+        declaredMethodNames.clear();
         currentClassName = null;
         currentMethodName = null;
+        junit4AnnotationUsage = false;
+        junit4AnnotationLine = 0;
+        junit4AnnotationName = null;
+        junit4AssertionUsage = false;
+        junit4AssertionLine = 0;
+    }
+
+    /**
+     * Record method names declared in the current file.
+     *
+     * @param methodNames method names declared in this file.
+     */
+    public void setDeclaredMethodNames(Set<String> methodNames) {
+        declaredMethodNames.clear();
+        if (methodNames != null && !methodNames.isEmpty()) {
+            declaredMethodNames.addAll(methodNames);
+        }
+    }
+
+    /**
+     * Check whether a method name is declared in this file.
+     *
+     * @param methodName method name to check.
+     * @return {@code true} if the method name is declared.
+     */
+    public boolean isDeclaredMethodName(String methodName) {
+        return methodName != null && declaredMethodNames.contains(methodName);
     }
 
     /**
@@ -302,6 +342,42 @@ public final class MessageExtractionContext {
     }
 
     /**
+     * Check whether the annotation refers to JUnit 4 test lifecycle usage.
+     *
+     * @param annotationName simple annotation name like "Test".
+     * @param fullName       fully qualified name, if resolved.
+     * @return {@code true} if this is a JUnit 4 test annotation.
+     */
+    public boolean isJUnit4TestAnnotation(String annotationName, String fullName) {
+        if (annotationName == null) {
+            return false;
+        }
+        if (!"Test".equals(annotationName)
+                && !"Before".equals(annotationName)
+                && !"After".equals(annotationName)
+                && !"ParameterizedTest".equals(annotationName)) {
+            return false;
+        }
+        if (fullName != null && !fullName.isEmpty()) {
+            return fullName.startsWith("org.junit.")
+                    && !fullName.startsWith("org.junit.jupiter.");
+        }
+        if ("Test".equals(annotationName)) {
+            if (junit5ImportWildcard) {
+                return false;
+            }
+            return junit4ImportWildcard;
+        }
+        if ("ParameterizedTest".equals(annotationName)) {
+            if (junit5ParamsImportWildcard) {
+                return false;
+            }
+            return junit4ImportWildcard;
+        }
+        return junit4ImportWildcard;
+    }
+
+    /**
      * Return the current class name.
      *
      * @return current class name, or {@code null} if unknown.
@@ -320,6 +396,87 @@ public final class MessageExtractionContext {
     }
 
     /**
+     * Record a JUnit 4 annotation usage for the current file.
+     *
+     * @param annotationName annotation name.
+     * @param lineNo         annotation line number.
+     */
+    public void recordJUnit4AnnotationUsage(String annotationName, int lineNo) {
+        if (isJUnit4MigrationIgnored()) {
+            return;
+        }
+        if (!junit4AnnotationUsage) {
+            junit4AnnotationUsage = true;
+            junit4AnnotationLine = lineNo;
+            junit4AnnotationName = annotationName;
+        }
+    }
+
+    /**
+     * Record a JUnit 4 assertion usage for the current file.
+     *
+     * @param lineNo assertion line number.
+     */
+    public void recordJUnit4AssertionUsage(int lineNo) {
+        if (isJUnit4MigrationIgnored()) {
+            return;
+        }
+        if (!junit4AssertionUsage) {
+            junit4AssertionUsage = true;
+            junit4AssertionLine = lineNo;
+        }
+    }
+
+    /**
+     * Return whether JUnit 4 test annotations were used in the file.
+     *
+     * @return {@code true} if any JUnit 4 test annotation was recorded.
+     */
+    public boolean hasJUnit4AnnotationUsage() {
+        return junit4AnnotationUsage;
+    }
+
+    /**
+     * Return the first JUnit 4 annotation line.
+     *
+     * @return line number, or 0 when unknown.
+     */
+    public int junit4AnnotationLine() {
+        return junit4AnnotationLine;
+    }
+
+    /**
+     * Return the first JUnit 4 annotation name.
+     *
+     * @return annotation name, or {@code null} when unknown.
+     */
+    public String junit4AnnotationName() {
+        return junit4AnnotationName;
+    }
+
+    /**
+     * Return whether JUnit 4 assertions were used in the file.
+     *
+     * @return {@code true} if any JUnit 4 assertion was recorded.
+     */
+    public boolean hasJUnit4AssertionUsage() {
+        return junit4AssertionUsage;
+    }
+
+    /**
+     * Return the first JUnit 4 assertion line.
+     *
+     * @return line number, or 0 when unknown.
+     */
+    public int junit4AssertionLine() {
+        return junit4AssertionLine;
+    }
+
+    private boolean isJUnit4MigrationIgnored() {
+        return currentClassName != null && currentClassName.endsWith("TestCommon");
+    }
+
+    /**
      * Record a regular import for name resolution.
      *
      * @param importAst import AST node.
@@ -327,6 +484,13 @@ public final class MessageExtractionContext {
     public void recordImport(DetailAST importAst) {
         String importText = requireNonNull(astSupport.extractImportText(importAst));
         if (importText.endsWith(".*")) {
+            if ("org.junit.*".equals(importText)) {
+                junit4ImportWildcard = true;
+            } else if ("org.junit.jupiter.api.*".equals(importText)) {
+                junit5ImportWildcard = true;
+            } else if ("org.junit.jupiter.params.*".equals(importText)) {
+                junit5ParamsImportWildcard = true;
+            }
             return;
         }
         int lastDot = importText.lastIndexOf('.');

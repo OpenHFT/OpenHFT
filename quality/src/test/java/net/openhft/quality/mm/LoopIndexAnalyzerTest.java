@@ -9,6 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -240,6 +245,16 @@ class LoopIndexAnalyzerTest {
                 () -> analyzer.findLoopIndexInfo(methodCall, null, "test"));
     }
 
+    @Test
+    @DisplayName("Message contains loop index detects word and key value forms")
+    void messageContainsLoopIndexDetectsWordAndKeyValueForms() throws Exception {
+        Set<String> loopNames = new HashSet<>(Collections.singleton("idx"));
+
+        assertTrue(invokeMessageContainsLoopIndex("index idx is set", loopNames));
+        assertTrue(invokeMessageContainsLoopIndex("idx=4 value", loopNames));
+        assertFalse(invokeMessageContainsLoopIndex("index is set", loopNames));
+    }
+
     // --- Helper methods ---
 
     private DetailAST createMethodCall(String methodName) {
@@ -299,6 +314,13 @@ class LoopIndexAnalyzerTest {
         DetailAST methodCall = createMethodCall(methodName);
         when(methodCall.getParent()).thenReturn(forLoop);
         return methodCall;
+    }
+
+    private boolean invokeMessageContainsLoopIndex(String message, Set<String> names) throws Exception {
+        Method method = LoopIndexAnalyzer.class
+                .getDeclaredMethod("messageContainsLoopIndex", String.class, Set.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(analyzer, message, names);
     }
 
     private DetailAST createEnhancedForLoopWithVariable(String varName) {

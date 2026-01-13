@@ -10,8 +10,8 @@ public class InputSuppressionScopes {
     @SuppressWarnings("MMTooShort")
     @SuppressWarnings("checkstyle:MMContextless")
     public void suppressedClassScope() {
-        assertTrue(false, "alpha beta gamma");
-        assertTrue(false, "operation result should equal expected value");
+        assertTrue(false, "alpha beta gamma because delta");
+        assertTrue(false, "operation result should equal expected value due to epsilon");
     }
 
     @SuppressWarnings(value = "MMTooShort")

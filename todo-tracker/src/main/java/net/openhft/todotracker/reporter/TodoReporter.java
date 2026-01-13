@@ -165,7 +165,7 @@ public final class TodoReporter {
     }
 
     /**
-     * Reports that no TODO files were found.
+     * Reports that no TODO files were found after searching configured paths.
      *
      * @param searchedPaths the paths that were searched
      */
@@ -176,7 +176,7 @@ public final class TodoReporter {
     }
 
     /**
-     * Reports that all tasks are completed.
+     * Reports that all tasks are completed after the scan.
      */
     public void reportAllCompleted() {
         log.info("TODO Tracker: No uncompleted tasks found");

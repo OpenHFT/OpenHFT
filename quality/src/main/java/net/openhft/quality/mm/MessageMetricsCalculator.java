@@ -32,19 +32,21 @@ public final class MessageMetricsCalculator {
     private static final Set<String> FILLER_WORDS = new HashSet<>(
             java.util.Arrays.asList(
                     "a", "an", "the", "is", "are", "was", "were", "be", "been",
-                    "to", "of", "in", "for", "on", "at", "by", "with", "from",
-                    "as", "if", "or", "and", "not", "no", "when", "after", "before",
-                    "should", "must", "expected", "actual", "value", "result",
-                    "test", "check", "assert", "equals", "return", "returns",
+                    "to", "of", "in", "on", "at", "by", "with", "from",
+                    "as", "if", "or", "and", "not", "no", "none", "that", "when", "after", "before",
+                    "around", "yet",
+                    "should", "must", "expected", "actual", "value", "result", "data",
+                    "test", "check", "assert", "equals", "match", "return", "returns", "throw",
                     "read", "todo", "this",
                     "error", "fail", "failed", "failure",
-                    "null", "true", "false", "non", "empty",
-                    "have", "has", "does", "contain", "contains", "exist", "exists",
-                    "present", "set", "get", "first", "second", "one", "two",
-                    "more", "only", "all", "without", "within", "under",
-                    "line", "method", "class", "assertion", "occurred", "here",
-                    "call", "new", "instance", "created", "successfully",
+                    "null", "true", "false", "non", "empty", "npe",
+                    "have", "has", "do", "does", "contain", "contains", "exist", "exists",
+                    "present", "first", "second", "one", "once", "two",
+                    "more", "only", "all", "nothing", "without", "within", "under",
+                    "line", "method", "tostring", "class", "assertion", "occurred", "remains", "here",
+                    "call", "called", "new", "instance", "created", "successfully", "op",
                     "input", "output", "conditions", "behaviour", "behavior",
+                    "time", "unit", "configured", "system",
                     "behaviours"
             )
     );

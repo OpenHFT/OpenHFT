@@ -14,7 +14,7 @@ public class InputThrowCauseMessages {
     }
 
     public void throwWithMessageAndCause(RuntimeException cause) {
-        throw new IllegalStateException("cache entry should be ready", cause);
+        throw new IllegalStateException("cache entry should be ready because callers rely on it", cause);
     }
 
     public void throwWithIndex(long index, long headerNumber) {

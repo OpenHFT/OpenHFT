@@ -8,12 +8,12 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -288,9 +288,19 @@ class ThrowMessageExtractorTest {
     }
 
     @Test
-    @Disabled("NPE in context.hasInlineReasonComment - needs FileContents with actual line content")
     @DisplayName("Handle throw statement with no arguments emits missing message")
-    void handleThrowStatement_noArguments_emitsMissingMessage() {
+    void handleThrowStatement_noArguments_emitsMissingMessage() throws Exception {
+        // Create FileContents with actual source line at line 10
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            lines.add("");
+        }
+        lines.add("        throw new RuntimeException();"); // Line 10 (0-indexed: 9)
+        Path file = tempDir.resolve("InputThrowNoArgs.java");
+        Files.write(file, lines, StandardCharsets.UTF_8);
+        FileText text = new FileText(file.toFile(), lines);
+        context.reset(new FileContents(text));
+
         // throw new RuntimeException(); - valid construction but no message
         DetailAstImpl throwAst = createThrowNewStatement("RuntimeException");
 
@@ -303,9 +313,22 @@ class ThrowMessageExtractorTest {
     }
 
     @Test
-    @Disabled("NPE in context.recordVariableType - needs proper variable tracking setup")
     @DisplayName("Handle throw statement with cause only emits missing message")
-    void handleThrowStatement_causeOnly_emitsMissingMessage() {
+    void handleThrowStatement_causeOnly_emitsMissingMessage() throws Exception {
+        // Create FileContents with actual source line at line 10
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            lines.add("");
+        }
+        lines.add("        throw new RuntimeException(cause);"); // Line 10 (0-indexed: 9)
+        Path file = tempDir.resolve("InputThrowCauseOnly.java");
+        Files.write(file, lines, StandardCharsets.UTF_8);
+        FileText text = new FileText(file.toFile(), lines);
+        context.reset(new FileContents(text));
+
+        // Register the cause variable as a Throwable type
+        context.recordVariableType(createVariableDef("cause", "RuntimeException"));
+
         // throw new RuntimeException(cause); - no string message, just cause
         DetailAstImpl throwAst = new DetailAstImpl();
         throwAst.setType(TokenTypes.LITERAL_THROW);
@@ -341,7 +364,9 @@ class ThrowMessageExtractorTest {
         extractor.handleThrowStatement(throwAst);
 
         assertTrue(sink.candidates.isEmpty(), "Should not emit candidate with only cause");
-        // Should emit missing message since no string message provided
+        assertEquals(1, sink.missingMessages.size(), "Should emit missing message since no string message provided");
+        assertEquals(MessageSource.THROW, sink.missingMessages.get(0),
+                "Missing message source should be THROW");
     }
 
     // --- Helper methods to create AST structures ---
@@ -735,6 +760,56 @@ class ThrowMessageExtractorTest {
         assertEquals(1, sink.unhandledReasons.size(), "Should emit unhandled for non-throwable field");
     }
 
+    @Test
+    @DisplayName("Throwable expression recognises dot qualifiers")
+    void throwableExpressionRecognisesDotQualifiers() throws Exception {
+        context.recordVariableType(createVariableDef("cause", "RuntimeException"));
+        DetailAstImpl dot = createDot("holder", "cause");
+
+        assertTrue(invokeIsThrowableExpression(dot),
+                "Dot expression with throwable field should be throwable");
+
+        DetailAstImpl typeDot = createDot("RuntimeException", "class");
+        assertTrue(invokeIsThrowableExpression(typeDot),
+                "Dot expression with throwable qualifier should be throwable");
+    }
+
+    @Test
+    @DisplayName("Throwable message call recognises getMessage on throwable")
+    void throwableMessageCallRecognisesGetMessageOnThrowable() throws Exception {
+        context.recordVariableType(createVariableDef("cause", "RuntimeException"));
+        DetailAstImpl messageExpr = createMethodCall("cause", "getMessage");
+
+        assertTrue(invokeIsThrowableMessageCall(messageExpr),
+                "getMessage on throwable should be recognised");
+
+        DetailAstImpl nonThrowable = createMethodCall("value", "getMessage");
+        assertFalse(invokeIsThrowableMessageCall(nonThrowable),
+                "getMessage on non-throwable should be ignored");
+    }
+
+    @Test
+    @DisplayName("Throwable rethrow recognises type casts and method calls")
+    void throwableRethrowRecognisesTypeCastsAndMethodCalls() throws Exception {
+        context.recordVariableType(createVariableDef("e", "RuntimeException"));
+
+        DetailAstImpl cast = createTypeCast("String", createIdent("e"));
+        assertTrue(invokeIsThrowableRethrow(cast),
+                "Type cast of throwable variable should be treated as rethrow");
+
+        DetailAstImpl methodCall = createMethodCall("someFactory");
+        assertTrue(invokeIsThrowableRethrow(methodCall),
+                "Factory method call should be treated as rethrow");
+    }
+
+    @Test
+    @DisplayName("Throwable type name handles null and error types")
+    void throwableTypeNameHandlesNullAndErrorTypes() throws Exception {
+        assertFalse(invokeIsThrowableTypeName(null), "Null type name should be false");
+        assertTrue(invokeIsThrowableTypeName("OutOfMemoryError"),
+                "Error type should be recognised as throwable");
+    }
+
     private DetailAstImpl createThrowNewStatementWithQualifiedClass(String qualifiedName, String message) {
         DetailAstImpl throwAst = new DetailAstImpl();
         throwAst.setType(TokenTypes.LITERAL_THROW);
@@ -775,5 +850,33 @@ class ThrowMessageExtractorTest {
         argExpr.addChild(literal);
 
         return throwAst;
+    }
+
+    private boolean invokeIsThrowableExpression(DetailAstImpl expr) throws Exception {
+        Method method = ThrowMessageExtractor.class
+                .getDeclaredMethod("isThrowableExpression", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, expr);
+    }
+
+    private boolean invokeIsThrowableMessageCall(DetailAstImpl expr) throws Exception {
+        Method method = ThrowMessageExtractor.class
+                .getDeclaredMethod("isThrowableMessageCall", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, expr);
+    }
+
+    private boolean invokeIsThrowableRethrow(DetailAstImpl expr) throws Exception {
+        Method method = ThrowMessageExtractor.class
+                .getDeclaredMethod("isThrowableRethrow", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, expr);
+    }
+
+    private boolean invokeIsThrowableTypeName(String typeName) throws Exception {
+        Method method = ThrowMessageExtractor.class
+                .getDeclaredMethod("isThrowableTypeName", String.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, typeName);
     }
 }

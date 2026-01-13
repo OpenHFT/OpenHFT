@@ -7,6 +7,8 @@ package net.openhft.quality.mm;
  * Flags messages that are shorter than the minimum word count.
  */
 public final class MMTooShort extends AbstractMessageRule {
+    private static final int DEFAULT_MAX_WORD_COUNT = new MessageMetricsCalculator().maxWordCount();
+
     /**
      * Create the rule instance.
      */
@@ -27,9 +29,14 @@ public final class MMTooShort extends AbstractMessageRule {
         MessageCandidate candidate = context.candidate();
         MessageSource source = candidate.source();
         int minWordCount = source.minWordCount();
+        int maxWordCount = DEFAULT_MAX_WORD_COUNT;
+        MessageRuleSupport ruleSupport = context.ruleSupport();
+        if (ruleSupport != null && ruleSupport.metricsCalculator() != null) {
+            maxWordCount = ruleSupport.metricsCalculator().maxWordCount();
+        }
         if (metrics.totalWordCount() < minWordCount) {
             if (record(context, collector, candidate.message(),
-                    metrics.totalWordCount(), minWordCount, fixFor(candidate))) {
+                    metrics.totalWordCount(), minWordCount, maxWordCount, fixFor(candidate))) {
                 state.requestStopProcessing();
             }
         }

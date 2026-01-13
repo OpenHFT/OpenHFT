@@ -57,6 +57,10 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                     emitMessageCandidate(template.message(), nextExpr.getLineNo(),
                             template.placeholderCount(), keyValueLabelCount);
                 } else {
+                    DetailAST content = astSupport().unwrapExpr(nextExpr);
+                    if (content != null && isNonLiteralMessageExpression(content)) {
+                        return;
+                    }
                     emitUnhandled(nextExpr, "Java assert message expression not recognised");
                 }
                 break;
@@ -76,14 +80,18 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         if (AssertionMethodClassifier.isAssertionMethod(methodName)) {
             DetailAST elist = methodCall.findFirstToken(TokenTypes.ELIST);
             if (elist != null) {
+                boolean localAssertionHelper = isLocalAssertionHelper(methodCall, methodName);
                 MessageSource source = AssertionMethodClassifier.isPreconditionMethod(methodName)
                         ? MessageSource.PRECONDITION
                         : MessageSource.ASSERTION;
                 AssertionOperandExtractor.AssertionStyle style = source == MessageSource.ASSERTION
                         ? resolveAssertionStyle(methodCall, methodName)
                         : AssertionOperandExtractor.AssertionStyle.UNKNOWN;
+                if (localAssertionHelper) {
+                    style = AssertionOperandExtractor.AssertionStyle.UNKNOWN;
+                }
                 checkAssertionArguments(methodCall, elist, methodName, methodCall.getLineNo(),
-                        source, style);
+                        source, style, localAssertionHelper);
             } else {
                 emitUnhandled(methodCall, "Assertion call without argument list: " + methodName);
             }
@@ -128,7 +136,8 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     }
 
     private void checkAssertionArguments(DetailAST methodCall, DetailAST elist, String methodName, int lineNo,
-                                         MessageSource source, AssertionOperandExtractor.AssertionStyle style) {
+                                         MessageSource source, AssertionOperandExtractor.AssertionStyle style,
+                                         boolean localAssertionHelper) {
         if (source == MessageSource.ASSERTION && AssertionMethodClassifier.isAssertThrowsMethod(methodName)) {
             String exceptionClassName = extractExceptionClassLiteral(elist);
             if (context().isIgnoredExceptionClass(exceptionClassName)) {
@@ -136,14 +145,22 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             }
         }
 
+        if (source == MessageSource.ASSERTION
+                && style == AssertionOperandExtractor.AssertionStyle.JUNIT4) {
+            context().recordJUnit4AssertionUsage(lineNo);
+        }
+
         int argCount = 0;
+        int stringArgCount = 0;
         List<DetailAST> args = new ArrayList<>();
         DetailAST firstStringExpr = null;
         DetailAST lastStringExpr = null;
         DetailAST lastLambda = null;
+        DetailAST lastSupplierExpr = null;
         int firstStringArgIndex = -1;
         int lastStringArgIndex = -1;
         int lastLambdaArgIndex = -1;
+        int lastSupplierArgIndex = -1;
         Map<DetailAST, String> exprToInputValue = new IdentityHashMap<>();
         Map<DetailAST, MessageTemplate> messageTemplates = new IdentityHashMap<>();
 
@@ -163,12 +180,17 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                         lastLambdaArgIndex = argCount;
                     } else {
                         DetailAST content = astSupport().unwrapExpr(child);
+                        if (content != null && isSupplierExpression(content)) {
+                            lastSupplierExpr = child;
+                            lastSupplierArgIndex = argCount;
+                        }
                         MessageTemplate template = extractMessageTemplate(child);
                         boolean stringCandidate = template != null;
                         if (!stringCandidate && content != null && typeAnalyzer.isStringTypedExpression(content)) {
                             stringCandidate = true;
                         }
                         if (stringCandidate) {
+                            stringArgCount++;
                             if (template != null) {
                                 messageTemplates.put(child, template);
                             }
@@ -187,6 +209,12 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 }
             }
             child = child.getNextSibling();
+        }
+
+        if (source == MessageSource.ASSERTION
+                && AssertionMethodClassifier.isAssertThatMethod(methodName)
+                && argCount == 2) {
+            return;
         }
 
         if (source == MessageSource.ASSERTION && style != AssertionOperandExtractor.AssertionStyle.UNKNOWN) {
@@ -223,9 +251,18 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             return;
         }
 
+        if (source == MessageSource.ASSERTION
+                && style == AssertionOperandExtractor.AssertionStyle.UNKNOWN
+                && stringArgCount > 1
+                && argCount >= 3
+                && AssertionMethodClassifier.isRecognisedAssertionMethod(methodName)) {
+            return;
+        }
+
         String cheapSupplierDesc = null;
         boolean lambdaIsMessageArgument = isLambdaMessageArgument(methodName, style, argCount,
-                firstStringArgIndex, lastLambdaArgIndex);
+                firstStringArgIndex, lastLambdaArgIndex)
+                && (!localAssertionHelper || AssertionMethodClassifier.isPreconditionMethod(methodName));
         if (lastLambda != null && lambdaIsMessageArgument) {
             String trivialLambdaMessage = lambdaExtractor.extractTrivialLambdaMessageDirect(lastLambda);
             if (trivialLambdaMessage == null) {
@@ -251,7 +288,8 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         }
 
         DetailAST messageExpr = selectMessageExpression(methodName, argCount, args,
-                firstStringExpr, firstStringArgIndex, lastStringExpr, lastStringArgIndex, source, style);
+                firstStringExpr, firstStringArgIndex, lastStringExpr, lastStringArgIndex,
+                lastSupplierExpr, lastSupplierArgIndex, source, style);
 
         if (messageExpr != null) {
             MessageTemplate template = messageTemplates.get(messageExpr);
@@ -308,9 +346,24 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                             .stringSearchArg(searchInfo.searchArg());
                 }
                 sink().emitCandidate(builder.build());
+            } else if (isSupplierMessageExpression(messageExpr)) {
+                if (cheapSupplierDesc != null) {
+                    MessageCandidate candidate = new MessageCandidate.Builder()
+                            .source(source)
+                            .lineNo(lineNo)
+                            .trivialSupplierDescription(cheapSupplierDesc)
+                            .build();
+                    sink().emitCandidate(candidate);
+                }
+                return;
             } else {
                 if (!context().hasInlineReasonComment(methodCall)) {
-                    sink().emitMissingMessage(lineNo, source);
+                    DetailAST content = astSupport().unwrapExpr(messageExpr);
+                    if (content != null && isNonLiteralMessageExpression(content)) {
+                        emitUnhandled(methodCall, "Non-literal message argument not handled for " + methodName);
+                    } else {
+                        sink().emitMissingMessage(lineNo, source);
+                    }
                 }
             }
         } else if (cheapSupplierDesc != null) {
@@ -326,7 +379,10 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 if (AssertionMethodClassifier.isEqualityAssertionMethod(methodName)) {
                     missingMessage = argCount < 3;
                 } else if (AssertionMethodClassifier.isAssertThatMethod(methodName)) {
-                    missingMessage = argCount < 3;
+                    DetailAST content = astSupport().unwrapExpr(firstStringExpr);
+                    if (argCount < 3 && content != null && astSupport().containsStringLiteralDeep(content)) {
+                        missingMessage = true;
+                    }
                 } else if (AssertionMethodClassifier.isAssertThrowsMethod(methodName)
                         || AssertionMethodClassifier.isTimeoutAssertionMethod(methodName)) {
                     missingMessage = argCount < 3;
@@ -350,6 +406,11 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 }
                 return;
             }
+            // Unrecognised assert* methods are silently ignored when we cannot determine
+            // message position. Many custom assertion methods (e.g., assertCustomCondition)
+            // do not have message-accepting overloads, so flagging them as "missing message"
+            // or "unhandled" would produce false positives. We only flag unhandled when we
+            // have a string argument but cannot determine its role.
             if (source == MessageSource.ASSERTION
                     && style == AssertionOperandExtractor.AssertionStyle.UNKNOWN
                     && methodName.startsWith("assert")
@@ -364,13 +425,38 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         }
     }
 
+    /**
+     * Select the message expression from the method call arguments.
+     *
+     * <p>Returns {@code null} for several distinct reasons:
+     * <ul>
+     *   <li>No string expression exists in arguments (caller should emit missing message)</li>
+     *   <li>Insufficient arguments for the method signature (e.g., assertTrue(boolean) has no message)</li>
+     *   <li>String at unexpected position for method pattern (likely not a message)</li>
+     *   <li>Source type not handled by this method</li>
+     * </ul>
+     *
+     * <p>Callers cannot distinguish these reasons from the null return alone.
+     * The caller uses {@code firstStringExpr != null} to distinguish "no string found" from
+     * "string found but not in message position", which determines whether to emit
+     * {@code MMMissingMessage} or {@code MMUnhandled}.
+     */
     private DetailAST selectMessageExpression(String methodName, int argCount, List<DetailAST> args,
                                               DetailAST firstStringExpr, int firstStringArgIndex,
                                               DetailAST lastStringExpr, int lastStringArgIndex,
+                                              DetailAST lastSupplierExpr, int lastSupplierArgIndex,
                                               MessageSource source, AssertionOperandExtractor.AssertionStyle style) {
         if (source == MessageSource.ASSERTION
                 && style == AssertionOperandExtractor.AssertionStyle.JUNIT4) {
             return selectJUnit4MessageExpression(methodName, argCount, args);
+        }
+        if (source == MessageSource.ASSERTION
+                && style == AssertionOperandExtractor.AssertionStyle.JUNIT5
+                && lastSupplierExpr != null
+                && lastSupplierArgIndex == argCount
+                && !AssertionMethodClassifier.isAssertThatMethod(methodName)
+                && methodName.startsWith("assert")) {
+            return lastSupplierExpr;
         }
         if (firstStringExpr == null) {
             return null;
@@ -406,6 +492,15 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             if (style == AssertionOperandExtractor.AssertionStyle.JUNIT4
                     || (style == AssertionOperandExtractor.AssertionStyle.UNKNOWN
                     && firstStringArgIndex == 1)) {
+                return firstStringArgIndex == 1 ? firstStringExpr : null;
+            }
+            return lastStringArgIndex == argCount ? lastStringExpr : null;
+        }
+        if (AssertionMethodClassifier.isTimeoutAssertionMethod(methodName)) {
+            if (argCount < 3) {
+                return null;
+            }
+            if (style == AssertionOperandExtractor.AssertionStyle.JUNIT4) {
                 return firstStringArgIndex == 1 ? firstStringExpr : null;
             }
             return lastStringArgIndex == argCount ? lastStringExpr : null;
@@ -500,6 +595,53 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             return argCount >= 3;
         }
         return argCount >= 3 && firstStringArgIndex != 1;
+    }
+
+    private boolean isLocalAssertionHelper(DetailAST methodCall, String methodName) {
+        if (methodCall == null || methodName == null) {
+            return false;
+        }
+        DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
+        if (dot != null) {
+            DetailAST qualifier = dot.getFirstChild();
+            if (qualifier != null
+                    && (qualifier.getType() == TokenTypes.LITERAL_THIS
+                    || qualifier.getType() == TokenTypes.LITERAL_SUPER)) {
+                return context().isDeclaredMethodName(methodName);
+            }
+            return false;
+        }
+        return context().isDeclaredMethodName(methodName);
+    }
+
+    private boolean isNonLiteralMessageExpression(DetailAST expr) {
+        if (expr == null) {
+            return false;
+        }
+        if (expr.getType() == TokenTypes.METHOD_CALL || expr.getType() == TokenTypes.METHOD_REF) {
+            return true;
+        }
+        return typeAnalyzer.isStringTypedExpression(expr)
+                || typeAnalyzer.isSupplierTypedExpression(expr);
+    }
+
+    private boolean isSupplierExpression(DetailAST expr) {
+        if (expr == null) {
+            return false;
+        }
+        return expr.getType() == TokenTypes.METHOD_REF
+                || typeAnalyzer.isSupplierTypedExpression(expr);
+    }
+
+    private boolean isSupplierMessageExpression(DetailAST expr) {
+        DetailAST content = astSupport().unwrapExpr(expr);
+        if (content == null) {
+            return false;
+        }
+        if (content.getType() == TokenTypes.LAMBDA || content.getType() == TokenTypes.METHOD_REF) {
+            return true;
+        }
+        return typeAnalyzer.isSupplierTypedExpression(content);
     }
 
     private boolean isParameterNameMessage(MessageTemplate template, List<DetailAST> args,

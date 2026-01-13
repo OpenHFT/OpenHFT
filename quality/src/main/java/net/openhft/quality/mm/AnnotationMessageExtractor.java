@@ -6,8 +6,6 @@ package net.openhft.quality.mm;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Extracts message candidates and missing-message signals from annotations.
  */
@@ -29,8 +27,18 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
      * @param annotationAst annotation AST node.
      */
     public void handleAnnotation(DetailAST annotationAst) {
-        String annotationName = requireNonNull(extractAnnotationName(annotationAst));
+        String annotationName = extractAnnotationName(annotationAst);
+        if (annotationName == null) {
+            // Annotation name could not be extracted (unusual AST structure).
+            // This was previously an NPE; now explicitly flagged as unhandled.
+            emitUnhandled(annotationAst, "Could not extract annotation name from AST");
+            return;
+        }
         context().recordMethodAnnotation(annotationName, annotationAst.getLineNo());
+        String fullName = resolveAnnotationFullName(annotationAst, annotationName);
+        if (context().isJUnit4TestAnnotation(annotationName, fullName)) {
+            context().recordJUnit4AnnotationUsage(annotationName, annotationAst.getLineNo());
+        }
 
         // Track JUnit 5 test annotations (not JUnit 4)
         if (context().isJUnit5TestAnnotation(annotationName)) {
@@ -90,6 +98,18 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
             }
         }
         return ident != null ? ident.getText() : null;
+    }
+
+    private String resolveAnnotationFullName(DetailAST annotationAst, String annotationName) {
+        String imported = annotationName == null ? null : context().importedClass(annotationName);
+        if (imported != null && !imported.isEmpty()) {
+            return imported;
+        }
+        DetailAST dot = annotationAst.findFirstToken(TokenTypes.DOT);
+        if (dot != null) {
+            return astSupport().flattenDot(dot);
+        }
+        return null;
     }
 
     private DetailAST findAnnotationValue(DetailAST annotationAst, String attributeName) {

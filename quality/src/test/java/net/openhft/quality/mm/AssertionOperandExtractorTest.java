@@ -3,6 +3,7 @@
  */
 package net.openhft.quality.mm;
 
+import com.puppycrawl.tools.checkstyle.DetailAstImpl;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -266,5 +267,42 @@ class AssertionOperandExtractorTest {
         when(methodCall.getFirstChild()).thenReturn(null);
 
         assertEquals("getValue()", extractor.extractOperandName(methodCall));
+    }
+
+    @Test
+    @DisplayName("Extract operand name dot returns rightmost ident")
+    void extractOperandName_dot_returnsRightmostIdent() {
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        DetailAstImpl left = new DetailAstImpl();
+        left.setType(TokenTypes.IDENT);
+        left.setText("obj");
+        DetailAstImpl right = new DetailAstImpl();
+        right.setType(TokenTypes.IDENT);
+        right.setText("field");
+        dot.addChild(left);
+        dot.addChild(right);
+
+        assertEquals("field", extractor.extractOperandName(dot));
+    }
+
+    @Test
+    @DisplayName("Extract operand name dot method call returns method name")
+    void extractOperandName_dotMethodCall_returnsMethodName() {
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        DetailAstImpl left = new DetailAstImpl();
+        left.setType(TokenTypes.IDENT);
+        left.setText("obj");
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText("getValue");
+        methodCall.addChild(ident);
+        dot.addChild(left);
+        dot.addChild(methodCall);
+
+        assertEquals("getValue()", extractor.extractOperandName(dot));
     }
 }

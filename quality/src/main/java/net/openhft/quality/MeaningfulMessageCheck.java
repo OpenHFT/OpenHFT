@@ -9,7 +9,8 @@ import net.openhft.quality.mm.MeaningfulMessageProcessor;
 
 /**
  * Checkstyle check that enforces unique and meaningful messages for assertions,
- * preconditions, thrown exceptions, and JUnit annotation descriptions within each Java file.
+ * preconditions, thrown exceptions, and JUnit annotation descriptions within each Java file
+ * because reports should explain intent so that triage stays clear.
  * <p>
  * This check flags:
  * <ul>
@@ -89,7 +90,7 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     @Override
     public void beginTree(DetailAST rootAST) {
         try {
-            processor.beginTree(getFileContents());
+            processor.beginTree(getFileContents(), rootAST);
         } catch (RuntimeException e) {
             logUnexpected(rootAST, e);
         }

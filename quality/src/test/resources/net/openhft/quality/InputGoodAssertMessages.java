@@ -4,13 +4,13 @@
 package net.openhft.quality;
 
 import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InputGoodAssertMessages {
     public void test() {
-        assertEquals("value should be in positive range", 1, 1);
-        assertEquals("array contents should be empty", 0, 0);
-        assertEquals("connection should be open", true, true);
+        assertEquals(1, 1, "value should be in positive range because rounding must be stable");
+        assertEquals(0, 0, "array contents should be empty");
+        assertEquals(true, true, "connection should be open");
     }
 
     public void testRequireNonNull(Object value) {

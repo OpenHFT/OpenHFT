@@ -11,6 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Covers processor paths because message extraction must capture variants so that reports stay complete.
+ */
+@SuppressWarnings("MMOverusedWord")
 public class InputProcessorCoverage {
 
     @DisplayName("cache entry should be ready for lookup")

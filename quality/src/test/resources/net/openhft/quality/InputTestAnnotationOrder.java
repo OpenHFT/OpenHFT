@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test input for @Test annotation ordering.
+ * Test input for @Test annotation ordering because reports read best.
  */
 @SuppressWarnings({"MMTooShort", "MMTooFewMeaningfulWords"})
 class InputTestAnnotationOrder {

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 public class InputAssertionExtractorCoverage {
 
     public void qualifiedAssertion() {
-        Assertions.assertTrue(true, "cache entry should be ready for ingestion");
+        Assertions.assertTrue(true, "cache entry should be ready for ingestion because loaders are warm");
     }
 
     public void loopAssignedIndex() {

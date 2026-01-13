@@ -9,10 +9,10 @@ public class InputThrowNewMessages {
 
     public void testThrowNew(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("bad input");
+            throw new IllegalArgumentException("rejected because input was null");
         }
         if (value.isEmpty()) {
-            throw new IllegalArgumentException("Cannot parse header value");
+            throw new IllegalArgumentException("Cannot parse header because value is empty");
         }
     }
 

@@ -4,11 +4,16 @@
 package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.DetailAstImpl;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -352,6 +357,77 @@ class SuppressionTrackerTest {
                 "outer scope should still have suppression");
     }
 
+    @Test
+    @DisplayName("Collect string values traverses expr and array init")
+    void collectStringValuesTraversesExprAndArrayInit() throws Exception {
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        DetailAstImpl arrayInit = new DetailAstImpl();
+        arrayInit.setType(TokenTypes.ANNOTATION_ARRAY_INIT);
+        expr.addChild(arrayInit);
+        arrayInit.addChild(createExprWithLiteral("MMTooShort"));
+        arrayInit.addChild(createExprWithLiteral("MMTooLong"));
+
+        List<String> tokens = new ArrayList<>();
+        invokeCollectStringValues(expr, tokens);
+
+        assertEquals(Arrays.asList("MMTooShort", "MMTooLong"), tokens,
+                "Should collect tokens from array init");
+    }
+
+    @Test
+    @DisplayName("Unwrap expr returns child only when single child")
+    void unwrapExprReturnsChildOnlyWhenSingleChild() throws Exception {
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        DetailAstImpl literal = new DetailAstImpl();
+        literal.setType(TokenTypes.STRING_LITERAL);
+        literal.setText("\"MMTooShort\"");
+        expr.addChild(literal);
+
+        assertSame(literal, invokeUnwrapExpr(expr), "Single child should be unwrapped");
+
+        DetailAstImpl exprWithTwo = new DetailAstImpl();
+        exprWithTwo.setType(TokenTypes.EXPR);
+        exprWithTwo.addChild(createIdent("first"));
+        exprWithTwo.addChild(createIdent("second"));
+
+        assertSame(exprWithTwo, invokeUnwrapExpr(exprWithTwo),
+                "Expr with multiple children should return itself");
+    }
+
+    @Test
+    @DisplayName("Find annotation value handles literal and array init")
+    void findAnnotationValueHandlesLiteralAndArrayInit() throws Exception {
+        DetailAstImpl literalAnnotation = createAnnotationWithValueLiteral("MMTooShort");
+        DetailAstImpl arrayAnnotation = createAnnotationWithValueArray("MMTooShort", "MMTooLong");
+
+        DetailAST literalValue = invokeFindAnnotationValue(literalAnnotation);
+        DetailAST arrayValue = invokeFindAnnotationValue(arrayAnnotation);
+
+        assertNotNull(literalValue, "Literal value should be found");
+        assertEquals(TokenTypes.EXPR, literalValue.getType());
+        assertNotNull(arrayValue, "Array value should be found");
+        assertEquals(TokenTypes.ANNOTATION_ARRAY_INIT, arrayValue.getType());
+    }
+
+    @Test
+    @DisplayName("Find annotation value handles direct expr and missing value")
+    void findAnnotationValueHandlesDirectExprAndMissingValue() throws Exception {
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        annotation.addChild(expr);
+
+        assertSame(expr, invokeFindAnnotationValue(annotation),
+                "Direct expr child should be returned");
+
+        DetailAstImpl missingValue = createAnnotationWithNamedValue("ignored", "MMTooShort");
+        assertNull(invokeFindAnnotationValue(missingValue),
+                "Non-value attribute should return null");
+    }
+
     // --- Helper methods to build AST structures ---
 
     private DetailAstImpl createClassDefWithSuppressWarnings(String... tokens) {
@@ -439,5 +515,82 @@ class SuppressionTrackerTest {
         expr.addChild(literal);
 
         return classDef;
+    }
+
+    private DetailAstImpl createExprWithLiteral(String token) {
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        DetailAstImpl literal = new DetailAstImpl();
+        literal.setType(TokenTypes.STRING_LITERAL);
+        literal.setText("\"" + token + "\"");
+        expr.addChild(literal);
+        return expr;
+    }
+
+    private DetailAstImpl createAnnotationWithValueLiteral(String token) {
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        DetailAstImpl pair = new DetailAstImpl();
+        pair.setType(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+        annotation.addChild(pair);
+        pair.addChild(createIdent("value"));
+        pair.addChild(createExprWithLiteral(token));
+        return annotation;
+    }
+
+    private DetailAstImpl createAnnotationWithValueArray(String... tokens) {
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        DetailAstImpl pair = new DetailAstImpl();
+        pair.setType(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+        annotation.addChild(pair);
+        pair.addChild(createIdent("value"));
+        DetailAstImpl arrayInit = new DetailAstImpl();
+        arrayInit.setType(TokenTypes.ANNOTATION_ARRAY_INIT);
+        pair.addChild(arrayInit);
+        for (String token : tokens) {
+            arrayInit.addChild(createExprWithLiteral(token));
+        }
+        return annotation;
+    }
+
+    private DetailAstImpl createAnnotationWithNamedValue(String name, String token) {
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        DetailAstImpl pair = new DetailAstImpl();
+        pair.setType(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+        annotation.addChild(pair);
+        pair.addChild(createIdent(name));
+        pair.addChild(createExprWithLiteral(token));
+        return annotation;
+    }
+
+    private DetailAstImpl createIdent(String text) {
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText(text);
+        return ident;
+    }
+
+    private void invokeCollectStringValues(DetailAstImpl expr, List<String> tokens) throws Exception {
+        Method method = SuppressionTracker.class
+                .getDeclaredMethod("collectStringValues", com.puppycrawl.tools.checkstyle.api.DetailAST.class,
+                        List.class);
+        method.setAccessible(true);
+        method.invoke(tracker, expr, tokens);
+    }
+
+    private DetailAST invokeFindAnnotationValue(DetailAstImpl annotation) throws Exception {
+        Method method = SuppressionTracker.class
+                .getDeclaredMethod("findAnnotationValue", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
+        method.setAccessible(true);
+        return (DetailAST) method.invoke(tracker, annotation);
+    }
+
+    private DetailAST invokeUnwrapExpr(DetailAstImpl expr) throws Exception {
+        Method method = SuppressionTracker.class
+                .getDeclaredMethod("unwrapExpr", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
+        method.setAccessible(true);
+        return (DetailAST) method.invoke(tracker, expr);
     }
 }

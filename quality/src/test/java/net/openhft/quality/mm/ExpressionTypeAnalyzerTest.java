@@ -3,6 +3,7 @@
  */
 package net.openhft.quality.mm;
 
+import com.puppycrawl.tools.checkstyle.DetailAstImpl;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +25,12 @@ import static org.mockito.Mockito.when;
 class ExpressionTypeAnalyzerTest {
 
     private ExpressionTypeAnalyzer analyzer;
+    private MessageExtractionContext context;
 
     @BeforeEach
     void setUp() {
         MessageAstSupport astSupport = new MessageAstSupport();
-        MessageExtractionContext context = new MessageExtractionContext(astSupport);
+        context = new MessageExtractionContext(astSupport);
         analyzer = new ExpressionTypeAnalyzer(context);
     }
 
@@ -193,6 +195,35 @@ class ExpressionTypeAnalyzerTest {
     }
 
     @Test
+    @DisplayName("Is string typed expression ident with string type returns true")
+    void isStringTypedExpression_identWithStringType_returnsTrue() {
+        context.recordVariableType(createVariableDef("value", "String"));
+        DetailAST ident = mock(DetailAST.class);
+        when(ident.getType()).thenReturn(TokenTypes.IDENT);
+        when(ident.getText()).thenReturn("value");
+
+        assertTrue(analyzer.isStringTypedExpression(ident),
+                "IDENT with String variable type should return true");
+    }
+
+    @Test
+    @DisplayName("Is string typed expression typecast to string returns true")
+    void isStringTypedExpression_typecastToString_returnsTrue() {
+        DetailAstImpl typecast = new DetailAstImpl();
+        typecast.setType(TokenTypes.TYPECAST);
+        DetailAstImpl type = new DetailAstImpl();
+        type.setType(TokenTypes.TYPE);
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText("String");
+        type.addChild(ident);
+        typecast.addChild(type);
+
+        assertTrue(analyzer.isStringTypedExpression(typecast),
+                "TYPECAST to String should return true");
+    }
+
+    @Test
     @DisplayName("Is string typed expression plus without string literal returns false")
     void isStringTypedExpression_plusWithoutStringLiteral_returnsFalse() {
         DetailAST plus = mock(DetailAST.class);
@@ -201,6 +232,24 @@ class ExpressionTypeAnalyzerTest {
         when(plus.getFirstChild()).thenReturn(null);
         assertFalse(analyzer.isStringTypedExpression(plus),
                 "PLUS without string literal should return false");
+    }
+
+    @Test
+    @DisplayName("Is string typed expression plus with string literal returns true")
+    void isStringTypedExpression_plusWithStringLiteral_returnsTrue() {
+        DetailAstImpl plus = new DetailAstImpl();
+        plus.setType(TokenTypes.PLUS);
+        DetailAstImpl left = new DetailAstImpl();
+        left.setType(TokenTypes.STRING_LITERAL);
+        left.setText("\"value\"");
+        DetailAstImpl right = new DetailAstImpl();
+        right.setType(TokenTypes.IDENT);
+        right.setText("suffix");
+        plus.addChild(left);
+        plus.addChild(right);
+
+        assertTrue(analyzer.isStringTypedExpression(plus),
+                "PLUS with string literal should return true");
     }
 
     // --- isSupplierTypedExpression tests ---
@@ -230,5 +279,24 @@ class ExpressionTypeAnalyzerTest {
         assertThrows(NullPointerException.class,
                 () -> analyzer.isSupplierTypedExpression(null),
                 "null should throw NPE");
+    }
+
+    private DetailAstImpl createVariableDef(String name, String typeName) {
+        DetailAstImpl varDef = new DetailAstImpl();
+        varDef.setType(TokenTypes.VARIABLE_DEF);
+
+        DetailAstImpl type = new DetailAstImpl();
+        type.setType(TokenTypes.TYPE);
+        DetailAstImpl typeIdent = new DetailAstImpl();
+        typeIdent.setType(TokenTypes.IDENT);
+        typeIdent.setText(typeName);
+        type.addChild(typeIdent);
+        varDef.addChild(type);
+
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText(name);
+        varDef.addChild(ident);
+        return varDef;
     }
 }

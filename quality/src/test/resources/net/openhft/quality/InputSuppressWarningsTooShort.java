@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 public class InputSuppressWarningsTooShort {
 
     @SuppressWarnings("MMTooShort")
-    @DisplayName("alpha beta gamma delta echo")
+    @DisplayName("alpha beta gamma delta echo because context matters")
     public void methodSuppressedDisplayName() {
         Logger log = LoggerFactory.getLogger(InputSuppressWarningsTooShort.class);
         log.info("bravo charlie delta");

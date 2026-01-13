@@ -147,6 +147,16 @@ public enum RuleId {
                     MessageSource.THROW, MessageSource.ANNOTATION, MessageSource.LOG,
                     MessageSource.COMMENT, MessageSource.JAVADOC_CLASS, MessageSource.JAVADOC_MEMBER)),
     /**
+     * Overused meaningful word across a file.
+     */
+    OVERUSED_WORD("assert.message.overused.word", "MMOverusedWord", 27,
+            EnumSet.allOf(MessageSource.class)),
+    /**
+     * Not enough rationale cues across a file.
+     */
+    LACKS_PURPOSE("assert.message.lacks.purpose", "MMLacksPurpose", 28,
+            EnumSet.allOf(MessageSource.class)),
+    /**
      * Missing @DisplayName annotation on JUnit 5 test method.
      */
     MISSING_DISPLAY_NAME("assert.message.missing.display.name", "MMDisplayName", 25,
@@ -156,6 +166,16 @@ public enum RuleId {
      */
     TEST_ANNOTATION_ORDER("assert.message.test.annotation.order", "MMTestAnnotationOrder", 26,
             EnumSet.of(MessageSource.ANNOTATION)),
+    /**
+     * JUnit 4 test annotations used in a file.
+     */
+    JUNIT4_ANNOTATION("assert.message.junit4.annotation", "MMJUnit4Annotation", 90,
+            EnumSet.of(MessageSource.ANNOTATION)),
+    /**
+     * JUnit 4 assertions used in a file.
+     */
+    JUNIT4_ASSERTION("assert.message.junit4.assertion", "MMJUnit4Assertion", 91,
+            EnumSet.of(MessageSource.ASSERTION)),
     /**
      * Unhandled extraction case, reported unless disabled.
      */

@@ -6,7 +6,7 @@ package net.openhft.quality;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Exercises rules for duplicate inputs, low-signal headings, and derived assertions.
+ * Covers duplicate inputs and derived assertions because intent drifts; thus tests mislead, hence we flag them so that fixes stay clear.
  */
 public class InputDuplicateInputHeadingDerivedRules {
 
@@ -21,7 +21,7 @@ public class InputDuplicateInputHeadingDerivedRules {
         assertEquals(expected, actual, "expected");  // message duplicates variable name
 
         // These are OK - message explains the invariant
-        assertEquals("admin", actual, "user role should be admin after promotion");
+        assertEquals("admin", actual, "user role should be admin after promotion because of policy");
         assertEquals(expected, actual, "computed hash should match stored value");
     }
 

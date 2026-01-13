@@ -57,18 +57,20 @@ class TodoReporterTest {
     @DisplayName("Reporter should constructor null log throws exception")
     void constructor_nullLog_throwsException() {
         assertThrows(NullPointerException.class, () ->
-                new TodoReporter(null, 10, true), "reporter should throw when log is null");
+                new TodoReporter(null, 10, true),
+                "output should throw when log is null because logging requires a sink");
     }
 
     @Test
     @DisplayName("Reporter should report uncompleted null report throws exception")
     void reportUncompleted_nullReport_throwsException() {
         assertThrows(NullPointerException.class, () ->
-                reporter.reportUncompleted(null), "reporter should throw when report is null");
+                reporter.reportUncompleted(null),
+                "output should throw when report is null because no data is available");
     }
 
     @Test
-    @DisplayName("Reporter should report uncompleted empty report does nothing")
+    @DisplayName("Reporter should skip logging when the task list is empty")
     void reportUncompleted_emptyReport_doesNothing() {
         TodoReport report = new TodoReport();
 
@@ -89,19 +91,19 @@ class TodoReporterTest {
         List<String> warnings = warnCaptor.getAllValues();
 
         assertTrue(warnings.stream().anyMatch(s -> s.contains("TODO TRACKER")),
-                "reporter should include TODO TRACKER header in output");
+                "output should include TODO TRACKER header in output because it flags the failure context");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("TODO.md")),
-                "reporter should include TODO.md file name in output");
+                "output should include TODO.md file name in output because file location aids fixes");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("[Line 10]")),
-                "reporter should include a line marker in output list");
+                "output should include a line marker in output list");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("[P1]")),
-                "reporter should include [P1] priority marker in output");
+                "output should include [P1] priority marker in output");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("[E:M]")),
-                "reporter should include [E:M] effort marker in output");
+                "output should include [E:M] effort marker in output");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("Fix the bug")),
-                "reporter should include task text Fix the bug");
+                "output should include task text Fix the bug");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("Phase 1")),
-                "reporter should include context Phase 1 line");
+                "output should include context Phase 1 line");
     }
 
     @Test
@@ -116,7 +118,7 @@ class TodoReporterTest {
         List<String> warnings = warnCaptor.getAllValues();
 
         assertFalse(warnings.stream().anyMatch(s -> s.contains("Context:")),
-                "reporter should not include Context: when context is null");
+                "output should not include Context: when context is null because no header exists");
     }
 
     @Test
@@ -133,9 +135,9 @@ class TodoReporterTest {
                 .filter(line -> line.contains("Context:"))
                 .findFirst().orElse("");
 
-        assertFalse(contextLine.isEmpty(), "reporter should emit context line for " + contextValue);
+        assertFalse(contextLine.isEmpty(), "output should emit context line for " + contextValue);
         assertEquals("     Context: " + contextValue, contextLine,
-                "reporter should render exact context line without heading markup");
+                "output should render exact context line without heading markup");
     }
 
     @Test
@@ -151,7 +153,7 @@ class TodoReporterTest {
         List<String> warnings = warnCaptor.getAllValues();
 
         assertFalse(warnings.stream().anyMatch(s -> s.contains("Context:")),
-                "reporter should not include Context: when showContext is false");
+                "output should not include Context: when showContext is false");
     }
 
     @Test
@@ -170,7 +172,7 @@ class TodoReporterTest {
         List<String> warnings = warnCaptor.getAllValues();
 
         assertTrue(warnings.stream().anyMatch(s -> s.contains("2 more task(s)")),
-                "reporter should include 2 more task(s) notice for limit");
+                "output should include 2 more task(s) notice for limit because output is truncated");
     }
 
     @Test
@@ -189,7 +191,7 @@ class TodoReporterTest {
 
         // Should not show "more tasks" message
         assertFalse(warnings.stream().anyMatch(s -> s.contains("more task(s)")),
-                "reporter should not include more task(s) when unlimited");
+                "output should not include more task(s) when unlimited because all entries are shown");
     }
 
     @Test
@@ -205,9 +207,9 @@ class TodoReporterTest {
         List<String> warnings = warnCaptor.getAllValues();
 
         assertTrue(warnings.stream().anyMatch(s -> s.contains("file1.md")),
-                "reporter should include file1.md header in warnings");
+                "output should include file1.md header in warnings");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("file2.md")),
-                "reporter should include file2.md header in warnings");
+                "output should include file2.md header in warnings");
     }
 
     @Test
@@ -222,13 +224,13 @@ class TodoReporterTest {
         List<String> warnings = warnCaptor.getAllValues();
 
         assertTrue(warnings.stream().anyMatch(s -> s.contains("TO RESOLVE")),
-                "reporter should include TO RESOLVE instructions header");
+                "output should include TO RESOLVE instructions header");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("- [ ]")),
-                "reporter should include - [ ] instruction example");
+                "output should include - [ ] instruction example");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("- [x]")),
-                "reporter should include - [x] instruction example");
+                "output should include - [x] instruction example");
         assertTrue(warnings.stream().anyMatch(s -> s.contains("mvn verify")),
-                "reporter should include mvn verify instruction line");
+                "output should include mvn verify instruction line");
     }
 
     @Test
@@ -244,7 +246,7 @@ class TodoReporterTest {
 
         // Should contain task text but not priority/effort markers
         assertTrue(warnings.stream().anyMatch(s -> s.contains("Simple task")),
-                "reporter should include Simple task text in output");
+                "output should include Simple task text in output");
         String taskLine = warnings.stream()
                 .filter(s -> s.contains("Simple task"))
                 .findFirst()
@@ -257,7 +259,7 @@ class TodoReporterTest {
     @DisplayName("Reporter should generate summary null report throws exception")
     void generateSummary_nullReport_throwsException() {
         assertThrows(NullPointerException.class, () ->
-                reporter.generateSummary(null), "reporter should throw when summary report is null");
+                reporter.generateSummary(null), "output should throw when summary report is null");
     }
 
     @Test
@@ -268,7 +270,7 @@ class TodoReporterTest {
         String summary = reporter.generateSummary(report);
 
         assertEquals("0 task(s) (0 completed, 0 uncompleted) in 0 file(s)", summary,
-                "reporter should summarise empty report with zeros");
+                "output should summarise empty report with zeros");
     }
 
     @Test
@@ -283,7 +285,7 @@ class TodoReporterTest {
         String summary = reporter.generateSummary(report);
 
         assertEquals("3 task(s) (1 completed, 2 uncompleted) in 1 file(s)", summary,
-                "reporter should summarise mixed tasks with totals");
+                "output should summarise mixed tasks with totals");
     }
 
     @Test
@@ -297,10 +299,10 @@ class TodoReporterTest {
         List<String> infos = infoCaptor.getAllValues();
 
         assertTrue(infos.get(0).contains("No TODO files found"),
-                "reporter should mention No TODO files found message");
-        assertTrue(infos.get(0).contains("TODO.md"), "reporter should list TODO.md in missing paths");
-        assertTrue(infos.get(0).contains("todo/TODO.md"), "reporter should list todo/TODO.md in missing paths");
-        assertTrue(infos.get(1).contains("Check passed"), "reporter should include Check passed status line");
+                "output should mention No TODO files found message");
+        assertTrue(infos.get(0).contains("TODO.md"), "output should list TODO.md in missing paths");
+        assertTrue(infos.get(0).contains("todo/TODO.md"), "output should list todo/TODO.md in missing paths");
+        assertTrue(infos.get(1).contains("Check passed"), "output should include Check passed status line");
     }
 
     @Test
@@ -312,9 +314,9 @@ class TodoReporterTest {
         List<String> infos = infoCaptor.getAllValues();
 
         assertTrue(infos.get(0).contains("No uncompleted tasks"),
-                "reporter should mention No uncompleted tasks line");
+                "output should mention No uncompleted tasks line");
         assertTrue(infos.get(1).contains("Check passed"),
-                "reporter should include Check passed status line for completion");
+                "output should include Check passed status line for completion");
     }
 
     @Test
@@ -324,7 +326,7 @@ class TodoReporterTest {
 
         verify(log).info(infoCaptor.capture());
         assertTrue(infoCaptor.getValue().contains("Skipping execution"),
-                "reporter should mention Skipping execution in info");
+                "output should mention Skipping execution in info");
     }
 
     @Test
@@ -344,7 +346,7 @@ class TodoReporterTest {
 
         // Should show "2 more" message (3 total - 1 displayed = 2 remaining)
         assertTrue(warnings.stream().anyMatch(s -> s.contains("2 more task(s)")),
-                "reporter should include 2 more task(s) notice across files");
+                "output should include 2 more task(s) notice across files");
     }
 
     @Test
@@ -363,7 +365,7 @@ class TodoReporterTest {
 
         // Both tasks shown, no "more" message
         assertFalse(warnings.stream().anyMatch(s -> s.contains("more task(s)")),
-                "reporter should not include more task(s) at exact limit");
+                "output should not include more task(s) at exact limit");
     }
 
     @Test
@@ -382,7 +384,7 @@ class TodoReporterTest {
         List<String> warnings = warnCaptor.getAllValues();
 
         assertTrue(warnings.stream().anyMatch(s -> s.contains("1 more task(s)")),
-                "reporter should include 1 more task(s) notice at limit");
+                "output should include 1 more task(s) notice at limit");
     }
 
     @Test
@@ -400,7 +402,7 @@ class TodoReporterTest {
 
         String expectedPriority = "[P2]";
         assertTrue(taskLine.contains(expectedPriority),
-                "reporter should include priority marker " + expectedPriority + " in " + taskLine);
+                "output should include priority marker " + expectedPriority + " in " + taskLine);
         assertFalse(taskLine.contains("[E:"), taskLine + " should not contain [E: tag");
     }
 
@@ -420,6 +422,51 @@ class TodoReporterTest {
         assertFalse(taskLine.contains("[P"), taskLine + " should not contain [P tag");
         String expectedEffort = "[E:L]";
         assertTrue(taskLine.contains(expectedEffort),
-                "reporter should include effort marker " + expectedEffort + " in " + taskLine);
+                "output should include effort marker " + expectedEffort + " in " + taskLine);
+    }
+
+    @Test
+    @DisplayName("Reporter should number tasks sequentially starting from 1")
+    void reportUncompleted_multipleTasks_numbersSequentially() {
+        TodoReport report = new TodoReport();
+        report.addTask(new TodoTask("TODO.md", 10, "First task", null, false));
+        report.addTask(new TodoTask("TODO.md", 20, "Second task", null, false));
+        report.addTask(new TodoTask("TODO.md", 30, "Third task", null, false));
+
+        reporter.reportUncompleted(report);
+
+        verify(log, atLeastOnce()).warn(warnCaptor.capture());
+        List<String> warnings = warnCaptor.getAllValues();
+
+        // Verify sequential numbering 1, 2, 3
+        assertTrue(warnings.stream().anyMatch(s -> s.contains("1.") && s.contains("First task")),
+                "First task should be numbered 1");
+        assertTrue(warnings.stream().anyMatch(s -> s.contains("2.") && s.contains("Second task")),
+                "Second task should be numbered 2");
+        assertTrue(warnings.stream().anyMatch(s -> s.contains("3.") && s.contains("Third task")),
+                "Third task should be numbered 3");
+    }
+
+    @Test
+    @DisplayName("Reporter should display exactly maxTasks tasks when more exist")
+    void reportUncompleted_moreThanMax_displaysExactlyMaxTasks() {
+        TodoReport report = new TodoReport();
+        report.addTask(new TodoTask("TODO.md", 1, "Task A", null, false));
+        report.addTask(new TodoTask("TODO.md", 2, "Task B", null, false));
+        report.addTask(new TodoTask("TODO.md", 3, "Task C", null, false));
+
+        TodoReporter limitedReporter = new TodoReporter(log, 2, false);
+        limitedReporter.reportUncompleted(report);
+
+        verify(log, atLeastOnce()).warn(warnCaptor.capture());
+        List<String> warnings = warnCaptor.getAllValues();
+
+        // Should show tasks 1 and 2, but NOT task 3
+        assertTrue(warnings.stream().anyMatch(s -> s.contains("1.") && s.contains("Task A")),
+                "output should display task 1");
+        assertTrue(warnings.stream().anyMatch(s -> s.contains("2.") && s.contains("Task B")),
+                "output should display task 2");
+        assertFalse(warnings.stream().anyMatch(s -> s.contains("Task C")),
+                "output should NOT display task 3 beyond limit");
     }
 }

@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Parses TODO files in Markdown or AsciiDoc to extract checkbox tasks and context headings.
+ * Parses TODO files in Markdown or AsciiDoc to extract checkbox tasks and context headings,
+ * so that build checks can report unfinished work with enough context to fix it.
  * <p>
  * Markdown checkbox formats:
  * <ul>
@@ -42,9 +43,11 @@ import static java.util.Objects.requireNonNull;
  *   <li>{@code * [-]} - dropped task</li>
  * </ul>
  * <p>
- * Also extracts priority tags [P1-3] and effort tags [E:S/M/L] from task text.
+ * Also extracts priority tags [P1-3] and effort tags [E:S/M/L] from task text,
+ * because the reporter uses them to order and summarise work.
  * <p>
- * Note: Format is detected from file extension (.ad/.adoc/.asciidoc = AsciiDoc, .md/.markdown = Markdown).
+ * Note: Format is detected from file extension (.ad/.adoc/.asciidoc = AsciiDoc, .md/.markdown = Markdown)
+ * to avoid misclassifying AsciiDoc checkboxes as Markdown syntax.
  */
 public final class TodoParser {
 
@@ -107,7 +110,7 @@ public final class TodoParser {
     }
 
     /**
-     * Detects the format based on file extension.
+     * Detects the format based on file extension so that AsciiDoc is handled correctly.
      *
      * @param filePath the file path to check
      * @return ASCIIDOC for .ad/.adoc/.asciidoc files, MARKDOWN otherwise
@@ -124,7 +127,7 @@ public final class TodoParser {
     }
 
     /**
-     * Parses a TODO file and extracts all tasks.
+     * Parses a TODO file and extracts all tasks because the checker needs a single report.
      * Format is auto-detected from file extension.
      *
      * @param file the TODO file to parse (.md or .adoc)

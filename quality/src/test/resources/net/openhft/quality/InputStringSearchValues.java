@@ -6,7 +6,7 @@ package net.openhft.quality;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Exercises MMMissingStringSearchValue with string searches lacking the searched literal value in messages.
+ * Exercises MMMissingStringSearchValue with string searches because the literal must appear, thus the failed match stays visible.
  */
 public class InputStringSearchValues {
 

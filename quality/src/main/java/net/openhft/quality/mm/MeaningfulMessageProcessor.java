@@ -23,6 +23,18 @@ import static java.util.Objects.requireNonNull;
  * Coordinates extraction and evaluation of message candidates for a single file.
  */
 public class MeaningfulMessageProcessor implements MessageCandidateSink {
+    private static final int OVERUSED_WORD_MIN_MESSAGES = 12;
+    private static final int PURPOSE_CUE_RATIO = 8;
+    private static final String CONSEQUENT_ROOT = "consequent";
+    private static final String GENERATED_JAVADOC_PREFIX = "Generated at ";
+    private static final Set<String> PURPOSE_CUES = new HashSet<>(java.util.Arrays.asList(
+            "because", "since", "due", "owing", "account", "reason", "for",
+            "result", "therefore", "thus", "hence",
+            "purpose",
+            "if", "given", "assuming", "provided",
+            "although", "despite", "spite", "regardless",
+            "required", "workaround", "avoid", "otherwise"
+    ));
     private ViolationCollector violationCollector;
     private SuppressionTracker suppressionTracker;
     private MessageMetricsCalculator metricsCalculator;
@@ -47,6 +59,11 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private String messageExtractionFailureDetail;
 
     private Set<String> ignoredExceptionClassNames = java.util.Collections.emptySet();
+    private Map<String, Integer> overusedWordCounts = new HashMap<>();
+    private int fileMessageCount;
+    private int fileFirstMessageLine;
+    private int purposeCueCount;
+    private boolean skipFile;
 
     /**
      * Create a processor with default settings.
@@ -168,6 +185,16 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      * @param fileContents file contents for the current file.
      */
     public void beginTree(FileContents fileContents) {
+        beginTree(fileContents, null);
+    }
+
+    /**
+     * Initialise per-file state from the Checkstyle file contents.
+     *
+     * @param fileContents file contents for the current file.
+     * @param rootAst      root AST node for the file, or {@code null} if unavailable.
+     */
+    public void beginTree(FileContents fileContents, DetailAST rootAst) {
         Map<String, Integer> messageOccurrences = new HashMap<>();
         suppressionTracker = new SuppressionTracker();
         violationCollector = new ViolationCollector(suppressionTracker);
@@ -180,6 +207,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         context.setTemplateExtractor(templateExtractor);
         context.setIgnoredExceptionClassNames(ignoredExceptionClassNames);
         context.reset(fileContents);
+        context.setDeclaredMethodNames(collectDeclaredMethods(rootAst));
+        skipFile = shouldSkipFile(fileContents);
         ruleEngine = new RuleEngine(ruleSupport, messageOccurrences);
         assertionExtractor = new AssertionMessageExtractor(context, this);
         throwExtractor = new ThrowMessageExtractor(context, this);
@@ -188,10 +217,16 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         javadocExtractor = new JavadocMessageExtractor(context, this);
         commentExtractor = new CommentMessageExtractor(context, this);
         javadocExtractor.reset();
+        overusedWordCounts = new HashMap<>();
+        fileMessageCount = 0;
+        fileFirstMessageLine = 0;
+        purposeCueCount = 0;
         messageExtractionFailureLine = 0;
         messageExtractionFailureDetail = null;
         messageExtractionTarget = null;
-        openMessageExtractionWriter();
+        if (!skipFile) {
+            openMessageExtractionWriter();
+        }
     }
 
     /**
@@ -200,7 +235,17 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      * @param check owning check to report violations against.
      */
     public void finishTree(AbstractCheck check) {
+        if (skipFile) {
+            closeMessageExtractionWriter();
+            if (context != null) {
+                context.reset(null);
+            }
+            return;
+        }
         if (violationCollector != null) {
+            emitJUnit4MigrationWarnings();
+            emitOverusedWordWarning();
+            emitLacksPurposeWarning();
             if (verbose) {
                 emitRuleSummary();
             }
@@ -220,6 +265,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      * @param ast token AST node.
      */
     public void visitToken(DetailAST ast) {
+        if (skipFile) {
+            return;
+        }
         switch (ast.getType()) {
             case TokenTypes.IMPORT:
                 context.recordImport(ast);
@@ -233,6 +281,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             case TokenTypes.ANNOTATION_DEF:
             case TokenTypes.RECORD_DEF:
                 suppressionTracker.enterScope(ast);
+                if (isTopLevelType(ast)) {
+                    suppressionTracker.recordFileSuppressions(ast);
+                }
                 context.enterType(ast);
                 if (javadocExtractor != null) {
                     javadocExtractor.handleType(ast, isTopLevelType(ast));
@@ -288,6 +339,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      * @param ast token AST node.
      */
     public void leaveToken(DetailAST ast) {
+        if (skipFile) {
+            return;
+        }
         switch (ast.getType()) {
             case TokenTypes.METHOD_DEF:
             case TokenTypes.CTOR_DEF:
@@ -307,6 +361,73 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             default:
                 break;
         }
+    }
+
+    private boolean shouldSkipFile(FileContents fileContents) {
+        if (fileContents == null) {
+            return false;
+        }
+        String[] lines = fileContents.getLines();
+        if (lines == null) {
+            return false;
+        }
+        boolean inJavadoc = false;
+        for (String raw : lines) {
+            if (raw == null) {
+                continue;
+            }
+            String line = raw;
+            if (!inJavadoc) {
+                int start = line.indexOf("/**");
+                if (start < 0) {
+                    continue;
+                }
+                inJavadoc = true;
+                line = line.substring(start + 3);
+            }
+            int end = line.indexOf("*/");
+            String contentLine = end >= 0 ? line.substring(0, end) : line;
+            String content = trimJavadocLine(contentLine);
+            if (!content.isEmpty()) {
+                return content.startsWith(GENERATED_JAVADOC_PREFIX);
+            }
+            if (end >= 0) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private Set<String> collectDeclaredMethods(DetailAST rootAst) {
+        if (rootAst == null) {
+            return java.util.Collections.emptySet();
+        }
+        Set<String> names = new HashSet<>();
+        ArrayDeque<DetailAST> stack = new ArrayDeque<>();
+        stack.push(rootAst);
+        while (!stack.isEmpty()) {
+            DetailAST current = stack.pop();
+            if (current.getType() == TokenTypes.METHOD_DEF) {
+                DetailAST ident = current.findFirstToken(TokenTypes.IDENT);
+                if (ident != null) {
+                    names.add(ident.getText());
+                }
+            }
+            DetailAST child = current.getFirstChild();
+            while (child != null) {
+                stack.push(child);
+                child = child.getNextSibling();
+            }
+        }
+        return names;
+    }
+
+    private String trimJavadocLine(String raw) {
+        String line = raw.trim();
+        if (line.startsWith("*")) {
+            line = line.substring(1).trim();
+        }
+        return line;
     }
 
     private void checkMissingDisplayName() {
@@ -358,12 +479,15 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (message != null) {
             metrics = computeMessageMetrics(message, candidate.placeholderCount(),
                     candidate.keyValueLabelCount());
+            String role = resolveExtractionRole(candidate);
             writeMessageExtractionRecord(message, candidate.lineNo(), metrics,
                     candidate.placeholderCount(), candidate.keyValueLabelCount(),
-                    candidate.source());
+                    candidate.source(), role);
             if (messagePrefilter != null && messagePrefilter.shouldSkip(message)) {
                 return;
             }
+            recordOverusedWordUsage(metrics, candidate.lineNo());
+            recordPurposeCueUsage(message);
         }
         if (ruleEngine != null) {
             ruleEngine.evaluate(candidate, metrics, context.currentClassName(),
@@ -431,7 +555,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             messageExtractionWriter = Files.newBufferedWriter(outputPath, StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
             if (writeHeader) {
-                messageExtractionWriter.write("file\tline\tsource\tchars\twords\tmeaningful\tplaceholders\tkeyValueLabels\ttotalWords\teffectiveMeaningful\tmessage");
+                messageExtractionWriter.write("file\tline\tsource\trole\tchars\twords\tmeaningful\tplaceholders\tkeyValueLabels\ttotalWords\teffectiveMeaningful\tmessage");
                 messageExtractionWriter.newLine();
                 messageExtractionWriter.flush();
             }
@@ -456,7 +580,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
 
     private void writeMessageExtractionRecord(String message, int lineNo,
                                               MessageMetrics metrics, int placeholderCount,
-                                              int keyValueLabelCount, MessageSource source) {
+                                              int keyValueLabelCount, MessageSource source,
+                                              String role) {
         if (messageExtractionWriter == null || messageExtractionFailureDetail != null) {
             return;
         }
@@ -470,6 +595,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         line.append(escapeForTsv(fileName)).append('\t')
                 .append(lineNo).append('\t')
                 .append(source.name()).append('\t')
+                .append(role == null ? "unknown" : role).append('\t')
                 .append(resolvedMetrics.charCount()).append('\t')
                 .append(resolvedMetrics.wordCount()).append('\t')
                 .append(resolvedMetrics.meaningfulWordCount()).append('\t')
@@ -518,6 +644,46 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         return fromProperty == null || fromProperty.trim().isEmpty() ? "unknown" : fromProperty.trim();
     }
 
+    private String resolveExtractionRole(MessageCandidate candidate) {
+        if (candidate == null || candidate.source() == null) {
+            return "unknown";
+        }
+        if (candidate.source() == MessageSource.ASSERTION) {
+            if (candidate.assertAllHeading()) {
+                return "assert_all_heading";
+            }
+            if (candidate.assertJOverride()) {
+                return "assert_override";
+            }
+            if (candidate.trivialSupplierDescription() != null) {
+                return "assert_supplier";
+            }
+            return "assert_message";
+        }
+        if (candidate.source() == MessageSource.PRECONDITION) {
+            return "precondition_message";
+        }
+        if (candidate.source() == MessageSource.THROW) {
+            return "throw_message";
+        }
+        if (candidate.source() == MessageSource.LOG) {
+            return "log_message";
+        }
+        if (candidate.source() == MessageSource.ANNOTATION) {
+            return "annotation_value";
+        }
+        if (candidate.source() == MessageSource.COMMENT) {
+            return "comment_text";
+        }
+        if (candidate.source() == MessageSource.JAVADOC_CLASS) {
+            return "javadoc_class";
+        }
+        if (candidate.source() == MessageSource.JAVADOC_MEMBER) {
+            return "javadoc_member";
+        }
+        return "unknown";
+    }
+
     private void emitRuleSummary() {
         Map<RuleId, Integer> summary = violationCollector == null
                 ? java.util.Collections.emptyMap()
@@ -551,6 +717,168 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             builder.append(entry.getKey().code()).append('=').append(entry.getValue());
         }
         return builder.toString();
+    }
+
+    private void recordOverusedWordUsage(MessageMetrics metrics, int lineNo) {
+        if (metrics == null) {
+            return;
+        }
+        fileMessageCount++;
+        if (fileFirstMessageLine == 0 && lineNo > 0) {
+            fileFirstMessageLine = lineNo;
+        }
+        List<String> words = metrics.meaningfulWords();
+        if (words.isEmpty()) {
+            return;
+        }
+        for (String word : words) {
+            if (word == null || word.isEmpty()) {
+                continue;
+            }
+            String normalised = word.toLowerCase(java.util.Locale.ROOT);
+            overusedWordCounts.merge(normalised, 1, Integer::sum);
+        }
+    }
+
+    private void recordPurposeCueUsage(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return;
+        }
+        purposeCueCount += countPurposeCues(message);
+    }
+
+    private int countPurposeCues(String message) {
+        if (metricsCalculator == null) {
+            return 0;
+        }
+        String[] words = metricsCalculator.splitWords(message);
+        List<String> tokens = new ArrayList<>(words.length);
+        for (String word : words) {
+            if (word == null || word.isEmpty()) {
+                continue;
+            }
+            tokens.add(word.toLowerCase(java.util.Locale.ROOT));
+        }
+        if (tokens.size() < 3) {
+            return 0;
+        }
+        int count = 0;
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            if ("so".equals(token) && i + 1 < tokens.size()
+                    && "that".equals(tokens.get(i + 1))) {
+                if (i > 0 && i + 1 < tokens.size() - 1) {
+                    count++;
+                }
+                i++;
+                continue;
+            }
+            if ("in".equals(token) && i + 1 < tokens.size()
+                    && "order".equals(tokens.get(i + 1))) {
+                if (i > 0 && i + 1 < tokens.size() - 1) {
+                    count++;
+                }
+                i++;
+                continue;
+            }
+            if (i == 0 || i == tokens.size() - 1) {
+                continue;
+            }
+            if (isPurposeCue(token)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private boolean isPurposeCue(String token) {
+        if (token.startsWith(CONSEQUENT_ROOT)) {
+            return true;
+        }
+        return PURPOSE_CUES.contains(token);
+    }
+
+    private void emitOverusedWordWarning() {
+        if (violationCollector == null || overusedWordCounts.isEmpty()) {
+            return;
+        }
+        if (fileMessageCount < OVERUSED_WORD_MIN_MESSAGES) {
+            return;
+        }
+        if (suppressionTracker != null && suppressionTracker.isSuppressedInFile(RuleId.OVERUSED_WORD)) {
+            return;
+        }
+        List<Map.Entry<String, Integer>> entries = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : overusedWordCounts.entrySet()) {
+            if (entry.getValue() * 2 > fileMessageCount) {
+                entries.add(entry);
+            }
+        }
+        if (entries.isEmpty()) {
+            return;
+        }
+        entries.sort(Comparator
+                .comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
+                .reversed()
+                .thenComparing(Map.Entry::getKey));
+        StringBuilder builder = new StringBuilder(128);
+        for (Map.Entry<String, Integer> entry : entries) {
+            if (builder.length() > 0) {
+                builder.append(", ");
+            }
+            builder.append(entry.getKey())
+                    .append('(')
+                    .append(entry.getValue())
+                    .append('/')
+                    .append(fileMessageCount)
+                    .append(')');
+        }
+        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
+        violationCollector.record(lineNo, RuleId.OVERUSED_WORD,
+                builder.toString(), fileMessageCount);
+    }
+
+    private void emitLacksPurposeWarning() {
+        if (violationCollector == null) {
+            return;
+        }
+        if (fileMessageCount == 0) {
+            return;
+        }
+        if (suppressionTracker != null && suppressionTracker.isSuppressedInFile(RuleId.LACKS_PURPOSE)) {
+            return;
+        }
+        int expectedMin = Math.max(1, (int) Math.round((double) fileMessageCount / PURPOSE_CUE_RATIO));
+        if (purposeCueCount >= expectedMin) {
+            return;
+        }
+        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
+        violationCollector.record(lineNo, RuleId.LACKS_PURPOSE,
+                purposeCueCount, expectedMin, fileMessageCount);
+    }
+
+    private void emitJUnit4MigrationWarnings() {
+        if (violationCollector == null || context == null) {
+            return;
+        }
+        if (context.hasJUnit4AnnotationUsage()) {
+            int lineNo = context.junit4AnnotationLine();
+            if (lineNo <= 0) {
+                lineNo = 1;
+            }
+            String name = context.junit4AnnotationName();
+            if (name == null || name.isEmpty()) {
+                name = "Test";
+            }
+            violationCollector.record(lineNo, RuleId.JUNIT4_ANNOTATION, name);
+        }
+        if (context.hasJUnit4AssertionUsage()) {
+            int lineNo = context.junit4AssertionLine();
+            if (lineNo <= 0) {
+                lineNo = 1;
+            }
+            violationCollector.record(lineNo, RuleId.JUNIT4_ASSERTION);
+        }
     }
 
     private MessageMetrics computeMessageMetrics(String message, int placeholderCount, int keyValueLabelCount) {

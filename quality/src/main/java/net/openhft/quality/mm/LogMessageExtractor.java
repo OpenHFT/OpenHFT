@@ -101,6 +101,12 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
 
         MessageTemplate template = extractMessageTemplate(messageExpr);
         if (template == null) {
+            // Message expression exists but couldn't be parsed as a template.
+            // This could be a complex expression (method call, ternary, etc.).
+            // An inline comment like "// MM-reason: computed message" suppresses this.
+            // Note: We emit "missing message" rather than "unhandled" because:
+            // - The message IS expected but we can't verify its quality
+            // - Users can suppress with inline comment if the expression is intentional
             if (!context().hasInlineReasonComment(methodCall)) {
                 sink().emitMissingMessage(lineNo, MessageSource.LOG);
             }

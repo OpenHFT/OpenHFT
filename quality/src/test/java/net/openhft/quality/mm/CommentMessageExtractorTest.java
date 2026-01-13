@@ -4,8 +4,10 @@
 package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.DetailAstImpl;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FileText;
+import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +24,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Comment message extractor tests scenario case")
 class CommentMessageExtractorTest {
@@ -430,6 +435,84 @@ class CommentMessageExtractorTest {
                 "Should use comment source");
     }
 
+    @Test
+    @DisplayName("Thread method recognition handles known and unknown names")
+    void threadMethodRecognitionHandlesKnownAndUnknownNames() throws Exception {
+        prepareContext(Collections.singletonList(""));
+        assertTrue(invokeIsThreadMethod("sleep"));
+        assertFalse(invokeIsThreadMethod("run"));
+    }
+
+    @Test
+    @DisplayName("Instance method call returns false for unknown qualifier type")
+    void instanceMethodCallReturnsFalseForUnknownQualifierType() throws Exception {
+        prepareContext(Collections.singletonList(""));
+        DetailAstImpl methodCall = createMethodCall(new String[]{"value", "setPriority"}, 1);
+
+        assertFalse(invokeIsInstanceMethodCall(methodCall, "setPriority", "Thread"));
+    }
+
+    @Test
+    @DisplayName("Instance method call returns false for mismatched method name")
+    void instanceMethodCallReturnsFalseForMismatchedMethodName() throws Exception {
+        prepareContext(Collections.singletonList(""));
+        DetailAstImpl methodCall = createMethodCall(new String[]{"thread", "setPriority"}, 1);
+        context.recordVariableType(createVariableDef("thread", "Thread"));
+
+        assertFalse(invokeIsInstanceMethodCall(methodCall, "sleep", "Thread"));
+    }
+
+    @Test
+    @DisplayName("Instance method call returns false for unexpected literal new type")
+    void instanceMethodCallReturnsFalseForUnexpectedLiteralNewType() throws Exception {
+        prepareContext(Collections.singletonList(""));
+        DetailAstImpl qualifier = createLiteralNew("String");
+        DetailAstImpl methodCall = createMethodCallWithQualifier(qualifier, "intern", 1);
+
+        assertFalse(invokeIsInstanceMethodCall(methodCall, "intern", "Thread"));
+    }
+
+    @Test
+    @DisplayName("Comment line detection recognises block comment only line")
+    void commentLineDetectionRecognisesBlockCommentOnlyLine() throws Exception {
+        String line = "/* comment */";
+        FileContents contents = createFileContents("InputBlockOnly.java", Collections.singletonList(line));
+        prepareContext(contents);
+        TextBlock block = mock(TextBlock.class);
+        when(block.getStartLineNo()).thenReturn(1);
+        when(block.getEndLineNo()).thenReturn(1);
+        when(block.getStartColNo()).thenReturn(0);
+        when(block.getEndColNo()).thenReturn(line.indexOf("*/") + 1);
+
+        assertTrue(invokeIsCommentLine(contents, 0, Collections.singletonList(block)),
+                "Block-only line should be treated as comment line");
+    }
+
+    @Test
+    @DisplayName("Block comment only line returns false when trailing text exists")
+    void blockCommentOnlyLineReturnsFalseWhenTrailingTextExists() throws Exception {
+        String line = "/* comment */ int x;";
+        prepareContext(Collections.singletonList(line));
+        TextBlock block = mock(TextBlock.class);
+        when(block.getStartLineNo()).thenReturn(1);
+        when(block.getEndLineNo()).thenReturn(1);
+        when(block.getStartColNo()).thenReturn(0);
+        when(block.getEndColNo()).thenReturn(line.indexOf("*/") + 1);
+
+        assertFalse(invokeIsBlockCommentOnlyLine(line, 1, block),
+                "Trailing text should not be treated as comment-only line");
+    }
+
+    @Test
+    @DisplayName("Clamp column and whitespace checks handle boundaries")
+    void clampColumnAndWhitespaceChecksHandleBoundaries() throws Exception {
+        prepareContext(Collections.singletonList(""));
+        assertEquals(0, invokeClampColumn(-4, 3));
+        assertEquals(3, invokeClampColumn(10, 3));
+        assertTrue(invokeIsWhitespace(" \t"));
+        assertFalse(invokeIsWhitespace("x "));
+    }
+
     private void prepareContext(List<String> lines) throws Exception {
         prepareContext(createFileContents("Input.java", lines));
     }
@@ -538,6 +621,50 @@ class CommentMessageExtractorTest {
 
         varDef.addChild(createIdent(name));
         return varDef;
+    }
+
+    private boolean invokeIsThreadMethod(String methodName) throws Exception {
+        java.lang.reflect.Method method = CommentMessageExtractor.class
+                .getDeclaredMethod("isThreadMethod", String.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, methodName);
+    }
+
+    private boolean invokeIsInstanceMethodCall(DetailAST methodCall, String methodName,
+                                               String... classNames) throws Exception {
+        java.lang.reflect.Method method = CommentMessageExtractor.class
+                .getDeclaredMethod("isInstanceMethodCall", DetailAST.class, String.class, String[].class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, methodCall, methodName, classNames);
+    }
+
+    private boolean invokeIsCommentLine(FileContents contents, int lineIndex,
+                                        List<TextBlock> blockComments) throws Exception {
+        java.lang.reflect.Method method = CommentMessageExtractor.class
+                .getDeclaredMethod("isCommentLine", FileContents.class, int.class, List.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, contents, lineIndex, blockComments);
+    }
+
+    private boolean invokeIsBlockCommentOnlyLine(String line, int lineNo, TextBlock block) throws Exception {
+        java.lang.reflect.Method method = CommentMessageExtractor.class
+                .getDeclaredMethod("isBlockCommentOnlyLine", String.class, int.class, TextBlock.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, line, lineNo, block);
+    }
+
+    private int invokeClampColumn(int column, int length) throws Exception {
+        java.lang.reflect.Method method = CommentMessageExtractor.class
+                .getDeclaredMethod("clampColumn", int.class, int.class);
+        method.setAccessible(true);
+        return (int) method.invoke(extractor, column, length);
+    }
+
+    private boolean invokeIsWhitespace(String text) throws Exception {
+        java.lang.reflect.Method method = CommentMessageExtractor.class
+                .getDeclaredMethod("isWhitespace", String.class);
+        method.setAccessible(true);
+        return (boolean) method.invoke(extractor, text);
     }
 
     private static final class TestMessageSink implements MessageCandidateSink {

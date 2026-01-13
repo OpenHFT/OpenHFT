@@ -196,4 +196,16 @@ public class AssertionMethodClassifierTest {
     void isLoopIndexAssertionMethod_null_returnsFalse(String methodName) {
         assertFalse(AssertionMethodClassifier.isLoopIndexAssertionMethod(methodName));
     }
+
+    @DisplayName("Is assumption method scenario case")
+    @ParameterizedTest
+    @CsvSource({
+            "assumeTrue, true",
+            "assumeFalse, true",
+            "assertTrue, false",
+            "assumption, false"
+    })
+    void isAssumptionMethod(String methodName, boolean expected) {
+        assertEquals(expected, AssertionMethodClassifier.isAssumptionMethod(methodName));
+    }
 }

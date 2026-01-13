@@ -24,7 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Todo report aggregates tasks and counts totals")
+@DisplayName("Todo aggregation tracks tasks and counts totals")
 class TodoReportTest {
 
     private TodoReport report;
@@ -35,52 +35,55 @@ class TodoReportTest {
     }
 
     @Test
-    @DisplayName("Report should start with zero tasks in new instance")
+    @DisplayName("New instance should start with zero task counts")
     void newReport_isEmpty() {
-        assertTrue(report.isEmpty(), "new report should start out empty");
-        assertEquals(0, report.getTotalCount(), "new report should have zero total tasks");
-        assertEquals(0, report.getUncompletedCount(), "new report should have zero uncompleted tasks");
-        assertEquals(0, report.getCompletedCount(), "new report should have zero completed tasks");
-        assertFalse(report.hasFilesProcessed(), "new report should have no files processed");
-        assertFalse(report.hasUncompletedTasks(), "new report should have no uncompleted tasks");
+        assertTrue(report.isEmpty(), "new instance should start out empty because no entries are added yet");
+        assertEquals(0, report.getTotalCount(), "new instance should have zero total tasks");
+        assertEquals(0, report.getUncompletedCount(), "new instance should have zero uncompleted tasks");
+        assertEquals(0, report.getCompletedCount(), "new instance should have zero completed tasks");
+        assertFalse(report.hasFilesProcessed(), "new instance should have no files processed");
+        assertFalse(report.hasUncompletedTasks(), "new instance should have no uncompleted tasks");
     }
 
     @Test
-    @DisplayName("Report should add task increases total count")
+    @DisplayName("Task collection should increase total count")
     void addTask_increasesTotalCount() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false);
         report.addTask(task);
 
-        assertEquals(1, report.getTotalCount(), "report should increase total count after adding task");
-        assertFalse(report.isEmpty(), "report should not be empty after adding task");
+        assertEquals(1, report.getTotalCount(),
+                "task collection should increase total count after adding task because totals are additive");
+        assertFalse(report.isEmpty(), "task collection should not be empty after adding task");
     }
 
     @Test
-    @DisplayName("Report should add task with null throws exception")
+    @DisplayName("Task collection should reject null input entry")
     void addTask_withNull_throwsException() {
         assertThrows(NullPointerException.class, () -> report.addTask(null),
-                "report should throw when task is null");
+                "task collection should throw when task is null");
     }
 
     @Test
-    @DisplayName("Report should add file processed tracks file")
+    @DisplayName("File tracking should record processed file")
     void addFileProcessed_tracksFile() {
         report.addFileProcessed("TODO.md");
 
-        assertTrue(report.hasFilesProcessed(), "report should mark files processed after adding");
-        assertEquals(1, report.getFileCount(), "report should count one processed file entry");
-        assertTrue(report.getFilesProcessed().contains("TODO.md"), "report should include TODO.md in processed files");
+        assertTrue(report.hasFilesProcessed(),
+                "file tracking should mark files processed after adding because summary output uses the list");
+        assertEquals(1, report.getFileCount(), "file tracking should count one processed file entry");
+        assertTrue(report.getFilesProcessed().contains("TODO.md"),
+                "file tracking should include TODO.md in processed files");
     }
 
     @Test
-    @DisplayName("Report should add file processed with null throws exception")
+    @DisplayName("File tracking should reject null file path")
     void addFileProcessed_withNull_throwsException() {
         assertThrows(NullPointerException.class, () -> report.addFileProcessed(null),
-                "report should throw when file path is null");
+                "file tracking should throw when file path is null");
     }
 
     @Test
-    @DisplayName("Report should get uncompleted tasks filters correctly")
+    @DisplayName("Uncompleted list should filter entries correctly")
     void getUncompletedTasks_filtersCorrectly() {
         report.addTask(new TodoTask("f.md", 1, "uncompleted", null, false));
         report.addTask(new TodoTask("f.md", 2, "completed", null, true));
@@ -88,13 +91,13 @@ class TodoReportTest {
 
         List<TodoTask> uncompleted = report.getUncompletedTasks();
 
-        assertEquals(2, uncompleted.size(), "report should return two uncompleted task entries");
+        assertEquals(2, uncompleted.size(), "uncompleted list should return two task entries");
         assertTrue(uncompleted.stream().allMatch(TodoTask::isUncompleted),
-                "report should include only uncompleted task entries");
+                "uncompleted list should include only open entries because completed items are filtered out");
     }
 
     @Test
-    @DisplayName("Report should get completed tasks filters correctly")
+    @DisplayName("Completed list should filter entries correctly")
     void getCompletedTasks_filtersCorrectly() {
         report.addTask(new TodoTask("f.md", 1, "uncompleted", null, false));
         report.addTask(new TodoTask("f.md", 2, "completed", null, true));
@@ -102,27 +105,29 @@ class TodoReportTest {
 
         List<TodoTask> completed = report.getCompletedTasks();
 
-        assertEquals(2, completed.size(), "report should return two completed task entries");
+        assertEquals(2, completed.size(), "completed list should return two task entries");
         assertTrue(completed.stream().allMatch(TodoTask::isCompleted),
-                "report should include only completed task entries");
+                "completed list should include only completed task entries");
     }
 
     @Test
-    @DisplayName("Report detects uncompleted tasks when present")
+    @DisplayName("Uncompleted flag should show when tasks are open")
     void hasUncompletedTasks_returnsTrueWhenPresent() {
         report.addTask(new TodoTask("f.md", 1, "uncompleted", null, false));
-        assertTrue(report.hasUncompletedTasks(), "report should report uncompleted tasks as present");
+        assertTrue(report.hasUncompletedTasks(),
+                "uncompleted flag should show open tasks are present because enforcement needs visibility");
     }
 
     @Test
-    @DisplayName("Report should has uncompleted tasks returns false when all completed")
+    @DisplayName("Uncompleted flag should be false when all tasks are done")
     void hasUncompletedTasks_returnsFalseWhenAllCompleted() {
         report.addTask(new TodoTask("f.md", 1, "completed", null, true));
-        assertFalse(report.hasUncompletedTasks(), "report should report no uncompleted tasks when all done");
+        assertFalse(report.hasUncompletedTasks(),
+                "uncompleted flag should be false when every entry is completed because none remain open");
     }
 
     @Test
-    @DisplayName("Report should merge task lists from another report")
+    @DisplayName("Merge should combine task lists from sources")
     void merge_combinesTasks() {
         TodoReport other = new TodoReport();
         report.addTask(new TodoTask("f1.md", 1, "task1", null, false));
@@ -130,13 +135,14 @@ class TodoReportTest {
 
         report.merge(other);
 
-        assertEquals(2, report.getTotalCount(), "report should merge total task count correctly");
-        assertEquals(1, report.getUncompletedCount(), "report should merge uncompleted task count correctly");
-        assertEquals(1, report.getCompletedCount(), "report should merge completed task count correctly");
+        assertEquals(2, report.getTotalCount(),
+                "merge should combine total task count correctly because counts are additive");
+        assertEquals(1, report.getUncompletedCount(), "merge should combine uncompleted task count correctly");
+        assertEquals(1, report.getCompletedCount(), "merge should combine completed task count correctly");
     }
 
     @Test
-    @DisplayName("Report should merge combines files processed")
+    @DisplayName("Merge should combine processed file entries")
     void merge_combinesFilesProcessed() {
         TodoReport other = new TodoReport();
         report.addFileProcessed("file1.md");
@@ -144,41 +150,56 @@ class TodoReportTest {
 
         report.merge(other);
 
-        assertEquals(2, report.getFileCount(), "report should merge processed file count correctly");
-        assertTrue(report.getFilesProcessed().contains("file1.md"), "report should include file1.md in merged list");
-        assertTrue(report.getFilesProcessed().contains("file2.md"), "report should include file2.md in merged list");
+        assertEquals(2, report.getFileCount(), "merge should combine processed file count correctly");
+        assertTrue(report.getFilesProcessed().contains("file1.md"), "merge should include file1.md in merged list");
+        assertTrue(report.getFilesProcessed().contains("file2.md"), "merge should include file2.md in merged list");
     }
 
     @Test
-    @DisplayName("Report should merge with null throws exception")
+    @DisplayName("Merge should reject null summary arguments early")
     void merge_withNull_throwsException() {
         assertThrows(NullPointerException.class, () -> report.merge(null),
-                "report should throw when other report is null");
+                "merge should throw when other summary is null because merge needs data");
     }
 
     @Test
-    @DisplayName("Report should get all tasks returns unmodifiable list")
+    @DisplayName("All tasks view should be unmodifiable by callers")
     void getAllTasks_returnsUnmodifiableList() {
         report.addTask(new TodoTask("f.md", 1, "task", null, false));
         List<TodoTask> tasks = report.getAllTasks();
 
         assertThrows(UnsupportedOperationException.class, () ->
                         tasks.add(new TodoTask("f.md", 2, "new", null, false)),
-                "report should not allow adding tasks to list");
+                "all tasks view should reject additions to the list");
     }
 
     @Test
-    @DisplayName("Report should get files processed returns unmodifiable list")
+    @DisplayName("All tasks view should include added tasks")
+    void getAllTasks_returnsAddedTasks() {
+        TodoTask task1 = new TodoTask("f.md", 1, "task1", null, false);
+        TodoTask task2 = new TodoTask("f.md", 2, "task2", null, true);
+        report.addTask(task1);
+        report.addTask(task2);
+
+        List<TodoTask> all = report.getAllTasks();
+
+        assertEquals(2, all.size(), "all tasks view should return two entries");
+        assertTrue(all.contains(task1), all + " should contain " + task1);
+        assertTrue(all.contains(task2), all + " should contain " + task2);
+    }
+
+    @Test
+    @DisplayName("Processed files view should be unmodifiable")
     void getFilesProcessed_returnsUnmodifiableList() {
         report.addFileProcessed("file.md");
         List<String> files = report.getFilesProcessed();
 
         assertThrows(UnsupportedOperationException.class, () -> files.add("new.md"),
-                "report should not allow adding files to list");
+                "processed files view should reject additions to the list");
     }
 
     @Test
-    @DisplayName("Report should to string contains relevant info")
+    @DisplayName("ToString output should include relevant count values")
     void toString_containsRelevantInfo() {
         report.addTask(new TodoTask("f.md", 1, "uncompleted", null, false));
         report.addTask(new TodoTask("f.md", 2, "completed", null, true));
@@ -189,13 +210,13 @@ class TodoReportTest {
         String totalCount = "2";
         String singleCount = "1";
         assertTrue(str.contains(totalCount),
-                "report should include total count " + totalCount + " in string: " + str);  // total
+                "toString output should include total count " + totalCount + " in: " + str);  // total
         assertTrue(str.contains(singleCount),
-                "report should include count " + singleCount + " in string: " + str);  // uncompleted and completed counts
+                "toString output should include count " + singleCount + " in: " + str);  // uncompleted and completed counts
     }
 
     @Test
-    @DisplayName("Report should counts with mixed tasks")
+    @DisplayName("Mixed tasks should yield expected counts")
     void counts_withMixedTasks() {
         report.addTask(new TodoTask("f.md", 1, "t1", null, false));
         report.addTask(new TodoTask("f.md", 2, "t2", null, true));
@@ -203,8 +224,8 @@ class TodoReportTest {
         report.addTask(new TodoTask("f.md", 4, "t4", null, true));
         report.addTask(new TodoTask("f.md", 5, "t5", null, false));
 
-        assertEquals(5, report.getTotalCount(), "report should count total tasks for mixed set");
-        assertEquals(3, report.getUncompletedCount(), "report should count open tasks for mixed set");
-        assertEquals(2, report.getCompletedCount(), "report should count completed tasks for mixed set");
+        assertEquals(5, report.getTotalCount(), "mixed set should count total tasks correctly");
+        assertEquals(3, report.getUncompletedCount(), "mixed set should count open tasks correctly");
+        assertEquals(2, report.getCompletedCount(), "mixed set should count completed tasks correctly");
     }
 }

@@ -4,11 +4,19 @@
 package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -202,6 +210,55 @@ class JavadocMessageExtractorTest {
         verify(methodDef).getType();
     }
 
+    @Test
+    @DisplayName("Extract first paragraph stops at paragraph tag")
+    void extractFirstParagraphStopsAtParagraphTag() throws Exception {
+        TextBlock block = mock(TextBlock.class);
+        when(block.getText()).thenReturn(new String[]{
+                "/**",
+                " * First line {@code value}.",
+                " * <p>Second line",
+                " */"
+        });
+
+        assertEquals("First line {@code value}.", invokeExtractFirstParagraph(block));
+    }
+
+    @Test
+    @DisplayName("Emit candidate skips empty paragraph")
+    void emitCandidateSkipsEmptyParagraph() throws Exception {
+        TextBlock block = mock(TextBlock.class);
+        when(block.getText()).thenReturn(new String[]{
+                "/**",
+                " * @param value description",
+                " */"
+        });
+        when(block.getStartLineNo()).thenReturn(4);
+
+        invokeEmitCandidate(block, MessageSource.JAVADOC_MEMBER);
+
+        assertTrue(sink.candidates.isEmpty(), "Empty paragraph should emit no candidates");
+    }
+
+    @Test
+    @DisplayName("Emit candidate normalises inline tags")
+    void emitCandidateNormalisesInlineTags() throws Exception {
+        TextBlock block = mock(TextBlock.class);
+        when(block.getText()).thenReturn(new String[]{
+                "/**",
+                " * Uses {@code value} here.",
+                " */"
+        });
+        when(block.getStartLineNo()).thenReturn(7);
+
+        invokeEmitCandidate(block, MessageSource.JAVADOC_MEMBER);
+
+        assertEquals(1, sink.candidates.size(), "Should emit one candidate");
+        MessageCandidate candidate = sink.candidates.get(0);
+        assertEquals("Uses {@code} here.", candidate.message());
+        assertEquals(1, candidate.placeholderCount());
+    }
+
     // Helper method to create a variable def with a direct parent
     private DetailAST createVariableDefWithParent(int parentType) {
         DetailAST parent = mock(DetailAST.class);
@@ -216,13 +273,29 @@ class JavadocMessageExtractorTest {
         return varDef;
     }
 
+    private String invokeExtractFirstParagraph(TextBlock block) throws Exception {
+        Method method = JavadocMessageExtractor.class
+                .getDeclaredMethod("extractFirstParagraph", TextBlock.class);
+        method.setAccessible(true);
+        return (String) method.invoke(extractor, block);
+    }
+
+    private void invokeEmitCandidate(TextBlock block, MessageSource source) throws Exception {
+        Method method = JavadocMessageExtractor.class
+                .getDeclaredMethod("emitCandidate", TextBlock.class, MessageSource.class);
+        method.setAccessible(true);
+        method.invoke(extractor, block, source);
+    }
+
     /**
      * Test sink for capturing emitted candidates.
      */
     private static class TestMessageSink implements MessageCandidateSink {
+        final List<MessageCandidate> candidates = new ArrayList<>();
+
         @Override
         public void emitCandidate(MessageCandidate candidate) {
-            // No-op for testing
+            candidates.add(candidate);
         }
 
         @Override

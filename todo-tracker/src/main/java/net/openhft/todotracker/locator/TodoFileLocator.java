@@ -27,14 +27,14 @@ import static java.util.Objects.requireNonNull;
 /**
  * Locates TODO files in Markdown or AsciiDoc across a project directory tree.
  * <p>
- * Supports multiple patterns:
+ * Supports multiple match styles:
  * <ul>
  *   <li>Exact paths: {@code TODO.md}, {@code TODO.markdown}, {@code docs/TODO.md}</li>
  *   <li>Glob patterns: {@code *TODO.md}, {@code *TODO.markdown}, {@code todo/*.md}, {@code todo/*.markdown}</li>
  *   <li>Recursive patterns: {@code **&#47;TODO.md} (searches all subdirectories)</li>
  * </ul>
  * <p>
- * Default Markdown patterns:
+ * Default Markdown globs:
  * <ul>
  *   <li>{@code **&#47;*TODO.md} - any file ending with TODO.md (case-insensitive)</li>
  *   <li>{@code **&#47;*TODOS.md} - any file ending with TODOS.md (case-insensitive)</li>
@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
  *   <li>{@code todo/*.markdown} - any .markdown file in a todo/ directory</li>
  * </ul>
  * <p>
- * Default AsciiDoc patterns (.ad, .adoc, and .asciidoc extensions):
+ * Default AsciiDoc globs (.ad, .adoc, and .asciidoc extensions):
  * <ul>
  *   <li>{@code todo/*.ad}, {@code todo/*.adoc}, {@code todo/*.asciidoc} - any AsciiDoc file in todo/</li>
  *   <li>{@code src/main/docs/*plan.ad}, {@code src/main/docs/*plan.adoc}, {@code src/main/docs/*plan.asciidoc}</li>
@@ -54,9 +54,9 @@ import static java.util.Objects.requireNonNull;
 public final class TodoFileLocator {
 
     /**
-     * Default glob patterns for locating TODO files.
+     * Default glob rules used to locate TODO files.
      * <p>
-     * Markdown patterns:
+     * Markdown globs:
      * <ul>
      *   <li>{@code *TODO.md}, {@code *TODOS.md} anywhere (case-insensitive)</li>
      *   <li>{@code *TODO.markdown}, {@code *TODOS.markdown} anywhere (case-insensitive)</li>
@@ -64,7 +64,7 @@ public final class TodoFileLocator {
      *   <li>{@code todo/*.markdown} - all .markdown files in todo/ directory</li>
      * </ul>
      * <p>
-     * AsciiDoc patterns:
+     * AsciiDoc globs:
      * <ul>
      *   <li>{@code todo/*.ad} - all .ad files in todo/ directory</li>
      *   <li>{@code todo/*.adoc} - all .adoc files in todo/ directory</li>
@@ -105,7 +105,7 @@ public final class TodoFileLocator {
     );
 
     /**
-     * Legacy exact paths for backwards compatibility.
+     * Legacy exact paths to preserve backwards compatibility.
      */
     private static final List<String> DEFAULT_TODO_FILES = Arrays.asList(
             "TODO.md",
@@ -134,7 +134,7 @@ public final class TodoFileLocator {
 
     /**
      * Creates a locator with default patterns.
-     * Searches for *TODO.md, *TODO.markdown, and todo/*.{md,markdown,ad,adoc,asciidoc},
+     * Searches *TODO.md, *TODO.markdown, and todo/*.{md,markdown,ad,adoc,asciidoc},
      * plus src/main/docs/*plan.* or src/main/docs/*todo.* AsciiDoc files.
      */
     public TodoFileLocator() {
@@ -157,14 +157,14 @@ public final class TodoFileLocator {
     }
 
     /**
-     * Returns the default TODO file paths (for backwards compatibility).
+     * Returns the default TODO file paths to preserve backwards compatibility.
      */
     public static List<String> getDefaultTodoFiles() {
         return new ArrayList<>(DEFAULT_TODO_FILES);
     }
 
     /**
-     * Returns the default glob patterns used for TODO file discovery.
+     * Returns the default glob rules used in TODO file discovery.
      */
     public static List<String> getDefaultPatterns() {
         return new ArrayList<>(DEFAULT_PATTERNS);
@@ -228,7 +228,7 @@ public final class TodoFileLocator {
     }
 
     /**
-     * Returns the configured TODO file paths (for exact path mode).
+     * Returns the configured TODO file paths in exact path mode.
      */
     public List<String> getTodoFilePaths() {
         if (usePatterns) {
@@ -238,14 +238,14 @@ public final class TodoFileLocator {
     }
 
     /**
-     * Returns the configured patterns (for pattern mode).
+     * Returns the configured globs when pattern mode is enabled.
      */
     public List<String> getPatterns() {
         return new ArrayList<>(patterns);
     }
 
     /**
-     * Returns true when pattern matching is enabled for discovery.
+     * Returns true when pattern matching is enabled in discovery.
      */
     public boolean isUsingPatterns() {
         return usePatterns;

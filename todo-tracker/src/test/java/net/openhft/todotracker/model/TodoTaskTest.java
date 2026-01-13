@@ -20,264 +20,285 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.DisplayName;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Todo task model retains fields and status flags")
+@DisplayName("Todo model retains fields and status flags")
 class TodoTaskTest {
 
     @Test
-    @DisplayName("Task should constructor with all fields creates valid task")
+    @DisplayName("Constructor with all fields creates a valid entry")
     void constructorWithAllFields_createsValidTask() {
         TodoTask task = new TodoTask("TODO.md", 10, "Do something", "Phase 1", false, 1, 'M');
 
-        assertEquals("TODO.md", task.getFilePath(), "task should retain file path from constructor");
-        assertEquals(10, task.getLineNumber(), "task should retain line number from constructor");
-        assertEquals("Do something", task.getText(), "task should retain task text from constructor");
-        assertEquals("Phase 1", task.getContext(), "task should retain context from constructor");
-        assertFalse(task.isCompleted(), "task should mark completed flag as false");
-        assertTrue(task.isUncompleted(), "task should mark task as uncompleted state");
-        assertEquals(1, task.getPriority(), "task should retain priority value from constructor");
-        assertEquals('M', task.getEffort(), "task should retain effort value from constructor");
+        assertEquals("TODO.md", task.getFilePath(), "model should retain file path from constructor");
+        assertEquals(10, task.getLineNumber(), "model should retain line number from constructor");
+        assertEquals("Do something", task.getText(), "model should retain text from constructor");
+        assertEquals("Phase 1", task.getContext(), "model should retain context from constructor");
+        assertFalse(task.isCompleted(), "model should mark completed flag as false");
+        assertTrue(task.isUncompleted(), "model should mark entry as uncompleted state");
+        assertEquals(1, task.getPriority(), "model should retain priority value from constructor");
+        assertEquals('M', task.getEffort(), "model should retain effort value from constructor");
     }
 
     @Test
-    @DisplayName("Task should constructor without priority effort creates valid task")
+    @DisplayName("Constructor without priority effort creates a valid entry")
     void constructorWithoutPriorityEffort_createsValidTask() {
         TodoTask task = new TodoTask("TODO.md", 5, "Simple task", null, true);
 
-        assertEquals("TODO.md", task.getFilePath(), "task should retain file path without priority");
-        assertEquals(5, task.getLineNumber(), "task should retain line number without priority");
-        assertEquals("Simple task", task.getText(), "task should retain task text without priority");
-        assertNull(task.getContext(), "task should allow null context without priority");
-        assertTrue(task.isCompleted(), "task should mark completed flag as true");
-        assertFalse(task.isUncompleted(), "task should mark task as completed state");
-        assertNull(task.getPriority(), "task should leave priority value as null");
-        assertNull(task.getEffort(), "task should leave effort value as null");
+        assertEquals("TODO.md", task.getFilePath(), "instance should retain file path without priority");
+        assertEquals(5, task.getLineNumber(), "instance should retain line number without priority");
+        assertEquals("Simple task", task.getText(), "instance should retain text without priority");
+        assertNull(task.getContext(), "instance should allow null context without priority");
+        assertTrue(task.isCompleted(), "instance should mark completed flag as true");
+        assertFalse(task.isUncompleted(), "instance should mark entry as completed state");
+        assertNull(task.getPriority(), "instance should leave priority value as null");
+        assertNull(task.getEffort(), "instance should leave effort value as null");
     }
 
     @Test
-    @DisplayName("Task should constructor with null file path throws exception")
+    @DisplayName("Constructor with null file path throws exception")
     void constructorWithNullFilePath_throwsException() {
         assertThrows(NullPointerException.class, () ->
-                new TodoTask(null, 1, "text", null, false), "task should throw when file path is null");
+                new TodoTask(null, 1, "text", null, false), "constructor should throw when file path is null");
     }
 
     @Test
-    @DisplayName("Task should constructor with null text throws exception")
+    @DisplayName("Constructor with null text throws exception")
     void constructorWithNullText_throwsException() {
         assertThrows(NullPointerException.class, () ->
-                new TodoTask("file.md", 1, null, null, false), "task should throw when task text is null");
+                new TodoTask("file.md", 1, null, null, false), "constructor should throw when text is null");
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, -1, -100})
-    @DisplayName("Task should constructor with invalid line number throws exception")
+    @DisplayName("Constructor with invalid line number throws exception")
     void constructorWithInvalidLineNumber_throwsException(int lineNumber) {
         assertThrows(IllegalArgumentException.class, () ->
                         new TodoTask("file.md", lineNumber, "text", null, false),
-                "task should throw when line number is invalid");
+                "constructor should throw when line number is invalid");
     }
 
     @Test
-    @DisplayName("Task should constructor with null context is allowed")
+    @DisplayName("Constructor with null context value is allowed because headings are optional")
     void constructorWithNullContext_isAllowed() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false);
-        assertNull(task.getContext(), "task should allow null context in constructor");
+        assertNull(task.getContext(), "constructor should allow null context values because headings are optional");
     }
 
     @Test
-    @DisplayName("Task should report priority flag as present when value is set")
+    @DisplayName("Priority flag should be present when value is set explicitly")
     void hasPriority_returnsTrueWhenSet() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false, 2, null);
-        assertTrue(task.hasPriority(), "task should report priority present when set");
-        assertEquals(2, task.getPriority(), "task should return priority value when set");
+        assertTrue(task.hasPriority(), "priority flag should be present when set because the value is provided");
+        assertEquals(2, task.getPriority(), "priority value should return when set");
     }
 
     @Test
-    @DisplayName("Task should report priority as absent when value is null")
+    @DisplayName("Priority flag should be absent when value is null or missing")
     void hasPriority_returnsFalseWhenNull() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false, null, 'S');
-        assertFalse(task.hasPriority(), "task should report no priority when null");
-        assertNull(task.getPriority(), "task should return null priority when missing");
+        assertFalse(task.hasPriority(), "priority flag should be absent when null because tag is missing");
+        assertNull(task.getPriority(), "priority value should be null when missing");
     }
 
     @Test
-    @DisplayName("Task should report effort flag as present when value is set")
+    @DisplayName("Effort flag should be present when value is set explicitly")
     void hasEffort_returnsTrueWhenSet() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false, null, 'L');
-        assertTrue(task.hasEffort(), "task should report effort present when set");
-        assertEquals('L', task.getEffort(), "task should return effort value when set");
+        assertTrue(task.hasEffort(), "effort flag should be present when set because the value is provided");
+        assertEquals('L', task.getEffort(), "effort value should return when set");
     }
 
     @Test
-    @DisplayName("Task should report effort as absent when value is null")
+    @DisplayName("Effort flag should be absent when value is null or missing")
     void hasEffort_returnsFalseWhenNull() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false, 1, null);
-        assertFalse(task.hasEffort(), "task should report no effort when null");
-        assertNull(task.getEffort(), "task should return null effort when missing");
+        assertFalse(task.hasEffort(), "effort flag should be absent when null because tag is missing");
+        assertNull(task.getEffort(), "effort value should be null when missing");
     }
 
     @Test
-    @DisplayName("Task should to location string formats correctly")
+    @DisplayName("Location string should format correctly for display")
     void toLocationString_formatsCorrectly() {
         TodoTask task = new TodoTask("path/to/TODO.md", 42, "text", null, false);
         assertEquals("path/to/TODO.md:42", task.toLocationString(),
-                "task should format location as path and line");
+                "location string should format as path and line");
     }
 
     @Test
-    @DisplayName("Task should to formatted string with priority and effort")
+    @DisplayName("Formatted string should include priority and effort")
     void toFormattedString_withPriorityAndEffort() {
         TodoTask task = new TodoTask("file.md", 1, "Implement feature", null, false, 1, 'M');
         assertEquals("[P1] [E:M] Implement feature", task.toFormattedString(),
-                "task should format priority and effort tags in text");
+                "formatted string should include priority and effort tags");
     }
 
     @Test
-    @DisplayName("Task should to formatted string with priority only")
+    @DisplayName("Formatted string should include priority tag only")
     void toFormattedString_withPriorityOnly() {
         TodoTask task = new TodoTask("file.md", 1, "Implement feature", null, false, 2, null);
         assertEquals("[P2] Implement feature", task.toFormattedString(),
-                "task should format priority tag when effort missing");
+                "formatted string should include priority when effort missing");
     }
 
     @Test
-    @DisplayName("Task should to formatted string with effort only")
+    @DisplayName("Formatted string should include effort tag only")
     void toFormattedString_withEffortOnly() {
         TodoTask task = new TodoTask("file.md", 1, "Implement feature", null, false, null, 'S');
         assertEquals("[E:S] Implement feature", task.toFormattedString(),
-                "task should format effort tag when priority missing");
+                "formatted string should include effort when priority missing");
     }
 
     @Test
-    @DisplayName("Task should to formatted string with no tags")
+    @DisplayName("Formatted string should exclude tags when absent")
     void toFormattedString_withNoTags() {
         TodoTask task = new TodoTask("file.md", 1, "Implement feature", null, false);
         assertEquals("Implement feature", task.toFormattedString(),
-                "task should format text with no tags");
+                "formatted string should keep text with no tags");
     }
 
     @Test
-    @DisplayName("Task should compare equal when all values match")
+    @DisplayName("Entries should compare equal when values match")
     void equals_sameValues_returnsTrue() {
         TodoTask task1 = new TodoTask("file.md", 1, "text", "context", true, 1, 'M');
         TodoTask task2 = new TodoTask("file.md", 1, "text", "context", true, 1, 'M');
-        assertEquals(task1, task2, "task should be equal for identical values");
+        assertEquals(task1, task2, "entries should be equal for identical values");
         assertEquals(task1.hashCode(), task2.hashCode(), "hashCode should match for identical values");
     }
 
     @Test
-    @DisplayName("Task should equals different file path returns false")
+    @DisplayName("Equality should fail when file path differs")
     void equals_differentFilePath_returnsFalse() {
         TodoTask task1 = new TodoTask("file1.md", 1, "text", null, false);
         TodoTask task2 = new TodoTask("file2.md", 1, "text", null, false);
-        assertNotEquals(task1, task2, "task should not equal when file path differs");
+        assertNotEquals(task1, task2,
+                "equality should fail when file path differs because path is part of identity");
     }
 
     @Test
-    @DisplayName("Task should not equal when line number differs")
+    @DisplayName("Equality should fail when line number differs between entries")
     void equals_differentLineNumber_returnsFalse() {
         TodoTask task1 = new TodoTask("file.md", 1, "text", null, false);
         TodoTask task2 = new TodoTask("file.md", 2, "text", null, false);
         assertNotEquals(task1, task2,
-                "task should not equal when line numbers differ between tasks");
+                "equality should fail when line numbers differ because location is part of identity");
     }
 
     @Test
-    @DisplayName("Task should not equal when task text differs")
+    @DisplayName("Equality should fail when text differs between entries")
     void equals_differentText_returnsFalse() {
         TodoTask task1 = new TodoTask("file.md", 1, "text1", null, false);
         TodoTask task2 = new TodoTask("file.md", 1, "text2", null, false);
         assertNotEquals(task1, task2,
-                "task should not equal when task text differs between instances");
+                "equality should fail when text differs because content is part of identity");
     }
 
     @Test
-    @DisplayName("Task should not equal when context value differs")
+    @DisplayName("Equality should fail when context differs between entries")
     void equals_differentContext_returnsFalse() {
         TodoTask task1 = new TodoTask("file.md", 1, "text", "context1", false);
         TodoTask task2 = new TodoTask("file.md", 1, "text", "context2", false);
-        assertNotEquals(task1, task2, "task should not equal when context differs");
+        assertNotEquals(task1, task2,
+                "equality should fail when context differs because context is part of identity");
     }
 
     @Test
-    @DisplayName("Task should not equal when completion flag differs")
+    @DisplayName("Equality should fail when completion flag differs")
     void equals_differentCompleted_returnsFalse() {
         TodoTask task1 = new TodoTask("file.md", 1, "text", null, true);
         TodoTask task2 = new TodoTask("file.md", 1, "text", null, false);
-        assertNotEquals(task1, task2, "task should not equal when completed flag differs");
+        assertNotEquals(task1, task2, "equality should fail when completed flag differs");
     }
 
     @Test
-    @DisplayName("Task should not equal when priority value differs")
+    @DisplayName("Equality should fail when priority differs between entries")
     void equals_differentPriority_returnsFalse() {
         TodoTask task1 = new TodoTask("file.md", 1, "text", null, false, 1, null);
         TodoTask task2 = new TodoTask("file.md", 1, "text", null, false, 2, null);
-        assertNotEquals(task1, task2, "task should not equal when priority differs");
+        assertNotEquals(task1, task2,
+                "equality should fail when priority differs because priority affects identity");
     }
 
     @Test
-    @DisplayName("Task should not equal when effort value differs")
+    @DisplayName("Equality should fail when effort differs between entries")
     void equals_differentEffort_returnsFalse() {
         TodoTask task1 = new TodoTask("file.md", 1, "text", null, false, null, 'S');
         TodoTask task2 = new TodoTask("file.md", 1, "text", null, false, null, 'L');
-        assertNotEquals(task1, task2, "task should not equal when effort differs");
+        assertNotEquals(task1, task2,
+                "equality should fail when effort differs because effort affects identity");
     }
 
     @Test
-    @DisplayName("Task instance should not equal a null object reference")
+    @DisplayName("Instance should not equal a null reference in equality checks")
     void equals_null_returnsFalse() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false);
-        assertNotEquals(null, task, "task should not equal a null instance");
+        assertNotEquals(null, task, "instance should not equal a null reference because null is not a valid entry");
     }
 
     @Test
-    @DisplayName("Task should not equal a different object type")
+    @DisplayName("Instance should not equal a different object type")
     void equals_differentType_returnsFalse() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false);
-        assertNotEquals("not a task", task, "task should not equal different object type");
+        assertNotEquals("not a task", task,
+                "instance should not equal a different object type because types are incompatible");
     }
 
     @Test
-    @DisplayName("Task should equal the same instance reference")
+    @DisplayName("Instance should equal the same reference object")
     void equals_sameInstance_returnsTrue() {
         TodoTask task = new TodoTask("file.md", 1, "text", null, false);
-        assertEquals(task, task, "task should equal same instance reference value");
+        assertEquals(task, task, "instance should equal the same reference value because identity is stable");
     }
 
     @Test
-    @DisplayName("Task should render toString with all fields")
+    @DisplayName("Different entries should produce different hash codes")
+    void hashCode_differentTasks_produceDifferentHashes() {
+        TodoTask task1 = new TodoTask("file1.md", 1, "text1", null, false);
+        TodoTask task2 = new TodoTask("file2.md", 2, "text2", null, true);
+
+        Set<TodoTask> set = new HashSet<>();
+        set.add(task1);
+        set.add(task2);
+
+        assertEquals(2, set.size(), "HashSet should contain both entries with different hashes");
+    }
+
+    @Test
+    @DisplayName("ToString output should include file, context, and flag values")
     void toString_containsAllFields() {
         TodoTask task = new TodoTask("file.md", 10, "Do it", "Phase 1", true, 1, 'M');
         String str = task.toString();
 
         String expectedFile = "file.md";
         assertTrue(str.contains(expectedFile),
-                "task should include file path " + expectedFile + " in toString: " + str);
+                "text form should include file path " + expectedFile + " in: " + str);
         String expectedLine = "10";
         assertTrue(str.contains(expectedLine),
-                "task should include line number " + expectedLine + " in toString: " + str);
+                "text form should include line number " + expectedLine + " in: " + str);
         String expectedText = "Do it";
         assertTrue(str.contains(expectedText),
-                "task should include task text " + expectedText + " in toString: " + str);
+                "text form should include text value " + expectedText + " in: " + str);
         String expectedContext = "Phase 1";
         assertTrue(str.contains(expectedContext),
-                "task should include context " + expectedContext + " in toString: " + str);
+                "text form should include context " + expectedContext + " in: " + str);
         String expectedCompleted = "true";
         assertTrue(str.contains(expectedCompleted),
-                "task should include completion flag " + expectedCompleted + " in toString: " + str);
+                "text form should include completion flag " + expectedCompleted + " in: " + str);
         String expectedPriority = "1";
         assertTrue(str.contains(expectedPriority),
-                "task should include priority value " + expectedPriority + " in toString: " + str);
+                "text form should include priority value " + expectedPriority + " in: " + str);
         String expectedEffort = "M";
         assertTrue(str.contains(expectedEffort),
-                "task should include effort value " + expectedEffort + " in toString: " + str);
+                "text form should include effort value " + expectedEffort + " in: " + str);
     }
 
     @Test
-    @DisplayName("Blank task text is accepted by model")
+    @DisplayName("Blank text is accepted by model")
     void emptyText_isAllowed() {
         TodoTask task = new TodoTask("file.md", 1, "", null, false);
-        assertEquals("", task.getText(), "task should allow empty task text value");
+        assertEquals("", task.getText(), "model should allow empty text values");
     }
 }

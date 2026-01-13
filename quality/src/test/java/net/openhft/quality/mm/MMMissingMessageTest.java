@@ -166,6 +166,81 @@ class MMMissingMessageTest {
                 "should not stop for PRECONDITION source");
     }
 
+    @Test
+    @DisplayName("Comment missing message uses return null fix guidance")
+    void commentMissingMessageUsesReturnNullFixGuidance() {
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .lineNo(40)
+                .source(MessageSource.COMMENT)
+                .missingMessage(true)
+                .missingMessageKind(MissingMessageKind.RETURN_NULL)
+                .build();
+        MessageContext context = createContext(candidate);
+
+        rule.evaluate(context, collector, state);
+
+        Violation violation = collector.pendingForTesting().get(40);
+        assertNotNull(violation, "Violation should be recorded for missing comment");
+        assertEquals("add a single-line comment on the line before explaining why returning null is required",
+                violation.args()[0], "Return-null fix guidance should match");
+    }
+
+    @Test
+    @DisplayName("Comment missing message uses system call fix guidance")
+    void commentMissingMessageUsesSystemCallFixGuidance() {
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .lineNo(41)
+                .source(MessageSource.COMMENT)
+                .missingMessage(true)
+                .missingMessageKind(MissingMessageKind.SYSTEM_CALL)
+                .build();
+        MessageContext context = createContext(candidate);
+
+        rule.evaluate(context, collector, state);
+
+        Violation violation = collector.pendingForTesting().get(41);
+        assertNotNull(violation, "Violation should be recorded for missing comment");
+        assertEquals("add a single-line comment on the line before explaining why java.lang.System is required here",
+                violation.args()[0], "System call fix guidance should match");
+    }
+
+    @Test
+    @DisplayName("Comment missing message uses runtime call fix guidance")
+    void commentMissingMessageUsesRuntimeCallFixGuidance() {
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .lineNo(42)
+                .source(MessageSource.COMMENT)
+                .missingMessage(true)
+                .missingMessageKind(MissingMessageKind.RUNTIME_CALL)
+                .build();
+        MessageContext context = createContext(candidate);
+
+        rule.evaluate(context, collector, state);
+
+        Violation violation = collector.pendingForTesting().get(42);
+        assertNotNull(violation, "Violation should be recorded for missing comment");
+        assertEquals("add a single-line comment on the line before explaining why java.lang.Runtime is required here",
+                violation.args()[0], "Runtime call fix guidance should match");
+    }
+
+    @Test
+    @DisplayName("Non comment missing message uses default fix guidance")
+    void nonCommentMissingMessageUsesDefaultFixGuidance() {
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .lineNo(43)
+                .source(MessageSource.ASSERTION)
+                .missingMessage(true)
+                .build();
+        MessageContext context = createContext(candidate);
+
+        rule.evaluate(context, collector, state);
+
+        Violation violation = collector.pendingForTesting().get(43);
+        assertNotNull(violation, "Violation should be recorded for missing message");
+        assertEquals("add a meaningful message, supply a Throwable, or add a /* reason */ comment inside the argument list when a message must be omitted",
+                violation.args()[0], "Default fix guidance should match");
+    }
+
     private MessageContext createContext(MessageCandidate candidate) {
         return new MessageContext(candidate, null, "TestClass", "testMethod",
                 false, null, null);

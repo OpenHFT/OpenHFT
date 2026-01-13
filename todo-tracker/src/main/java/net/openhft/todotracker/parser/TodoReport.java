@@ -37,36 +37,36 @@ public final class TodoReport {
     }
 
     /**
-     * Adds a task entry to the report list.
+     * Adds a task entry to the task collection.
      *
      * @param task the task to add (must not be null)
      */
     public void addTask(TodoTask task) {
-        tasks.add(requireNonNull(task, "report task must not be null"));
+        tasks.add(requireNonNull(task, "task entry must not be null"));
     }
 
     /**
-     * Records that a file has been processed.
+     * Records processed file paths for summary output.
      *
      * @param filePath the path of the processed file
      */
     public void addFileProcessed(String filePath) {
-        filesProcessed.add(requireNonNull(filePath, "report file path must not be null"));
+        filesProcessed.add(requireNonNull(filePath, "processed file path must not be null"));
     }
 
     /**
-     * Merges another report into this one.
+     * Merges another task summary into this instance.
      *
-     * @param other the report to merge
+     * @param other the summary to merge
      */
     public void merge(TodoReport other) {
-        requireNonNull(other, "other report must not be null");
+        requireNonNull(other, "other summary must not be null");
         tasks.addAll(other.tasks);
         filesProcessed.addAll(other.filesProcessed);
     }
 
     /**
-     * Returns an unmodifiable view of all reported tasks.
+     * Returns an unmodifiable view of all recorded tasks.
      */
     public List<TodoTask> getAllTasks() {
         return Collections.unmodifiableList(tasks);
@@ -120,35 +120,35 @@ public final class TodoReport {
     }
 
     /**
-     * Returns the total number of tasks in the report.
+     * Returns the total number of tasks tracked.
      */
     public int getTotalCount() {
         return tasks.size();
     }
 
     /**
-     * Returns the number of uncompleted tasks in the report.
+     * Returns the number of uncompleted tasks tracked.
      */
     public int getUncompletedCount() {
         return (int) tasks.stream().filter(TodoTask::isUncompleted).count();
     }
 
     /**
-     * Returns the number of completed tasks in the report.
+     * Returns the number of completed tasks tracked.
      */
     public int getCompletedCount() {
         return (int) tasks.stream().filter(TodoTask::isCompleted).count();
     }
 
     /**
-     * Returns true when the report contains uncompleted task entries.
+     * Returns true when uncompleted task entries are present in the current summary.
      */
     public boolean hasUncompletedTasks() {
         return tasks.stream().anyMatch(TodoTask::isUncompleted);
     }
 
     /**
-     * Returns true when the report contains zero task entries.
+     * Returns true when no task entries are recorded in the current summary.
      */
     public boolean isEmpty() {
         return tasks.isEmpty();
@@ -162,7 +162,7 @@ public final class TodoReport {
     }
 
     /**
-     * Returns the number of processed files tracked by the report.
+     * Returns the number of processed files tracked.
      */
     public int getFileCount() {
         return filesProcessed.size();

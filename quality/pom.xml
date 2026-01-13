@@ -34,10 +34,10 @@
         <spotbugs.excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml
         </spotbugs.excludeFilterFile>
 
-        <!-- Coverage thresholds: 93.8% line / 81.1% branch -->
+        <!-- Coverage thresholds: 95.4% line / 84.2% branch -->
         <!-- Updated after refreshing JaCoCo coverage -->
-        <jacoco.line.coverage>0.935</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.805</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.954</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.842</jacoco.branch.coverage>
     </properties>
 
     <dependencyManagement>
@@ -285,9 +285,9 @@
                                 <param>XML</param>
                             </outputFormats>
                             <!-- Mutation thresholds -->
-                            <!-- Current: 81% mutation coverage -->
-                            <mutationThreshold>81</mutationThreshold>
-                            <coverageThreshold>93</coverageThreshold>
+                            <!-- Current: 88.4% mutation coverage -->
+                            <mutationThreshold>88</mutationThreshold>
+                            <coverageThreshold>95</coverageThreshold>
                             <!-- Run all tests against all mutations for accuracy -->
                             <fullMutationMatrix>true</fullMutationMatrix>
                             <!-- Reduce noise from logging -->

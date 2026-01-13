@@ -18,7 +18,7 @@ public class InputMissingAssertionMessages {
         org.junit.Assert.fail((String) null);
         org.junit.Assert.assertThrows(IllegalStateException.class, () -> {
         });
-        org.junit.Assert.assertEquals("cache entry should be ready for lookup", 1, 1);
+        org.junit.Assert.assertEquals("cache entry should be ready for lookup because callers rely on it", 1, 1);
     }
 
     public void junit5Missing() {

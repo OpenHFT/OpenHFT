@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @SuppressWarnings("MMDisplayName")
-@DisplayName("Meaningful message check tests scenario case")
+@DisplayName("Meaningful message check tests because intent matters so that reports stay clear")
 public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     private static final String FIX_TOO_SHORT_ASSERTION =
             "add subject + expected behaviour, include key values if relevant";
@@ -37,6 +37,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
             "describe scenario + expected outcome";
     private static final String FIX_TOO_SHORT_LOG =
             "include action + subject + identifier or outcome";
+    private static final String FIX_TOO_SHORT_JAVADOC_CLASS =
+            "state responsibility + lifecycle, thread-safety, or performance intent";
     private static final String FIX_TOO_SHORT_JAVADOC_MEMBER =
             "state contract + units, edge cases, or side effects";
     private static final String FIX_TOO_FEW_MEANINGFUL_ASSERTION =
@@ -77,9 +79,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 arguments("JavadocFirstParagraphs", "InputJavadocMessages.java", new Object[][]{
                         {6, RuleId.REDUNDANT_CLASS, "InputJavadocMessages class.", "InputJavadocMessages",
                                 "only filler words remain: class"},
-                        {11, RuleId.TOO_SHORT, "Does stuff.", 2, 6, FIX_TOO_SHORT_JAVADOC_MEMBER},
+                        {11, RuleId.TOO_SHORT, "Does stuff.", 2, 6, 42, FIX_TOO_SHORT_JAVADOC_MEMBER},
                         {17, RuleId.DUPLICATE, "Does stuff.", 11},
-                        {23, RuleId.TOO_SHORT, "Uses {@code} now.", 3, 6, FIX_TOO_SHORT_JAVADOC_MEMBER},
+                        {23, RuleId.TOO_SHORT, "Uses {@code} now.", 3, 6, 42, FIX_TOO_SHORT_JAVADOC_MEMBER},
                         {29, RuleId.REDUNDANT_METHOD, "methodNamed method class method check method.", "methodNamed",
                                 "only filler words remain: method, class, method, check, method"}
                 }),
@@ -183,8 +185,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {105, RuleId.CONTEXTLESS, "value should match"}
                 }),
                 arguments("WordMetrics", "InputWordMetrics.java", new Object[][]{
-                        {16, RuleId.TOO_SHORT, "short", 1, 4, FIX_TOO_SHORT_ASSERTION},
-                        {18, RuleId.TOO_SHORT, "too short", 2, 4, FIX_TOO_SHORT_ASSERTION},
+                        {16, RuleId.TOO_SHORT, "short", 1, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {18, RuleId.TOO_SHORT, "too short", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {27, RuleId.MISSING_SUBJECT, "expected result ok value"},
                         {36, RuleId.TOO_LONG, "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twentyone twentytwo twentythree twentyfour twentyfive twentysix twentyseven twentyeight twentynine thirty thirtyone thirtytwo thirtythree thirtyfour thirtyfive thirtysix thirtyseven thirtyeight thirtynine forty fortyone fortytwo fortythree", 43, 42},
                         {45, RuleId.LONG_WORD, "error in SomeExtremelyVeryLongClassNameThatExceedsLimitHere here",
@@ -223,43 +225,90 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {43, RuleId.TRIVIAL_SUPPLIER, "name + suffix"},
                         {44, RuleId.TRIVIAL_SUPPLIER, "prefix {} suffix ..."},
                         {47, RuleId.TRIVIAL_SUPPLIER, "constant message"},
-                        {50, RuleId.TOO_SHORT, "value: {}", 2, 4, FIX_TOO_SHORT_ASSERTION},
+                        {50, RuleId.TOO_SHORT, "value: {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {53, RuleId.TRIVIAL_SUPPLIER, "computed: {} ..."}
                 }),
                 arguments("AssertJMessageArgs", "InputAssertJMessageArgs.java", new Object[][]{
                         {12, RuleId.ASSERTJ_OVERRIDE, "expected %s"}
                 }),
-                arguments("HamcrestMessages", "InputHamcrestMessages.java", new Object[][]{
-                        {12, RuleId.MISSING_MESSAGE},
-                        {13, RuleId.TOO_SHORT, "bad input", 2, 4, FIX_TOO_SHORT_ASSERTION},
-                        {14, RuleId.MISSING_SUBJECT, "expected result should match"}
+                arguments("HamcrestMessages", "InputHamcrestMessages.java", new Object[][]{}),
+                arguments("MissingSubjectExamples", "InputMissingSubjectExamples.java", new Object[][]{
+                        {11, RuleId.TOO_SHORT, "malformed input: partial character at end", 6, 10, 42,
+                                FIX_TOO_SHORT_JAVADOC_CLASS},
+                        {19, RuleId.MISSING_SUBJECT, "should emit missing message"},
+                        {20, RuleId.MISSING_SUBJECT, "should use comment source"},
+                        {21, RuleId.MISSING_SUBJECT, "should not emit unhandled warning"},
+                        {22, RuleId.MISSING_SUBJECT, "should not emit missing message"},
+                        {23, RuleId.MISSING_SUBJECT, "should throw npe for null"},
+                        {24, RuleId.MISSING_SUBJECT, "should emit one message candidate"},
+                        {25, RuleId.MISSING_SUBJECT, "should emit one candidate"},
+                        {29, RuleId.TOO_SHORT, "skipped on windows/wsl", 4, 6, 42,
+                                FIX_TOO_SHORT_ANNOTATION},
+                        {34, RuleId.TOO_SHORT, "tradable", 1, 6, 42, FIX_TOO_SHORT_ANNOTATION},
+                        {39, RuleId.TOO_SHORT, "ask indicative", 2, 6, 42, FIX_TOO_SHORT_ANNOTATION},
+                        {44, RuleId.TOO_SHORT, "bid indicative", 2, 6, 42, FIX_TOO_SHORT_ANNOTATION},
+                        {49, RuleId.TOO_SHORT, "assumes synchronous", 2, 6, 42, FIX_TOO_SHORT_ANNOTATION},
+                        {54, RuleId.TOO_SHORT, "mid", 1, 6, 42, FIX_TOO_SHORT_ANNOTATION},
+                        {59, RuleId.TOO_SHORT, "countpaused updated after pauses ({})", 4, 6, 42,
+                                FIX_TOO_SHORT_ANNOTATION}
+                }),
+                arguments("AssertionMessageCandidates", "InputAssertionMessageCandidates.java", new Object[][]{
+                        {10, RuleId.MISSING_SUBJECT, "should emit one candidate"},
+                        {11, RuleId.TOO_FEW_MEANINGFUL, "result should not be empty",
+                                "(none)", "result, should, not, be, empty", 0, 2,
+                                FIX_TOO_FEW_MEANINGFUL_ASSERTION},
+                        {12, RuleId.TOO_SHORT, "i: {}", 1, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {13, RuleId.TOO_SHORT, "offer i={}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {14, RuleId.MISSING_SUBJECT, "don't support index()"},
+                        {22, RuleId.TOO_SHORT, "handler closed (priority={})", 3, 4, 42,
+                                FIX_TOO_SHORT_ASSERTION},
+                        {23, RuleId.TOO_FEW_MEANINGFUL, "null should return 0",
+                                "0", "null, should, return", 1, 2,
+                                FIX_TOO_FEW_MEANINGFUL_ASSERTION},
+                        {24, RuleId.MISSING_SUBJECT, "don't support two queues yet"},
+                        {25, RuleId.MISSING_SUBJECT, "should skip when multiple comments are present"},
+                        {26, RuleId.TOO_SHORT, "adding {} {} to {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {28, RuleId.MISSING_SUBJECT, "should emit unhandled warning"},
+                        {29, RuleId.TOO_FEW_MEANINGFUL, "null should throw npe",
+                                "(none)", "null, should, throw, npe", 0, 2,
+                                FIX_TOO_FEW_MEANINGFUL_ASSERTION},
+                        {30, RuleId.MISSING_SUBJECT, "should use return line"},
+                        {33, RuleId.TOO_SHORT, "no error for {}", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {37, RuleId.TOO_SHORT, "no more messages", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {39, RuleId.TOO_SHORT, "i={}", 1, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {40, RuleId.TOO_SHORT, "`transacttime` not set", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {41, RuleId.TOO_FEW_MEANINGFUL, "textmethodtester output should match expected",
+                                "textmethodtester", "output, should, match, expected", 1, 2,
+                                FIX_TOO_FEW_MEANINGFUL_ASSERTION},
+                        {42, RuleId.TOO_SHORT, "iter={}", 1, 4, 42, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("MethodCallMessageTemplates", "InputMethodCallMessageTemplates.java", new Object[][]{
                         {14, RuleId.GENERIC, "expected"},
                         {15, RuleId.CONTEXTLESS, "comparison"},
-                        {16, RuleId.TOO_SHORT, "value %s", 3, 4, FIX_TOO_SHORT_ASSERTION},
-                        {17, RuleId.TOO_SHORT, "ok %s", 3, 4, FIX_TOO_SHORT_ASSERTION},
+                        {16, RuleId.TOO_SHORT, "value %s", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {17, RuleId.TOO_SHORT, "ok %s", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {18, RuleId.GENERIC, "expected"}
                 }),
                 arguments("LocaleFormatExpressions", "InputLocaleFormatExpressions.java", new Object[][]{
-                        {17, RuleId.TOO_SHORT, "alpha beta gamma", 3, 4, FIX_TOO_SHORT_ASSERTION},
-                        {18, RuleId.TOO_SHORT, "delta epsilon zeta", 3, 4, FIX_TOO_SHORT_ASSERTION},
-                        {19, RuleId.TOO_SHORT, "eta theta iota", 3, 4, FIX_TOO_SHORT_ASSERTION},
-                        {20, RuleId.TOO_SHORT, "kappa lambda mu", 3, 4, FIX_TOO_SHORT_ASSERTION},
-                        {21, RuleId.TOO_SHORT, "nu xi omicron", 3, 4, FIX_TOO_SHORT_ASSERTION},
-                        {22, RuleId.TOO_SHORT, "pi rho sigma", 3, 4, FIX_TOO_SHORT_ASSERTION},
-                        {23, RuleId.TOO_SHORT, "tau upsilon phi", 3, 4, FIX_TOO_SHORT_ASSERTION}
+                        {17, RuleId.TOO_SHORT, "alpha beta gamma", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {18, RuleId.TOO_SHORT, "delta epsilon zeta", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {19, RuleId.TOO_SHORT, "eta theta iota", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {20, RuleId.TOO_SHORT, "kappa lambda mu", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {21, RuleId.TOO_SHORT, "nu xi omicron", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {22, RuleId.TOO_SHORT, "pi rho sigma", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {23, RuleId.TOO_SHORT, "tau upsilon phi", 3, 4, 42, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("TemplateEdgeCases", "InputTemplateEdgeCases.java", new Object[][]{
                         {16, RuleId.CONTEXTLESS, "comparison"},
                         {17, RuleId.CONTEXTLESS, "comparison"},
-                        {18, RuleId.TOO_SHORT, "value {0}", 3, 4, FIX_TOO_SHORT_ASSERTION}
+                        {18, RuleId.TOO_SHORT, "value {0}", 3, 4, 42, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("TemplateVariablesInThrowStatements", "InputThrowTemplateVariables.java", new Object[][]{
                         {9, RuleId.MISSING_MESSAGE},
                         {13, RuleId.MISSING_MESSAGE}
                 }),
                 arguments("MissingComparisonValues", "InputComparisonValues.java", new Object[][]{
+                        {8, RuleId.OVERUSED_WORD, "b(8/12)", 12},
                         {20, RuleId.MISSING_COMPARISON_VALUES, ">", "a", "b"},
                         {21, RuleId.MISSING_COMPARISON_VALUES, ">=", "a", "b"},
                         {22, RuleId.MISSING_COMPARISON_VALUES, "<", "a", "b"},
@@ -272,6 +321,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {40, RuleId.TOO_FEW_MEANINGFUL, "collection should not be empty",
                                 "collection", "should, not, be, empty", 1, 2,
                                 FIX_TOO_FEW_MEANINGFUL_ASSERTION}
+                }),
+                arguments("LacksPurpose", "InputLacksPurpose.java", new Object[][]{
+                        {8, RuleId.LACKS_PURPOSE, 0, 2, 12}
                 }),
                 arguments("MissingStringSearchValues", "InputStringSearchValues.java", new Object[][]{
                         {19, RuleId.MISSING_STRING_VALUE, "contains", "text", "\"@\""},
@@ -288,8 +340,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {33, RuleId.MISSING_MESSAGE}
                 }),
                 arguments("AssertionMessageVariables", "InputAssertionMessageVariables.java", new Object[][]{
-                        {10, RuleId.TOO_SHORT, "dump: {}", 2, 4, FIX_TOO_SHORT_ASSERTION},
-                        {15, RuleId.TOO_SHORT, "snapshot: {}", 2, 4, FIX_TOO_SHORT_ASSERTION}
+                        {10, RuleId.TOO_SHORT, "dump: {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {15, RuleId.TOO_SHORT, "snapshot: {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("MissingLoopIndex", "InputMissingLoopIndex.java", new Object[][]{
                         {18, RuleId.MISSING_LOOP_INDEX, "i"},
@@ -304,7 +356,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {19, RuleId.MISSING_LOOP_INDEX, "name"}
                 }),
                 arguments("AnnotationMessages", "InputAnnotationMessages.java", new Object[][]{
-                        {16, RuleId.TOO_SHORT, "cache ready", 2, 6, FIX_TOO_SHORT_ANNOTATION},
+                        {16, RuleId.TOO_SHORT, "cache ready", 2, 6, 42, FIX_TOO_SHORT_ANNOTATION},
                         {20, RuleId.GENERIC, "expected"},
                         {24, RuleId.REDUNDANT_LINE, "L42 run", "L42"},
                         {28, RuleId.RESTATES_ASSERTION, "should be true"},
@@ -334,9 +386,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {35, RuleId.MISSING_SUBJECT, "should reconnect"},
                         {38, RuleId.MISSING_MESSAGE},
                         {40, RuleId.MISSING_SUBJECT, "expected value should match"},
-                        {41, RuleId.TOO_SHORT, "", 1, 4, FIX_TOO_SHORT_LOG},
+                        {41, RuleId.TOO_SHORT, "", 1, 4, 42, FIX_TOO_SHORT_LOG},
                         {44, RuleId.MISSING_MESSAGE},
-                        {46, RuleId.TOO_SHORT, "", 0, 4, FIX_TOO_SHORT_LOG},
+                        {46, RuleId.TOO_SHORT, "", 0, 4, 42, FIX_TOO_SHORT_LOG},
                         {48, RuleId.MISSING_SUBJECT, "should retry"},
                         {49, RuleId.CONTEXTLESS, "comparison"},
                         {50, RuleId.INDEX_ONLY, "0"},
@@ -360,10 +412,10 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {13, RuleId.MISSING_MESSAGE}
                 }),
                 arguments("LogSupplierBranches", "InputLogSupplierBranches.java", new Object[][]{
-                        {17, RuleId.TOO_SHORT, "", 1, 4, FIX_TOO_SHORT_LOG},
-                        {18, RuleId.TOO_SHORT, "", 1, 4, FIX_TOO_SHORT_LOG},
-                        {19, RuleId.TOO_SHORT, "", 1, 4, FIX_TOO_SHORT_LOG},
-                        {21, RuleId.TOO_SHORT, "", 1, 4, FIX_TOO_SHORT_LOG}
+                        {17, RuleId.TOO_SHORT, "", 1, 4, 42, FIX_TOO_SHORT_LOG},
+                        {18, RuleId.TOO_SHORT, "", 1, 4, 42, FIX_TOO_SHORT_LOG},
+                        {19, RuleId.TOO_SHORT, "", 1, 4, 42, FIX_TOO_SHORT_LOG},
+                        {21, RuleId.TOO_SHORT, "", 1, 4, 42, FIX_TOO_SHORT_LOG}
                 }),
                 arguments("CheapSupplierDescriptions", "InputCheapSupplierDescriptions.java", new Object[][]{
                         {15, RuleId.TRIVIAL_SUPPLIER, "message"},
@@ -425,30 +477,28 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 }),
                 arguments("SuppressionScopes", "InputSuppressionScopes.java", new Object[][]{
                         {20, RuleId.CONTEXTLESS, "result should match expected"},
-                        {37, RuleId.TOO_SHORT, "omicron pi rho", 3, 4, FIX_TOO_SHORT_ASSERTION},
+                        {37, RuleId.TOO_SHORT, "omicron pi rho", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {38, RuleId.CONTEXTLESS, "indices should be valid"}
                 }),
                 arguments("QualifiedSuppressions", "InputQualifiedSuppressions.java", new Object[][]{
-                        {22, RuleId.TOO_SHORT, "eta theta iota", 3, 4, FIX_TOO_SHORT_ASSERTION},
+                        {22, RuleId.TOO_SHORT, "eta theta iota", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {23, RuleId.CONTEXTLESS, "result should match expected"}
                 }),
                 arguments("TooShortSuppressWarnings", "InputSuppressWarningsTooShort.java", new Object[][]{
-                        {19, RuleId.TOO_SHORT, "foxtrot golf hotel india juliet", 5, 6, FIX_TOO_SHORT_ANNOTATION},
-                        {22, RuleId.TOO_SHORT, "kilo lima mike", 3, 4, FIX_TOO_SHORT_LOG}
+                        {19, RuleId.TOO_SHORT, "foxtrot golf hotel india juliet", 5, 6, 42, FIX_TOO_SHORT_ANNOTATION},
+                        {22, RuleId.TOO_SHORT, "kilo lima mike", 3, 4, 42, FIX_TOO_SHORT_LOG}
                 }),
                 arguments("RuleCodeSuppressions", "InputRuleCodeSuppressions.java", new Object[][]{
-                        {16, RuleId.TOO_SHORT, "delta epsilon zeta", 3, 4, FIX_TOO_SHORT_ASSERTION},
+                        {16, RuleId.TOO_SHORT, "delta epsilon zeta", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {25, RuleId.CONTEXTLESS, "operation result should equal expected value"}
                 }),
                 arguments("PrefilteredMessages", "InputPrefilteredMessages.java", new Object[][]{
-                        {21, RuleId.TOO_SHORT, "alpha beta gamma", 3, 4, FIX_TOO_SHORT_ASSERTION}
+                        {21, RuleId.TOO_SHORT, "alpha beta gamma", 3, 4, 42, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("CoveragePaths", "InputCoveragePaths.java", new Object[][]{
                         {20, RuleId.MISSING_MESSAGE},
                         {26, RuleId.MISSING_MESSAGE},
                         {32, RuleId.MISSING_MESSAGE},
-                        {37, RuleId.MISSING_MESSAGE},
-                        {43, RuleId.MISSING_MESSAGE},
                         {48, RuleId.TRIVIAL_SUPPLIER, "this is a very long string that exceeds twelve characters for truncation test {} ..."},
                         {54, RuleId.MISSING_MESSAGE},
                         {60, RuleId.MISSING_MESSAGE},
@@ -471,9 +521,17 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 arguments("TestAnnotationOrder", "InputTestAnnotationOrder.java", new Object[][]{
                         {16, RuleId.TEST_ANNOTATION_ORDER, "DisplayName", "testAnnotationOrderViolation"}
                 }),
+                arguments("JUnit4Migration", "InputJUnit4Migration.java", new Object[][]{
+                        {11, RuleId.JUNIT4_ANNOTATION, "Before"},
+                        {13, RuleId.JUNIT4_ASSERTION}
+                }),
+                arguments("JUnit4TestCommonIgnored", "InputJUnit4TestCommon.java", new Object[][]{}),
+                arguments("GeneratedAtJavadocSkipped", "InputGeneratedAtJavadoc.java", new Object[][]{}),
                 // Coverage-only input files - no expected violations
                 arguments("JavadocEdgeCases", "InputJavadocEdgeCases.java", new Object[][]{}),
-                arguments("AssertionRarePaths", "InputAssertionRarePaths.java", new Object[][]{})
+                arguments("AssertionRarePaths", "InputAssertionRarePaths.java", new Object[][]{}),
+                arguments("MessageQualityGuideAfterExamples",
+                        "InputMessageQualityGuideAfterExamples.java", new Object[][]{})
         );
     }
 
@@ -574,6 +632,17 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    @DisplayName("Test local helpers and supplier messages avoid unhandled warnings")
+    public void testUnhandledCasesSkippedForLocalHelpers() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(MeaningfulMessageCheck.class);
+
+        final String[] expected = {};
+
+        verify(checkConfig, getPath("InputUnhandledSkipped.java"), expected);
+    }
+
+    @Test
     @DisplayName("Test extraction file failure is reported scenario")
     public void testExtractionFileFailureIsReported() throws Exception {
         final DefaultConfiguration checkConfig =
@@ -625,7 +694,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 "21: " + getCheckMessage(RuleId.DUPLICATES_INPUT.messageKey(),
                         "IllegalStateException", "IllegalStateException"),
                 "22: " + getCheckMessage(RuleId.TOO_SHORT.messageKey(),
-                        "bad", 1, 2, FIX_TOO_SHORT_THROW),
+                        "bad", 1, 2, 42, FIX_TOO_SHORT_THROW),
         };
 
         verify(checkConfig, getPath("InputAssertThrowsIgnoredExceptions.java"), expected);
@@ -644,7 +713,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
         assertEquals(codes.size(), uniqueCodes.size(), "Duplicate rule codes detected");
 
         for (String code : codes) {
-            assertTrue(code.matches("MM[A-Z][A-Za-z]*"), "Rule code format invalid: " + code);
+            assertTrue(code.matches("MM[A-Z][A-Za-z0-9]*"), "Rule code format invalid: " + code);
         }
     }
 }

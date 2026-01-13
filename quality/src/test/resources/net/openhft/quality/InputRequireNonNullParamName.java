@@ -6,6 +6,9 @@ package net.openhft.quality;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Covers requireNonNull inputs because parameter names are acceptable so that precondition failures stay precise.
+ */
 public class InputRequireNonNullParamName {
     public void testRequireNonNull(Object value) {
         requireNonNull(value, "value");

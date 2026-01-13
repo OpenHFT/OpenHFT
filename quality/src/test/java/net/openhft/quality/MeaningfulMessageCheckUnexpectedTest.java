@@ -23,6 +23,7 @@ import java.util.SortedSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SuppressWarnings("MMOverusedWord")
 @DisplayName("Meaningful message check reports unexpected exceptions safely")
 class MeaningfulMessageCheckUnexpectedTest {
     @TempDir

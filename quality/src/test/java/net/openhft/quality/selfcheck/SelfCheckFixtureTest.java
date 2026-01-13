@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("MMDisplayName")
-@DisplayName("Self check fixture tests scenario case")
+@DisplayName("Self check fixture tests because coverage must show failures")
 public class SelfCheckFixtureTest {
 
     @Test

@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Test input for MMDisplayName rule validation.
+ * Test input for MMDisplayName rule validation because reports should read clearly.
  */
 @SuppressWarnings({"MMTooShort", "MMTooFewMeaningfulWords"})
 class InputDisplayNameMessages {

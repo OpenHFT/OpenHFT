@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public final class MMMissingSubject extends AbstractMessageRule {
     private static final Pattern MISSING_SUBJECT_PATTERN = Pattern.compile(
-            "(?i)^(should|must|will|can|cannot|can't|won't|shouldn't|mustn't|expected)\\b"
+            "(?i)^(should|must|will|can|cannot|can't|don't|won't|shouldn't|mustn't|expected|throws|returns)\\b"
     );
 
     /**

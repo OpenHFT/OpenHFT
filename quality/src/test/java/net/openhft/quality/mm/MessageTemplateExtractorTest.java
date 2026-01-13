@@ -55,6 +55,13 @@ class MessageTemplateExtractorTest {
         return ident;
     }
 
+    private static DetailAST numberLiteral(int type, String text) {
+        DetailAST literal = mock(DetailAST.class);
+        when(literal.getType()).thenReturn(type);
+        when(literal.getText()).thenReturn(text);
+        return literal;
+    }
+
     private static DetailAST plus(DetailAST left, DetailAST right) {
         DetailAST plus = mock(DetailAST.class);
         when(plus.getType()).thenReturn(TokenTypes.PLUS);
@@ -69,6 +76,37 @@ class MessageTemplateExtractorTest {
         when(dot.getFirstChild()).thenReturn(left);
         when(dot.getLastChild()).thenReturn(right);
         return dot;
+    }
+
+    private static DetailAST typecast(DetailAST expr) {
+        DetailAST typecast = mock(DetailAST.class);
+        when(typecast.getType()).thenReturn(TokenTypes.TYPECAST);
+        when(typecast.getLastChild()).thenReturn(expr);
+        return typecast;
+    }
+
+    private static DetailAST exprWithChildren(DetailAST first, DetailAST second) {
+        DetailAST expr = mock(DetailAST.class);
+        when(expr.getType()).thenReturn(TokenTypes.EXPR);
+        when(expr.getFirstChild()).thenReturn(first);
+        when(first.getNextSibling()).thenReturn(second);
+        when(second.getNextSibling()).thenReturn(null);
+        return expr;
+    }
+
+    private static DetailAST nodeWithChildren(int type, DetailAST... children) {
+        DetailAST node = mock(DetailAST.class);
+        when(node.getType()).thenReturn(type);
+        if (children.length == 0) {
+            when(node.getFirstChild()).thenReturn(null);
+            return node;
+        }
+        for (int i = 0; i < children.length - 1; i++) {
+            when(children[i].getNextSibling()).thenReturn(children[i + 1]);
+        }
+        when(children[children.length - 1].getNextSibling()).thenReturn(null);
+        when(node.getFirstChild()).thenReturn(children[0]);
+        return node;
     }
 
     private static DetailAST methodCall(DetailAST dot, DetailAST elist) {
@@ -382,6 +420,61 @@ class MessageTemplateExtractorTest {
     }
 
     @Test
+    @DisplayName("Count placeholder tokens string literal returns zero")
+    void countPlaceholderTokens_stringLiteral_returnsZero() {
+        assertEquals(0, extractor.countPlaceholderTokens(stringLiteral("text")),
+                "string literal should not count as placeholder");
+    }
+
+    @Test
+    @DisplayName("Count placeholder tokens dot counts as placeholder")
+    void countPlaceholderTokens_dot_countsAsPlaceholder() {
+        DetailAST expr = dot(ident("owner"), ident("field"));
+        assertEquals(1, extractor.countPlaceholderTokens(expr),
+                "dot expression should count as one placeholder");
+    }
+
+    @Test
+    @DisplayName("Count placeholder tokens typecast uses last child")
+    void countPlaceholderTokens_typecast_usesLastChild() {
+        DetailAST expr = typecast(ident("value"));
+        assertEquals(1, extractor.countPlaceholderTokens(expr),
+                "typecast should count placeholder from casted expression");
+    }
+
+    @Test
+    @DisplayName("Count placeholder tokens expr sums child tokens")
+    void countPlaceholderTokens_expr_sumsChildTokens() {
+        DetailAST expr = exprWithChildren(ident("first"), stringLiteral("text"));
+        assertEquals(1, extractor.countPlaceholderTokens(expr),
+                "expr should sum placeholder tokens from children");
+    }
+
+    @Test
+    @DisplayName("Count placeholder tokens numeric literal counts as placeholder")
+    void countPlaceholderTokens_numericLiteral_countsAsPlaceholder() {
+        assertEquals(1, extractor.countPlaceholderTokens(numberLiteral(TokenTypes.NUM_INT, "1")),
+                "numeric literal should count as placeholder");
+    }
+
+    @Test
+    @DisplayName("Count placeholder tokens method call counts as placeholder")
+    void countPlaceholderTokens_methodCall_countsAsPlaceholder() {
+        DetailAST dot = dot(ident("value"), ident("toString"));
+        DetailAST methodCall = methodCall(dot, null);
+        assertEquals(1, extractor.countPlaceholderTokens(methodCall),
+                "method call should count as placeholder");
+    }
+
+    @Test
+    @DisplayName("Count placeholder tokens unknown node sums children")
+    void countPlaceholderTokens_unknownNode_sumsChildren() {
+        DetailAST expr = nodeWithChildren(TokenTypes.ELIST, ident("left"), ident("right"));
+        assertEquals(2, extractor.countPlaceholderTokens(expr),
+                "unknown node should sum placeholder counts from children");
+    }
+
+    @Test
     @DisplayName("Extract message template null throws NPE")
     void extractMessageTemplate_null_throwsNPE() {
         assertThrows(NullPointerException.class,
@@ -446,5 +539,87 @@ class MessageTemplateExtractorTest {
         MessageTemplate template = extractor.extractMessageTemplate(methodCall);
 
         assertNull(template, "non-format method call should not produce a template");
+    }
+
+    @Test
+    @DisplayName("Extract constant string parts typecast returns literal")
+    void extractConstantStringParts_typecast_returnsLiteral() throws Exception {
+        DetailAST expr = typecast(stringLiteral("value"));
+        assertEquals("value", invokeExtractConstantStringParts(expr, false),
+                "typecast should keep literal text");
+    }
+
+    @Test
+    @DisplayName("Extract constant string parts expr unwraps single child")
+    void extractConstantStringParts_exprUnwrapsSingleChild() throws Exception {
+        DetailAST expr = expr(stringLiteral("value"));
+        assertEquals("value", invokeExtractConstantStringParts(expr, false),
+                "expr with single child should unwrap");
+    }
+
+    @Test
+    @DisplayName("Extract constant string parts returns placeholder when allowed")
+    void extractConstantStringParts_returnsPlaceholderWhenAllowed() throws Exception {
+        DetailAST expr = ident("value");
+        assertEquals("{}", invokeExtractConstantStringParts(expr, true),
+                "placeholder should be returned when allowed");
+    }
+
+    @Test
+    @DisplayName("Extract constant string parts method call returns empty when placeholders disallowed")
+    void extractConstantStringParts_methodCall_returnsEmptyWhenPlaceholdersDisallowed() throws Exception {
+        DetailAST dot = dot(ident("value"), ident("toString"));
+        DetailAST methodCall = methodCall(dot, null);
+        assertEquals("", invokeExtractConstantStringParts(methodCall, false),
+                "method call should return empty when placeholders disallowed");
+    }
+
+    @Test
+    @DisplayName("Extract string literal includes placeholder for method call concatenation")
+    void extractStringLiteral_includesPlaceholderForMethodCallConcatenation() {
+        DetailAST dot = dot(ident("value"), ident("toString"));
+        DetailAST methodCall = methodCall(dot, null);
+        DetailAST expr = expr(plus(stringLiteral("value "), methodCall));
+
+        String message = extractor.extractStringLiteral(expr, false);
+
+        assertEquals("value {}", message,
+                "concatenation with method call should include placeholder");
+    }
+
+    @Test
+    @DisplayName("Extract string literal returns null for method call when disallowed")
+    void extractStringLiteral_returnsNullForMethodCallWhenDisallowed() {
+        DetailAST dot = dot(ident("String"), ident("valueOf"));
+        DetailAST methodCall = methodCall(dot, elist(exprWithIdent("count")));
+
+        assertNull(extractor.extractStringLiteral(methodCall, false),
+                "method call should be rejected when disallowed");
+    }
+
+    @Test
+    @DisplayName("Extract string literal returns format string when allowed")
+    void extractStringLiteral_returnsFormatStringWhenAllowed() {
+        DetailAST dot = dot(ident("String"), ident("format"));
+        DetailAST methodCall = methodCall(dot, elist(exprWithString("value %s"), exprWithIdent("count")));
+
+        assertEquals("value %s", extractor.extractStringLiteral(methodCall, true),
+                "format call should return format string");
+    }
+
+    @Test
+    @DisplayName("Extract string literal finds empty literal in mixed expression")
+    void extractStringLiteral_findsEmptyLiteralInMixedExpression() {
+        DetailAST expr = nodeWithChildren(TokenTypes.ELIST, stringLiteral(""), ident("value"));
+
+        assertEquals("", extractor.extractStringLiteral(expr, false),
+                "empty literal should be returned when found in mixed expression");
+    }
+
+    private String invokeExtractConstantStringParts(DetailAST expr, boolean allowPlaceholder) throws Exception {
+        java.lang.reflect.Method method = MessageTemplateExtractor.class
+                .getDeclaredMethod("extractConstantStringParts", DetailAST.class, boolean.class);
+        method.setAccessible(true);
+        return (String) method.invoke(extractor, expr, allowPlaceholder);
     }
 }

@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Intentional MeaningfulMessage violations for QualityCheckstyleSelfTest.
+ * MeaningfulMessage violations for QualityCheckstyleSelfTest because diagnostics need coverage so that expectations stay aligned.
  * Keep these messages synchronised with the expected rule counts in that test.
  */
 public final class SelfCheckFixture {

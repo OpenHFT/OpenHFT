@@ -21,6 +21,7 @@ public class SuppressionTracker {
     private static final String CHECK_CLASS = "MeaningfulMessageCheck";
 
     private final Deque<SuppressionScope> scopes = new ArrayDeque<>();
+    private final SuppressionScope fileScope = new SuppressionScope();
 
     /**
      * Create a suppression tracker.
@@ -42,6 +43,17 @@ public class SuppressionTracker {
             current.addToken(token);
         }
         scopes.push(current);
+    }
+
+    /**
+     * Record suppressions declared on a top-level type for file-level checks.
+     *
+     * @param scopeAst AST node that defines the top-level type.
+     */
+    public void recordFileSuppressions(DetailAST scopeAst) {
+        for (String token : extractSuppressWarnings(scopeAst)) {
+            fileScope.addToken(token);
+        }
     }
 
     /**
@@ -69,6 +81,20 @@ public class SuppressionTracker {
             return true;
         }
         return scope.suppressedCodes.contains(ruleId.code());
+    }
+
+    /**
+     * Check whether a rule is suppressed at the file level.
+     *
+     * @param ruleId rule identifier to check.
+     * @return {@code true} if the rule is suppressed for the file.
+     */
+    public boolean isSuppressedInFile(RuleId ruleId) {
+        requireNonNull(ruleId);
+        if (fileScope.suppressAll) {
+            return true;
+        }
+        return fileScope.suppressedCodes.contains(ruleId.code());
     }
 
     private List<String> extractSuppressWarnings(DetailAST scopeAst) {

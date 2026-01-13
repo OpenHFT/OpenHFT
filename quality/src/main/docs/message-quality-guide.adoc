@@ -1,4 +1,4 @@
-= Assertion Message Quality Guide
+= Message Quality Guide
 :toc:
 :toclevels: 2
 :sectnums:
@@ -7,7 +7,7 @@ The Meaningful Message Check applies these rules to assertion messages (JUnit, A
 `throw new` exception/error messages, and JUnit annotation descriptions (display names, parameterised/repeated names, and disabled reasons).
 Log sites (SLF4J `trace/debug/info/warn/error`, Log4j2
 `trace/debug/info/warn/error/fatal`, JUL `java.util.logging.Logger`, `System.Logger`, and Chronicle
-`Jvm.*.on(...)`) are also in scope; see `meaningful-message-checker-requirements.adoc` for the log-specific rules.
+`Jvm.*.on(...)`) are also in scope.
 
 For `requireNonNull` and `requireNotNull`, a message is optional.
 If one is supplied it should be meaningful, but a message that matches the first argument (for example, `requireNonNull(in, "in")` or `requireNonNull(a.getIn(), "a.getIn()")`) is acceptable.
@@ -15,14 +15,13 @@ If one is supplied it should be meaningful, but a message that matches the first
 == Reason Comments for Non-Idiomatic Code
 
 Some statements require a short reason comment on the same line or the line immediately before.
-The comment text is evaluated like a message: at least 4 words with 2 meaningful words.
+The comment text is evaluated like a message: 4-42 words with at least 2 meaningful words.
 This applies to `return null;` and to uses of `java.lang.Runtime` or `java.lang.System`
 (excluding `currentTimeMillis()`, `nanoTime()`, `lineSeparator()`, `getLogger()`, `System.Logger`,
 `out`, and `err`).
 Additional cases include:
 
-* `Thread.stop()`, `Thread.suspend()`, `Thread.resume()`, `Thread.yield()`, `Thread.setPriority(...)`,
-  and `Thread.sleep(...)`.
+* `Thread.stop()`, `Thread.suspend()`, `Thread.resume()`, `Thread.yield()`, `Thread.setPriority(...)`, and `Thread.sleep(...)`.
 * `ThreadLocal.set(...)` and `InheritableThreadLocal.set(...)`.
 * `Object.wait()`, `Object.notify()`, and `Object.notifyAll()`.
 * `Class.forName(...)`.
@@ -30,13 +29,11 @@ Additional cases include:
 * `String.intern()`.
 
 The extracted comment text is also checked for missing subjects and duplicates.
-Comments may be on the same line or on one or more immediately preceding comment lines
-(including block comments), as long as no non-comment line appears between them.
-If multiple comments appear in that region, the checker assumes sufficient context
-and does not evaluate the comment text.
+Comments may be on the same line or on one or more immediately preceding comment lines (including block comments), as long as no non-comment line appears between them.
+If multiple comments appear in that region, the checker assumes sufficient context and does not evaluate the comment text.
 
 .Allowed comment placement
-[source,java]
+[source,java,opts=novalidate]
 ----
 // legacy case requires null
 return null;
@@ -46,6 +43,33 @@ return null;
 
 return null; // legacy case requires null
 ----
+
+If you must use System for line separators, add a reason comment.
+For path separators, prefer File.separatorChar or File.separator.
+
+.System separator guidance
+[source,java,opts=novalidate]
+----
+// use System line separator because export files must match platform endings
+String lineSeparator = System.lineSeparator();
+// for file paths, prefer File.separatorChar or File.separator
+char pathSeparator = File.separatorChar;
+String pathSeparatorText = File.separator;
+----
+
+== Generated Files
+
+If the first non-empty line in the first Javadoc comment starts with `Generated at `, the file is treated as generated and the checker skips message extraction and rule evaluation.
+
+== File-Level Rules
+
+Two rules are evaluated across an entire file rather than on a single message:
+
+* *MMOverusedWord* looks at meaningful words across all messages in the file (assertions, preconditions, throw messages, logs, annotations, comments, and Javadoc) after prefiltering.
+It runs only when there are at least 12 messages, emits one warning per file, and lists the words that appear in more than half of the messages with their counts.
+* *MMLacksPurpose* counts rationale cues across the same message set and expects at least max(1, round(messages/8)) cues (rounded half up).
+It emits one warning per file when the count is below the threshold.
+Phrase cues such as "so that" and "in order" are counted when they have words on both sides.
 
 == Rule Categories
 
@@ -80,7 +104,11 @@ Operational warnings highlight checker limitations or configuration issues and a
 |MMThrowNull |Throw null literal |Replace with `throw new UnsupportedOperationException()`
 |MMDisplayName |Missing display name |Add @DisplayName("descriptive name") to JUnit 5 test methods
 |MMTestAnnotationOrder |@Test annotation order |Place @Test first on JUnit 5 test methods
+|MMJUnit4Annotation |JUnit 4 annotation |Migrate to JUnit 5 annotations and add @DisplayName
+|MMJUnit4Assertion |JUnit 4 assertion |Migrate to org.junit.jupiter.api.Assertions
 |MMTooShort |Too short |Use source-specific guidance (assertion/log/javadoc/throw/annotation)
+|MMOverusedWord |Overused word in file |Rephrase to reduce repeated word use below half
+|MMLacksPurpose |Lacks purpose cues |Add rationale cues such as because/due to/so that/in order to/to avoid/required by/workaround for/otherwise/if/despite (target 1 per 8 messages)
 |MMTooFewMeaningfulWords |Too few unique meaningful words |Add meaningful words/placeholders to meet the minimum
 |MMTooLong |Too long |Keep invariant, move data to expected/actual
 |MMWhitespaceRun |Whitespace run |Use single spaces
@@ -134,17 +162,17 @@ Each assertion should have a unique message describing its specific invariant.
 Describe the specific invariant being tested at each assertion site.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(5, users.size(), "check value");
 assertEquals("admin", users.get(0).getRole(), "check value");  // duplicate!
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(5, users.size(), "user count after filtering inactive accounts");
-assertEquals("admin", users.get(0).getRole(), "first user should have admin role");
+assertEquals(5, users.size(), "inactive account count after eligibility filter");
+assertEquals("admin", users.get(0).getRole(), "primary admin user should keep elevated role");
 ----
 
 [#MMRedundantClassName]
@@ -164,7 +192,7 @@ A message that only repeats the class name (e.g., "BytesStore test") provides no
 Add 2+ meaningful words that describe the invariant, independent of the class name.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 class BytesStoreTest {
     void test() {
@@ -175,7 +203,7 @@ class BytesStoreTest {
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
 class BytesStoreTest {
     void test() {
@@ -201,7 +229,7 @@ A message like "testWriteBuffer" or "testWriteBuffer failed" adds no diagnostic 
 Add 2+ meaningful words that describe what the method is testing.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 void testWriteBuffer() {
     assertTrue(result, "testWriteBuffer");
@@ -209,7 +237,7 @@ void testWriteBuffer() {
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
 void testWriteBuffer() {
     assertTrue(result, "write should flush all bytes to underlying storage");
@@ -233,16 +261,16 @@ Including them in messages ("L42", "line 42", "File.java:42") is redundant and b
 Remove the line reference and describe the invariant instead.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(5, count, "L42");
 assertEquals(5, count, "line 42 check");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(5, count, "active user count after filtering");
+assertEquals(5, count, "active session count after reconciliation pass");
 ----
 
 [#MMTrivialSupplier]
@@ -260,10 +288,10 @@ A trivial supplier like `() -> "constant"`, `() -> "value: " + x`, or `() -> nam
 === How to Fix
 
 Use a plain String for simple cases.
-If you need lazy evaluation, move the construction into a helper method.
+If you need a reusable format, build the message once and pass the String.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(expected, actual, () -> "values should match");
 assertEquals(expected, actual, () -> "expected " + expected);
@@ -271,17 +299,18 @@ assertEquals(expected, actual, () -> name);
 ----
 
 .After (plain String)
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(expected, actual, "values should match");
-assertEquals(expected, actual, "expected " + expected);
+assertEquals(expected, actual, "seat allocation should match capacity budget");
+assertEquals(expected, actual, "item count should equal expected " + expected);
 assertEquals(expected, actual, name);
 ----
 
-.After (helper method)
-[source,java]
+.After (prepared message)
+[source,java,opts=novalidate]
 ----
-assertEquals(expected, actual, () -> buildMismatchMessage(expected, actual));
+String mismatch = "item count should remain " + expected + " after load, but was " + actual;
+assertEquals(expected, actual, mismatch);
 ----
 
 [#MMGenericMessage]
@@ -301,17 +330,17 @@ They're often just variable names copied into the message.
 Name what is being checked (subject) and what should hold (expected behaviour).
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(expected, actual, "value");
 assertTrue(condition, "test");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(expected, actual, "order total after applying discount");
-assertTrue(condition, "user session should be active after login");
+assertEquals(expected, actual, "order total after loyalty discount applied");
+assertTrue(condition, "session token should remain valid because login succeeded");
 ----
 
 [#MMRestatesAssertion]
@@ -331,7 +360,7 @@ The message should explain *why* this condition matters, not repeat *what* is be
 Explain the expected behaviour or invariant.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertTrue(flag, "should be true");
 assertNotNull(obj, "not null");
@@ -339,11 +368,11 @@ assertEquals(a, b, "should equal");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertTrue(flag, "feature flag should be enabled in production config");
+assertTrue(flag, "feature flag should be enabled to avoid legacy fallback");
 assertNotNull(obj, "connection pool should be initialized before first request");
-assertEquals(a, b, "serialized form should match original after round-trip");
+assertEquals(a, b, "serialized payload should preserve original bytes after round-trip");
 ----
 
 [#MMIndexOnly]
@@ -362,17 +391,17 @@ An index alone doesn't explain what the element represents or why it matters.
 Include what the element at that index represents.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(expected, array[0], "0");
 assertEquals(expected, list.get(5), "[5]");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(expected, array[0], "first entry should be header record");
-assertEquals(expected, list.get(5), "sixth item should be the sentinel value");
+assertEquals(expected, array[0], "first entry should be header record marker");
+assertEquals(expected, list.get(5), "sixth item should be sentinel marker value");
 ----
 
 [#MMContextless]
@@ -391,17 +420,17 @@ These words describe what the assertion *does*, not what the values *represent* 
 State what is being compared and why it matters (domain meaning).
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(a, b, "comparison");
 assertEquals(x, y, "values should match");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(a, b, "calculated tax should match expected rate");
-assertEquals(x, y, "cache entry should reflect database state");
+assertEquals(a, b, "calculated tax should match regional rate table");
+assertEquals(x, y, "cache entry should reflect database state after refresh");
 ----
 
 [#MMMissingMessage]
@@ -424,23 +453,23 @@ For JUnit `fail()` and `assertXxx(...)`, always supply a non-null message.
 For low-level or performance-sensitive cases (especially `throw new`), you may use an inline block comment with a short reason inside the argument list instead of a message literal.
 Empty comments and line comments do not suppress.
 
-[source,java]
+[source,java,opts=novalidate]
 ----
 throw new IllegalArgumentException(/* condition not met */);
 ----
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 slf4j.warn((String) null);
 @Disabled
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-slf4j.warn("order should remain in pending state");
-@Disabled("awaiting fix for queue recovery")
+slf4j.warn("order should remain in pending state so that retry can resume");
+@Disabled("disabled because queue recovery fix is pending")
 ----
 
 [#MMThrowNull]
@@ -448,28 +477,26 @@ slf4j.warn("order should remain in pending state");
 
 === Problem
 
-The code throws a null literal, which obscures the intent and produces a confusing
-NullPointerException at runtime.
+The code throws a null literal, which obscures the intent and produces a confusing NullPointerException at runtime.
 
 === Why This Matters
 
-A null throw does not describe the unsupported path and makes it harder to reason
-about failure modes during triage.
+A null throw does not describe the unsupported path and makes it harder to reason about failure modes during triage.
 
 === How to Fix
 
 Replace the null literal with an explicit exception type.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 throw null;
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-throw new UnsupportedOperationException();
+throw new UnsupportedOperationException("operation not supported for replay mode");
 ----
 
 [#MMDisplayName]
@@ -489,7 +516,7 @@ They also keep results consistent with the rest of the message-quality rules.
 Add @DisplayName with a short, descriptive sentence.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 @Test
 void parsesTodoFiles() {
@@ -497,10 +524,10 @@ void parsesTodoFiles() {
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
 @Test
-@DisplayName("Parses TODO files and reports incomplete tasks")
+@DisplayName("Lists incomplete TODO files after scan")
 void parsesTodoFiles() {
 }
 ----
@@ -521,7 +548,7 @@ Placing @Test first keeps annotation blocks consistent and makes the test intent
 Move @Test above other annotations such as @DisplayName, @Tag, or @Disabled.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 @DisplayName("Parses TODO files and reports incomplete tasks")
 @Test
@@ -530,11 +557,120 @@ void parsesTodoFiles() {
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
 @Test
-@DisplayName("Parses TODO files and reports incomplete tasks")
+@DisplayName("Validates parser output against fixture files")
 void parsesTodoFiles() {
+}
+----
+
+[#MMJUnit4Annotation]
+== MMJUnit4Annotation: JUnit 4 Test Annotation
+
+=== Problem
+
+A JUnit 4 test annotation (@Test, @Before, @After, @ParameterizedTest) is used.
+
+=== Why This Matters
+
+JUnit 5 is the standard test platform in these repositories.
+Mixing JUnit 4 annotations makes test execution and reporting inconsistent and hides JUnit 5 features such as @DisplayName.
+
+=== How to Fix
+
+Migrate to the JUnit 5 equivalents (@Test, @BeforeEach, @AfterEach, @ParameterizedTest) and add @DisplayName with a meaningful message.
+This rule emits one warning per file and skips classes whose names end with `TestCommon`.
+
+.Before
+[source,java,opts=novalidate]
+----
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class PriceTest {
+    @Before
+    public void setUp() {
+    }
+
+    @Test
+    public void calculatesPrice() {
+    }
+
+    @After
+    public void tearDown() {
+    }
+}
+----
+
+.After
+[source,java,opts=novalidate]
+----
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+public class PriceTest {
+    @BeforeEach
+    void setUp() {
+    }
+
+    @Test
+    @DisplayName("computes price after applying discount rules")
+    void calculatesPrice() {
+    }
+
+    @AfterEach
+    void tearDown() {
+    }
+}
+----
+
+[#MMJUnit4Assertion]
+== MMJUnit4Assertion: JUnit 4 Assertion
+
+=== Problem
+
+A JUnit 4 assertion is used.
+
+=== Why This Matters
+
+JUnit 5 assertions provide the standard API in these repositories and keep tests consistent with JUnit 5 annotations and tooling.
+
+=== How to Fix
+
+Migrate to `org.junit.jupiter.api.Assertions` and keep assertion messages meaningful.
+This rule emits one warning per file and skips classes whose names end with `TestCommon`.
+
+.Before
+[source,java,opts=novalidate]
+----
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+public class PriceTest {
+    @Test
+    public void calculatesPrice() {
+        assertEquals("total should remain stable after update", 1, 1);
+    }
+}
+----
+
+.After
+[source,java,opts=novalidate]
+----
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+public class PriceTest {
+    @Test
+    @DisplayName("total should remain stable after update")
+    void calculatesPrice() {
+        assertEquals("total should remain stable after update", 1, 1);
+    }
 }
 ----
 
@@ -553,6 +689,7 @@ Very short messages rarely provide sufficient context to diagnose failures witho
 
 The fix depends on the message source.
 Use the guidance below, then meet the minimums in the requirements.
+Word count ranges (min-max, max from MMTooLong): assertions/preconditions/logs/comments 4-42 words, annotations/Javadoc members 6-42 words, Javadoc class 10-42 words, throw messages 2-42 words.
 For assertions and logs, 4-8 words is a useful default.
 
 [cols="1,2"]
@@ -587,18 +724,64 @@ For assertions and logs, 4-8 words is a useful default.
 ----
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(5, count, "count");
 assertTrue(valid, "ok");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(5, count, "user count after filtering inactive");
-assertTrue(valid, "order should pass validation rules");
+assertEquals(5, count, "retired account count after purge step");
+assertTrue(valid, "order should pass validation rules so that settlement proceeds");
 ----
+
+[#MMOverusedWord]
+== MMOverusedWord: Overused Word
+
+=== Problem
+
+A meaningful word appears in more than half of the messages in the same file, based on at least 12 messages.
+
+=== Why This Matters
+
+Overusing a word that appears meaningful reduces its signal and makes messages blur together.
+
+=== How to Fix
+
+Rephrase some messages so the word appears in fewer than half of the messages.
+
+[#MMLacksPurpose]
+== MMLacksPurpose: Lacks Purpose Cues
+
+=== Problem
+
+The file does not contain enough rationale cues across messages.
+At least max(1, round(messages/8)) cues are expected (rounded half up).
+
+=== Why This Matters
+
+Messages that never explain why behaviour exists or constraints apply are harder to interpret when triaging failures.
+
+=== How to Fix
+
+Add rationale cues such as "because", "due to", "so that", "in order to", "to avoid", "required by", "workaround for", "otherwise", "if", or "despite" to explain why the behaviour is required.
+
+Reasoning cues list (case-insensitive): because, since, due, owing, account, reason, for, result, therefore, thus, hence, purpose, if, given, assuming, provided, although, despite, spite, regardless, required, workaround, avoid, otherwise, plus phrase cues "so that" and "in order", and any token starting with "consequent".
+
+Suggested cue examples (each includes words before and after the cue):
+
+* "Skip on Windows because file offsets differ under WSL."
+* "This test is skipped due to hugetlbfs page size differences."
+* "Flush the queue so that tailers observe the commit immediately."
+* "Use a fixed clock in order to keep the test deterministic."
+* "Close the selector to avoid leaking native file descriptors."
+* "Fail fast on mismatch, required by the quality profile settings."
+* "Use a temp directory as a workaround for Windows file locking."
+* "Write the index now, otherwise recovery may replay from the wrong point."
+* "Only enable huge pages if hugetlbfs is mounted and writable."
+* "Proceed despite a missing optional tag 58; it is not required for logon."
 
 [#MMTooFewMeaningfulWords]
 == MMTooFewMeaningfulWords: Too Few Meaningful Words
@@ -608,6 +791,8 @@ assertTrue(valid, "order should pass validation rules");
 The message has fewer than the source minimum unique meaningful words or placeholders (filler words like "should", "be", "expected", "error", "failed" do not count and duplicates are ignored).
 The warning lists the filler words present so it is clear which words did not count.
 
+Filler words list (case-insensitive): a, an, the, is, are, was, were, be, been, to, of, in, on, at, by, with, from, as, if, or, and, not, no, none, that, when, after, before, around, yet, should, must, expected, actual, value, result, data, test, check, assert, equals, match, return, returns, throw, read, todo, this, error, fail, failed, failure, null, true, false, non, empty, npe, have, has, do, does, contain, contains, exist, exists, present, first, second, one, once, two, more, only, all, nothing, without, within, under, line, method, tostring, class, assertion, occurred, remains, here, call, called, new, instance, created, successfully, op, input, output, conditions, behaviour, behavior, time, unit, configured, system, behaviours.
+
 === Why This Matters
 
 Messages made up mostly of filler words are hard to interpret without reading the code.
@@ -615,17 +800,18 @@ Messages made up mostly of filler words are hard to interpret without reading th
 === How to Fix
 
 Add meaningful words or data placeholders to meet the minimum.
+Meaningful word ranges (min-max, max from MMTooLong): assertions/preconditions/logs/comments 2-42 meaningful words, annotations/Javadoc members 4-42 meaningful words, Javadoc class 8-42 meaningful words, throw messages 1-42 meaningful words.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertTrue(valid, "should be ok");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertTrue(valid, "order should be valid");
+assertTrue(valid, "order payload should remain valid after parse");
 ----
 
 [#MMTooLong]
@@ -644,16 +830,16 @@ Overly long messages often contain data dumps or implementation details that bel
 Keep the invariant description; move data to expected/actual parameters or test output.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(expected, actual,
     "the value that was returned from the method after calling it with the specified parameters should be equal to the expected result that we calculated earlier");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(expected, actual, "computed result should match expected value");
+assertEquals(expected, actual, "computed checksum should match stored snapshot");
 // Let the assertion framework show expected vs actual
 ----
 
@@ -673,15 +859,15 @@ Repeated whitespace often signals missing data or accidental formatting, which m
 Collapse repeated whitespace to single spaces, or move dynamic values into expected/actual arguments.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(expected, actual, "order  should persist");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals(expected, actual, "order should persist");
+assertEquals(expected, actual, "order state should persist across restart");
 ----
 
 [#MMLongWord]
@@ -700,13 +886,13 @@ Long identifiers like `ConfigurationManagerServiceFactoryImpl` suggest the messa
 Use short, descriptive domain terms instead of code identifiers.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(expected, actual, "ConfigurationManagerServiceFactoryImpl returned wrong value");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals(expected, actual, "config service should return cached settings");
 ----
@@ -728,7 +914,7 @@ The assertion framework already shows the expected and actual values.
 Explain the invariant - why this value matters, not what the value is.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertEquals("admin", role, "admin");
 assertThrows(IllegalArgumentException.class, code, "IllegalArgumentException");
@@ -736,11 +922,11 @@ assertEquals(expected, actual, "expected");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertEquals("admin", role, "first user should have admin role");
-assertThrows(IllegalArgumentException.class, code, "negative quantity should be rejected");
-assertEquals(expected, actual, "computed hash should match stored value");
+assertEquals("admin", role, "primary operator account should retain admin rights");
+assertThrows(IllegalArgumentException.class, code, "negative quantity should be rejected to avoid inventory drift");
+assertEquals(expected, actual, "computed checksum should equal baseline signature");
 ----
 
 [#MMLowSignalAssertAllHeading]
@@ -760,7 +946,7 @@ Generic headings provide no context about what invariant is being checked.
 Name what the group of assertions validates - the business rule or invariant.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertAll("assertions",
     () -> assertEquals(5, order.getItems().size()),
@@ -774,16 +960,16 @@ assertAll("checks",
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertAll("order should be complete and valid",
-    () -> assertEquals(5, order.getItems().size()),
-    () -> assertTrue(order.isValid())
+assertAll("order should validate line items so that totals reconcile",
+    () -> assertEquals(5, order.getItems().size(), "line item count should equal expected total"),
+    () -> assertTrue(order.isValid(), "order totals should reconcile after recalculation")
 );
 
-assertAll("user should be properly initialized",
-    () -> assertNotNull(user.getId()),
-    () -> assertEquals("active", user.getStatus())
+assertAll("user session should initialise so that roles load",
+    () -> assertNotNull(user.getId(), "user identifier should be assigned after login"),
+    () -> assertEquals("active", user.getStatus(), "user status should remain active after login")
 );
 ----
 
@@ -804,7 +990,7 @@ Restating this in the message adds no value.
 Explain why this property matters in the domain context.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertThat(list).isEmpty();  // with message "empty"
 assertThat(optional).isPresent();  // with message "present"
@@ -812,11 +998,11 @@ assertThat(text).contains("@");  // with message "contains"
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertThat(list).as("no pending orders after cleanup").isEmpty();
-assertThat(optional).as("authenticated user should have a session").isPresent();
-assertThat(text).as("email should have valid format").contains("@");
+assertThat(list).as("no pending orders after end-of-day cleanup").isEmpty();
+assertThat(optional).as("authenticated user should have active session token").isPresent();
+assertThat(retryCount).as("retry count should remain positive during validation").isPositive();
 ----
 
 [#MMAssertJGenericOverride]
@@ -839,21 +1025,21 @@ Prefer `as()` for adding context.
 Only use `withFailMessage()` when you need to completely replace the output with specific diagnostic information.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertThat(result).withFailMessage("value").isEqualTo(expected);
 assertThat(list).overridingErrorMessage("check").isEmpty();
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertThat(result).as("computed hash should match stored value").isEqualTo(expected);
-assertThat(list).as("pending orders after cleanup").isEmpty();
+assertThat(digestCount).as("digest counter should remain positive after load").isPositive();
+assertThat(list).as("queued orders after nightly cleanup pass").isEmpty();
 ----
 
 .When withFailMessage is appropriate
-[source,java]
+[source,java,opts=novalidate]
 ----
 // Use when you need complete control over the error message
 assertThat(response.getStatus())
@@ -878,7 +1064,7 @@ A constant message like `"should be greater"` doesn't tell you what `a` and `b` 
 Include the operand values in the message so they're visible when the assertion fails.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertTrue(a > b, "a should be greater than b");
 assertTrue(count >= minCount, "count too low");
@@ -886,27 +1072,26 @@ assertFalse(x == y, "values should differ");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertTrue(a > b, a + " should be greater than " + b);
-assertTrue(count >= minCount, "count " + count + " should be >= " + minCount);
-assertFalse(x == y, x + " should not equal " + y);
+assertTrue(a > b, "min threshold " + a + " should exceed " + b + " baseline");
+assertTrue(count >= minCount, "item count " + count + " should meet minimum " + minCount + " target");
+assertFalse(x == y, "record id " + x + " should differ from " + y + " source");
 ----
 
 .With context
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertTrue(a > b, a + " > " + b + " required for valid range");
+assertTrue(a > b, "range start " + a + " > " + b + " required for valid window");
 assertTrue(count >= minCount,
-    "count " + count + " below minimum " + minCount + " after filtering");
+    "item count " + count + " below minimum " + minCount + " after filtering");
 ----
 
 === When This Rule Doesn't Apply
 
 This rule only triggers when:
 - The assertion is `assertTrue` or `assertFalse`
-- The condition is a comparison (`>`, `<`, `>=`, `<=`, `==`, `!=`)
-- The message is a constant string (no dynamic content)
+- The condition is a comparison (`>`, `<`, `>=`, `<=`, `==`, `!=`) - The message is a constant string (no dynamic content)
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
@@ -927,7 +1112,7 @@ A constant message like `"should contain pattern"` doesn't tell you what the str
 Include the string being searched in the message so it's visible when the assertion fails.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertTrue(text.contains("@"), "should contain @");
 assertTrue(name.startsWith("Mr"), "should start with title");
@@ -935,20 +1120,20 @@ assertFalse(path.endsWith(".tmp"), "should not be temp file");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertTrue(text.contains("@"), text + " should contain @");
-assertTrue(name.startsWith("Mr"), name + " should start with Mr");
-assertFalse(path.endsWith(".tmp"), path + " should not end with .tmp");
+assertTrue(text.contains("@"), "address '" + text + "' should include @ symbol for login");
+assertTrue(name.startsWith("Mr"), "display name '" + name + "' should start with title Mr");
+assertFalse(path.endsWith(".tmp"), "path '" + path + "' should not end with .tmp extension");
 ----
 
 .With context
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertTrue(email.contains("@"),
-    "email '" + email + "' should contain @ symbol");
+    "contact email '" + email + "' should include @ symbol for login");
 assertTrue(filename.endsWith(".json"),
-    "config file '" + filename + "' should have .json extension");
+    "config file '" + filename + "' should end with .json extension");
 ----
 
 === When This Rule Doesn't Apply
@@ -956,8 +1141,7 @@ assertTrue(filename.endsWith(".json"),
 This rule only triggers when:
 - The assertion is `assertTrue` or `assertFalse`
 - The condition is a call to `contains()`, `startsWith()`, or `endsWith()`
-- The message is a constant string (no dynamic content)
-- The string search target is not a literal already mentioned in the message
+- The message is a constant string (no dynamic content) - The string search target is not a literal already mentioned in the message
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
@@ -979,7 +1163,7 @@ This makes debugging significantly harder, especially for large datasets.
 Include the loop index variable in the message so you know which iteration failed.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 for (int i = 0; i < items.size(); i++) {
     assertEquals(expected, items.get(i), "item should match expected");
@@ -991,33 +1175,31 @@ for (int row = 0; row < matrix.length; row++) {
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
 for (int i = 0; i < items.size(); i++) {
-    assertEquals(expected, items.get(i), "item at index " + i + " should match expected");
+    assertEquals(expected, items.get(i), "item at index " + i + " should match expected header field");
 }
 
 for (int row = 0; row < matrix.length; row++) {
-    assertTrue(matrix[row] != null, "row " + row + " should not be null");
+    assertTrue(matrix[row] != null, "matrix row " + row + " should not be null payload entry");
 }
 ----
 
 .With additional context
-[source,java]
+[source,java,opts=novalidate]
 ----
 for (int i = 0; i < orders.size(); i++) {
     Order order = orders.get(i);
     assertTrue(order.isValid(),
-        "order " + i + " (id=" + order.getId() + ") should be valid");
+        "order " + i + " (id=" + order.getId() + ") should be valid for settlement");
 }
 ----
 
 === When This Rule Doesn't Apply
 
 This rule only triggers when:
-- The assertion is inside a traditional indexed `for` loop (with `int` or `long` index)
-- The loop has an initialization, condition, and update expression
-- The message is a constant string (no dynamic content)
+- The assertion is inside a traditional indexed `for` loop (with `int` or `long` index) - The loop has an initialization, condition, and update expression - The message is a constant string (no dynamic content)
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
 
@@ -1039,7 +1221,7 @@ The subject provides essential context.
 Add a subject before the modal verb - name what is being tested.
 
 .Before
-[source,java]
+[source,java,opts=novalidate]
 ----
 assertTrue(result.isValid(), "should be valid");
 assertEquals(5, count, "should equal expected");
@@ -1047,11 +1229,11 @@ assertNotNull(connection, "must not be null");
 ----
 
 .After
-[source,java]
+[source,java,opts=novalidate]
 ----
-assertTrue(result.isValid(), "order should be valid after checkout");
-assertEquals(5, count, "item count should equal expected");
-assertNotNull(connection, "database connection must not be null");
+assertTrue(result.isValid(), "order should be valid after checkout payment");
+assertEquals(5, count, "item count should equal target total");
+assertNotNull(connection, "database connection must not be null before transaction commit");
 ----
 
 .Pattern
@@ -1109,8 +1291,7 @@ Unhandled patterns mean the rule set is incomplete for that style of message, so
 === How to Fix
 
 Extend the relevant extractor or add a rule for the missing pattern.
-If needed, suppress temporarily with `emitUnhandled=false` in the checkstyle configuration
-or `@SuppressWarnings("MMUnhandled")` on the affected code.
+If needed, suppress temporarily with `emitUnhandled=false` in the checkstyle configuration or `@SuppressWarnings("MMUnhandled")` on the affected code.
 
 [#MMExtractionFile]
 == MMExtractionFile: Extraction Output Failure
