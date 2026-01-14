@@ -27,7 +27,7 @@
     </parent>
 
     <artifactId>third-party-bom</artifactId>
-    <version>3.27ea8-SNAPSHOT</version>
+    <version>2026.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Third Party BOM (Bill of Materials)</name>
