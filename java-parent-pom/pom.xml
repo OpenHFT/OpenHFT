@@ -135,10 +135,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs} -Djvm.coverage=true</argLine>
+                    <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs} -Djvm.coverage=true -Dfile.encoding=UTF-8</argLine>
                     <systemPropertyVariables>
                         <project.build.directory>${project.build.directory}</project.build.directory>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <JAVA_TOOL_OPTIONS></JAVA_TOOL_OPTIONS>
+                    </environmentVariables>
                     <enableAssertions>true</enableAssertions>
                 </configuration>
             </plugin>
