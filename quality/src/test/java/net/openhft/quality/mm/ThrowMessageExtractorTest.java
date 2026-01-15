@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -853,30 +852,18 @@ class ThrowMessageExtractorTest {
     }
 
     private boolean invokeIsThrowableExpression(DetailAstImpl expr) throws Exception {
-        Method method = ThrowMessageExtractor.class
-                .getDeclaredMethod("isThrowableExpression", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, expr);
+        return extractor.isThrowableExpression(expr);
     }
 
     private boolean invokeIsThrowableMessageCall(DetailAstImpl expr) throws Exception {
-        Method method = ThrowMessageExtractor.class
-                .getDeclaredMethod("isThrowableMessageCall", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, expr);
+        return extractor.isThrowableMessageCall(expr);
     }
 
     private boolean invokeIsThrowableRethrow(DetailAstImpl expr) throws Exception {
-        Method method = ThrowMessageExtractor.class
-                .getDeclaredMethod("isThrowableRethrow", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, expr);
+        return extractor.isThrowableRethrow(expr);
     }
 
     private boolean invokeIsThrowableTypeName(String typeName) throws Exception {
-        Method method = ThrowMessageExtractor.class
-                .getDeclaredMethod("isThrowableTypeName", String.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, typeName);
+        return extractor.isThrowableTypeName(typeName);
     }
 }

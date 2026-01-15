@@ -81,6 +81,14 @@ public class ViolationCollector {
         return summary;
     }
 
+    boolean hasViolations() {
+        return !pending.isEmpty();
+    }
+
+    void putPendingForTesting(int lineNo, Violation violation) {
+        pending.put(lineNo, violation);
+    }
+
     Map<Integer, Violation> pendingForTesting() {
         return new HashMap<>(pending);
     }
@@ -88,14 +96,22 @@ public class ViolationCollector {
     private boolean isHigherPriority(RuleId candidate, RuleId existing) {
         requireNonNull(existing);
         requireNonNull(candidate);
-        if (candidate.priority() != existing.priority()) {
-            return candidate.priority() < existing.priority();
+        return isHigherPriority(candidate.priority(), candidate.code(), candidate.order(),
+                existing.priority(), existing.code(), existing.order());
+    }
+
+    static boolean isHigherPriority(int candidatePriority, String candidateCode, int candidateOrder,
+                                    int existingPriority, String existingCode, int existingOrder) {
+        requireNonNull(candidateCode);
+        requireNonNull(existingCode);
+        if (candidatePriority != existingPriority) {
+            return candidatePriority < existingPriority;
         }
-        int candidateLength = candidate.code().length();
-        int existingLength = existing.code().length();
+        int candidateLength = candidateCode.length();
+        int existingLength = existingCode.length();
         if (candidateLength != existingLength) {
             return candidateLength < existingLength;
         }
-        return candidate.order() < existing.order();
+        return candidateOrder < existingOrder;
     }
 }

@@ -120,7 +120,7 @@ public class SuppressionTracker {
         return tokens;
     }
 
-    private void collectStringValues(DetailAST expr, List<String> tokens) {
+    void collectStringValues(DetailAST expr, List<String> tokens) {
         DetailAST content = unwrapExpr(expr);
         requireNonNull(content);
         if (content.getType() == TokenTypes.EXPR) {
@@ -148,7 +148,7 @@ public class SuppressionTracker {
         }
     }
 
-    private DetailAST unwrapExpr(DetailAST expr) {
+    DetailAST unwrapExpr(DetailAST expr) {
         requireNonNull(expr);
         if (expr.getType() == TokenTypes.EXPR && expr.getChildCount() == 1) {
             return expr.getFirstChild();
@@ -156,7 +156,7 @@ public class SuppressionTracker {
         return expr;
     }
 
-    private DetailAST findAnnotationValue(DetailAST annotationAst) {
+    DetailAST findAnnotationValue(DetailAST annotationAst) {
         DetailAST child = annotationAst.getFirstChild();
         while (child != null) {
             if (child.getType() == TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR) {
@@ -205,6 +205,7 @@ public class SuppressionTracker {
         }
         return current != null && current.getType() == TokenTypes.IDENT ? current : null;
     }
+
 
     String stripQuotes(String text) {
         requireNonNull(text);

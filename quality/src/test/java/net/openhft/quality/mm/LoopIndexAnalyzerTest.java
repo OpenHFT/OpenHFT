@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -317,10 +316,7 @@ class LoopIndexAnalyzerTest {
     }
 
     private boolean invokeMessageContainsLoopIndex(String message, Set<String> names) throws Exception {
-        Method method = LoopIndexAnalyzer.class
-                .getDeclaredMethod("messageContainsLoopIndex", String.class, Set.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(analyzer, message, names);
+        return analyzer.messageContainsLoopIndex(message, names);
     }
 
     private DetailAST createEnhancedForLoopWithVariable(String varName) {

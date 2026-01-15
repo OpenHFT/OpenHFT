@@ -361,7 +361,7 @@ public final class MessageTemplateExtractor {
         return extractConstantStringParts(expr, false);
     }
 
-    private String extractConstantStringParts(DetailAST expr, boolean allowPlaceholder) {
+    String extractConstantStringParts(DetailAST expr, boolean allowPlaceholder) {
         requireNonNull(expr);
         if (expr.getType() == TokenTypes.EXPR && expr.getChildCount() == 1) {
             return extractConstantStringParts(expr.getFirstChild(), allowPlaceholder);

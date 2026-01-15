@@ -97,7 +97,7 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         sink().emitCandidate(candidate);
     }
 
-    private boolean isThrowableExpression(DetailAST expr) {
+    boolean isThrowableExpression(DetailAST expr) {
         DetailAST content = astSupport().unwrapExpr(expr);
         if (content == null) {
             return false;
@@ -147,7 +147,7 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         return context().extractMessageTemplate(expr);
     }
 
-    private boolean isThrowableRethrow(DetailAST expr) {
+    boolean isThrowableRethrow(DetailAST expr) {
         DetailAST content = astSupport().unwrapExpr(expr);
         if (content == null) {
             return false;
@@ -172,7 +172,7 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
-    private boolean isThrowableMessageCall(DetailAST expr) {
+    boolean isThrowableMessageCall(DetailAST expr) {
         DetailAST content = astSupport().unwrapExpr(expr);
         if (content == null || content.getType() != TokenTypes.METHOD_CALL) {
             return false;
@@ -193,7 +193,7 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         return isThrowableTypeName(typeName);
     }
 
-    private boolean isThrowableTypeName(String typeName) {
+    boolean isThrowableTypeName(String typeName) {
         if (typeName == null) {
             return false;
         }
@@ -208,4 +208,5 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
                 || simple.endsWith("Error")
                 || simple.equals("StackTrace");
     }
+
 }

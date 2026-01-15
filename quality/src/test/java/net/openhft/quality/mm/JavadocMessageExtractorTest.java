@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -274,17 +273,11 @@ class JavadocMessageExtractorTest {
     }
 
     private String invokeExtractFirstParagraph(TextBlock block) throws Exception {
-        Method method = JavadocMessageExtractor.class
-                .getDeclaredMethod("extractFirstParagraph", TextBlock.class);
-        method.setAccessible(true);
-        return (String) method.invoke(extractor, block);
+        return extractor.extractFirstParagraph(block);
     }
 
     private void invokeEmitCandidate(TextBlock block, MessageSource source) throws Exception {
-        Method method = JavadocMessageExtractor.class
-                .getDeclaredMethod("emitCandidate", TextBlock.class, MessageSource.class);
-        method.setAccessible(true);
-        method.invoke(extractor, block, source);
+        extractor.emitCandidate(block, source);
     }
 
     /**

@@ -157,6 +157,11 @@ public enum RuleId {
     LACKS_PURPOSE("assert.message.lacks.purpose", "MMLacksPurpose", 28,
             EnumSet.allOf(MessageSource.class)),
     /**
+     * Low message entropy across a file.
+     */
+    LOW_ENTROPY("assert.message.low.entropy", "MMLowEntropy", 29,
+            EnumSet.allOf(MessageSource.class)),
+    /**
      * Missing @DisplayName annotation on JUnit 5 test method.
      */
     MISSING_DISPLAY_NAME("assert.message.missing.display.name", "MMDisplayName", 25,

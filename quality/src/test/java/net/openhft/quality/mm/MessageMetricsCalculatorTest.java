@@ -150,6 +150,111 @@ class MessageMetricsCalculatorTest {
     }
 
     @Test
+    @DisplayName("Colon counts as filler word for word count")
+    void colonCountsAsFillerWord() {
+        String message = "status: active";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(3, metrics.wordCount(), "wordCount should include colon token");
+        assertEquals(2, metrics.meaningfulWordCount(), "colon should not increase meaningful count");
+    }
+
+    @Test
+    @DisplayName("All filler symbols count as filler words for word count")
+    void allFillerSymbolsCountAsFillerWords() {
+        String[] fillerSymbols = {":", "&", "%", "$", ";", "|", "\\", "*", "+", "/", "-"};
+        String message = "alpha " + String.join(" ", fillerSymbols) + " beta";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        int expectedWordCount = 2 + fillerSymbols.length;
+        assertEquals(expectedWordCount, metrics.wordCount(),
+                "wordCount should include filler symbol tokens");
+        assertEquals(2, metrics.meaningfulWordCount(),
+                "filler symbols should not add meaningful words");
+    }
+
+    @Test
+    @DisplayName("Symbol runs are evaluated as whole tokens")
+    void symbolRunsAreEvaluatedAsWholeTokens() {
+        String message = "alpha <> beta => gamma >> delta << epsilon === zeta // eta ** theta #|# iota";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(9, metrics.wordCount(),
+                "symbol runs should not be split into known tokens");
+        assertEquals(9, metrics.meaningfulWordCount(),
+                "symbol runs should not contribute meaningful words");
+    }
+
+    @Test
+    @DisplayName("All comparison operators count as meaningful words")
+    void allComparisonOperatorsCountAsMeaningfulWords() {
+        String message = "alpha >= beta <= gamma != delta == epsilon > zeta < eta -> theta";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(15, metrics.wordCount(),
+                "wordCount should include operator tokens");
+        assertEquals(15, metrics.meaningfulWordCount(),
+                "operators should count as meaningful words");
+        assertTrue(metrics.meaningfulWords().containsAll(
+                java.util.Arrays.asList(">=", "<=", "!=", "==", ">", "<", "->")),
+                "meaningfulWords should include all operators");
+    }
+
+    @Test
+    @DisplayName("Duplicate operator tokens only appear once in meaningful words")
+    void duplicateOperatorTokensOnlyAppearOnceInMeaningfulWords() {
+        java.util.LinkedHashSet<String> unique = new java.util.LinkedHashSet<>();
+        java.util.List<String> meaningful = new java.util.ArrayList<>();
+        java.util.List<String> operators = java.util.Arrays.asList(">=", ">=", "<=");
+
+        calculator.appendOperatorTokens(unique, meaningful, operators);
+
+        assertEquals(java.util.Arrays.asList(">=", "<="), meaningful,
+                "operator tokens should only be added once");
+        assertEquals(2, unique.size(), "unique operator count should match de-duplicated list");
+    }
+
+    @Test
+    @DisplayName("Format placeholders imply meaningful words")
+    void formatPlaceholdersImplyMeaningfulWords() {
+        String message = "alpha %s beta %d gamma";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(5, metrics.wordCount(),
+                "wordCount should include format placeholders");
+        assertEquals(5, metrics.meaningfulWordCount(),
+                "format placeholders should count as meaningful words");
+    }
+
+    @Test
+    @DisplayName("Whitespace escapes and %n are treated as whitespace")
+    void whitespaceEscapesAndPercentNAreWhitespace() {
+        String message = "alpha %n beta \\n gamma \\t delta \\r epsilon";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(5, metrics.wordCount(),
+                "wordCount should ignore whitespace escape tokens");
+        assertEquals(5, metrics.meaningfulWordCount(),
+                "whitespace escape tokens should not add meaning");
+    }
+
+    @Test
+    @DisplayName("Multiple %n tokens are treated as whitespace")
+    void multiplePercentNIsWhitespace() {
+        String message = "alpha %n beta %n gamma";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(3, metrics.wordCount(),
+                "wordCount should ignore repeated %n tokens");
+        assertEquals(3, metrics.meaningfulWordCount(),
+                "meaningfulWordCount should ignore repeated %n tokens");
+    }
+
+    @Test
+    @DisplayName("Non-whitespace escapes remain as tokens")
+    void nonWhitespaceEscapesRemainAsTokens() {
+        String message = "alpha \\x beta";
+        MessageMetrics metrics = calculator.calculate(message, 0, 0);
+        assertEquals(4, metrics.wordCount(),
+                "wordCount should include non-whitespace escape token and filler symbol");
+        assertEquals(3, metrics.meaningfulWordCount(),
+                "meaningfulWordCount should include non-whitespace escape token");
+    }
+
+    @Test
     @DisplayName("Calculate meaningful word count uses unique words")
     void calculateMeaningfulWordCountUsesUniqueWords() {
         String message = "account account balance balance";

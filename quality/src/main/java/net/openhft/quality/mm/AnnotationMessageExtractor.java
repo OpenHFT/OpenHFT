@@ -89,7 +89,7 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
         return true;
     }
 
-    private String extractAnnotationName(DetailAST annotationAst) {
+    String extractAnnotationName(DetailAST annotationAst) {
         DetailAST ident = annotationAst.findFirstToken(TokenTypes.IDENT);
         if (ident == null) {
             DetailAST dot = annotationAst.findFirstToken(TokenTypes.DOT);

@@ -5,16 +5,18 @@ package net.openhft.quality;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.DetailAstImpl;
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.api.Violation;
+import net.openhft.quality.mm.MeaningfulMessageProcessor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,7 +59,7 @@ class MeaningfulMessageCheckUnexpectedTest {
     @Test
     @DisplayName("Unexpected exceptions in finish and leave paths are logged")
     void unexpectedExceptionsInFinishAndLeavePathsAreLogged() throws Exception {
-        MeaningfulMessageCheck check = new MeaningfulMessageCheck();
+        MeaningfulMessageCheck check = new MeaningfulMessageCheck(new ExplodingProcessor());
         check.configure(new DefaultConfiguration("MeaningfulMessageCheck"));
         FileContents contents = createFileContents("InputUnexpectedFinish.java",
                 "class InputUnexpectedFinish { void test() {} }");
@@ -67,7 +69,6 @@ class MeaningfulMessageCheckUnexpectedTest {
                 "Acceptable tokens should mirror required tokens");
 
         check.leaveToken(null);
-        setProcessor(check, null);
         check.finishTree(null);
 
         SortedSet<Violation> violations = check.getViolations();
@@ -82,12 +83,15 @@ class MeaningfulMessageCheckUnexpectedTest {
         return new FileContents(text);
     }
 
-    private void setProcessor(MeaningfulMessageCheck check, Object processor) throws Exception {
-        Field field = MeaningfulMessageCheck.class.getDeclaredField("processor");
-        field.setAccessible(true);
-        field.set(check, processor);
-        if (field.get(check) != processor) {
-            throw new IllegalStateException("Unable to replace processor for test coverage");
+    private static final class ExplodingProcessor extends MeaningfulMessageProcessor {
+        @Override
+        public void leaveToken(DetailAST ast) {
+            throw new IllegalStateException("leave failure");
+        }
+
+        @Override
+        public void finishTree(AbstractCheck check) {
+            throw new IllegalStateException("finish failure");
         }
     }
 }

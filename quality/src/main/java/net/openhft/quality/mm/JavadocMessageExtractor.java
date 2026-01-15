@@ -116,7 +116,7 @@ public final class JavadocMessageExtractor extends AbstractMessageExtractor {
         return contents.getJavadocBefore(ast.getLineNo());
     }
 
-    private void emitCandidate(TextBlock javadoc, MessageSource source) {
+    void emitCandidate(TextBlock javadoc, MessageSource source) {
         requireNonNull(javadoc);
         String paragraph = extractFirstParagraph(javadoc);
         if (paragraph == null) {
@@ -158,7 +158,7 @@ public final class JavadocMessageExtractor extends AbstractMessageExtractor {
         return new ExtractionResult(collapsed, placeholderCount);
     }
 
-    private String extractFirstParagraph(TextBlock block) {
+    String extractFirstParagraph(TextBlock block) {
         String[] lines = block.getText();
         if (lines == null || lines.length == 0) {
             return "";

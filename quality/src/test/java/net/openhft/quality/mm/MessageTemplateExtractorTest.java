@@ -617,9 +617,6 @@ class MessageTemplateExtractorTest {
     }
 
     private String invokeExtractConstantStringParts(DetailAST expr, boolean allowPlaceholder) throws Exception {
-        java.lang.reflect.Method method = MessageTemplateExtractor.class
-                .getDeclaredMethod("extractConstantStringParts", DetailAST.class, boolean.class);
-        method.setAccessible(true);
-        return (String) method.invoke(extractor, expr, allowPlaceholder);
+        return extractor.extractConstantStringParts(expr, allowPlaceholder);
     }
 }

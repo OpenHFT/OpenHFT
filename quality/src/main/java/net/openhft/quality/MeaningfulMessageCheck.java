@@ -7,6 +7,8 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import net.openhft.quality.mm.MeaningfulMessageProcessor;
 
+import java.util.Objects;
+
 /**
  * Checkstyle check that enforces unique and meaningful messages for assertions,
  * preconditions, thrown exceptions, and JUnit annotation descriptions within each Java file
@@ -27,12 +29,22 @@ import net.openhft.quality.mm.MeaningfulMessageProcessor;
  * </pre>
  */
 public class MeaningfulMessageCheck extends AbstractCheck {
-    private final MeaningfulMessageProcessor processor = new MeaningfulMessageProcessor();
+    private final MeaningfulMessageProcessor processor;
 
     /**
      * Create the check with default processor settings.
      */
     public MeaningfulMessageCheck() {
+        processor = new MeaningfulMessageProcessor();
+    }
+
+    /**
+     * Create the check with a caller-supplied processor to allow injection and configuration control.
+     *
+     * @param processor meaningful message processor.
+     */
+    public MeaningfulMessageCheck(MeaningfulMessageProcessor processor) {
+        this.processor = Objects.requireNonNull(processor, "processor");
     }
 
     /**
@@ -123,7 +135,7 @@ public class MeaningfulMessageCheck extends AbstractCheck {
         }
     }
 
-    private void logUnexpected(DetailAST ast, RuntimeException exception) {
+    void logUnexpected(DetailAST ast, RuntimeException exception) {
         String message = exception.getClass().getSimpleName();
         String detail = exception.getMessage();
         if (detail != null && !detail.isEmpty()) {

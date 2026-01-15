@@ -526,7 +526,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 lastStringExpr, lastStringArgIndex, argCount);
     }
 
-    private DetailAST selectJUnit4MessageExpression(String methodName, int argCount, List<DetailAST> args) {
+    DetailAST selectJUnit4MessageExpression(String methodName, int argCount, List<DetailAST> args) {
         if (args == null || args.isEmpty()) {
             return null;
         }
@@ -580,8 +580,8 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         return null;
     }
 
-    private boolean isLambdaMessageArgument(String methodName, AssertionOperandExtractor.AssertionStyle style,
-                                            int argCount, int firstStringArgIndex, int lastLambdaArgIndex) {
+    boolean isLambdaMessageArgument(String methodName, AssertionOperandExtractor.AssertionStyle style,
+                                    int argCount, int firstStringArgIndex, int lastLambdaArgIndex) {
         if (lastLambdaArgIndex != argCount) {
             return false;
         }
@@ -644,16 +644,16 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         return typeAnalyzer.isSupplierTypedExpression(content);
     }
 
-    private boolean isParameterNameMessage(MessageTemplate template, List<DetailAST> args,
-                                           Map<DetailAST, String> exprToInputValue) {
+    boolean isParameterNameMessage(MessageTemplate template, List<DetailAST> args,
+                                   Map<DetailAST, String> exprToInputValue) {
         if (template.placeholderCount() != 0) {
             return false;
         }
         return isParameterNameMessage(template.message(), args, exprToInputValue);
     }
 
-    private boolean isParameterNameMessage(String message, List<DetailAST> args,
-                                           Map<DetailAST, String> exprToInputValue) {
+    boolean isParameterNameMessage(String message, List<DetailAST> args,
+                                   Map<DetailAST, String> exprToInputValue) {
         if (message == null) {
             return false;
         }
@@ -750,7 +750,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         return text == null ? null : text.replaceAll("\\s+", "");
     }
 
-    private boolean isMissingAssertionMessage(String methodName, AssertionOperandExtractor.AssertionStyle style, List<DetailAST> args) {
+    boolean isMissingAssertionMessage(String methodName, AssertionOperandExtractor.AssertionStyle style, List<DetailAST> args) {
         if (style == AssertionOperandExtractor.AssertionStyle.UNKNOWN) {
             return false;
         }
@@ -878,7 +878,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         return context().extractMessageTemplate(expr);
     }
 
-    private String extractStringLiteral(DetailAST expr) {
+    String extractStringLiteral(DetailAST expr) {
         MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.extractStringLiteral(expr, true);
     }
@@ -901,7 +901,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         sink().emitCandidate(candidate);
     }
 
-    private String extractInputValue(DetailAST expr) {
+    String extractInputValue(DetailAST expr) {
         requireNonNull(expr);
 
         DetailAST content = expr;

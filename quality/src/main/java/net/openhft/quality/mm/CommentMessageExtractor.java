@@ -248,8 +248,8 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return blocks;
     }
 
-    private boolean isCommentLine(FileContents contents, int lineIndex,
-                                  List<TextBlock> blockComments) {
+    boolean isCommentLine(FileContents contents, int lineIndex,
+                          List<TextBlock> blockComments) {
         if (contents.lineIsComment(lineIndex)) {
             return true;
         }
@@ -275,7 +275,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
-    private boolean isBlockCommentOnlyLine(String line, int lineNo, TextBlock block) {
+    boolean isBlockCommentOnlyLine(String line, int lineNo, TextBlock block) {
         int startLine = block.getStartLineNo();
         int endLine = block.getEndLineNo();
         if (lineNo == startLine) {
@@ -296,14 +296,14 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return true;
     }
 
-    private int clampColumn(int column, int length) {
+    int clampColumn(int column, int length) {
         if (column < 0) {
             return 0;
         }
         return Math.min(column, length);
     }
 
-    private boolean isWhitespace(String text) {
+    boolean isWhitespace(String text) {
         for (int i = 0; i < text.length(); i++) {
             if (!Character.isWhitespace(text.charAt(i))) {
                 return false;
@@ -417,8 +417,8 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return RUNTIME.equals(resolved) || (JAVA_LANG_PREFIX + RUNTIME).equals(resolved);
     }
 
-    private boolean isInstanceMethodCall(DetailAST methodCall, String methodName,
-                                         String... classNames) {
+    boolean isInstanceMethodCall(DetailAST methodCall, String methodName,
+                                 String... classNames) {
         DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
         if (dot == null) {
             return false;
@@ -459,7 +459,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
-    private boolean isThreadMethod(String methodName) {
+    boolean isThreadMethod(String methodName) {
         return "stop".equals(methodName)
                 || "suspend".equals(methodName)
                 || "resume".equals(methodName)

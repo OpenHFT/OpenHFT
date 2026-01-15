@@ -110,7 +110,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("AssertEquals with JUnit4 static import uses message variable template")
     void assertEqualsWithJUnit4StaticImportUsesMessageVariableTemplate() {
-        context.recordStaticJUnitImportForTesting("org.junit.Assert.assertEquals", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.Assert.assertEquals", "org.junit.Assert", true);
 
         DetailAstImpl initExpr = createPlusExpression(
                 createStringLiteral("dump: "),
@@ -135,7 +135,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("AssertNotNull with JUnit4 message position ignores trailing string argument")
     void assertNotNullWithJUnit4MessagePositionIgnoresTrailingStringArg() {
-        context.recordStaticJUnitImportForTesting("org.junit.Assert.assertNotNull", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.Assert.assertNotNull", "org.junit.Assert", true);
         context.recordVariableType(createVariableDef("actual", "String"));
 
         DetailAstImpl methodCall = createMethodCall("assertNotNull");
@@ -154,7 +154,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("AssertEquals with JUnit5 static import uses message variable template")
     void assertEqualsWithJUnit5StaticImportUsesMessageVariableTemplate() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertEquals",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertEquals",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl initExpr = createPlusExpression(
@@ -211,7 +211,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("AssertThat with message extracts first string argument")
     void assertThatWithMessageExtractsFirstStringArgument() {
-        context.recordStaticJUnitImportForTesting("org.junit.Assert.assertThat", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.Assert.assertThat", "org.junit.Assert", true);
 
         DetailAstImpl methodCall = createMethodCall("assertThat");
         DetailAstImpl elist = createElist(methodCall);
@@ -316,7 +316,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("AssertTimeout with message extracts last string argument")
     void assertTimeoutWithMessageExtractsLastStringArgument() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertTimeout",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertTimeout",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertTimeout");
@@ -350,7 +350,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("AssertDoesNotThrow with message extracts last string argument")
     void assertDoesNotThrowWithMessageExtractsLastStringArgument() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertDoesNotThrow",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertDoesNotThrow",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertDoesNotThrow");
@@ -383,7 +383,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("AssertAll with lambda heading emits missing message for JUnit5")
     void assertAllWithLambdaHeadingEmitsMissingMessage() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertAll",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertAll",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertAll");
@@ -399,7 +399,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("JUnit4 assertEquals without message emits missing message")
     void assertEqualsWithJUnit4StyleMissingMessage() {
-        context.recordStaticJUnitImportForTesting("org.junit.Assert.assertEquals", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.Assert.assertEquals", "org.junit.Assert", true);
 
         DetailAstImpl methodCall = createMethodCall("assertEquals");
         DetailAstImpl elist = createElist(methodCall);
@@ -415,7 +415,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("JUnit5 assertEquals without message emits missing message")
     void assertEqualsWithJUnit5StyleMissingMessage() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertEquals",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertEquals",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertEquals");
@@ -432,7 +432,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("JUnit5 assertThrows prefers lambda message when last argument")
     void assertThrowsWithLambdaMessageUsesLambdaMessage() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertThrows",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertThrows",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertThrows");
@@ -485,7 +485,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("JUnit5 supplier message argument is accepted without missing message")
     void assertTrueWithSupplierMessageUsesJUnit5Position() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertTrue",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertTrue",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertTrue");
@@ -522,7 +522,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("String typed message variable emits unhandled warning")
     void stringTypedMessageVariableEmitsUnhandledWarning() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertTrue",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertTrue",
                 "org.junit.jupiter.api.Assertions", false);
         context.recordVariableType(createVariableDef("message", "String"));
 
@@ -690,7 +690,7 @@ class AssertionMessageExtractorTest {
     @DisplayName("Template extraction handles assertion message")
     void templateExtractionHandlesAssertionMessage() throws Exception {
         context.setTemplateExtractor(new MessageTemplateExtractor(expr -> false));
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertTrue",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertTrue",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertTrue");
@@ -708,7 +708,7 @@ class AssertionMessageExtractorTest {
     @Test
     @DisplayName("Key value labels are counted for assertion messages")
     void keyValueLabelsAreCountedForAssertionMessages() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertTrue",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertTrue",
                 "org.junit.jupiter.api.Assertions", false);
 
         DetailAstImpl methodCall = createMethodCall("assertTrue");
@@ -956,62 +956,39 @@ class AssertionMessageExtractorTest {
 
     private DetailAST invokeSelectJUnit4MessageExpression(String methodName, int argCount,
                                                           List<DetailAST> args) throws Exception {
-        java.lang.reflect.Method method = AssertionMessageExtractor.class
-                .getDeclaredMethod("selectJUnit4MessageExpression", String.class, int.class, List.class);
-        method.setAccessible(true);
-        return (DetailAST) method.invoke(extractor, methodName, argCount, args);
+        return extractor.selectJUnit4MessageExpression(methodName, argCount, args);
     }
 
     private boolean invokeIsLambdaMessageArgument(String methodName,
                                                   AssertionOperandExtractor.AssertionStyle style,
                                                   int argCount, int firstStringArgIndex,
                                                   int lastLambdaArgIndex) throws Exception {
-        java.lang.reflect.Method method = AssertionMessageExtractor.class
-                .getDeclaredMethod("isLambdaMessageArgument", String.class,
-                        AssertionOperandExtractor.AssertionStyle.class, int.class, int.class, int.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, methodName, style, argCount,
+        return extractor.isLambdaMessageArgument(methodName, style, argCount,
                 firstStringArgIndex, lastLambdaArgIndex);
     }
 
     private boolean invokeIsMissingAssertionMessage(String methodName,
                                                     AssertionOperandExtractor.AssertionStyle style,
                                                     List<DetailAST> args) throws Exception {
-        java.lang.reflect.Method method = AssertionMessageExtractor.class
-                .getDeclaredMethod("isMissingAssertionMessage", String.class,
-                        AssertionOperandExtractor.AssertionStyle.class, List.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, methodName, style, args);
+        return extractor.isMissingAssertionMessage(methodName, style, args);
     }
 
     private String invokeExtractInputValue(DetailAST expr) throws Exception {
-        java.lang.reflect.Method method = AssertionMessageExtractor.class
-                .getDeclaredMethod("extractInputValue", DetailAST.class);
-        method.setAccessible(true);
-        return (String) method.invoke(extractor, expr);
+        return extractor.extractInputValue(expr);
     }
 
     private String invokeExtractStringLiteral(DetailAST expr) throws Exception {
-        java.lang.reflect.Method method = AssertionMessageExtractor.class
-                .getDeclaredMethod("extractStringLiteral", DetailAST.class);
-        method.setAccessible(true);
-        return (String) method.invoke(extractor, expr);
+        return extractor.extractStringLiteral(expr);
     }
 
     private boolean invokeIsParameterNameMessage(String message, List<DetailAST> args,
                                                  Map<DetailAST, String> exprToInputValue) throws Exception {
-        java.lang.reflect.Method method = AssertionMessageExtractor.class
-                .getDeclaredMethod("isParameterNameMessage", String.class, List.class, Map.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, message, args, exprToInputValue);
+        return extractor.isParameterNameMessage(message, args, exprToInputValue);
     }
 
     private boolean invokeIsParameterNameMessage(MessageTemplate template, List<DetailAST> args,
                                                  Map<DetailAST, String> exprToInputValue) throws Exception {
-        java.lang.reflect.Method method = AssertionMessageExtractor.class
-                .getDeclaredMethod("isParameterNameMessage", MessageTemplate.class, List.class, Map.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, template, args, exprToInputValue);
+        return extractor.isParameterNameMessage(template, args, exprToInputValue);
     }
 
     private static final class TestMessageSink implements MessageCandidateSink {

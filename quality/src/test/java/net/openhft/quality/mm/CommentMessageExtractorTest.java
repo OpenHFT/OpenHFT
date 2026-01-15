@@ -624,47 +624,29 @@ class CommentMessageExtractorTest {
     }
 
     private boolean invokeIsThreadMethod(String methodName) throws Exception {
-        java.lang.reflect.Method method = CommentMessageExtractor.class
-                .getDeclaredMethod("isThreadMethod", String.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, methodName);
+        return extractor.isThreadMethod(methodName);
     }
 
     private boolean invokeIsInstanceMethodCall(DetailAST methodCall, String methodName,
                                                String... classNames) throws Exception {
-        java.lang.reflect.Method method = CommentMessageExtractor.class
-                .getDeclaredMethod("isInstanceMethodCall", DetailAST.class, String.class, String[].class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, methodCall, methodName, classNames);
+        return extractor.isInstanceMethodCall(methodCall, methodName, classNames);
     }
 
     private boolean invokeIsCommentLine(FileContents contents, int lineIndex,
                                         List<TextBlock> blockComments) throws Exception {
-        java.lang.reflect.Method method = CommentMessageExtractor.class
-                .getDeclaredMethod("isCommentLine", FileContents.class, int.class, List.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, contents, lineIndex, blockComments);
+        return extractor.isCommentLine(contents, lineIndex, blockComments);
     }
 
     private boolean invokeIsBlockCommentOnlyLine(String line, int lineNo, TextBlock block) throws Exception {
-        java.lang.reflect.Method method = CommentMessageExtractor.class
-                .getDeclaredMethod("isBlockCommentOnlyLine", String.class, int.class, TextBlock.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, line, lineNo, block);
+        return extractor.isBlockCommentOnlyLine(line, lineNo, block);
     }
 
     private int invokeClampColumn(int column, int length) throws Exception {
-        java.lang.reflect.Method method = CommentMessageExtractor.class
-                .getDeclaredMethod("clampColumn", int.class, int.class);
-        method.setAccessible(true);
-        return (int) method.invoke(extractor, column, length);
+        return extractor.clampColumn(column, length);
     }
 
     private boolean invokeIsWhitespace(String text) throws Exception {
-        java.lang.reflect.Method method = CommentMessageExtractor.class
-                .getDeclaredMethod("isWhitespace", String.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, text);
+        return extractor.isWhitespace(text);
     }
 
     private static final class TestMessageSink implements MessageCandidateSink {

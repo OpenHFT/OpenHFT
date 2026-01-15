@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -136,7 +135,7 @@ class MessageExtractionContextTest {
         local.setTemplateExtractor(new MessageTemplateExtractor(expr -> false));
 
         local.recordImport(createImportAst("java.util.List"));
-        local.recordStaticJUnitImportForTesting("org.junit.Assert.assertEquals", "org.junit.Assert", true);
+        local.recordStaticJUnitImport("org.junit.Assert.assertEquals", "org.junit.Assert", true);
         local.setDeclaredMethodNames(new HashSet<>(Arrays.asList("helperMethod")));
 
         DetailAstImpl varDef = createVariableDefWithInitializer("field", "String",
@@ -554,7 +553,7 @@ class MessageExtractionContextTest {
     @Test
     @DisplayName("Record static J unit import junit 4 specific")
     void recordStaticJUnitImport_junit4Specific() {
-        context.recordStaticJUnitImportForTesting("org.junit.Assert.assertEquals", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.Assert.assertEquals", "org.junit.Assert", true);
         assertTrue(context.isStaticJUnit4Method("assertEquals"));
         assertFalse(context.isStaticJUnit5Method("assertEquals"));
     }
@@ -562,14 +561,14 @@ class MessageExtractionContextTest {
     @Test
     @DisplayName("Record static J unit import junit 4 wildcard")
     void recordStaticJUnitImport_junit4Wildcard() {
-        context.recordStaticJUnitImportForTesting("org.junit.Assert.*", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.Assert.*", "org.junit.Assert", true);
         assertTrue(context.isStaticJUnit4Method("anyMethod"));
     }
 
     @Test
     @DisplayName("Record static J unit import junit 5 specific")
     void recordStaticJUnitImport_junit5Specific() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.assertThrows",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertThrows",
                 "org.junit.jupiter.api.Assertions", false);
         assertTrue(context.isStaticJUnit5Method("assertThrows"));
         assertFalse(context.isStaticJUnit4Method("assertThrows"));
@@ -578,7 +577,7 @@ class MessageExtractionContextTest {
     @Test
     @DisplayName("Record static J unit import junit 5 wildcard")
     void recordStaticJUnitImport_junit5Wildcard() {
-        context.recordStaticJUnitImportForTesting("org.junit.jupiter.api.Assertions.*",
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.*",
                 "org.junit.jupiter.api.Assertions", false);
         assertTrue(context.isStaticJUnit5Method("anyMethod"));
     }
@@ -586,14 +585,14 @@ class MessageExtractionContextTest {
     @Test
     @DisplayName("Record static J unit import wrong prefix")
     void recordStaticJUnitImport_wrongPrefix() {
-        context.recordStaticJUnitImportForTesting("org.other.Assert.assertEquals", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.other.Assert.assertEquals", "org.junit.Assert", true);
         assertFalse(context.isStaticJUnit4Method("assertEquals"));
     }
 
     @Test
     @DisplayName("Record static J unit import empty suffix")
     void recordStaticJUnitImport_emptySuffix() {
-        context.recordStaticJUnitImportForTesting("org.junit.Assert.", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.Assert.", "org.junit.Assert", true);
         assertFalse(context.isStaticJUnit4Method(""));
     }
 
@@ -624,49 +623,49 @@ class MessageExtractionContextTest {
     @Test
     @DisplayName("Normalize class name simple scenario case")
     void normalizeClassName_simple() {
-        assertEquals("ClassName", context.normalizeClassNameForTesting("ClassName"));
+        assertEquals("ClassName", context.normalizeClassName("ClassName"));
     }
 
     @Test
     @DisplayName("Normalize class name qualified scenario case")
     void normalizeClassName_qualified() {
-        assertEquals("ClassName", context.normalizeClassNameForTesting("com.example.ClassName"));
+        assertEquals("ClassName", context.normalizeClassName("com.example.ClassName"));
     }
 
     @Test
     @DisplayName("Normalize class name whitespace scenario case")
     void normalizeClassName_whitespace() {
-        assertEquals("ClassName", context.normalizeClassNameForTesting("  com.example.ClassName  "));
+        assertEquals("ClassName", context.normalizeClassName("  com.example.ClassName  "));
     }
 
     @Test
     @DisplayName("Normalize class name empty after trim scenario")
     void normalizeClassName_emptyAfterTrim() {
-        assertNull(context.normalizeClassNameForTesting("  "));
+        assertNull(context.normalizeClassName("  "));
     }
 
     @Test
     @DisplayName("Is locale type name null scenario")
     void isLocaleTypeName_null() {
-        assertFalse(context.isLocaleTypeNameForTesting(null));
+        assertFalse(context.isLocaleTypeName(null));
     }
 
     @Test
     @DisplayName("Is locale type name locale scenario")
     void isLocaleTypeName_locale() {
-        assertTrue(context.isLocaleTypeNameForTesting("Locale"));
+        assertTrue(context.isLocaleTypeName("Locale"));
     }
 
     @Test
     @DisplayName("Is locale type name fully qualified")
     void isLocaleTypeName_fullyQualified() {
-        assertTrue(context.isLocaleTypeNameForTesting("java.util.Locale"));
+        assertTrue(context.isLocaleTypeName("java.util.Locale"));
     }
 
     @Test
     @DisplayName("Is locale type name other scenario")
     void isLocaleTypeName_other() {
-        assertFalse(context.isLocaleTypeNameForTesting("String"));
+        assertFalse(context.isLocaleTypeName("String"));
     }
 
     @Test
@@ -690,7 +689,7 @@ class MessageExtractionContextTest {
     @Test
     @DisplayName("Is before line before scenario case detail path")
     void isBefore_lineBefore() {
-        assertTrue(context.isBeforeForTesting(1, 1, 2, 1));
+        assertTrue(context.isBefore(1, 1, 2, 1));
     }
 
     // --- blockCommentHasWord tests ---
@@ -698,25 +697,25 @@ class MessageExtractionContextTest {
     @Test
     @DisplayName("Is before col before scenario case detail")
     void isBefore_colBefore() {
-        assertTrue(context.isBeforeForTesting(1, 1, 1, 2));
+        assertTrue(context.isBefore(1, 1, 1, 2));
     }
 
     @Test
     @DisplayName("Is before line after scenario case detail path")
     void isBefore_lineAfter() {
-        assertFalse(context.isBeforeForTesting(2, 1, 1, 1));
+        assertFalse(context.isBefore(2, 1, 1, 1));
     }
 
     @Test
     @DisplayName("Is before col after scenario case detail")
     void isBefore_colAfter() {
-        assertFalse(context.isBeforeForTesting(1, 2, 1, 1));
+        assertFalse(context.isBefore(1, 2, 1, 1));
     }
 
     @Test
     @DisplayName("Is before same scenario case detail")
     void isBefore_same() {
-        assertFalse(context.isBeforeForTesting(1, 1, 1, 1));
+        assertFalse(context.isBefore(1, 1, 1, 1));
     }
 
     // --- isInMethodOrCtor tests ---
@@ -726,7 +725,7 @@ class MessageExtractionContextTest {
     void blockCommentHasWord_emptyLines() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{});
-        assertFalse(context.blockCommentHasWordForTesting(block));
+        assertFalse(context.blockCommentHasWord(block));
     }
 
     @Test
@@ -734,7 +733,7 @@ class MessageExtractionContextTest {
     void blockCommentHasWord_noLetters() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{"/* 123 */"});
-        assertFalse(context.blockCommentHasWordForTesting(block));
+        assertFalse(context.blockCommentHasWord(block));
     }
 
     @Test
@@ -742,7 +741,7 @@ class MessageExtractionContextTest {
     void blockCommentHasWord_hasLetters() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{"/* reason */"});
-        assertTrue(context.blockCommentHasWordForTesting(block));
+        assertTrue(context.blockCommentHasWord(block));
     }
 
     @Test
@@ -750,7 +749,7 @@ class MessageExtractionContextTest {
     void blockCommentHasWord_multiLine() {
         TextBlock block = mock(TextBlock.class);
         when(block.getText()).thenReturn(new String[]{"/*", " * reason", " */"});
-        assertTrue(context.blockCommentHasWordForTesting(block));
+        assertTrue(context.blockCommentHasWord(block));
     }
 
     @Test
@@ -762,7 +761,7 @@ class MessageExtractionContextTest {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertTrue(context.isInMethodOrCtorForTesting(ast));
+        assertTrue(context.isInMethodOrCtor(ast));
     }
 
     @Test
@@ -774,7 +773,7 @@ class MessageExtractionContextTest {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertTrue(context.isInMethodOrCtorForTesting(ast));
+        assertTrue(context.isInMethodOrCtor(ast));
     }
 
     @Test
@@ -786,7 +785,7 @@ class MessageExtractionContextTest {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertFalse(context.isInMethodOrCtorForTesting(ast));
+        assertFalse(context.isInMethodOrCtor(ast));
     }
 
     @Test
@@ -798,7 +797,7 @@ class MessageExtractionContextTest {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertFalse(context.isInMethodOrCtorForTesting(ast));
+        assertFalse(context.isInMethodOrCtor(ast));
     }
 
     @Test
@@ -810,7 +809,7 @@ class MessageExtractionContextTest {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertFalse(context.isInMethodOrCtorForTesting(ast));
+        assertFalse(context.isInMethodOrCtor(ast));
     }
 
     @Test
@@ -822,7 +821,7 @@ class MessageExtractionContextTest {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(parent);
 
-        assertFalse(context.isInMethodOrCtorForTesting(ast));
+        assertFalse(context.isInMethodOrCtor(ast));
     }
 
     @Test
@@ -831,7 +830,7 @@ class MessageExtractionContextTest {
         DetailAST ast = mock(DetailAST.class);
         when(ast.getParent()).thenReturn(null);
 
-        assertFalse(context.isInMethodOrCtorForTesting(ast));
+        assertFalse(context.isInMethodOrCtor(ast));
     }
 
     @Test
@@ -1175,17 +1174,11 @@ class MessageExtractionContextTest {
     }
 
     private int[] invokeFindArgumentListRange(DetailAST node, FileContents contents) throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("findArgumentListRange", DetailAST.class, FileContents.class);
-        method.setAccessible(true);
-        return (int[]) method.invoke(context, node, contents);
+        return context.findArgumentListRange(node, contents);
     }
 
     private int[] invokeFindArgumentListRangeByScan(DetailAST node, FileContents contents) throws Exception {
-        Method method = MessageExtractionContext.class
-                .getDeclaredMethod("findArgumentListRangeByScan", DetailAST.class, FileContents.class);
-        method.setAccessible(true);
-        return (int[]) method.invoke(context, node, contents);
+        return context.findArgumentListRangeByScan(node, contents);
     }
 
     private FileContents createFileContents(String fileName, String... lines) throws IOException {

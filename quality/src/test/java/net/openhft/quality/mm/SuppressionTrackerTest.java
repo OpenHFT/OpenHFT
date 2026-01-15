@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -573,24 +572,14 @@ class SuppressionTrackerTest {
     }
 
     private void invokeCollectStringValues(DetailAstImpl expr, List<String> tokens) throws Exception {
-        Method method = SuppressionTracker.class
-                .getDeclaredMethod("collectStringValues", com.puppycrawl.tools.checkstyle.api.DetailAST.class,
-                        List.class);
-        method.setAccessible(true);
-        method.invoke(tracker, expr, tokens);
+        tracker.collectStringValues(expr, tokens);
     }
 
     private DetailAST invokeFindAnnotationValue(DetailAstImpl annotation) throws Exception {
-        Method method = SuppressionTracker.class
-                .getDeclaredMethod("findAnnotationValue", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
-        method.setAccessible(true);
-        return (DetailAST) method.invoke(tracker, annotation);
+        return tracker.findAnnotationValue(annotation);
     }
 
     private DetailAST invokeUnwrapExpr(DetailAstImpl expr) throws Exception {
-        Method method = SuppressionTracker.class
-                .getDeclaredMethod("unwrapExpr", com.puppycrawl.tools.checkstyle.api.DetailAST.class);
-        method.setAccessible(true);
-        return (DetailAST) method.invoke(tracker, expr);
+        return tracker.unwrapExpr(expr);
     }
 }

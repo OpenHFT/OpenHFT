@@ -106,7 +106,7 @@ public final class LoopIndexAnalyzer {
         }
     }
 
-    private boolean messageContainsLoopIndex(String message, Set<String> loopNames) {
+    boolean messageContainsLoopIndex(String message, Set<String> loopNames) {
         requireNonNull(message);
         requireNonNull(loopNames);
         for (String name : loopNames) {

@@ -771,45 +771,27 @@ public class LogMessageExtractorTest {
     }
 
     private boolean invokeCheckJvmLogCall(DetailAST methodCall, String methodName) throws Exception {
-        java.lang.reflect.Method method = LogMessageExtractor.class
-                .getDeclaredMethod("checkJvmLogCall", DetailAST.class, String.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(extractor, methodCall, methodName);
+        return extractor.checkJvmLogCall(methodCall, methodName);
     }
 
     private String invokeExtractQualifierNameForLog(DetailAST methodCall) throws Exception {
-        java.lang.reflect.Method method = LogMessageExtractor.class
-                .getDeclaredMethod("extractQualifierNameForLog", DetailAST.class);
-        method.setAccessible(true);
-        return (String) method.invoke(extractor, methodCall);
+        return extractor.extractQualifierNameForLog(methodCall);
     }
 
     private String invokeExtractConstantSupplierMessage(DetailAST expr) throws Exception {
-        java.lang.reflect.Method method = LogMessageExtractor.class
-                .getDeclaredMethod("extractConstantSupplierMessage", DetailAST.class);
-        method.setAccessible(true);
-        return (String) method.invoke(extractor, expr);
+        return extractor.extractConstantSupplierMessage(expr);
     }
 
     private int invokeCountLogPlaceholders(String message) throws Exception {
-        java.lang.reflect.Method method = LogMessageExtractor.class
-                .getDeclaredMethod("countLogPlaceholders", String.class);
-        method.setAccessible(true);
-        return (int) method.invoke(extractor, message);
+        return extractor.countLogPlaceholders(message);
     }
 
     private int invokeCountFormatPlaceholders(String message) throws Exception {
-        java.lang.reflect.Method method = LogMessageExtractor.class
-                .getDeclaredMethod("countFormatPlaceholders", String.class);
-        method.setAccessible(true);
-        return (int) method.invoke(extractor, message);
+        return extractor.countFormatPlaceholders(message);
     }
 
     private int invokeCountKeyValueLabels(String message) throws Exception {
-        java.lang.reflect.Method method = LogMessageExtractor.class
-                .getDeclaredMethod("countKeyValueLabels", String.class);
-        method.setAccessible(true);
-        return (int) method.invoke(extractor, message);
+        return extractor.countKeyValueLabels(message);
     }
 
     private DetailAstImpl createExpr(DetailAstImpl child) {

@@ -16,4 +16,9 @@ public class InputGoodAssertMessages {
     public void testRequireNonNull(Object value) {
         requireNonNull(value);
     }
+
+    public Object fallbackValue() {
+        // Fallback cache miss returns null to preserve fixture semantics during warmup verification.
+        return null;
+    }
 }

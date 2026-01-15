@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,10 +136,7 @@ class AnnotationMessageExtractorTest {
     }
 
     private String invokeExtractAnnotationName(DetailAST annotation) throws Exception {
-        Method method = AnnotationMessageExtractor.class
-                .getDeclaredMethod("extractAnnotationName", DetailAST.class);
-        method.setAccessible(true);
-        return (String) method.invoke(extractor, annotation);
+        return extractor.extractAnnotationName(annotation);
     }
 
     private static final class TestSink implements MessageCandidateSink {

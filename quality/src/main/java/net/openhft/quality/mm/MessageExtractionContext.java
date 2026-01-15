@@ -756,31 +756,7 @@ public final class MessageExtractionContext {
         return false;
     }
 
-    void recordStaticJUnitImportForTesting(String importText, String prefix, boolean junit4) {
-        recordStaticJUnitImport(importText, prefix, junit4);
-    }
-
-    String normalizeClassNameForTesting(String className) {
-        return normalizeClassName(className);
-    }
-
-    boolean isLocaleTypeNameForTesting(String typeName) {
-        return isLocaleTypeName(typeName);
-    }
-
-    boolean isBeforeForTesting(int leftLine, int leftCol, int rightLine, int rightCol) {
-        return isBefore(leftLine, leftCol, rightLine, rightCol);
-    }
-
-    boolean blockCommentHasWordForTesting(TextBlock block) {
-        return blockCommentHasWord(block);
-    }
-
-    boolean isInMethodOrCtorForTesting(DetailAST ast) {
-        return isInMethodOrCtor(ast);
-    }
-
-    private void recordStaticJUnitImport(String importText, String prefix, boolean junit4) {
+    void recordStaticJUnitImport(String importText, String prefix, boolean junit4) {
         if (!importText.startsWith(prefix + ".")) {
             return;
         }
@@ -803,7 +779,7 @@ public final class MessageExtractionContext {
         }
     }
 
-    private boolean isInMethodOrCtor(DetailAST ast) {
+    boolean isInMethodOrCtor(DetailAST ast) {
         DetailAST parent = ast.getParent();
         while (parent != null) {
             int type = parent.getType();
@@ -821,7 +797,7 @@ public final class MessageExtractionContext {
         return false;
     }
 
-    private boolean isLocaleTypeName(String typeName) {
+    boolean isLocaleTypeName(String typeName) {
         if (typeName == null) {
             return false;
         }
@@ -837,7 +813,7 @@ public final class MessageExtractionContext {
         return "java.lang.String".equals(resolved) || "String".equals(resolved);
     }
 
-    private String normalizeClassName(String className) {
+    String normalizeClassName(String className) {
         requireNonNull(className);
         String trimmed = className.trim();
         if (trimmed.isEmpty()) {
@@ -847,7 +823,7 @@ public final class MessageExtractionContext {
         return lastDot >= 0 ? trimmed.substring(lastDot + 1) : trimmed;
     }
 
-    private int[] findArgumentListRange(DetailAST nodeWithParens, FileContents contents) {
+    int[] findArgumentListRange(DetailAST nodeWithParens, FileContents contents) {
         DetailAST lparen = nodeWithParens.findFirstToken(TokenTypes.LPAREN);
         DetailAST rparen = nodeWithParens.findFirstToken(TokenTypes.RPAREN);
         if (lparen != null && rparen != null) {
@@ -866,7 +842,7 @@ public final class MessageExtractionContext {
         return findArgumentListRangeByScan(nodeWithParens, contents);
     }
 
-    private int[] findArgumentListRangeByScan(DetailAST nodeWithParens, FileContents contents) {
+    int[] findArgumentListRangeByScan(DetailAST nodeWithParens, FileContents contents) {
         String[] lines = contents.getLines();
         if (lines.length == 0) {
             return null;
@@ -1007,11 +983,11 @@ public final class MessageExtractionContext {
         return !isBefore(endLine, endCol, blockStartLine, blockStartCol);
     }
 
-    private boolean isBefore(int leftLine, int leftCol, int rightLine, int rightCol) {
+    boolean isBefore(int leftLine, int leftCol, int rightLine, int rightCol) {
         return leftLine < rightLine || (leftLine == rightLine && leftCol < rightCol);
     }
 
-    private boolean blockCommentHasWord(TextBlock block) {
+    boolean blockCommentHasWord(TextBlock block) {
         String[] text = block.getText();
         requireNonNull(text);
         for (String line : text) {

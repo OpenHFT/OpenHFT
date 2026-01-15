@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -551,13 +549,58 @@ public class MeaningfulMessageProcessorTest {
                 "class InputGeneratedAtReset { void test() {} }");
         processor.beginTree(contents);
 
-        MessageExtractionContext context = (MessageExtractionContext) getProcessorField("context");
+        MessageExtractionContext context = processor.contextForTesting();
         assertNotNull(context.fileContents(), "Context should have file contents before finish");
 
         TestCheck check = createCheck(contents);
         processor.finishTree(check);
 
         assertNull(context.fileContents(), "Context should be reset after finish");
+    }
+
+    @Test
+    @DisplayName("Begin tree records file name words for entropy tracking")
+    void beginTreeRecordsFileNameWordsForEntropyTracking() throws Exception {
+        FileContents contents = createFileContents("AlphaBeta_GammaDelta.java",
+                "class AlphaBetaGammaDelta { void test() {} }");
+
+        processor.beginTree(contents);
+
+        Map<String, Integer> entropy = processor.entropyWordCountsForTesting();
+        assertEquals(Integer.valueOf(1), entropy.get("alpha"),
+                "Entropy should include alpha token");
+        assertEquals(Integer.valueOf(1), entropy.get("beta"),
+                "Entropy should include beta token");
+        assertEquals(Integer.valueOf(1), entropy.get("gamma"),
+                "Entropy should include gamma token");
+        assertEquals(Integer.valueOf(1), entropy.get("delta"),
+                "Entropy should include delta token");
+        assertEquals(4, processor.entropyWordTotalForTesting(),
+                "Entropy total should include file name words");
+        Map<String, Integer> overused = processor.overusedWordCountsForTesting();
+        assertEquals(Integer.valueOf(1), overused.get("alpha"),
+                "Overused should include alpha token");
+    }
+
+    @Test
+    @DisplayName("Entropy tracking skips argument name messages")
+    void entropyTrackingSkipsArgumentNameMessages() throws Exception {
+        FileContents contents = createFileContents("AlphaBeta.java",
+                "class AlphaBeta { void test() {} }");
+        processor.beginTree(contents);
+
+        int before = processor.entropyWordTotalForTesting();
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .source(MessageSource.ASSERTION)
+                .lineNo(2)
+                .message("alpha beta gamma")
+                .normalisedMessage(MessageNormaliser.normalise("alpha beta gamma"))
+                .argumentNameMessage(true)
+                .build();
+        processor.emitCandidate(candidate);
+
+        assertEquals(before, processor.entropyWordTotalForTesting(),
+                "Entropy total should not change for argument name messages");
     }
 
     @Test
@@ -1168,8 +1211,8 @@ public class MeaningfulMessageProcessorTest {
 
         StringWriter writer = new StringWriter();
         BufferedWriter bufferedWriter = new BufferedWriter(writer);
-        setProcessorField("messageExtractionWriter", bufferedWriter);
-        setProcessorField("messageExtractionTarget", "target.tsv");
+        processor.setMessageExtractionWriterForTesting(bufferedWriter);
+        processor.setMessageExtractionTargetForTesting("target.tsv");
 
         invokeWriteMessageExtractionRecord("alpha bravo", 7, null, 1, 2,
                 MessageSource.LOG, null);
@@ -1206,21 +1249,21 @@ public class MeaningfulMessageProcessorTest {
                 throw new IOException("write failed");
             }
         };
-        setProcessorField("messageExtractionWriter", bufferedWriter);
-        setProcessorField("messageExtractionTarget", "test-target.tsv");
-        setProcessorField("messageExtractionFailureDetail", null);
+        processor.setMessageExtractionWriterForTesting(bufferedWriter);
+        processor.setMessageExtractionTargetForTesting("test-target.tsv");
+        processor.setMessageExtractionFailureDetailForTesting(null);
 
-        assertNotNull(getProcessorField("messageExtractionWriter"),
+        assertNotNull(processor.messageExtractionWriterForTesting(),
                 "Writer should be configured before write attempt");
 
         invokeWriteMessageExtractionRecord("message", 5, null, 0, 0,
                 MessageSource.ASSERTION, "assert_message");
 
-        String detail = (String) getProcessorField("messageExtractionFailureDetail");
+        String detail = processor.messageExtractionFailureDetailForTesting();
         assertNotNull(detail, "Failure detail should be recorded");
         assertTrue(detail.contains("Unable to write message extraction record"),
                 "Failure detail should describe write failure");
-        assertNull(getProcessorField("messageExtractionWriter"),
+        assertNull(processor.messageExtractionWriterForTesting(),
                 "Writer should be cleared after failure");
     }
 
@@ -1248,8 +1291,8 @@ public class MeaningfulMessageProcessorTest {
                 // no-op
             }
         };
-        setProcessorField("messageExtractionWriter", new BufferedWriter(trackingWriter));
-        setProcessorField("messageExtractionFailureDetail", "prior failure");
+        processor.setMessageExtractionWriterForTesting(new BufferedWriter(trackingWriter));
+        processor.setMessageExtractionFailureDetailForTesting("prior failure");
 
         invokeWriteMessageExtractionRecord("message", 1, null, 0, 0,
                 MessageSource.LOG, "log_message");
@@ -1333,8 +1376,8 @@ public class MeaningfulMessageProcessorTest {
     @Test
     @DisplayName("Extraction target prefers explicit target")
     void extractionTargetPrefersExplicitTarget() throws Exception {
-        setProcessorField("messageExtractionTarget", "explicit-target.tsv");
-        setProcessorField("messageExtractionFile", "fallback-target.tsv");
+        processor.setMessageExtractionTargetForTesting("explicit-target.tsv");
+        processor.setMessageExtractionFile("fallback-target.tsv");
 
         String target = invokeExtractionTarget();
 
@@ -1348,8 +1391,8 @@ public class MeaningfulMessageProcessorTest {
         String previous = System.getProperty("mm.extract.file");
         try {
             System.setProperty("mm.extract.file", "system-target.tsv");
-            setProcessorField("messageExtractionTarget", null);
-            setProcessorField("messageExtractionFile", null);
+            processor.setMessageExtractionTargetForTesting(null);
+            processor.setMessageExtractionFile(null);
 
             String target = invokeExtractionTarget();
 
@@ -1397,69 +1440,36 @@ public class MeaningfulMessageProcessorTest {
         processor.beginTree(createFileContents("InputPurpose.java", "class Sample {}"), null);
     }
 
-    private String invokeResolveExtractionRole(MessageCandidate candidate) throws Exception {
-        Method method = MeaningfulMessageProcessor.class
-                .getDeclaredMethod("resolveExtractionRole", MessageCandidate.class);
-        method.setAccessible(true);
-        return (String) method.invoke(processor, candidate);
+    private String invokeResolveExtractionRole(MessageCandidate candidate) {
+        return processor.resolveExtractionRole(candidate);
     }
 
-    private int invokeCountPurposeCues(String message) throws Exception {
-        Method method = MeaningfulMessageProcessor.class
-                .getDeclaredMethod("countPurposeCues", String.class);
-        method.setAccessible(true);
-        return (int) method.invoke(processor, message);
+    private int invokeCountPurposeCues(String message) {
+        return processor.countPurposeCues(message);
     }
 
-    private String invokeFormatRuleSummary(Map<RuleId, Integer> summary) throws Exception {
-        Method method = MeaningfulMessageProcessor.class
-                .getDeclaredMethod("formatRuleSummary", Map.class);
-        method.setAccessible(true);
-        return (String) method.invoke(processor, summary);
+    private String invokeFormatRuleSummary(Map<RuleId, Integer> summary) {
+        return processor.formatRuleSummary(summary);
     }
 
-    @SuppressWarnings("unchecked")
-    private Set<String> invokeCollectDeclaredMethods(DetailAST rootAst) throws Exception {
-        Method method = MeaningfulMessageProcessor.class
-                .getDeclaredMethod("collectDeclaredMethods", DetailAST.class);
-        method.setAccessible(true);
-        return (Set<String>) method.invoke(processor, rootAst);
+    private Set<String> invokeCollectDeclaredMethods(DetailAST rootAst) {
+        return processor.collectDeclaredMethods(rootAst);
     }
 
-    private String invokeExtractionTarget() throws Exception {
-        Method method = MeaningfulMessageProcessor.class
-                .getDeclaredMethod("extractionTarget");
-        method.setAccessible(true);
-        return (String) method.invoke(processor);
+    private String invokeExtractionTarget() {
+        return processor.extractionTarget();
     }
 
     private void invokeWriteMessageExtractionRecord(String message, int lineNo,
                                                     MessageMetrics metrics, int placeholderCount,
                                                     int keyValueLabelCount, MessageSource source,
-                                                    String role) throws Exception {
-        Method method = MeaningfulMessageProcessor.class
-                .getDeclaredMethod("writeMessageExtractionRecord", String.class, int.class,
-                        MessageMetrics.class, int.class, int.class, MessageSource.class, String.class);
-        method.setAccessible(true);
-        method.invoke(processor, message, lineNo, metrics, placeholderCount,
+                                                    String role) {
+        processor.writeMessageExtractionRecord(message, lineNo, metrics, placeholderCount,
                 keyValueLabelCount, source, role);
     }
 
-    private void recordViolationForTesting(int lineNo, RuleId ruleId) throws Exception {
-        ViolationCollector collector = (ViolationCollector) getProcessorField("violationCollector");
-        collector.record(lineNo, ruleId);
-    }
-
-    private Object getProcessorField(String name) throws Exception {
-        Field field = MeaningfulMessageProcessor.class.getDeclaredField(name);
-        field.setAccessible(true);
-        return field.get(processor);
-    }
-
-    private void setProcessorField(String name, Object value) throws Exception {
-        Field field = MeaningfulMessageProcessor.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(processor, value);
+    private void recordViolationForTesting(int lineNo, RuleId ruleId) {
+        processor.recordViolationForTesting(lineNo, ruleId);
     }
 
     private DetailAstImpl createVariableDef(String name, String typeName, int lineNo) {
@@ -1492,11 +1502,8 @@ public class MeaningfulMessageProcessorTest {
         }
     }
 
-    private String invokeBuildScope() throws Exception {
-        Method method = MeaningfulMessageProcessor.class
-                .getDeclaredMethod("buildScope");
-        method.setAccessible(true);
-        return (String) method.invoke(processor);
+    private String invokeBuildScope() {
+        return processor.buildScope();
     }
 
     private DetailAstImpl newAst(int type, String text, int lineNo) {

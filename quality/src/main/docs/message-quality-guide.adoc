@@ -63,13 +63,18 @@ If the first non-empty line in the first Javadoc comment starts with `Generated 
 
 == File-Level Rules
 
-Two rules are evaluated across an entire file rather than on a single message:
+Three rules are evaluated across an entire file rather than on a single message:
 
 * *MMOverusedWord* looks at meaningful words across all messages in the file (assertions, preconditions, throw messages, logs, annotations, comments, and Javadoc) after prefiltering.
+File name words are included once per file.
+File name words split on non-alphanumeric separators and lower-to-upper transitions.
 It runs only when there are at least 12 messages, emits one warning per file, and lists the words that appear in more than half of the messages with their counts.
 * *MMLacksPurpose* counts rationale cues across the same message set and expects at least max(1, round(messages/8)) cues (rounded half up).
 It emits one warning per file when the count is below the threshold.
 Phrase cues such as "so that" and "in order" are counted when they have words on both sides.
+* *MMLowEntropy* computes word-level Shannon entropy across all messages in the file.
+File name words are included once per file.
+It is checked only when no other message-quality rules fire for the file, and reports when the entropy falls below 4.00.
 
 == Rule Categories
 
@@ -109,6 +114,7 @@ Operational warnings highlight checker limitations or configuration issues and a
 |MMTooShort |Too short |Use source-specific guidance (assertion/log/javadoc/throw/annotation)
 |MMOverusedWord |Overused word in file |Rephrase to reduce repeated word use below half
 |MMLacksPurpose |Lacks purpose cues |Add rationale cues such as because/due to/so that/in order to/to avoid/required by/workaround for/otherwise/if/despite (target 1 per 8 messages)
+|MMLowEntropy |Low message entropy |Increase word variety across messages and avoid repeated phrasing
 |MMTooFewMeaningfulWords |Too few unique meaningful words |Add meaningful words/placeholders to meet the minimum
 |MMTooLong |Too long |Keep invariant, move data to expected/actual
 |MMWhitespaceRun |Whitespace run |Use single spaces
@@ -691,6 +697,10 @@ The fix depends on the message source.
 Use the guidance below, then meet the minimums in the requirements.
 Word count ranges (min-max, max from MMTooLong): assertions/preconditions/logs/comments 4-42 words, annotations/Javadoc members 6-42 words, Javadoc class 10-42 words, throw messages 2-42 words.
 For assertions and logs, 4-8 words is a useful default.
+Tokenisation notes: placeholders (SLF4J `{}`, MessageFormat `{0}`, and String.format `%s`/`%d` etc, excluding `%n`) count as words.
+Comparison operators (>, >=, <=, <, !=, ==, ->) count as meaningful words.
+Punctuation tokens such as `:` count towards word count but not meaningful words.
+Escape sequences like `\\n`, `\\t`, `\\r`, and `%n` are treated as whitespace.
 
 [cols="1,2"]
 |===
@@ -743,6 +753,7 @@ assertTrue(valid, "order should pass validation rules so that settlement proceed
 === Problem
 
 A meaningful word appears in more than half of the messages in the same file, based on at least 12 messages.
+File name words are included once per file.
 
 === Why This Matters
 
@@ -782,6 +793,23 @@ Suggested cue examples (each includes words before and after the cue):
 * "Write the index now, otherwise recovery may replay from the wrong point."
 * "Only enable huge pages if hugetlbfs is mounted and writable."
 * "Proceed despite a missing optional tag 58; it is not required for logon."
+
+[#MMLowEntropy]
+== MMLowEntropy: Low Message Entropy
+
+=== Problem
+
+The word-level Shannon entropy across all messages in a file is below 4.00.
+This check uses word tokens (not characters) and only runs when no other Meaningful Message rules fire for the file.
+File name words are included once per file.
+
+=== Why This Matters
+
+Messages that reuse the same words blur together and make triage slower.
+
+=== How to Fix
+
+Vary subject, action, and context words across messages; add brief rationale comments where needed; avoid repeating the same phrasing.
 
 [#MMTooFewMeaningfulWords]
 == MMTooFewMeaningfulWords: Too Few Meaningful Words

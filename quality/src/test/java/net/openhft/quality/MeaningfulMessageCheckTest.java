@@ -7,6 +7,7 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import net.openhft.quality.mm.RuleId;
+import org.mockito.Mockito;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -86,6 +87,9 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                                 "only filler words remain: method, class, method, check, method"}
                 }),
                 arguments("GoodMessages", "InputGoodAssertMessages.java", new Object[][]{}),
+                arguments("LowEntropyMessages", "InputLowEntropyMessages.java", new Object[][]{
+                        {10, RuleId.LOW_ENTROPY, "3.27", "4.00"}
+                }),
                 arguments("RequireNonNullParameterName", "InputRequireNonNullParamName.java", new Object[][]{}),
                 arguments("QualifiedNonJUnitAssertions", "InputQualifiedNonJUnitAssertions.java", new Object[][]{}),
                 arguments("DuplicateRedundantAndWordQualityWarnings", "InputAllWarningTypes.java", new Object[][]{
@@ -225,7 +229,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {43, RuleId.TRIVIAL_SUPPLIER, "name + suffix"},
                         {44, RuleId.TRIVIAL_SUPPLIER, "prefix {} suffix ..."},
                         {47, RuleId.TRIVIAL_SUPPLIER, "constant message"},
-                        {50, RuleId.TOO_SHORT, "value: {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {50, RuleId.TOO_SHORT, "value: {}", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {53, RuleId.TRIVIAL_SUPPLIER, "computed: {} ..."}
                 }),
                 arguments("AssertJMessageArgs", "InputAssertJMessageArgs.java", new Object[][]{
@@ -233,7 +237,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 }),
                 arguments("HamcrestMessages", "InputHamcrestMessages.java", new Object[][]{}),
                 arguments("MissingSubjectExamples", "InputMissingSubjectExamples.java", new Object[][]{
-                        {11, RuleId.TOO_SHORT, "malformed input: partial character at end", 6, 10, 42,
+                        {11, RuleId.TOO_SHORT, "malformed input: partial character at end", 7, 10, 42,
                                 FIX_TOO_SHORT_JAVADOC_CLASS},
                         {19, RuleId.MISSING_SUBJECT, "should emit missing message"},
                         {20, RuleId.MISSING_SUBJECT, "should use comment source"},
@@ -242,7 +246,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {23, RuleId.MISSING_SUBJECT, "should throw npe for null"},
                         {24, RuleId.MISSING_SUBJECT, "should emit one message candidate"},
                         {25, RuleId.MISSING_SUBJECT, "should emit one candidate"},
-                        {29, RuleId.TOO_SHORT, "skipped on windows/wsl", 4, 6, 42,
+                        {29, RuleId.TOO_SHORT, "skipped on windows/wsl", 5, 6, 42,
                                 FIX_TOO_SHORT_ANNOTATION},
                         {34, RuleId.TOO_SHORT, "tradable", 1, 6, 42, FIX_TOO_SHORT_ANNOTATION},
                         {39, RuleId.TOO_SHORT, "ask indicative", 2, 6, 42, FIX_TOO_SHORT_ANNOTATION},
@@ -257,7 +261,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {11, RuleId.TOO_FEW_MEANINGFUL, "result should not be empty",
                                 "(none)", "result, should, not, be, empty", 0, 2,
                                 FIX_TOO_FEW_MEANINGFUL_ASSERTION},
-                        {12, RuleId.TOO_SHORT, "i: {}", 1, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {12, RuleId.TOO_SHORT, "i: {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {13, RuleId.TOO_SHORT, "offer i={}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
                         {14, RuleId.MISSING_SUBJECT, "don't support index()"},
                         {22, RuleId.TOO_SHORT, "handler closed (priority={})", 3, 4, 42,
@@ -308,7 +312,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {13, RuleId.MISSING_MESSAGE}
                 }),
                 arguments("MissingComparisonValues", "InputComparisonValues.java", new Object[][]{
-                        {8, RuleId.OVERUSED_WORD, "b(8/12)", 12},
+                        {8, RuleId.OVERUSED_WORD, "b(8/13)", 13},
                         {20, RuleId.MISSING_COMPARISON_VALUES, ">", "a", "b"},
                         {21, RuleId.MISSING_COMPARISON_VALUES, ">=", "a", "b"},
                         {22, RuleId.MISSING_COMPARISON_VALUES, "<", "a", "b"},
@@ -340,8 +344,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {33, RuleId.MISSING_MESSAGE}
                 }),
                 arguments("AssertionMessageVariables", "InputAssertionMessageVariables.java", new Object[][]{
-                        {10, RuleId.TOO_SHORT, "dump: {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION},
-                        {15, RuleId.TOO_SHORT, "snapshot: {}", 2, 4, 42, FIX_TOO_SHORT_ASSERTION}
+                        {10, RuleId.TOO_SHORT, "dump: {}", 3, 4, 42, FIX_TOO_SHORT_ASSERTION},
+                        {15, RuleId.TOO_SHORT, "snapshot: {}", 3, 4, 42, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("MissingLoopIndex", "InputMissingLoopIndex.java", new Object[][]{
                         {18, RuleId.MISSING_LOOP_INDEX, "i"},
@@ -533,6 +537,48 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 arguments("MessageQualityGuideAfterExamples",
                         "InputMessageQualityGuideAfterExamples.java", new Object[][]{})
         );
+    }
+
+    @Test
+    @DisplayName("Unexpected exception logs default line when detail missing")
+    void unexpectedExceptionLogsDefaultLineWhenDetailMissing() throws Exception {
+        MeaningfulMessageCheck check = configuredCheck();
+        check.logUnexpected(null, new RuntimeException());
+
+        java.util.SortedSet<com.puppycrawl.tools.checkstyle.api.Violation> violations =
+                check.getViolations();
+        assertEquals(1, violations.size(),
+                "unexpected exception should log one violation for missing detail");
+        com.puppycrawl.tools.checkstyle.api.Violation violation = violations.first();
+        assertEquals(1, violation.getLineNo(), "default line should be 1 when AST is null");
+        assertEquals("assert.message.unexpected.exception", violation.getKey(),
+                "message key should match when detail is missing");
+    }
+
+    @Test
+    @DisplayName("Unexpected exception logs detail and AST line")
+    void unexpectedExceptionLogsDetailAndAstLine() throws Exception {
+        MeaningfulMessageCheck check = configuredCheck();
+        com.puppycrawl.tools.checkstyle.api.DetailAST ast =
+                Mockito.mock(com.puppycrawl.tools.checkstyle.api.DetailAST.class);
+        Mockito.when(ast.getLineNo()).thenReturn(42);
+
+        check.logUnexpected(ast, new IllegalStateException("boom"));
+
+        java.util.SortedSet<com.puppycrawl.tools.checkstyle.api.Violation> violations =
+                check.getViolations();
+        assertEquals(1, violations.size(),
+                "unexpected exception should log one violation with detail");
+        com.puppycrawl.tools.checkstyle.api.Violation violation = violations.first();
+        assertEquals(42, violation.getLineNo(), "line should be taken from AST when positive");
+        assertEquals("assert.message.unexpected.exception", violation.getKey(),
+                "message key should match when detail is present");
+    }
+
+    private static MeaningfulMessageCheck configuredCheck() throws Exception {
+        MeaningfulMessageCheck check = new MeaningfulMessageCheck();
+        check.configure(new DefaultConfiguration("MeaningfulMessageCheck"));
+        return check;
     }
 
     @Override

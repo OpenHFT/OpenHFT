@@ -159,7 +159,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         );
     }
 
-    private boolean checkJvmLogCall(DetailAST methodCall, String methodName) {
+    boolean checkJvmLogCall(DetailAST methodCall, String methodName) {
         if (!"on".equals(methodName)) {
             return false;
         }
@@ -274,7 +274,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         }
     }
 
-    private String extractQualifierNameForLog(DetailAST methodCall) {
+    String extractQualifierNameForLog(DetailAST methodCall) {
         DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
         if (dot == null) {
             return null;
@@ -350,17 +350,17 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
                 || simple.equals("StackTrace");
     }
 
-    private int countLogPlaceholders(String message) {
+    int countLogPlaceholders(String message) {
         MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.countLogPlaceholders(message);
     }
 
-    private int countFormatPlaceholders(String message) {
+    int countFormatPlaceholders(String message) {
         MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.countFormatPlaceholders(message);
     }
 
-    private String extractConstantSupplierMessage(DetailAST expr) {
+    String extractConstantSupplierMessage(DetailAST expr) {
         DetailAST lambda = astSupport().findLambda(expr);
         if (lambda == null) {
             return null;
@@ -407,7 +407,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return context().extractMessageTemplate(expr);
     }
 
-    private int countKeyValueLabels(String constantParts) {
+    int countKeyValueLabels(String constantParts) {
         MessageTemplateExtractor templateExtractor = requireNonNull(context().templateExtractor());
         return templateExtractor.countKeyValueLabels(constantParts);
     }
