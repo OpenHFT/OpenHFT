@@ -23,12 +23,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.XYZ</version>
         <relativePath/>
     </parent>
 
     <artifactId>third-party-bom</artifactId>
-    <version>2026.0-SNAPSHOT</version>
+    <version>2026.XYZ</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Third Party BOM (Bill of Materials)</name>

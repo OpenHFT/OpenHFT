@@ -22,7 +22,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.XYZ</version>
         <relativePath/>
     </parent>
 
@@ -61,7 +61,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>third-party-bom</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.XYZ</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

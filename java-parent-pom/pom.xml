@@ -12,12 +12,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.XYZ</version>
         <relativePath/>
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>2026.0-SNAPSHOT</version>
+    <version>2026.XYZ</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
@@ -37,7 +37,7 @@
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
         <quality.enforced>true</quality.enforced>
-        <quality.version>2026.0-SNAPSHOT</quality.version>
+        <quality.version>2026.XYZ</quality.version>
         <slf4j.version>2.0.17</slf4j.version>
 
         <pmd.targetJdk>1.8</pmd.targetJdk>

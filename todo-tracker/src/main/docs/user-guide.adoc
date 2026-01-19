@@ -64,7 +64,7 @@ Planned (ROADMAP):
 <plugin>
     <groupId>net.openhft</groupId>
     <artifactId>todo-tracker</artifactId>
-    <version>2026.0-SNAPSHOT</version>
+    <version>2026.XYZ</version>
     <executions>
         <execution>
             <phase>verify</phase>

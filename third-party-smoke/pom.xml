@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.XYZ</version>
         <relativePath/>
     </parent>
 
@@ -20,7 +20,7 @@
     <description>Smoke tests to assert third party BOM artefacts remain usable on Java 8.</description>
 
     <properties>
-        <third-party-bom.version>2026.0-SNAPSHOT</third-party-bom.version>
+        <third-party-bom.version>2026.XYZ</third-party-bom.version>
         <quality.enforced>true</quality.enforced>
         <bytebuddy.attachArgs/>
     </properties>
