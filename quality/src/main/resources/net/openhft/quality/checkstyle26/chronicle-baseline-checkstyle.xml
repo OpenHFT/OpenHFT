@@ -73,6 +73,11 @@
         </module>
 
         <module name="MissingSwitchDefault"/>
+        <module name="FallThrough">
+            <!-- Require comment for intentional fall-through in switch cases.
+                 Accepts any comment with at least four words. -->
+            <property name="reliefPattern" value="\w+\s+\w+\s+\w+\s+\w+"/>
+        </module>
         <module name="OneStatementPerLine"/>
         <module name="VariableDeclarationUsageDistance">
             <property name="ignoreVariablePattern"
