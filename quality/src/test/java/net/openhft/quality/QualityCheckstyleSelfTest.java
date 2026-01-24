@@ -36,33 +36,67 @@ public class QualityCheckstyleSelfTest {
             "net/openhft/quality/checkstyle26/checkstyle-suppressions.xml";
     private static final String SUPPRESSIONS_TESTS_RESOURCE =
             "net/openhft/quality/checkstyle26/checkstyle-suppressions-tests.xml";
-    private static final String FIXTURE_PATH_SUFFIX_UNIX =
-            "net/openhft/quality/selfcheck/SelfCheckFixture.java";
-    private static final String FIXTURE_PATH_SUFFIX_WIN =
-            "net\\openhft\\quality\\selfcheck\\SelfCheckFixture.java";
-    private static final Pattern RULE_CODE_PATTERN = Pattern.compile("\\[(MM[A-Za-z]+)\\]");
+    private static final String SELF_CHECK_PATH_UNIX =
+            "net/openhft/quality/selfcheck/";
+    private static final String SELF_CHECK_PATH_WIN =
+            "net\\openhft\\quality\\selfcheck\\";
+    private static final Set<String> SELF_CHECK_FIXTURES = new LinkedHashSet<>(Arrays.asList(
+            "SelfCheckFixture.java",
+            "SelfCheckAssertionFixture.java",
+            "SelfCheckPreconditionFixture.java",
+            "SelfCheckThrowFixture.java",
+            "SelfCheckLogFixture.java",
+            "SelfCheckCommentFixture.java",
+            "SelfCheckJavadocMemberFixture.java",
+            "SelfCheckJavadocClassRedundantFixture.java",
+            "SelfCheckJavadocClassTooShortFixture.java",
+            "SelfCheckJavadocClassTooFewMeaningfulFixture.java",
+            "SelfCheckJavadocClassLongWordFixture.java",
+            "SelfCheckJavadocClassDuplicateFixture.java",
+            "SelfCheckAnnotationMessagesFixture.java",
+            "SelfCheckMissingDisplayNameFixture.java",
+            "SelfCheckAnnotationOrderFixture.java",
+            "SelfCheckJUnit4Fixture.java",
+            "SelfCheckFileLevelFixture.java",
+            "SelfCheckLowEntropyFixture.java",
+            "SelfCheckUnhandledFixture.java"
+    ));
+    private static final Pattern RULE_CODE_PATTERN = Pattern.compile("\\[(MM[A-Za-z0-9]+)\\]");
     private static final Map<String, Integer> EXPECTED_RULE_COUNTS = new LinkedHashMap<>();
     private static final int EXPECTED_VIOLATION_COUNT;
 
     static {
-        EXPECTED_RULE_COUNTS.put("MMUnhandled", 0);
-        EXPECTED_RULE_COUNTS.put("MMMissingMessage", 3);
-        EXPECTED_RULE_COUNTS.put("MMRestatesDerivedAssertion", 1);
-        EXPECTED_RULE_COUNTS.put("MMContextless", 1);
-        EXPECTED_RULE_COUNTS.put("MMIndexOnly", 1);
-        EXPECTED_RULE_COUNTS.put("MMLongWord", 1);
-        EXPECTED_RULE_COUNTS.put("MMTrivialSupplier", 1);
-        EXPECTED_RULE_COUNTS.put("MMGenericMessage", 1);
-        EXPECTED_RULE_COUNTS.put("MMRedundantClassName", 1);
-        EXPECTED_RULE_COUNTS.put("MMRedundantMethodName", 1);
-        EXPECTED_RULE_COUNTS.put("MMRedundantLineNumber", 1);
-        EXPECTED_RULE_COUNTS.put("MMRestatesAssertion", 1);
-        EXPECTED_RULE_COUNTS.put("MMWhitespaceRun", 1);
-        EXPECTED_RULE_COUNTS.put("MMTooShort", 1);
-        EXPECTED_RULE_COUNTS.put("MMTooLong", 1);
-        EXPECTED_RULE_COUNTS.put("MMTooFewMeaningfulWords", 1);
-        EXPECTED_RULE_COUNTS.put("MMMissingSubject", 1);
-        EXPECTED_RULE_COUNTS.put("MMDuplicate", 1);
+        EXPECTED_RULE_COUNTS.put("MMTooShort", 16);
+        EXPECTED_RULE_COUNTS.put("MMRestatesDerivedAssertion", 6);
+        EXPECTED_RULE_COUNTS.put("MMContextless", 7);
+        EXPECTED_RULE_COUNTS.put("MMIndexOnly", 7);
+        EXPECTED_RULE_COUNTS.put("MMLongWord", 9);
+        EXPECTED_RULE_COUNTS.put("MMTooLong", 6);
+        EXPECTED_RULE_COUNTS.put("MMGenericMessage", 7);
+        EXPECTED_RULE_COUNTS.put("MMRestatesAssertion", 6);
+        EXPECTED_RULE_COUNTS.put("MMWhitespaceRun", 7);
+        EXPECTED_RULE_COUNTS.put("MMRedundantLineNumber", 7);
+        EXPECTED_RULE_COUNTS.put("MMTooFewMeaningfulWords", 10);
+        EXPECTED_RULE_COUNTS.put("MMDuplicate", 11);
+        EXPECTED_RULE_COUNTS.put("MMMissingMessage", 8);
+        EXPECTED_RULE_COUNTS.put("MMTestAnnotationOrder", 1);
+        EXPECTED_RULE_COUNTS.put("MMLowSignalAssertAllHeading", 1);
+        EXPECTED_RULE_COUNTS.put("MMAssertJGenericOverride", 1);
+        EXPECTED_RULE_COUNTS.put("MMTrivialSupplier", 4);
+        EXPECTED_RULE_COUNTS.put("MMMissingLoopIndex", 1);
+        EXPECTED_RULE_COUNTS.put("MMMissingComparisonValues", 1);
+        EXPECTED_RULE_COUNTS.put("MMMissingStringSearchValue", 1);
+        EXPECTED_RULE_COUNTS.put("MMRedundantClassName", 3);
+        EXPECTED_RULE_COUNTS.put("MMRedundantMethodName", 3);
+        EXPECTED_RULE_COUNTS.put("MMMissingSubject", 4);
+        EXPECTED_RULE_COUNTS.put("MMOverusedWord", 1);
+        EXPECTED_RULE_COUNTS.put("MMJUnit4Annotation", 1);
+        EXPECTED_RULE_COUNTS.put("MMJUnit4Assertion", 1);
+        EXPECTED_RULE_COUNTS.put("MMLowEntropy", 1);
+        EXPECTED_RULE_COUNTS.put("MMLacksPurpose", 9);
+        EXPECTED_RULE_COUNTS.put("MMDisplayName", 2);
+        EXPECTED_RULE_COUNTS.put("MMThrowNull", 1);
+        EXPECTED_RULE_COUNTS.put("MMUnhandled", 1);
 
         int total = 0;
         for (int count : EXPECTED_RULE_COUNTS.values()) {
@@ -143,6 +177,19 @@ public class QualityCheckstyleSelfTest {
         return violations;
     }
 
+    private static boolean isSelfCheckFixtureViolation(String line) {
+        if (line == null) {
+            return false;
+        }
+        for (String fixture : SELF_CHECK_FIXTURES) {
+            if (line.contains(SELF_CHECK_PATH_UNIX + fixture)
+                    || line.contains(SELF_CHECK_PATH_WIN + fixture)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static int sumCounts(Map<String, Integer> counts) {
         int total = 0;
         for (int count : counts.values()) {
@@ -217,7 +264,7 @@ public class QualityCheckstyleSelfTest {
         final Map<String, Integer> actualCounts = new LinkedHashMap<>();
         final List<String> unexpected = new ArrayList<>();
         for (String line : violations) {
-            if (!line.contains(FIXTURE_PATH_SUFFIX_UNIX) && !line.contains(FIXTURE_PATH_SUFFIX_WIN)) {
+            if (!isSelfCheckFixtureViolation(line)) {
                 unexpected.add(line);
             }
             Matcher matcher = RULE_CODE_PATTERN.matcher(line);
@@ -229,7 +276,7 @@ public class QualityCheckstyleSelfTest {
         }
 
         if (!unexpected.isEmpty()) {
-            fail("Unexpected Checkstyle violations outside SelfCheckFixture:"
+            fail("Unexpected Checkstyle violations outside self-check fixtures:"
                     + newline
                     + String.join(newline, unexpected));
         }

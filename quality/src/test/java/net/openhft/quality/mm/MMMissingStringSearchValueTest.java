@@ -117,6 +117,6 @@ class MMMissingStringSearchValueTest {
     }
 
     private MessageContext context(MessageCandidate candidate) {
-        return new MessageContext(candidate, null, "TestClass", "testMethod", false, null, null);
+        return new MessageContext(candidate, null, "TestClass", "testMethod", false, null, null, null);
     }
 }

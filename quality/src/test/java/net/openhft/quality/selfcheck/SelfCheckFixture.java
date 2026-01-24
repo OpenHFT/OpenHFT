@@ -10,7 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * MeaningfulMessage violations for QualityCheckstyleSelfTest because diagnostics need coverage so that expectations stay aligned.
- * Keep these messages synchronised with the expected rule counts in that test.
+ * Keep these messages synchronised with the expected rule counts in that test and group fixtures under this package.
  */
 public final class SelfCheckFixture {
     private static final Logger LOGGER = Logger.getLogger(SelfCheckFixture.class.getName());

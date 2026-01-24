@@ -103,6 +103,6 @@ class MMThrowNullTest {
 
     private MessageContext createContext(MessageCandidate candidate) {
         return new MessageContext(candidate, null, "TestClass", "testMethod",
-                false, null, null);
+                false, null, null, null);
     }
 }

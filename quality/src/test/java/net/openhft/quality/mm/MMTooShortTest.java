@@ -45,7 +45,7 @@ class MMTooShortTest {
         MessageMetrics metrics = new MessageMetrics(10, 2, 2, 2, 2,
                 Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -74,7 +74,7 @@ class MMTooShortTest {
         MessageMetrics metrics = new MessageMetrics(12, 2, 1, 2, 1,
                 Collections.emptyList(), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -97,7 +97,7 @@ class MMTooShortTest {
         MessageMetrics metrics = new MessageMetrics(5, 1, 1, 1, 1,
                 Collections.emptyList(), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -127,7 +127,7 @@ class MMTooShortTest {
         MessageMetrics metrics = new MessageMetrics(4, 1, 1, 1, 1,
                 Collections.emptyList(), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -149,7 +149,7 @@ class MMTooShortTest {
                 .missingMessageKind(MissingMessageKind.SYSTEM_CALL)
                 .build();
         rule.evaluate(new MessageContext(systemCandidate, metrics,
-                "TestClass", "testMethod", false, null, null), collector, state);
+                "TestClass", "testMethod", false, null, null, null), collector, state);
 
         MessageCandidate runtimeCandidate = new MessageCandidate.Builder()
                 .lineNo(41)
@@ -158,7 +158,7 @@ class MMTooShortTest {
                 .missingMessageKind(MissingMessageKind.RUNTIME_CALL)
                 .build();
         rule.evaluate(new MessageContext(runtimeCandidate, metrics,
-                "TestClass", "testMethod", false, null, null), collector, state);
+                "TestClass", "testMethod", false, null, null, null), collector, state);
 
         Map<Integer, Violation> pending = collector.pendingForTesting();
         assertEquals("explain why java.lang.System is required here",

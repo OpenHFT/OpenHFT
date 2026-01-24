@@ -63,7 +63,7 @@ class ThrowMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("Handle throw statement rethrowing variable skips unhandled warning")
+    @DisplayName("Handle throw statement rethrowing variable emits missing message without reason")
     void handleThrowStatement_rethrowVariable_skipsUnhandled() {
         // throw e; (rethrowing an existing exception)
         context.recordVariableType(createVariableDef("e", "RuntimeException"));
@@ -72,11 +72,14 @@ class ThrowMessageExtractorTest {
         extractor.handleThrowStatement(throwAst);
 
         assertTrue(sink.candidates.isEmpty(), "Should not emit candidate for rethrow");
+        assertEquals(1, sink.missingMessages.size(), "Should emit missing message for rethrow");
+        assertEquals(MessageSource.THROW, sink.missingMessages.get(0),
+                "Missing message source should be THROW");
         assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning for rethrow");
     }
 
     @Test
-    @DisplayName("Handle throw statement rethrowing casted exception skips unhandled warning")
+    @DisplayName("Handle throw statement rethrowing casted exception emits missing message without reason")
     void handleThrowStatement_rethrowTypeCast_skipsUnhandled() {
         context.recordVariableType(createVariableDef("e", "Throwable"));
         DetailAstImpl typecast = createTypeCast("RuntimeException", createIdent("e"));
@@ -85,6 +88,9 @@ class ThrowMessageExtractorTest {
         extractor.handleThrowStatement(throwAst);
 
         assertTrue(sink.candidates.isEmpty(), "Should not emit candidate for cast rethrow");
+        assertEquals(1, sink.missingMessages.size(), "Should emit missing message for cast rethrow");
+        assertEquals(MessageSource.THROW, sink.missingMessages.get(0),
+                "Missing message source should be THROW");
         assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning for cast rethrow");
     }
 
@@ -125,7 +131,7 @@ class ThrowMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("Handle throw statement rethrowing field skips unhandled warning")
+    @DisplayName("Handle throw statement rethrowing field emits missing message without reason")
     void handleThrowStatement_rethrowField_skipsUnhandled() {
         // throw holder.error; (rethrowing a field reference)
         context.recordVariableType(createVariableDef("error", "RuntimeException"));
@@ -134,11 +140,14 @@ class ThrowMessageExtractorTest {
         extractor.handleThrowStatement(throwAst);
 
         assertTrue(sink.candidates.isEmpty(), "Should not emit candidate for field rethrow");
+        assertEquals(1, sink.missingMessages.size(), "Should emit missing message for field rethrow");
+        assertEquals(MessageSource.THROW, sink.missingMessages.get(0),
+                "Missing message source should be THROW");
         assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning for field rethrow");
     }
 
     @Test
-    @DisplayName("Handle throw statement with factory call skips unhandled warning")
+    @DisplayName("Handle throw statement with factory call emits missing message without reason")
     void handleThrowStatement_factoryCall_skipsUnhandled() {
         // throw someFactory();
         DetailAstImpl throwAst = createThrowStatementWithExpr(createMethodCall("someFactory"));
@@ -146,6 +155,9 @@ class ThrowMessageExtractorTest {
         extractor.handleThrowStatement(throwAst);
 
         assertTrue(sink.candidates.isEmpty(), "Should not emit candidate for factory throw");
+        assertEquals(1, sink.missingMessages.size(), "Should emit missing message for factory throw");
+        assertEquals(MessageSource.THROW, sink.missingMessages.get(0),
+                "Missing message source should be THROW");
         assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning for factory throw");
     }
 
@@ -195,6 +207,18 @@ class ThrowMessageExtractorTest {
 
         assertTrue(sink.candidates.isEmpty(), "Should not emit candidate for ignored exception");
         assertTrue(sink.missingMessages.isEmpty(), "Should not emit missing message for ignored");
+    }
+
+    @Test
+    @DisplayName("Handle throw statement with UnsupportedOperationException no-arg emits nothing")
+    void handleThrowStatement_unsupportedOperationNoArg_emitsNothing() {
+        DetailAstImpl throwAst = createThrowNewStatement("UnsupportedOperationException");
+
+        extractor.handleThrowStatement(throwAst);
+
+        assertTrue(sink.candidates.isEmpty(), "Should not emit candidate for UnsupportedOperationException");
+        assertTrue(sink.missingMessages.isEmpty(), "Should not emit missing message for UnsupportedOperationException");
+        assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled warning for UnsupportedOperationException");
     }
 
     @Test
@@ -734,7 +758,7 @@ class ThrowMessageExtractorTest {
     }
 
     @Test
-    @DisplayName("Handle throw statement with dot expression referring to throwable field skips unhandled")
+    @DisplayName("Handle throw statement with dot expression referring to throwable field emits missing message without reason")
     void handleThrowStatement_dotExpressionThrowableField_skipsUnhandled() {
         // throw this.storedError; where storedError is Exception type
         context.recordVariableType(createVariableDef("storedError", "RuntimeException"));
@@ -743,6 +767,9 @@ class ThrowMessageExtractorTest {
         extractor.handleThrowStatement(throwAst);
 
         assertTrue(sink.candidates.isEmpty(), "Should not emit candidate for field rethrow");
+        assertEquals(1, sink.missingMessages.size(), "Should emit missing message for field rethrow");
+        assertEquals(MessageSource.THROW, sink.missingMessages.get(0),
+                "Missing message source should be THROW");
         assertTrue(sink.unhandledReasons.isEmpty(), "Should not emit unhandled for throwable field");
     }
 

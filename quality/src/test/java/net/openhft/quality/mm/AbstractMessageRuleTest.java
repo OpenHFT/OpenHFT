@@ -24,7 +24,7 @@ class AbstractMessageRuleTest {
                 .message("test")
                 .build();
         MessageContext context = new MessageContext(candidate, null,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -49,7 +49,7 @@ class AbstractMessageRuleTest {
                 .message("test")
                 .build();
         MessageContext context = new MessageContext(candidate, null,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 

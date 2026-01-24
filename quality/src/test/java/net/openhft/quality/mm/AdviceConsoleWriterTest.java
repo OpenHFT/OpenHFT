@@ -25,7 +25,7 @@ class AdviceConsoleWriterTest {
         AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
         AdviceText text = loader.textFor(AdviceId.MMAssertionMessageMissing);
         AdviceOccurrence occurrence = new AdviceOccurrence(12, AdviceSource.ASSERTION,
-                "missing message", null, "assertTrue(condition)");
+                "missing message", null, "assertTrue(condition)", null);
         AdviceGroup lineGroup = new AdviceGroup(AdviceId.MMAssertionMessageMissing, text, 1,
                 Collections.singletonList(occurrence));
         FileAdviceDetails fileDetails = new FileAdviceDetails(AdviceId.MMOverusedWord, 3,

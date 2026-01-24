@@ -45,10 +45,21 @@ class SuppressionTrackerTest {
     }
 
     @Test
+    @DisplayName("Is suppressed advice id respects scope")
+    void isSuppressed_adviceId_respectsScope() {
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
+        scope.addToken("MMAssertionMessageTooShort");
+        tracker.pushScopeForTesting(scope);
+
+        assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort),
+                "advice id should be suppressed in scope");
+    }
+
+    @Test
     @DisplayName("Is suppressed null rule id throws NPE")
     void isSuppressed_nullRuleId_throwsNPE() {
         assertThrows(NullPointerException.class,
-                () -> tracker.isSuppressed(null),
+                () -> tracker.isSuppressed((RuleId) null),
                 "should throw NPE for null ruleId");
     }
 
@@ -96,7 +107,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Suppression scope add token mm all sets flag")
     void suppressionScope_addToken_mmAll_setsFlag() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MM-all");
 
         assertTrue(scope.suppressAll,
@@ -106,7 +117,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Suppression scope add token meaningful message sets flag")
     void suppressionScope_addToken_meaningfulMessage_setsFlag() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MeaningfulMessage");
 
         assertTrue(scope.suppressAll,
@@ -116,7 +127,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Suppression scope add token meaningful message check sets flag")
     void suppressionScope_addToken_meaningfulMessageCheck_setsFlag() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MeaningfulMessageCheck");
 
         assertTrue(scope.suppressAll,
@@ -126,78 +137,90 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Suppression scope add token known code adds to set")
     void suppressionScope_addToken_knownCode_addsToSet() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMTooShort");
 
-        Set<String> codes = scope.suppressedCodes;
-        assertTrue(codes.contains("MMTooShort"),
-                "known code should be added to suppressedCodes");
+        Set<RuleId> codes = scope.suppressedRules;
+        assertTrue(codes.contains(RuleId.TOO_SHORT),
+                "known code should be added to suppressedRules");
+    }
+
+    @Test
+    @DisplayName("Suppression scope add token advice id adds to set")
+    void suppressionScope_addToken_adviceId_addsToSet() {
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
+        scope.addToken("MMAssertionMessageTooShort");
+
+        assertTrue(scope.suppressedAdviceIds.contains(AdviceId.MMAssertionMessageTooShort),
+                "advice id should be added to suppressedAdviceIds");
     }
 
     @Test
     @DisplayName("Suppression scope add token unknown code not added")
     void suppressionScope_addToken_unknownCode_notAdded() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("UnknownCode");
 
-        Set<String> codes = scope.suppressedCodes;
-        assertFalse(codes.contains("UnknownCode"),
+        assertTrue(scope.suppressedRules.isEmpty(),
+                "unknown code should not be added");
+        assertTrue(scope.suppressedAdviceIds.isEmpty(),
                 "unknown code should not be added");
     }
 
     @Test
     @DisplayName("Suppression scope add token empty string not added")
     void suppressionScope_addToken_emptyString_notAdded() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("");
 
-        Set<String> codes = scope.suppressedCodes;
-        assertTrue(codes.isEmpty(),
+        assertTrue(scope.suppressedRules.isEmpty(),
+                "empty string should not be added");
+        assertTrue(scope.suppressedAdviceIds.isEmpty(),
                 "empty string should not be added");
     }
 
     @Test
     @DisplayName("Suppression scope add token checkstyle prefix stripped")
     void suppressionScope_addToken_checkstylePrefix_stripped() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("checkstyle:MMTooShort");
 
-        Set<String> codes = scope.suppressedCodes;
-        assertTrue(codes.contains("MMTooShort"),
+        Set<RuleId> codes = scope.suppressedRules;
+        assertTrue(codes.contains(RuleId.TOO_SHORT),
                 "checkstyle: prefix should be stripped");
     }
 
     @Test
     @DisplayName("Suppression scope add token whitespace trimmed")
     void suppressionScope_addToken_whitespace_trimmed() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("  MMTooShort  ");
 
-        Set<String> codes = scope.suppressedCodes;
-        assertTrue(codes.contains("MMTooShort"),
+        Set<RuleId> codes = scope.suppressedRules;
+        assertTrue(codes.contains(RuleId.TOO_SHORT),
                 "whitespace should be trimmed");
     }
 
     @Test
     @DisplayName("Suppression scope copy constructor inherits codes")
     void suppressionScope_copyConstructor_inheritsCodes() {
-        SuppressionTracker.SuppressionScope parentScope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope parentScope = tracker.new SuppressionScope();
         parentScope.addToken("MMTooShort");
 
-        SuppressionTracker.SuppressionScope childScope = new SuppressionTracker.SuppressionScope(parentScope);
+        SuppressionTracker.SuppressionScope childScope = tracker.new SuppressionScope(parentScope);
 
-        Set<String> codes = childScope.suppressedCodes;
-        assertTrue(codes.contains("MMTooShort"),
+        Set<RuleId> codes = childScope.suppressedRules;
+        assertTrue(codes.contains(RuleId.TOO_SHORT),
                 "child scope should inherit parent codes");
     }
 
     @Test
     @DisplayName("Suppression scope copy constructor inherits suppress all")
     void suppressionScope_copyConstructor_inheritsSuppressAll() {
-        SuppressionTracker.SuppressionScope parentScope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope parentScope = tracker.new SuppressionScope();
         parentScope.addToken("MM-all");
 
-        SuppressionTracker.SuppressionScope childScope = new SuppressionTracker.SuppressionScope(parentScope);
+        SuppressionTracker.SuppressionScope childScope = tracker.new SuppressionScope(parentScope);
 
         assertTrue(childScope.suppressAll,
                 "child scope should inherit suppressAll flag");
@@ -206,7 +229,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Clean token strips checkstyle prefix scenario")
     void cleanToken_stripsCheckstylePrefix() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
 
         assertEquals("MMTooShort", scope.cleanToken("checkstyle:MMTooShort"),
                 "should strip checkstyle: prefix");
@@ -215,7 +238,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Clean token trims whitespace scenario case")
     void cleanToken_trimsWhitespace() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
 
         assertEquals("MMTooShort", scope.cleanToken("  MMTooShort  "),
                 "should trim whitespace");
@@ -224,7 +247,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Clean token preserves non prefixed scenario")
     void cleanToken_preservesNonPrefixed() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
 
         assertEquals("MMTooShort", scope.cleanToken("MMTooShort"),
                 "should preserve non-prefixed token");
@@ -235,7 +258,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Is suppressed with suppress all returns true scenario case")
     void isSuppressed_withSuppressAll_returnsTrue() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MM-all");
         tracker.pushScopeForTesting(scope);
 
@@ -248,7 +271,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("Is suppressed with specific code returns true for match")
     void isSuppressed_withSpecificCode_returnsTrueForMatch() {
-        SuppressionTracker.SuppressionScope scope = new SuppressionTracker.SuppressionScope();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMTooShort");
         tracker.pushScopeForTesting(scope);
 

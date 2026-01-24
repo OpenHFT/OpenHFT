@@ -44,7 +44,7 @@ class MMTooFewMeaningfulWordsTest {
         MessageMetrics metrics = new MessageMetrics(12, 2, 1, 2, 1,
                 Collections.singletonList("system"), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -67,7 +67,7 @@ class MMTooFewMeaningfulWordsTest {
         MessageMetrics metrics = new MessageMetrics(5, 1, 1, 1, 1,
                 Collections.singletonList("retry"), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -90,7 +90,7 @@ class MMTooFewMeaningfulWordsTest {
         MessageMetrics metrics = new MessageMetrics(12, 2, 1, 0, 1,
                 Collections.singletonList("class"), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", null, false, null, null);
+                "TestClass", null, false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -112,7 +112,7 @@ class MMTooFewMeaningfulWordsTest {
         MessageMetrics metrics = new MessageMetrics(12, 2, 1, 0, 1,
                 Collections.singletonList("member"), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -140,7 +140,7 @@ class MMTooFewMeaningfulWordsTest {
         MessageMetrics metrics = new MessageMetrics(4, 1, 0, 0, 0,
                 Collections.emptyList(), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -160,7 +160,7 @@ class MMTooFewMeaningfulWordsTest {
         MessageMetrics metrics = new MessageMetrics(20, 5, 0, 0, 0,
                 Collections.emptyList(), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 
@@ -182,7 +182,7 @@ class MMTooFewMeaningfulWordsTest {
         MessageMetrics metrics = new MessageMetrics(5, 1, 0, 0, 0,
                 Collections.emptyList(), Collections.emptyList());
         MessageContext context = new MessageContext(candidate, metrics,
-                "TestClass", "testMethod", false, null, null);
+                "TestClass", "testMethod", false, null, null, null);
 
         rule.evaluate(context, collector, state);
 

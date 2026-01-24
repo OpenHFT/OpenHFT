@@ -131,6 +131,6 @@ class MMAssertJGenericOverrideTest {
     private MessageContext buildContext(MessageCandidate candidate, MessageMetrics metrics) {
         MessageRuleSupport support = new MessageRuleSupport(new MessageMetricsCalculator());
         return new MessageContext(candidate, metrics, "TestClass", "testMethod",
-                false, support, null);
+                false, support, null, null);
     }
 }

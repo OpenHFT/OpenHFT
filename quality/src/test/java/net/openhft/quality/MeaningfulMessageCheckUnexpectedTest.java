@@ -12,6 +12,7 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.api.Violation;
 import net.openhft.quality.mm.MeaningfulMessageProcessor;
+import net.openhft.quality.mm.RuleId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -50,7 +51,8 @@ class MeaningfulMessageCheckUnexpectedTest {
         assertEquals(1, violations.size(),
                 "Unexpected exception should emit a single warning");
         Violation violation = violations.first();
-        assertEquals("assert.message.unexpected.exception", violation.getKey(),
+        assertEquals(RuleId.messageKey("assert.message.unexpected.exception", false),
+                violation.getKey(),
                 "Unexpected exception should use the unexpected rule key");
         assertEquals(4, violation.getLineNo(),
                 "Unexpected exception should use the AST line number");
