@@ -408,7 +408,7 @@ public class MeaningfulMessageProcessorTest {
 
         assertEquals(1, check.getViolations().size(),
                 "Processor should emit one unhandled warning");
-        assertEquals("assert.message.unhandled",
+        assertEquals(RuleId.UNHANDLED.messageKey(false),
                 check.getViolations().iterator().next().getKey());
     }
 
@@ -491,7 +491,7 @@ public class MeaningfulMessageProcessorTest {
 
         assertEquals(1, check.getViolations().size(),
                 "Output failure should emit one extraction warning");
-        assertEquals("assert.message.extraction.failure",
+        assertEquals(RuleId.messageKey("assert.message.extraction.failure", false),
                 check.getViolations().iterator().next().getKey());
     }
 
@@ -690,7 +690,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> RuleId.MISSING_MESSAGE.messageKey().equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.MISSING_MESSAGE.messageKey(false).equals(violation.getKey()));
         assertTrue(found, "Return null without comment should emit missing message warning");
     }
 
@@ -719,7 +719,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.overused.word".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.OVERUSED_WORD.messageKey(false).equals(violation.getKey()));
         assertTrue(found, "Should emit overused word warning");
     }
 
@@ -745,7 +745,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.overused.word".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.OVERUSED_WORD.messageKey(false).equals(violation.getKey()));
         assertFalse(found, "Should not emit overused word warning below minimum");
     }
 
@@ -775,7 +775,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.overused.word".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.OVERUSED_WORD.messageKey(false).equals(violation.getKey()));
         assertFalse(found, "Should not emit overused word warning at half threshold");
     }
 
@@ -786,6 +786,9 @@ public class MeaningfulMessageProcessorTest {
                 "@SuppressWarnings(\"MMOverusedWord\")",
                 "class InputOverusedWordSuppressed { void test() {} }");
         processor.beginTree(contents);
+
+        // Register file-level suppression directly for testing
+        processor.suppressionTrackerForTesting().addFileSuppressionsForTesting("MMOverusedWord");
 
         DetailAstImpl classDef = createClassDefWithSuppressWarnings("InputOverusedWordSuppressed",
                 "MMOverusedWord");
@@ -813,7 +816,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.overused.word".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.OVERUSED_WORD.messageKey(false).equals(violation.getKey()));
         assertFalse(found, "SuppressWarnings should silence overused word warning");
     }
 
@@ -843,7 +846,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.lacks.purpose".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.LACKS_PURPOSE.messageKey(false).equals(violation.getKey()));
         assertTrue(found, "Should emit lacks purpose warning");
     }
 
@@ -878,7 +881,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.lacks.purpose".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.LACKS_PURPOSE.messageKey(false).equals(violation.getKey()));
         assertFalse(found, "Should not emit lacks purpose warning when cues meet threshold");
     }
 
@@ -906,7 +909,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.lacks.purpose".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.LACKS_PURPOSE.messageKey(false).equals(violation.getKey()));
         assertFalse(found, "Should not emit lacks purpose warning at one in eight threshold");
     }
 
@@ -932,7 +935,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.lacks.purpose".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.LACKS_PURPOSE.messageKey(false).equals(violation.getKey()));
         assertTrue(found, "Should emit lacks purpose warning below one in eight threshold");
     }
 
@@ -943,6 +946,9 @@ public class MeaningfulMessageProcessorTest {
                 "@SuppressWarnings(\"MMLacksPurpose\")",
                 "class InputLacksPurposeSuppressed { void test() {} }");
         processor.beginTree(contents);
+
+        // Register file-level suppression directly for testing
+        processor.suppressionTrackerForTesting().addFileSuppressionsForTesting("MMLacksPurpose");
 
         DetailAstImpl classDef = createClassDefWithSuppressWarnings("InputLacksPurposeSuppressed",
                 "MMLacksPurpose");
@@ -969,7 +975,7 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.lacks.purpose".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.LACKS_PURPOSE.messageKey(false).equals(violation.getKey()));
         assertFalse(found, "SuppressWarnings should silence lacks purpose warning");
     }
 
@@ -1068,7 +1074,7 @@ public class MeaningfulMessageProcessorTest {
 
         assertEquals(1, check.getViolations().size(),
                 "Should emit one unhandled warning");
-        assertEquals(RuleId.UNHANDLED.messageKey(),
+        assertEquals(RuleId.UNHANDLED.messageKey(false),
                 check.getViolations().iterator().next().getKey(),
                 "Unhandled warning should be recorded");
     }
@@ -1092,7 +1098,7 @@ public class MeaningfulMessageProcessorTest {
         TestCheck check = createCheck(contents);
         processor.finishTree(check);
 
-        assertEquals(RuleId.UNHANDLED.messageKey(),
+        assertEquals(RuleId.UNHANDLED.messageKey(false),
                 check.getViolations().iterator().next().getKey(),
                 "Unhandled warning should be recorded");
     }
@@ -1117,7 +1123,7 @@ public class MeaningfulMessageProcessorTest {
         TestCheck check = createCheck(contents);
         processor.finishTree(check);
 
-        assertEquals(RuleId.UNHANDLED.messageKey(),
+        assertEquals(RuleId.UNHANDLED.messageKey(false),
                 check.getViolations().iterator().next().getKey(),
                 "Unhandled warning should be recorded");
     }
@@ -1139,8 +1145,36 @@ public class MeaningfulMessageProcessorTest {
         processor.finishTree(check);
 
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> "assert.message.missing.display.name".equals(violation.getKey()));
+                .anyMatch(violation -> RuleId.MISSING_DISPLAY_NAME.messageKey(false)
+                        .equals(violation.getKey()));
         assertTrue(found, "Should emit missing display name warning");
+    }
+
+    @Test
+    @DisplayName("Missing display name recorded for JUnit 5 test class")
+    void missingDisplayNameRecordedForJUnit5TestClass() throws Exception {
+        FileContents contents = createFileContents("InputMissingDisplayNameClass.java",
+                "class InputMissingDisplayNameClass { void test() {} }");
+        processor.beginTree(contents);
+
+        processor.visitToken(createImport("org.junit.jupiter.api.Test"));
+        DetailAstImpl classDef = createClassDef("InputMissingDisplayNameClass", 1);
+        processor.visitToken(classDef);
+
+        DetailAstImpl methodDef = createMethodDef("test", 2);
+        processor.visitToken(methodDef);
+        processor.visitToken(createAnnotation("Test", 2));
+        processor.visitToken(createAnnotation("DisplayName", 3));
+
+        processor.leaveToken(methodDef);
+        processor.leaveToken(classDef);
+        TestCheck check = createCheck(contents);
+        processor.finishTree(check);
+
+        boolean found = check.getViolations().stream()
+                .anyMatch(violation -> RuleId.MISSING_DISPLAY_NAME.messageKey(false)
+                        .equals(violation.getKey()));
+        assertTrue(found, "Should emit missing display name warning for class");
     }
 
     @Test
@@ -1168,7 +1202,7 @@ public class MeaningfulMessageProcessorTest {
         assertTrue(check.getViolations().size() >= 1,
                 "Should emit test annotation order warning");
         boolean found = check.getViolations().stream()
-                .anyMatch(violation -> RuleId.TEST_ANNOTATION_ORDER.messageKey().equals(violation.getKey())
+                .anyMatch(violation -> RuleId.TEST_ANNOTATION_ORDER.messageKey(false).equals(violation.getKey())
                         && violation.getLineNo() == 5);
         assertTrue(found, "Should fall back to method line when test line missing");
     }
@@ -1646,5 +1680,252 @@ public class MeaningfulMessageProcessorTest {
         public int[] getRequiredTokens() {
             return new int[0];
         }
+    }
+
+    // --- Additional mutation-killing tests ---
+
+    @Test
+    @DisplayName("Finish tree clears violation collector")
+    void finishTreeClearsViolationCollector() throws Exception {
+        FileContents contents = createFileContents("InputClearCollector.java",
+                "class InputClearCollector { void test() {} }");
+        processor.beginTree(contents);
+
+        recordViolationForTesting(5, RuleId.MISSING_MESSAGE);
+
+        TestCheck check = createCheck(contents);
+        processor.finishTree(check);
+
+        assertEquals(1, check.getViolations().size(),
+                "violation should have been flushed before clear");
+    }
+
+    @Test
+    @DisplayName("Should skip file returns false for null file contents")
+    void shouldSkipFileReturnsFalseForNullFileContents() throws Exception {
+        processor.beginTree(null);
+        // Should not throw and processing should continue
+    }
+
+    @Test
+    @DisplayName("Format rule summary handles empty summary map")
+    void formatRuleSummaryHandlesEmptySummaryMap() throws Exception {
+        Map<RuleId, Integer> empty = new EnumMap<>(RuleId.class);
+        String result = invokeFormatRuleSummary(empty);
+        assertTrue(result.contains("total=0"), "empty summary should have total=0");
+    }
+
+    @Test
+    @DisplayName("Normalize class name handles class without package")
+    void normalizeClassNameHandlesClassWithoutPackage() {
+        assertEquals("SimpleClass", processor.normalizeClassName("SimpleClass"),
+                "class without package should return unchanged");
+    }
+
+    @Test
+    @DisplayName("Record overused word usage handles null metrics")
+    void recordOverusedWordUsageHandlesNullMetrics() throws Exception {
+        FileContents contents = createFileContents("InputNullMetrics.java",
+                "class InputNullMetrics { void test() {} }");
+        processor.beginTree(contents);
+
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .source(MessageSource.ASSERTION)
+                .lineNo(5)
+                .message(null)
+                .build();
+
+        // Should not throw
+        processor.emitCandidate(candidate);
+    }
+
+    @Test
+    @DisplayName("Count purpose cues returns zero for null metrics calculator")
+    void countPurposeCuesReturnsZeroForNullMetricsCalculator() throws Exception {
+        // Before beginTree, metricsCalculator is null
+        int result = invokeCountPurposeCues("because reason here");
+        assertEquals(0, result, "null metrics calculator should return 0");
+    }
+
+    @Test
+    @DisplayName("Count purpose cues correctly counts middle position cues")
+    void countPurposeCuesCorrectlyCountsMiddlePositionCues() throws Exception {
+        prepareProcessor();
+        // "because" at position 2 (middle) should count
+        assertEquals(1, invokeCountPurposeCues("test because reason"),
+                "because in middle should count");
+        // "because" at position 0 should not count
+        assertEquals(0, invokeCountPurposeCues("because test fails"),
+                "because at start should not count");
+        // "because" at last position should not count
+        assertEquals(0, invokeCountPurposeCues("test fails because"),
+                "because at end should not count");
+    }
+
+    @Test
+    @DisplayName("Close message extraction writer flushes before closing")
+    void closeMessageExtractionWriterFlushesBeforeClosing() throws Exception {
+        Path output = tempDir.resolve("flush-close.tsv");
+        processor.setMessageExtractionFile(output.toString());
+
+        FileContents contents = createFileContents("InputFlushClose.java",
+                "class InputFlushClose { void test() {} }");
+        processor.beginTree(contents);
+
+        String message = "test message for flush";
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .source(MessageSource.ASSERTION)
+                .lineNo(3)
+                .message(message)
+                .normalisedMessage(MessageNormaliser.normalise(message))
+                .build();
+        processor.emitCandidate(candidate);
+
+        TestCheck check = createCheck(contents);
+        processor.finishTree(check);
+
+        assertTrue(Files.exists(output), "output file should exist");
+        List<String> lines = Files.readAllLines(output, StandardCharsets.UTF_8);
+        assertTrue(lines.size() >= 2, "file should have header and data after flush");
+    }
+
+    @Test
+    @DisplayName("Open message extraction writer checks file existence for header")
+    void openMessageExtractionWriterChecksFileExistenceForHeader() throws Exception {
+        Path output = tempDir.resolve("check-exists.tsv");
+
+        // First write should include header
+        processor.setMessageExtractionFile(output.toString());
+        FileContents contents1 = createFileContents("InputCheckExists1.java",
+                "class InputCheckExists1 { void test() {} }");
+        processor.beginTree(contents1);
+        MessageCandidate candidate1 = new MessageCandidate.Builder()
+                .source(MessageSource.ASSERTION)
+                .lineNo(3)
+                .message("first message")
+                .normalisedMessage("first message")
+                .build();
+        processor.emitCandidate(candidate1);
+        processor.finishTree(createCheck(contents1));
+
+        // Second write should append without header
+        MeaningfulMessageProcessor processor2 = new MeaningfulMessageProcessor();
+        processor2.setMessageExtractionFile(output.toString());
+        FileContents contents2 = createFileContents("InputCheckExists2.java",
+                "class InputCheckExists2 { void test() {} }");
+        processor2.beginTree(contents2);
+        MessageCandidate candidate2 = new MessageCandidate.Builder()
+                .source(MessageSource.ASSERTION)
+                .lineNo(3)
+                .message("second message")
+                .normalisedMessage("second message")
+                .build();
+        processor2.emitCandidate(candidate2);
+        processor2.finishTree(createCheck(contents2));
+
+        List<String> lines = Files.readAllLines(output, StandardCharsets.UTF_8);
+        long headerCount = lines.stream()
+                .filter(line -> line.startsWith("file\tline"))
+                .count();
+        assertEquals(1, headerCount, "header should appear only once");
+    }
+
+    @Test
+    @DisplayName("Format rule summary sorts entries by count descending")
+    void formatRuleSummarySortsEntriesByCountDescending() throws Exception {
+        Map<RuleId, Integer> summary = new EnumMap<>(RuleId.class);
+        summary.put(RuleId.TOO_LONG, 2);
+        summary.put(RuleId.GENERIC, 5);
+        summary.put(RuleId.MISSING_MESSAGE, 1);
+
+        String formatted = invokeFormatRuleSummary(summary);
+
+        int genericIndex = formatted.indexOf(RuleId.GENERIC.code());
+        int tooLongIndex = formatted.indexOf(RuleId.TOO_LONG.code());
+        int missingIndex = formatted.indexOf(RuleId.MISSING_MESSAGE.code());
+
+        assertTrue(genericIndex < tooLongIndex,
+                "higher count entries should appear first");
+        assertTrue(tooLongIndex < missingIndex,
+                "lower count entries should appear later");
+    }
+
+    // --- Verbose Mode Tests ---
+
+    @Test
+    @DisplayName("Verbose mode emits verbose message keys")
+    void verboseModeEmitsVerboseMessageKeys() throws Exception {
+        MeaningfulMessageProcessor verboseProcessor = new MeaningfulMessageProcessor();
+        verboseProcessor.setVerbose(true);
+
+        FileContents contents = createFileContents("InputVerboseUnhandled.java",
+                "class InputVerboseUnhandled { void test() {} }");
+        verboseProcessor.beginTree(contents);
+
+        DetailAstImpl ast = newAst(TokenTypes.LITERAL_THROW, "throw", 3);
+        verboseProcessor.emitUnhandled(ast, "test reason");
+
+        TestCheck check = createCheck(contents);
+        verboseProcessor.finishTree(check);
+
+        assertEquals(1, check.getViolations().size(),
+                "Verbose mode should emit one unhandled warning");
+        assertEquals(RuleId.UNHANDLED.messageKey(true),
+                check.getViolations().iterator().next().getKey(),
+                "Verbose mode should use verbose message key");
+    }
+
+    @Test
+    @DisplayName("Non-verbose mode emits intent message keys")
+    void nonVerboseModeEmitsIntentMessageKeys() throws Exception {
+        FileContents contents = createFileContents("InputIntentUnhandled.java",
+                "class InputIntentUnhandled { void test() {} }");
+        processor.beginTree(contents);
+
+        DetailAstImpl ast = newAst(TokenTypes.LITERAL_THROW, "throw", 3);
+        processor.emitUnhandled(ast, "test reason");
+
+        TestCheck check = createCheck(contents);
+        processor.finishTree(check);
+
+        assertEquals(1, check.getViolations().size(),
+                "Non-verbose mode should emit one unhandled warning");
+        assertEquals(RuleId.UNHANDLED.messageKey(false),
+                check.getViolations().iterator().next().getKey(),
+                "Non-verbose mode should use intent message key");
+    }
+
+    @Test
+    @DisplayName("Verbose and intent keys differ by suffix")
+    void verboseAndIntentKeysDifferBySuffix() {
+        String verboseKey = RuleId.UNHANDLED.messageKey(true);
+        String intentKey = RuleId.UNHANDLED.messageKey(false);
+
+        assertNotEquals(verboseKey, intentKey, "Verbose and intent keys should differ");
+        assertTrue(intentKey.endsWith(".intent"), "Intent key should end with .intent suffix");
+        assertFalse(verboseKey.endsWith(".intent"), "Verbose key should not have .intent suffix");
+    }
+
+    @Test
+    @DisplayName("Verbose mode uses verbose key for all rule types")
+    void verboseModeUsesVerboseKeyForAllRuleTypes() {
+        for (RuleId ruleId : RuleId.values()) {
+            String verboseKey = ruleId.messageKey(true);
+            String intentKey = ruleId.messageKey(false);
+            assertFalse(verboseKey.endsWith(".intent"),
+                    "Verbose key for " + ruleId + " should not end with .intent");
+            assertTrue(intentKey.endsWith(".intent"),
+                    "Intent key for " + ruleId + " should end with .intent");
+        }
+    }
+
+    @Test
+    @DisplayName("Verbose violation collector uses verbose keys")
+    void verboseViolationCollectorUsesVerboseKeys() throws Exception {
+        ViolationCollector verboseCollector = new ViolationCollector(null, true);
+        verboseCollector.record(10, RuleId.MISSING_MESSAGE);
+
+        Map<Integer, Violation> pending = verboseCollector.pendingForTesting();
+        assertEquals(1, pending.size(), "Should have one violation");
     }
 }

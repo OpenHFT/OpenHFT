@@ -22,6 +22,7 @@ public class SuppressionTracker {
 
     private final Deque<SuppressionScope> scopes = new ArrayDeque<>();
     private final SuppressionScope fileScope = new SuppressionScope();
+    private final Set<RuleId> legacySuppressedRuleIds = EnumSet.noneOf(RuleId.class);
 
     /**
      * Create a suppression tracker.
@@ -80,7 +81,16 @@ public class SuppressionTracker {
         if (scope.suppressAll) {
             return true;
         }
-        return scope.suppressedCodes.contains(ruleId.code());
+        if (scope.suppressedRules.contains(ruleId)) {
+            return true;
+        }
+        // Also check if any suppressed AdviceId has this RuleId
+        for (AdviceId adviceId : scope.suppressedAdviceIds) {
+            if (adviceId.ruleId() == ruleId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -94,7 +104,57 @@ public class SuppressionTracker {
         if (fileScope.suppressAll) {
             return true;
         }
-        return fileScope.suppressedCodes.contains(ruleId.code());
+        if (fileScope.suppressedRules.contains(ruleId)) {
+            return true;
+        }
+        // Also check if any suppressed AdviceId has this RuleId
+        for (AdviceId adviceId : fileScope.suppressedAdviceIds) {
+            if (adviceId.ruleId() == ruleId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check whether an advice identifier is suppressed in the current scope.
+     *
+     * @param adviceId advice identifier to check.
+     * @return {@code true} if the advice is suppressed.
+     */
+    public boolean isSuppressed(AdviceId adviceId) {
+        requireNonNull(adviceId);
+        SuppressionScope scope = scopes.peek();
+        if (scope == null) {
+            return false;
+        }
+        if (scope.suppressAll) {
+            return true;
+        }
+        return scope.suppressedAdviceIds.contains(adviceId);
+    }
+
+    /**
+     * Check whether an advice identifier is suppressed at the file level.
+     *
+     * @param adviceId advice identifier to check.
+     * @return {@code true} if the advice is suppressed for the file.
+     */
+    public boolean isSuppressedInFile(AdviceId adviceId) {
+        requireNonNull(adviceId);
+        if (fileScope.suppressAll) {
+            return true;
+        }
+        return fileScope.suppressedAdviceIds.contains(adviceId);
+    }
+
+    /**
+     * Return any legacy RuleId suppressions encountered in the file.
+     *
+     * @return unmodifiable set of legacy suppressed rules.
+     */
+    public Set<RuleId> legacySuppressedRuleIds() {
+        return Collections.unmodifiableSet(legacySuppressedRuleIds);
     }
 
     private List<String> extractSuppressWarnings(DetailAST scopeAst) {
@@ -215,15 +275,17 @@ public class SuppressionTracker {
         return text;
     }
 
-    static final class SuppressionScope {
-        final Set<String> suppressedCodes = new HashSet<>();
+    final class SuppressionScope {
+        final Set<RuleId> suppressedRules = EnumSet.noneOf(RuleId.class);
+        final Set<AdviceId> suppressedAdviceIds = EnumSet.noneOf(AdviceId.class);
         boolean suppressAll;
 
         SuppressionScope() {
         }
 
         SuppressionScope(SuppressionScope parent) {
-            suppressedCodes.addAll(parent.suppressedCodes);
+            suppressedRules.addAll(parent.suppressedRules);
+            suppressedAdviceIds.addAll(parent.suppressedAdviceIds);
             suppressAll = parent.suppressAll;
         }
 
@@ -237,9 +299,15 @@ public class SuppressionTracker {
                 suppressAll = true;
                 return;
             }
+            AdviceId adviceId = AdviceId.forName(cleaned);
+            if (adviceId != AdviceId.UNKNOWN) {
+                suppressedAdviceIds.add(adviceId);
+                return;
+            }
             RuleId ruleId = RuleRegistry.forCode(cleaned);
             if (ruleId != null) {
-                suppressedCodes.add(ruleId.code());
+                suppressedRules.add(ruleId);
+                legacySuppressedRuleIds.add(ruleId);
             }
         }
 
@@ -254,5 +322,16 @@ public class SuppressionTracker {
 
     void pushScopeForTesting(SuppressionScope scope) {
         scopes.push(scope);
+    }
+
+    /**
+     * Add file-level suppression tokens for testing purposes.
+     *
+     * @param tokens suppression tokens to add.
+     */
+    void addFileSuppressionsForTesting(String... tokens) {
+        for (String token : tokens) {
+            fileScope.addToken(token);
+        }
     }
 }

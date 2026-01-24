@@ -37,6 +37,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             "required", "workaround", "avoid", "otherwise"
     ));
     private ViolationCollector violationCollector;
+    private AdviceCollector adviceCollector;
+    private AdviceCandidateEmitter adviceEmitter;
+    private AdviceReportManager adviceReportManager;
     private SuppressionTracker suppressionTracker;
     private MessageMetricsCalculator metricsCalculator;
     private MessagePrefilter messagePrefilter;
@@ -52,6 +55,10 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private CommentMessageExtractor commentExtractor;
 
     private boolean verbose;
+    private boolean dryRun;
+    private String jsonlOutput;
+    private String rankOut;
+    private boolean warnLegacySuppressions = true;
     private boolean emitUnhandled = true;
     private String messageExtractionFile;
     private BufferedWriter messageExtractionWriter;
@@ -68,6 +75,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private int purposeCueCount;
     private int entropyWordTotal;
     private boolean skipFile;
+    private String currentFileName;
 
     /**
      * Create a processor with default settings.
@@ -76,12 +84,79 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     }
 
     /**
-     * Enable verbose evaluation details.
+     * Enable verbose evaluation details and message templates.
      *
      * @param verbose {@code true} to include verbose details in violations.
      */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
+        if (violationCollector != null) {
+            violationCollector.setVerbose(verbose);
+        }
+    }
+
+    /**
+     * Enable dry-run mode to emit all advice and generate ranks.
+     *
+     * @param dryRun {@code true} for dry-run mode.
+     */
+    public void setDryRun(boolean dryRun) {
+        this.dryRun = dryRun;
+    }
+
+    /**
+     * Return the suppression tracker for testing purposes.
+     *
+     * @return suppression tracker instance.
+     */
+    SuppressionTracker suppressionTrackerForTesting() {
+        return suppressionTracker;
+    }
+
+
+    /**
+     * Configure JSONL output path for aggregated advice.
+     *
+     * @param jsonlOutput JSONL output path, or {@code null} to disable.
+     */
+    public void setJsonlOutput(String jsonlOutput) {
+        this.jsonlOutput = jsonlOutput;
+    }
+
+    /**
+     * Configure the output path for rank generation.
+     *
+     * @param rankOut rank output path, or {@code null} to use defaults.
+     */
+    public void setRankOut(String rankOut) {
+        this.rankOut = rankOut;
+    }
+
+    /**
+     * Enable warnings for legacy RuleId suppressions.
+     *
+     * @param warnLegacySuppressions {@code true} to emit warnings.
+     */
+    public void setWarnLegacySuppressions(boolean warnLegacySuppressions) {
+        this.warnLegacySuppressions = warnLegacySuppressions;
+    }
+
+    /**
+     * Initialise run-level advice reporting resources.
+     */
+    public void beginRun() {
+        adviceReportManager = new AdviceReportManager(verbose, dryRun, jsonlOutput, rankOut,
+                warnLegacySuppressions);
+        adviceReportManager.beginRun();
+    }
+
+    /**
+     * Finalise run-level advice reporting resources.
+     */
+    public void finishRun() {
+        if (adviceReportManager != null) {
+            adviceReportManager.finishRun();
+        }
     }
 
     /**
@@ -201,7 +276,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     public void beginTree(FileContents fileContents, DetailAST rootAst) {
         Map<String, Integer> messageOccurrences = new HashMap<>();
         suppressionTracker = new SuppressionTracker();
-        violationCollector = new ViolationCollector(suppressionTracker);
+        violationCollector = new ViolationCollector(suppressionTracker, verbose);
+        adviceCollector = new AdviceCollector();
+        adviceEmitter = new AdviceCandidateEmitter(adviceCollector, suppressionTracker, fileContents);
         metricsCalculator = new MessageMetricsCalculator();
         MessageRuleSupport ruleSupport = new MessageRuleSupport(metricsCalculator);
         messagePrefilter = new MessagePrefilter();
@@ -211,6 +288,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         context.setTemplateExtractor(templateExtractor);
         context.setIgnoredExceptionClassNames(ignoredExceptionClassNames);
         context.reset(fileContents);
+        currentFileName = fileContents == null ? "unknown" : fileContents.getFileName();
         context.setDeclaredMethodNames(collectDeclaredMethods(rootAst));
         skipFile = shouldSkipFile(fileContents);
         ruleEngine = new RuleEngine(ruleSupport, messageOccurrences);
@@ -260,6 +338,10 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             }
             violationCollector.flush(check);
             violationCollector.clear();
+        }
+        if (adviceReportManager != null && adviceCollector != null) {
+            adviceReportManager.reportFile(currentFileName, adviceCollector, context, suppressionTracker);
+            adviceCollector.clearAll();
         }
         closeMessageExtractionWriter();
         emitMessageExtractionFailure(check);
@@ -365,6 +447,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             case TokenTypes.ENUM_DEF:
             case TokenTypes.ANNOTATION_DEF:
             case TokenTypes.RECORD_DEF:
+                checkMissingDisplayNameForClass();
+                context.leaveType();
                 suppressionTracker.leaveScope();
                 break;
             default:
@@ -440,12 +524,31 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     }
 
     private void checkMissingDisplayName() {
+        if (context.isCurrentMethodTest()) {
+            context.markCurrentClassHasJUnit5Tests();
+        }
         if (context.isCurrentMethodTest() && !context.currentMethodHasDisplayName()) {
             String methodName = context.currentMethodName();
             int lineNo = context.currentMethodLineNo();
             if (methodName != null && lineNo > 0) {
                 violationCollector.record(lineNo, RuleId.MISSING_DISPLAY_NAME, methodName);
+                recordManualAdvice(lineNo, RuleId.MISSING_DISPLAY_NAME,
+                        AdviceSource.ANNOTATION_DISPLAY_NAME, null, null);
             }
+        }
+    }
+
+    private void checkMissingDisplayNameForClass() {
+        if (context.currentClassHasJUnit5Tests() && !context.currentClassHasDisplayName()) {
+            int lineNo = context.currentClassLineNo();
+            if (lineNo <= 0) {
+                lineNo = 1;
+            }
+            String className = context.currentClassName();
+            String name = className == null ? "unknown" : className;
+            violationCollector.record(lineNo, RuleId.MISSING_DISPLAY_NAME, name);
+            recordManualAdvice(lineNo, RuleId.MISSING_DISPLAY_NAME,
+                    AdviceSource.ANNOTATION_DISPLAY_NAME, null, null);
         }
     }
 
@@ -468,6 +571,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         String name = methodName == null ? "unknown" : methodName;
         violationCollector.record(lineNo, RuleId.TEST_ANNOTATION_ORDER,
                 firstAnnotation, name);
+        recordManualAdvice(lineNo, RuleId.TEST_ANNOTATION_ORDER,
+                AdviceSource.ANNOTATION_TEST_ORDER, null, null);
     }
 
     private boolean isTopLevelType(DetailAST ast) {
@@ -502,7 +607,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (ruleEngine != null) {
             ruleEngine.evaluate(candidate, metrics, context.currentClassName(),
                     context.currentMethodName(), verbose, suppressionTracker,
-                    violationCollector);
+                    violationCollector, adviceEmitter);
         }
     }
 
@@ -514,14 +619,22 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      */
     @Override
     public void emitMissingMessage(int lineNo, MessageSource source) {
-        emitMissingMessage(lineNo, source, null);
+        emitMissingMessage(lineNo, source, null, null);
     }
 
     @Override
     public void emitMissingMessage(int lineNo, MessageSource source,
                                    MissingMessageKind missingMessageKind) {
+        emitMissingMessage(lineNo, source, null, missingMessageKind);
+    }
+
+    @Override
+    public void emitMissingMessage(int lineNo, MessageSource source,
+                                   AdviceSource adviceSource,
+                                   MissingMessageKind missingMessageKind) {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(source)
+                .adviceSource(adviceSource)
                 .lineNo(lineNo)
                 .missingMessage(true)
                 .missingMessageKind(missingMessageKind)
@@ -543,6 +656,14 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         }
         String detail = reason == null || reason.trim().isEmpty() ? "unknown" : reason;
         violationCollector.record(lineNo, RuleId.UNHANDLED, detail, buildScope());
+        if (suppressionTracker == null
+                || (!suppressionTracker.isSuppressed(RuleId.UNHANDLED)
+                && !suppressionTracker.isSuppressed(AdviceId.MMUnhandled))) {
+            java.util.List<String> items = new java.util.ArrayList<>(1);
+            items.add(detail);
+            recordFileAdvice(new FileAdviceDetails(AdviceId.MMUnhandled, lineNo, items,
+                    null, null, null, null, null, null));
+        }
     }
 
     private void openMessageExtractionWriter() {
@@ -638,7 +759,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             return;
         }
         int lineNo = messageExtractionFailureLine > 0 ? messageExtractionFailureLine : 1;
-        check.log(lineNo, "assert.message.extraction.failure", messageExtractionFailureDetail);
+        check.log(lineNo, RuleId.messageKey("assert.message.extraction.failure", verbose),
+                messageExtractionFailureDetail);
         messageExtractionFailureDetail = null;
         messageExtractionFailureLine = 0;
     }
@@ -928,6 +1050,12 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
         violationCollector.record(lineNo, RuleId.OVERUSED_WORD,
                 builder.toString(), messageCount);
+        List<String> overusedWords = new ArrayList<>(entries.size());
+        for (Map.Entry<String, Integer> entry : entries) {
+            overusedWords.add(entry.getKey());
+        }
+        recordFileAdvice(new FileAdviceDetails(AdviceId.MMOverusedWord, lineNo, overusedWords,
+                messageCount, null, null, null, null, null));
     }
 
     private void emitLacksPurposeWarning() {
@@ -947,6 +1075,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
         violationCollector.record(lineNo, RuleId.LACKS_PURPOSE,
                 purposeCueCount, expectedMin, fileMessageCount);
+        recordFileAdvice(new FileAdviceDetails(AdviceId.MMLacksPurpose, lineNo,
+                java.util.Collections.emptyList(), null, purposeCueCount,
+                expectedMin, fileMessageCount, null, null));
     }
 
     private void emitLowEntropyWarning() {
@@ -972,6 +1103,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
         violationCollector.record(lineNo, RuleId.LOW_ENTROPY,
                 formatEntropy(entropy), formatEntropy(MIN_WORD_SHANNON_ENTROPY));
+        recordFileAdvice(new FileAdviceDetails(AdviceId.MMLowEntropy, lineNo,
+                java.util.Collections.emptyList(), null, null, null, null,
+                entropy, MIN_WORD_SHANNON_ENTROPY));
     }
 
     private void emitJUnit4MigrationWarnings() {
@@ -988,6 +1122,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 name = "Test";
             }
             violationCollector.record(lineNo, RuleId.JUNIT4_ANNOTATION, name);
+            recordManualAdvice(lineNo, RuleId.JUNIT4_ANNOTATION,
+                    AdviceSource.ANNOTATION_JUNIT4, name, null);
         }
         if (context.hasJUnit4AssertionUsage()) {
             int lineNo = context.junit4AssertionLine();
@@ -995,6 +1131,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 lineNo = 1;
             }
             violationCollector.record(lineNo, RuleId.JUNIT4_ASSERTION);
+            recordManualAdvice(lineNo, RuleId.JUNIT4_ASSERTION,
+                    AdviceSource.ANNOTATION_JUNIT4, null, null);
         }
     }
 
@@ -1036,6 +1174,52 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             return className;
         }
         return className + "#" + methodName;
+    }
+
+    private void recordManualAdvice(int lineNo, RuleId ruleId, AdviceSource adviceSource,
+                                    String messageLiteral, String messageExpr) {
+        if (adviceCollector == null || ruleId == null || adviceSource == null) {
+            return;
+        }
+        AdviceId adviceId = AdviceId.forRule(ruleId, adviceSource);
+        if (adviceId == AdviceId.UNKNOWN) {
+            throw new IllegalStateException("Missing AdviceId mapping for " + ruleId + " and " + adviceSource);
+        }
+        if (suppressionTracker != null) {
+            if (suppressionTracker.isSuppressed(ruleId) || suppressionTracker.isSuppressed(adviceId)) {
+                return;
+            }
+        }
+        CandidateAdvice advice = new CandidateAdvice.Builder()
+                .fileName(currentFileName)
+                .lineNo(lineNo)
+                .source(adviceSource)
+                .adviceId(adviceId)
+                .ruleId(ruleId)
+                .messageLiteral(messageLiteral)
+                .messageExpr(messageExpr)
+                .build();
+        adviceCollector.record(advice);
+    }
+
+    private void recordFileAdvice(FileAdviceDetails details) {
+        if (adviceCollector == null || details == null) {
+            return;
+        }
+        AdviceId adviceId = details.adviceId();
+        if (adviceId == AdviceId.UNKNOWN) {
+            throw new IllegalStateException("Missing AdviceId mapping for file advice");
+        }
+        if (suppressionTracker != null) {
+            RuleId ruleId = adviceId.ruleId();
+            if (ruleId != null && suppressionTracker.isSuppressedInFile(ruleId)) {
+                return;
+            }
+            if (suppressionTracker.isSuppressedInFile(adviceId)) {
+                return;
+            }
+        }
+        adviceCollector.recordFileAdvice(currentFileName, details);
     }
 
     MessageExtractionContext contextForTesting() {
