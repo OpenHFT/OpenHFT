@@ -20,7 +20,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>2026.0</version>
+    <version>2026.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Root Parent POM</name>
@@ -580,7 +580,7 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>root-parent-pom-2026.0</tag>
+        <tag>root-parent-pom-1.27ea0</tag>
     </scm>
 
 </project>
