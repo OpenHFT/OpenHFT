@@ -27,7 +27,7 @@
     </parent>
 
     <artifactId>third-party-bom</artifactId>
-    <version>2026.0-SNAPSHOT</version>
+    <version>3.27ea8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Third Party BOM (Bill of Materials)</name>
@@ -573,7 +573,7 @@
             <dependency>
                 <groupId>jakarta.inject</groupId>
                 <artifactId>jakarta.inject-api</artifactId>
-                <version>2.0.1</version>
+                <version>2.3.3</version>
             </dependency>
 
             <dependency>
