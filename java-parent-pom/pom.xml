@@ -16,7 +16,7 @@
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>2026.0</version>
+    <version>2026.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
@@ -171,6 +171,6 @@
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
-        <tag>java-parent-pom-2026.0</tag>
+        <tag>ea</tag>
     </scm>
 </project>
