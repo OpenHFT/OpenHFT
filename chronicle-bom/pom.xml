@@ -32,22 +32,22 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2026.0</chronicle.network.version>
-        <chronicle.queue.version>5.27ea11</chronicle.queue.version>
-        <chronicle.zero.version>2.27ea1</chronicle.zero.version>
-        <chronicle.wire.enterprise.version>2.27ea1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2.27ea10</chronicle.queue.enterprise.version>
-        <chronicle.ring.version>2.27ea1</chronicle.ring.version>
-        <chronicle.fix.version>4.27ea41</chronicle.fix.version>
-        <chronicle.services.version>3.27ea4</chronicle.services.version>
-        <chronicle.logger.version>4.27ea3</chronicle.logger.version>
-        <chronicle.efx.version>2.27ea3</chronicle.efx.version>
-        <chronicle.matching.engine.version>2.27ea1</chronicle.matching.engine.version>
-        <chronicle.platform.version>2.27ea21</chronicle.platform.version>
-        <chronicle.market.data.distributor.version>3.27ea1</chronicle.market.data.distributor.version>
+        <chronicle.network.version>2026.0-SNAPSHOT</chronicle.network.version>
+        <chronicle.queue.version>2026.0-SNAPSHOT</chronicle.queue.version>
+        <chronicle.zero.version>2026.0-SNAPSHOT</chronicle.zero.version>
+        <chronicle.wire.enterprise.version>2026.0-SNAPSHOT</chronicle.wire.enterprise.version>
+        <chronicle.queue.enterprise.version>2026.0-SNAPSHOT</chronicle.queue.enterprise.version>
+        <chronicle.ring.version>2026.0-SNAPSHOT</chronicle.ring.version>
+        <chronicle.fix.version>2026.0-SNAPSHOT</chronicle.fix.version>
+        <chronicle.services.version>2026.0-SNAPSHOT</chronicle.services.version>
+        <chronicle.logger.version>2026.0-SNAPSHOT</chronicle.logger.version>
+        <chronicle.efx.version>2026.0-SNAPSHOT</chronicle.efx.version>
+        <chronicle.matching.engine.version>2026.0-SNAPSHOT</chronicle.matching.engine.version>
+        <chronicle.platform.version>2026.0-SNAPSHOT</chronicle.platform.version>
+        <chronicle.market.data.distributor.version>2026.0-SNAPSHOT</chronicle.market.data.distributor.version>
         <chronicle.core.version>2026.1</chronicle.core.version>
-        <chronicle.itch.adapters.version>4.27ea3</chronicle.itch.adapters.version>
-        <chronicle.extensions.version>2.27ea1</chronicle.extensions.version>
+        <chronicle.itch.adapters.version>2026.0-SNAPSHOT</chronicle.itch.adapters.version>
+        <chronicle.extensions.version>2026.0-SNAPSHOT</chronicle.extensions.version>
     </properties>
 
     <dependencyManagement>
@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>3.27ea2</version>
+                <version>2026.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -908,7 +908,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>zero-allocation-hashing</artifactId>
-                <version>0.27ea1</version>
+                <version>2026.0-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
