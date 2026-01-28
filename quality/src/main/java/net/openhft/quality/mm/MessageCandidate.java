@@ -11,8 +11,10 @@ import java.util.List;
  */
 public class MessageCandidate {
     private final MessageSource source;
+    private final AdviceSource adviceSource;
     private final int lineNo;
     private final String message;
+    private final String messageExpr;
     private final String normalisedMessage;
     private final int placeholderCount;
     private final int keyValueLabelCount;
@@ -36,8 +38,10 @@ public class MessageCandidate {
 
     private MessageCandidate(Builder builder) {
         this.source = builder.source;
+        this.adviceSource = builder.adviceSource;
         this.lineNo = builder.lineNo;
         this.message = builder.message;
+        this.messageExpr = builder.messageExpr;
         this.normalisedMessage = builder.normalisedMessage;
         this.placeholderCount = builder.placeholderCount;
         this.keyValueLabelCount = builder.keyValueLabelCount;
@@ -74,6 +78,15 @@ public class MessageCandidate {
     }
 
     /**
+     * Return the advice source override for this candidate, if specified.
+     *
+     * @return advice source override, or {@code null}.
+     */
+    public AdviceSource adviceSource() {
+        return adviceSource;
+    }
+
+    /**
      * Return the line number for the candidate.
      *
      * @return line number for the candidate.
@@ -89,6 +102,15 @@ public class MessageCandidate {
      */
     public String message() {
         return message;
+    }
+
+    /**
+     * Return the original message expression text, if available.
+     *
+     * @return message expression text, or {@code null}.
+     */
+    public String messageExpr() {
+        return messageExpr;
     }
 
     /**
@@ -276,8 +298,10 @@ public class MessageCandidate {
      */
     public static final class Builder {
         private MessageSource source;
+        private AdviceSource adviceSource;
         private int lineNo;
         private String message;
+        private String messageExpr;
         private String normalisedMessage;
         private int placeholderCount;
         private int keyValueLabelCount;
@@ -317,6 +341,17 @@ public class MessageCandidate {
         }
 
         /**
+         * Set the advice source override.
+         *
+         * @param adviceSource advice source override.
+         * @return this builder for chaining.
+         */
+        public Builder adviceSource(AdviceSource adviceSource) {
+            this.adviceSource = adviceSource;
+            return this;
+        }
+
+        /**
          * Set the line number where the candidate occurs.
          *
          * @param lineNo line number where the candidate occurs.
@@ -335,6 +370,17 @@ public class MessageCandidate {
          */
         public Builder message(String message) {
             this.message = message;
+            return this;
+        }
+
+        /**
+         * Set the original message expression text.
+         *
+         * @param messageExpr message expression text.
+         * @return this builder for chaining.
+         */
+        public Builder messageExpr(String messageExpr) {
+            this.messageExpr = messageExpr;
             return this;
         }
 

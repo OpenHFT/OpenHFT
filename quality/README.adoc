@@ -104,6 +104,33 @@ NOTE: In Chronicle parent POMs the quality checks are bound to the `quality` pro
 
 Parent POMs such as `root-parent-pom` and `chronicle-enterprise-root-pom` already wire this plugin; most Chronicle modules should prefer that route rather than duplicating configuration.
 
+== Gradle Usage
+
+To apply the Chronicle Checkstyle rules in a standalone Gradle build, add a Checkstyle task that fails the build on violations:
+
+[source,groovy]
+----
+plugins {
+    id 'checkstyle'
+}
+
+checkstyle {
+    toolVersion = '9.3'
+    config = resources.text.fromArchiveEntry(configurations.checkstyle, 'net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml')
+}
+
+dependencies {
+    checkstyle 'com.puppycrawl.tools:checkstyle:9.3'
+    checkstyle 'net.openhft:quality:2026.0'
+}
+
+def qualityEnforce = (project.findProperty('quality.enforced') ?: 'true').toString().toBoolean()
+tasks.withType(Checkstyle).configureEach {
+    ignoreFailures = !qualityEnforce
+    maxWarnings = qualityEnforce ? 0 : Integer.MAX_VALUE
+}
+----
+
 === SpotBugs
 
 SpotBugs configuration (rule filters, effort and threshold settings) is also provided from this module and surfaced by the parent POMs.

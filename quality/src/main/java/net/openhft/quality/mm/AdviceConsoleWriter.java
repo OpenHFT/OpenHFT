@@ -69,6 +69,8 @@ public final class AdviceConsoleWriter {
             }
             if (occurrence.snippet() != null && !occurrence.snippet().isEmpty()) {
                 line.append(" snippet=\"").append(occurrence.snippet()).append('"');
+            } else if (occurrence.lineText() != null && !occurrence.lineText().isEmpty()) {
+                line.append(" line: \"").append(occurrence.lineText()).append('"');
             } else {
                 line.append(" hint=").append(text.hintA()).append(" / ").append(text.hintB());
             }

@@ -57,9 +57,11 @@ public final class AdviceReportBuilder {
             deduped.put(line, dedupedCandidates);
             List<CandidateAdvice> selected = selectCandidates(dedupedCandidates);
             for (CandidateAdvice candidate : selected) {
+                LineSnippet snippet = snippetForLine(context, line,
+                        candidate.messageLiteral(), candidate.messageExpr());
                 AdviceOccurrence occurrence = new AdviceOccurrence(line, candidate.source(),
                         candidate.messageLiteral(), candidate.messageExpr(),
-                        snippetForLine(context, line));
+                        snippet.lineText, snippet.snippet);
                 grouped.computeIfAbsent(candidate.adviceId(), key -> new ArrayList<>())
                         .add(occurrence);
             }
@@ -122,22 +124,80 @@ public final class AdviceReportBuilder {
         return selected;
     }
 
-    private String snippetForLine(MessageExtractionContext context, int lineNo) {
+    private LineSnippet snippetForLine(MessageExtractionContext context, int lineNo,
+                                       String messageLiteral, String messageExpr) {
         if (context == null || lineNo <= 0) {
-            return null;
+            return LineSnippet.empty();
         }
         FileContents contents = context.fileContents();
         if (contents == null) {
-            return null;
+            return LineSnippet.empty();
         }
         String[] lines = contents.getLines();
         if (lines == null || lineNo > lines.length) {
-            return null;
+            return LineSnippet.empty();
         }
         String line = lines[lineNo - 1];
-        return line == null ? null : line.trim();
+        String trimmed = line == null ? null : line.trim();
+        if (trimmed == null || trimmed.isEmpty()) {
+            return LineSnippet.empty();
+        }
+        String snippet = extractSnippet(trimmed, messageExpr, messageLiteral);
+        if (snippet == null || snippet.equals(trimmed)) {
+            return new LineSnippet(trimmed, null);
+        }
+        return new LineSnippet(null, snippet);
     }
 
+    private String extractSnippet(String line, String messageExpr, String messageLiteral) {
+        String target = pickTarget(messageExpr, messageLiteral);
+        if (target == null || target.isEmpty()) {
+            return null;
+        }
+        int index = line.indexOf(target);
+        if (index < 0) {
+            return null;
+        }
+        int start = Math.max(0, index - 40);
+        int end = Math.min(line.length(), index + target.length() + 40);
+        if (start == 0 && end == line.length()) {
+            return line;
+        }
+        StringBuilder snippet = new StringBuilder();
+        if (start > 0) {
+            snippet.append("...");
+        }
+        snippet.append(line, start, end);
+        if (end < line.length()) {
+            snippet.append("...");
+        }
+        return snippet.toString();
+    }
+
+    private String pickTarget(String messageExpr, String messageLiteral) {
+        if (messageLiteral != null && !messageLiteral.isEmpty()) {
+            return messageLiteral;
+        }
+        if (messageExpr != null && !messageExpr.isEmpty()) {
+            return messageExpr;
+        }
+        return null;
+    }
+
+    private static final class LineSnippet {
+        private static final LineSnippet EMPTY = new LineSnippet(null, null);
+        private final String lineText;
+        private final String snippet;
+
+        private LineSnippet(String lineText, String snippet) {
+            this.lineText = lineText;
+            this.snippet = snippet;
+        }
+
+        private static LineSnippet empty() {
+            return EMPTY;
+        }
+    }
     private List<RuleId> legacySuppressions(SuppressionTracker suppressionTracker) {
         if (!warnLegacySuppressions || suppressionTracker == null) {
             return Collections.emptyList();

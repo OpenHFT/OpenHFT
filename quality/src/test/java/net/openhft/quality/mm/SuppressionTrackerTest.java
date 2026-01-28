@@ -5,11 +5,17 @@ package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.DetailAstImpl;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.FileContents;
+import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class SuppressionTrackerTest {
 
     private SuppressionTracker tracker;
+
+    @TempDir
+    Path tempDir;
 
     @BeforeEach
     void setUp() {
@@ -53,6 +62,39 @@ class SuppressionTrackerTest {
 
         assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort),
                 "advice id should be suppressed in scope");
+    }
+
+    @Test
+    @DisplayName("Comment suppression toggles rule ranges")
+    void commentSuppression_togglesRuleRanges() throws Exception {
+        FileContents contents = createFileContents("InputComments.java",
+                "// MMTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "// MMTooShort:ON",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT, 2),
+                "rule should be suppressed between OFF and ON");
+        assertFalse(tracker.isSuppressed(RuleId.TOO_SHORT, 4),
+                "rule should not be suppressed after ON");
+    }
+
+    @Test
+    @DisplayName("Comment suppression supports advice ids and hash comments")
+    void commentSuppression_supportsAdviceIdAndHashComments() throws Exception {
+        FileContents contents = createFileContents("InputHash.txt",
+                "# MMAssertionMessageTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "# MMAssertionMessageTooShort:ON");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort, 2),
+                "advice id should be suppressed between OFF and ON");
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT, 2),
+                "rule should be suppressed when advice id is suppressed");
     }
 
     @Test
@@ -592,6 +634,14 @@ class SuppressionTrackerTest {
         ident.setType(TokenTypes.IDENT);
         ident.setText(text);
         return ident;
+    }
+
+    private FileContents createFileContents(String fileName, String... lines) throws Exception {
+        Path file = tempDir.resolve(fileName);
+        List<String> content = Arrays.asList(lines);
+        Files.write(file, content, StandardCharsets.UTF_8);
+        FileText text = new FileText(file.toFile(), content);
+        return new FileContents(text);
     }
 
     private void invokeCollectStringValues(DetailAstImpl expr, List<String> tokens) throws Exception {

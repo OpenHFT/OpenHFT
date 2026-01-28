@@ -47,24 +47,30 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
 
         // Track @DisplayName presence
         if (annotationName.equals("DisplayName")) {
-            context().markCurrentMethodHasDisplayName();
-            checkAnnotationValue(annotationAst, "value");
+            if (context().currentMethodName() == null) {
+                context().markCurrentClassHasDisplayName();
+            } else {
+                context().markCurrentMethodHasDisplayName();
+            }
+            checkAnnotationValue(annotationAst, annotationName, "value");
         } else if (annotationName.equals("Disabled") || annotationName.equals("Ignore")) {
-            boolean hasValue = checkAnnotationValue(annotationAst, "value");
+            boolean hasValue = checkAnnotationValue(annotationAst, annotationName, "value");
             if (!hasValue) {
-                sink().emitMissingMessage(annotationAst.getLineNo(), MessageSource.ANNOTATION);
+                sink().emitMissingMessage(annotationAst.getLineNo(), MessageSource.ANNOTATION,
+                        AdviceSource.ANNOTATION_DISABLED, null);
             }
         }
 
         if (annotationName.equals("ParameterizedTest")
                 || annotationName.equals("RepeatedTest")) {
-            checkAnnotationValue(annotationAst, "name");
+            checkAnnotationValue(annotationAst, annotationName, "name");
         }
 
-        checkAnnotationValue(annotationAst, "disabledReason");
+        checkAnnotationValue(annotationAst, annotationName, "disabledReason");
     }
 
-    private boolean checkAnnotationValue(DetailAST annotationAst, String attributeName) {
+    private boolean checkAnnotationValue(DetailAST annotationAst, String annotationName,
+                                         String attributeName) {
         DetailAST expr = findAnnotationValue(annotationAst, attributeName);
         if (expr == null) {
             return false;
@@ -77,16 +83,39 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
         }
         int placeholderCount = templateExtractor.countAnnotationPlaceholders(message);
         int keyValueLabelCount = templateExtractor.countKeyValueLabels(message);
+        AdviceSource adviceSource = resolveAdviceSource(annotationName, attributeName);
+        String messageExpr = MessageExpressionRenderer.render(expr, astSupport());
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(MessageSource.ANNOTATION)
+                .adviceSource(adviceSource)
                 .lineNo(expr.getLineNo())
                 .message(message)
+                .messageExpr(messageExpr)
                 .normalisedMessage(MessageNormaliser.normalise(message))
                 .placeholderCount(placeholderCount)
                 .keyValueLabelCount(keyValueLabelCount)
+                .constantMessage(true)
                 .build();
         sink().emitCandidate(candidate);
         return true;
+    }
+
+    private AdviceSource resolveAdviceSource(String annotationName, String attributeName) {
+        if ("DisplayName".equals(annotationName)) {
+            return AdviceSource.ANNOTATION_DISPLAY_NAME;
+        }
+        if ("Disabled".equals(annotationName) || "Ignore".equals(annotationName)) {
+            return AdviceSource.ANNOTATION_DISABLED;
+        }
+        if ("disabledReason".equals(attributeName)) {
+            return AdviceSource.ANNOTATION_DISABLED;
+        }
+        if ("name".equals(attributeName)
+                && ("ParameterizedTest".equals(annotationName)
+                || "RepeatedTest".equals(annotationName))) {
+            return AdviceSource.ANNOTATION_DISPLAY_NAME;
+        }
+        return AdviceSource.ANNOTATION_DISPLAY_NAME;
     }
 
     String extractAnnotationName(DetailAST annotationAst) {

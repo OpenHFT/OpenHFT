@@ -32,6 +32,7 @@ final class AdviceIdCoverageTest {
             AdviceId.MMAnnotationTestOrder,
             AdviceId.MMAnnotationJUnit4Annotation,
             AdviceId.MMAnnotationJUnit4Assertion,
+            AdviceId.MMCommentMapStringObject,
             AdviceId.MMUnhandled
     );
 

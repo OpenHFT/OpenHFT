@@ -6,11 +6,12 @@ package net.openhft.quality;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import net.openhft.quality.mm.MeaningfulMessageProcessor;
+import net.openhft.quality.mm.RuleId;
 
 import java.util.Objects;
 
 /**
- * Checkstyle check that enforces unique and meaningful messages for assertions,
+ * Checkstyle check that enforces unique and meaningful messages in assertions,
  * preconditions, thrown exceptions, and JUnit annotation descriptions within each Java file
  * because reports should explain intent so that triage stays clear.
  * <p>
@@ -30,6 +31,12 @@ import java.util.Objects;
  */
 public class MeaningfulMessageCheck extends AbstractCheck {
     private final MeaningfulMessageProcessor processor;
+    private boolean verbose;
+    private boolean dryRun;
+    private String jsonlOutput;
+    private String rankOut;
+    private boolean warnLegacySuppressions = true;
+    private String excludedPaths;
 
     /**
      * Create the check with default processor settings.
@@ -48,16 +55,57 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     }
 
     /**
-     * Enable verbose reporting for rule evaluation.
+     * Enable verbose reporting during rule evaluation and message template rendering.
      *
      * @param verbose {@code true} to include verbose details in violations.
      */
     public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
         processor.setVerbose(verbose);
     }
 
     /**
-     * Enable warnings for unhandled extraction cases.
+     * Enable dry-run mode to generate advice ranking.
+     *
+     * @param dryRun {@code true} for dry-run mode.
+     */
+    public void setDryRun(boolean dryRun) {
+        this.dryRun = dryRun;
+        processor.setDryRun(dryRun);
+    }
+
+    /**
+     * Configure JSONL output to emit aggregated advice.
+     *
+     * @param jsonlOutput output path, or {@code null} to disable.
+     */
+    public void setJsonl(String jsonlOutput) {
+        this.jsonlOutput = jsonlOutput;
+        processor.setJsonlOutput(jsonlOutput);
+    }
+
+    /**
+     * Configure the output path used to generate advice ranks.
+     *
+     * @param rankOut output path, or {@code null} to use defaults.
+     */
+    public void setRankOut(String rankOut) {
+        this.rankOut = rankOut;
+        processor.setRankOut(rankOut);
+    }
+
+    /**
+     * Enable warnings about legacy RuleId suppressions.
+     *
+     * @param warnLegacySuppressions {@code true} to emit warnings.
+     */
+    public void setWarnLegacySuppressions(boolean warnLegacySuppressions) {
+        this.warnLegacySuppressions = warnLegacySuppressions;
+        processor.setWarnLegacySuppressions(warnLegacySuppressions);
+    }
+
+    /**
+     * Enable warnings about unhandled extraction cases.
      *
      * @param emitUnhandled {@code true} to emit unhandled warnings.
      */
@@ -66,7 +114,7 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     }
 
     /**
-     * Configure an optional output file for extracted message data.
+     * Configure an optional output file to capture extracted message data.
      *
      * @param messageExtractionFile path to the extraction file, or {@code null} to disable.
      */
@@ -75,12 +123,22 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     }
 
     /**
-     * Configure exception class names that should be ignored for message checks.
+     * Configure exception class names that should be ignored during message checks.
      *
      * @param ignoredExceptionClassNames comma or whitespace separated class names.
      */
     public void setIgnoredExceptionClassNames(String ignoredExceptionClassNames) {
         processor.setIgnoredExceptionClassNames(ignoredExceptionClassNames);
+    }
+
+    /**
+     * Configure file exclusions by path fragment, glob, or regex (prefix with {@code regex:}).
+     *
+     * @param excludedPaths comma/whitespace separated path patterns.
+     */
+    public void setExcludedPaths(String excludedPaths) {
+        this.excludedPaths = excludedPaths;
+        processor.setExcludedPaths(excludedPaths);
     }
 
     @Override
@@ -96,6 +154,24 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     @Override
     public int[] getRequiredTokens() {
         return processor.getRequiredTokens();
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        processor.setVerbose(verbose);
+        processor.setDryRun(dryRun);
+        processor.setJsonlOutput(jsonlOutput);
+        processor.setRankOut(rankOut);
+        processor.setWarnLegacySuppressions(warnLegacySuppressions);
+        processor.setExcludedPaths(excludedPaths);
+        processor.beginRun();
+    }
+
+    @Override
+    public void destroy() {
+        processor.finishRun();
+        super.destroy();
     }
 
     @SuppressWarnings("deprecation")
@@ -143,6 +219,6 @@ public class MeaningfulMessageCheck extends AbstractCheck {
         }
         int lineNo = ast == null ? 0 : ast.getLineNo();
         int resolvedLine = lineNo > 0 ? lineNo : 1;
-        log(resolvedLine, "assert.message.unexpected.exception", message);
+        log(resolvedLine, RuleId.messageKey("assert.message.unexpected.exception", verbose), message);
     }
 }

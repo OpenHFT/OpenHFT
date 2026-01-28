@@ -202,6 +202,8 @@ public final class AdviceJsonlWriter implements AutoCloseable {
             }
             if (occurrence.snippet() != null) {
                 field(sb, fieldFirst, "snippet", occurrence.snippet());
+            } else if (occurrence.lineText() != null) {
+                field(sb, fieldFirst, "line_text", occurrence.lineText());
             }
             sb.append('}');
         }

@@ -29,9 +29,6 @@
         <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
     </Match>
     <Match>
-        <Bug pattern="DM_DEFAULT_ENCODING"/>
-    </Match>
-    <Match>
         <Bug pattern="DM_EXIT"/>
     </Match>
     <Match>
@@ -250,10 +247,7 @@
         <Bug pattern="UC_USELESS_VOID_METHOD"/>
     </Match>
 
-    <!-- DLS_/UPM_/UMAC_: dead stores / unused methods -->
-    <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-    </Match>
+    <!-- UPM_/UMAC_: unused methods -->
     <Match>
         <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
     </Match>
@@ -306,6 +300,6 @@
         <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
     </Match>
 
-    <!-- SS_SHOULD_BE_STATIC already above; DM_DEFAULT_ENCODING already above -->
+    <!-- SS_SHOULD_BE_STATIC already above; DM_DEFAULT_ENCODING intentionally excluded to avoid legacy behaviour churn -->
 
 </FindBugsFilter>

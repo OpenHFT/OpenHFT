@@ -180,4 +180,143 @@ class MMDuplicateTest {
         assertTrue(collector.pendingForTesting().isEmpty(),
                 "null message should not trigger violation");
     }
+
+    // Additional tests to kill surviving mutations
+
+    @Test
+    @DisplayName("Argument name message true skips duplicate detection entirely")
+    void argumentNameMessageTrueSkipsDuplicateDetectionEntirely() {
+        // Pre-populate so if detection runs, it would find a duplicate
+        messageOccurrences.put("test message", 1);
+
+        MessageCandidate candidateWithFlag = new MessageCandidate.Builder()
+                .lineNo(10)
+                .source(MessageSource.ASSERTION)
+                .message("test message")
+                .normalisedMessage("test message")
+                .argumentNameMessage(true)
+                .build();
+        MessageContext context = new MessageContext(candidateWithFlag, null,
+                "TestClass", "testMethod", false, null, null, null);
+
+        rule.evaluate(context, collector, state);
+
+        // Verify no violation was recorded (early return was taken)
+        assertTrue(collector.pendingForTesting().isEmpty(),
+                "argumentNameMessage=true should skip all processing");
+        // Verify no new entries added to occurrences map
+        assertEquals(1, messageOccurrences.size(),
+                "argumentNameMessage=true should not add to occurrences map");
+    }
+
+    @Test
+    @DisplayName("Argument name message false processes duplicate normally")
+    void argumentNameMessageFalseProcessesDuplicateNormally() {
+        // Pre-populate so detection will find a duplicate
+        messageOccurrences.put("test message", 1);
+
+        MessageCandidate candidateWithoutFlag = new MessageCandidate.Builder()
+                .lineNo(10)
+                .source(MessageSource.ASSERTION)
+                .message("test message")
+                .normalisedMessage("test message")
+                .argumentNameMessage(false)
+                .build();
+        MessageContext context = new MessageContext(candidateWithoutFlag, null,
+                "TestClass", "testMethod", false, null, null, null);
+
+        rule.evaluate(context, collector, state);
+
+        // Verify violation was recorded (early return was NOT taken)
+        assertEquals(1, collector.pendingForTesting().size(),
+                "argumentNameMessage=false should detect duplicate");
+    }
+
+    @Test
+    @DisplayName("Log source with recorded violation does not mark warning fired")
+    void logSourceWithRecordedViolationDoesNotMarkWarningFired() {
+        messageOccurrences.put("log duplicate", 5);
+
+        MessageCandidate logCandidate = new MessageCandidate.Builder()
+                .lineNo(20)
+                .source(MessageSource.LOG)
+                .message("log duplicate")
+                .normalisedMessage("log duplicate")
+                .argumentNameMessage(false)
+                .build();
+        MessageContext context = new MessageContext(logCandidate, null,
+                "TestClass", "testMethod", false, null, null, null);
+
+        rule.evaluate(context, collector, state);
+
+        assertEquals(1, collector.pendingForTesting().size(),
+                "LOG source should still record violation");
+        assertFalse(state.warningFired(),
+                "LOG source should NOT mark warning fired even with violation");
+    }
+
+    @Test
+    @DisplayName("Assertion source with recorded violation marks warning fired")
+    void assertionSourceWithRecordedViolationMarksWarningFired() {
+        messageOccurrences.put("assertion duplicate", 5);
+
+        MessageCandidate assertionCandidate = new MessageCandidate.Builder()
+                .lineNo(20)
+                .source(MessageSource.ASSERTION)
+                .message("assertion duplicate")
+                .normalisedMessage("assertion duplicate")
+                .argumentNameMessage(false)
+                .build();
+        MessageContext context = new MessageContext(assertionCandidate, null,
+                "TestClass", "testMethod", false, null, null, null);
+
+        rule.evaluate(context, collector, state);
+
+        assertEquals(1, collector.pendingForTesting().size(),
+                "ASSERTION source should record violation");
+        assertTrue(state.warningFired(),
+                "ASSERTION source should mark warning fired");
+    }
+
+    @Test
+    @DisplayName("Precondition source marks warning fired on duplicate")
+    void preconditionSourceMarksWarningFiredOnDuplicate() {
+        messageOccurrences.put("precondition message", 5);
+
+        MessageCandidate preconditionCandidate = new MessageCandidate.Builder()
+                .lineNo(20)
+                .source(MessageSource.PRECONDITION)
+                .message("precondition message")
+                .normalisedMessage("precondition message")
+                .argumentNameMessage(false)
+                .build();
+        MessageContext context = new MessageContext(preconditionCandidate, null,
+                "TestClass", "testMethod", false, null, null, null);
+
+        rule.evaluate(context, collector, state);
+
+        assertEquals(1, collector.pendingForTesting().size(),
+                "PRECONDITION source should record violation");
+        assertTrue(state.warningFired(),
+                "PRECONDITION source should mark warning fired");
+    }
+
+    @Test
+    @DisplayName("Empty normalised message falls back to normalise")
+    void emptyNormalisedMessageFallsBackToNormalise() {
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .lineNo(10)
+                .source(MessageSource.ASSERTION)
+                .message("Order Should Be Valid")
+                .normalisedMessage("")
+                .build();
+        MessageContext context = new MessageContext(candidate, null,
+                "TestClass", "testMethod", false, null, null, null);
+
+        rule.evaluate(context, collector, state);
+
+        // After normalisation, "Order Should Be Valid" becomes "order should be valid"
+        assertTrue(messageOccurrences.containsKey("order should be valid"),
+                "empty normalisedMessage should fall back to MessageNormaliser.normalise");
+    }
 }

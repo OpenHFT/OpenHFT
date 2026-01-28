@@ -35,10 +35,11 @@ public final class AdviceCandidateEmitter implements AdviceEmitter {
             throw new IllegalStateException("Missing AdviceId mapping for " + ruleId + " and " + adviceSource);
         }
         if (suppressionTracker != null) {
-            if (suppressionTracker.isSuppressed(ruleId)) {
+            int lineNo = candidate.lineNo();
+            if (suppressionTracker.isSuppressed(ruleId, lineNo)) {
                 return;
             }
-            if (suppressionTracker.isSuppressed(adviceId)) {
+            if (suppressionTracker.isSuppressed(adviceId, lineNo)) {
                 return;
             }
         }

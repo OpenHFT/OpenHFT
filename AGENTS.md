@@ -21,6 +21,7 @@
 - `quality/` holds quality rules with docs under `quality/src/main/docs/`.
 - `third-party-smoke/` validates dependencies across Java 8 and Java 21.
 - Module docs and decision logs live under `src/main/docs/`.
+- MeaningfulMessage advice text and ranks live in `quality/src/main/resources/net/openhft/quality/mm-advice.properties` and `quality/src/main/resources/net/openhft/quality/mm-advice-ranks.properties`.
 
 ## Constraints
 - Java baseline: 8 (also validate Java 21 via `third-party-smoke`).
@@ -32,6 +33,8 @@
 
 ## Docs and review checklist
 - Keep docs, tests, and code in sync; update `.adoc` files when behaviour changes.
+- MeaningfulMessageCheck emits intent-first messages by default; set `verbose=true` for detailed diagnostics.
+- Aggregated advice uses AdviceId suppression; Checkstyle violations still use RuleId/Checkstyle suppression rules.
 - Javadoc must add behavioural contracts, edge cases, thread safety, units, or performance notes.
 - For large mechanical changes, declare the transformation rule and keep it consistent.
 - For CPD work, follow `/prompts:CPD_PLAYBOOK` and run `mvn -q pmd:cpd-check -l logs/mvn-cpd.log`.

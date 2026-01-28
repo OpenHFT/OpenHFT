@@ -4,13 +4,16 @@
 package net.openhft.quality.mm;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Tracks @SuppressWarnings tokens for MeaningfulMessage rule suppression.
+ * Tracks @SuppressWarnings tokens and comment directives for MeaningfulMessage rule suppression.
  */
 public class SuppressionTracker {
 
@@ -19,10 +22,16 @@ public class SuppressionTracker {
     private static final String ALL_TOKEN = "MM-all";
     private static final String CHECK_ID = "MeaningfulMessage";
     private static final String CHECK_CLASS = "MeaningfulMessageCheck";
+    private static final Pattern COMMENT_SUPPRESSION =
+            Pattern.compile("^\\s*(//|#)\\s*(.+)\\s*:\\s*(OFF|ON)\\b.*$", Pattern.CASE_INSENSITIVE);
+    private static final int NO_LINE = -1;
 
     private final Deque<SuppressionScope> scopes = new ArrayDeque<>();
     private final SuppressionScope fileScope = new SuppressionScope();
     private final Set<RuleId> legacySuppressedRuleIds = EnumSet.noneOf(RuleId.class);
+    private final List<LineRange> commentSuppressAll = new ArrayList<>();
+    private final Map<RuleId, List<LineRange>> commentSuppressedRules = new EnumMap<>(RuleId.class);
+    private final Map<AdviceId, List<LineRange>> commentSuppressedAdviceIds = new EnumMap<>(AdviceId.class);
 
     /**
      * Create a suppression tracker.
@@ -54,6 +63,92 @@ public class SuppressionTracker {
     public void recordFileSuppressions(DetailAST scopeAst) {
         for (String token : extractSuppressWarnings(scopeAst)) {
             fileScope.addToken(token);
+        }
+    }
+
+    /**
+     * Record comment-based suppression ranges for this file.
+     *
+     * @param fileContents file contents for the current file.
+     */
+    public void recordCommentSuppressions(FileContents fileContents) {
+        commentSuppressAll.clear();
+        commentSuppressedRules.clear();
+        commentSuppressedAdviceIds.clear();
+        if (fileContents == null) {
+            return;
+        }
+        String[] lines = fileContents.getLines();
+        if (lines == null || lines.length == 0) {
+            return;
+        }
+        int openAll = NO_LINE;
+        Map<RuleId, Integer> openRules = new EnumMap<>(RuleId.class);
+        Map<AdviceId, Integer> openAdviceIds = new EnumMap<>(AdviceId.class);
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            if (line == null) {
+                continue;
+            }
+            Matcher matcher = COMMENT_SUPPRESSION.matcher(line);
+            if (!matcher.matches()) {
+                continue;
+            }
+            String token = matcher.group(2);
+            if (token == null) {
+                continue;
+            }
+            String cleaned = cleanToken(token);
+            if (cleaned.isEmpty()) {
+                continue;
+            }
+            boolean off = "OFF".equalsIgnoreCase(matcher.group(3));
+            int lineNo = i + 1;
+            if (ALL_TOKEN.equals(cleaned) || CHECK_ID.equals(cleaned) || CHECK_CLASS.equals(cleaned)) {
+                if (off) {
+                    if (openAll == NO_LINE) {
+                        openAll = lineNo;
+                    }
+                } else if (openAll != NO_LINE) {
+                    commentSuppressAll.add(new LineRange(openAll, lineNo));
+                    openAll = NO_LINE;
+                }
+                continue;
+            }
+            AdviceId adviceId = AdviceId.forName(cleaned);
+            if (adviceId != AdviceId.UNKNOWN) {
+                if (off) {
+                    openAdviceIds.putIfAbsent(adviceId, lineNo);
+                } else {
+                    Integer start = openAdviceIds.remove(adviceId);
+                    if (start != null) {
+                        addAdviceRange(adviceId, start, lineNo);
+                    }
+                }
+                continue;
+            }
+            RuleId ruleId = RuleRegistry.forCode(cleaned);
+            if (ruleId != null) {
+                legacySuppressedRuleIds.add(ruleId);
+                if (off) {
+                    openRules.putIfAbsent(ruleId, lineNo);
+                } else {
+                    Integer start = openRules.remove(ruleId);
+                    if (start != null) {
+                        addRuleRange(ruleId, start, lineNo);
+                    }
+                }
+            }
+        }
+        int lastLine = lines.length;
+        if (openAll != NO_LINE) {
+            commentSuppressAll.add(new LineRange(openAll, lastLine));
+        }
+        for (Map.Entry<RuleId, Integer> entry : openRules.entrySet()) {
+            addRuleRange(entry.getKey(), entry.getValue(), lastLine);
+        }
+        for (Map.Entry<AdviceId, Integer> entry : openAdviceIds.entrySet()) {
+            addAdviceRange(entry.getKey(), entry.getValue(), lastLine);
         }
     }
 
@@ -94,6 +189,20 @@ public class SuppressionTracker {
     }
 
     /**
+     * Check whether a rule is suppressed for the given line.
+     *
+     * @param ruleId rule identifier to check.
+     * @param lineNo line number to check.
+     * @return {@code true} if the rule is suppressed.
+     */
+    public boolean isSuppressed(RuleId ruleId, int lineNo) {
+        if (isSuppressed(ruleId)) {
+            return true;
+        }
+        return isCommentSuppressed(ruleId, lineNo);
+    }
+
+    /**
      * Check whether a rule is suppressed at the file level.
      *
      * @param ruleId rule identifier to check.
@@ -117,6 +226,20 @@ public class SuppressionTracker {
     }
 
     /**
+     * Check whether a rule is suppressed at the file level for the given line.
+     *
+     * @param ruleId rule identifier to check.
+     * @param lineNo line number to check.
+     * @return {@code true} if the rule is suppressed for the file.
+     */
+    public boolean isSuppressedInFile(RuleId ruleId, int lineNo) {
+        if (isSuppressedInFile(ruleId)) {
+            return true;
+        }
+        return isCommentSuppressed(ruleId, lineNo);
+    }
+
+    /**
      * Check whether an advice identifier is suppressed in the current scope.
      *
      * @param adviceId advice identifier to check.
@@ -135,6 +258,20 @@ public class SuppressionTracker {
     }
 
     /**
+     * Check whether an advice identifier is suppressed for the given line.
+     *
+     * @param adviceId advice identifier to check.
+     * @param lineNo   line number to check.
+     * @return {@code true} if the advice is suppressed.
+     */
+    public boolean isSuppressed(AdviceId adviceId, int lineNo) {
+        if (isSuppressed(adviceId)) {
+            return true;
+        }
+        return isCommentSuppressed(adviceId, lineNo);
+    }
+
+    /**
      * Check whether an advice identifier is suppressed at the file level.
      *
      * @param adviceId advice identifier to check.
@@ -146,6 +283,20 @@ public class SuppressionTracker {
             return true;
         }
         return fileScope.suppressedAdviceIds.contains(adviceId);
+    }
+
+    /**
+     * Check whether an advice identifier is suppressed at the file level for the given line.
+     *
+     * @param adviceId advice identifier to check.
+     * @param lineNo   line number to check.
+     * @return {@code true} if the advice is suppressed for the file.
+     */
+    public boolean isSuppressedInFile(AdviceId adviceId, int lineNo) {
+        if (isSuppressedInFile(adviceId)) {
+            return true;
+        }
+        return isCommentSuppressed(adviceId, lineNo);
     }
 
     /**
@@ -246,6 +397,61 @@ public class SuppressionTracker {
         return null;
     }
 
+    private void addRuleRange(RuleId ruleId, int startLine, int endLine) {
+        commentSuppressedRules
+                .computeIfAbsent(ruleId, key -> new ArrayList<>())
+                .add(new LineRange(startLine, endLine));
+    }
+
+    private void addAdviceRange(AdviceId adviceId, int startLine, int endLine) {
+        commentSuppressedAdviceIds
+                .computeIfAbsent(adviceId, key -> new ArrayList<>())
+                .add(new LineRange(startLine, endLine));
+    }
+
+    private boolean isCommentSuppressed(RuleId ruleId, int lineNo) {
+        requireNonNull(ruleId);
+        if (lineNo <= 0) {
+            return false;
+        }
+        if (isLineSuppressed(commentSuppressAll, lineNo)) {
+            return true;
+        }
+        if (isLineSuppressed(commentSuppressedRules.get(ruleId), lineNo)) {
+            return true;
+        }
+        for (Map.Entry<AdviceId, List<LineRange>> entry : commentSuppressedAdviceIds.entrySet()) {
+            AdviceId adviceId = entry.getKey();
+            if (adviceId.ruleId() == ruleId && isLineSuppressed(entry.getValue(), lineNo)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isCommentSuppressed(AdviceId adviceId, int lineNo) {
+        requireNonNull(adviceId);
+        if (lineNo <= 0) {
+            return false;
+        }
+        if (isLineSuppressed(commentSuppressAll, lineNo)) {
+            return true;
+        }
+        return isLineSuppressed(commentSuppressedAdviceIds.get(adviceId), lineNo);
+    }
+
+    private boolean isLineSuppressed(List<LineRange> ranges, int lineNo) {
+        if (ranges == null || ranges.isEmpty()) {
+            return false;
+        }
+        for (LineRange range : ranges) {
+            if (range.contains(lineNo)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String extractAnnotationName(DetailAST annotationAst) {
         DetailAST dot = annotationAst.findFirstToken(TokenTypes.DOT);
         if (dot != null) {
@@ -273,6 +479,14 @@ public class SuppressionTracker {
             return text.substring(1, text.length() - 1);
         }
         return text;
+    }
+
+    private String cleanToken(String token) {
+        String trimmed = token.trim();
+        if (trimmed.startsWith(CHECKSTYLE_PREFIX)) {
+            return trimmed.substring(CHECKSTYLE_PREFIX.length());
+        }
+        return trimmed;
     }
 
     final class SuppressionScope {
@@ -312,11 +526,21 @@ public class SuppressionTracker {
         }
 
         String cleanToken(String token) {
-            String trimmed = token.trim();
-            if (trimmed.startsWith(CHECKSTYLE_PREFIX)) {
-                return trimmed.substring(CHECKSTYLE_PREFIX.length());
-            }
-            return trimmed;
+            return SuppressionTracker.this.cleanToken(token);
+        }
+    }
+
+    private static final class LineRange {
+        private final int start;
+        private final int end;
+
+        private LineRange(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        private boolean contains(int lineNo) {
+            return lineNo >= start && lineNo <= end;
         }
     }
 

@@ -99,6 +99,32 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
             return;
         }
 
+        DetailAST content = astSupport().unwrapExpr(messageExpr);
+        boolean hasSupplier = content != null && content.getType() == TokenTypes.METHOD_REF;
+        if (!hasSupplier) {
+            hasSupplier = astSupport().findLambda(messageExpr) != null;
+        }
+        if (!hasSupplier && content != null) {
+            hasSupplier = isSupplierTypedExpression(content);
+        }
+        if (hasSupplier) {
+            String supplierMessage = extractConstantSupplierMessage(messageExpr);
+            if (supplierMessage == null) {
+                if (!context().hasInlineReasonComment(methodCall)) {
+                    sink().emitMissingMessage(lineNo, MessageSource.LOG);
+                }
+                return;
+            }
+            int formatPlaceholderCount = countFormatPlaceholders(supplierMessage);
+            int logPlaceholderCount = formatPlaceholderCount > 0 ? 0 : countLogPlaceholders(supplierMessage);
+            int placeholderCount = formatPlaceholderCount + Math.max(extraArgs.size(), logPlaceholderCount);
+            int keyValueLabelCount = countKeyValueLabels(supplierMessage);
+            String messageExprText = MessageExpressionRenderer.render(messageExpr, astSupport());
+            emitMessageCandidate(supplierMessage, messageExprText, lineNo, placeholderCount,
+                    keyValueLabelCount, supplierMessage);
+            return;
+        }
+
         MessageTemplate template = extractMessageTemplate(messageExpr);
         if (template == null) {
             // Message expression exists but couldn't be parsed as a template.
@@ -118,7 +144,8 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         int logPlaceholderCount = template.fromFormatCall() ? 0 : countLogPlaceholders(template.message());
         int placeholderCount = template.placeholderCount() + Math.max(extraArgs.size(), logPlaceholderCount);
         int keyValueLabelCount = countKeyValueLabels(template.message());
-        emitMessageCandidate(template.message(), lineNo, placeholderCount, keyValueLabelCount);
+        String messageExprText = MessageExpressionRenderer.render(messageExpr, astSupport());
+        emitMessageCandidate(template.message(), messageExprText, lineNo, placeholderCount, keyValueLabelCount);
     }
 
     private void checkSystemLoggerCall(DetailAST methodCall, int lineNo, DetailAST messageExpr,
@@ -148,15 +175,17 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         String supplierMessage = extractConstantSupplierMessage(messageExpr);
         if (supplierMessage == null) {
             int placeholderCount = extraArgs.size() + 1;
-            emitMessageCandidate("", lineNo, placeholderCount, 0);
+            String messageExprText = MessageExpressionRenderer.render(messageExpr, astSupport());
+            emitMessageCandidate("", messageExprText, lineNo, placeholderCount, 0);
             return;
         }
         int formatPlaceholderCount = countFormatPlaceholders(supplierMessage);
         int logPlaceholderCount = formatPlaceholderCount > 0 ? 0 : countLogPlaceholders(supplierMessage);
         int placeholderCount = formatPlaceholderCount + Math.max(extraArgs.size(), logPlaceholderCount);
         int keyValueLabelCount = countKeyValueLabels(supplierMessage);
-        emitMessageCandidate(supplierMessage, lineNo, placeholderCount, keyValueLabelCount
-        );
+        String messageExprText = MessageExpressionRenderer.render(messageExpr, astSupport());
+        emitMessageCandidate(supplierMessage, messageExprText, lineNo, placeholderCount,
+                keyValueLabelCount, supplierMessage);
     }
 
     boolean checkJvmLogCall(DetailAST methodCall, String methodName) {
@@ -225,7 +254,8 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
             return true;
         }
         int keyValueLabelCount = countKeyValueLabels(template.message());
-        emitMessageCandidate(template.message(), methodCall.getLineNo(),
+        String messageExprText = MessageExpressionRenderer.render(messageExpr, astSupport());
+        emitMessageCandidate(template.message(), messageExprText, methodCall.getLineNo(),
                 template.placeholderCount(), keyValueLabelCount);
         return true;
     }
@@ -416,15 +446,23 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return message == null || message.trim().isEmpty();
     }
 
-    private void emitMessageCandidate(String message, int lineNo,
+    private void emitMessageCandidate(String message, String messageExpr, int lineNo,
                                       int placeholderCount, int keyValueLabelCount) {
+        emitMessageCandidate(message, messageExpr, lineNo, placeholderCount, keyValueLabelCount, null);
+    }
+
+    private void emitMessageCandidate(String message, String messageExpr, int lineNo,
+                                      int placeholderCount, int keyValueLabelCount,
+                                      String trivialSupplierDescription) {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(MessageSource.LOG)
                 .lineNo(lineNo)
                 .message(message)
+                .messageExpr(messageExpr)
                 .normalisedMessage(MessageNormaliser.normalise(message))
                 .placeholderCount(placeholderCount)
                 .keyValueLabelCount(keyValueLabelCount)
+                .trivialSupplierDescription(trivialSupplierDescription)
                 .build();
         sink().emitCandidate(candidate);
     }

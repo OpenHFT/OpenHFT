@@ -16,6 +16,11 @@ public enum RuleId {
             EnumSet.of(MessageSource.ASSERTION, MessageSource.THROW,
                     MessageSource.ANNOTATION, MessageSource.LOG, MessageSource.COMMENT)),
     /**
+     * Map<String, Object> or Map<String, ?> used without a reason comment.
+     */
+    MAP_STRING_OBJECT("assert.message.map.string.object", "MMMapStringObject", 30,
+            EnumSet.of(MessageSource.COMMENT)),
+    /**
      * Throw statement uses a null literal.
      */
     THROW_NULL("assert.message.throw.null", "MMThrowNull", -2,
@@ -187,6 +192,7 @@ public enum RuleId {
     UNHANDLED("assert.message.unhandled", "MMUnhandled", 1000,
             EnumSet.allOf(MessageSource.class));
 
+    private static final String INTENT_SUFFIX = ".intent";
     private final String messageKey;
     private final String code;
     private final int priority;
@@ -200,12 +206,42 @@ public enum RuleId {
     }
 
     /**
-     * Return the message key used for Checkstyle output.
+     * Return the verbose message key used for Checkstyle output.
      *
-     * @return message key.
+     * @return verbose message key.
      */
     public String messageKey() {
         return messageKey;
+    }
+
+    /**
+     * Return the intent-first message key used for concise output.
+     *
+     * @return intent message key.
+     */
+    public String intentMessageKey() {
+        return messageKey + INTENT_SUFFIX;
+    }
+
+    /**
+     * Return the message key for the chosen verbosity.
+     *
+     * @param verbose {@code true} for verbose output.
+     * @return message key for the selected verbosity.
+     */
+    public String messageKey(boolean verbose) {
+        return verbose ? messageKey : intentMessageKey();
+    }
+
+    /**
+     * Return the message key for the chosen verbosity.
+     *
+     * @param verboseKey verbose key.
+     * @param verbose    {@code true} for verbose output.
+     * @return message key for the selected verbosity.
+     */
+    public static String messageKey(String verboseKey, boolean verbose) {
+        return verbose ? verboseKey : verboseKey + INTENT_SUFFIX;
     }
 
     /**

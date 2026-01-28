@@ -27,6 +27,8 @@ Additional cases include:
 * `Class.forName(...)`.
 * `ProcessBuilder.start()`.
 * `String.intern()`.
+* `Map<String, Object>`, `Map<String, ?>`, or `Map<String, String>` declarations when field names and types are known.
+Prefer a DTO (`SelfDescribingMarshallable` or `AbstractMarshallableCfg`); if keys are dynamic, add a short reason comment.
 
 The extracted comment text is also checked for missing subjects and duplicates.
 Comments may be on the same line or on one or more immediately preceding comment lines (including block comments), as long as no non-comment line appears between them.
@@ -106,6 +108,7 @@ Operational warnings highlight checker limitations or configuration issues and a
 |MMIndexOnly |Index only |Name what the indexed element represents
 |MMContextless |Contextless |State what is compared and why it matters
 |MMMissingMessage |Missing message |Add a meaningful message, supply a Throwable, or use /* reason */
+|MMMapStringObject |Map<String, Object>/String comment |Prefer a DTO for known fields, AbstractMarshallableCfg for config; add a reason comment for dynamic keys
 |MMThrowNull |Throw null literal |Replace with `throw new UnsupportedOperationException()`
 |MMDisplayName |Missing display name |Add @DisplayName("descriptive name") to JUnit 5 test methods
 |MMTestAnnotationOrder |@Test annotation order |Place @Test first on JUnit 5 test methods
@@ -147,9 +150,27 @@ Replace nouns and values with local context.
 |Log action + context |"retry connection for shard %d"
 |===
 
+== Intent-First Output
+
+By default, violations focus on intent and avoid rule mechanics or numeric thresholds to discourage gaming.
+Use the detailed rule sections below for rationale and examples.
+
+== Aggregated Advice Output
+
+The aggregated advice report groups guidance per file and AdviceId.
+It uses the advice text in `mm-advice.properties` and ranks from `mm-advice-ranks.properties`.
+File-level advice prints before line-level advice, and only one AdviceId per line is shown unless multiple AdviceIds share the same rarest rank.
+JSONL output is optional and is only written when `--jsonl` is supplied.
+
+Standard Checkstyle violations still use `messages.properties` and are emitted per violation.
+Suppressions for AdviceIds apply to the aggregated report only.
+Comment toggles `// <token>:OFF` and `// <token>:ON` (or `#` for hash-commented files) are supported for per-line control.
+Use the `excludePaths` check property to skip files by path fragment, glob, or `regex:` pattern when inline suppression is undesirable.
+
 == Verbose Mode
 
-When `verbose=true`, the checker adds diagnostic details to some warnings and prints a per-file rule summary to standard output.
+When `verbose=true`, the checker emits the detailed format (Problem/Why/Fix/Ref), adds diagnostic details to some warnings, and prints a per-file rule summary to standard output.
+The CLI uses `--verbose` for the same behaviour.
 
 [#MMDuplicate]
 == MMDuplicate: Duplicate Message
@@ -476,6 +497,46 @@ slf4j.warn((String) null);
 ----
 slf4j.warn("order should remain in pending state so that retry can resume");
 @Disabled("disabled because queue recovery fix is pending")
+----
+
+[#MMMapStringObject]
+== MMMapStringObject: Map<String, Object> or Map<String, String> Without Reason Comment
+
+=== Problem
+
+`Map<String, Object>`, `Map<String, ?>`, or `Map<String, String>` is declared without a reason comment.
+
+=== Why This Matters
+
+Maps hide schema when field names and types are known, making intent and evolution harder to track.
+When Chronicle Wire is available, DTOs provide explicit fields and self-describing serialization.
+
+=== How to Fix
+
+When field names and types are known, create a DTO that extends `SelfDescribingMarshallable`.
+If the data is read or written from config files, use `AbstractMarshallableCfg` instead.
+If keys are dynamic, keep the map but add a short reason comment describing the key source.
+
+.Before
+[source,java,opts=novalidate]
+----
+Map<String, Object> payload = new LinkedHashMap<>();
+----
+
+.After (DTO)
+[source,java,opts=novalidate]
+----
+static final class Payload extends SelfDescribingMarshallable {
+    String id;
+    int count;
+}
+----
+
+.After (dynamic keys)
+[source,java,opts=novalidate]
+----
+// keys are defined at runtime by tool schema
+Map<String, Object> payload = new LinkedHashMap<>();
 ----
 
 [#MMThrowNull]

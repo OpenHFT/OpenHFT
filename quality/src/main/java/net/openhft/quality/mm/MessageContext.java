@@ -14,6 +14,7 @@ public class MessageContext {
     private final boolean verbose;
     private final MessageRuleSupport ruleSupport;
     private final SuppressionTracker suppressionTracker;
+    private final AdviceEmitter adviceEmitter;
 
     /**
      * Create a new message context.
@@ -29,7 +30,8 @@ public class MessageContext {
     public MessageContext(MessageCandidate candidate, MessageMetrics metrics,
                           String currentClassName, String currentMethodName,
                           boolean verbose, MessageRuleSupport ruleSupport,
-                          SuppressionTracker suppressionTracker) {
+                          SuppressionTracker suppressionTracker,
+                          AdviceEmitter adviceEmitter) {
         this.candidate = candidate;
         this.metrics = metrics;
         this.currentClassName = currentClassName;
@@ -37,6 +39,7 @@ public class MessageContext {
         this.verbose = verbose;
         this.ruleSupport = ruleSupport;
         this.suppressionTracker = suppressionTracker;
+        this.adviceEmitter = adviceEmitter;
     }
 
     /**
@@ -100,5 +103,16 @@ public class MessageContext {
      */
     public SuppressionTracker suppressionTracker() {
         return suppressionTracker;
+    }
+
+    /**
+     * Record advice for the given rule if an emitter is configured.
+     *
+     * @param ruleId rule identifier.
+     */
+    public void recordAdvice(RuleId ruleId) {
+        if (adviceEmitter != null && ruleId != null) {
+            adviceEmitter.record(this, ruleId);
+        }
     }
 }

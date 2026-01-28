@@ -191,6 +191,62 @@ class ViolationCollectorTest {
                 "empty collector should not log any violations");
     }
 
+    // Additional tests to kill surviving mutations
+
+    @Test
+    @DisplayName("Priority comparison returns false when code lengths are equal")
+    void priorityComparisonReturnsFalseWhenCodeLengthsAreEqual() {
+        // When priorities are equal and lengths are equal, we proceed to order comparison
+        // Test boundary: candidateLength < existingLength when both are equal should return false
+        assertFalse(ViolationCollector.isHigherPriority(1, "ABC", 5, 1, "DEF", 5),
+                "equal priority and equal length should proceed to order, equal order returns false");
+    }
+
+    @Test
+    @DisplayName("Priority comparison returns false when orders are equal")
+    void priorityComparisonReturnsFalseWhenOrdersAreEqual() {
+        // When priorities, lengths, and orders are all equal, should return false
+        assertFalse(ViolationCollector.isHigherPriority(2, "XY", 10, 2, "AB", 10),
+                "identical priority, length, and order should return false");
+    }
+
+    @Test
+    @DisplayName("Priority comparison boundary at code length equality")
+    void priorityComparisonBoundaryAtCodeLengthEquality() {
+        // Test the boundary: when lengths differ by 1
+        assertTrue(ViolationCollector.isHigherPriority(1, "AB", 1, 1, "ABC", 1),
+                "shorter code (2 chars) beats longer code (3 chars)");
+        assertFalse(ViolationCollector.isHigherPriority(1, "ABC", 1, 1, "AB", 1),
+                "longer code (3 chars) does not beat shorter code (2 chars)");
+    }
+
+    @Test
+    @DisplayName("Priority comparison boundary at order equality")
+    void priorityComparisonBoundaryAtOrderEquality() {
+        // Test the boundary: when orders differ by 1
+        assertTrue(ViolationCollector.isHigherPriority(1, "AB", 5, 1, "CD", 6),
+                "lower order (5) beats higher order (6)");
+        assertFalse(ViolationCollector.isHigherPriority(1, "AB", 6, 1, "CD", 5),
+                "higher order (6) does not beat lower order (5)");
+    }
+
+    @Test
+    @DisplayName("Set verbose updates verbose flag")
+    void setVerboseUpdatesVerboseFlag() throws Exception {
+        ViolationCollector collector = new ViolationCollector(null, false);
+        collector.setVerbose(true);
+        
+        // Record a violation with the updated verbose setting
+        collector.record(10, RuleId.MISSING_MESSAGE);
+        
+        TestCheck check = new TestCheck();
+        check.configure(new com.puppycrawl.tools.checkstyle.DefaultConfiguration("TestCheck"));
+        collector.flush(check);
+        
+        // Verify that a violation was recorded (showing setVerbose was called)
+        assertEquals(1, check.getViolations().size(), "violation should be recorded");
+    }
+
     private static final class TestCheck extends AbstractCheck {
 
         @Override

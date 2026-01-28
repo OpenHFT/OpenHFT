@@ -82,6 +82,43 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         }
     }
 
+    static final class ReasonComment {
+        private static final ReasonComment MULTIPLE = new ReasonComment(null, true);
+        private static final ReasonComment MISSING = new ReasonComment(null, false);
+
+        private final String message;
+        private final boolean multiple;
+
+        private ReasonComment(String message, boolean multiple) {
+            this.message = message;
+            this.multiple = multiple;
+        }
+
+        static ReasonComment missing() {
+            return MISSING;
+        }
+
+        static ReasonComment multiple() {
+            return MULTIPLE;
+        }
+
+        static ReasonComment single(String message) {
+            return new ReasonComment(message, false);
+        }
+
+        boolean isMissing() {
+            return message == null && !multiple;
+        }
+
+        boolean isMultiple() {
+            return multiple;
+        }
+
+        String message() {
+            return message;
+        }
+    }
+
     private boolean requiresSystemComment(DetailAST methodCall) {
         String member = findMemberAfterClass(methodCall, SYSTEM);
         if (member == null || member.isEmpty()) {
@@ -164,19 +201,15 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         if (lineNo <= 0 || !processedLines.add(lineNo)) {
             return;
         }
-        FileContents contents = context().fileContents();
-        if (contents == null) {
-            return;
-        }
-        List<TextBlock> comments = collectAdjacentComments(contents, lineNo);
-        if (comments.isEmpty()) {
+        ReasonComment comment = findReasonComment(lineNo);
+        if (comment.isMissing()) {
             sink().emitMissingMessage(lineNo, MessageSource.COMMENT, missingMessageKind);
             return;
         }
-        if (comments.size() > 1) {
+        if (comment.isMultiple()) {
             return;
         }
-        String message = extractCommentMessage(comments.get(0));
+        String message = comment.message();
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(MessageSource.COMMENT)
                 .lineNo(lineNo)
@@ -187,6 +220,24 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
                 .missingMessageKind(missingMessageKind)
                 .build();
         sink().emitCandidate(candidate);
+    }
+
+    ReasonComment findReasonComment(int lineNo) {
+        if (lineNo <= 0) {
+            return ReasonComment.missing();
+        }
+        FileContents contents = context().fileContents();
+        if (contents == null) {
+            return ReasonComment.multiple();
+        }
+        List<TextBlock> comments = collectAdjacentComments(contents, lineNo);
+        if (comments.isEmpty()) {
+            return ReasonComment.missing();
+        }
+        if (comments.size() > 1) {
+            return ReasonComment.multiple();
+        }
+        return ReasonComment.single(extractCommentMessage(comments.get(0)));
     }
 
     private List<TextBlock> collectAdjacentComments(FileContents contents, int lineNo) {

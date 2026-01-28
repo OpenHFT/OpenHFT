@@ -35,7 +35,7 @@ public final class MMDuplicate extends AbstractMessageRule {
             return;
         }
         SuppressionTracker suppressionTracker = context.suppressionTracker();
-        if (suppressionTracker != null && suppressionTracker.isSuppressed(ruleId())) {
+        if (suppressionTracker != null && suppressionTracker.isSuppressed(ruleId(), candidate.lineNo())) {
             return;
         }
         String normalised = requireNonNull(candidate.normalisedMessage());

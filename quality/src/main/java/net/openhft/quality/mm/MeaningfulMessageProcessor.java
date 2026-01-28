@@ -67,6 +67,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private String messageExtractionFailureDetail;
 
     private Set<String> ignoredExceptionClassNames = java.util.Collections.emptySet();
+    private List<String> excludedPathFragments = java.util.Collections.emptyList();
+    private List<java.util.regex.Pattern> excludedPathPatterns = java.util.Collections.emptyList();
     private Map<String, Integer> overusedWordCounts = new HashMap<>();
     private Map<String, Integer> entropyWordCounts = new HashMap<>();
     private int fileMessageCount;
@@ -74,6 +76,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private int fileFirstMessageLine;
     private int purposeCueCount;
     private int entropyWordTotal;
+    private Set<Integer> mapStringObjectLines = new HashSet<>();
     private boolean skipFile;
     private String currentFileName;
 
@@ -212,6 +215,49 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     }
 
     /**
+     * Configure file exclusions by path fragment, glob, or regex (prefix with {@code regex:}).
+     *
+     * @param excludedPaths comma/whitespace separated path patterns.
+     */
+    public void setExcludedPaths(String excludedPaths) {
+        if (excludedPaths == null || excludedPaths.trim().isEmpty()) {
+            excludedPathFragments = java.util.Collections.emptyList();
+            excludedPathPatterns = java.util.Collections.emptyList();
+            return;
+        }
+        List<String> fragments = new ArrayList<>();
+        List<java.util.regex.Pattern> patterns = new ArrayList<>();
+        String[] tokens = excludedPaths.split("[,;\\s]+");
+        for (String token : tokens) {
+            if (token == null) {
+                continue;
+            }
+            String trimmed = token.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            if (trimmed.startsWith("regex:") || trimmed.startsWith("re:")) {
+                String regex = trimmed.startsWith("regex:") ? trimmed.substring(6) : trimmed.substring(3);
+                if (!regex.isEmpty()) {
+                    patterns.add(java.util.regex.Pattern.compile(regex));
+                }
+                continue;
+            }
+            if (trimmed.indexOf('*') >= 0 || trimmed.indexOf('?') >= 0) {
+                patterns.add(java.util.regex.Pattern.compile(globToRegex(normalizePath(trimmed))));
+                continue;
+            }
+            fragments.add(normalizePath(trimmed));
+        }
+        excludedPathFragments = fragments.isEmpty()
+                ? java.util.Collections.emptyList()
+                : java.util.Collections.unmodifiableList(fragments);
+        excludedPathPatterns = patterns.isEmpty()
+                ? java.util.Collections.emptyList()
+                : java.util.Collections.unmodifiableList(patterns);
+    }
+
+    /**
      * Return the default tokens this processor consumes.
      *
      * @return the default tokens this processor consumes.
@@ -291,6 +337,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         currentFileName = fileContents == null ? "unknown" : fileContents.getFileName();
         context.setDeclaredMethodNames(collectDeclaredMethods(rootAst));
         skipFile = shouldSkipFile(fileContents);
+        if (!skipFile && suppressionTracker != null) {
+            suppressionTracker.recordCommentSuppressions(fileContents);
+        }
         ruleEngine = new RuleEngine(ruleSupport, messageOccurrences);
         assertionExtractor = new AssertionMessageExtractor(context, this);
         throwExtractor = new ThrowMessageExtractor(context, this);
@@ -301,6 +350,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         javadocExtractor.reset();
         overusedWordCounts = new HashMap<>();
         entropyWordCounts = new HashMap<>();
+        mapStringObjectLines = new HashSet<>();
         fileMessageCount = 0;
         overusedWordMessageCount = 0;
         fileFirstMessageLine = 0;
@@ -392,8 +442,11 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             case TokenTypes.PARAMETER_DEF:
             case TokenTypes.VARIABLE_DEF:
                 context.recordVariableType(ast);
-                if (javadocExtractor != null && ast.getType() == TokenTypes.VARIABLE_DEF) {
-                    javadocExtractor.handleField(ast);
+                if (ast.getType() == TokenTypes.VARIABLE_DEF) {
+                    if (javadocExtractor != null) {
+                        javadocExtractor.handleField(ast);
+                    }
+                    checkMapStringObjectUsage(ast);
                 }
                 break;
             case TokenTypes.ENUM_CONSTANT_DEF:
@@ -460,6 +513,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (fileContents == null) {
             return false;
         }
+        if (isExcludedPath(fileContents.getFileName())) {
+            return true;
+        }
         String[] lines = fileContents.getLines();
         if (lines == null) {
             return false;
@@ -489,6 +545,66 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             }
         }
         return false;
+    }
+
+    private boolean isExcludedPath(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return false;
+        }
+        if (excludedPathFragments.isEmpty() && excludedPathPatterns.isEmpty()) {
+            return false;
+        }
+        String normalized = normalizePath(fileName);
+        for (String fragment : excludedPathFragments) {
+            if (normalized.contains(fragment)) {
+                return true;
+            }
+        }
+        for (java.util.regex.Pattern pattern : excludedPathPatterns) {
+            if (pattern.matcher(normalized).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String normalizePath(String path) {
+        return path == null ? "" : path.replace('\\', '/');
+    }
+
+    private String globToRegex(String glob) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < glob.length(); i++) {
+            char ch = glob.charAt(i);
+            switch (ch) {
+                case '*':
+                    builder.append(".*");
+                    break;
+                case '?':
+                    builder.append('.');
+                    break;
+                case '.':
+                case '(':
+                case ')':
+                case '+':
+                case '|':
+                case '^':
+                case '$':
+                case '@':
+                case '%':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '\\':
+                    builder.append('\\').append(ch);
+                    break;
+                default:
+                    builder.append(ch);
+                    break;
+            }
+        }
+        return builder.toString();
     }
 
     Set<String> collectDeclaredMethods(DetailAST rootAst) {
@@ -575,6 +691,143 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 AdviceSource.ANNOTATION_TEST_ORDER, null, null);
     }
 
+    private void checkMapStringObjectUsage(DetailAST varDef) {
+        if (varDef == null || context == null || commentExtractor == null) {
+            return;
+        }
+        DetailAST type = varDef.findFirstToken(TokenTypes.TYPE);
+        if (type == null) {
+            return;
+        }
+        String mapType = matchMapStringObjectType(type);
+        if (mapType == null) {
+            return;
+        }
+        int lineNo = varDef.getLineNo();
+        if (lineNo <= 0) {
+            lineNo = 1;
+        }
+        if (!mapStringObjectLines.add(lineNo)) {
+            return;
+        }
+        CommentMessageExtractor.ReasonComment comment = commentExtractor.findReasonComment(lineNo);
+        if (comment.isMultiple()) {
+            return;
+        }
+        if (comment.message() != null) {
+            String message = comment.message();
+            MessageCandidate candidate = new MessageCandidate.Builder()
+                    .source(MessageSource.COMMENT)
+                    .lineNo(lineNo)
+                    .message(message)
+                    .normalisedMessage(MessageNormaliser.normalise(message))
+                    .placeholderCount(0)
+                    .keyValueLabelCount(0)
+                    .build();
+            emitCandidate(candidate);
+            return;
+        }
+        String name = extractVariableName(varDef);
+        if (name == null || name.isEmpty()) {
+            name = "map";
+        }
+        if (violationCollector != null) {
+            violationCollector.record(lineNo, RuleId.MAP_STRING_OBJECT, name, mapType);
+        }
+        recordManualAdvice(lineNo, RuleId.MAP_STRING_OBJECT, AdviceSource.COMMENT, name, mapType);
+    }
+
+    private String extractVariableName(DetailAST varDef) {
+        DetailAST child = varDef.getFirstChild();
+        while (child != null) {
+            if (child.getType() == TokenTypes.IDENT) {
+                return child.getText();
+            }
+            child = child.getNextSibling();
+        }
+        return null;
+    }
+
+    private String matchMapStringObjectType(DetailAST typeAst) {
+        String typeName = context.astSupport().extractTypeName(typeAst);
+        if (typeName == null) {
+            return null;
+        }
+        String resolved = context.resolveTypeName(typeName);
+        if (!"java.util.Map".equals(resolved) && !"Map".equals(resolved)) {
+            return null;
+        }
+        DetailAST typeArgs = typeAst.findFirstToken(TokenTypes.TYPE_ARGUMENTS);
+        if (typeArgs == null) {
+            return null;
+        }
+        List<DetailAST> args = collectTypeArguments(typeArgs);
+        if (args.size() != 2) {
+            return null;
+        }
+        if (!isStringTypeArgument(args.get(0))) {
+            return null;
+        }
+        if (isWildcardTypeArgument(args.get(1))) {
+            return "Map<String, ?>";
+        }
+        if (isStringTypeArgument(args.get(1))) {
+            return "Map<String, String>";
+        }
+        if (isObjectTypeArgument(args.get(1))) {
+            return "Map<String, Object>";
+        }
+        return null;
+    }
+
+    private List<DetailAST> collectTypeArguments(DetailAST typeArgs) {
+        List<DetailAST> args = new ArrayList<>();
+        DetailAST child = typeArgs.getFirstChild();
+        while (child != null) {
+            if (child.getType() == TokenTypes.TYPE_ARGUMENT) {
+                args.add(child);
+            }
+            child = child.getNextSibling();
+        }
+        return args;
+    }
+
+    private boolean isStringTypeArgument(DetailAST typeArg) {
+        String name = extractTypeArgumentName(typeArg);
+        if (name == null) {
+            return false;
+        }
+        String resolved = context.resolveTypeName(name);
+        return "java.lang.String".equals(resolved) || "String".equals(resolved);
+    }
+
+    private boolean isObjectTypeArgument(DetailAST typeArg) {
+        String name = extractTypeArgumentName(typeArg);
+        if (name == null) {
+            return false;
+        }
+        String resolved = context.resolveTypeName(name);
+        return "java.lang.Object".equals(resolved) || "Object".equals(resolved);
+    }
+
+    private boolean isWildcardTypeArgument(DetailAST typeArg) {
+        if (typeArg.getType() == TokenTypes.WILDCARD_TYPE
+                || typeArg.getType() == TokenTypes.QUESTION) {
+            return true;
+        }
+        return typeArg.findFirstToken(TokenTypes.WILDCARD_TYPE) != null
+                || typeArg.findFirstToken(TokenTypes.QUESTION) != null;
+    }
+
+    private String extractTypeArgumentName(DetailAST typeArg) {
+        DetailAST dot = typeArg.findFirstToken(TokenTypes.DOT);
+        if (dot != null) {
+            return context.astSupport().flattenDot(dot);
+        }
+        DetailAST ident = typeArg.findFirstToken(TokenTypes.IDENT);
+        return ident != null ? ident.getText() : null;
+    }
+
     private boolean isTopLevelType(DetailAST ast) {
         DetailAST parent = ast.getParent();
         return parent != null && parent.getType() == TokenTypes.COMPILATION_UNIT;
@@ -657,8 +910,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         String detail = reason == null || reason.trim().isEmpty() ? "unknown" : reason;
         violationCollector.record(lineNo, RuleId.UNHANDLED, detail, buildScope());
         if (suppressionTracker == null
-                || (!suppressionTracker.isSuppressed(RuleId.UNHANDLED)
-                && !suppressionTracker.isSuppressed(AdviceId.MMUnhandled))) {
+                || (!suppressionTracker.isSuppressed(RuleId.UNHANDLED, lineNo)
+                && !suppressionTracker.isSuppressed(AdviceId.MMUnhandled, lineNo))) {
             java.util.List<String> items = new java.util.ArrayList<>(1);
             items.add(detail);
             recordFileAdvice(new FileAdviceDetails(AdviceId.MMUnhandled, lineNo, items,
@@ -1018,7 +1271,9 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (fileMessageCount < OVERUSED_WORD_MIN_MESSAGES) {
             return;
         }
-        if (suppressionTracker != null && suppressionTracker.isSuppressedInFile(RuleId.OVERUSED_WORD)) {
+        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
+        if (suppressionTracker != null
+                && suppressionTracker.isSuppressedInFile(RuleId.OVERUSED_WORD, lineNo)) {
             return;
         }
         int messageCount = overusedWordMessageCount == 0 ? fileMessageCount : overusedWordMessageCount;
@@ -1047,7 +1302,6 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                     .append(messageCount)
                     .append(')');
         }
-        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
         violationCollector.record(lineNo, RuleId.OVERUSED_WORD,
                 builder.toString(), messageCount);
         List<String> overusedWords = new ArrayList<>(entries.size());
@@ -1065,14 +1319,15 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (fileMessageCount == 0) {
             return;
         }
-        if (suppressionTracker != null && suppressionTracker.isSuppressedInFile(RuleId.LACKS_PURPOSE)) {
+        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
+        if (suppressionTracker != null
+                && suppressionTracker.isSuppressedInFile(RuleId.LACKS_PURPOSE, lineNo)) {
             return;
         }
         int expectedMin = Math.max(1, (int) Math.round((double) fileMessageCount / PURPOSE_CUE_RATIO));
         if (purposeCueCount >= expectedMin) {
             return;
         }
-        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
         violationCollector.record(lineNo, RuleId.LACKS_PURPOSE,
                 purposeCueCount, expectedMin, fileMessageCount);
         recordFileAdvice(new FileAdviceDetails(AdviceId.MMLacksPurpose, lineNo,
@@ -1093,14 +1348,15 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (entropyWordTotal == 0) {
             return;
         }
-        if (suppressionTracker != null && suppressionTracker.isSuppressedInFile(RuleId.LOW_ENTROPY)) {
+        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
+        if (suppressionTracker != null
+                && suppressionTracker.isSuppressedInFile(RuleId.LOW_ENTROPY, lineNo)) {
             return;
         }
         double entropy = shannonEntropy(entropyWordCounts, entropyWordTotal);
         if (entropy >= MIN_WORD_SHANNON_ENTROPY) {
             return;
         }
-        int lineNo = fileFirstMessageLine > 0 ? fileFirstMessageLine : 1;
         violationCollector.record(lineNo, RuleId.LOW_ENTROPY,
                 formatEntropy(entropy), formatEntropy(MIN_WORD_SHANNON_ENTROPY));
         recordFileAdvice(new FileAdviceDetails(AdviceId.MMLowEntropy, lineNo,
@@ -1186,7 +1442,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             throw new IllegalStateException("Missing AdviceId mapping for " + ruleId + " and " + adviceSource);
         }
         if (suppressionTracker != null) {
-            if (suppressionTracker.isSuppressed(ruleId) || suppressionTracker.isSuppressed(adviceId)) {
+            if (suppressionTracker.isSuppressed(ruleId, lineNo)
+                    || suppressionTracker.isSuppressed(adviceId, lineNo)) {
                 return;
             }
         }
@@ -1212,10 +1469,11 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         }
         if (suppressionTracker != null) {
             RuleId ruleId = adviceId.ruleId();
-            if (ruleId != null && suppressionTracker.isSuppressedInFile(ruleId)) {
+            int lineNo = details.lineNo();
+            if (ruleId != null && suppressionTracker.isSuppressedInFile(ruleId, lineNo)) {
                 return;
             }
-            if (suppressionTracker.isSuppressedInFile(adviceId)) {
+            if (suppressionTracker.isSuppressedInFile(adviceId, lineNo)) {
                 return;
             }
         }

@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CLI entry point for aggregated advice reporting.
+ * CLI entry point for running MeaningfulMessage checks against source files.
+ * Provides command-line options for verbose output, dry-run mode, and various output formats.
  */
+@SuppressWarnings({"MMTooShort", "MMMissingMessage"})
 public final class MeaningfulMessageCli {
     private MeaningfulMessageCli() {
     }
@@ -25,10 +27,12 @@ public final class MeaningfulMessageCli {
         CliOptions options = CliOptions.parse(args);
         if (options.showHelp || options.paths.isEmpty()) {
             printUsage();
+            // Exit early when help requested or no paths provided
             System.exit(options.paths.isEmpty() ? 2 : 0);
         }
         List<File> files = collectFiles(options.paths);
         if (files.isEmpty()) {
+            // Exit with error when no Java files found in paths
             System.err.println("No Java files found.");
             System.exit(2);
         }
@@ -38,13 +42,12 @@ public final class MeaningfulMessageCli {
         checker.configure(config);
         int errors = checker.process(files);
         checker.destroy();
+        // Exit with success only when no errors found
         System.exit(errors == 0 ? 0 : 1);
     }
 
     private static Configuration buildConfiguration(CliOptions options) {
-        DefaultConfiguration checker = new DefaultConfiguration("Checker");
-        DefaultConfiguration treeWalker = new DefaultConfiguration("TreeWalker");
-        DefaultConfiguration mm = new DefaultConfiguration(MeaningfulMessageCheck.class.getName());
+        final DefaultConfiguration mm = new DefaultConfiguration(MeaningfulMessageCheck.class.getName());
         if (options.verbose) {
             mm.addProperty("verbose", "true");
         }
@@ -57,9 +60,11 @@ public final class MeaningfulMessageCli {
         if (options.rankOut != null) {
             mm.addProperty("rankOut", options.rankOut);
         }
+        final DefaultConfiguration treeWalker = new DefaultConfiguration("TreeWalker");
         treeWalker.addChild(mm);
-        checker.addChild(treeWalker);
-        return checker;
+        final DefaultConfiguration checkerConfig = new DefaultConfiguration("Checker");
+        checkerConfig.addChild(treeWalker);
+        return checkerConfig;
     }
 
     private static List<File> collectFiles(List<String> paths) throws Exception {

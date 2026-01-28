@@ -91,13 +91,20 @@ public final class AdviceReportManager {
     }
 
     private void updateCounts(FileReport report) {
+        if (report == null) {
+            return;
+        }
+        java.util.EnumSet<AdviceId> seen = java.util.EnumSet.noneOf(AdviceId.class);
         for (FileAdviceGroup group : report.fileAdvice()) {
-            counts.merge(group.adviceId(), 1, Integer::sum);
+            seen.add(group.adviceId());
         }
         for (Map.Entry<Integer, java.util.List<CandidateAdvice>> entry : report.candidatesByLine().entrySet()) {
             for (CandidateAdvice candidate : entry.getValue()) {
-                counts.merge(candidate.adviceId(), 1, Integer::sum);
+                seen.add(candidate.adviceId());
             }
+        }
+        for (AdviceId adviceId : seen) {
+            counts.merge(adviceId, 1, Integer::sum);
         }
     }
 

@@ -11,15 +11,17 @@ public final class AdviceOccurrence {
     private final AdviceSource source;
     private final String messageLiteral;
     private final String messageExpr;
+    private final String lineText;
     private final String snippet;
 
     public AdviceOccurrence(int lineNo, AdviceSource source,
                             String messageLiteral, String messageExpr,
-                            String snippet) {
+                            String lineText, String snippet) {
         this.lineNo = lineNo;
         this.source = source;
         this.messageLiteral = messageLiteral;
         this.messageExpr = messageExpr;
+        this.lineText = lineText;
         this.snippet = snippet;
     }
 
@@ -37,6 +39,10 @@ public final class AdviceOccurrence {
 
     public String messageExpr() {
         return messageExpr;
+    }
+
+    public String lineText() {
+        return lineText;
     }
 
     public String snippet() {

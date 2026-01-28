@@ -38,9 +38,8 @@ public class SpotBugs27AllRulesExample {
         // DMI_RANDOM_USED_ONLY_ONCE
         int random = new Random().nextInt();
 
-        // DM_DEFAULT_ENCODING
-        byte[] bytes = "text".getBytes();
-        String s = new String(bytes);
+        // DM_DEFAULT_ENCODING intentionally excluded; legacy behaviour can depend on platform defaults.
+        String s = "text";
 
         // DM_STRING_VOID_CTOR
         String empty = new String();

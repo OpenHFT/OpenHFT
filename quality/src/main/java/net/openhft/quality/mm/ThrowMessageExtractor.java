@@ -46,6 +46,11 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         DetailAST literalNew = expr.findFirstToken(TokenTypes.LITERAL_NEW);
         if (literalNew == null) {
             if (isThrowableRethrow(expr)) {
+                if (context().hasInlineReasonComment(expr)
+                        || context().hasAdjacentReasonComment(throwAst.getLineNo())) {
+                    return;
+                }
+                sink().emitMissingMessage(throwAst.getLineNo(), MessageSource.THROW);
                 return;
             }
             emitUnhandled(throwAst, "Throw statement does not construct new exception");
@@ -61,6 +66,9 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             return;
         }
         List<DetailAST> args = astSupport().collectArguments(elist);
+        if (args.isEmpty() && isUnsupportedOperationException(exceptionClassName)) {
+            return;
+        }
         DetailAST messageExpr = findMessageExpression(args);
         if (messageExpr == null) {
             if (!context().hasInlineReasonComment(literalNew)) {
@@ -86,13 +94,16 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             return;
         }
         int keyValueLabelCount = context().templateExtractor().countKeyValueLabels(template.message());
+        String messageExprText = MessageExpressionRenderer.render(messageExpr, astSupport());
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(MessageSource.THROW)
                 .lineNo(messageExpr.getLineNo())
                 .message(template.message())
+                .messageExpr(messageExprText)
                 .normalisedMessage(MessageNormaliser.normalise(template.message()))
                 .placeholderCount(template.placeholderCount())
                 .keyValueLabelCount(keyValueLabelCount)
+                .constantMessage(true)
                 .build();
         sink().emitCandidate(candidate);
     }
@@ -207,6 +218,19 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
                 || simple.endsWith("Exception")
                 || simple.endsWith("Error")
                 || simple.equals("StackTrace");
+    }
+
+    private boolean isUnsupportedOperationException(String typeName) {
+        if (typeName == null) {
+            return false;
+        }
+        String resolved = context().resolveTypeName(typeName);
+        String simple = resolved;
+        int lastDot = resolved.lastIndexOf('.');
+        if (lastDot >= 0) {
+            simple = resolved.substring(lastDot + 1);
+        }
+        return "UnsupportedOperationException".equals(simple);
     }
 
 }

@@ -54,7 +54,8 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 MessageTemplate template = extractMessageTemplate(nextExpr);
                 if (template != null) {
                     int keyValueLabelCount = countKeyValueLabels(template.message());
-                    emitMessageCandidate(template.message(), nextExpr.getLineNo(),
+                    String messageExpr = MessageExpressionRenderer.render(nextExpr, astSupport());
+                    emitMessageCandidate(template.message(), messageExpr, nextExpr.getLineNo(),
                             template.placeholderCount(), keyValueLabelCount);
                 } else {
                     DetailAST content = astSupport().unwrapExpr(nextExpr);
@@ -236,10 +237,12 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 MessageTemplate template = extractMessageTemplate(firstStringExpr);
                 if (template != null) {
                     int keyValueLabelCount = countKeyValueLabels(template.message());
+                    String messageExprText = MessageExpressionRenderer.render(firstStringExpr, astSupport());
                     MessageCandidate candidate = new MessageCandidate.Builder()
                             .source(source)
                             .lineNo(lineNo)
                             .message(template.message())
+                            .messageExpr(messageExprText)
                             .normalisedMessage(MessageNormaliser.normalise(template.message()))
                             .placeholderCount(template.placeholderCount())
                             .keyValueLabelCount(keyValueLabelCount)
@@ -320,10 +323,12 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
 
                 int keyValueLabelCount = countKeyValueLabels(template.message());
 
+                String messageExprText = MessageExpressionRenderer.render(messageExpr, astSupport());
                 MessageCandidate.Builder builder = new MessageCandidate.Builder()
                         .source(source)
                         .lineNo(lineNo)
                         .message(template.message())
+                        .messageExpr(messageExprText)
                         .normalisedMessage(MessageNormaliser.normalise(template.message()))
                         .placeholderCount(template.placeholderCount())
                         .keyValueLabelCount(keyValueLabelCount)
@@ -888,12 +893,13 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         return templateExtractor.countKeyValueLabels(constantParts);
     }
 
-    private void emitMessageCandidate(String message, int lineNo,
+    private void emitMessageCandidate(String message, String messageExpr, int lineNo,
                                       int placeholderCount, int keyValueLabelCount) {
         MessageCandidate candidate = new MessageCandidate.Builder()
                 .source(MessageSource.ASSERTION)
                 .lineNo(lineNo)
                 .message(message)
+                .messageExpr(messageExpr)
                 .normalisedMessage(MessageNormaliser.normalise(message))
                 .placeholderCount(placeholderCount)
                 .keyValueLabelCount(keyValueLabelCount)

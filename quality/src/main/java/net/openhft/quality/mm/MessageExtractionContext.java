@@ -25,6 +25,7 @@ public final class MessageExtractionContext {
     private final Set<String> junit4StaticMethods = new HashSet<>();
     private final Set<String> junit5StaticMethods = new HashSet<>();
     private final Set<String> declaredMethodNames = new HashSet<>();
+    private final Deque<ClassScope> classScopes = new ArrayDeque<>();
     private MessageTemplateExtractor templateExtractor;
     private FileContents fileContents;
     private boolean junit4StaticWildcard;
@@ -36,6 +37,9 @@ public final class MessageExtractionContext {
     private Set<String> ignoredExceptionClassNames = java.util.Collections.emptySet();
 
     private String currentClassName;
+    private int currentClassLineNo;
+    private boolean currentClassHasDisplayName;
+    private boolean currentClassHasJUnit5Tests;
     private String currentMethodName;
     private boolean currentMethodIsTest;
     private boolean currentMethodHasDisplayName;
@@ -115,7 +119,11 @@ public final class MessageExtractionContext {
         junit5ImportWildcard = false;
         junit5ParamsImportWildcard = false;
         declaredMethodNames.clear();
+        classScopes.clear();
         currentClassName = null;
+        currentClassLineNo = 0;
+        currentClassHasDisplayName = false;
+        currentClassHasJUnit5Tests = false;
         currentMethodName = null;
         junit4AnnotationUsage = false;
         junit4AnnotationLine = 0;
@@ -179,7 +187,29 @@ public final class MessageExtractionContext {
      * @param typeAst type definition AST node.
      */
     public void enterType(DetailAST typeAst) {
-        currentClassName = astSupport.extractName(typeAst);
+        String className = astSupport.extractName(typeAst);
+        int lineNo = typeAst == null ? 0 : typeAst.getLineNo();
+        ClassScope scope = new ClassScope(className, lineNo);
+        classScopes.push(scope);
+        applyClassScope(scope);
+    }
+
+    /**
+     * Leave a type declaration and clear class-level state.
+     */
+    public void leaveType() {
+        if (!classScopes.isEmpty()) {
+            classScopes.pop();
+        }
+        ClassScope scope = classScopes.peek();
+        if (scope == null) {
+            currentClassName = null;
+            currentClassLineNo = 0;
+            currentClassHasDisplayName = false;
+            currentClassHasJUnit5Tests = false;
+        } else {
+            applyClassScope(scope);
+        }
     }
 
     /**
@@ -231,6 +261,35 @@ public final class MessageExtractionContext {
     }
 
     /**
+     * Mark the current class as having a @DisplayName annotation.
+     */
+    public void markCurrentClassHasDisplayName() {
+        currentClassHasDisplayName = true;
+        ClassScope scope = classScopes.peek();
+        if (scope != null) {
+            scope.hasDisplayName = true;
+        }
+    }
+
+    /**
+     * Mark the current class as containing JUnit 5 tests.
+     */
+    public void markCurrentClassHasJUnit5Tests() {
+        currentClassHasJUnit5Tests = true;
+        ClassScope scope = classScopes.peek();
+        if (scope != null) {
+            scope.hasJUnit5Tests = true;
+        }
+    }
+
+    private void applyClassScope(ClassScope scope) {
+        currentClassName = scope.name;
+        currentClassLineNo = scope.lineNo;
+        currentClassHasDisplayName = scope.hasDisplayName;
+        currentClassHasJUnit5Tests = scope.hasJUnit5Tests;
+    }
+
+    /**
      * Record an annotation applied to the current method.
      *
      * @param annotationName annotation simple name.
@@ -266,6 +325,33 @@ public final class MessageExtractionContext {
      */
     public boolean currentMethodHasDisplayName() {
         return currentMethodHasDisplayName;
+    }
+
+    /**
+     * Check whether the current class has a @DisplayName annotation.
+     *
+     * @return {@code true} if the current class has @DisplayName.
+     */
+    public boolean currentClassHasDisplayName() {
+        return currentClassHasDisplayName;
+    }
+
+    /**
+     * Check whether the current class contains JUnit 5 tests.
+     *
+     * @return {@code true} if any JUnit 5 test method was recorded.
+     */
+    public boolean currentClassHasJUnit5Tests() {
+        return currentClassHasJUnit5Tests;
+    }
+
+    /**
+     * Return the current class line number.
+     *
+     * @return current class line number, or 0 if unknown.
+     */
+    public int currentClassLineNo() {
+        return currentClassLineNo;
     }
 
     /**
@@ -756,6 +842,39 @@ public final class MessageExtractionContext {
         return false;
     }
 
+    /**
+     * Check for a single-line or block comment on the same or previous line.
+     *
+     * @param lineNo line number of the statement needing a reason.
+     * @return {@code true} if a nearby comment with words is found.
+     */
+    public boolean hasAdjacentReasonComment(int lineNo) {
+        if (lineNo <= 0 || fileContents == null) {
+            return false;
+        }
+        return hasReasonCommentOnLine(lineNo) || hasReasonCommentOnLine(lineNo - 1);
+    }
+
+    private boolean hasReasonCommentOnLine(int lineNo) {
+        if (lineNo <= 0 || fileContents == null) {
+            return false;
+        }
+        TextBlock single = fileContents.getSingleLineComments().get(lineNo);
+        if (single != null && blockCommentHasWord(single)) {
+            return true;
+        }
+        List<TextBlock> blocks = fileContents.getBlockComments().get(lineNo);
+        if (blocks == null) {
+            return false;
+        }
+        for (TextBlock block : blocks) {
+            if (block != null && blockCommentHasWord(block)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void recordStaticJUnitImport(String importText, String prefix, boolean junit4) {
         if (!importText.startsWith(prefix + ".")) {
             return;
@@ -999,5 +1118,17 @@ public final class MessageExtractionContext {
             }
         }
         return false;
+    }
+
+    private static final class ClassScope {
+        private final String name;
+        private final int lineNo;
+        private boolean hasDisplayName;
+        private boolean hasJUnit5Tests;
+
+        private ClassScope(String name, int lineNo) {
+            this.name = name;
+            this.lineNo = lineNo;
+        }
     }
 }

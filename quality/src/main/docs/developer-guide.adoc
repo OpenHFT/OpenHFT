@@ -10,12 +10,16 @@ It follows a pipeline architecture:
 [source]
 ----
 AST Tokens
-    ↓
-[Extractors] → MessageCandidate → [RuleEngine] → Violation
-    ↓
+    v
+[Extractors] -> MessageCandidate -> [RuleEngine] -> ViolationCollector
+    v
+AdviceCandidateEmitter -> AdviceCollector -> AdviceReportBuilder
+    v
 MeaningfulMessageProcessor (coordinator)
-    ↓
-Checkstyle violation output
+    v
+Checkstyle violation output (standard rules)
+    v
+Aggregated advice output (console / JSONL)
 ----
 
 === Core Components
@@ -44,7 +48,58 @@ Checkstyle violation output
 
 | `ViolationCollector`
 | Collects violations per line, keeping highest priority (lowest number wins).
+
+| `AdviceCollector`
+| Stores advice candidates and file-level advice per file and line.
+
+| `AdviceReportBuilder`
+| Aggregates candidates into per-file advice groups and selects the rarest advice per line.
+
+| `AdviceReportManager`
+| Coordinates console/JSONL output and rank generation across a run.
 |===
+
+=== Advice-First Reporting
+
+Advice-first reporting produces aggregated guidance that is separate from standard Checkstyle violations.
+It uses stable AdviceIds (user-facing) and internal RuleIds (detector-facing).
+
+* AdviceId drives suppression in the aggregated report.
+* RuleId remains for diagnostics and legacy suppression.
+* AdviceSource identifies the call-site category (including annotation subtypes).
+
+Advice text is loaded from:
+
+* `quality/src/main/resources/net/openhft/quality/mm-advice.properties`
+
+Advice ranks are loaded from:
+
+* `quality/src/main/resources/net/openhft/quality/mm-advice-ranks.properties`
+
+Lower rank values are rarer and are preferred when multiple AdviceIds fire on the same line.
+Unknown AdviceIds resolve to rank -1 (treated as rarest).
+See link:meaningful-message-jsonl.adoc[Meaningful Message JSONL Schema] for the JSONL output contract.
+
+Rank generation in dry-run counts each AdviceId once per line (deduped by line), then orders by frequency.
+
+=== Glossary
+
+AdviceId::
+Stable, user-facing identifier for aggregated advice and suppression.
+
+RuleId::
+Internal detector identifier used for rule logic and verbose diagnostics.
+
+AdviceSource::
+Call-site category used to select the correct AdviceId (includes annotation subtypes).
+
+=== Suppression Behaviour
+
+Suppression tokens still accept `@SuppressWarnings("MM-all")`, `MeaningfulMessage`, and legacy RuleId codes.
+Comment toggles `// <token>:OFF` and `// <token>:ON` (or `#` for hash-commented files) are supported.
+The check also supports an `excludePaths` property for path fragments, globs, or `regex:` patterns to skip files entirely.
+AdviceId suppressions affect only the aggregated report.
+Standard Checkstyle violations continue to follow Checkstyle's usual suppression rules.
 
 === Message Flow
 
@@ -54,7 +109,8 @@ Checkstyle violation output
 4. **Metrics calculation**: Processor computes `MessageMetrics` (word counts, meaningful words, long words)
 5. **Rule evaluation**: `RuleEngine` iterates rules by priority, each rule checks applicability and fires violations
 6. **Violation collection**: `ViolationCollector` de-duplicates, keeping highest priority per line
-7. **Reporting**: Violations logged via Checkstyle API
+7. **Advice aggregation**: `AdviceCandidateEmitter` records AdviceIds for the aggregated report
+8. **Reporting**: Violations logged via Checkstyle API, aggregated advice printed per file
 
 == How to Add a New Rule
 
@@ -108,30 +164,57 @@ public enum RuleId {
     // ... existing rules ...
 
     /** Your rule description. */
-    YOUR_RULE("MMYourRule", "assert.message.your.key", 15, MessageSource.ASSERTION, MessageSource.THROW),
+    YOUR_RULE("assert.message.your.key", "MMYourRule", 15, MessageSource.ASSERTION, MessageSource.THROW),
 
     // ...
 }
 ----
 
 Parameters:
-- `code`: Short code for `@SuppressWarnings` (e.g., `MMYourRule`) - `messageKey`: Key in `messages.properties`
+- `messageKey`: Verbose key in `messages.properties` (add a matching `.intent` entry for intent-first output)
+- `code`: Short code for `@SuppressWarnings` (e.g., `MMYourRule`)
 - `priority`: Lower = higher priority (evaluated earlier, wins conflicts).
 Use 10-20 for most rules.
 - `sources`: Which `MessageSource` types this rule applies to
 
-=== Step 3: Add Message to messages.properties
+=== Step 3: Add AdviceId Mapping
+
+Add a new AdviceId entry in `AdviceId` with the rule and advice source mapping.
+AdviceId names are stable (do not rename once shipped).
+
+=== Step 4: Add Message to messages.properties
 
 Edit `src/main/resources/net/openhft/quality/messages.properties`:
 
 [source,properties]
 ----
+assert.message.your.key.intent = [MMYourRule] Intent-first message text.
 assert.message.your.key = [MMYourRule] Problem description. Why: {0}. Fix: Suggested action. Ref: your-rule-anchor
 ----
 
 Placeholders `\{0}`, `\{1}`, etc. correspond to arguments passed to `record()`.
 
-=== Step 4: Add Test Input and Test Method
+=== Step 5: Add Advice Text
+
+Add the required keys for the AdviceId to `mm-advice.properties`:
+
+* `title`
+* `intent_intro`
+* `intent_outro`
+* `hint_a`
+* `hint_b`
+* `checklist`
+* `anti_patterns`
+* `verbose`
+
+Intent and hint pairs must differ unless you add an explicit allow flag for the advice id.
+
+=== Step 6: Update Ranks
+
+Add the AdviceId to `mm-advice-ranks.properties` or regenerate ranks via `--dry-run`.
+Lower rank values are rarer and are selected first when multiple AdviceIds fire.
+
+=== Step 7: Add Test Input and Test Method
 
 Create test input file `src/test/resources/net/openhft/quality/InputYourRule.java`:
 
@@ -162,16 +245,52 @@ public void testYourRule() throws Exception {
             createModuleConfig(MeaningfulMessageCheck.class);
 
     final String[] expected = {
-        "7: " + getCheckMessage(RuleId.YOUR_RULE.messageKey(), "arg0"),
+        "7: " + getCheckMessage(RuleId.YOUR_RULE.messageKey(false), "arg0"),
     };
 
     verify(checkConfig, getPath("InputYourRule.java"), expected);
 }
 ----
 
-=== Step 5: Document in message-quality-guide.adoc
+=== Step 8: Document in message-quality-guide.adoc
 
 Add documentation for your rule in `src/main/docs/message-quality-guide.adoc`.
+
+=== CLI Usage
+
+The standalone CLI supports:
+
+* `--verbose` for diagnostics
+* `--dry-run` to generate rank files
+* `--jsonl <path>` to emit JSONL output
+* `--rank-out <path>` to control rank output location
+
+=== Checkstyle Properties
+
+`MeaningfulMessageCheck` supports:
+
+* `verbose` (boolean)
+* `dryRun` (boolean)
+* `jsonl` (path)
+* `rankOut` (path)
+* `warnLegacySuppressions` (boolean)
+
+=== Operational Notes
+
+Error handling::
+Missing advice keys or malformed rank files are treated as configuration errors and fail fast.
+Rank files are required outside dry-run.
+
+Performance::
+Advice aggregation buffers per file and writes console/JSONL output on file completion.
+Keep advice text concise to avoid large console output on wide scans.
+
+JSONL versioning::
+`schema_version` increases only for breaking changes. Additive fields may appear without a bump.
+
+Rollback::
+To disable aggregated advice output, remove `MeaningfulMessageCheck` from the Checkstyle configuration
+or run without the CLI. This leaves standard Checkstyle violations unchanged.
 
 == How to Add a New Extractor
 
@@ -261,7 +380,7 @@ Notable choices:
 
 - **Priority-based conflict resolution**: When multiple rules match, lowest priority number wins
 - **Per-line deduplication**: Only one violation per line to avoid noise
-- **Flexible suppression**: `@SuppressWarnings`, inline comments, and Checkstyle `CHECKSTYLE:OFF` all supported
+- **Flexible suppression**: `@SuppressWarnings`, comment toggles (`// AdviceId:OFF` / `// AdviceId:ON`), and Checkstyle `CHECKSTYLE:OFF` all supported
 - **Source-specific thresholds**: Different word count minimums per source type (assertions need more than throws)
 
 == Useful Helper Methods

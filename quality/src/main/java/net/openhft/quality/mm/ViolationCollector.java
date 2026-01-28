@@ -14,6 +14,7 @@ import static java.util.Objects.requireNonNull;
 public class ViolationCollector {
     private final Map<Integer, Violation> pending = new HashMap<>();
     private final SuppressionTracker suppressionTracker;
+    private boolean verbose;
 
     /**
      * Create a collector using the supplied suppression tracker.
@@ -21,7 +22,22 @@ public class ViolationCollector {
      * @param suppressionTracker suppression tracker to consult, or {@code null}.
      */
     public ViolationCollector(SuppressionTracker suppressionTracker) {
+        this(suppressionTracker, false);
+    }
+
+    /**
+     * Create a collector using the supplied suppression tracker and verbosity.
+     *
+     * @param suppressionTracker suppression tracker to consult, or {@code null}.
+     * @param verbose            {@code true} to emit verbose message keys.
+     */
+    public ViolationCollector(SuppressionTracker suppressionTracker, boolean verbose) {
         this.suppressionTracker = suppressionTracker;
+        this.verbose = verbose;
+    }
+
+    void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 
     /**
@@ -34,7 +50,7 @@ public class ViolationCollector {
      */
     public boolean record(int lineNo, RuleId ruleId, Object... args) {
         requireNonNull(ruleId, "ruleId is null");
-        if (suppressionTracker != null && suppressionTracker.isSuppressed(ruleId)) {
+        if (suppressionTracker != null && suppressionTracker.isSuppressed(ruleId, lineNo)) {
             return false;
         }
         Violation existing = pending.get(lineNo);
@@ -58,7 +74,7 @@ public class ViolationCollector {
         for (Integer line : lines) {
             Violation violation = pending.get(line);
             if (violation != null) {
-                check.log(line, violation.ruleId().messageKey(), violation.args());
+                check.log(line, violation.ruleId().messageKey(verbose), violation.args());
             }
         }
     }

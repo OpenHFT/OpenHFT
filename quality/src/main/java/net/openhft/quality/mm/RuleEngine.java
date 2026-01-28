@@ -44,14 +44,15 @@ public final class RuleEngine {
                          String currentClassName,
                          String currentMethodName, boolean verbose,
                          SuppressionTracker suppressionTracker,
-                         ViolationCollector collector) {
+                         ViolationCollector collector,
+                         AdviceEmitter adviceEmitter) {
         MessageMetrics resolvedMetrics = metrics;
         if (resolvedMetrics == null && candidate.message() != null) {
             resolvedMetrics = ruleSupport.metricsCalculator().calculate(candidate.message(),
                     candidate.placeholderCount(), candidate.keyValueLabelCount());
         }
         MessageContext context = new MessageContext(candidate, resolvedMetrics, currentClassName,
-                currentMethodName, verbose, ruleSupport, suppressionTracker);
+                currentMethodName, verbose, ruleSupport, suppressionTracker, adviceEmitter);
         RuleEvaluationState state = new RuleEvaluationState();
 
         if (candidate.throwNull()) {

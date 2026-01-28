@@ -61,6 +61,7 @@ public abstract class AbstractMessageRule {
      * @return {@code true} if the violation was recorded.
      */
     protected boolean record(MessageContext context, ViolationCollector collector, Object... args) {
+        context.recordAdvice(ruleId);
         return collector.record(context.candidate().lineNo(), ruleId, args);
     }
 

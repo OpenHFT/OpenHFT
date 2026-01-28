@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisplayName("Message quality guide after examples demonstrate correct patterns")
 public class InputMessageQualityGuideAfterExamples {
     private static final org.slf4j.Logger SLF4J_LOGGER =
             org.slf4j.LoggerFactory.getLogger(InputMessageQualityGuideAfterExamples.class);

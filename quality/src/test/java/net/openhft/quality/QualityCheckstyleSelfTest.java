@@ -47,6 +47,7 @@ public class QualityCheckstyleSelfTest {
             "SelfCheckThrowFixture.java",
             "SelfCheckLogFixture.java",
             "SelfCheckCommentFixture.java",
+            "SelfCheckMapStringObjectFixture.java",
             "SelfCheckJavadocMemberFixture.java",
             "SelfCheckJavadocClassRedundantFixture.java",
             "SelfCheckJavadocClassTooShortFixture.java",
@@ -79,6 +80,7 @@ public class QualityCheckstyleSelfTest {
         EXPECTED_RULE_COUNTS.put("MMTooFewMeaningfulWords", 10);
         EXPECTED_RULE_COUNTS.put("MMDuplicate", 11);
         EXPECTED_RULE_COUNTS.put("MMMissingMessage", 8);
+        EXPECTED_RULE_COUNTS.put("MMMapStringObject", 3);
         EXPECTED_RULE_COUNTS.put("MMTestAnnotationOrder", 1);
         EXPECTED_RULE_COUNTS.put("MMLowSignalAssertAllHeading", 1);
         EXPECTED_RULE_COUNTS.put("MMAssertJGenericOverride", 1);

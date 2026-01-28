@@ -59,6 +59,7 @@ class MMLowSignalAssertAllHeadingTest {
         // Create a SuppressionTracker that suppresses all rules
         SuppressionTracker tracker = mock(SuppressionTracker.class);
         when(tracker.isSuppressed(any(RuleId.class))).thenReturn(true);
+        when(tracker.isSuppressed(any(RuleId.class), anyInt())).thenReturn(true);
 
         ViolationCollector collector = new ViolationCollector(tracker);
         RuleEvaluationState state = new RuleEvaluationState();

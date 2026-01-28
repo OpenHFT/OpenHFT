@@ -18,6 +18,8 @@ public enum AdviceId {
     MMCommentMessageMissing(RuleId.MISSING_MESSAGE, AdviceSource.COMMENT),
     MMAnnotationDisabledMessageMissing(RuleId.MISSING_MESSAGE, AdviceSource.ANNOTATION_DISABLED),
 
+    MMCommentMapStringObject(RuleId.MAP_STRING_OBJECT, AdviceSource.COMMENT),
+
     MMThrowNull(RuleId.THROW_NULL, AdviceSource.THROW),
     MMAssertionAssertJOverrideMessage(RuleId.ASSERTJ_OVERRIDE, AdviceSource.ASSERTION),
     MMAssertionAssertAllHeadingLowSignal(RuleId.ASSERTALL_HEADING, AdviceSource.ASSERTION),

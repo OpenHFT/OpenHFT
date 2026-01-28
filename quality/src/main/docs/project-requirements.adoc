@@ -25,9 +25,11 @@ Implementation: `quality/src/main/resources/net/openhft/quality/checkstyle26/chr
 Implementation: `quality/src/main/resources/net/openhft/quality/chronicle-baseline-checkstyle-no-custom.xml`,
 `quality/pom.xml`.
 
-*QUALITY-REQ-004* Meaningful Message check :: Provide the `MeaningfulMessageCheck` extension and message bundle for message-quality enforcement in Chronicle builds.
+*QUALITY-REQ-004* Meaningful Message check :: Provide the `MeaningfulMessageCheck` extension and message bundle for message-quality enforcement in Chronicle builds, including advice text and rank resources for aggregated reporting.
 Implementation: `quality/src/main/java/net/openhft/quality/MeaningfulMessageCheck.java`,
-`quality/src/main/resources/net/openhft/quality/messages.properties`.
+`quality/src/main/resources/net/openhft/quality/messages.properties`,
+`quality/src/main/resources/net/openhft/quality/mm-advice.properties`,
+`quality/src/main/resources/net/openhft/quality/mm-advice-ranks.properties`.
 
 *QUALITY-REQ-005* Documentation set :: Provide developer guidance under `src/main/docs`, including Meaningful Message check documentation and PMD suppression guidance.
 Documentation in `src/main/docs` is not packaged in the release JAR.
