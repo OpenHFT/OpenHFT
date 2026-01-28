@@ -45,7 +45,7 @@
         <chronicle.matching.engine.version>2026.0-SNAPSHOT</chronicle.matching.engine.version>
         <chronicle.platform.version>2026.0-SNAPSHOT</chronicle.platform.version>
         <chronicle.market.data.distributor.version>2026.0-SNAPSHOT</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2026.0-SNAPSHOT</chronicle.core.version>
+        <chronicle.core.version>2026.1-SNAPSHOT</chronicle.core.version>
         <chronicle.itch.adapters.version>2026.0-SNAPSHOT</chronicle.itch.adapters.version>
         <chronicle.extensions.version>2026.0-SNAPSHOT</chronicle.extensions.version>
     </properties>
@@ -58,19 +58,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-test-framework</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-analytics</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -89,25 +89,25 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -126,7 +126,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -670,19 +670,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>2026.0-SNAPSHOT</version>
+                <version>2026.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
