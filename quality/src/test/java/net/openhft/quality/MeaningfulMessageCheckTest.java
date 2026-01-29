@@ -47,8 +47,8 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     private static final String FIX_TOO_FEW_MEANINGFUL_ANNOTATION =
             "add unique words: scenario + expected outcome";
     private static final String FIX_MISSING_MESSAGE_DEFAULT =
-            "add a meaningful message, supply a Throwable, or add a /* reason */ comment "
-                    + "inside the argument list when a message must be omitted";
+            "add a meaningful message, supply a Throwable, or add a single-line comment "
+                    + "on the line before when a message must be omitted";
 
     static Stream<Arguments> provideStandardTestCases() {
         return Stream.of(

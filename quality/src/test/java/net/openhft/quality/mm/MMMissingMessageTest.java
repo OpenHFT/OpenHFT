@@ -237,7 +237,7 @@ class MMMissingMessageTest {
 
         Violation violation = collector.pendingForTesting().get(43);
         assertNotNull(violation, "Violation should be recorded for missing message");
-        assertEquals("add a meaningful message, supply a Throwable, or add a /* reason */ comment inside the argument list when a message must be omitted",
+        assertEquals("add a meaningful message, supply a Throwable, or add a single-line comment on the line before when a message must be omitted",
                 violation.args()[0], "Default fix guidance should match");
     }
 

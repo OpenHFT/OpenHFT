@@ -107,7 +107,7 @@ Operational warnings highlight checker limitations or configuration issues and a
 |MMRestatesAssertion |Restates assertion |Explain the invariant, not the assertion type
 |MMIndexOnly |Index only |Name what the indexed element represents
 |MMContextless |Contextless |State what is compared and why it matters
-|MMMissingMessage |Missing message |Add a meaningful message, supply a Throwable, or use /* reason */
+|MMMissingMessage |Missing message |Add a meaningful message, supply a Throwable, or add a single-line comment on the line before
 |MMMapStringObject |Map<String, Object>/String comment |Prefer a DTO for known fields, AbstractMarshallableCfg for config; add a reason comment for dynamic keys
 |MMThrowNull |Throw null literal |Replace with `throw new UnsupportedOperationException()`
 |MMDisplayName |Missing display name |Add @DisplayName("descriptive name") to JUnit 5 test methods
@@ -477,12 +477,13 @@ Provide a meaningful message or supply a Throwable when allowed.
 For log sites, use a stable message template; for annotations, add a clear reason.
 For JUnit `fail()` and `assertXxx(...)`, always supply a non-null message.
 
-For low-level or performance-sensitive cases (especially `throw new`), you may use an inline block comment with a short reason inside the argument list instead of a message literal.
-Empty comments and line comments do not suppress.
+For low-level or performance-sensitive cases (especially `throw new`), add a single-line comment on the line before explaining why the exception is needed.
+An inline block comment inside the argument list is also accepted but a line-before comment is preferred for readability.
 
 [source,java,opts=novalidate]
 ----
-throw new IllegalArgumentException(/* condition not met */);
+// condition not met
+throw new IllegalArgumentException();
 ----
 
 .Before

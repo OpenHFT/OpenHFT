@@ -45,7 +45,7 @@ public final class MMMissingMessage extends AbstractMessageRule {
             }
             return "add a single-line comment on the line before explaining why this is required";
         }
-        return "add a meaningful message, supply a Throwable, or add a /* reason */ comment "
-                + "inside the argument list when a message must be omitted";
+        return "add a meaningful message, supply a Throwable, or add a single-line comment "
+                + "on the line before when a message must be omitted";
     }
 }

@@ -71,7 +71,8 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         }
         DetailAST messageExpr = findMessageExpression(args);
         if (messageExpr == null) {
-            if (!context().hasInlineReasonComment(literalNew)) {
+            if (!context().hasInlineReasonComment(literalNew)
+                    && !context().hasAdjacentReasonComment(throwAst.getLineNo())) {
                 sink().emitMissingMessage(throwAst.getLineNo(), MessageSource.THROW);
             }
             return;
@@ -84,11 +85,12 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             }
             // Message expression exists but couldn't be parsed as a template.
             // This could be a complex expression (method call, ternary, etc.).
-            // An inline comment like "// MM-reason: computed message" suppresses this.
+            // A line-before or inline comment suppresses this.
             // Note: We emit "missing message" rather than "unhandled" because:
             // - The message IS expected but we can't verify its quality
-            // - Users can suppress with inline comment if the expression is intentional
-            if (!context().hasInlineReasonComment(literalNew)) {
+            // - Users can suppress with a comment if the expression is intentional
+            if (!context().hasInlineReasonComment(literalNew)
+                    && !context().hasAdjacentReasonComment(throwAst.getLineNo())) {
                 sink().emitMissingMessage(throwAst.getLineNo(), MessageSource.THROW);
             }
             return;
