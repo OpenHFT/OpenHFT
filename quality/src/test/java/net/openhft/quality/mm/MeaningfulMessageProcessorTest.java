@@ -292,10 +292,10 @@ public class MeaningfulMessageProcessorTest {
     }
 
     @Test
-    @DisplayName("Count purpose cues ignores edge and short phrases")
-    void countPurposeCuesIgnoresEdgeAndShortPhrases() throws Exception {
+    @DisplayName("Count purpose cues counts leading cues but ignores trailing ones")
+    void countPurposeCuesCountsLeadingCuesButIgnoresTrailingOnes() throws Exception {
         prepareProcessor();
-        assertEquals(0, invokeCountPurposeCues("because this fails"));
+        assertEquals(1, invokeCountPurposeCues("because this fails"));
         assertEquals(0, invokeCountPurposeCues("this fails because"));
         assertEquals(0, invokeCountPurposeCues("so that"));
     }
@@ -322,10 +322,10 @@ public class MeaningfulMessageProcessorTest {
     }
 
     @Test
-    @DisplayName("Count purpose cues ignores so that at start")
-    void countPurposeCuesIgnoresSoThatAtStart() throws Exception {
+    @DisplayName("Count purpose cues counts so that at start")
+    void countPurposeCuesCountsSoThatAtStart() throws Exception {
         prepareProcessor();
-        assertEquals(0, invokeCountPurposeCues("so that now"));
+        assertEquals(1, invokeCountPurposeCues("so that now"));
     }
 
     @Test
@@ -1748,15 +1748,15 @@ public class MeaningfulMessageProcessorTest {
     }
 
     @Test
-    @DisplayName("Count purpose cues correctly counts middle position cues")
-    void countPurposeCuesCorrectlyCountsMiddlePositionCues() throws Exception {
+    @DisplayName("Count purpose cues counts middle and leading position cues")
+    void countPurposeCuesCountsMiddleAndLeadingPositionCues() throws Exception {
         prepareProcessor();
         // "because" at position 2 (middle) should count
         assertEquals(1, invokeCountPurposeCues("test because reason"),
                 "because in middle should count");
-        // "because" at position 0 should not count
-        assertEquals(0, invokeCountPurposeCues("because test fails"),
-                "because at start should not count");
+        // "because" at position 0 should count
+        assertEquals(1, invokeCountPurposeCues("because test fails"),
+                "because at start should count");
         // "because" at last position should not count
         assertEquals(0, invokeCountPurposeCues("test fails because"),
                 "because at end should not count");

@@ -258,6 +258,16 @@
                         </dependencies>
                         <executions>
                             <execution>
+                                <id>spotbugs-report</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>spotbugs</goal>
+                                </goals>
+                                <configuration>
+                                    <htmlOutput>true</htmlOutput>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>spotbugs-main</id>
                                 <!-- Run after compilation of main and test classes, and gate on findings -->
                                 <phase>process-test-classes</phase>

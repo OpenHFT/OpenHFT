@@ -642,4 +642,13 @@
         <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
         <Class name="net.openhft.posix.PosixAPI"/>
     </Match>
+    <!-- Runtime-generated MethodReader/MethodWriter classes from Chronicle-Wire's compiler.
+         These are emitted into target/test-classes during test execution and produce
+         non-deterministic SpotBugs counts depending on whether tests ran before the quality gate. -->
+    <Match>
+        <Class name="~.*MethodReader"/>
+    </Match>
+    <Match>
+        <Class name="~.*MethodWriter"/>
+    </Match>
 </FindBugsFilter>

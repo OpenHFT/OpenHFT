@@ -21,6 +21,7 @@ public final class AdviceConsoleWriter {
             return;
         }
         System.out.println("FILE: " + report.fileName());
+        printRuleSummary(report);
         for (FileAdviceGroup group : report.fileAdvice()) {
             printFileAdvice(group);
         }
@@ -36,6 +37,42 @@ public final class AdviceConsoleWriter {
     public void writeRunSummary(int fileCount, int issueCount) {
         if (issueCount == 0) {
             System.out.println(fileCount + " files read; no issues found.");
+        }
+    }
+
+    private void printRuleSummary(FileReport report) {
+        List<String> fileRules = new java.util.ArrayList<>();
+        for (FileAdviceGroup group : report.fileAdvice()) {
+            int lineNo = group.details().lineNo();
+            String entry = lineNo > 0
+                    ? group.adviceId().name() + "(L" + lineNo + ')'
+                    : group.adviceId().name();
+            fileRules.add(entry);
+        }
+        java.util.Map<Integer, java.util.List<String>> lineRules = new java.util.TreeMap<>();
+        for (AdviceGroup group : report.lineAdvice()) {
+            String adviceName = group.adviceId().name();
+            for (AdviceOccurrence occurrence : group.occurrences()) {
+                lineRules.computeIfAbsent(occurrence.lineNo(), key -> new java.util.ArrayList<>())
+                        .add(adviceName);
+            }
+        }
+        if (fileRules.isEmpty() && lineRules.isEmpty()) {
+            return;
+        }
+        System.out.println("  RULES:");
+        if (!fileRules.isEmpty()) {
+            java.util.Collections.sort(fileRules);
+            System.out.println("    FILE: " + String.join(", ", fileRules));
+        }
+        for (java.util.Map.Entry<Integer, java.util.List<String>> entry : lineRules.entrySet()) {
+            java.util.List<String> rules = entry.getValue();
+            if (rules == null || rules.isEmpty()) {
+                continue;
+            }
+            java.util.Collections.sort(rules);
+            String joined = String.join(", ", new java.util.LinkedHashSet<>(rules));
+            System.out.println("    L" + entry.getKey() + ": " + joined);
         }
     }
 

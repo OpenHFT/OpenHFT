@@ -1233,7 +1233,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             String token = tokens.get(i);
             if ("so".equals(token) && i + 1 < tokens.size()
                     && "that".equals(tokens.get(i + 1))) {
-                if (i > 0 && i + 1 < tokens.size() - 1) {
+                if (i + 1 < tokens.size() - 1) {
                     count++;
                 }
                 i++;
@@ -1241,13 +1241,13 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             }
             if ("in".equals(token) && i + 1 < tokens.size()
                     && "order".equals(tokens.get(i + 1))) {
-                if (i > 0 && i + 1 < tokens.size() - 1) {
+                if (i + 1 < tokens.size() - 1) {
                     count++;
                 }
                 i++;
                 continue;
             }
-            if (i == 0 || i == tokens.size() - 1) {
+            if (i == tokens.size() - 1) {
                 continue;
             }
             if (isPurposeCue(token)) {
