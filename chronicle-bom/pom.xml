@@ -25,25 +25,25 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-bom</artifactId>
-    <version>2026.0-SNAPSHOT</version>
+    <version>2026.6</version>
     <packaging>pom</packaging>
     <name>OpenHFT/Chronicle BOM (Bill of Materials)</name>
     <description>This meta-project is used to generate a bill-of-materials POM that contains the
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <chronicle.network.version>2026.2-SNAPSHOT</chronicle.network.version>
+        <chronicle.network.version>2026.2</chronicle.network.version>
         <chronicle.queue.version>2026.1</chronicle.queue.version>
         <chronicle.zero.version>2026.0</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2026.1</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2026.1</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2026.0</chronicle.ring.version>
-        <chronicle.fix.version>2026.2-SNAPSHOT</chronicle.fix.version>
-        <chronicle.services.version>2026.2-SNAPSHOT</chronicle.services.version>
+        <chronicle.fix.version>2026.2</chronicle.fix.version>
+        <chronicle.services.version>2026.2</chronicle.services.version>
         <chronicle.logger.version>2026.0</chronicle.logger.version>
         <chronicle.efx.version>2026.2</chronicle.efx.version>
         <chronicle.matching.engine.version>2026.0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2026.1-SNAPSHOT</chronicle.platform.version>
+        <chronicle.platform.version>2026.1</chronicle.platform.version>
         <chronicle.market.data.distributor.version>2026.0</chronicle.market.data.distributor.version>
         <chronicle.core.version>2026.3</chronicle.core.version>
         <chronicle.itch.adapters.version>2026.0</chronicle.itch.adapters.version>
@@ -107,7 +107,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2026.4-SNAPSHOT</version>
+                <version>2026.4</version>
             </dependency>
 
             <dependency>
@@ -933,6 +933,6 @@
         <url>scm:git:git@github.com:OpenHFT/OpenHFT.git</url>
         <connection>scm:git:git@github.com:OpenHFT/OpenHFT.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
-        <tag>ea</tag>
+        <tag>chronicle-bom-2026.6</tag>
     </scm>
 </project>
