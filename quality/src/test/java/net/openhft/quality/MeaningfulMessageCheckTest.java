@@ -86,6 +86,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {29, RuleId.REDUNDANT_METHOD, "methodNamed method class method check method.", "methodNamed",
                                 "only filler words remain: method, class, method, check, method"}
                 }),
+                arguments("RecordJavadocReuse", "InputRecordJavadocDuplicate.java", new Object[][]{}),
                 arguments("GoodMessages", "InputGoodAssertMessages.java", new Object[][]{}),
                 arguments("LowEntropyMessages", "InputLowEntropyMessages.java", new Object[][]{
                         {10, RuleId.LOW_ENTROPY, "3.27", "4.00"}

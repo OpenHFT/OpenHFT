@@ -24,6 +24,7 @@ public final class JavadocMessageExtractor extends AbstractMessageExtractor {
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]+>");
 
     private boolean classJavadocSeen;
+    private final java.util.Set<Integer> emittedJavadocStartLines = new java.util.HashSet<>();
 
     /**
      * Create an extractor for Javadoc paragraphs.
@@ -40,6 +41,7 @@ public final class JavadocMessageExtractor extends AbstractMessageExtractor {
      */
     public void reset() {
         classJavadocSeen = false;
+        emittedJavadocStartLines.clear();
     }
 
     /**
@@ -118,6 +120,10 @@ public final class JavadocMessageExtractor extends AbstractMessageExtractor {
 
     void emitCandidate(TextBlock javadoc, MessageSource source) {
         requireNonNull(javadoc);
+        int startLine = javadoc.getStartLineNo();
+        if (!emittedJavadocStartLines.add(startLine)) {
+            return;
+        }
         String paragraph = extractFirstParagraph(javadoc);
         if (paragraph == null) {
             return;
