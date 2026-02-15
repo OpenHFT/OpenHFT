@@ -57,6 +57,28 @@ class MMTooFewMeaningfulWordsTest {
     }
 
     @Test
+    @DisplayName("Comment fix guidance uses return null wording")
+    void commentFixGuidanceUsesReturnNullWording() {
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .lineNo(19)
+                .source(MessageSource.COMMENT)
+                .message("null reason")
+                .missingMessageKind(MissingMessageKind.RETURN_NULL)
+                .build();
+        MessageMetrics metrics = new MessageMetrics(12, 2, 1, 2, 1,
+                Collections.singletonList("null"), Collections.emptyList());
+        MessageContext context = new MessageContext(candidate, metrics,
+                "TestClass", "testMethod", false, null, null, null);
+
+        rule.evaluate(context, collector, state);
+
+        Violation violation = collector.pendingForTesting().get(19);
+        assertNotNull(violation, "Violation should be recorded for return null comment");
+        assertEquals("use two+ meaningful words about why returning null is required",
+                violation.args()[5], "Return-null comment guidance should match");
+    }
+
+    @Test
     @DisplayName("Log message uses log fix guidance")
     void logMessageUsesLogFixGuidance() {
         MessageCandidate candidate = new MessageCandidate.Builder()
