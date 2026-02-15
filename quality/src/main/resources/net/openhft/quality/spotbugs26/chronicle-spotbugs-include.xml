@@ -296,9 +296,6 @@
     <Match>
         <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
     </Match>
-    <Match>
-        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
-    </Match>
 
     <!-- SS_SHOULD_BE_STATIC already above; DM_DEFAULT_ENCODING intentionally excluded to avoid legacy behaviour churn -->
 

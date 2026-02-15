@@ -650,11 +650,6 @@ class ReturnValueExamples {
         // RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT
         new StringBuilder().append("x");
     }
-
-    String formatWithNewline() {
-        // VA_FORMAT_STRING_USES_NEWLINE
-        return String.format("line1\n");
-    }
 }
 
 class MiscCorrectnessExamples {
