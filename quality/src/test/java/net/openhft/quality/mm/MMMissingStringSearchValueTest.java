@@ -105,6 +105,99 @@ class MMMissingStringSearchValueTest {
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
     }
 
+    @Test
+    @DisplayName("Evaluate records when alnum literal appears only inside larger word")
+    void evaluateRecordsWhenLiteralAppearsInsideLargerWordOnly() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"id\"")
+                .message("identifier should be present")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate skips when alnum literal appears as standalone token")
+    void evaluateSkipsWhenLiteralAppearsAsStandaloneToken() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"id\"")
+                .message("missing value for id")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when alnum literal has only adjacent matches")
+    void evaluateRecordsWhenLiteralHasOnlyAdjacentMatches() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"id\"")
+                .message("idid")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when quoted literal is empty")
+    void evaluateRecordsWhenQuotedLiteralIsEmpty() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"\"")
+                .message("value should include anything")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when search argument is null")
+    void evaluateRecordsWhenSearchArgumentIsNull() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg(null)
+                .message("value should include abc")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when quoted literal is malformed")
+    void evaluateRecordsWhenQuotedLiteralIsMalformed() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"")
+                .message("value should include quote")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
+    }
+
     private MessageCandidate.Builder baseCandidate() {
         return new MessageCandidate.Builder()
                 .lineNo(10)

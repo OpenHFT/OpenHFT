@@ -41,7 +41,41 @@ public final class MMMissingStringSearchValue extends AbstractMessageRule {
         if (literal.length() == 1 && Character.isLetterOrDigit(literal.charAt(0))) {
             return false;
         }
+        if (isAlnumUnderscoreLiteral(literal)) {
+            return containsAsStandaloneToken(message, literal);
+        }
         return message.contains(literal);
+    }
+
+    private static boolean isAlnumUnderscoreLiteral(String literal) {
+        for (int i = 0; i < literal.length(); i++) {
+            if (!isWordChar(literal.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean containsAsStandaloneToken(String message, String literal) {
+        int from = 0;
+        while (from <= message.length() - literal.length()) {
+            int idx = message.indexOf(literal, from);
+            if (idx < 0) {
+                return false;
+            }
+            char before = idx > 0 ? message.charAt(idx - 1) : '\0';
+            int end = idx + literal.length();
+            char after = end < message.length() ? message.charAt(end) : '\0';
+            if (!isWordChar(before) && !isWordChar(after)) {
+                return true;
+            }
+            from = idx + 1;
+        }
+        return false;
+    }
+
+    private static boolean isWordChar(char ch) {
+        return ch != '\0' && (Character.isLetterOrDigit(ch) || ch == '_');
     }
 
     private static String unquoteLiteral(String text) {
