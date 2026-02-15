@@ -1,0 +1,50 @@
+name: Third-Party Smoke
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: JDK ${{ matrix.java }} / ${{ matrix.slf4j }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ["8", "21"]
+        slf4j: ["slf4j-simple", "slf4j-nop"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+
+      - name: Run smoke tests
+        run: |
+          mkdir -p logs
+          mvn -B -pl third-party-smoke -am -P${{ matrix.slf4j }} verify \
+            -l logs/mvn-third-party-smoke-jdk${{ matrix.java }}-${{ matrix.slf4j }}.log
+
+      - name: Scan Maven log for warnings/errors
+        run: |
+          LOG=logs/mvn-third-party-smoke-jdk${{ matrix.java }}-${{ matrix.slf4j }}.log
+          if grep -nE '^\[(WARNING|ERROR)\]|SLF4J\(W\)|WARNING:|warning:' "$LOG"; then
+            echo "::error::Build log contains warnings or errors (see $LOG)"
+            exit 1
+          fi
+
+      - name: Upload Maven log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvn-third-party-smoke-jdk${{ matrix.java }}-${{ matrix.slf4j }}
+          path: logs/mvn-third-party-smoke-jdk${{ matrix.java }}-${{ matrix.slf4j }}.log

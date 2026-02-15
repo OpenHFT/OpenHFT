@@ -1,0 +1,104 @@
+= Reviewable Pull Requests
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+This document describes how to keep reviews low-effort, even when a change touches many files.
+The objective is *low cognitive load per unit of change*, not "small PRs at all costs".
+
+== Principles
+
+* Prefer changes that are easy to reason about locally.
+* Keep diffs free of incidental noise (formatting, reordering, renames) unless that is the change.
+* Treat warnings as defects: aim for clean build logs, not just green exit codes.
+
+== PR Types
+
+=== Functional change
+
+Behaviour changes (features, fixes, API changes).
+Keep the scope tight and provide focused tests/evidence.
+
+=== Non-functional change
+
+Build, tooling, docs, refactors, cleanup. These can be large, but should still be easy to review.
+
+=== Mechanical transformation (large is OK)
+
+A wide change can be easy to review when it is:
+
+* mechanical (same rule everywhere),
+* locally obvious (no semantic branching),
+* machine-verifiable (tests/static checks),
+* presented as a pattern (reviewers can sample and spot-check).
+
+== Mechanical Transformation Checklist
+
+1. *Declare the transformation rule*: one sentence, "X -> Y".
+2. *No exceptions*: if exceptions are needed, isolate them in a dedicated commit or follow-up PR.
+3. *Commit layering that matches review*:
+   * optional prep (introduce helper/abstraction, no call sites),
+   * mechanical sweep (tool-driven, same change everywhere),
+   * tidy-up (remove dead code, docs),
+   * verification-only (tests/bench updates) if needed.
+4. *Diff hygiene*:
+   * do not mix formatting with behaviour,
+   * avoid rename + edit in the same commit unless purely mechanical,
+   * keep ordering stable.
+5. *Sampling plan*: tell reviewers how to validate without reading every file.
+6. *Machine-checkable evidence*:
+   * capture Maven output with `-l` and review the log,
+   * include grep/ripgrep invariants (old pattern count -> 0).
+7. *Tool-driven and reproducible*: prefer a script/tool/rule that can be re-run (OpenRewrite, IDE structural replace, a one-off script).
+
+== Clean Builds (Logs, Not Exit Codes)
+
+When running Maven, capture output with `-l` and treat warnings/errors in the log as defects:
+
+[source,bash]
+----
+mkdir -p logs
+mvn -pl third-party-smoke verify -l logs/mvn-third-party-smoke.log
+rg -n '^\[(WARNING|ERROR)\]|SLF4J\(W\)|\bWARNING:|\bwarning:' logs/mvn-third-party-smoke.log
+----
+
+If a warning cannot be eliminated immediately, document it with an owner and follow-up plan (do not normalise warning noise).
+
+== Guardrails (when "mechanical" is not low-risk)
+
+Even consistent transforms can be risky in Chronicle-style code. Require extra evidence when touching:
+
+* hot-path logic (allocation/JIT/inlining sensitivity),
+* concurrency or ordering,
+* wire formats/serialization compatibility,
+* off-heap layouts.
+
+Prefer targeted microbench/JLBH evidence and narrowly-scoped tests for these areas.
+
+== Recommended PR Description Template
+
+Copy/paste and fill in:
+
+----
+Type: Mechanical / Semantics-preserving transformation
+Transformation rule: X -> Y
+Non-goals: No behavioural change intended
+
+Tooling used:
+- <tool> (command or description)
+
+Evidence:
+- Maven: mvn ... -l logs/<name>.log (log reviewed; clean)
+- Invariants:
+  - old pattern occurrences: N -> 0
+  - new pattern occurrences: N
+
+How to review (fast path):
+1) Review the "mechanical sweep" commit only
+2) Spot-check <N> files across <modules>
+3) Confirm invariants + CI
+
+Risk:
+- Why safe / what would indicate it is not safe
+----

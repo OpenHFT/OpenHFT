@@ -1,0 +1,128 @@
+= Company-Wide Tagging and Decision Records
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+This document defines the tagging scheme used across Chronicle projects for requirements and decisions.
+The goal is consistent traceability without repeating boilerplate in every repository.
+
+== Identifier Format
+
+Use the following format:
+
+`<SCOPE>-<TAG>-<NNN>`
+
+Where:
+
+* `<SCOPE>` identifies the repo/module (for example `WIRE`, `BYTES`, `SMOKE`).
+* `<TAG>` is one of the taxonomy tags below.
+* `<NNN>` is a zero-padded number unique within the scope.
+
+`ALL-*` is reserved for global decisions that apply to every Chronicle project.
+
+== Tag Taxonomy (Nine-Box Framework)
+
+Pick one primary tag if multiple apply.
+
+|===
+| Tag | Meaning | Typical examples
+
+| FN
+| Functional user-visible behaviour
+| Message routing, business rules
+
+| NF-P
+| Non-functional - Performance
+| Latency budgets, throughput targets
+
+| NF-S
+| Non-functional - Security
+| Authentication method, TLS version
+
+| NF-O
+| Non-functional - Operability
+| Logging, monitoring, health checks
+
+| TEST
+| Test / QA obligations
+| Chaos scenarios, benchmarking rigs
+
+| DOC
+| Documentation obligations
+| Sequence diagrams, user guides
+
+| OPS
+| Operational / DevOps concerns
+| Deployment checklist, build pipeline requirements
+
+| UX
+| Operator or end-user experience
+| CLI ergonomics, dashboard layouts
+
+| RISK
+| Compliance / risk controls
+| GDPR retention, audit trail
+|===
+
+== Decision Record Template
+
+Use this template in a `decision-log.adoc` file:
+
+[source,asciidoc]
+----
+=== <IDENTIFIER> <Title of Decision>
+
+Date:: YYYY-MM-DD
+Context::
+* What is the issue that this decision addresses?
+* What are the driving forces, constraints, and requirements?
+Decision Statement::
+* What is the change that is being proposed or was decided?
+Alternatives Considered::
+* <Alternative 1 Name/Type>:
+** *Description:* Brief description of the alternative.
+** *Pros:* ...
+** *Cons:* ...
+* <Alternative 2 Name/Type>:
+** *Description:* Brief description of the alternative.
+** *Pros:* ...
+** *Cons:* ...
+Rationale for Decision::
+* Why was the chosen decision selected?
+* How does it address the context and outweigh the cons of alternatives?
+Impact & Consequences::
+* What are the positive and negative consequences of this decision?
+* How does this decision affect the system, developers, users, or operations?
+Notes/Links::
+* (Optional: links to issues, discussions, proof-of-concepts)
+----
+
+== AsciiDoc Conventions
+
+=== List indentation
+
+Do not rely on indentation alone for list nesting.
+Use explicit list markers:
+
+[source,asciidoc]
+----
+* first level
+** nested level
+*** nested level 2
+----
+
+=== Emphasis and bold
+
+In AsciiDoc:
+
+* `_text_` is emphasis
+* `*text*` is bold
+
+=== Section numbering
+
+Use automatic section numbering for `.adoc` files:
+
+* add `:sectnums:` to the document header
+* do not prefix section titles with manual numbers
+
