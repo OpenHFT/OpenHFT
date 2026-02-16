@@ -198,6 +198,103 @@ class MMMissingStringSearchValueTest {
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
     }
 
+    @Test
+    @DisplayName("Evaluate skips when non-alnum literal with punctuation is present in message")
+    void evaluateSkipsWhenNonAlnumLiteralWithPunctuationIsPresent() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\".txt\"")
+                .message("path should end with .txt")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when non-alnum literal with punctuation is absent from message")
+    void evaluateRecordsWhenNonAlnumLiteralWithPunctuationIsAbsent() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\".txt\"")
+                .message("path should have correct extension")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate skips when punctuation-only literal like @ is present in message")
+    void evaluateSkipsWhenPunctuationOnlyLiteralIsPresent() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"@\"")
+                .message("email should contain @")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Evaluate skips when underscore literal appears as standalone token")
+    void evaluateSkipsWhenUnderscoreLiteralAppearsAsStandaloneToken() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"foo_bar\"")
+                .message("value should contain foo_bar here")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when underscore literal is embedded in larger token")
+    void evaluateRecordsWhenUnderscoreLiteralIsEmbeddedInLargerToken() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"foo_bar\"")
+                .message("prefix_foo_bar_suffix detected")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate skips when alnum literal appears at start of message")
+    void evaluateSkipsWhenAlnumLiteralAppearsAtStartOfMessage() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"abc\"")
+                .message("abc should be present")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Evaluate skips when alnum literal appears at end of message")
+    void evaluateSkipsWhenAlnumLiteralAppearsAtEndOfMessage() {
+        MessageCandidate candidate = baseCandidate()
+                .stringSearchArg("\"abc\"")
+                .message("value should be abc")
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
     private MessageCandidate.Builder baseCandidate() {
         return new MessageCandidate.Builder()
                 .lineNo(10)

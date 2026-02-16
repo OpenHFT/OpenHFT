@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("MM duplicates input tests")
@@ -82,6 +83,79 @@ class MMDuplicatesInputTest {
         rule.evaluate(context(candidate), collector, state);
 
         assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Evaluate throws NPE when input list contains null value before any match")
+    void evaluateThrowsOnNullInputValue() {
+        MessageCandidate candidate = baseCandidate()
+                .message("something else")
+                .inputValues(Arrays.asList(null, "admin"))
+                .build();
+
+        assertThrows(NullPointerException.class,
+                () -> rule.evaluate(context(candidate), collector, state));
+    }
+
+    @Test
+    @DisplayName("Evaluate does not match when input values are whitespace-only")
+    void evaluateDoesNotMatchWhenInputValuesAreWhitespaceOnly() {
+        MessageCandidate candidate = baseCandidate()
+                .message("admin")
+                .inputValues(Arrays.asList("   ", "\t"))
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        assertTrue(collector.pendingForTesting().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Evaluate records exact match case-insensitive")
+    void evaluateRecordsExactMatchCaseInsensitive() {
+        MessageCandidate candidate = baseCandidate()
+                .message("Admin")
+                .inputValues(Collections.singletonList("admin"))
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.DUPLICATES_INPUT, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when message matches input plus value suffix")
+    void evaluateRecordsWhenMessageMatchesInputPlusValueSuffix() {
+        MessageCandidate candidate = baseCandidate()
+                .message("admin value")
+                .inputValues(Collections.singletonList("admin"))
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.DUPLICATES_INPUT, violation.ruleId());
+    }
+
+    @Test
+    @DisplayName("Evaluate records when message matches expected prefix plus input")
+    void evaluateRecordsWhenMessageMatchesExpectedPrefixPlusInput() {
+        MessageCandidate candidate = baseCandidate()
+                .message("expected admin")
+                .inputValues(Collections.singletonList("admin"))
+                .build();
+
+        rule.evaluate(context(candidate), collector, state);
+
+        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertNotNull(violation);
+        assertEquals(RuleId.DUPLICATES_INPUT, violation.ruleId());
     }
 
     private MessageCandidate.Builder baseCandidate() {

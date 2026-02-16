@@ -1019,6 +1019,18 @@ assertThrows(IllegalArgumentException.class, code, "negative quantity should be 
 assertEquals(expected, actual, "computed checksum should equal baseline signature");
 ----
 
+=== Input Value Handling
+
+The rule checks each input value from the assertion arguments:
+
+- **Empty inputs** are skipped (no comparison is attempted).
+- **Whitespace-only inputs** are effectively skipped because trimming produces an empty string that cannot match a non-empty message.
+- **Null inputs** are rejected with a `NullPointerException`.
+  A null in the input list indicates a bug in message extraction, not a valid edge case.
+- **Case-insensitive matching** is used: `"Admin"` and `"admin"` are treated as equivalent.
+
+The rule matches five patterns: exact match, input + "value", input + "result", "expected" + input, and "actual" + input.
+
 [#MMLowSignalAssertAllHeading]
 == MMLowSignalAssertAllHeading: Low-Signal assertAll Heading
 
@@ -1231,9 +1243,21 @@ assertTrue(filename.endsWith(".json"),
 This rule only triggers when:
 - The assertion is `assertTrue` or `assertFalse`
 - The condition is a call to `contains()`, `startsWith()`, or `endsWith()`
-- The message is a constant string (no dynamic content) - The string search target is not a literal already mentioned in the message
+- The message is a constant string (no dynamic content)
+- The string search target is not a literal already mentioned in the message
 
 If you use a lambda supplier or string concatenation with variables, the rule assumes you're already including dynamic content.
+
+=== Token Boundary Behaviour
+
+The rule uses different matching strategies depending on the literal:
+
+- **Alphanumeric/underscore literals** (e.g. `"id"`, `"foo_bar"`): must appear as a standalone token in the message, bounded by non-word characters or string boundaries.
+  For example, `"id"` inside `"identifier"` is not a standalone match and triggers a violation.
+- **Non-alphanumeric literals** (e.g. `".txt"`, `"@"`): use simple substring matching.
+  If the message contains the literal anywhere, the rule is satisfied.
+- **Single alphanumeric characters** (e.g. `"x"`): always trigger a violation because a single character is too ambiguous to serve as meaningful context.
+- **Unquoted or malformed arguments**: treated as unresolvable and always trigger a violation.
 
 [#MMMissingLoopIndex]
 == MMMissingLoopIndex: Missing Loop Index
