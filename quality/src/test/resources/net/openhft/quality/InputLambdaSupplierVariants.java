@@ -102,4 +102,29 @@ public class InputLambdaSupplierVariants {
                 () -> assertFalse(false, () -> "Second check should pass")
         );
     }
+
+    // --- Block-bodied lambda with simple return (covers SLIST + LITERAL_RETURN path) ---
+
+    public void blockBodyWithSimpleReturn() {
+        assertTrue(true, () -> {
+            return "Simple block return message for assertion";
+        });
+    }
+
+    // --- Block-bodied lambda with format call return ---
+
+    public void blockBodyWithFormatReturn() {
+        int x = 5;
+        assertTrue(x > 0, () -> {
+            return String.format("Value %d should exceed zero", x);
+        });
+    }
+
+    // --- Lambda with multi-part concatenation ---
+
+    public void multiPartConcatenation() {
+        String a = "alpha";
+        String b = "beta";
+        assertTrue(true, () -> "Parts: " + a + " and " + b + " combined");
+    }
 }

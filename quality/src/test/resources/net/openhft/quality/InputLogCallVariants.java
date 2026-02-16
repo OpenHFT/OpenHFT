@@ -119,6 +119,27 @@ public class InputLogCallVariants {
         net.openhft.chronicle.core.Jvm.debug().on(getClass(), "Processing count: " + count);
     }
 
+    // --- Chronicle Jvm warn and debug with placeholder arguments ---
+
+    public void chronicleJvmWarnWithArgs() {
+        int retries = 3;
+        net.openhft.chronicle.core.Jvm.warn().on(getClass(),
+                "Retry limit reached after " + retries + " attempts");
+    }
+
+    public void chronicleJvmDebugWithArgs() {
+        String key = "user-session";
+        net.openhft.chronicle.core.Jvm.debug().on(getClass(),
+                "Cache miss for key " + key);
+    }
+
+    // --- Chronicle Jvm error with exception ---
+
+    public void chronicleJvmErrorWithException() {
+        Exception ex = new RuntimeException("test");
+        net.openhft.chronicle.core.Jvm.error().on(getClass(), "Critical error during processing", ex);
+    }
+
     // --- Empty or blank log messages (edge cases) ---
 
     public void edgeCaseMessages() {

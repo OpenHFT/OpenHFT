@@ -893,4 +893,77 @@ class ThrowMessageExtractorTest {
     private boolean invokeIsThrowableTypeName(String typeName) throws Exception {
         return extractor.isThrowableTypeName(typeName);
     }
+
+    // --- Phase 1 coverage: isThrowableTypeName edge cases ---
+
+    @Test
+    @DisplayName("Throwable type name recognises single-segment names ending in Exception")
+    void isThrowableTypeNameRecognisesSingleSegmentException() throws Exception {
+        assertTrue(invokeIsThrowableTypeName("RuntimeException"),
+                "Single-segment name ending in Exception should be throwable");
+        assertTrue(invokeIsThrowableTypeName("IllegalStateException"),
+                "IllegalStateException should be throwable");
+    }
+
+    @Test
+    @DisplayName("Throwable type name recognises names ending in Error")
+    void isThrowableTypeNameRecognisesNamesEndingInError() throws Exception {
+        assertTrue(invokeIsThrowableTypeName("AssertionError"),
+                "AssertionError should be throwable");
+        assertTrue(invokeIsThrowableTypeName("StackOverflowError"),
+                "StackOverflowError should be throwable");
+    }
+
+    @Test
+    @DisplayName("Throwable type name rejects names not ending in Exception or Error")
+    void isThrowableTypeNameRejectsNonThrowableNames() throws Exception {
+        assertFalse(invokeIsThrowableTypeName("String"),
+                "String should not be throwable");
+        assertFalse(invokeIsThrowableTypeName("Object"),
+                "Object should not be throwable");
+        assertFalse(invokeIsThrowableTypeName("ExceptionHandler"),
+                "ExceptionHandler should not be throwable (ends in Handler)");
+    }
+
+    @Test
+    @DisplayName("Throwable type name recognises StackTrace")
+    void isThrowableTypeNameRecognisesStackTrace() throws Exception {
+        assertTrue(invokeIsThrowableTypeName("StackTrace"),
+                "StackTrace should be recognised as throwable");
+    }
+
+    @Test
+    @DisplayName("Throwable type name recognises qualified names")
+    void isThrowableTypeNameRecognisesQualifiedNames() throws Exception {
+        assertTrue(invokeIsThrowableTypeName("java.lang.RuntimeException"),
+                "Qualified Exception should be throwable");
+        assertTrue(invokeIsThrowableTypeName("java.lang.OutOfMemoryError"),
+                "Qualified Error should be throwable");
+        assertFalse(invokeIsThrowableTypeName("java.lang.String"),
+                "Qualified non-throwable should not be throwable");
+    }
+
+    @Test
+    @DisplayName("Throwable type name returns false for empty string")
+    void isThrowableTypeNameReturnsFalseForEmptyString() throws Exception {
+        assertFalse(invokeIsThrowableTypeName(""),
+                "Empty string should not be throwable");
+    }
+
+    // --- Phase 1 coverage: throw-variable (not new) patterns ---
+
+    @Test
+    @DisplayName("Handle throw statement with conditional expression emits unhandled")
+    void handleThrowStatement_conditionalExpression_emitsUnhandled() {
+        // throw condition ? new RuntimeException("a") : new RuntimeException("b");
+        DetailAstImpl question = new DetailAstImpl();
+        question.setType(TokenTypes.QUESTION);
+        DetailAstImpl throwAst = createThrowStatementWithExpr(question);
+
+        extractor.handleThrowStatement(throwAst);
+
+        // Ternary is not a recognized pattern - should emit unhandled
+        assertFalse(sink.unhandledReasons.isEmpty() && sink.missingMessages.isEmpty(),
+                "Should emit some diagnostic for ternary throw expression");
+    }
 }

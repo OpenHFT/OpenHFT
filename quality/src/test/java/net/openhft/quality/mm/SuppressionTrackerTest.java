@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Unit tests for {@link SuppressionTracker}.
  */
 @SuppressWarnings("MMDisplayName")
-@DisplayName("Suppression tracker tests scenario case detail")
+@DisplayName("Suppression tracker tests")
 class SuppressionTrackerTest {
 
     private SuppressionTracker tracker;
@@ -41,13 +41,13 @@ class SuppressionTrackerTest {
     }
 
     @Test
-    @DisplayName("Constructor creates empty tracker scenario case")
+    @DisplayName("Constructor creates empty tracker")
     void constructorCreatesEmptyTracker() {
         assertNotNull(tracker, "tracker should not be null");
     }
 
     @Test
-    @DisplayName("Is suppressed empty scope returns false scenario case")
+    @DisplayName("Is suppressed empty scope returns false")
     void isSuppressed_emptyScope_returnsFalse() {
         assertFalse(tracker.isSuppressed(RuleId.TOO_SHORT),
                 "should return false when no scope entered");
@@ -117,28 +117,28 @@ class SuppressionTrackerTest {
     // --- stripQuotes tests ---
 
     @Test
-    @DisplayName("Strip quotes normal string scenario case")
+    @DisplayName("Strip quotes normal string")
     void stripQuotes_normalString() {
         assertEquals("test", tracker.stripQuotes("\"test\""),
                 "should strip surrounding quotes");
     }
 
     @Test
-    @DisplayName("Strip quotes no quotes scenario case")
+    @DisplayName("Strip quotes no quotes")
     void stripQuotes_noQuotes() {
         assertEquals("test", tracker.stripQuotes("test"),
                 "should return unchanged if no quotes");
     }
 
     @Test
-    @DisplayName("Strip quotes empty quotes scenario case")
+    @DisplayName("Strip quotes empty quotes")
     void stripQuotes_emptyQuotes() {
         assertEquals("", tracker.stripQuotes("\"\""),
                 "should return empty string for empty quotes");
     }
 
     @Test
-    @DisplayName("Strip quotes single char scenario case")
+    @DisplayName("Strip quotes single char")
     void stripQuotes_singleChar() {
         assertEquals("x", tracker.stripQuotes("x"),
                 "should return unchanged for single char");
@@ -269,7 +269,7 @@ class SuppressionTrackerTest {
     }
 
     @Test
-    @DisplayName("Clean token strips checkstyle prefix scenario")
+    @DisplayName("Clean token strips checkstyle prefix")
     void cleanToken_stripsCheckstylePrefix() {
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
 
@@ -278,7 +278,7 @@ class SuppressionTrackerTest {
     }
 
     @Test
-    @DisplayName("Clean token trims whitespace scenario case")
+    @DisplayName("Clean token trims whitespace")
     void cleanToken_trimsWhitespace() {
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
 
@@ -287,7 +287,7 @@ class SuppressionTrackerTest {
     }
 
     @Test
-    @DisplayName("Clean token preserves non prefixed scenario")
+    @DisplayName("Clean token preserves non prefixed")
     void cleanToken_preservesNonPrefixed() {
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
 
@@ -298,7 +298,7 @@ class SuppressionTrackerTest {
     // --- Test isSuppressed with manually manipulated scope stack ---
 
     @Test
-    @DisplayName("Is suppressed with suppress all returns true scenario case")
+    @DisplayName("Is suppressed with suppress all returns true")
     void isSuppressed_withSuppressAll_returnsTrue() {
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MM-all");
@@ -490,6 +490,199 @@ class SuppressionTrackerTest {
         DetailAstImpl missingValue = createAnnotationWithNamedValue("ignored", "MMTooShort");
         assertNull(invokeFindAnnotationValue(missingValue),
                 "Non-value attribute should return null");
+    }
+
+    @Test
+    @DisplayName("Find annotation value returns array init from named value attribute")
+    void findAnnotationValueReturnsArrayInitFromNamedValueAttribute() throws Exception {
+        // Build: @SuppressWarnings(value = {"MMTooShort", "MMTooLong"})
+        DetailAstImpl annotation = createAnnotationWithValueArray("MMTooShort", "MMTooLong");
+
+        DetailAST result = invokeFindAnnotationValue(annotation);
+        assertNotNull(result, "Array init should be found in named value attribute");
+        assertEquals(TokenTypes.ANNOTATION_ARRAY_INIT, result.getType(),
+                "Should return ANNOTATION_ARRAY_INIT for array-valued annotation");
+    }
+
+    @Test
+    @DisplayName("Find annotation value returns null for annotation without value attribute")
+    void findAnnotationValueReturnsNullForAnnotationWithoutValueAttribute() throws Exception {
+        // Build: @SuppressWarnings with no children at all (empty annotation)
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        // Add only the annotation name identifier, no value
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText("SuppressWarnings");
+        annotation.addChild(ident);
+
+        DetailAST result = invokeFindAnnotationValue(annotation);
+        assertNull(result, "Annotation with only identifier should return null");
+    }
+
+    @Test
+    @DisplayName("Collect string values handles direct ANNOTATION_ARRAY_INIT expression")
+    void collectStringValuesHandlesDirectAnnotationArrayInit() throws Exception {
+        // Build a standalone ANNOTATION_ARRAY_INIT with string literals inside
+        DetailAstImpl arrayInit = new DetailAstImpl();
+        arrayInit.setType(TokenTypes.ANNOTATION_ARRAY_INIT);
+        arrayInit.addChild(createExprWithLiteral("value1"));
+        arrayInit.addChild(createExprWithLiteral("value2"));
+        arrayInit.addChild(createExprWithLiteral("value3"));
+
+        List<String> tokens = new ArrayList<>();
+        invokeCollectStringValues(arrayInit, tokens);
+
+        assertEquals(Arrays.asList("value1", "value2", "value3"), tokens,
+                "Should collect all string values from annotation array init");
+    }
+
+    // --- Additional coverage tests (from peer review) ---
+
+    @Test
+    @DisplayName("Record comment suppressions with null input does not throw")
+    void recordCommentSuppressionsWithNullDoesNotThrow() {
+        tracker.recordCommentSuppressions(null);
+        assertFalse(tracker.isSuppressed(RuleId.TOO_SHORT, 1),
+                "should not suppress after null input");
+    }
+
+    @Test
+    @DisplayName("Unclosed MM-all OFF range extends to end of file")
+    void unclosedMmAllOffRangeExtendsToEndOfFile() throws Exception {
+        FileContents contents = createFileContents("InputUnclosedAll.java",
+                "// MM-all:OFF",
+                "assertEquals(a, b, \"x\");",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT, 2),
+                "should be suppressed after MM-all:OFF without matching ON");
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT, 3),
+                "should be suppressed until end of file");
+    }
+
+    @Test
+    @DisplayName("Unclosed rule-specific OFF range extends to end of file")
+    void unclosedRuleOffRangeExtendsToEndOfFile() throws Exception {
+        FileContents contents = createFileContents("InputUnclosedRule.java",
+                "// MMTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT, 2),
+                "should be suppressed after rule OFF without matching ON");
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT, 3),
+                "should be suppressed until end of file");
+        assertFalse(tracker.isSuppressed(RuleId.TOO_LONG, 2),
+                "other rules should not be suppressed");
+    }
+
+    @Test
+    @DisplayName("Unclosed AdviceId OFF range extends to end of file")
+    void unclosedAdviceIdOffRangeExtendsToEndOfFile() throws Exception {
+        FileContents contents = createFileContents("InputUnclosedAdvice.java",
+                "// MMAssertionMessageTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort, 2),
+                "should be suppressed after advice OFF without matching ON");
+        assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort, 3),
+                "should be suppressed until end of file");
+    }
+
+    @Test
+    @DisplayName("Collect string values skips non-string node types")
+    void collectStringValuesSkipsNonStringNodeTypes() throws Exception {
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText("notAString");
+
+        List<String> tokens = new ArrayList<>();
+        invokeCollectStringValues(ident, tokens);
+
+        assertTrue(tokens.isEmpty(),
+                "IDENT node should be silently ignored");
+    }
+
+    @Test
+    @DisplayName("Is suppressed AdviceId with no scope returns false")
+    void isSuppressedAdviceIdWithNoScopeReturnsFalse() {
+        assertFalse(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort),
+                "should return false when no scope entered");
+    }
+
+    @Test
+    @DisplayName("File-scope suppression suppresses file-level checks")
+    void fileScopeSuppressionSuppressesFileLevelChecks() {
+        tracker.addFileSuppressionsForTesting("MMTooShort");
+
+        assertTrue(tracker.isSuppressedInFile(RuleId.TOO_SHORT),
+                "file-scope suppression should suppress the rule at file level");
+        assertFalse(tracker.isSuppressedInFile(RuleId.TOO_LONG),
+                "other rules should not be suppressed at file level");
+    }
+
+    @Test
+    @DisplayName("File-scope MM-all suppresses all file-level checks")
+    void fileScopeMmAllSuppressesAllFileLevelChecks() {
+        tracker.addFileSuppressionsForTesting("MM-all");
+
+        assertTrue(tracker.isSuppressedInFile(RuleId.TOO_SHORT),
+                "MM-all should suppress any rule at file level");
+        assertTrue(tracker.isSuppressedInFile(RuleId.DUPLICATE),
+                "MM-all should suppress any rule at file level");
+    }
+
+    @Test
+    @DisplayName("File-scope AdviceId suppression works at file level")
+    void fileScopeAdviceIdSuppressionWorksAtFileLevel() {
+        tracker.addFileSuppressionsForTesting("MMAssertionMessageTooShort");
+
+        assertTrue(tracker.isSuppressedInFile(AdviceId.MMAssertionMessageTooShort),
+                "file-scope advice suppression should work");
+        assertFalse(tracker.isSuppressedInFile(AdviceId.MMAssertionMessageTooLong),
+                "other advice ids should not be suppressed");
+    }
+
+    @Test
+    @DisplayName("Comment suppression with MeaningfulMessage OFF toggles all rules")
+    void commentSuppressionMeaningfulMessageToggle() throws Exception {
+        FileContents contents = createFileContents("InputMeaningfulMsg.java",
+                "// MeaningfulMessage:OFF",
+                "assertEquals(a, b, \"x\");",
+                "// MeaningfulMessage:ON",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT, 2),
+                "should be suppressed between MeaningfulMessage OFF and ON");
+        assertTrue(tracker.isSuppressed(RuleId.DUPLICATE, 2),
+                "all rules should be suppressed between OFF and ON");
+        assertFalse(tracker.isSuppressed(RuleId.TOO_SHORT, 4),
+                "should not be suppressed after ON");
+    }
+
+    @Test
+    @DisplayName("Legacy suppressed rule IDs are tracked from comment directives")
+    void legacySuppressedRuleIdsTrackedFromComments() throws Exception {
+        FileContents contents = createFileContents("InputLegacy.java",
+                "// MMTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "// MMTooShort:ON");
+
+        tracker.recordCommentSuppressions(contents);
+
+        Set<RuleId> legacy = tracker.legacySuppressedRuleIds();
+        assertTrue(legacy.contains(RuleId.TOO_SHORT),
+                "legacy rule IDs should be tracked from comment directives");
     }
 
     // --- Helper methods to build AST structures ---

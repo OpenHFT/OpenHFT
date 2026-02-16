@@ -247,6 +247,93 @@ class ViolationCollectorTest {
         assertEquals(1, check.getViolations().size(), "violation should be recorded");
     }
 
+    @Test
+    @DisplayName("Record returns false when violation is suppressed by tracker")
+    void recordReturnsFalseWhenSuppressedByTracker() {
+        SuppressionTracker tracker = new SuppressionTracker();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
+        scope.addToken("MMTooShort");
+        tracker.pushScopeForTesting(scope);
+
+        ViolationCollector collector = new ViolationCollector(tracker);
+        boolean result = collector.record(10, RuleId.TOO_SHORT);
+
+        assertFalse(result, "record should return false when violation is suppressed");
+        assertFalse(collector.hasViolations(),
+                "suppressed violation should not be stored");
+    }
+
+    @Test
+    @DisplayName("Record returns true and stores violation when not suppressed by tracker")
+    void recordReturnsTrueWhenNotSuppressedByTracker() {
+        SuppressionTracker tracker = new SuppressionTracker();
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
+        scope.addToken("MMTooShort");
+        tracker.pushScopeForTesting(scope);
+
+        ViolationCollector collector = new ViolationCollector(tracker);
+        boolean result = collector.record(10, RuleId.MISSING_MESSAGE);
+
+        assertTrue(result, "record should return true when not suppressed");
+        assertTrue(collector.hasViolations(),
+                "non-suppressed violation should be stored");
+    }
+
+    @Test
+    @DisplayName("Record with duplicate line and equal priority keeps first violation")
+    void recordWithDuplicateLineAndEqualPriorityKeepsFirst() {
+        ViolationCollector collector = new ViolationCollector(null);
+        collector.record(10, RuleId.TOO_SHORT);
+        collector.record(10, RuleId.TOO_SHORT);
+
+        assertEquals(1, collector.pendingForTesting().size(),
+                "should keep only one violation per line");
+    }
+
+    @Test
+    @DisplayName("Record replaces violation with negative priority candidate")
+    void recordReplacesViolationWithNegativePriorityCandidate() {
+        ViolationCollector collector = new ViolationCollector(null);
+        collector.record(10, RuleId.MISSING_MESSAGE, "first");
+        collector.record(10, RuleId.THROW_NULL, "second");
+
+        java.util.Map<Integer, Violation> pending = collector.pendingForTesting();
+        assertEquals(1, pending.size(), "should have one violation for line 10");
+    }
+
+    @Test
+    @DisplayName("Record keeps higher priority violation when lower priority candidate arrives")
+    void recordKeepsHigherPriorityViolationWhenLowerPriorityCandidateArrives() {
+        ViolationCollector collector = new ViolationCollector(null);
+        collector.record(10, RuleId.THROW_NULL, "higher priority first");
+        collector.record(10, RuleId.TOO_SHORT, "lower priority second");
+
+        java.util.Map<Integer, Violation> pending = collector.pendingForTesting();
+        Violation violation = pending.get(10);
+        assertEquals(RuleId.THROW_NULL, violation.ruleId(),
+                "higher priority THROW_NULL should be kept over TOO_SHORT");
+    }
+
+    @Test
+    @DisplayName("Same priority violations use code length as tiebreaker")
+    void samePriorityViolationsUseCodeLengthAsTiebreaker() {
+        assertTrue(ViolationCollector.isHigherPriority(1, "AB", 1, 1, "ABC", 1),
+                "shorter code should be higher priority when priority is equal");
+        assertFalse(ViolationCollector.isHigherPriority(1, "ABC", 1, 1, "AB", 1),
+                "longer code should not be higher priority when priority is equal");
+    }
+
+    @Test
+    @DisplayName("Same priority and code length violations use order as tiebreaker")
+    void samePriorityAndCodeLengthViolationsUseOrderAsTiebreaker() {
+        assertTrue(ViolationCollector.isHigherPriority(1, "AB", 1, 1, "AB", 2),
+                "lower order should be higher priority");
+        assertFalse(ViolationCollector.isHigherPriority(1, "AB", 2, 1, "AB", 1),
+                "higher order should not be higher priority");
+        assertFalse(ViolationCollector.isHigherPriority(1, "AB", 1, 1, "AB", 1),
+                "equal order should not be higher priority");
+    }
+
     private static final class TestCheck extends AbstractCheck {
 
         @Override

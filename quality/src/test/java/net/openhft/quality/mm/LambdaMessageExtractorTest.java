@@ -208,6 +208,118 @@ class LambdaMessageExtractorTest {
         assertTrue(result.endsWith("..."), "Should end with ellipsis");
     }
 
+    // --- isCheapConcatenation edge cases ---
+
+    @Test
+    @DisplayName("Extract cheap supplier description single ident returns ident name")
+    void extractCheapSupplierDescription_singleIdent_returnsIdentName() {
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        lambda.addChild(expr);
+
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText("message");
+        expr.addChild(ident);
+
+        String result = extractor.extractCheapSupplierDescription(lambda);
+        assertEquals("message", result, "Single ident should return its name");
+    }
+
+    @Test
+    @DisplayName("Extract cheap supplier description non-cheap expression returns null")
+    void extractCheapSupplierDescription_nonCheapExpression_returnsNull() {
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        lambda.addChild(expr);
+
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        expr.addChild(methodCall);
+
+        String result = extractor.extractCheapSupplierDescription(lambda);
+        assertNull(result, "Non-cheap expression should return null");
+    }
+
+    @Test
+    @DisplayName("Extract cheap supplier description plus with non-ident child returns null")
+    void extractCheapSupplierDescription_plusWithNonIdentChild_returnsNull() {
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        lambda.addChild(expr);
+
+        DetailAstImpl plus = new DetailAstImpl();
+        plus.setType(TokenTypes.PLUS);
+        expr.addChild(plus);
+
+        DetailAstImpl stringLiteral = new DetailAstImpl();
+        stringLiteral.setType(TokenTypes.STRING_LITERAL);
+        stringLiteral.setText("\"hello\"");
+        plus.addChild(stringLiteral);
+
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText("value");
+        plus.addChild(ident);
+
+        String result = extractor.extractCheapSupplierDescription(lambda);
+        assertNull(result, "Plus with non-ident left child should return null");
+    }
+
+    // --- Block-bodied lambda tests (adopted from peer consensus) ---
+
+    @Test
+    @DisplayName("Block-bodied lambda with empty SLIST returns null from cheap supplier")
+    void blockBodiedLambdaWithEmptySlistReturnsNullFromCheapSupplier() {
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+
+        DetailAstImpl slist = new DetailAstImpl();
+        slist.setType(TokenTypes.SLIST);
+        lambda.addChild(slist);
+
+        assertNull(extractor.extractCheapSupplierDescription(lambda),
+                "Empty SLIST block body should return null from cheap supplier");
+        assertNull(extractor.extractTrivialLambdaMessageDirect(lambda),
+                "Empty SLIST block body should return null from direct extraction");
+    }
+
+    @Test
+    @DisplayName("Block-bodied lambda with return statement returns null from direct extraction")
+    void blockBodiedLambdaWithReturnReturnsNullFromDirect() {
+        DetailAstImpl lambda = new DetailAstImpl();
+        lambda.setType(TokenTypes.LAMBDA);
+
+        DetailAstImpl slist = new DetailAstImpl();
+        slist.setType(TokenTypes.SLIST);
+        lambda.addChild(slist);
+
+        DetailAstImpl returnStmt = new DetailAstImpl();
+        returnStmt.setType(TokenTypes.LITERAL_RETURN);
+        slist.addChild(returnStmt);
+
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        returnStmt.addChild(expr);
+
+        DetailAstImpl literal = new DetailAstImpl();
+        literal.setType(TokenTypes.STRING_LITERAL);
+        literal.setText("\"block message\"");
+        expr.addChild(literal);
+
+        assertNull(extractor.extractTrivialLambdaMessageDirect(lambda),
+                "Block-bodied lambda with return should return null from direct extraction");
+    }
+
     // --- Helper methods ---
 
     private DetailAstImpl createLambdaWithStringLiteral(String message) {

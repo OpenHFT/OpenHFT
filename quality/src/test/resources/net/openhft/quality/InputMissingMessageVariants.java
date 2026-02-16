@@ -106,6 +106,37 @@ public class InputMissingMessageVariants {
         }
     }
 
+    // --- JUnit 5 no-message assertions (missing messages) ---
+
+    public void junitNoMessage() {
+        assertTrue(true);
+        assertFalse(false);
+        assertEquals(1, 1);
+        assertNotEquals(1, 2);
+        assertNull(null);
+        assertNotNull(new Object());
+        assertSame("a", "a");
+        assertNotSame("a", "b");
+    }
+
+    // --- AssertJ fluent chain without as/describedAs ---
+
+    public void assertjFluentNoMessage() {
+        assertThat(true).isTrue();
+        assertThat("hello").startsWith("he");
+        assertThat(42).isEqualTo(42);
+        assertThat(java.util.List.of(1, 2)).hasSize(2);
+        assertThat("text").isNotEmpty();
+    }
+
+    // --- Static import variants ---
+
+    public void staticImportVariants() {
+        // Fully qualified vs static import assertions
+        org.junit.jupiter.api.Assertions.assertTrue(true, "Full qualified assertion should pass");
+        assertTrue(true, "Static imported assertion should pass");
+    }
+
     // --- Good messages that should not trigger violations ---
 
     public void goodMessages() {
