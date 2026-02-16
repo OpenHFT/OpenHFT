@@ -572,37 +572,21 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         return path == null ? "" : path.replace('\\', '/');
     }
 
-    private String globToRegex(String glob) {
+    String globToRegex(String glob) {
         StringBuilder builder = new StringBuilder();
+        int start = 0;
         for (int i = 0; i < glob.length(); i++) {
             char ch = glob.charAt(i);
-            switch (ch) {
-                case '*':
-                    builder.append(".*");
-                    break;
-                case '?':
-                    builder.append('.');
-                    break;
-                case '.':
-                case '(':
-                case ')':
-                case '+':
-                case '|':
-                case '^':
-                case '$':
-                case '@':
-                case '%':
-                case '{':
-                case '}':
-                case '[':
-                case ']':
-                case '\\':
-                    builder.append('\\').append(ch);
-                    break;
-                default:
-                    builder.append(ch);
-                    break;
+            if (ch == '*' || ch == '?') {
+                if (i > start) {
+                    builder.append(java.util.regex.Pattern.quote(glob.substring(start, i)));
+                }
+                builder.append(ch == '*' ? ".*" : ".");
+                start = i + 1;
             }
+        }
+        if (start < glob.length()) {
+            builder.append(java.util.regex.Pattern.quote(glob.substring(start)));
         }
         return builder.toString();
     }
@@ -1233,17 +1217,13 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             String token = tokens.get(i);
             if ("so".equals(token) && i + 1 < tokens.size()
                     && "that".equals(tokens.get(i + 1))) {
-                if (i + 1 < tokens.size() - 1) {
-                    count++;
-                }
+                count++;
                 i++;
                 continue;
             }
             if ("in".equals(token) && i + 1 < tokens.size()
                     && "order".equals(tokens.get(i + 1))) {
-                if (i + 1 < tokens.size() - 1) {
-                    count++;
-                }
+                count++;
                 i++;
                 continue;
             }

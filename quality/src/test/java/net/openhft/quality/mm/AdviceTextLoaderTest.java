@@ -26,4 +26,25 @@ class AdviceTextLoaderTest {
         assertNotEquals(text.hintA(), text.hintB(),
                 "hints should differ");
     }
+
+    @Test
+    @DisplayName("Every AdviceId except UNKNOWN has intent and verbose entries")
+    void everyAdviceIdHasIntentAndVerboseEntries() {
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+
+        for (AdviceId adviceId : AdviceId.values()) {
+            if (adviceId == AdviceId.UNKNOWN) {
+                continue;
+            }
+            AdviceText text = loader.textFor(adviceId);
+            assertNotNull(text.intentIntro(),
+                    adviceId.name() + " should have intent_intro in mm-advice.properties");
+            assertFalse(text.intentIntro().isEmpty(),
+                    adviceId.name() + " intent_intro should not be empty");
+            assertNotNull(text.verbose(),
+                    adviceId.name() + " should have verbose entry in mm-advice.properties");
+            assertFalse(text.verbose().isEmpty(),
+                    adviceId.name() + " verbose should not be empty");
+        }
+    }
 }

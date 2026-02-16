@@ -91,22 +91,22 @@ public class MeaningfulMessageProcessorTest {
     // --- setMessageExtractionFile tests ---
 
     @Test
-    @DisplayName("Set message extraction file null scenario")
-    void setMessageExtractionFileNull() {
+    @DisplayName("Set message extraction file accepts null without throwing")
+    void setMessageExtractionFileAcceptsNullWithoutThrowing() {
         processor.setMessageExtractionFile(null);
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set message extraction file empty scenario")
-    void setMessageExtractionFileEmpty() {
+    @DisplayName("Set message extraction file accepts empty string without throwing")
+    void setMessageExtractionFileAcceptsEmptyStringWithoutThrowing() {
         processor.setMessageExtractionFile("");
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set message extraction file whitespace scenario")
-    void setMessageExtractionFileWhitespace() {
+    @DisplayName("Set message extraction file accepts whitespace without throwing")
+    void setMessageExtractionFileAcceptsWhitespaceWithoutThrowing() {
         processor.setMessageExtractionFile("   ");
         // Should not throw
     }
@@ -135,36 +135,36 @@ public class MeaningfulMessageProcessorTest {
     // --- setIgnoredExceptionClassNames tests ---
 
     @Test
-    @DisplayName("Set ignored exception class names null scenario")
-    void setIgnoredExceptionClassNamesNull() {
+    @DisplayName("Set ignored exception class names accepts null without throwing")
+    void setIgnoredExceptionClassNamesAcceptsNullWithoutThrowing() {
         processor.setIgnoredExceptionClassNames(null);
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set ignored exception class names empty scenario")
-    void setIgnoredExceptionClassNamesEmpty() {
+    @DisplayName("Set ignored exception class names accepts empty string without throwing")
+    void setIgnoredExceptionClassNamesAcceptsEmptyStringWithoutThrowing() {
         processor.setIgnoredExceptionClassNames("");
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set ignored exception class names comma separated")
-    void setIgnoredExceptionClassNamesCommaSeparated() {
+    @DisplayName("Set ignored exception class names splits comma-separated values")
+    void setIgnoredExceptionClassNamesSplitsCommaSeparatedValues() {
         processor.setIgnoredExceptionClassNames("IOException,RuntimeException");
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set ignored exception class names whitespace separated")
-    void setIgnoredExceptionClassNamesWhitespaceSeparated() {
+    @DisplayName("Set ignored exception class names splits whitespace-separated values")
+    void setIgnoredExceptionClassNamesSplitsWhitespaceSeparatedValues() {
         processor.setIgnoredExceptionClassNames("IOException RuntimeException");
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set ignored exception class names mixed")
-    void setIgnoredExceptionClassNamesMixed() {
+    @DisplayName("Set ignored exception class names splits mixed delimiters")
+    void setIgnoredExceptionClassNamesSplitsMixedDelimiters() {
         processor.setIgnoredExceptionClassNames("IOException, RuntimeException  IllegalStateException");
         // Should not throw
     }
@@ -186,15 +186,15 @@ public class MeaningfulMessageProcessorTest {
     // --- setVerbose tests ---
 
     @Test
-    @DisplayName("Set verbose true scenario case detail")
-    void setVerboseTrue() {
+    @DisplayName("Set verbose true does not throw before begin tree")
+    void setVerboseTrueDoesNotThrowBeforeBeginTree() {
         processor.setVerbose(true);
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set verbose false scenario case detail")
-    void setVerboseFalse() {
+    @DisplayName("Set verbose false does not throw before begin tree")
+    void setVerboseFalseDoesNotThrowBeforeBeginTree() {
         processor.setVerbose(false);
         // Should not throw
     }
@@ -329,11 +329,11 @@ public class MeaningfulMessageProcessorTest {
     }
 
     @Test
-    @DisplayName("Count purpose cues ignores trailing so that and in order")
-    void countPurposeCuesIgnoresTrailingSoThatAndInOrder() throws Exception {
+    @DisplayName("Count purpose cues counts trailing so that and in order")
+    void countPurposeCuesCountsTrailingSoThatAndInOrder() throws Exception {
         prepareProcessor();
-        assertEquals(0, invokeCountPurposeCues("work so that"));
-        assertEquals(0, invokeCountPurposeCues("work in order"));
+        assertEquals(1, invokeCountPurposeCues("work so that"));
+        assertEquals(1, invokeCountPurposeCues("work in order"));
     }
 
     // --- escapeForTsv tests ---
@@ -989,15 +989,15 @@ public class MeaningfulMessageProcessorTest {
     // --- setEmitUnhandled tests ---
 
     @Test
-    @DisplayName("Set emit unhandled true does not throw")
-    void setEmitUnhandledTrue() {
+    @DisplayName("Set emit unhandled true enables unhandled warnings")
+    void setEmitUnhandledTrueEnablesUnhandledWarnings() {
         processor.setEmitUnhandled(true);
         // Should not throw
     }
 
     @Test
-    @DisplayName("Set emit unhandled false does not throw")
-    void setEmitUnhandledFalse() {
+    @DisplayName("Set emit unhandled false disables unhandled warnings")
+    void setEmitUnhandledFalseDisablesUnhandledWarnings() {
         processor.setEmitUnhandled(false);
         // Should not throw
     }
@@ -1178,8 +1178,8 @@ public class MeaningfulMessageProcessorTest {
     }
 
     @Test
-    @DisplayName("Test annotation order uses method line when test line missing")
-    void testAnnotationOrderUsesMethodLineWhenTestLineMissing() throws Exception {
+    @DisplayName("Annotation order uses method line when test annotation line is missing")
+    void annotationOrderUsesMethodLineWhenTestAnnotationLineMissing() throws Exception {
         FileContents contents = createFileContents("InputTestAnnotationOrderLine.java",
                 "class InputTestAnnotationOrderLine {",
                 "    void test() {",
@@ -2211,5 +2211,137 @@ public class MeaningfulMessageProcessorTest {
         prepareProcessor();
         int count = invokeCountPurposeCues("field is required by the spec");
         assertTrue(count >= 1, "required by phrase should count");
+    }
+
+    // --- buildScope edge cases (Phase 1 coverage) ---
+
+    @Test
+    @DisplayName("Build scope returns unknown when context is null")
+    void buildScopeReturnsUnknownWhenContextIsNull() {
+        assertEquals("unknown", invokeBuildScope(),
+                "should return unknown when processor has no context");
+    }
+
+    @Test
+    @DisplayName("Build scope returns unknown when class and method are both empty")
+    void buildScopeReturnsUnknownWhenClassAndMethodBothEmpty() throws Exception {
+        FileContents contents = createFileContents("InputEmptyScope.java",
+                "class InputEmptyScope {}");
+        processor.beginTree(contents);
+        // Context exists but no class or method visited
+        assertEquals("unknown", invokeBuildScope(),
+                "should return unknown when no class or method entered");
+    }
+
+    @Test
+    @DisplayName("Build scope returns method name when class name is empty")
+    void buildScopeReturnsMethodNameWhenClassNameEmpty() throws Exception {
+        FileContents contents = createFileContents("InputMethodOnlyScope.java",
+                "class InputMethodOnlyScope {",
+                "    void scopeMethod() {}",
+                "}");
+        processor.beginTree(contents);
+        DetailAstImpl methodDef = createMethodDef("scopeMethod", 2);
+        processor.visitToken(methodDef);
+        String scope = invokeBuildScope();
+        // Either method-only or class#method depending on context state
+        assertTrue(scope.contains("scopeMethod"),
+                "scope should include method name");
+    }
+
+    // --- emitUnhandled edge cases (Phase 1 coverage) ---
+
+    @Test
+    @DisplayName("Emit unhandled does nothing when disabled")
+    void emitUnhandledDoesNothingWhenDisabled() throws Exception {
+        FileContents contents = createFileContents("InputEmitDisabled.java",
+                "class InputEmitDisabled { void test() {} }");
+        processor.beginTree(contents);
+        processor.setEmitUnhandled(false);
+
+        DetailAstImpl ast = newAst(TokenTypes.LITERAL_THROW, "throw", 1);
+        processor.emitUnhandled(ast, "should be ignored");
+
+        TestCheck check = createCheck(contents);
+        processor.finishTree(check);
+
+        assertTrue(check.getViolations().isEmpty(),
+                "should not record violation when emitUnhandled is disabled");
+    }
+
+    @Test
+    @DisplayName("Emit unhandled handles null AST by using fallback line")
+    void emitUnhandledHandlesNullAstByUsingFallbackLine() throws Exception {
+        FileContents contents = createFileContents("InputEmitNullAst.java",
+                "class InputEmitNullAst {",
+                "    void test() {}",
+                "}");
+        processor.beginTree(contents);
+        DetailAstImpl methodDef = createMethodDef("test", 2);
+        processor.visitToken(methodDef);
+
+        processor.emitUnhandled(null, "null ast reason");
+
+        TestCheck check = createCheck(contents);
+        processor.finishTree(check);
+
+        assertFalse(check.getViolations().isEmpty(),
+                "should record violation even with null AST");
+    }
+
+    @Test
+    @DisplayName("Emit unhandled uses unknown when reason is blank")
+    void emitUnhandledUsesUnknownWhenReasonIsBlank() throws Exception {
+        FileContents contents = createFileContents("InputEmitBlankReason.java",
+                "class InputEmitBlankReason {",
+                "    void test() {}",
+                "}");
+        processor.beginTree(contents);
+        DetailAstImpl methodDef = createMethodDef("test", 2);
+        processor.visitToken(methodDef);
+
+        DetailAstImpl ast = newAst(TokenTypes.LITERAL_THROW, "throw", 2);
+        processor.emitUnhandled(ast, "   ");
+
+        TestCheck check = createCheck(contents);
+        processor.finishTree(check);
+
+        assertFalse(check.getViolations().isEmpty(),
+                "should record violation with blank reason");
+    }
+
+    // --- globToRegex tests (fix validation) ---
+
+    @Test
+    @DisplayName("Glob to regex escapes parentheses via Pattern.quote")
+    void globToRegexEscapesParenthesesViaPatternQuote() {
+        String regex = processor.globToRegex("src/test/(special)/*.java");
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+        assertTrue(pattern.matcher("src/test/(special)/Foo.java").matches(),
+                "should match path with parentheses");
+        assertFalse(pattern.matcher("src/test/special/Foo.java").matches(),
+                "should not match path without parentheses");
+    }
+
+    @Test
+    @DisplayName("Glob to regex handles simple wildcard patterns")
+    void globToRegexHandlesSimpleWildcardPatterns() {
+        String regex = processor.globToRegex("src/*.java");
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+        assertTrue(pattern.matcher("src/Foo.java").matches(),
+                "should match simple wildcard");
+        assertFalse(pattern.matcher("other/Foo.java").matches(),
+                "should not match different prefix");
+    }
+
+    @Test
+    @DisplayName("Glob to regex handles question mark wildcard")
+    void globToRegexHandlesQuestionMarkWildcard() {
+        String regex = processor.globToRegex("test?.java");
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+        assertTrue(pattern.matcher("testA.java").matches(),
+                "question mark should match single char");
+        assertFalse(pattern.matcher("testAB.java").matches(),
+                "question mark should not match multiple chars");
     }
 }

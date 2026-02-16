@@ -6,11 +6,14 @@ package net.openhft.quality.mm;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,5 +64,31 @@ class AdviceRankingsTest {
                 "unknown keys should be recorded");
         assertEquals(1, rankings.rankFor(AdviceId.MMAssertionMessageMissing),
                 "known rank should be loaded");
+    }
+
+    @Test
+    @DisplayName("Every AdviceId except UNKNOWN has an explicit rank entry")
+    void everyAdviceIdHasRankEntry() throws Exception {
+        Properties properties = new Properties();
+        try (InputStream input = getClass().getClassLoader()
+                .getResourceAsStream(AdviceReportManager.RANK_RESOURCE)) {
+            assertNotNull(input, "rank resource should exist");
+            properties.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+        }
+        for (AdviceId adviceId : AdviceId.values()) {
+            if (adviceId == AdviceId.UNKNOWN) {
+                continue;
+            }
+            assertTrue(properties.containsKey(adviceId.name()),
+                    adviceId.name() + " should have an explicit rank entry");
+        }
+    }
+
+    @Test
+    @DisplayName("No unknown or stale keys exist in rank properties")
+    void noUnknownKeysInRankProperties() {
+        AdviceRankings rankings = AdviceRankings.loadFromResource(AdviceReportManager.RANK_RESOURCE);
+        assertTrue(rankings.unknownKeys().isEmpty(),
+                "rank properties should not contain unknown keys: " + rankings.unknownKeys());
     }
 }
