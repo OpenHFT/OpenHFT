@@ -34,6 +34,13 @@ public class AssertionMethodClassifierTest {
         assertEquals(expected, AssertionMethodClassifier.isAssertionMethod(methodName));
     }
 
+    @DisplayName("Is assertion method null returns false scenario case")
+    @ParameterizedTest
+    @NullSource
+    void isAssertionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isAssertionMethod(methodName));
+    }
+
     @DisplayName("Is precondition method scenario case detail")
     @ParameterizedTest
     @CsvSource({

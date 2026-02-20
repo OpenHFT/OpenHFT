@@ -19,6 +19,9 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is an assertion method.
      */
     public static boolean isAssertionMethod(String methodName) {
+        if (methodName == null) {
+            return false;
+        }
         if (methodName.equals("assertClassesLoad")
                 || methodName.equals("assertPackagePresent")
                 || methodName.equals("assertResourcePresent")) {
