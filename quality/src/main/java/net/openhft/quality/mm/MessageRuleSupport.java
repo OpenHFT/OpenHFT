@@ -127,12 +127,12 @@ public final class MessageRuleSupport {
         if (containsNameExact(text, swappedCase)) {
             return swappedCase;
         }
-        String lowerCase = name.toLowerCase();
+        String lowerCase = name.toLowerCase(Locale.ROOT);
         if (!lowerCase.equals(name) && !lowerCase.equals(swappedCase)
                 && containsNameExact(text, lowerCase)) {
             return lowerCase;
         }
-        String upperCase = name.toUpperCase();
+        String upperCase = name.toUpperCase(Locale.ROOT);
         if (!upperCase.equals(name) && containsNameExact(text, upperCase)) {
             return upperCase;
         }
