@@ -35,6 +35,7 @@
         <module>quality</module>
         <module>java-parent-pom</module>
         <module>chronicle-bom</module>
+        <module>third-party-smoke</module>
     </modules>
 
     <build>
