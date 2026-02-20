@@ -33,7 +33,6 @@ Implementation: `quality/src/main/java/net/openhft/quality/MeaningfulMessageChec
 
 *QUALITY-REQ-005* Documentation set :: Provide developer guidance under `src/main/docs`, including Meaningful Message check documentation and PMD suppression guidance.
 Documentation in `src/main/docs` is not packaged in the release JAR.
-Implementation: link:message-quality-guide.adoc[Message Quality Guide]
 
 *QUALITY-REQ-006* Self-check baseline warnings :: Keep Meaningful Message self-check coverage stable by sourcing expected violations exclusively from `SelfCheckFixture`, so the self test can distinguish a broken check (no warnings found) from a clean codebase (no warnings expected) by always providing intentional violations.
 Implementation: `quality/src/test/java/net/openhft/quality/QualityCheckstyleSelfTest.java`,
