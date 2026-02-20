@@ -1,0 +1,162 @@
+= Decision Log
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Recorded Decisions
+
+=== SMOKE-DEC-001 Dedicated smoke test module
+
+Date:: 2025-11-29
+Context:: The third-party BOM must stay usable on Java 8, but the set of dependencies evolves and can drift in bytecode level or transitive requirements.
+Without continuous validation, regressions would only be detected when downstream consumers attempt to use the BOM.
+Decision Statement:: Create dedicated `third-party-smoke` module with class loading and minimal usage tests to validate Java 8 compatibility continuously.
+Alternatives Considered::
+* Manual spot checks:
+** *Pros:* No automated test maintenance.
+** *Cons:* Error-prone, inconsistent, no CI gate.
+* Rely on downstream consumers:
+** *Pros:* No extra module to maintain.
+** *Cons:* Late detection of breakage, poor developer experience.
+* CI-only validation without committed tests:
+** *Pros:* Keeps repository lightweight.
+** *Cons:* No local reproducibility, unclear coverage.
+Rationale for Decision:: Fast feedback loop prevents regressions.
+Validates transitive dependencies.
+No external service dependencies.
+Developers can run locally before pushing.
+Impact & Consequences:: Contributors must keep tests green.
+Build time increases ~15-30 seconds.
+Version bumps that break Java 8 fail fast with clear error messages.
+Notes/Links:: Module path `third-party-smoke`.
+See requirement `SMOKE-TEST-001` in project-requirements.adoc.
+
+=== SMOKE-DEC-002 Separate class loading and usage tests
+
+Date:: 2025-11-29
+Context:: Class loading proves artifact resolution and bytecode compatibility but not runtime behaviour.
+Some libraries may load successfully but fail when actually used due to API changes, missing resources, or runtime assumptions.
+Decision Statement:: Maintain `ClassLoadingSmokeTest` (85+ tests) for comprehensive coverage and `MinimalUsageSmokeTest` suite for behavioural validation of critical dependencies.
+Alternatives Considered::
+* Class loading only:
+** *Pros:* Faster, simpler test suite.
+** *Cons:* Misses runtime issues, API breakage, resource loading problems.
+* Full integration tests:
+** *Pros:* Complete behavioural coverage.
+** *Cons:* Slow, requires external services, brittle, expensive to maintain.
+* Combined approach (current):
+** *Pros:* Fast comprehensive class loading + targeted behavioural validation.
+** *Cons:* Two test layers to maintain.
+Rationale for Decision:: Class loading is fast (85+ tests in ~1.3s) and proves basic compatibility.
+Minimal usage tests catch runtime issues without external dependencies.
+Balance between speed and confidence.
+Impact & Consequences:: Two test layers require maintenance.
+Minimal usage tests focus on frequently-used artifacts.
+Less-common artifacts rely on class loading only.
+Notes/Links:: `ClassLoadingSmokeTest.java` (85+ dynamic tests), `Minimal*SmokeTest.java` (25+ tests across 6 categories).
+
+=== SMOKE-DEC-003 Categorised minimal usage tests
+
+Date:: 2025-11-29
+Context:: `MinimalUsageSmokeTest` grew to 25+ tests covering disparate technologies (observability, serialisation, networking, logging, utilities, database).
+Single file became difficult to navigate and didn't align with dependency groupings.
+Decision Statement:: Split minimal usage tests into category-based test classes: `MinimalObservabilitySmokeTest`, `MinimalSerializationSmokeTest`, `MinimalNetworkingSmokeTest`, `MinimalLoggingSmokeTest`, `MinimalUtilitiesSmokeTest`, `MinimalDatabaseSmokeTest`.
+Alternatives Considered::
+* Single monolithic test class:
+** *Pros:* One file, simpler structure.
+** *Cons:* Poor navigation, unclear grouping, difficult to execute categories independently.
+* Package-based organisation (separate packages):
+** *Pros:* Strong separation.
+** *Cons:* Over-engineered for 6 test classes, unnecessary complexity.
+* Artifact-based organisation (one class per dependency):
+** *Pros:* Maximum granularity.
+** *Cons:* Too many files (80+ test classes), maintenance burden.
+Rationale for Decision:: Category-based organisation aligns with dependency groupings in pom.xml and `ClassLoadingSmokeTest` helper methods.
+IDE navigation and test execution become clearer.
+Parallel execution can target specific categories.
+Impact & Consequences:: More test files (6 classes instead of 1).
+Clearer test organisation and reporting.
+Easier to add new tests to appropriate category.
+Notes/Links:: Test classes in `/home/peter/Second/OpenHFT/third-party-smoke/src/test/java/net/openhft/thirdparty/smoke/`.
+See requirement `SMOKE-TEST-002` in project-requirements.adoc.
+
+=== SMOKE-DEC-004 Hardcoded dependency versions
+
+Date:: 2025-11-29
+Context:: Several dependencies (JCommander 1.48, Gson 2.8.2, Unirest 1.4.9, Joda-Time 2.14.0, Commons Email 1.5, JGit 5.13.0.202109080827-r, Maven Model 3.6.3) were found in peer modules but not managed in `third-party-bom`.
+These represent actual usage patterns in the Chronicle ecosystem.
+Decision Statement:: Keep hardcoded versions in `pom.xml` as "additional peer tests" until `third-party-bom` is updated to manage these dependencies.
+Alternatives Considered::
+* Remove from smoke tests:
+** *Pros:* Cleaner pom.xml, no version maintenance.
+** *Cons:* Loses validation of real peer module dependencies.
+* Add to third-party-bom immediately:
+** *Pros:* Centralized version management.
+** *Cons:* Requires BOM update decision, may include unwanted dependencies.
+* Create separate smoke module for peer dependencies:
+** *Pros:* Clear separation of concerns.
+** *Cons:* Over-engineered, unnecessary complexity for 7 dependencies.
+Rationale for Decision:: Validates real usage patterns.
+Documents version drift between peer modules and BOM.
+Provides evidence for future BOM migration.
+Tests remain green with known versions.
+Impact & Consequences:: Version maintenance burden in smoke module pom.xml.
+Documented in version-issues.adoc with migration path.
+Requires manual version updates when peer modules change.
+Notes/Links:: See pom.xml lines 495-541 for hardcoded versions.
+Documented in version-issues.adoc.
+See requirement `SMOKE-NF-O-003` for documentation currency.
+
+=== SMOKE-DEC-005 Bytecode enforcement with exclusions
+
+Date:: 2025-11-29
+Context:: HSQLDB and MongoDB bson-record-codec ship with Java 11+/17 bytecode, exceeding Java 8 baseline.
+Complete rejection would break legitimate use cases (HSQLDB has jdk8 classifier; bson-record-codec may be transitive-only).
+Decision Statement:: Use `enforceBytecodeVersion` with explicit exclusions for HSQLDB and bson-record-codec, documented in version-issues.adoc with action items to investigate alternatives.
+Alternatives Considered::
+* Remove dependencies entirely:
+** *Pros:* Pure Java 8 bytecode compliance.
+** *Cons:* Breaks HSQLDB validation, may exclude legitimate use cases.
+* Require Java 8 variants for all dependencies:
+** *Pros:* Strict enforcement.
+** *Cons:* Not all libraries provide Java 8 variants; blocks upgrades.
+* Skip bytecode enforcement:
+** *Pros:* No exclusion management.
+** *Cons:* Silent Java 8 breakage, defeats purpose of smoke tests.
+Rationale for Decision:: Balanced approach - enforce for most artifacts, document exceptions, alert on new violations.
+Exceptions require justification and follow-up.
+HSQLDB provides jdk8 classifier. bson-record-codec may be transitive and unused.
+Impact & Consequences:: Explicit exclusion list in pom.xml lines 559-577. Requires documentation updates when adding exclusions.
+Follow-up action to verify if both HSQLDB artifacts needed.
+Notes/Links:: See `maven-enforcer-plugin` configuration in pom.xml.
+Documented in version-issues.adoc.
+See requirement `SMOKE-NF-O-001` in project-requirements.adoc.
+
+=== SMOKE-DEC-006 Single SLF4J binding in tests
+
+Date:: 2025-11-29
+Context:: Tests need an SLF4J binding on the classpath, but multiple bindings create noisy warnings that do not add coverage value.
+Keep slf4j-nop version-managed in third-party-bom for consumers, but do not include it in smoke tests.
+Decision Statement:: Use slf4j-simple as the only SLF4J binding in third-party-smoke tests.
+Alternatives Considered::
+* Multiple bindings in one test run:
+** *Description:* Include slf4j-simple and slf4j-nop together.
+** *Pros:* Exercises binding selection with conflicting classpath entries.
+** *Cons:* Produces warnings and hides real issues in logs.
+* No explicit binding:
+** *Description:* Rely on whatever binding arrives transitively.
+** *Pros:* Less configuration.
+** *Cons:* Unreliable tests and harder to reproduce failures.
+* Separate profiles per binding:
+** *Description:* Run smoke tests once per binding.
+** *Pros:* Coverage without conflicts.
+** *Cons:* More build complexity and longer CI times.
+Rationale for Decision:: A single binding keeps logs readable while still validating core SLF4J behaviour.
+slf4j-simple is lightweight and stable on Java 8.
+Impact & Consequences:: SLF4J multiple-binding warnings should stop in third-party-smoke runs.
+If a second binding needs validation, add a dedicated profile or targeted test.
+Notes/Links:: See third-party-smoke pom.xml SLF4J dependencies.
+Documented in version-issues.adoc.
+See `MinimalLoggingSmokeTest` for SLF4J validation.
