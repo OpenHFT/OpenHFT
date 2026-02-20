@@ -1,12 +1,69 @@
 = Version Support
 Peter Lawrey
-:toc:
-:lang: en-GB
-:source-highlighter: rouge
 
-Chronicle Software supports each version for two years from the start of the next minor version.
+== New Release Methodology (from 2026.X onwards)
 
-All our software has a MAJOR.STAGE.MINOR version.
+This section describes the new annual release methodology introduced from 2026.X onwards.
+The previous approach remains below for reference.
+
+Chronicle Software now follows an **annual release cycle**, with a new stable version released each **January**.
+Each version is supported for **two years** from its initial release.
+
+All releases now use a **YEAR.MINOR** versioning format.
+For example, the first release under this system will be **2026.01**, followed by **2026.02**, **2026.03**, and so on, for incremental updates throughout that year.
+The following January will introduce a new annual baseline, for example **2027.01**, which becomes the next stable version stream.
+
+=== Support Lifecycle
+
+Each annual release series receives:
+- **Two years of active support** from its release month (January).
+- **Incremental updates** (for example, 2026.02, 2026.03) released throughout the year to deliver enhancements and fixes.
+- **Backports and maintenance** only during its supported period.
+- **No overlapping version streams** beyond the two-year window, ensuring predictable maintenance and stable dependencies.
+
+=== Java Version Support
+
+|====
+| Year | Version Format | Supported Java Versions | Support End
+| 2026 | 2026.X | 8, 11, 17, 21 | January 2028
+| 2027 | 2027.X | 11, 17, 21, 25 | January 2029
+| 2028 | 2028.X | 11, 17, 21, 25 | January 2030
+| 2029 | 2029.X | 11, 17, 21, 25 | January 2031
+| 2030 | 2030.X | 11, 17, 21, 25 | January 2032
+| 2031 | 2031.X | 11, 17, 21, 25 | January 2033
+| 2032 | 2032.X | 11, 17, 21, 25 | January 2034
+| 2033 | 2033.X | 11, 17, 21, 25 | January 2035
+| 2034 | 2034.X | 11, 17, 21, 25 | January 2036
+| 2035 | 2035.X | 11, 17, 21, 25 | January 2037
+|====
+
+=== Release and Development Model
+
+The annual release represents a **single stable branch** that is actively developed and refined throughout the year.
+Subsequent point releases (for example, 2026.02, 2026.03) are produced as needed, incorporating improvements, bug fixes, and selected feature updates.
+Each January, a new major line begins, such as **2027.X**, which becomes the next supported baseline.
+
+There are **no longer Early Access (EA) releases**.
+Development occurs continuously on the main branch, and the January release marks the culmination of that year’s development cycle.
+This approach ensures predictability, stability, and synchronised release timing across all Chronicle Software products.
+
+=== Binary Compatibility and Deprecation Policy
+
+Chronicle Software will continue to maintain **binary compatibility** within each annual release series (for example, all 2026.X artefacts remain compatible).
+Deprecations will follow a **two-release schedule**: methods deprecated in 2026.X will typically be removed in 2028.X.
+
+=== Transition from Legacy Model
+
+All existing versions up to and including **x.27** will continue to follow the previous release and support model until their respective end-of-support dates.
+
+
+
+== Legacy Release Methodology (up to x.27)
+
+This methodology applies to all versions up to and including **x.27**.
+Chronicle Software supports each version for two years from the start of the next minor version. 
+
+All our software has a MAJOR.STAGE.MINOR version. 
 
 The MAJOR version is the generation of the software, where major versions are not compatible with each other.
 
@@ -18,17 +75,13 @@ Once a MAJOR.STAGE is updated to the new version, the previous MAJOR.STAGE-1 sta
 
 == Commercial Support Agreement
 
-A commercial support agreement is available from mailto:sales@chronicle.software[sales@chronicle.software], free open-source support is also available but on a best-effort basis.
-Free support issues are only treated as a high priority if the issues also affect organisations with a commercial agreement.
-The support agreement doesn’t just benefit your organisation, but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries.
+A commercial support agreement is available from mailto:sales@chronicle.software[sales@chronicle.software], free open-source support is also available but on a best-effort basis. Free support issues are only treated as a high priority if the issues also affect organisations with a commercial agreement. The support agreement doesn’t just benefit your organisation, but it helps the wider community as it allows us to fund the continued development of our OpenSource libraries.
 
 == Stage release dates and end of support.
 
 |====
 | Stage | first released | stable release | end of backport | Java versions
-| x.29  | 2025/10 (a) | 2026/04 (a) | 2027/04 (a) | 11, 17, 21, 25
-| x.28  | 2025/04 (a) | 2025/10 (a) | 2026/10 (a) | 8, 11, 17, 21
-| x.27  | 2024/11 (a) | 2025/04 (a) | 2026/04 (a) | 8, 11, 17, 21
+| x.27  | 2024/11 (a) | 2026/01 (a) | 2026/12 (a) | 8, 11, 17, 21
 | x.26  | 2024/05 | 2024/11 (a) | 2025/10 (a) | 8, 11, 17, 21
 | x.25  | 2023/10 | 2024/05 | 2025/06 | 8, 11, 17, 21
 | x.24  | 2022/10 | 2023/10 | 2024/11 | 8, 11, 17
@@ -44,7 +97,6 @@ The support agreement doesn’t just benefit your organisation, but it helps the
 | x.13  | 2016/07 | 2017/03 | 2019/03 | 8
 | x.12  | 2016/03 | 2016/07 | 2019/03 | 8
 |====
-
 (a) Provisional dates
 
 From x.24, backporting changes for stable releases will only be guaranteed for 1 year, after that fixes will be backported as required and as practical.
@@ -65,33 +117,28 @@ Once the master branch updates to a new stage, older stages are only updated and
 
 Java 11, 17, and 21 are supported on the ea branch, and Java 8 will likely only be supported up to and including the x.28 branch.
 
-See also <<Java-Version-Support#java-version-support,Java Version Support>>
+See also <<docs/Java-Version-Support.adoc#,Java Version Support>>
 
 == BOM files
 
-We use Maven dependency management to express the version set of all our libraries.
-We always publish a set of artefacts that work together using a BOM file (see details on BOM files link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms/[here]).
+We use Maven dependency management to express the version set of all our libraries. We always publish a set of artefacts that work together using a BOM file (see details on BOM files link:https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms/[here]).
 
 == EA (Early Access)
 
-We have introduced the characters "ea" into our build versions to denote our Early Access release.
-As the name suggests, we release our early access version regularly.
+We have introduced the characters "ea" into our build versions to denote our Early Access release. As the name suggests, we release our early access version regularly.
 
-Only EA releases are released to Maven Central.
-Releases of stable versions (e.g. x.23) are made to Chronicle's nexus and are available to customers with a commercial agreement.
+Only EA releases are released to Maven Central. Releases of stable versions (e.g. x.23) are made to
+Chronicle's nexus and are available to customers with a commercial agreement.
 
 Note: Many organizations use the “ea” release in production, as this contains the latest functionality and fixes.
 
 == Binary Compatibility
 
-Each release is now automatically checked to be binary backwards compatible to the first patch release of any version; this also includes the early access release versions.
-This means that any 2.25.x chronicle-bom should be a drop-in replacement for any other 2.25.y chronicle-bom, with full binary compatibility.
+Each release is now automatically checked to be binary backwards compatible to the first patch release of any version; this also includes the early access release versions. This means that any 2.25.x chronicle-bom should be a drop-in replacement for any other 2.25.y chronicle-bom, with full binary compatibility.
 
 == API evolution
 
-Requirements change and APIs evolve.
-Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones.
-All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea.
+Requirements change and APIs evolve. Our strategy for API evolution is to add new `default` method(s) to an interface and deprecate the old ones. All deprecated methods are marked with a clear indication e.g. "To be removed in x.25" and we will typically schedule them for removal in two stages time - if we deprecate a method in 2.24ea then it will be removed in 2.26ea.
 
 NOTE: we recommend to enable deprecation warnings e.g. turning on
 link:https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#showDeprecation[`showDeprecation` in your maven builds]

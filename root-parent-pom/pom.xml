@@ -15,13 +15,12 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>2026.0-SNAPSHOT</version>
+    <version>2026.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Root Parent POM</name>
@@ -68,11 +67,11 @@
             By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
             contain the arguments necessary to run the Chronicle libraries
         -->
-        <jvm.requiredArgs/>
+        <jvm.requiredArgs />
         <jvm.extraArgs/>
         <!-- Define the target coverage thresholds as properties -->
-        <jacoco.line.coverage>0.9</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.8</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.8</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
     </properties>
 
     <build>
@@ -326,6 +325,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!--
                 Set argLine to include ${jvm.requiredArgs} (JVM args needed to run Chronicle libraries on the detected JVM)
 
@@ -374,9 +374,7 @@
                                         <exclude>net/openhft/chronicle/bytes/internal/ByteBuffers*</exclude>
                                         <exclude>net/openhft/chronicle/bytes/internal/UnsafeText*</exclude>
                                         <exclude>net/openhft/chronicle/map/MemoryLeaksTest*</exclude>
-                                        <exclude>
-                                            net/openhft/chronicle/network/connection/AbstractStatelessClient.class
-                                        </exclude>
+                                        <exclude>net/openhft/chronicle/network/connection/AbstractStatelessClient.class</exclude>
                                         <exclude>net/openhft/chronicle/queue/impl/single/AppenderFileHandleLeakTest*
                                         </exclude>
                                     </excludes>

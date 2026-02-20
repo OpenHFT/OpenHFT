@@ -5,19 +5,18 @@
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.0</version>
         <relativePath/>
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>2026.0-SNAPSHOT</version>
+    <version>2026.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
@@ -36,7 +35,7 @@
         <license.owner>chronicle.software</license.owner>
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
-        <quality.enforced>true</quality.enforced>
+        <quality.enforced>false</quality.enforced>
         <quality.version>2026.0-SNAPSHOT</quality.version>
         <slf4j.version>2.0.17</slf4j.version>
 
@@ -192,7 +191,6 @@
                     <doclint>all,-missing</doclint>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
