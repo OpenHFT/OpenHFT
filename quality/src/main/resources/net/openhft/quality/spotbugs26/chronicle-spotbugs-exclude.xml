@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  chronicle-spotbugs-exclude.xml
+
+  Exclude filter for low-violation SpotBugs checks. Use this file sparingly:
+  - Only add Match blocks for findings we have consciously decided to suppress.
+  - Each suppression must be accompanied by a comment referencing the rationale
+    (e.g. false positive, legacy API requirement, tracking ticket).
+
+  Configure via the SpotBugs Maven plugin with:
+    <excludeFilterFile>${project.basedir}/../chronicle-spotbugs-exclude.xml</excludeFilterFile>
+-->
+<FindBugsFilter>
+
+    <!-- DM_GC: The 'forces garbage collection' rule is not part of the Chronicle low-violation gate.
+         Explicit GC is used deliberately in tests and a few profiling hooks, so we disable DM_GC at
+         filter level and rely on code review instead. -->
+    <Match>
+        <Bug pattern="DM_GC"/>
+    </Match>
+
+    <!-- SF_SWITCH_FALLTHROUGH: copyOne intentionally groups terminal tokens; branching verified via tests -->
+    <Match>
+        <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
+        <Class name="net.openhft.chronicle.wire.YamlWire"/>
+        <Method name="copyOne"/>
+    </Match>
+
+    <!-- UC_USELESS_VOID_METHOD: Safepoint.force intentionally loops to trigger safepoint polling -->
+    <Match>
+        <Bug pattern="UC_USELESS_VOID_METHOD"/>
+        <Class name="net.openhft.chronicle.core.Jvm$Safepoint"/>
+        <Method name="force"/>
+    </Match>
+
+    <!-- UMAC: postInterrupt placeholder keeps compatibility with newer JDKs -->
+    <Match>
+        <Bug pattern="UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS"/>
+        <Class name="net.openhft.chronicle.core.Jvm$1"/>
+        <Method name="postInterrupt"/>
+    </Match>
+
+    <!-- MS_EXPOSE_REP: reusable() intentionally returns singleton instance for flow-control -->
+    <Match>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.core.threads.InvalidEventHandlerException"/>
+        <Method name="reusable"/>
+    </Match>
+
+    <!-- MS_EXPOSE_REP: NativeAccess.instance() intentionally returns a stateless singleton accessor -->
+    <Match>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.algo.bytes.NativeAccess"/>
+        <Method name="instance"/>
+    </Match>
+
+    <!-- MS_EXPOSE_REP: lock strategy singletons are stateless and intentionally shared -->
+    <Match>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.algo.locks.VanillaReadWriteUpdateWithWaitsLockingStrategy"/>
+        <Method name="instance"/>
+    </Match>
+    <Match>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.algo.locks.VanillaReadWriteWithWaitsLockingStrategy"/>
+        <Method name="instance"/>
+    </Match>
+
+    <!-- MS_SHOULD_BE_FINAL: CLOCK is reassigned in tests to simulate different clocks -->
+    <Match>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <Class name="net.openhft.chronicle.core.time.SystemTimeProvider"/>
+        <Field name="CLOCK"/>
+    </Match>
+
+    <!-- MS_SHOULD_BE_FINAL: DISABLE_TCP_NODELAY stays mutable to honour legacy system-property overrides and public API expectations -->
+    <Match>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <Class name="net.openhft.chronicle.network.TcpEventHandler"/>
+        <Field name="DISABLE_TCP_NODELAY"/>
+    </Match>
+
+    <!-- MS_SHOULD_BE_FINAL: GENERATE_TUPLES toggled in tests/system properties so remains mutable -->
+    <Match>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <Class name="net.openhft.chronicle.wire.Wires"/>
+        <Field name="GENERATE_TUPLES"/>
+    </Match>
+
+    <!-- NM_SAME_SIMPLE_NAME_AS_INTERFACE: Chronicle Closeable intentionally shadows java.io.Closeable -->
+    <Match>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
+        <Class name="net.openhft.chronicle.core.io.Closeable"/>
+    </Match>
+
+    <!-- MS_MUTABLE_ARRAY: char lookup table intentionally exposed for zero-allocation hex dumps -->
+    <Match>
+        <Bug pattern="MS_MUTABLE_ARRAY"/>
+        <Class name="net.openhft.chronicle.bytes.internal.Chars"/>
+        <Field name="charToString"/>
+    </Match>
+
+    <!-- SF_SWITCH_FALLTHROUGH / SF_SWITCH_NO_DEFAULT: MurmurHash_3 tail mixing uses intentional fallthrough for performance -->
+    <Match>
+        <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
+        <Class name="net.openhft.chronicle.algo.hashing.MurmurHash_3"/>
+        <Method name="tailK1"/>
+    </Match>
+    <Match>
+        <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
+        <Class name="net.openhft.chronicle.algo.hashing.MurmurHash_3"/>
+        <Method name="tailK2"/>
+    </Match>
+    <Match>
+        <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
+        <Class name="net.openhft.chronicle.algo.hashing.MurmurHash_3"/>
+        <Method name="tailK1"/>
+    </Match>
+    <Match>
+        <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
+        <Class name="net.openhft.chronicle.algo.hashing.MurmurHash_3"/>
+        <Method name="tailK2"/>
+    </Match>
+
+    <!-- HSM_HIDING_METHOD: JSONWire keeps a convenience static asText in addition to TextWire for backwards compatibility -->
+    <Match>
+        <Bug pattern="HSM_HIDING_METHOD"/>
+        <Class name="net.openhft.chronicle.wire.JSONWire"/>
+        <Method name="asText"/>
+    </Match>
+
+    <!-- URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD: AbstractMapService exposes protected map/reply for subclasses -->
+    <Match>
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+        <Class name="net.openhft.chronicle.map.channel.AbstractMapService"/>
+    </Match>
+
+    <!-- EI_EXPOSE_REP2: ArrayFieldModel keeps a reference to the shared ScalarFieldModel so element metadata stays consistent -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Class name="net.openhft.chronicle.values.ArrayFieldModel"/>
+        <Method name="&lt;init&gt;"/>
+    </Match>
+
+    <!-- EI_EXPOSE_REP: FieldModel intentionally exposes Method handles so generators/serialisers can invoke the declared accessors -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.values.FieldModel"/>
+        <Method name="get"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.values.FieldModel"/>
+        <Method name="set"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.values.FieldModel"/>
+        <Method name="setOrSetOrderedOrSetVolatile"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="net.openhft.chronicle.values.FieldModel"/>
+        <Method name="getOrGetVolatile"/>
+    </Match>
+
+    <!-- CT_CONSTRUCTOR_THROW: ValueModel constructor validates layouts and must fail-fast if the interface definition is invalid -->
+    <Match>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+        <Class name="net.openhft.chronicle.values.ValueModel"/>
+        <Method name="&lt;init&gt;"/>
+    </Match>
+
+    <!-- UC_USELESS_OBJECT: OSTest.testMap keeps anchors list only to pin mapped buffers in memory -->
+    <Match>
+        <Bug pattern="UC_USELESS_OBJECT"/>
+        <Class name="net.openhft.chronicle.core.OSTest"/>
+        <Method name="testMap"/>
+    </Match>
+
+    <!-- UUF/URF in JvmTest helper classes: layout-only fields used by Jvm.classMetrics -->
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.JvmTest$ClassA"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.JvmTest$ClassB"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.JvmTest$ClassC"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.JvmTest$ClassD"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.JvmTest$SomeClass"/>
+    </Match>
+
+    <!-- UUF/URF in UnsafeMemoryTest holders: reflective access exercises field layout -->
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.UnsafeMemoryTest$1CharHolder"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.UnsafeMemoryTest$1FloatHolder"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.core.UnsafeMemoryTest$1ObjectHolder"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.core.UnsafeMemoryTest$TestClass"/>
+    </Match>
+
+    <!-- DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED in cleaner tests: classloader is test-only and runs under unit-test security context -->
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceFallbackTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceIncludeNewerOlderTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceLoaderErrorTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceLocatorTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceMixedTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Class name="net.openhft.chronicle.core.cleaner.CleanerServicePriorityTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Class name="net.openhft.chronicle.core.internal.pom.InternalPomPropertiesPresenceTest"/>
+    </Match>
+
+    <!-- UPM/URF in reflection-focused ClassUtil tests: private members are probed reflectively -->
+    <Match>
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+        <Class name="net.openhft.chronicle.core.internal.ClassUtilExtraTest$Parent"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.core.internal.ClassUtilExtraTest$Parent"/>
+    </Match>
+    <Match>
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+        <Class name="net.openhft.chronicle.core.internal.ClassUtilSetAccessibleTest$PkgClass"/>
+    </Match>
+
+    <!-- UPM in ScopedThreadLocalLifecycleTest: helper kept for future coverage of simple acquire/close -->
+    <Match>
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+        <Class name="net.openhft.chronicle.core.scoped.ScopedThreadLocalLifecycleTest"/>
+        <Method name="acquireAndClose"/>
+    </Match>
+
+    <!-- BC_VACUOUS_INSTANCEOF in ClassNotFoundRuntimeExceptionTest: test intentionally asserts the obvious instanceof for demonstration -->
+    <Match>
+        <Bug pattern="BC_VACUOUS_INSTANCEOF"/>
+        <Class name="net.openhft.chronicle.core.util.ClassNotFoundRuntimeExceptionTest"/>
+    </Match>
+
+    <!-- URF in ObjectUtils tests: fields exist only to drive reflection-based helpers -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.core.util.ObjectUtilsConvertToTest$DEnum"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.core.util.ObjectUtilsTest$ClassWithSetter"/>
+    </Match>
+
+    <!-- URF in AbstractInvocationHandlerTest: cached exampleMethod / handler are exercised indirectly via mocks -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.core.util.AbstractInvocationHandlerTest"/>
+    </Match>
+
+    <!-- SystemTimeProvider CLOCK mutability is intentional for testability -->
+    <Match>
+        <Bug pattern="MS_CANNOT_BE_FINAL"/>
+        <Class name="net.openhft.chronicle.core.time.SystemTimeProvider"/>
+        <Field name="CLOCK"/>
+    </Match>
+
+    <!-- RecordingHistogram tests rebind CLOCK to a SetTimeProvider in a controlled way -->
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.core.util.RecordingHistogramTest"/>
+        <Method name="testSampleNanosAndTopDurations"/>
+    </Match>
+    <Match>
+        <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+        <Class name="net.openhft.chronicle.core.util.RecordingHistogramTest$MyRecordingHistogram"/>
+    </Match>
+
+    <!-- ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD in bytes time-provider perf tests: static volatile sinks prevent JVM from eliminating hot paths -->
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.bytes.DistributedUniqueTimeProviderTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.bytes.MappedUniqueTimeProviderTest"/>
+    </Match>
+
+    <!-- DMI_HARDCODED_ABSOLUTE_FILENAME in PageUtilTest: Linux-only test guarded by OS and Files.exists checks -->
+    <Match>
+        <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+        <Class name="net.openhft.chronicle.bytes.PageUtilTest"/>
+    </Match>
+
+    <!-- PriorityHook: singleton hook manager has deliberate equals/getter semantics for backwards compatibility -->
+    <Match>
+        <Bug pattern="EC_UNRELATED_CLASS_AND_INTERFACE"/>
+        <Class name="net.openhft.chronicle.core.shutdown.PriorityHook"/>
+        <Method name="add"/>
+    </Match>
+    <Match>
+        <Bug pattern="SING_SINGLETON_GETTER_NOT_SYNCHRONIZED"/>
+        <Class name="net.openhft.chronicle.core.shutdown.PriorityHook"/>
+        <Method name="getRegisteredHook"/>
+    </Match>
+
+    <!-- RecordingHistogram: relies on Histogram equality; extra sampleCount field is bookkeeping-only -->
+    <Match>
+        <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+        <Class name="net.openhft.chronicle.core.util.RecordingHistogram"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.core.util.RecordingHistogram"/>
+        <Field name="sampleCount"/>
+    </Match>
+
+    <!-- DMI_RANDOM_USED_ONLY_ONCE in long-running or benchmarking tests where randomness is intentional -->
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.NativeBytesStoreTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.StopBitDecimalTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.UnsafeTextBytesTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.algo.OptimisedBytesStoreHashTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.internal.BytesInternalTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.internal.UnsafeTextTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.util.GzipTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.util.LZWTest"/>
+    </Match>
+
+    <!-- UPM / UUF / URF in NotNullHandlingTest and BytesFieldInfoTest: shape-only fixtures or assertion-only helpers -->
+    <Match>
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+        <Class name="net.openhft.chronicle.bytes.NotNullHandlingTest"/>
+        <Method name="fooZeroCost"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.bytes.internal.BytesFieldInfoTest$Groups1"/>
+    </Match>
+
+    <!-- DMI_RANDOM_USED_ONLY_ONCE in MappedBytes boundary-underflow stress test -->
+    <Match>
+        <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+        <Class name="net.openhft.chronicle.bytes.MappedBytesTest"/>
+    </Match>
+
+    <!-- HashWire hashing: integer-overflow in multipliers is intentional and part of the stable hash contract -->
+    <Match>
+        <Bug pattern="ICAST_INTEGER_MULTIPLY_CAST_TO_LONG"/>
+        <Class name="net.openhft.chronicle.wire.HashWire$HashValueOut"/>
+    </Match>
+
+    <!-- Dead store patterns in internal perf / comparison tests -->
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        <Class name="net.openhft.chronicle.bytes.internal.BytesInternalGuardedTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        <Class name="net.openhft.chronicle.bytes.internal.BytesInternalTest"/>
+    </Match>
+
+    <!-- URF_* in PrimitiveTest DTOs used for README-style marshalling examples -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.bytes.readme.PrimitiveTest$Outer"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.bytes.readme.PrimitiveTest$Inner"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.bytes.readme.PrimitiveTest$PrimitiveDTO"/>
+    </Match>
+
+    <!-- URF_/ST_WRITE in YAML tester fixtures: test harness shapes fields and clocks, behaviour validated via expectations -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.utils.OMSEventsTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.utils.YamlTesterErrorTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.utils.YamlTesterParametersTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.utils.YamlTesterReadMarshallableTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="run.chronicle.account.AccountsTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.wire.utils.YamlTesterParametersTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.wire.utils.YamlTesterTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="run.chronicle.account.AccountsTest"/>
+    </Match>
+
+    <!-- wire-channel and Chronicle-Map/Queue test/perf harnesses: DTO shapes, volatile counters, and filesystem helpers -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.map.channel.MapHandlerTest$DTO"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.chronicle.map.channel.PerfMapHandlerMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+        <Class name="net.openhft.chronicle.map.channel.PerfMapHandlerMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="VO_VOLATILE_INCREMENT"/>
+        <Class name="net.openhft.chronicle.map.channel.PerfMapHandlerMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="ICAST_IDIV_CAST_TO_DOUBLE"/>
+        <Class name="net.openhft.chronicle.queue.QueueTestCommon"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.queue.QueueTestCommon"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+        <Class name="net.openhft.chronicle.queue.QueueTestCommon"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.queue.QueueTestCommon"/>
+    </Match>
+
+    <!-- URF_UNREAD_*: Java-Runtime-Compiler test scaffolding keeps these fields for API shape and dynamic compilation examples -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="eg.FooBarTee"/>
+        <Field name="name"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="eg.components.Foo"/>
+        <Field name="i"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+        <Class name="eg.components.Foo"/>
+        <Field name="bar"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+        <Class name="eg.components.Foo"/>
+        <Field name="copy"/>
+    </Match>
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        <Class name="net.openhft.chronicle.queue.channel.Main"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.chronicle.queue.channel.PerfLatencyMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="VO_VOLATILE_INCREMENT"/>
+        <Class name="net.openhft.chronicle.queue.channel.PerfLatencyMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.queue.channel.PubSubHandler"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.chronicle.queue.channel.PubSubHandlerTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.wire.WireTestCommon"/>
+    </Match>
+    <Match>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.channel.ChronicleServiceMain$ConnectionHandler"/>
+    </Match>
+    <Match>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.channel.ChronicleServiceMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.channel.ClosingMicroservice"/>
+    </Match>
+    <Match>
+        <Bug pattern="ICAST_IDIV_CAST_TO_DOUBLE"/>
+        <Class name="net.openhft.chronicle.wire.channel.book.PerfTopOfBookAllocationMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.channel.book.PerfTopOfBookMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.channel.book.TopOfBookHandlerTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.wire.channel.internal.ChronicleEvent"/>
+    </Match>
+    <Match>
+        <Bug pattern="UUF_UNUSED_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.channel.internal.ChronicleEvent"/>
+    </Match>
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.wire.channel.internal.WireExchangerPerfMain"/>
+    </Match>
+
+    <!-- Chronicle-Test-Framework harness and DTO helpers -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+        <Class name="net.openhft.chronicle.testframework.internal.VanillaFlakyTestRunnerBuilder"/>
+    </Match>
+    <Match>
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+        <Class name="net.openhft.chronicle.testframework.internal.dto.StandardDtoTester"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.chronicle.testframework.internal.network.proxy.TcpProxy"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.chronicle.testframework.internal.network.proxy.TcpProxyTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        <Class name="net.openhft.chronicle.testframework.mappedfiles.MappedFileUtilTest"/>
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <Class name="net.openhft.chronicle.values.ValuesTestCommon"/>
+    </Match>
+    <Match>
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+        <Class name="net.openhft.chronicle.values.pointer.PointerTest"/>
+    </Match>
+
+    <!-- Posix module: perf harnesses and security-related patterns managed by design -->
+    <Match>
+        <Bug pattern="MS_CANNOT_BE_FINAL"/>
+        <Class name="net.openhft.posix.internal.PosixAPIHolder"/>
+    </Match>
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        <Class name="net.openhft.posix.internal.jnr.BenchmarkMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+        <Class name="net.openhft.posix.internal.jnr.BenchmarkMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.posix.internal.jnr.BenchmarkMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        <Class name="net.openhft.posix.internal.jnr.JNRPosixAPITest"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.posix.internal.jnr.JNRPosixAPITest"/>
+    </Match>
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+        <Class name="net.openhft.posix.internal.jnr.MSyncFileBenchmarkMain"/>
+    </Match>
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        <Class name="net.openhft.posix.PosixAPI"/>
+    </Match>
+    <!-- Runtime-generated MethodReader/MethodWriter classes from Chronicle-Wire's compiler.
+         These are emitted into target/test-classes during test execution and produce
+         non-deterministic SpotBugs counts depending on whether tests ran before the quality gate. -->
+    <Match>
+        <Class name="~.*MethodReader"/>
+    </Match>
+    <Match>
+        <Class name="~.*MethodWriter"/>
+    </Match>
+</FindBugsFilter>

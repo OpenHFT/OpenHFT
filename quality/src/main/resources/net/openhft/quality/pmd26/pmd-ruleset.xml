@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         name="OpenHFT PMD Baseline"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <!-- 
+      MAINTENANCE GUIDE: 
+      Please read pmd-ruleset-guide.md in this directory before editing.
+      Use <exclude> inside category tags to suppress rules. Do not add duplicate <rule> tags.
+    -->
+
+    <description>
+        Baseline rules with noisy items suppressed while violations are triaged.
+    </description>
+
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="AvoidDuplicateLiterals"/>
+        <exclude name="EmptyCatchBlock"/>
+        <exclude name="CloseResource"/>
+        <exclude name="AvoidBranchingStatementAsLastInLoop"/>
+        <exclude name="UseProperClassLoader"/>
+        <exclude name="AvoidFieldNameMatchingMethodName"/>
+        <exclude name="AvoidLiteralsInIfCondition"/>
+        <exclude name="NullAssignment"/>
+        <exclude name="AvoidCatchingThrowable"/>
+        <exclude name="AssignmentInOperand"/>
+        <exclude name="AvoidCatchingNPE"/>
+        <exclude name="AvoidCatchingGenericException"/>
+        <exclude name="ConstructorCallsOverridableMethod"/>
+        <exclude name="CompareObjectsWithEquals"/>
+        <exclude name="AvoidAccessibilityAlteration"/>
+        <exclude name="DoNotCallGarbageCollectionExplicitly"/>
+        <exclude name="UseLocaleWithCaseConversions"/>
+        <exclude name="UnnecessaryBooleanAssertion"/>
+        <exclude name="DontImportSun"/>
+        <exclude name="DetachedTestCase"/>
+        <exclude name="AvoidFieldNameMatchingTypeName"/>
+        <exclude name="DoNotTerminateVM"/>
+        <exclude name="SimpleDateFormatNeedsLocale"/>
+        <exclude name="NonSerializableClass"/>
+        <exclude name="AvoidInstanceofChecksInCatchClause"/>
+        <exclude name="DontUseFloatTypeForLoopIndices"/>
+        <exclude name="ReplaceJavaUtilDate"/>
+        <exclude name="TestClassWithoutTestCases"/>
+    </rule>
+
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="SystemPrintln"/>
+        <exclude name="UnusedPrivateField"/>
+        <exclude name="UnusedLocalVariable"/>
+        <exclude name="UnitTestContainsTooManyAsserts"/>
+        <exclude name="UnusedFormalParameter"/>
+        <exclude name="UnitTestAssertionsShouldIncludeMessage"/>
+        <exclude name="AvoidUsingHardCodedIP"/>
+        <exclude name="AvoidPrintStackTrace"/>
+        <exclude name="AccessorMethodGeneration"/>
+        <exclude name="AccessorClassGeneration"/>
+        <exclude name="UnitTestShouldIncludeAssert"/>
+        <exclude name="UnitTestShouldUseTestAnnotation"/>
+        <exclude name="AvoidReassigningParameters"/>
+        <exclude name="UseVarargs"/>
+        <exclude name="GuardLogStatement"/>
+        <exclude name="LiteralsFirstInComparisons"/>
+        <exclude name="ForLoopCanBeForeach"/>
+        <exclude name="MethodReturnsInternalArray"/>
+        <exclude name="UseTryWithResources"/>
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
+        <exclude name="LooseCoupling"/>
+        <exclude name="ForLoopVariableCount"/>
+        <exclude name="ArrayIsStoredDirectly"/>
+        <exclude name="AvoidStringBufferField"/>
+        <exclude name="PreserveStackTrace"/>
+        <exclude name="ConstantsInInterface"/>
+        <exclude name="AvoidReassigningLoopVariables"/>
+        <exclude name="OneDeclarationPerLine"/>
+        <exclude name="ImplicitFunctionalInterface"/>
+        <exclude name="RelianceOnDefaultCharset"/>
+        <exclude name="ExhaustiveSwitchHasDefault"/>
+        <exclude name="UnusedPrivateMethod"/>
+        <exclude name="UnnecessaryVarargsArrayCreation"/>
+        <exclude name="UnnecessaryWarningSuppression"/>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="UselessParentheses"/>
+        <exclude name="UnnecessaryFullyQualifiedName"/>
+        <exclude name="UnnecessaryImport"/>
+        <exclude name="TooManyStaticImports"/>
+        <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="ShortClassName"/>
+        <exclude name="UseUnderscoresInNumericLiterals"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
+        <exclude name="ShortVariable"/>
+        <exclude name="ControlStatementBraces"/>
+        <exclude name="CommentDefaultAccessModifier"/>
+        <exclude name="LongVariable"/>
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="CallSuperInConstructor"/>
+        <exclude name="FieldNamingConventions"/>
+        <exclude name="FormalParameterNamingConventions"/>
+        <exclude name="MethodNamingConventions"/>
+        <exclude name="ShortMethodName"/>
+        <exclude name="ConfusingTernary"/>
+        <exclude name="LocalVariableNamingConventions"/>
+        <exclude name="LinguisticNaming"/>
+        <exclude name="UnnecessaryModifier"/>
+        <exclude name="EmptyControlStatement"/>
+        <exclude name="AvoidDollarSigns"/>
+        <exclude name="ModifierOrder"/>
+        <exclude name="UnnecessaryConstructor"/>
+        <exclude name="ClassNamingConventions"/>
+        <exclude name="UseDiamondOperator"/>
+        <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
+        <exclude name="BooleanGetMethodName"/>
+        <exclude name="PrematureDeclaration"/>
+        <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
+        <exclude name="FinalParameterInAbstractMethod"/>
+        <exclude name="UnnecessaryCast"/>
+        <exclude name="PackageCase"/>
+    </rule>
+
+    <rule ref="category/java/performance.xml">
+        <exclude name="AvoidFileStream"/>
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+        <exclude name="RedundantFieldInitializer"/>
+        <exclude name="AddEmptyString"/>
+        <exclude name="ConsecutiveLiteralAppends"/>
+    </rule>
+
+    <rule ref="category/java/security.xml"/>
+
+    <rule ref="category/java/documentation.xml">
+        <exclude name="CommentRequired"/>
+        <exclude name="CommentSize"/>
+        <exclude name="UncommentedEmptyMethodBody"/>
+        <exclude name="UncommentedEmptyConstructor"/>
+    </rule>
+
+    <!-- Disable multithreading rules as well -->
+    <rule ref="category/java/multithreading.xml">
+        <exclude name="AvoidSynchronizedAtMethodLevel"/>
+        <exclude name="AvoidThreadGroup"/>
+        <exclude name="AvoidUsingVolatile"/>
+        <exclude name="DoNotUseThreads"/>
+        <exclude name="DontCallThreadRun"/>
+        <exclude name="DoubleCheckedLocking"/>
+        <exclude name="NonThreadSafeSingleton"/>
+        <exclude name="UnsynchronizedStaticFormatter"/>
+        <exclude name="UseConcurrentHashMap"/>
+        <exclude name="UseNotifyAllInsteadOfNotify"/>
+        <exclude name="AvoidSynchronizedStatement"/>
+    </rule>
+</ruleset>
