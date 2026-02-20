@@ -6,11 +6,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.0</version>
         <relativePath/>
     </parent>
 
     <artifactId>quality</artifactId>
+    <version>2026.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>OpenHFT/Quality Rules JAR</name>
 
@@ -21,7 +22,7 @@
         <license.spdx>Apache-2.0</license.spdx>
         <license.skip>false</license.skip>
         <!-- jvm.requiredArgs and jvm.extraArgs inherited from root-parent-pom profiles -->
-        <jvm.extraArgs></jvm.extraArgs>
+        <jvm.extraArgs/>
         <!-- Enable strict quality enforcement for this module -->
         <quality.enforced>true</quality.enforced>
         <!-- Use checkstyle26 baseline for this module -->
