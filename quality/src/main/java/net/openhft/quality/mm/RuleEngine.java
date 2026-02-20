@@ -20,7 +20,8 @@ public final class RuleEngine {
      * Create a rule engine for the provided rule support and message map.
      *
      * @param ruleSupport        rule helper utilities.
-     * @param messageOccurrences map of normalised messages to first line numbers.
+     * @param messageOccurrences map of normalised messages to first line numbers; populated by
+     *                           {@link MMDuplicate} during evaluation (not dead code).
      */
     public RuleEngine(MessageRuleSupport ruleSupport, Map<String, Integer> messageOccurrences) {
         this.ruleSupport = ruleSupport;

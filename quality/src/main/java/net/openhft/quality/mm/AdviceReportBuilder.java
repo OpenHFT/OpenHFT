@@ -11,11 +11,14 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Builds per-file advice reports from collected candidates.
  */
 public final class AdviceReportBuilder {
+    private static final Logger LOG = Logger.getLogger(AdviceReportBuilder.class.getName());
+    private static final int SNIPPET_CONTEXT_CHARS = 40;
     private final AdviceTextLoader textLoader;
     private final AdviceRankings rankings;
     private final boolean dryRun;
@@ -49,7 +52,8 @@ public final class AdviceReportBuilder {
             for (CandidateAdvice candidate : candidates) {
                 AdviceId adviceId = candidate.adviceId();
                 if (byAdvice.containsKey(adviceId)) {
-                    throw new IllegalStateException("Duplicate advice on line " + line + ": " + adviceId);
+                    LOG.warning("Duplicate advice on line " + line + ": " + adviceId + "; keeping first");
+                    continue;
                 }
                 byAdvice.put(adviceId, candidate);
             }
@@ -84,7 +88,7 @@ public final class AdviceReportBuilder {
             groups.add(new AdviceGroup(adviceId, text, rank, entry.getValue()));
         }
         groups.sort(Comparator
-                .comparingInt(AdviceGroup::rank)
+                .comparingInt((AdviceGroup g) -> g.rank() < 0 ? Integer.MAX_VALUE : g.rank())
                 .thenComparing(group -> group.adviceId().name()));
         return groups;
     }
@@ -98,7 +102,7 @@ public final class AdviceReportBuilder {
             groups.add(new FileAdviceGroup(adviceId, text, rank, details));
         }
         groups.sort(Comparator
-                .comparingInt(FileAdviceGroup::rank)
+                .comparingInt((FileAdviceGroup g) -> g.rank() < 0 ? Integer.MAX_VALUE : g.rank())
                 .thenComparing(group -> group.adviceId().name()));
         return groups;
     }
@@ -107,21 +111,24 @@ public final class AdviceReportBuilder {
         if (dryRun) {
             return candidates;
         }
+        List<CandidateAdvice> selected = new ArrayList<>();
         int minRank = Integer.MAX_VALUE;
-        for (CandidateAdvice candidate : candidates) {
-            int rank = rankings == null ? -1 : rankings.rankFor(candidate.adviceId());
+        for (CandidateAdvice c : candidates) {
+            int rank = rankForSelection(c.adviceId());
             if (rank < minRank) {
                 minRank = rank;
-            }
-        }
-        List<CandidateAdvice> selected = new ArrayList<>();
-        for (CandidateAdvice candidate : candidates) {
-            int rank = rankings == null ? -1 : rankings.rankFor(candidate.adviceId());
-            if (rank == minRank) {
-                selected.add(candidate);
+                selected.clear();
+                selected.add(c);
+            } else if (rank == minRank) {
+                selected.add(c);
             }
         }
         return selected;
+    }
+
+    private int rankForSelection(AdviceId adviceId) {
+        int rank = rankings == null ? -1 : rankings.rankFor(adviceId);
+        return rank < 0 ? Integer.MAX_VALUE : rank;
     }
 
     private LineSnippet snippetForLine(MessageExtractionContext context, int lineNo,
@@ -158,8 +165,8 @@ public final class AdviceReportBuilder {
         if (index < 0) {
             return null;
         }
-        int start = Math.max(0, index - 40);
-        int end = Math.min(line.length(), index + target.length() + 40);
+        int start = Math.max(0, index - SNIPPET_CONTEXT_CHARS);
+        int end = Math.min(line.length(), index + target.length() + SNIPPET_CONTEXT_CHARS);
         if (start == 0 && end == line.length()) {
             return line;
         }

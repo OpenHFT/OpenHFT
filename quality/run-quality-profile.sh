@@ -18,7 +18,7 @@ PMD_PLUGIN_VERSION="3.26.0"
 SPOTBUGS_PLUGIN_VERSION="4.8.6.6"
 DEPENDENCY_PLUGIN_VERSION="3.6.1"
 JACOCO_VERSION="0.8.12"
-PITEST_PLUGIN_VERSION="1.17.2"
+PITEST_PLUGIN_VERSION="1.22.0"
 
 CHECKSTYLE_BASELINE_CFG="src/main/resources/net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml"
 PMD_RULESET="src/main/resources/net/openhft/quality/pmd26/pmd-ruleset.xml"
@@ -295,13 +295,13 @@ if [[ "$JACOCO85" == "on" ]]; then
     line_ratio=$(echo "$ratios" | awk '{print $1}')
     branch_ratio=$(echo "$ratios" | awk '{print $2}')
 
-    line_ok=$(awk -v r="$line_ratio" 'BEGIN{print (r>=0.85)?1:0}')
+    line_ok=$(awk -v r="$line_ratio" 'BEGIN{print (r>=0.90)?1:0}')
     branch_ok=$(awk -v r="$branch_ratio" 'BEGIN{print (r>=0.85)?1:0}')
 
     {
       echo "line_ratio=$line_ratio"
       echo "branch_ratio=$branch_ratio"
-      echo "line_threshold=0.85"
+      echo "line_threshold=0.90"
       echo "branch_threshold=0.85"
     } >"$LOGS_DIR/jacoco_85_gate.log"
 
@@ -314,7 +314,7 @@ if [[ "$JACOCO85" == "on" ]]; then
       else
         STATUS[jacoco_85_gate]="WARN"
       fi
-      echo "JaCoCo 85%% gate not met (line=$line_ratio branch=$branch_ratio)." >&2
+      echo "JaCoCo 90/85 gate not met (line=$line_ratio branch=$branch_ratio)." >&2
     fi
   fi
 else

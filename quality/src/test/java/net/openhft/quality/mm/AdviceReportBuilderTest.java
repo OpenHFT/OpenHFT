@@ -130,8 +130,43 @@ class AdviceReportBuilderTest {
     }
 
     @Test
-    @DisplayName("Duplicate advice on the same line fails fast")
-    void duplicateAdvice_failsFast() {
+    @DisplayName("Normal mode prefers ranked advice over unranked advice")
+    void normalMode_prefersRankedOverUnranked() throws Exception {
+        Path ranksPath = Files.createTempFile("mm-ranks-ranked-vs-unranked", ".properties");
+        Files.write(ranksPath, ("MMAssertionMessageMissing=1\n").getBytes(StandardCharsets.UTF_8));
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+        AdviceRankings rankings = AdviceRankings.load(ranksPath);
+        AdviceCollector collector = new AdviceCollector();
+        String file = "Test.java";
+        CandidateAdvice ranked = new CandidateAdvice.Builder()
+                .fileName(file)
+                .lineNo(10)
+                .source(AdviceSource.ASSERTION)
+                .adviceId(AdviceId.MMAssertionMessageMissing)
+                .ruleId(RuleId.MISSING_MESSAGE)
+                .build();
+        CandidateAdvice unranked = new CandidateAdvice.Builder()
+                .fileName(file)
+                .lineNo(10)
+                .source(AdviceSource.ASSERTION)
+                .adviceId(AdviceId.MMAssertionMessageTooShort)
+                .ruleId(RuleId.TOO_SHORT)
+                .build();
+        collector.record(unranked);
+        collector.record(ranked);
+
+        AdviceReportBuilder builder = new AdviceReportBuilder(loader, rankings, false, false, true);
+        FileReport report = builder.build(file, file, collector, null, new SuppressionTracker());
+
+        assertEquals(1, report.lineAdvice().size(),
+                "normal mode should choose one advice per line when a lowest rank exists");
+        assertEquals(AdviceId.MMAssertionMessageMissing, report.lineAdvice().get(0).adviceId(),
+                "ranked advice should be preferred over unranked advice");
+    }
+
+    @Test
+    @DisplayName("Duplicate advice on the same line merges gracefully")
+    void duplicateAdvice_mergesGracefully() {
         AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
         AdviceRankings rankings = AdviceRankings.loadFromResource(AdviceReportManager.RANK_RESOURCE);
         AdviceCollector collector = new AdviceCollector();
@@ -154,9 +189,10 @@ class AdviceReportBuilderTest {
         collector.record(second);
 
         AdviceReportBuilder builder = new AdviceReportBuilder(loader, rankings, false, false, true);
-        assertThrows(IllegalStateException.class,
-                () -> builder.build(file, file, collector, null, new SuppressionTracker()),
-                "duplicate advice on a line should fail fast");
+        FileReport report = builder.build(file, file, collector, null, new SuppressionTracker());
+        assertNotNull(report, "duplicate advice on a line should merge gracefully");
+        assertEquals(1, report.lineAdvice().size(),
+                "duplicate advice should be deduplicated to one");
     }
 
     @Test
@@ -177,7 +213,7 @@ class AdviceReportBuilderTest {
         SuppressionTracker tracker = new SuppressionTracker();
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMTooShort");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         AdviceReportBuilder builder = new AdviceReportBuilder(loader, rankings, false, true, true);
         FileReport report = builder.build(file, file, collector, null, tracker);
@@ -206,7 +242,7 @@ class AdviceReportBuilderTest {
         SuppressionTracker tracker = new SuppressionTracker();
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMTooShort");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         AdviceReportBuilder builder = new AdviceReportBuilder(loader, rankings, false, true, false);
         FileReport report = builder.build(file, file, collector, null, tracker);
@@ -632,6 +668,74 @@ class AdviceReportBuilderTest {
         assertNotNull(report, "report should not be null with null tracker");
         assertEquals(0, report.legacySuppressionRuleIds().size(),
                 "legacy suppressions should be empty with null tracker");
+    }
+
+    @Test
+    @DisplayName("Snippet at start of long line has trailing ellipsis only")
+    void snippetAtStartOfLongLine_hasTrailingEllipsisOnly() throws IOException {
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+        AdviceRankings rankings = AdviceRankings.loadFromResource(AdviceReportManager.RANK_RESOURCE);
+        AdviceCollector collector = new AdviceCollector();
+        String file = "Test.java";
+        String messageLiteral = "target";
+        collector.record(new CandidateAdvice.Builder()
+                .fileName(file)
+                .lineNo(1)
+                .source(AdviceSource.ASSERTION)
+                .adviceId(AdviceId.MMAssertionMessageMissing)
+                .ruleId(RuleId.MISSING_MESSAGE)
+                .messageLiteral(messageLiteral)
+                .build());
+
+        // Target at the very start, line much longer than snippet context
+        String longLine = "target_very_long_suffix_padding_that_extends_well_beyond_"
+                + "the_snippet_context_chars_limit_to_ensure_trailing_ellipsis";
+        List<String> lines = Collections.singletonList(longLine);
+        MessageExtractionContext context = createContextWithLines(file, lines);
+
+        AdviceReportBuilder builder = new AdviceReportBuilder(loader, rankings, false, false, false);
+        FileReport report = builder.build(file, file, collector, context, new SuppressionTracker());
+
+        AdviceOccurrence occurrence = report.lineAdvice().get(0).occurrences().get(0);
+        assertNotNull(occurrence.snippet(), "snippet should be set for long line");
+        assertFalse(occurrence.snippet().startsWith("..."),
+                "snippet should not start with ellipsis when target is at start");
+        assertTrue(occurrence.snippet().endsWith("..."),
+                "snippet should end with ellipsis when line continues");
+    }
+
+    @Test
+    @DisplayName("Snippet at end of long line has leading ellipsis only")
+    void snippetAtEndOfLongLine_hasLeadingEllipsisOnly() throws IOException {
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+        AdviceRankings rankings = AdviceRankings.loadFromResource(AdviceReportManager.RANK_RESOURCE);
+        AdviceCollector collector = new AdviceCollector();
+        String file = "Test.java";
+        String messageLiteral = "target";
+        collector.record(new CandidateAdvice.Builder()
+                .fileName(file)
+                .lineNo(1)
+                .source(AdviceSource.ASSERTION)
+                .adviceId(AdviceId.MMAssertionMessageMissing)
+                .ruleId(RuleId.MISSING_MESSAGE)
+                .messageLiteral(messageLiteral)
+                .build());
+
+        // Target at the very end, line much longer
+        String longLine = "very_long_prefix_padding_that_pushes_the_snippet_start_forward_"
+                + "well_beyond_zero_to_ensure_leading_ellipsis_and_then_target";
+        List<String> lines = Collections.singletonList(longLine);
+        MessageExtractionContext context = createContextWithLines(file, lines);
+
+        AdviceReportBuilder builder = new AdviceReportBuilder(loader, rankings, false, false, false);
+        FileReport report = builder.build(file, file, collector, context, new SuppressionTracker());
+
+        AdviceOccurrence occurrence = report.lineAdvice().get(0).occurrences().get(0);
+        assertNotNull(occurrence.snippet(), "snippet should be set for long line");
+        assertTrue(occurrence.snippet().startsWith("..."),
+                "snippet should start with ellipsis when line starts before snippet");
+        assertFalse(occurrence.snippet().endsWith("..."),
+                "snippet should not end with ellipsis when target is at end");
     }
 
     private MessageExtractionContext createContextWithLines(String fileName, List<String> lines) throws IOException {
