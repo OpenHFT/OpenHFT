@@ -22,6 +22,7 @@
     <properties>
         <third-party-bom.version>2026.1-SNAPSHOT</third-party-bom.version>
         <bytebuddy.attachArgs/>
+        <jvm.extraArgs/>
     </properties>
 
     <dependencyManagement>
