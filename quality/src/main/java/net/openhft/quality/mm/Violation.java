@@ -3,6 +3,8 @@
  */
 package net.openhft.quality.mm;
 
+import java.util.Arrays;
+
 /**
  * Immutable representation of a rule violation.
  */
@@ -21,7 +23,7 @@ public final class Violation {
     public Violation(int lineNo, RuleId ruleId, Object[] args) {
         this.lineNo = lineNo;
         this.ruleId = ruleId;
-        this.args = args;
+        this.args = args == null ? null : Arrays.copyOf(args, args.length);
     }
 
     /**
@@ -48,6 +50,6 @@ public final class Violation {
      * @return message argument array.
      */
     public Object[] args() {
-        return args;
+        return args == null ? null : Arrays.copyOf(args, args.length);
     }
 }
