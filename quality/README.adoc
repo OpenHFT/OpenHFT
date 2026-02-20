@@ -63,7 +63,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>quality</artifactId>
-            <version>2026.0</version>
+            <version>2026.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </plugin>
@@ -83,7 +83,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>quality</artifactId>
-            <version>2026.0</version>
+            <version>2026.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <executions>
@@ -121,7 +121,7 @@ checkstyle {
 
 dependencies {
     checkstyle 'com.puppycrawl.tools:checkstyle:9.3'
-    checkstyle 'net.openhft:quality:2026.0'
+    checkstyle 'net.openhft:quality:2026.1-SNAPSHOT'
 }
 
 def qualityEnforce = (project.findProperty('quality.enforced') ?: 'true').toString().toBoolean()
@@ -134,14 +134,14 @@ tasks.withType(Checkstyle).configureEach {
 === SpotBugs
 
 SpotBugs configuration (rule filters, effort and threshold settings) is also provided from this module and surfaced by the parent POMs.
-To consume it directly, add the `spotbugs-maven-plugin` with a dependency on `chronicle-quality-rules` in a similar fashion to the Checkstyle example above.
+To consume it directly, add the `spotbugs-maven-plugin` with a dependency on `quality` in a similar fashion to the Checkstyle example above.
 
 === JaCoCo Code Coverage
 
 This module enforces code coverage thresholds via JaCoCo:
 
-* *Line coverage*: 95.4%
-* *Branch coverage*: 84.2%
+* *Line coverage*: 90%
+* *Branch coverage*: 85%
 
 Coverage is checked during the `verify` phase automatically.
 
@@ -172,10 +172,10 @@ The `pitest` profile is configured with:
 |1.2.1
 
 |Mutation threshold
-|88%
+|85%
 
 |Coverage threshold
-|95%
+|90%
 
 |Full mutation matrix
 |enabled
@@ -186,7 +186,7 @@ The `pitest` profile is configured with:
 Run `mvn -Ppitest verify` to generate current coverage reports.
 Reports are written to `target/pit-reports/index.html`.
 
-Coverage levels must meet the configured thresholds (88% mutation, 95% line) for the build to pass.
+Coverage levels must meet the configured thresholds (85% mutation, 90% coverage) for the build to pass.
 
 ==== JUnit 5 Compatibility
 

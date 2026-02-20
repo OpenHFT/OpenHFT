@@ -653,6 +653,13 @@ public class LogMessageExtractorTest {
         }
 
         @Override
+        public void emitMissingMessage(int lineNo, MessageSource source,
+                                       AdviceSource adviceSource,
+                                       MissingMessageKind missingMessageKind) {
+            emitMissingMessage(lineNo, source);
+        }
+
+        @Override
         public void emitUnhandled(DetailAST ast, String reason) {
             unhandledReasons.add(reason);
         }
@@ -792,6 +799,71 @@ public class LogMessageExtractorTest {
 
     private int invokeCountKeyValueLabels(String message) throws Exception {
         return extractor.countKeyValueLabels(message);
+    }
+
+    // --- Tests for newly package-local methods ---
+
+    @Test
+    @DisplayName("resolveMessageIndex returns zero for SLF4J any method name")
+    void resolveMessageIndex_returnsZeroForSlf4j() {
+        assertEquals(0, extractor.resolveMessageIndex(
+                LogMessageExtractor.LoggerKind.SLF4J, "info", Collections.emptyList()),
+                "SLF4J always uses index 0 for message argument");
+    }
+
+    @Test
+    @DisplayName("resolveMessageIndex returns one for JUL log method with multiple args")
+    void resolveMessageIndex_returnsOneForJulLog() {
+        java.util.List<DetailAST> args = java.util.Arrays.asList(
+                (DetailAST) createIdent("level"), createIdent("msg"));
+        assertEquals(1, extractor.resolveMessageIndex(
+                LogMessageExtractor.LoggerKind.JUL, "log", args),
+                "JUL log() uses index 1 for message (after level)");
+    }
+
+    @Test
+    @DisplayName("resolveMessageIndex returns negative one for JUL log with single arg")
+    void resolveMessageIndex_returnsNegativeOneForJulLogSingleArg() {
+        java.util.List<DetailAST> args = java.util.Arrays.asList((DetailAST) createIdent("level"));
+        assertEquals(-1, extractor.resolveMessageIndex(
+                LogMessageExtractor.LoggerKind.JUL, "log", args),
+                "JUL log() with only one arg should return -1 (no message)");
+    }
+
+    @Test
+    @DisplayName("resolveMessageIndex returns zero for JUL level method")
+    void resolveMessageIndex_returnsZeroForJulLevelMethod() {
+        assertEquals(0, extractor.resolveMessageIndex(
+                LogMessageExtractor.LoggerKind.JUL, "info", Collections.emptyList()),
+                "JUL level methods use index 0 for message");
+    }
+
+    @Test
+    @DisplayName("resolveMessageIndex returns one for SYSTEM log method with args")
+    void resolveMessageIndex_returnsOneForSystemLog() {
+        java.util.List<DetailAST> args = java.util.Arrays.asList(
+                (DetailAST) createIdent("level"), createIdent("msg"));
+        assertEquals(1, extractor.resolveMessageIndex(
+                LogMessageExtractor.LoggerKind.SYSTEM, "log", args),
+                "System.Logger log() uses index 1 for message");
+    }
+
+    @Test
+    @DisplayName("resolveMessageIndex returns negative one for SYSTEM non-log method")
+    void resolveMessageIndex_returnsNegativeOneForSystemNonLog() {
+        assertEquals(-1, extractor.resolveMessageIndex(
+                LogMessageExtractor.LoggerKind.SYSTEM, "info", Collections.emptyList()),
+                "System.Logger non-log method should return -1");
+    }
+
+    @Test
+    @DisplayName("resolveLoggerKind returns null for method call without DOT qualifier")
+    void resolveLoggerKind_returnsNullWithoutDot() {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        methodCall.addChild(createIdent("info"));
+        assertNull(extractor.resolveLoggerKind(methodCall),
+                "Method call without DOT should return null logger kind");
     }
 
     private DetailAstImpl createExpr(DetailAstImpl child) {

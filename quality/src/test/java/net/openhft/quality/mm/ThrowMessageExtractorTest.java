@@ -533,6 +533,13 @@ class ThrowMessageExtractorTest {
         }
 
         @Override
+        public void emitMissingMessage(int lineNo, MessageSource source,
+                                       AdviceSource adviceSource,
+                                       MissingMessageKind missingMessageKind) {
+            emitMissingMessage(lineNo, source);
+        }
+
+        @Override
         public void emitUnhandled(com.puppycrawl.tools.checkstyle.api.DetailAST ast, String reason) {
             unhandledReasons.add(reason);
         }
@@ -824,8 +831,8 @@ class ThrowMessageExtractorTest {
                 "Type cast of throwable variable should be treated as rethrow");
 
         DetailAstImpl methodCall = createMethodCall("someFactory");
-        assertTrue(invokeIsThrowableRethrow(methodCall),
-                "Factory method call should be treated as rethrow");
+        assertFalse(invokeIsThrowableRethrow(methodCall),
+                "Generic factory method call should not be treated as rethrow");
     }
 
     @Test
@@ -951,6 +958,116 @@ class ThrowMessageExtractorTest {
     }
 
     // --- Phase 1 coverage: throw-variable (not new) patterns ---
+
+    // --- Tests for newly package-local methods ---
+
+    @Test
+    @DisplayName("findMessageExpression skips null literal args and returns first string template")
+    void findMessageExpression_skipsNullAndReturnsStringTemplate() {
+        List<com.puppycrawl.tools.checkstyle.api.DetailAST> args = new ArrayList<>();
+        // First arg: null literal (should be skipped)
+        DetailAstImpl nullLit = new DetailAstImpl();
+        nullLit.setType(TokenTypes.LITERAL_NULL);
+        nullLit.setText("null");
+        DetailAstImpl nullExpr = new DetailAstImpl();
+        nullExpr.setType(TokenTypes.EXPR);
+        nullExpr.addChild(nullLit);
+        args.add(nullExpr);
+
+        // Second arg: string literal (should be found)
+        DetailAstImpl strExpr = new DetailAstImpl();
+        strExpr.setType(TokenTypes.EXPR);
+        DetailAstImpl strLit = new DetailAstImpl();
+        strLit.setType(TokenTypes.STRING_LITERAL);
+        strLit.setText("\"Found the message\"");
+        strExpr.addChild(strLit);
+        args.add(strExpr);
+
+        com.puppycrawl.tools.checkstyle.api.DetailAST result = extractor.findMessageExpression(args);
+        assertNotNull(result, "Should find the string expression after skipping null");
+    }
+
+    @Test
+    @DisplayName("findMessageExpression skips throwable args and returns null when no message")
+    void findMessageExpression_skipsThrowableAndReturnsNullWhenNoMessage() {
+        context.recordVariableType(createVariableDef("cause", "RuntimeException"));
+        List<com.puppycrawl.tools.checkstyle.api.DetailAST> args = new ArrayList<>();
+        // First arg: throwable reference (should be skipped)
+        DetailAstImpl causeExpr = new DetailAstImpl();
+        causeExpr.setType(TokenTypes.EXPR);
+        causeExpr.addChild(createIdent("cause"));
+        args.add(causeExpr);
+
+        com.puppycrawl.tools.checkstyle.api.DetailAST result = extractor.findMessageExpression(args);
+        assertNull(result, "Should return null when all args are throwable");
+    }
+
+    @Test
+    @DisplayName("findMessageExpression returns empty list result as null")
+    void findMessageExpression_returnsNullForEmptyArgs() {
+        List<com.puppycrawl.tools.checkstyle.api.DetailAST> args = new ArrayList<>();
+        com.puppycrawl.tools.checkstyle.api.DetailAST result = extractor.findMessageExpression(args);
+        assertNull(result, "Should return null for empty args list");
+    }
+
+    @Test
+    @DisplayName("isUnsupportedOperationException returns true for simple name")
+    void isUnsupportedOperationException_returnsTrueForSimpleName() {
+        assertTrue(extractor.isUnsupportedOperationException("UnsupportedOperationException"),
+                "Should recognise simple UnsupportedOperationException name");
+    }
+
+    @Test
+    @DisplayName("isUnsupportedOperationException returns true for fully qualified name")
+    void isUnsupportedOperationException_returnsTrueForQualifiedName() {
+        assertTrue(extractor.isUnsupportedOperationException("java.lang.UnsupportedOperationException"),
+                "Should recognise fully qualified UnsupportedOperationException name");
+    }
+
+    @Test
+    @DisplayName("isUnsupportedOperationException returns false for other exception")
+    void isUnsupportedOperationException_returnsFalseForOtherException() {
+        assertFalse(extractor.isUnsupportedOperationException("IllegalStateException"),
+                "Should reject other exception names");
+    }
+
+    @Test
+    @DisplayName("isUnsupportedOperationException returns false for null")
+    void isUnsupportedOperationException_returnsFalseForNull() {
+        assertFalse(extractor.isUnsupportedOperationException(null),
+                "Should return false for null type name");
+    }
+
+    @Test
+    @DisplayName("isMethodCallExpression returns true for method call node")
+    void isMethodCallExpression_returnsTrueForMethodCall() {
+        DetailAstImpl methodCall = createMethodCall("someFactory");
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        expr.addChild(methodCall);
+        assertTrue(extractor.isMethodCallExpression(expr),
+                "Should recognise method call expression");
+    }
+
+    @Test
+    @DisplayName("isMethodCallExpression returns false for non-method-call node")
+    void isMethodCallExpression_returnsFalseForIdent() {
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        expr.addChild(createIdent("value"));
+        assertFalse(extractor.isMethodCallExpression(expr),
+                "Should reject non-method-call expression");
+    }
+
+    @Test
+    @DisplayName("isMethodCallExpression returns false for empty expr with no child")
+    void isMethodCallExpression_returnsFalseForEmptyExpr() {
+        DetailAstImpl expr = new DetailAstImpl();
+        expr.setType(TokenTypes.EXPR);
+        // No child — unwrapExpr returns null
+        assertFalse(extractor.isMethodCallExpression(expr),
+                "Should return false for empty expression without child");
+    }
 
     @Test
     @DisplayName("Handle throw statement with conditional expression emits unhandled")

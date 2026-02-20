@@ -295,5 +295,12 @@ class JavadocMessageExtractorTest {
         public void emitMissingMessage(int lineNo, MessageSource source) {
             // No-op for testing
         }
+
+        @Override
+        public void emitMissingMessage(int lineNo, MessageSource source,
+                                       AdviceSource adviceSource,
+                                       MissingMessageKind missingMessageKind) {
+            emitMissingMessage(lineNo, source);
+        }
     }
 }

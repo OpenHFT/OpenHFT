@@ -39,7 +39,7 @@ class MMThrowNullTest {
 
         rule.evaluate(context, collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         assertEquals(1, pending.size(), "should record one violation");
         Violation violation = pending.get(10);
         assertNotNull(violation, "violation should be on line 10");
@@ -77,7 +77,7 @@ class MMThrowNullTest {
 
         rule.evaluate(context, collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         assertTrue(pending.isEmpty(), "should not record violation when throwNull is false");
         assertFalse(state.shouldStopProcessing(),
                 "should not stop processing when no violation");
@@ -96,7 +96,7 @@ class MMThrowNullTest {
 
         rule.evaluate(context, collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         assertTrue(pending.isEmpty(),
                 "should skip evaluation for non-THROW source");
     }

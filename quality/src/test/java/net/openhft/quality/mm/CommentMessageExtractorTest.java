@@ -649,6 +649,180 @@ class CommentMessageExtractorTest {
         return extractor.isWhitespace(text);
     }
 
+    // --- Tests for newly package-local methods ---
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment returns true for wait method")
+    void requiresObjectMonitorComment_returnsTrueForWait() throws Exception {
+        prepareContext(Arrays.asList("", "obj.wait();"));
+        DetailAstImpl methodCall = createMethodCallWithName("wait");
+        assertTrue(extractor.requiresObjectMonitorComment(methodCall),
+                "wait() should require object monitor comment");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment returns true for notify method")
+    void requiresObjectMonitorComment_returnsTrueForNotify() throws Exception {
+        prepareContext(Arrays.asList("", "obj.notify();"));
+        DetailAstImpl methodCall = createMethodCallWithName("notify");
+        assertTrue(extractor.requiresObjectMonitorComment(methodCall),
+                "notify() should require object monitor comment");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment returns true for notifyAll method")
+    void requiresObjectMonitorComment_returnsTrueForNotifyAll() throws Exception {
+        prepareContext(Arrays.asList("", "obj.notifyAll();"));
+        DetailAstImpl methodCall = createMethodCallWithName("notifyAll");
+        assertTrue(extractor.requiresObjectMonitorComment(methodCall),
+                "notifyAll() should require object monitor comment");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment returns false for other method")
+    void requiresObjectMonitorComment_returnsFalseForOtherMethod() throws Exception {
+        prepareContext(Arrays.asList("", "obj.toString();"));
+        DetailAstImpl methodCall = createMethodCallWithName("toString");
+        assertFalse(extractor.requiresObjectMonitorComment(methodCall),
+                "toString() should not require object monitor comment");
+    }
+
+    @Test
+    @DisplayName("requiresClassForNameComment returns true for Class.forName call")
+    void requiresClassForNameComment_returnsTrueForForName() throws Exception {
+        prepareContext(Arrays.asList("", "Class.forName(\"test\");"));
+        DetailAstImpl methodCall = createDotMethodCall("Class", "forName");
+        assertTrue(extractor.requiresClassForNameComment(methodCall),
+                "Class.forName() should require reason comment");
+    }
+
+    @Test
+    @DisplayName("requiresClassForNameComment returns false for other Class method")
+    void requiresClassForNameComment_returnsFalseForOtherMethod() throws Exception {
+        prepareContext(Arrays.asList("", "Class.cast(obj);"));
+        DetailAstImpl methodCall = createDotMethodCall("Class", "cast");
+        assertFalse(extractor.requiresClassForNameComment(methodCall),
+                "Class.cast() should not require reason comment");
+    }
+
+    @Test
+    @DisplayName("requiresSystemComment returns false for allowed system member currentTimeMillis")
+    void requiresSystemComment_returnsFalseForAllowedMember() throws Exception {
+        prepareContext(Arrays.asList("", "System.currentTimeMillis();"));
+        DetailAstImpl methodCall = createDotMethodCall("System", "currentTimeMillis");
+        assertFalse(extractor.requiresSystemComment(methodCall),
+                "System.currentTimeMillis() is an allowed member");
+    }
+
+    @Test
+    @DisplayName("requiresSystemComment returns true for exit call")
+    void requiresSystemComment_returnsTrueForExit() throws Exception {
+        prepareContext(Arrays.asList("", "System.exit(0);"));
+        DetailAstImpl methodCall = createDotMethodCall("System", "exit");
+        assertTrue(extractor.requiresSystemComment(methodCall),
+                "System.exit() should require reason comment");
+    }
+
+    @Test
+    @DisplayName("requiresSystemComment returns false for nanoTime member")
+    void requiresSystemComment_returnsFalseForNanoTime() throws Exception {
+        prepareContext(Arrays.asList("", "System.nanoTime();"));
+        DetailAstImpl methodCall = createDotMethodCall("System", "nanoTime");
+        assertFalse(extractor.requiresSystemComment(methodCall),
+                "System.nanoTime() is an allowed system member");
+    }
+
+    @Test
+    @DisplayName("requiresSystemComment returns false for lineSeparator member")
+    void requiresSystemComment_returnsFalseForLineSeparator() throws Exception {
+        prepareContext(Arrays.asList("", "System.lineSeparator();"));
+        DetailAstImpl methodCall = createDotMethodCall("System", "lineSeparator");
+        assertFalse(extractor.requiresSystemComment(methodCall),
+                "System.lineSeparator() is an allowed system member");
+    }
+
+    @Test
+    @DisplayName("requiresSystemComment returns false for out member")
+    void requiresSystemComment_returnsFalseForOut() throws Exception {
+        prepareContext(Arrays.asList("", "System.out;"));
+        DetailAstImpl methodCall = createDotMethodCall("System", "out");
+        assertFalse(extractor.requiresSystemComment(methodCall),
+                "System.out is an allowed system member");
+    }
+
+    @Test
+    @DisplayName("requiresSystemComment returns false when member is not System qualified")
+    void requiresSystemComment_returnsFalseForNonSystemQualifier() throws Exception {
+        prepareContext(Arrays.asList("", "MyUtil.exit(0);"));
+        DetailAstImpl methodCall = createDotMethodCall("MyUtil", "exit");
+        assertFalse(extractor.requiresSystemComment(methodCall),
+                "MyUtil.exit() should not require system comment");
+    }
+
+    @Test
+    @DisplayName("requiresThreadLocalComment returns true for ThreadLocal.set call")
+    void requiresThreadLocalComment_returnsTrueForSet() throws Exception {
+        prepareContext(Arrays.asList("", "local.set(val);"));
+        context.recordVariableType(createVariableDef("local", "ThreadLocal"));
+        DetailAstImpl methodCall = createDotMethodCall("local", "set");
+        assertTrue(extractor.requiresThreadLocalComment(methodCall),
+                "ThreadLocal.set() should require reason comment");
+    }
+
+    @Test
+    @DisplayName("requiresThreadLocalComment returns false for get method")
+    void requiresThreadLocalComment_returnsFalseForGet() throws Exception {
+        prepareContext(Arrays.asList("", "local.get();"));
+        DetailAstImpl methodCall = createDotMethodCall("local", "get");
+        assertFalse(extractor.requiresThreadLocalComment(methodCall),
+                "ThreadLocal.get() should not require thread local comment");
+    }
+
+    @Test
+    @DisplayName("requiresProcessBuilderComment returns false for non-start method")
+    void requiresProcessBuilderComment_returnsFalseForNonStart() throws Exception {
+        prepareContext(Arrays.asList("", "pb.command();"));
+        DetailAstImpl methodCall = createDotMethodCall("pb", "command");
+        assertFalse(extractor.requiresProcessBuilderComment(methodCall),
+                "ProcessBuilder.command() should not require process builder comment");
+    }
+
+    @Test
+    @DisplayName("requiresStringInternComment returns false for non-intern method")
+    void requiresStringInternComment_returnsFalseForNonIntern() throws Exception {
+        prepareContext(Arrays.asList("", "str.length();"));
+        DetailAstImpl methodCall = createDotMethodCall("str", "length");
+        assertFalse(extractor.requiresStringInternComment(methodCall),
+                "String.length() should not require string intern comment");
+    }
+
+    private DetailAstImpl createMethodCallWithName(String name) {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl ident = new DetailAstImpl();
+        ident.setType(TokenTypes.IDENT);
+        ident.setText(name);
+        methodCall.addChild(ident);
+        return methodCall;
+    }
+
+    private DetailAstImpl createDotMethodCall(String qualifier, String name) {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        DetailAstImpl qualIdent = new DetailAstImpl();
+        qualIdent.setType(TokenTypes.IDENT);
+        qualIdent.setText(qualifier);
+        dot.addChild(qualIdent);
+        DetailAstImpl nameIdent = new DetailAstImpl();
+        nameIdent.setType(TokenTypes.IDENT);
+        nameIdent.setText(name);
+        dot.addChild(nameIdent);
+        methodCall.addChild(dot);
+        return methodCall;
+    }
+
     private static final class TestMessageSink implements MessageCandidateSink {
         final List<MessageCandidate> candidates = new ArrayList<>();
         final List<MissingMessage> missingMessages = new ArrayList<>();
@@ -661,6 +835,13 @@ class CommentMessageExtractorTest {
         @Override
         public void emitMissingMessage(int lineNo, MessageSource source) {
             missingMessages.add(new MissingMessage(lineNo, source));
+        }
+
+        @Override
+        public void emitMissingMessage(int lineNo, MessageSource source,
+                                       AdviceSource adviceSource,
+                                       MissingMessageKind missingMessageKind) {
+            emitMissingMessage(lineNo, source);
         }
     }
 

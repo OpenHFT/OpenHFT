@@ -99,7 +99,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         }
     }
 
-    private AssertionOperandExtractor.AssertionStyle resolveAssertionStyle(DetailAST methodCall, String methodName) {
+    AssertionOperandExtractor.AssertionStyle resolveAssertionStyle(DetailAST methodCall, String methodName) {
         DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
         if (dot != null) {
             String fullCall = astSupport().flattenDot(dot);
@@ -602,7 +602,7 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
         return argCount >= 3 && firstStringArgIndex != 1;
     }
 
-    private boolean isLocalAssertionHelper(DetailAST methodCall, String methodName) {
+    boolean isLocalAssertionHelper(DetailAST methodCall, String methodName) {
         if (methodCall == null || methodName == null) {
             return false;
         }
@@ -859,11 +859,16 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
     }
 
     private boolean isMessageArgumentPresent(DetailAST expr) {
-        requireNonNull(expr);
+        if (expr == null) {
+            return false;
+        }
         if (astSupport().isNullLiteral(expr)) {
             return false;
         }
-        DetailAST content = requireNonNull(astSupport().unwrapExpr(expr));
+        DetailAST content = astSupport().unwrapExpr(expr);
+        if (content == null) {
+            return false;
+        }
         if (content.getType() == TokenTypes.LAMBDA
                 || content.getType() == TokenTypes.METHOD_REF) {
             return true;

@@ -15,6 +15,13 @@ import static java.util.Objects.requireNonNull;
  */
 public final class LoopIndexAnalyzer {
 
+    private static final int PATTERN_CACHE_MAX = 256;
+    private final Map<String, Pattern> cachedPatterns = new LinkedHashMap<String, Pattern>(PATTERN_CACHE_MAX, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Pattern> eldest) {
+            return size() > PATTERN_CACHE_MAX;
+        }
+    };
     private final MessageAstSupport astSupport;
 
     /**
@@ -115,10 +122,14 @@ public final class LoopIndexAnalyzer {
                 continue;
             }
             String quoted = Pattern.quote(name);
-            if (Pattern.compile("\\b" + quoted + "\\b").matcher(message).find()) {
+            Pattern wordPattern = cachedPatterns.computeIfAbsent(
+                    "word:" + name, k -> Pattern.compile("\\b" + quoted + "\\b"));
+            if (wordPattern.matcher(message).find()) {
                 return true;
             }
-            if (Pattern.compile("\\b" + quoted + "\\s*[:=]").matcher(message).find()) {
+            Pattern kvPattern = cachedPatterns.computeIfAbsent(
+                    "kv:" + name, k -> Pattern.compile("\\b" + quoted + "\\s*[:=]"));
+            if (kvPattern.matcher(message).find()) {
                 return true;
             }
         }

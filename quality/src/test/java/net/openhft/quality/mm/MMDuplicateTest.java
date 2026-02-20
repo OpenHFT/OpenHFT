@@ -50,7 +50,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "rule should skip candidates with argumentNameMessage flag");
         assertFalse(state.warningFired(),
                 "warning should not fire for skipped candidate");
@@ -73,7 +73,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "rule should detect duplicate for non-argument-name message");
         assertTrue(state.warningFired(),
                 "warning should fire for duplicate message");
@@ -95,7 +95,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "rule should detect duplicate for log message");
         assertFalse(state.warningFired(),
                 "warning should not be marked as fired for LOG source");
@@ -117,7 +117,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "rule should detect duplicate for throw message");
         assertTrue(state.warningFired(),
                 "warning should be marked as fired for THROW source");
@@ -137,7 +137,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "no violation for first occurrence");
         assertEquals(Integer.valueOf(15), messageOccurrences.get("order should be valid"),
                 "first occurrence should record line number in map");
@@ -157,7 +157,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "empty message should not trigger violation");
         assertTrue(messageOccurrences.isEmpty(),
                 "empty message should not be recorded");
@@ -177,7 +177,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "null message should not trigger violation");
     }
 
@@ -202,7 +202,7 @@ class MMDuplicateTest {
         rule.evaluate(context, collector, state);
 
         // Verify no violation was recorded (early return was taken)
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "argumentNameMessage=true should skip all processing");
         // Verify no new entries added to occurrences map
         assertEquals(1, messageOccurrences.size(),
@@ -228,7 +228,7 @@ class MMDuplicateTest {
         rule.evaluate(context, collector, state);
 
         // Verify violation was recorded (early return was NOT taken)
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "argumentNameMessage=false should detect duplicate");
     }
 
@@ -249,7 +249,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "LOG source should still record violation");
         assertFalse(state.warningFired(),
                 "LOG source should NOT mark warning fired even with violation");
@@ -272,7 +272,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "ASSERTION source should record violation");
         assertTrue(state.warningFired(),
                 "ASSERTION source should mark warning fired");
@@ -295,7 +295,7 @@ class MMDuplicateTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "PRECONDITION source should record violation");
         assertTrue(state.warningFired(),
                 "PRECONDITION source should mark warning fired");

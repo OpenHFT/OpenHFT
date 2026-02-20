@@ -16,7 +16,7 @@ public enum RuleId {
             EnumSet.of(MessageSource.ASSERTION, MessageSource.THROW,
                     MessageSource.ANNOTATION, MessageSource.LOG, MessageSource.COMMENT)),
     /**
-     * Map<String, Object> or Map<String, ?> used without a reason comment.
+     * {@code Map<String, Object>} or {@code Map<String, ?>} used without a reason comment.
      */
     MAP_STRING_OBJECT("assert.message.map.string.object", "MMMapStringObject", 30,
             EnumSet.of(MessageSource.COMMENT)),
@@ -191,6 +191,15 @@ public enum RuleId {
      */
     UNHANDLED("assert.message.unhandled", "MMUnhandled", 1000,
             EnumSet.allOf(MessageSource.class));
+
+    static {
+        java.util.Set<String> codes = new java.util.HashSet<>();
+        for (RuleId r : values()) {
+            if (!codes.add(r.code)) {
+                throw new ExceptionInInitializerError("Duplicate RuleId code: " + r.code);
+            }
+        }
+    }
 
     private static final String INTENT_SUFFIX = ".intent";
     private final String messageKey;

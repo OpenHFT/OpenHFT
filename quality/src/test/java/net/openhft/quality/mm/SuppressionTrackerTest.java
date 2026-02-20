@@ -58,7 +58,7 @@ class SuppressionTrackerTest {
     void isSuppressed_adviceId_respectsScope() {
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMAssertionMessageTooShort");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort),
                 "advice id should be suppressed in scope");
@@ -106,12 +106,10 @@ class SuppressionTrackerTest {
     }
 
     @Test
-    @DisplayName("Leave scope empty stack does not throw")
-    void leaveScope_emptyStack_doesNotThrow() {
-        // Should not throw even with empty stack
-        tracker.leaveScope();
-        assertFalse(tracker.isSuppressed(RuleId.TOO_SHORT),
-                "should still return false after leaveScope on empty stack");
+    @DisplayName("Leave scope empty stack throws IllegalStateException")
+    void leaveScope_emptyStack_throwsIllegalState() {
+        assertThrows(IllegalStateException.class, () -> tracker.leaveScope(),
+                "leaveScope on empty stack should fail fast");
     }
 
     // --- stripQuotes tests ---
@@ -302,7 +300,7 @@ class SuppressionTrackerTest {
     void isSuppressed_withSuppressAll_returnsTrue() {
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MM-all");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT),
                 "should return true when suppressAll is set");
@@ -315,7 +313,7 @@ class SuppressionTrackerTest {
     void isSuppressed_withSpecificCode_returnsTrueForMatch() {
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMTooShort");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT),
                 "should return true for suppressed rule");
@@ -621,7 +619,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("File-scope suppression suppresses file-level checks")
     void fileScopeSuppressionSuppressesFileLevelChecks() {
-        tracker.addFileSuppressionsForTesting("MMTooShort");
+        tracker.addFileSuppressionsForTest("MMTooShort");
 
         assertTrue(tracker.isSuppressedInFile(RuleId.TOO_SHORT),
                 "file-scope suppression should suppress the rule at file level");
@@ -632,7 +630,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("File-scope MM-all suppresses all file-level checks")
     void fileScopeMmAllSuppressesAllFileLevelChecks() {
-        tracker.addFileSuppressionsForTesting("MM-all");
+        tracker.addFileSuppressionsForTest("MM-all");
 
         assertTrue(tracker.isSuppressedInFile(RuleId.TOO_SHORT),
                 "MM-all should suppress any rule at file level");
@@ -643,7 +641,7 @@ class SuppressionTrackerTest {
     @Test
     @DisplayName("File-scope AdviceId suppression works at file level")
     void fileScopeAdviceIdSuppressionWorksAtFileLevel() {
-        tracker.addFileSuppressionsForTesting("MMAssertionMessageTooShort");
+        tracker.addFileSuppressionsForTest("MMAssertionMessageTooShort");
 
         assertTrue(tracker.isSuppressedInFile(AdviceId.MMAssertionMessageTooShort),
                 "file-scope advice suppression should work");
@@ -835,6 +833,107 @@ class SuppressionTrackerTest {
         Files.write(file, content, StandardCharsets.UTF_8);
         FileText text = new FileText(file.toFile(), content);
         return new FileContents(text);
+    }
+
+    @Test
+    @DisplayName("Transitive suppression: suppressed AdviceId implies its parent RuleId is suppressed")
+    void transitiveSuppression_adviceIdImpliesRuleId() {
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
+        scope.addToken("MMAssertionMessageTooShort");
+        tracker.pushScopeForTest(scope);
+
+        assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort),
+                "AdviceId should be directly suppressed");
+        assertTrue(tracker.isSuppressed(RuleId.TOO_SHORT),
+                "parent RuleId should be transitively suppressed via AdviceId");
+        assertFalse(tracker.isSuppressed(RuleId.DUPLICATE),
+                "unrelated RuleId should not be suppressed");
+    }
+
+    @Test
+    @DisplayName("Suppress all flag suppresses any AdviceId")
+    void suppressAll_suppressesAnyAdviceId() {
+        SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
+        scope.addToken("MM-all");
+        tracker.pushScopeForTest(scope);
+
+        assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort),
+                "suppressAll should suppress any AdviceId");
+        assertTrue(tracker.isSuppressed(AdviceId.MMThrowMessageMissing),
+                "suppressAll should suppress any AdviceId");
+    }
+
+    @Test
+    @DisplayName("isSuppressed(AdviceId, lineNo) delegates to comment suppression")
+    void isSuppressedAdviceIdLineNo_delegatesToCommentSuppression() throws Exception {
+        FileContents contents = createFileContents("InputAdviceComment.java",
+                "// MMAssertionMessageTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "// MMAssertionMessageTooShort:ON",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort, 2),
+                "should be suppressed in OFF range");
+        assertFalse(tracker.isSuppressed(AdviceId.MMAssertionMessageTooShort, 4),
+                "should not be suppressed after ON");
+    }
+
+    @Test
+    @DisplayName("isSuppressedInFile with transitive AdviceId to RuleId")
+    void isSuppressedInFile_transitiveAdviceIdToRuleId() {
+        tracker.addFileSuppressionsForTest("MMAssertionMessageTooShort");
+
+        assertTrue(tracker.isSuppressedInFile(RuleId.TOO_SHORT),
+                "file scope should transitively suppress parent RuleId via AdviceId");
+        assertFalse(tracker.isSuppressedInFile(RuleId.DUPLICATE),
+                "unrelated RuleId should not be suppressed at file level");
+    }
+
+    @Test
+    @DisplayName("isSuppressedInFile(RuleId, lineNo) delegates to comment suppression")
+    void isSuppressedInFileRuleIdLineNo_delegatesToCommentSuppression() throws Exception {
+        FileContents contents = createFileContents("InputFileComment.java",
+                "// MMTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "// MMTooShort:ON",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressedInFile(RuleId.TOO_SHORT, 2),
+                "should be suppressed in OFF range at file level");
+        assertFalse(tracker.isSuppressedInFile(RuleId.TOO_SHORT, 4),
+                "should not be suppressed after ON at file level");
+    }
+
+    @Test
+    @DisplayName("isSuppressedInFile(AdviceId, lineNo) delegates to comment suppression")
+    void isSuppressedInFileAdviceIdLineNo_delegatesToCommentSuppression() throws Exception {
+        FileContents contents = createFileContents("InputFileAdviceComment.java",
+                "// MMAssertionMessageTooShort:OFF",
+                "assertEquals(a, b, \"x\");",
+                "// MMAssertionMessageTooShort:ON",
+                "assertEquals(a, b, \"y\");");
+
+        tracker.recordCommentSuppressions(contents);
+
+        assertTrue(tracker.isSuppressedInFile(AdviceId.MMAssertionMessageTooShort, 2),
+                "should be suppressed in OFF range at file level");
+        assertFalse(tracker.isSuppressedInFile(AdviceId.MMAssertionMessageTooShort, 4),
+                "should not be suppressed after ON at file level");
+    }
+
+    @Test
+    @DisplayName("File scope MM-all suppresses any AdviceId at file level")
+    void fileScopeMmAll_suppressesAnyAdviceId() {
+        tracker.addFileSuppressionsForTest("MM-all");
+
+        assertTrue(tracker.isSuppressedInFile(AdviceId.MMAssertionMessageTooShort),
+                "MM-all should suppress any AdviceId at file level");
+        assertTrue(tracker.isSuppressedInFile(AdviceId.MMThrowMessageMissing),
+                "MM-all should suppress any AdviceId at file level");
     }
 
     private void invokeCollectStringValues(DetailAstImpl expr, List<String> tokens) throws Exception {

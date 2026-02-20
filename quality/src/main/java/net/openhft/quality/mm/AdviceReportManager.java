@@ -14,6 +14,7 @@ import java.util.Map;
 public final class AdviceReportManager {
     static final String ADVICE_TEXT_RESOURCE = "net/openhft/quality/mm-advice.properties";
     static final String RANK_RESOURCE = "net/openhft/quality/mm-advice-ranks.properties";
+    // Relative to user.dir (CWD); resolved at runtime when rankOut is not explicitly configured
     static final String DEFAULT_RANK_OUT = "logs/mm-advice-ranks.properties";
 
     private final boolean verbose;
@@ -30,6 +31,7 @@ public final class AdviceReportManager {
     private final Map<AdviceId, Integer> counts = new EnumMap<>(AdviceId.class);
     private int fileCount;
     private int issueCount;
+    private boolean started = false;
 
     public AdviceReportManager(boolean verbose, boolean dryRun,
                                String jsonlOutput, String rankOut,
@@ -52,6 +54,7 @@ public final class AdviceReportManager {
                     rankOutPath == null ? null : rankOutPath.toString());
             jsonlWriter.writeRunRecord();
         }
+        started = true;
     }
 
     public void reportFile(String fileName, AdviceCollector collector,
@@ -78,6 +81,7 @@ public final class AdviceReportManager {
     }
 
     public void finishRun() {
+        if (!started) return;
         if (dryRun && rankOutPath != null) {
             Map<AdviceId, Integer> ranks = AdviceRankings.buildRanks(counts);
             AdviceRankings.write(rankOutPath, ranks);

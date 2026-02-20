@@ -24,14 +24,14 @@ public final class FileReport {
                       Map<Integer, List<CandidateAdvice>> candidatesByLine,
                       List<RuleId> legacySuppressionRuleIds) {
         this.fileName = requireNonNull(fileName, "fileName");
-        this.fileAdvice = Collections.unmodifiableList(fileAdvice);
-        this.lineAdvice = Collections.unmodifiableList(lineAdvice);
+        this.fileAdvice = Collections.unmodifiableList(new java.util.ArrayList<>(fileAdvice));
+        this.lineAdvice = Collections.unmodifiableList(new java.util.ArrayList<>(lineAdvice));
         this.candidatesByLine = candidatesByLine == null
                 ? Collections.emptyMap()
-                : Collections.unmodifiableMap(candidatesByLine);
+                : Collections.unmodifiableMap(new java.util.HashMap<>(candidatesByLine));
         this.legacySuppressionRuleIds = legacySuppressionRuleIds == null
                 ? Collections.emptyList()
-                : Collections.unmodifiableList(legacySuppressionRuleIds);
+                : Collections.unmodifiableList(new java.util.ArrayList<>(legacySuppressionRuleIds));
     }
 
     public String fileName() {
@@ -56,5 +56,13 @@ public final class FileReport {
 
     public boolean hasIssues() {
         return !(fileAdvice.isEmpty() && lineAdvice.isEmpty());
+    }
+
+    @Override
+    public String toString() {
+        return "FileReport{fileName='" + fileName + '\''
+                + ", fileAdvice=" + fileAdvice.size()
+                + ", lineAdvice=" + lineAdvice.size()
+                + '}';
     }
 }

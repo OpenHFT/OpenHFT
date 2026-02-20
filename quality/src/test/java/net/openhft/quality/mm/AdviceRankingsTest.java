@@ -91,4 +91,109 @@ class AdviceRankingsTest {
         assertTrue(rankings.unknownKeys().isEmpty(),
                 "rank properties should not contain unknown keys: " + rankings.unknownKeys());
     }
+
+    // --- Edge case coverage tests ---
+
+    @Test
+    @DisplayName("Build ranks skips zero counts")
+    void buildRanksSkipsZeroCounts() {
+        Map<AdviceId, Integer> counts = new EnumMap<>(AdviceId.class);
+        counts.put(AdviceId.MMAssertionMessageMissing, 0);
+        counts.put(AdviceId.MMAssertionMessageGeneric, 3);
+
+        Map<AdviceId, Integer> ranks = AdviceRankings.buildRanks(counts);
+
+        assertEquals(-1, ranks.get(AdviceId.MMAssertionMessageMissing),
+                "zero count should result in unranked -1");
+        assertEquals(1, ranks.get(AdviceId.MMAssertionMessageGeneric),
+                "positive count should be ranked 1");
+    }
+
+    @Test
+    @DisplayName("Build ranks skips negative counts")
+    void buildRanksSkipsNegativeCounts() {
+        Map<AdviceId, Integer> counts = new EnumMap<>(AdviceId.class);
+        counts.put(AdviceId.MMAssertionMessageMissing, -5);
+        counts.put(AdviceId.MMAssertionMessageGeneric, 2);
+
+        Map<AdviceId, Integer> ranks = AdviceRankings.buildRanks(counts);
+
+        assertEquals(-1, ranks.get(AdviceId.MMAssertionMessageMissing),
+                "negative count should result in unranked -1");
+        assertEquals(1, ranks.get(AdviceId.MMAssertionMessageGeneric),
+                "positive count should be ranked 1");
+    }
+
+    @Test
+    @DisplayName("Build ranks with empty counts produces all unranked")
+    void buildRanksEmptyCountsProducesAllUnranked() {
+        Map<AdviceId, Integer> counts = new EnumMap<>(AdviceId.class);
+
+        Map<AdviceId, Integer> ranks = AdviceRankings.buildRanks(counts);
+
+        assertEquals(-1, ranks.get(AdviceId.MMAssertionMessageMissing),
+                "absent advice should be unranked -1");
+        assertEquals(-1, ranks.get(AdviceId.MMAssertionMessageGeneric),
+                "absent advice should be unranked -1");
+    }
+
+    @Test
+    @DisplayName("Write returns early for null output path")
+    void writeReturnsEarlyForNullOutput() {
+        Map<AdviceId, Integer> ranks = new EnumMap<>(AdviceId.class);
+        ranks.put(AdviceId.MMAssertionMessageMissing, 1);
+        AdviceRankings.write(null, ranks);
+        // Should not throw
+    }
+
+    @Test
+    @DisplayName("Write returns early for null ranks map")
+    void writeReturnsEarlyForNullRanks() throws Exception {
+        Path temp = Files.createTempFile("mm-advice-ranks-null", ".properties");
+        Files.delete(temp);
+        AdviceRankings.write(temp, null);
+        assertFalse(Files.exists(temp),
+                "file should not be created when ranks are null");
+    }
+
+    @Test
+    @DisplayName("Write creates output file with all advice ids")
+    void writeCreatesOutputFile() throws Exception {
+        Path temp = Files.createTempFile("mm-advice-ranks-write", ".properties");
+        Map<AdviceId, Integer> ranks = new EnumMap<>(AdviceId.class);
+        ranks.put(AdviceId.MMAssertionMessageMissing, 1);
+        ranks.put(AdviceId.MMAssertionMessageGeneric, 2);
+        AdviceRankings.write(temp, ranks);
+
+        assertTrue(Files.exists(temp),
+                "output file should be created by write");
+        String content = Files.readString(temp);
+        assertTrue(content.contains("MMAssertionMessageMissing=1"),
+                "written file should contain ranked advice id");
+    }
+
+    @Test
+    @DisplayName("From properties ignores empty key and empty value")
+    void fromPropertiesIgnoresEmptyKeyAndEmptyValue() throws Exception {
+        Path temp = Files.createTempFile("mm-advice-ranks-empty", ".properties");
+        Files.write(temp,
+                (AdviceId.MMAssertionMessageMissing.name() + "=\n"
+                        + "=5\n"
+                        + AdviceId.MMAssertionMessageGeneric.name() + "=3\n")
+                        .getBytes(StandardCharsets.UTF_8));
+        AdviceRankings rankings = AdviceRankings.load(temp);
+
+        assertEquals(-1, rankings.rankFor(AdviceId.MMAssertionMessageMissing),
+                "empty value should result in default -1 rank");
+        assertEquals(3, rankings.rankFor(AdviceId.MMAssertionMessageGeneric),
+                "valid entry should be loaded");
+    }
+
+    @Test
+    @DisplayName("Rank for unknown advice returns minus one")
+    void rankForUnknownAdviceReturnsMinusOne() {
+        AdviceRankings rankings = AdviceRankings.loadFromResource(AdviceReportManager.RANK_RESOURCE);
+        assertEquals(-1, rankings.rankFor(AdviceId.UNKNOWN),
+                "UNKNOWN should always return -1");
+    }
 }

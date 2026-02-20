@@ -16,6 +16,7 @@ import static java.util.Objects.requireNonNull;
  * Holds per-file extraction state such as imports, variable types, and comments.
  */
 public final class MessageExtractionContext {
+    private static final int MAX_PARSE_ITERATIONS = 10_000;
     private final MessageAstSupport astSupport;
     private final Map<String, String> importedClasses = new HashMap<>();
     private final Map<String, String> fieldTypes = new HashMap<>();
@@ -130,6 +131,13 @@ public final class MessageExtractionContext {
         junit4AnnotationName = null;
         junit4AssertionUsage = false;
         junit4AssertionLine = 0;
+        currentMethodIsTest = false;
+        currentMethodHasDisplayName = false;
+        currentMethodLineNo = 0;
+        currentMethodFirstAnnotationName = null;
+        currentMethodFirstAnnotationLine = 0;
+        currentMethodHasTestAnnotation = false;
+        currentMethodTestAnnotationLine = 0;
     }
 
     /**
@@ -770,7 +778,10 @@ public final class MessageExtractionContext {
      * @return {@code true} if the expression represents a Locale.
      */
     public boolean isLocaleExpression(DetailAST expr) {
-        DetailAST content = requireNonNull(astSupport.unwrapExpr(expr));
+        DetailAST content = astSupport.unwrapExpr(expr);
+        if (content == null) {
+            return false;
+        }
         if (content.getType() == TokenTypes.IDENT) {
             return isLocaleTypeName(getVariableType(content.getText()));
         }
@@ -933,13 +944,7 @@ public final class MessageExtractionContext {
     }
 
     String normalizeClassName(String className) {
-        requireNonNull(className);
-        String trimmed = className.trim();
-        if (trimmed.isEmpty()) {
-            return null;
-        }
-        int lastDot = trimmed.lastIndexOf('.');
-        return lastDot >= 0 ? trimmed.substring(lastDot + 1) : trimmed;
+        return MessageAstSupport.normalizeClassName(className);
     }
 
     int[] findArgumentListRange(DetailAST nodeWithParens, FileContents contents) {
@@ -997,11 +1002,16 @@ public final class MessageExtractionContext {
         int openLine = 0;
         int openCol = 0;
 
+        int iterations = 0;
         for (int line = scanLine - 1; line < lines.length; line++) {
             String text = lines[line];
             requireNonNull(text);
             int index = line == scanLine - 1 ? Math.min(startIndex, text.length()) : 0;
             while (index < text.length()) {
+                if (++iterations > MAX_PARSE_ITERATIONS) {
+                    // guard against hanging on malformed or unusually long input
+                    break;
+                }
                 char current = text.charAt(index);
                 char next = index + 1 < text.length() ? text.charAt(index + 1) : '\0';
 
@@ -1046,6 +1056,22 @@ public final class MessageExtractionContext {
                     continue;
                 }
                 if (current == '"') {
+                    if (index + 2 < text.length()
+                            && text.charAt(index + 1) == '"'
+                            && text.charAt(index + 2) == '"') {
+                        // text block: skip to closing """
+                        index += 3;
+                        while (index + 2 < text.length()) {
+                            if (text.charAt(index) == '"'
+                                    && text.charAt(index + 1) == '"'
+                                    && text.charAt(index + 2) == '"') {
+                                index += 3;
+                                break;
+                            }
+                            index++;
+                        }
+                        continue;
+                    }
                     inString = true;
                     index++;
                     continue;

@@ -48,7 +48,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(17);
         assertNotNull(violation, "Violation should be recorded for the candidate line");
         Object[] args = violation.args();
@@ -72,7 +72,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(19);
+        Violation violation = collector.pendingForTest().get(19);
         assertNotNull(violation, "Violation should be recorded for return null comment");
         assertEquals("use two+ meaningful words about why returning null is required",
                 violation.args()[5], "Return-null comment guidance should match");
@@ -93,7 +93,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(23);
         assertNotNull(violation, "Violation should be recorded for the candidate line");
         Object[] args = violation.args();
@@ -116,7 +116,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(5);
+        Violation violation = collector.pendingForTest().get(5);
         assertNotNull(violation, "Violation should be recorded for Javadoc class");
         Object[] args = violation.args();
         assertEquals("add unique words: responsibility + lifecycle or thread-safety intent",
@@ -138,7 +138,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(7);
+        Violation violation = collector.pendingForTest().get(7);
         assertNotNull(violation, "Violation should be recorded for Javadoc member");
         Object[] args = violation.args();
         assertEquals("add unique words: contract + units, edge cases, or side effects",
@@ -166,7 +166,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(9);
+        Violation violation = collector.pendingForTest().get(9);
         assertNotNull(violation, "Violation should be recorded for short message");
         assertEquals(expected, violation.args()[5], "Fix guidance should match source");
     }
@@ -186,7 +186,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(11);
+        Violation violation = collector.pendingForTest().get(11);
         assertNotNull(violation, "Violation should be recorded for filler words");
         assertEquals("the, value, is, the", violation.args()[2],
                 "Filler words should be listed in order");
@@ -208,7 +208,7 @@ class MMTooFewMeaningfulWordsTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(12);
+        Violation violation = collector.pendingForTest().get(12);
         assertNotNull(violation, "Violation should be recorded for runtime comment");
         assertEquals("use two+ meaningful words about why java.lang.Runtime is required",
                 violation.args()[5], "Runtime comment guidance should match");

@@ -4,6 +4,7 @@
 package net.openhft.quality.mm;
 
 import java.util.List;
+import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
 
@@ -26,13 +27,13 @@ public final class MMDuplicatesInput extends AbstractMessageRule {
         if (message == null || inputValues.isEmpty()) {
             return;
         }
-        String messageLower = message.toLowerCase().trim();
+        String messageLower = message.toLowerCase(Locale.ROOT).trim();
         for (String input : inputValues) {
             requireNonNull(input);
             if (input.isEmpty()) {
                 continue;
             }
-            String inputLower = input.toLowerCase().trim();
+            String inputLower = input.toLowerCase(Locale.ROOT).trim();
             if (messageLower.equals(inputLower)
                     || messageLower.equals(inputLower + " value")
                     || messageLower.equals(inputLower + " result")

@@ -6,6 +6,11 @@ package net.openhft.quality.mm;
 /**
  * Classifies method names to determine their assertion type.
  * All methods are static since classification is purely string-based.
+ * <p>
+ * Note: the class name and several method names use the nonstandard spelling
+ * "Assertion" (without the second 's'). This is intentional and consistent
+ * throughout the codebase; renaming would require changes across hundreds of
+ * tests and input fixtures for no functional benefit.
  */
 public final class AssertionMethodClassifier {
 
@@ -44,7 +49,7 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a precondition method.
      */
     public static boolean isPreconditionMethod(String methodName) {
-        return methodName.startsWith("require");
+        return methodName != null && methodName.startsWith("require");
     }
 
     /**
@@ -54,8 +59,9 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a requireNotNull method.
      */
     public static boolean isRequireNotNullMethod(String methodName) {
-        return methodName.equals("requireNotNull")
-                || methodName.equals("requireNonNull");
+        return methodName != null
+                && (methodName.equals("requireNotNull")
+                || methodName.equals("requireNonNull"));
     }
 
     /**
@@ -65,7 +71,7 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a fail method.
      */
     public static boolean isFailMethod(String methodName) {
-        return methodName.equals("fail");
+        return methodName != null && methodName.equals("fail");
     }
 
     /**
@@ -75,7 +81,7 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is an assertThat method.
      */
     public static boolean isAssertThatMethod(String methodName) {
-        return methodName.equals("assertThat");
+        return methodName != null && methodName.equals("assertThat");
     }
 
     /**
@@ -85,10 +91,11 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a boolean assertion method.
      */
     public static boolean isBooleanAssertionMethod(String methodName) {
-        return methodName.equals("assertTrue")
+        return methodName != null
+                && (methodName.equals("assertTrue")
                 || methodName.equals("assertFalse")
                 || methodName.equals("assumeTrue")
-                || methodName.equals("assumeFalse");
+                || methodName.equals("assumeFalse"));
     }
 
     /**
@@ -98,7 +105,7 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is an assumption method.
      */
     public static boolean isAssumptionMethod(String methodName) {
-        return methodName.startsWith("assume");
+        return methodName != null && methodName.startsWith("assume");
     }
 
     /**
@@ -108,8 +115,9 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a nullness assertion method.
      */
     public static boolean isNullnessAssertionMethod(String methodName) {
-        return methodName.equals("assertNull")
-                || methodName.equals("assertNotNull");
+        return methodName != null
+                && (methodName.equals("assertNull")
+                || methodName.equals("assertNotNull"));
     }
 
     /**
@@ -119,13 +127,14 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is an equality assertion method.
      */
     public static boolean isEqualityAssertionMethod(String methodName) {
-        return methodName.equals("assertEquals")
+        return methodName != null
+                && (methodName.equals("assertEquals")
                 || methodName.equals("assertNotEquals")
                 || methodName.equals("assertSame")
                 || methodName.equals("assertNotSame")
                 || methodName.equals("assertArrayEquals")
                 || methodName.equals("assertIterableEquals")
-                || methodName.equals("assertLinesMatch");
+                || methodName.equals("assertLinesMatch"));
     }
 
     /**
@@ -135,10 +144,11 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is an AssertJ message method.
      */
     public static boolean isAssertJMessageMethod(String methodName) {
-        return methodName.equals("as")
+        return methodName != null
+                && (methodName.equals("as")
                 || methodName.equals("describedAs")
                 || methodName.equals("withFailMessage")
-                || methodName.equals("overridingErrorMessage");
+                || methodName.equals("overridingErrorMessage"));
     }
 
     /**
@@ -148,8 +158,9 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is an assertThrows method.
      */
     public static boolean isAssertThrowsMethod(String methodName) {
-        return methodName.equals("assertThrows")
-                || methodName.equals("assertThrowsExactly");
+        return methodName != null
+                && (methodName.equals("assertThrows")
+                || methodName.equals("assertThrowsExactly"));
     }
 
     /**
@@ -159,8 +170,9 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a timeout assertion method.
      */
     public static boolean isTimeoutAssertionMethod(String methodName) {
-        return methodName.equals("assertTimeout")
-                || methodName.equals("assertTimeoutPreemptively");
+        return methodName != null
+                && (methodName.equals("assertTimeout")
+                || methodName.equals("assertTimeoutPreemptively"));
     }
 
     /**
@@ -170,7 +182,7 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a doesNotThrow method.
      */
     public static boolean isDoesNotThrowMethod(String methodName) {
-        return methodName.equals("assertDoesNotThrow");
+        return methodName != null && methodName.equals("assertDoesNotThrow");
     }
 
     /**
@@ -180,8 +192,9 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is an AssertJ override method.
      */
     public static boolean isAssertJOverrideMethod(String methodName) {
-        return methodName.equals("withFailMessage")
-                || methodName.equals("overridingErrorMessage");
+        return methodName != null
+                && (methodName.equals("withFailMessage")
+                || methodName.equals("overridingErrorMessage"));
     }
 
     /**
@@ -191,7 +204,8 @@ public final class AssertionMethodClassifier {
      * @return {@code true} if the method is a known assertion signature.
      */
     public static boolean isRecognisedAssertionMethod(String methodName) {
-        return isFailMethod(methodName)
+        return methodName != null
+                && (isFailMethod(methodName)
                 || isAssertThatMethod(methodName)
                 || isAssertThrowsMethod(methodName)
                 || isTimeoutAssertionMethod(methodName)
@@ -199,7 +213,7 @@ public final class AssertionMethodClassifier {
                 || isBooleanAssertionMethod(methodName)
                 || isNullnessAssertionMethod(methodName)
                 || isEqualityAssertionMethod(methodName)
-                || methodName.equals("assertAll");
+                || methodName.equals("assertAll"));
     }
 
     /**

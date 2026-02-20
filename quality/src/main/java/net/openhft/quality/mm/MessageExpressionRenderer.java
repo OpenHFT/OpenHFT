@@ -36,7 +36,7 @@ public final class MessageExpressionRenderer {
         return rendered == null || rendered.trim().isEmpty() ? null : rendered;
     }
 
-    private static String renderNode(DetailAST node, MessageAstSupport astSupport) {
+    static String renderNode(DetailAST node, MessageAstSupport astSupport) {
         requireNonNull(node);
         switch (node.getType()) {
             case TokenTypes.STRING_LITERAL:

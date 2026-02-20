@@ -51,7 +51,7 @@ class MMTooShortTest {
 
         assertTrue(state.shouldStopProcessing(),
                 "Rule should request stop processing when too short");
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         assertEquals(1, pending.size(), "One violation should be recorded");
         Violation violation = pending.get(12);
         assertNotNull(violation, "Violation should be recorded for the candidate line");
@@ -78,7 +78,7 @@ class MMTooShortTest {
 
         rule.evaluate(context, collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(21);
         assertNotNull(violation, "Violation should be recorded for the candidate line");
         Object[] args = violation.args();
@@ -101,7 +101,7 @@ class MMTooShortTest {
 
         rule.evaluate(context, collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(28);
         assertNotNull(violation, "Violation should be recorded for the candidate line");
         Object[] args = violation.args();
@@ -131,7 +131,7 @@ class MMTooShortTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(30);
+        Violation violation = collector.pendingForTest().get(30);
         assertNotNull(violation, "Violation should be recorded for short message");
         assertEquals(expected, violation.args()[4], "Fix guidance should match source");
     }
@@ -160,7 +160,7 @@ class MMTooShortTest {
         rule.evaluate(new MessageContext(runtimeCandidate, metrics,
                 "TestClass", "testMethod", false, null, null, null), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         assertEquals("explain why java.lang.System is required here",
                 pending.get(40).args()[4], "System comment guidance should match");
         assertEquals("explain why java.lang.Runtime is required here",

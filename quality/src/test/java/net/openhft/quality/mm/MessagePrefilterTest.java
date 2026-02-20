@@ -148,7 +148,7 @@ class MessagePrefilterTest {
     @Test
     @DisplayName("Generated class name pattern should be skipped")
     void shouldSkip_generatedClassNamePattern_returnsTrue() {
-        assertTrue(prefilter.shouldSkip("MyVeryLongGeneratedClassName"),
+        assertTrue(prefilter.shouldSkip("MyVeryLongGeneratedClassNameFactory"),
                 "Generated PascalCase name should be skipped");
     }
 

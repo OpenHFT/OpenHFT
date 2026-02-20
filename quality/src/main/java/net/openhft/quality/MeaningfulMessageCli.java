@@ -38,10 +38,14 @@ public final class MeaningfulMessageCli {
         }
         Configuration config = buildConfiguration(options);
         Checker checker = new Checker();
-        checker.setModuleClassLoader(MeaningfulMessageCli.class.getClassLoader());
-        checker.configure(config);
-        int errors = checker.process(files);
-        checker.destroy();
+        int errors;
+        try {
+            checker.setModuleClassLoader(MeaningfulMessageCli.class.getClassLoader());
+            checker.configure(config);
+            errors = checker.process(files);
+        } finally {
+            checker.destroy();
+        }
         // Exit with success only when no errors found
         System.exit(errors == 0 ? 0 : 1);
     }

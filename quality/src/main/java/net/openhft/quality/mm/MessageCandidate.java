@@ -54,10 +54,10 @@ public class MessageCandidate {
         this.trivialSupplierDescription = builder.trivialSupplierDescription;
         this.inputValues = builder.inputValues == null
                 ? Collections.emptyList()
-                : Collections.unmodifiableList(builder.inputValues);
+                : Collections.unmodifiableList(new java.util.ArrayList<>(builder.inputValues));
         this.loopNames = builder.loopNames == null
                 ? Collections.emptyList()
-                : Collections.unmodifiableList(builder.loopNames);
+                : Collections.unmodifiableList(new java.util.ArrayList<>(builder.loopNames));
         this.missingLoopIndex = builder.missingLoopIndex;
         this.comparisonOperator = builder.comparisonOperator;
         this.comparisonLeftOperand = builder.comparisonLeftOperand;
@@ -612,5 +612,14 @@ public class MessageCandidate {
         public MessageCandidate build() {
             return new MessageCandidate(this);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "MessageCandidate{source=" + source
+                + ", lineNo=" + lineNo
+                + ", message='" + message + '\''
+                + ", missingMessage=" + missingMessage
+                + '}';
     }
 }

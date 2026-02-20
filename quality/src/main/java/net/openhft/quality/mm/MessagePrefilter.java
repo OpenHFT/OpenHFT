@@ -17,8 +17,10 @@ public final class MessagePrefilter {
     private static final Pattern ESCAPE_ONLY_PATTERN = Pattern.compile(
             "^(\\\\+|\\\\n|\\\\t|\\\\r|\\s*)+$"
     );
+    // Minimum 6 PascalCase segments to avoid false positives on real class names
+    // like AbstractMethodInterceptorFactory (4 segments)
     private static final Pattern GENERATED_CLASS_NAME_PATTERN = Pattern.compile(
-            "^[A-Z][a-zA-Z0-9]*([A-Z][a-z0-9]+){4,}[A-Za-z0-9]*$"
+            "^[A-Z][a-zA-Z0-9]*([A-Z][a-z0-9]+){6,}[A-Za-z0-9]*$"
     );
 
     /**
@@ -73,10 +75,11 @@ public final class MessagePrefilter {
         }
         if (hasNewline) {
             int newlineCount = 0;
-            for (int i = 0; i < text.length() - 1; i++) {
-                if (text.charAt(i) == '\\' && text.charAt(i + 1) == 'n') {
+            for (int i = 0; i < text.length(); i++) {
+                char ch = text.charAt(i);
+                if (ch == '\n') {
                     newlineCount++;
-                } else if (text.charAt(i) == '\n') {
+                } else if (ch == '\\' && i + 1 < text.length() && text.charAt(i + 1) == 'n') {
                     newlineCount++;
                 }
             }

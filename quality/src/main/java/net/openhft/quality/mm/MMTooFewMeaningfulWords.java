@@ -7,7 +7,7 @@ package net.openhft.quality.mm;
  * Flags messages with too few meaningful words.
  */
 public final class MMTooFewMeaningfulWords extends AbstractMessageRule {
-    private static final MessageMetricsCalculator METRICS_CALCULATOR = new MessageMetricsCalculator();
+    private static final MessageMetricsCalculator FALLBACK_CALCULATOR = new MessageMetricsCalculator();
 
     /**
      * Create the rule instance.
@@ -31,25 +31,27 @@ public final class MMTooFewMeaningfulWords extends AbstractMessageRule {
             String uniqueWords = metrics.meaningfulWords().isEmpty()
                     ? "(none)"
                     : String.join(", ", metrics.meaningfulWords());
-            String fillerWords = collectFillerWords(context.candidate().message());
+            MessageMetricsCalculator calc = context.ruleSupport() != null
+                    ? context.ruleSupport().metricsCalculator() : FALLBACK_CALCULATOR;
+            String fillerWords = collectFillerWords(context.candidate().message(), calc);
             record(context, collector, context.candidate().message(),
                     uniqueWords, fillerWords, metrics.effectiveMeaningfulWordCount(),
                     minMeaningfulWordCount, fixFor(context.candidate()));
         }
     }
 
-    private String collectFillerWords(String message) {
+    private String collectFillerWords(String message, MessageMetricsCalculator calculator) {
         if (message == null) {
             return "(none)";
         }
-        String[] words = METRICS_CALCULATOR.splitWords(message);
+        String[] words = calculator.splitWords(message);
         StringBuilder filler = new StringBuilder();
         boolean first = true;
         for (String word : words) {
             if (word.isEmpty()) {
                 continue;
             }
-            if (!METRICS_CALCULATOR.isFillerWord(word)) {
+            if (!calculator.isFillerWord(word)) {
                 continue;
             }
             if (!first) {

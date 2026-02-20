@@ -89,7 +89,7 @@ public enum AdviceSource {
             case ANNOTATION:
                 return null;
             default:
-                return null;
+                throw new IllegalStateException("Unhandled MessageSource: " + source);
         }
     }
 }

@@ -17,6 +17,8 @@ public final class MessageMetricsCalculator {
      * Maximum word count for a message before triggering MMTooLong.
      * Chosen to allow detailed messages while discouraging essays.
      * Beyond ~40 words, messages become harder to scan at a glance.
+     * 42 is a practical upper bound — real assertion messages almost never
+     * need more words than this threshold.
      */
     private static final int MAX_WORD_COUNT = 42;
 
@@ -24,6 +26,8 @@ public final class MessageMetricsCalculator {
      * Maximum word length before flagging as a long word (likely an identifier).
      * Most English words are under 20 characters; technical identifiers like
      * class names or variable names often exceed this threshold.
+     * 42 is a practical upper bound — real assertion messages almost never
+     * contain longer identifiers than this threshold.
      */
     private static final int MAX_WORD_LENGTH = 42;
 

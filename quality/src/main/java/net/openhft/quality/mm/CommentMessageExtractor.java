@@ -45,6 +45,13 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
     }
 
     /**
+     * Clear per-file state so the extractor can be reused across files.
+     */
+    public void reset() {
+        processedLines.clear();
+    }
+
+    /**
      * Process {@code return} statements that return {@code null}.
      *
      * @param returnAst AST node for the return statement.
@@ -119,7 +126,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         }
     }
 
-    private boolean requiresSystemComment(DetailAST methodCall) {
+    boolean requiresSystemComment(DetailAST methodCall) {
         String member = findMemberAfterClass(methodCall, SYSTEM);
         if (member == null || member.isEmpty()) {
             return false;
@@ -127,14 +134,14 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return !isAllowedSystemMember(member);
     }
 
-    private boolean requiresRuntimeComment(DetailAST methodCall) {
+    boolean requiresRuntimeComment(DetailAST methodCall) {
         if (findMemberAfterClass(methodCall, RUNTIME) != null) {
             return true;
         }
         return isRuntimeInstanceCall(methodCall);
     }
 
-    private boolean requiresThreadComment(DetailAST methodCall) {
+    boolean requiresThreadComment(DetailAST methodCall) {
         String member = findMemberAfterClass(methodCall, THREAD);
         if (member != null && isThreadMethod(member)) {
             return true;
@@ -146,7 +153,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return isInstanceMethodCall(methodCall, methodName, THREAD);
     }
 
-    private boolean requiresThreadLocalComment(DetailAST methodCall) {
+    boolean requiresThreadLocalComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
         if (!"set".equals(methodName)) {
             return false;
@@ -154,19 +161,19 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return isInstanceMethodCall(methodCall, methodName, THREAD_LOCAL, INHERITABLE_THREAD_LOCAL);
     }
 
-    private boolean requiresObjectMonitorComment(DetailAST methodCall) {
+    boolean requiresObjectMonitorComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
         return "wait".equals(methodName)
                 || "notify".equals(methodName)
                 || "notifyAll".equals(methodName);
     }
 
-    private boolean requiresClassForNameComment(DetailAST methodCall) {
+    boolean requiresClassForNameComment(DetailAST methodCall) {
         String member = findMemberAfterClass(methodCall, CLASS);
         return "forName".equals(member);
     }
 
-    private boolean requiresProcessBuilderComment(DetailAST methodCall) {
+    boolean requiresProcessBuilderComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
         if (!"start".equals(methodName)) {
             return false;
@@ -174,7 +181,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return isInstanceMethodCall(methodCall, methodName, PROCESS_BUILDER);
     }
 
-    private boolean requiresStringInternComment(DetailAST methodCall) {
+    boolean requiresStringInternComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
         if (!"intern".equals(methodName)) {
             return false;
@@ -417,6 +424,9 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
             return null;
         }
         DetailAST content = astSupport().unwrapExpr(ast);
+        if (content == null) {
+            return null;
+        }
         if (content.getType() == TokenTypes.METHOD_CALL) {
             DetailAST dot = content.findFirstToken(TokenTypes.DOT);
             return dot == null ? null : findMemberAfterClass(dot, className);

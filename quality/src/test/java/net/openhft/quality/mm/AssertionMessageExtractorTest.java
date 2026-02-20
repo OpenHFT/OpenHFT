@@ -991,6 +991,220 @@ class AssertionMessageExtractorTest {
         return extractor.isParameterNameMessage(template, args, exprToInputValue);
     }
 
+    // --- Tests for newly package-local methods ---
+
+    @Test
+    @DisplayName("resolveAssertionStyle returns JUNIT4 for qualified Assert call")
+    void resolveAssertionStyle_returnsJUnit4ForQualifiedAssertCall() {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        DetailAstImpl qualDot = new DetailAstImpl();
+        qualDot.setType(TokenTypes.DOT);
+        DetailAstImpl orgDot = new DetailAstImpl();
+        orgDot.setType(TokenTypes.DOT);
+        orgDot.addChild(createIdent("org"));
+        orgDot.addChild(createIdent("junit"));
+        qualDot.addChild(orgDot);
+        qualDot.addChild(createIdent("Assert"));
+        dot.addChild(qualDot);
+        dot.addChild(createIdent("assertEquals"));
+        methodCall.addChild(dot);
+
+        AssertionOperandExtractor.AssertionStyle style =
+                extractor.resolveAssertionStyle(methodCall, "assertEquals");
+        assertEquals(AssertionOperandExtractor.AssertionStyle.JUNIT4, style,
+                "Qualified org.junit.Assert call should resolve to JUNIT4 style");
+    }
+
+    @Test
+    @DisplayName("resolveAssertionStyle returns JUNIT5 for qualified Assertions call")
+    void resolveAssertionStyle_returnsJUnit5ForQualifiedAssertionsCall() {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+
+        // Build org.junit.jupiter.api.Assertions.assertEquals
+        DetailAstImpl d1 = new DetailAstImpl();
+        d1.setType(TokenTypes.DOT);
+        d1.addChild(createIdent("org"));
+        d1.addChild(createIdent("junit"));
+
+        DetailAstImpl d2 = new DetailAstImpl();
+        d2.setType(TokenTypes.DOT);
+        d2.addChild(d1);
+        d2.addChild(createIdent("jupiter"));
+
+        DetailAstImpl d3 = new DetailAstImpl();
+        d3.setType(TokenTypes.DOT);
+        d3.addChild(d2);
+        d3.addChild(createIdent("api"));
+
+        DetailAstImpl d4 = new DetailAstImpl();
+        d4.setType(TokenTypes.DOT);
+        d4.addChild(d3);
+        d4.addChild(createIdent("Assertions"));
+
+        dot.addChild(d4);
+        dot.addChild(createIdent("assertEquals"));
+        methodCall.addChild(dot);
+
+        AssertionOperandExtractor.AssertionStyle style =
+                extractor.resolveAssertionStyle(methodCall, "assertEquals");
+        assertEquals(AssertionOperandExtractor.AssertionStyle.JUNIT5, style,
+                "Qualified org.junit.jupiter.api.Assertions call should resolve to JUNIT5 style");
+    }
+
+    @Test
+    @DisplayName("resolveAssertionStyle returns UNKNOWN for unrecognised qualifier class")
+    void resolveAssertionStyle_returnsUnknownForUnrecognisedQualifier() {
+        // CustomAssertions.assertEquals(...)
+        context.recordImport(createImportAst("com.example.CustomAssertions"));
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        dot.addChild(createIdent("CustomAssertions"));
+        dot.addChild(createIdent("assertEquals"));
+        methodCall.addChild(dot);
+
+        AssertionOperandExtractor.AssertionStyle style =
+                extractor.resolveAssertionStyle(methodCall, "assertEquals");
+        assertEquals(AssertionOperandExtractor.AssertionStyle.UNKNOWN, style,
+                "Unrecognised qualifier should resolve to UNKNOWN style");
+    }
+
+    @Test
+    @DisplayName("resolveAssertionStyle returns JUNIT4 for imported Assert qualifier")
+    void resolveAssertionStyle_returnsJUnit4ForImportedAssertQualifier() {
+        context.recordImport(createImportAst("org.junit.Assert"));
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        dot.addChild(createIdent("Assert"));
+        dot.addChild(createIdent("assertEquals"));
+        methodCall.addChild(dot);
+
+        AssertionOperandExtractor.AssertionStyle style =
+                extractor.resolveAssertionStyle(methodCall, "assertEquals");
+        assertEquals(AssertionOperandExtractor.AssertionStyle.JUNIT4, style,
+                "Assert imported as org.junit.Assert should resolve to JUNIT4 style");
+    }
+
+    @Test
+    @DisplayName("resolveAssertionStyle returns JUNIT5 for imported Assertions qualifier")
+    void resolveAssertionStyle_returnsJUnit5ForImportedAssertionsQualifier() {
+        context.recordImport(createImportAst("org.junit.jupiter.api.Assertions"));
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        dot.addChild(createIdent("Assertions"));
+        dot.addChild(createIdent("assertEquals"));
+        methodCall.addChild(dot);
+
+        AssertionOperandExtractor.AssertionStyle style =
+                extractor.resolveAssertionStyle(methodCall, "assertEquals");
+        assertEquals(AssertionOperandExtractor.AssertionStyle.JUNIT5, style,
+                "Assertions imported as org.junit.jupiter.api.Assertions should resolve to JUNIT5 style");
+    }
+
+    @Test
+    @DisplayName("resolveAssertionStyle returns UNKNOWN when both JUnit4 and JUnit5 match unqualified")
+    void resolveAssertionStyle_returnsUnknownForAmbiguousStaticImports() {
+        context.recordStaticJUnitImport("org.junit.Assert.assertTrue", "org.junit.Assert", true);
+        context.recordStaticJUnitImport("org.junit.jupiter.api.Assertions.assertTrue",
+                "org.junit.jupiter.api.Assertions", false);
+
+        DetailAstImpl methodCall = createMethodCall("assertTrue");
+        AssertionOperandExtractor.AssertionStyle style =
+                extractor.resolveAssertionStyle(methodCall, "assertTrue");
+        assertEquals(AssertionOperandExtractor.AssertionStyle.UNKNOWN, style,
+                "Ambiguous imports should resolve to UNKNOWN style");
+    }
+
+    @Test
+    @DisplayName("isLocalAssertionHelper returns true for undotted declared method")
+    void isLocalAssertionHelper_returnsTrueForDeclaredMethod() {
+        Set<String> declared = new HashSet<>();
+        declared.add("assertMyCondition");
+        context.setDeclaredMethodNames(declared);
+
+        DetailAstImpl methodCall = createMethodCall("assertMyCondition");
+        assertTrue(extractor.isLocalAssertionHelper(methodCall, "assertMyCondition"),
+                "Declared undotted method should be a local assertion helper");
+    }
+
+    @Test
+    @DisplayName("isLocalAssertionHelper returns false for dotted non-this qualifier")
+    void isLocalAssertionHelper_returnsFalseForDottedNonThisQualifier() {
+        Set<String> declared = new HashSet<>();
+        declared.add("assertTrue");
+        context.setDeclaredMethodNames(declared);
+
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        dot.addChild(createIdent("other"));
+        dot.addChild(createIdent("assertTrue"));
+        methodCall.addChild(dot);
+
+        assertFalse(extractor.isLocalAssertionHelper(methodCall, "assertTrue"),
+                "Dotted call with non-this qualifier should not be local helper");
+    }
+
+    @Test
+    @DisplayName("isLocalAssertionHelper returns true for this-qualified declared method")
+    void isLocalAssertionHelper_returnsTrueForThisQualifiedDeclaredMethod() {
+        Set<String> declared = new HashSet<>();
+        declared.add("assertMyCondition");
+        context.setDeclaredMethodNames(declared);
+
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        DetailAstImpl dot = new DetailAstImpl();
+        dot.setType(TokenTypes.DOT);
+        DetailAstImpl thisLit = new DetailAstImpl();
+        thisLit.setType(TokenTypes.LITERAL_THIS);
+        thisLit.setText("this");
+        dot.addChild(thisLit);
+        dot.addChild(createIdent("assertMyCondition"));
+        methodCall.addChild(dot);
+
+        assertTrue(extractor.isLocalAssertionHelper(methodCall, "assertMyCondition"),
+                "this-qualified declared method should be local helper");
+    }
+
+    @Test
+    @DisplayName("isLocalAssertionHelper returns false for null arguments")
+    void isLocalAssertionHelper_returnsFalseForNullArguments() {
+        assertFalse(extractor.isLocalAssertionHelper(null, "name"),
+                "null methodCall should return false");
+        DetailAstImpl methodCall = createMethodCall("test");
+        assertFalse(extractor.isLocalAssertionHelper(methodCall, null),
+                "null methodName should return false");
+    }
+
+    private DetailAstImpl createImportAst(String qualifiedName) {
+        String[] parts = qualifiedName.split("\\.");
+        DetailAstImpl current = createIdent(parts[0]);
+        for (int i = 1; i < parts.length; i++) {
+            DetailAstImpl dot = new DetailAstImpl();
+            dot.setType(TokenTypes.DOT);
+            dot.addChild(current);
+            dot.addChild(createIdent(parts[i]));
+            current = dot;
+        }
+        DetailAstImpl importAst = new DetailAstImpl();
+        importAst.setType(TokenTypes.IMPORT);
+        importAst.addChild(current);
+        return importAst;
+    }
+
     private static final class TestMessageSink implements MessageCandidateSink {
         private final List<MessageCandidate> candidates = new ArrayList<>();
         private final List<MessageSource> missingMessages = new ArrayList<>();
@@ -1004,6 +1218,13 @@ class AssertionMessageExtractorTest {
         @Override
         public void emitMissingMessage(int lineNo, MessageSource source) {
             missingMessages.add(source);
+        }
+
+        @Override
+        public void emitMissingMessage(int lineNo, MessageSource source,
+                                       AdviceSource adviceSource,
+                                       MissingMessageKind missingMessageKind) {
+            emitMissingMessage(lineNo, source);
         }
 
         @Override

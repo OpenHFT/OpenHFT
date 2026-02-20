@@ -17,6 +17,7 @@ import static java.util.Objects.requireNonNull;
  * Extracts message candidates from logging calls (SLF4J, Log4j2, JUL, System.Logger, Jvm).
  */
 public final class LogMessageExtractor extends AbstractMessageExtractor {
+    private final ExpressionTypeAnalyzer typeAnalyzer;
     private static final Set<String> SLF4J_LEVEL_METHODS = new HashSet<>(
             Arrays.asList("trace", "debug", "info", "warn", "error")
     );
@@ -38,6 +39,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
      */
     public LogMessageExtractor(MessageExtractionContext context, MessageCandidateSink sink) {
         super(context, sink);
+        this.typeAnalyzer = new ExpressionTypeAnalyzer(context);
     }
 
     /**
@@ -260,8 +262,8 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return true;
     }
 
-    private int resolveMessageIndex(LoggerKind loggerKind, String methodName,
-                                    List<DetailAST> args) {
+    int resolveMessageIndex(LoggerKind loggerKind, String methodName,
+                            List<DetailAST> args) {
         if (loggerKind == LoggerKind.JUL) {
             if ("log".equals(methodName)) {
                 return args.size() >= 2 ? 1 : -1;
@@ -274,7 +276,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
         return 0;
     }
 
-    private LoggerKind resolveLoggerKind(DetailAST methodCall) {
+    LoggerKind resolveLoggerKind(DetailAST methodCall) {
         String qualifier = extractQualifierNameForLog(methodCall);
         if (qualifier == null) {
             return null;
@@ -349,7 +351,9 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
 
     boolean isThrowableExpression(DetailAST expr) {
         DetailAST content = astSupport().unwrapExpr(expr);
-        requireNonNull(content);
+        if (content == null) {
+            return false;
+        }
         if (content.getType() == TokenTypes.LITERAL_NEW) {
             String className = astSupport().extractNewClassName(content);
             return isThrowableTypeName(className);
@@ -362,22 +366,7 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
     }
 
     boolean isThrowableTypeName(String typeName) {
-        if (typeName == null) {
-            return false;
-        }
-        String resolved = context().resolveTypeName(typeName);
-        if (resolved == null) {
-            return false;
-        }
-        String simple = resolved;
-        int lastDot = resolved.lastIndexOf('.');
-        if (lastDot >= 0) {
-            simple = resolved.substring(lastDot + 1);
-        }
-        return simple.equals("Throwable")
-                || simple.endsWith("Exception")
-                || simple.endsWith("Error")
-                || simple.equals("StackTrace");
+        return MessageAstSupport.isThrowableTypeName(typeName, context()::resolveTypeName);
     }
 
     int countLogPlaceholders(String message) {
@@ -468,36 +457,11 @@ public final class LogMessageExtractor extends AbstractMessageExtractor {
     }
 
     boolean isSupplierTypedExpression(DetailAST expr) {
-        if (expr == null) {
-            return false;
-        }
-        if (expr.getType() == TokenTypes.IDENT) {
-            return isSupplierTypeName(context().getVariableType(expr.getText()));
-        }
-        if (expr.getType() == TokenTypes.DOT) {
-            DetailAST rightmost = astSupport().findRightmostIdent(expr);
-            if (rightmost != null) {
-                return isSupplierTypeName(context().getVariableType(rightmost.getText()));
-            }
-        }
-        if (expr.getType() == TokenTypes.TYPECAST) {
-            DetailAST type = expr.findFirstToken(TokenTypes.TYPE);
-            return type != null && isSupplierTypeName(astSupport().extractTypeName(type));
-        }
-        return false;
+        return typeAnalyzer.isSupplierTypedExpression(expr);
     }
 
     boolean isSupplierTypeName(String typeName) {
-        if (typeName == null) {
-            return false;
-        }
-        String resolved = context().resolveTypeName(typeName);
-        if (resolved == null) {
-            return false;
-        }
-        return "java.util.function.Supplier".equals(resolved)
-                || "Supplier".equals(resolved)
-                || resolved.endsWith(".Supplier");
+        return typeAnalyzer.isSupplierTypeName(typeName);
     }
 
     enum LoggerKind {

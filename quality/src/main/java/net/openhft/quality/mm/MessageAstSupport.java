@@ -96,9 +96,11 @@ public final class MessageAstSupport {
     public String extractMethodName(DetailAST methodCall) {
         DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
         if (dot != null) {
-            return findRightmostIdent(dot).getText();
+            DetailAST ident = findRightmostIdent(dot);
+            return ident == null ? null : ident.getText();
         }
-        return methodCall.findFirstToken(TokenTypes.IDENT).getText();
+        DetailAST ident = methodCall.findFirstToken(TokenTypes.IDENT);
+        return ident == null ? null : ident.getText();
     }
 
     /**
@@ -354,6 +356,48 @@ public final class MessageAstSupport {
             }
         }
         return null;
+    }
+
+    /**
+     * Normalize a class name to its simple (unqualified) form.
+     *
+     * @param className class name to normalize.
+     * @return simple class name, or {@code null} if blank.
+     */
+    public static String normalizeClassName(String className) {
+        requireNonNull(className);
+        String trimmed = className.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        int lastDot = trimmed.lastIndexOf('.');
+        return lastDot >= 0 ? trimmed.substring(lastDot + 1) : trimmed;
+    }
+
+    /**
+     * Check whether a type name represents a Throwable hierarchy type.
+     *
+     * @param typeName  type name to check.
+     * @param resolver  function to resolve simple names to qualified form.
+     * @return {@code true} if the type is Throwable, an Exception, or an Error.
+     */
+    public static boolean isThrowableTypeName(String typeName, java.util.function.UnaryOperator<String> resolver) {
+        if (typeName == null) {
+            return false;
+        }
+        String resolved = resolver.apply(typeName);
+        if (resolved == null) {
+            return false;
+        }
+        String simple = resolved;
+        int lastDot = resolved.lastIndexOf('.');
+        if (lastDot >= 0) {
+            simple = resolved.substring(lastDot + 1);
+        }
+        return simple.equals("Throwable")
+                || simple.endsWith("Exception")
+                || simple.endsWith("Error")
+                || simple.equals("StackTrace");
     }
 
     /**

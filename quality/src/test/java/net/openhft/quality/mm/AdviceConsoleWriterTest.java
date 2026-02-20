@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -681,5 +683,108 @@ class AdviceConsoleWriterTest {
         assertTrue(output.contains("L10"), "should print first occurrence line");
         assertTrue(output.contains("L20"), "should print second occurrence line");
         assertTrue(output.contains("L30"), "should print third occurrence line");
+    }
+
+    @Test
+    @DisplayName("printRuleSummary includes file rules with line number and line rules")
+    void printRuleSummary_includesFileAndLineRules() {
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+        AdviceText text = loader.textFor(AdviceId.MMAssertionMessageMissing);
+        AdviceOccurrence occ = new AdviceOccurrence(12, AdviceSource.ASSERTION,
+                "msg", null, "assert()", null);
+        AdviceGroup lineGroup = new AdviceGroup(AdviceId.MMAssertionMessageMissing, text, 1,
+                Collections.singletonList(occ));
+        FileAdviceDetails fileDetails = new FileAdviceDetails(AdviceId.MMOverusedWord, 3,
+                Collections.singletonList("value"), 5, null, null, null, null, null);
+        FileAdviceGroup fileGroup = new FileAdviceGroup(AdviceId.MMOverusedWord,
+                loader.textFor(AdviceId.MMOverusedWord), 1, fileDetails);
+        FileReport report = new FileReport("Test.java",
+                Collections.singletonList(fileGroup),
+                Collections.singletonList(lineGroup),
+                Collections.emptyMap(),
+                Collections.emptyList());
+
+        StringWriter sw = new StringWriter();
+        new AdviceConsoleWriter(false, new PrintWriter(sw, true)).write(report);
+        String output = sw.toString();
+
+        assertTrue(output.contains("RULES:"), "should print RULES header");
+        assertTrue(output.contains("FILE: MMOverusedWord(L3)"),
+                "file rule should include name with line number");
+        assertTrue(output.contains("L12: MMAssertionMessageMissing"),
+                "line rule should include line number and advice name");
+    }
+
+    @Test
+    @DisplayName("printRuleSummary omits file rules section when no file advice")
+    void printRuleSummary_omitsFileRulesWhenEmpty() {
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+        AdviceText text = loader.textFor(AdviceId.MMAssertionMessageMissing);
+        AdviceOccurrence occ = new AdviceOccurrence(5, AdviceSource.ASSERTION,
+                "msg", null, "assert()", null);
+        AdviceGroup lineGroup = new AdviceGroup(AdviceId.MMAssertionMessageMissing, text, 1,
+                Collections.singletonList(occ));
+        FileReport report = new FileReport("Test.java",
+                Collections.emptyList(),
+                Collections.singletonList(lineGroup),
+                Collections.emptyMap(),
+                Collections.emptyList());
+
+        StringWriter sw = new StringWriter();
+        new AdviceConsoleWriter(false, new PrintWriter(sw, true)).write(report);
+        String output = sw.toString();
+
+        assertTrue(output.contains("RULES:"), "should still print RULES header for line rules");
+        assertFalse(output.contains("FILE: MM"), "should not print FILE rules section");
+        assertTrue(output.contains("L5: MMAssertionMessageMissing"),
+                "line rules should still be printed");
+    }
+
+    @Test
+    @DisplayName("printRuleSummary file advice without line number omits parenthetical")
+    void printRuleSummary_fileAdviceWithoutLineNumber() {
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+        FileAdviceDetails fileDetails = new FileAdviceDetails(AdviceId.MMOverusedWord, 0,
+                Collections.emptyList(), 5, null, null, null, null, null);
+        FileAdviceGroup fileGroup = new FileAdviceGroup(AdviceId.MMOverusedWord,
+                loader.textFor(AdviceId.MMOverusedWord), 1, fileDetails);
+        FileReport report = new FileReport("Test.java",
+                Collections.singletonList(fileGroup),
+                Collections.emptyList(),
+                Collections.emptyMap(),
+                Collections.emptyList());
+
+        StringWriter sw = new StringWriter();
+        new AdviceConsoleWriter(false, new PrintWriter(sw, true)).write(report);
+        String output = sw.toString();
+
+        assertTrue(output.contains("RULES:"), "should print RULES header");
+        assertTrue(output.contains("FILE: MMOverusedWord"),
+                "file rule should be printed without parenthetical");
+        assertFalse(output.contains("MMOverusedWord(L"),
+                "should not include line number when zero");
+    }
+
+    @Test
+    @DisplayName("printRuleSummary deduplicates line rules on same line")
+    void printRuleSummary_deduplicatesLineRules() {
+        AdviceTextLoader loader = AdviceTextLoader.loadFromResource(AdviceReportManager.ADVICE_TEXT_RESOURCE);
+        AdviceText text = loader.textFor(AdviceId.MMAssertionMessageMissing);
+        List<AdviceOccurrence> occs = Arrays.asList(
+                new AdviceOccurrence(10, AdviceSource.ASSERTION, "a", null, null, null),
+                new AdviceOccurrence(10, AdviceSource.ASSERTION, "b", null, null, null));
+        AdviceGroup lineGroup = new AdviceGroup(AdviceId.MMAssertionMessageMissing, text, 1, occs);
+        FileReport report = new FileReport("Test.java",
+                Collections.emptyList(),
+                Collections.singletonList(lineGroup),
+                Collections.emptyMap(),
+                Collections.emptyList());
+
+        StringWriter sw = new StringWriter();
+        new AdviceConsoleWriter(false, new PrintWriter(sw, true)).write(report);
+        String output = sw.toString();
+
+        assertTrue(output.contains("L10: MMAssertionMessageMissing"),
+                "should print deduplicated rule for line");
     }
 }

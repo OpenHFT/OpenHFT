@@ -30,11 +30,11 @@ public final class AdviceCollector {
 
     public Map<Integer, List<CandidateAdvice>> candidatesForFile(String file) {
         Map<Integer, List<CandidateAdvice>> result = byFile.get(file);
-        return result == null ? java.util.Collections.emptyMap() : result;
+        return result == null ? java.util.Collections.emptyMap() : java.util.Collections.unmodifiableMap(result);
     }
 
     public Map<String, Map<Integer, List<CandidateAdvice>>> allCandidates() {
-        return byFile;
+        return java.util.Collections.unmodifiableMap(byFile);
     }
 
     public void recordFileAdvice(String file, FileAdviceDetails details) {

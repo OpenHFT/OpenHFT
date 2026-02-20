@@ -9,6 +9,8 @@ import net.openhft.quality.mm.MeaningfulMessageProcessor;
 import net.openhft.quality.mm.RuleId;
 
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Checkstyle check that enforces unique and meaningful messages in assertions,
@@ -30,6 +32,7 @@ import java.util.Objects;
  * </pre>
  */
 public class MeaningfulMessageCheck extends AbstractCheck {
+    private static final Logger LOG = Logger.getLogger(MeaningfulMessageCheck.class.getName());
     private final MeaningfulMessageProcessor processor;
     private boolean verbose;
     private boolean dryRun;
@@ -212,11 +215,8 @@ public class MeaningfulMessageCheck extends AbstractCheck {
     }
 
     void logUnexpected(DetailAST ast, RuntimeException exception) {
-        String message = exception.getClass().getSimpleName();
-        String detail = exception.getMessage();
-        if (detail != null && !detail.isEmpty()) {
-            message = message + ": " + detail;
-        }
+        LOG.log(Level.SEVERE, "Unexpected exception in MeaningfulMessageCheck", exception);
+        String message = exception.toString();
         int lineNo = ast == null ? 0 : ast.getLineNo();
         int resolvedLine = lineNo > 0 ? lineNo : 1;
         log(resolvedLine, RuleId.messageKey("assert.message.unexpected.exception", verbose), message);

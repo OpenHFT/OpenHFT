@@ -5,11 +5,13 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <!-- Quality module's own checkstyle implementations follow checkstyle conventions -->
-    <suppress checks=".*"
+    <!-- Quality module: suppress its own MeaningfulMessage check because the quality module's own
+         source contains many example/internal strings that would produce circular violations.
+         VariableDeclarationUsageDistance is also suppressed because the processor has inherent
+         long-distance variables for legitimate reasons. Checkstyle matches on file paths so the
+         file-path regex below is sufficient; a dot-notation backup is not needed. -->
+    <suppress checks="MeaningfulMessage|VariableDeclarationUsageDistance"
               files=".*[\\/]net[\\/]openhft[\\/]quality[\\/](mm[\\/].*|MeaningfulMessageCheck\\.java|MeaningfulMessageCheckTest\\.java|QualityCheckstyleSelfTest\\.java|package-info\\.java)"/>
-    <suppress checks=".*"
-              files=".*net\\.openhft\\.quality\\.(mm\\..*|MeaningfulMessageCheck|MeaningfulMessageCheckTest|QualityCheckstyleSelfTest|package-info).*"/>
 
     <!-- Chronicle-Core backward-compatibility shims -->
     <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]core[\\/]pool[\\/]ClassAliasPool\\.java"/>

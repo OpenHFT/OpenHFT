@@ -22,7 +22,7 @@ public final class AdviceGroup {
         this.adviceId = requireNonNull(adviceId, "adviceId");
         this.adviceText = requireNonNull(adviceText, "adviceText");
         this.rank = rank;
-        this.occurrences = Collections.unmodifiableList(occurrences);
+        this.occurrences = Collections.unmodifiableList(new java.util.ArrayList<>(occurrences));
     }
 
     public AdviceId adviceId() {

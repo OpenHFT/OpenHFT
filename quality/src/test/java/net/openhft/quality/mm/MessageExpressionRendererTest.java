@@ -338,6 +338,66 @@ class MessageExpressionRendererTest {
         assertEquals("ARRAY_INIT", rendered, "unknown token should use getText()");
     }
 
+    @Test
+    @DisplayName("render handles typecast without TYPE node uses expression only")
+    void render_handlesTypecastWithoutTypeNode() {
+        DetailAstImpl typecast = new DetailAstImpl();
+        typecast.setType(TokenTypes.TYPECAST);
+        typecast.setText("(");
+        // No TYPE child, just expression child
+        typecast.addChild(createIdent("obj"));
+
+        DetailAstImpl expr = createExpr(typecast);
+        String rendered = MessageExpressionRenderer.render(expr, astSupport);
+        assertNotNull(rendered, "typecast without TYPE should still render expression");
+        assertEquals("obj", rendered, "typecast without TYPE should render child expression");
+    }
+
+    @Test
+    @DisplayName("render handles method call without ELIST omits parenthesised args")
+    void render_handlesMethodCallWithoutElist() {
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        methodCall.setText("(");
+        methodCall.addChild(createIdent("doSomething"));
+        // No ELIST added
+
+        DetailAstImpl expr = createExpr(methodCall);
+        String rendered = MessageExpressionRenderer.render(expr, astSupport);
+        assertNotNull(rendered, "method call without ELIST should still render");
+        assertEquals("doSomething()", rendered, "method call without ELIST should render name and empty parens");
+    }
+
+    @Test
+    @DisplayName("render handles method call with null method name uses empty name")
+    void render_handlesMethodCallWithNullMethodName() {
+        // Method call where extractMethodName returns null (no IDENT child)
+        DetailAstImpl methodCall = new DetailAstImpl();
+        methodCall.setType(TokenTypes.METHOD_CALL);
+        methodCall.setText("(");
+        // Add ELIST but no IDENT
+        DetailAstImpl elist = new DetailAstImpl();
+        elist.setType(TokenTypes.ELIST);
+        methodCall.addChild(elist);
+
+        DetailAstImpl expr = createExpr(methodCall);
+        String rendered = MessageExpressionRenderer.render(expr, astSupport);
+        assertNotNull(rendered, "method call without name should still render");
+        assertEquals("()", rendered, "method call without name should render just parens");
+    }
+
+    @Test
+    @DisplayName("renderNode directly handles EXPR by delegating to child")
+    void renderNode_handlesExprByDelegatingToChild() {
+        // Test renderNode with EXPR token
+        DetailAstImpl exprNode = new DetailAstImpl();
+        exprNode.setType(TokenTypes.EXPR);
+        exprNode.addChild(createStringLiteral("inner"));
+
+        String rendered = MessageExpressionRenderer.renderNode(exprNode, astSupport);
+        assertEquals("\"inner\"", rendered, "EXPR token should delegate to first child");
+    }
+
     // Helper methods
 
     private DetailAstImpl createExpr(DetailAST child) {

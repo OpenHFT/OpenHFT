@@ -45,7 +45,7 @@ class MMLowSignalAssertAllHeadingTest {
 
         assertTrue(state.shouldStopProcessing(),
                 "requestStopProcessing should be called when violation is recorded");
-        assertFalse(collector.pendingForTesting().isEmpty(),
+        assertFalse(collector.pendingForTest().isEmpty(),
                 "violation should be recorded");
     }
 
@@ -68,7 +68,7 @@ class MMLowSignalAssertAllHeadingTest {
 
         assertFalse(state.shouldStopProcessing(),
                 "requestStopProcessing should NOT be called when violation is suppressed");
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "no violation should be recorded when suppressed");
     }
 
@@ -84,7 +84,7 @@ class MMLowSignalAssertAllHeadingTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "no violation should be recorded for non-assertAllHeading");
         assertFalse(state.shouldStopProcessing(),
                 "stop processing should not be requested");
@@ -102,7 +102,7 @@ class MMLowSignalAssertAllHeadingTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "no violation should be recorded for null message");
     }
 
@@ -118,7 +118,7 @@ class MMLowSignalAssertAllHeadingTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "no violation should be recorded for meaningful message");
     }
 
@@ -138,7 +138,7 @@ class MMLowSignalAssertAllHeadingTest {
 
             rule.evaluate(context, collector, state);
 
-            assertFalse(collector.pendingForTesting().isEmpty(),
+            assertFalse(collector.pendingForTest().isEmpty(),
                     "violation should be recorded for low-signal pattern: " + pattern);
             assertTrue(state.shouldStopProcessing(),
                     "stop processing should be requested for: " + pattern);
@@ -177,7 +177,7 @@ class MMLowSignalAssertAllHeadingTest {
 
             rule.evaluate(context, collector, state);
 
-            assertTrue(collector.pendingForTesting().isEmpty(),
+            assertTrue(collector.pendingForTest().isEmpty(),
                     "no violation should be recorded for source: " + source);
         }
     }

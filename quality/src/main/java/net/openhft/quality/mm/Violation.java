@@ -52,4 +52,12 @@ public final class Violation {
     public Object[] args() {
         return args == null ? null : Arrays.copyOf(args, args.length);
     }
+
+    @Override
+    public String toString() {
+        return "Violation{lineNo=" + lineNo
+                + ", ruleId=" + ruleId
+                + ", args=" + Arrays.toString(args)
+                + '}';
+    }
 }
