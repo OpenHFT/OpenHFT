@@ -1,0 +1,128 @@
+rule_id	rule_code	message_key	call_site	scope	candidate_flags	rule_class
+MISSING_MESSAGE	MMMissingMessage	assert.message.missing.message	ASSERTION	message	missingMessage,missingMessageKind	MMMissingMessage.java
+MISSING_MESSAGE	MMMissingMessage	assert.message.missing.message	THROW	message	missingMessage,missingMessageKind	MMMissingMessage.java
+MISSING_MESSAGE	MMMissingMessage	assert.message.missing.message	ANNOTATION	message	missingMessage,missingMessageKind	MMMissingMessage.java
+MISSING_MESSAGE	MMMissingMessage	assert.message.missing.message	LOG	message	missingMessage,missingMessageKind	MMMissingMessage.java
+MISSING_MESSAGE	MMMissingMessage	assert.message.missing.message	COMMENT	message	missingMessage,missingMessageKind	MMMissingMessage.java
+THROW_NULL	MMThrowNull	assert.message.throw.null	THROW	message	throwNull	MMThrowNull.java
+ASSERTJ_OVERRIDE	MMAssertJGenericOverride	assert.message.assertj.override	ASSERTION	message	assertJOverride	MMAssertJGenericOverride.java
+ASSERTALL_HEADING	MMLowSignalAssertAllHeading	assert.message.assertall.heading	ASSERTION	message	assertAllHeading	MMLowSignalAssertAllHeading.java
+MISSING_LOOP_INDEX	MMMissingLoopIndex	assert.message.missing.loop.index	ASSERTION	message	loopNames,missingLoopIndex	MMMissingLoopIndex.java
+RESTATES_DERIVED	MMRestatesDerivedAssertion	assert.message.restates.derived	ASSERTION	message		MMRestatesDerivedAssertion.java
+RESTATES_DERIVED	MMRestatesDerivedAssertion	assert.message.restates.derived	PRECONDITION	message		MMRestatesDerivedAssertion.java
+RESTATES_DERIVED	MMRestatesDerivedAssertion	assert.message.restates.derived	THROW	message		MMRestatesDerivedAssertion.java
+RESTATES_DERIVED	MMRestatesDerivedAssertion	assert.message.restates.derived	ANNOTATION	message		MMRestatesDerivedAssertion.java
+CONTEXTLESS	MMContextless	assert.message.contextless	ASSERTION	message		MMContextless.java
+CONTEXTLESS	MMContextless	assert.message.contextless	PRECONDITION	message		MMContextless.java
+CONTEXTLESS	MMContextless	assert.message.contextless	THROW	message		MMContextless.java
+CONTEXTLESS	MMContextless	assert.message.contextless	ANNOTATION	message		MMContextless.java
+CONTEXTLESS	MMContextless	assert.message.contextless	LOG	message		MMContextless.java
+INDEX_ONLY	MMIndexOnly	assert.message.index.only	ASSERTION	message		MMIndexOnly.java
+INDEX_ONLY	MMIndexOnly	assert.message.index.only	PRECONDITION	message		MMIndexOnly.java
+INDEX_ONLY	MMIndexOnly	assert.message.index.only	THROW	message		MMIndexOnly.java
+INDEX_ONLY	MMIndexOnly	assert.message.index.only	ANNOTATION	message		MMIndexOnly.java
+INDEX_ONLY	MMIndexOnly	assert.message.index.only	LOG	message		MMIndexOnly.java
+LONG_WORD	MMLongWord	assert.message.long.word	ASSERTION	message		MMLongWord.java
+LONG_WORD	MMLongWord	assert.message.long.word	PRECONDITION	message		MMLongWord.java
+LONG_WORD	MMLongWord	assert.message.long.word	THROW	message		MMLongWord.java
+LONG_WORD	MMLongWord	assert.message.long.word	ANNOTATION	message		MMLongWord.java
+LONG_WORD	MMLongWord	assert.message.long.word	LOG	message		MMLongWord.java
+LONG_WORD	MMLongWord	assert.message.long.word	JAVADOC_CLASS	message		MMLongWord.java
+LONG_WORD	MMLongWord	assert.message.long.word	JAVADOC_MEMBER	message		MMLongWord.java
+TOO_LONG	MMTooLong	assert.message.too.long	ASSERTION	message		MMTooLong.java
+TOO_LONG	MMTooLong	assert.message.too.long	PRECONDITION	message		MMTooLong.java
+TOO_LONG	MMTooLong	assert.message.too.long	THROW	message		MMTooLong.java
+TOO_LONG	MMTooLong	assert.message.too.long	ANNOTATION	message		MMTooLong.java
+TOO_LONG	MMTooLong	assert.message.too.long	LOG	message		MMTooLong.java
+TRIVIAL_SUPPLIER	MMTrivialSupplier	assert.message.trivial.supplier	ASSERTION	message	trivialSupplierDescription	MMTrivialSupplier.java
+TRIVIAL_SUPPLIER	MMTrivialSupplier	assert.message.trivial.supplier	PRECONDITION	message	trivialSupplierDescription	MMTrivialSupplier.java
+TRIVIAL_SUPPLIER	MMTrivialSupplier	assert.message.trivial.supplier	LOG	message	trivialSupplierDescription	MMTrivialSupplier.java
+GENERIC	MMGenericMessage	assert.message.generic	ASSERTION	message	argumentNameMessage	MMGenericMessage.java
+GENERIC	MMGenericMessage	assert.message.generic	PRECONDITION	message	argumentNameMessage	MMGenericMessage.java
+GENERIC	MMGenericMessage	assert.message.generic	THROW	message	argumentNameMessage	MMGenericMessage.java
+GENERIC	MMGenericMessage	assert.message.generic	ANNOTATION	message	argumentNameMessage	MMGenericMessage.java
+GENERIC	MMGenericMessage	assert.message.generic	LOG	message	argumentNameMessage	MMGenericMessage.java
+REDUNDANT_CLASS	MMRedundantClassName	assert.message.redundant.class	ASSERTION	message		MMRedundantClassName.java
+REDUNDANT_CLASS	MMRedundantClassName	assert.message.redundant.class	JAVADOC_CLASS	message		MMRedundantClassName.java
+RESTATES_ASSERTION	MMRestatesAssertion	assert.message.restates.assertion	ASSERTION	message		MMRestatesAssertion.java
+RESTATES_ASSERTION	MMRestatesAssertion	assert.message.restates.assertion	PRECONDITION	message		MMRestatesAssertion.java
+RESTATES_ASSERTION	MMRestatesAssertion	assert.message.restates.assertion	THROW	message		MMRestatesAssertion.java
+RESTATES_ASSERTION	MMRestatesAssertion	assert.message.restates.assertion	ANNOTATION	message		MMRestatesAssertion.java
+WHITESPACE_RUN	MMWhitespaceRun	assert.message.whitespace.run	ASSERTION	message		MMWhitespaceRun.java
+WHITESPACE_RUN	MMWhitespaceRun	assert.message.whitespace.run	PRECONDITION	message		MMWhitespaceRun.java
+WHITESPACE_RUN	MMWhitespaceRun	assert.message.whitespace.run	THROW	message		MMWhitespaceRun.java
+WHITESPACE_RUN	MMWhitespaceRun	assert.message.whitespace.run	ANNOTATION	message		MMWhitespaceRun.java
+WHITESPACE_RUN	MMWhitespaceRun	assert.message.whitespace.run	LOG	message		MMWhitespaceRun.java
+MISSING_STRING_VALUE	MMMissingStringSearchValue	assert.message.missing.string.value	ASSERTION	message	constantMessage,stringSearchArg,stringSearchMethod,stringSearchTarget	MMMissingStringSearchValue.java
+REDUNDANT_LINE	MMRedundantLineNumber	assert.message.redundant.line	ASSERTION	message		MMRedundantLineNumber.java
+REDUNDANT_LINE	MMRedundantLineNumber	assert.message.redundant.line	PRECONDITION	message		MMRedundantLineNumber.java
+REDUNDANT_LINE	MMRedundantLineNumber	assert.message.redundant.line	THROW	message		MMRedundantLineNumber.java
+REDUNDANT_LINE	MMRedundantLineNumber	assert.message.redundant.line	ANNOTATION	message		MMRedundantLineNumber.java
+REDUNDANT_LINE	MMRedundantLineNumber	assert.message.redundant.line	LOG	message		MMRedundantLineNumber.java
+DUPLICATES_INPUT	MMDuplicatesInput	assert.message.duplicates.input	ASSERTION	message	inputValues	MMDuplicatesInput.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	ASSERTION	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	PRECONDITION	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	THROW	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	ANNOTATION	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	LOG	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	COMMENT	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	JAVADOC_CLASS	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+TOO_FEW_MEANINGFUL	MMTooFewMeaningfulWords	assert.message.too.few.meaningful	JAVADOC_MEMBER	message	argumentNameMessage,missingMessageKind	MMTooFewMeaningfulWords.java
+MISSING_COMPARISON_VALUES	MMMissingComparisonValues	assert.message.missing.comparison.values	ASSERTION	message	comparisonLeftOperand,comparisonOperator,comparisonRightOperand,constantMessage	MMMissingComparisonValues.java
+REDUNDANT_METHOD	MMRedundantMethodName	assert.message.redundant.method	ASSERTION	message		MMRedundantMethodName.java
+REDUNDANT_METHOD	MMRedundantMethodName	assert.message.redundant.method	JAVADOC_MEMBER	message		MMRedundantMethodName.java
+MISSING_SUBJECT	MMMissingSubject	assert.message.missing.subject	ASSERTION	message		MMMissingSubject.java
+MISSING_SUBJECT	MMMissingSubject	assert.message.missing.subject	LOG	message		MMMissingSubject.java
+MISSING_SUBJECT	MMMissingSubject	assert.message.missing.subject	COMMENT	message		MMMissingSubject.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	ASSERTION	message	argumentNameMessage	MMDuplicate.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	PRECONDITION	message	argumentNameMessage	MMDuplicate.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	THROW	message	argumentNameMessage	MMDuplicate.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	ANNOTATION	message	argumentNameMessage	MMDuplicate.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	LOG	message	argumentNameMessage	MMDuplicate.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	COMMENT	message	argumentNameMessage	MMDuplicate.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	JAVADOC_CLASS	message	argumentNameMessage	MMDuplicate.java
+DUPLICATE	MMDuplicate	assert.message.duplicate	JAVADOC_MEMBER	message	argumentNameMessage	MMDuplicate.java
+TOO_SHORT	MMTooShort	assert.message.too.short	ASSERTION	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+TOO_SHORT	MMTooShort	assert.message.too.short	PRECONDITION	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+TOO_SHORT	MMTooShort	assert.message.too.short	THROW	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+TOO_SHORT	MMTooShort	assert.message.too.short	ANNOTATION	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+TOO_SHORT	MMTooShort	assert.message.too.short	LOG	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+TOO_SHORT	MMTooShort	assert.message.too.short	COMMENT	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+TOO_SHORT	MMTooShort	assert.message.too.short	JAVADOC_CLASS	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+TOO_SHORT	MMTooShort	assert.message.too.short	JAVADOC_MEMBER	message	argumentNameMessage,missingMessageKind	MMTooShort.java
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	ASSERTION	file		
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	PRECONDITION	file		
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	THROW	file		
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	ANNOTATION	file		
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	LOG	file		
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	COMMENT	file		
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	JAVADOC_CLASS	file		
+OVERUSED_WORD	MMOverusedWord	assert.message.overused.word	JAVADOC_MEMBER	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	ASSERTION	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	PRECONDITION	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	THROW	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	ANNOTATION	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	LOG	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	COMMENT	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	JAVADOC_CLASS	file		
+LACKS_PURPOSE	MMLacksPurpose	assert.message.lacks.purpose	JAVADOC_MEMBER	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	ASSERTION	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	PRECONDITION	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	THROW	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	ANNOTATION	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	LOG	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	COMMENT	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	JAVADOC_CLASS	file		
+LOW_ENTROPY	MMLowEntropy	assert.message.low.entropy	JAVADOC_MEMBER	file		
+MISSING_DISPLAY_NAME	MMDisplayName	assert.message.missing.display.name	ANNOTATION	message		
+TEST_ANNOTATION_ORDER	MMTestAnnotationOrder	assert.message.test.annotation.order	ANNOTATION	message		
+JUNIT4_ANNOTATION	MMJUnit4Annotation	assert.message.junit4.annotation	ANNOTATION	message		
+JUNIT4_ASSERTION	MMJUnit4Assertion	assert.message.junit4.assertion	ASSERTION	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	ASSERTION	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	PRECONDITION	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	THROW	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	ANNOTATION	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	LOG	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	COMMENT	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	JAVADOC_CLASS	message		
+UNHANDLED	MMUnhandled	assert.message.unhandled	JAVADOC_MEMBER	message		

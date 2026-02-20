@@ -1,0 +1,424 @@
+= MeaningfulMessageCheck Developer Guide
+:toc:
+:toclevels: 3
+
+== Architecture Overview
+
+The MeaningfulMessageCheck system enforces high-quality, informative messages in assertions, exceptions, logs, annotations, and Javadoc.
+It follows a pipeline architecture:
+
+[source]
+----
+AST Tokens
+    v
+[Extractors] -> MessageCandidate -> [RuleEngine] -> ViolationCollector
+    v
+AdviceCandidateEmitter -> AdviceCollector -> AdviceReportBuilder
+    v
+MeaningfulMessageProcessor (coordinator)
+    v
+Checkstyle violation output (standard rules)
+    v
+Aggregated advice output (console / JSONL)
+----
+
+=== Core Components
+
+[cols="1,3"]
+|===
+| Component | Responsibility
+
+| `MeaningfulMessageCheck`
+| Checkstyle `AbstractCheck` entry point. Configures processor and delegates token handling.
+
+| `MeaningfulMessageProcessor`
+| Per-file coordinator. Manages extractors, routes tokens, collects violations.
+
+| `AbstractMessageExtractor`
+| Base class for extractors. Provides `context()`, `sink()`, and `astSupport()` accessors.
+
+| `MessageCandidate`
+| Immutable description of an extracted message with metadata (source, line, placeholders, etc.).
+
+| `RuleEngine`
+| Evaluates candidates against all configured rules in priority order.
+
+| `AbstractMessageRule`
+| Base class for rules. Provides `requireMetrics()`, `record()`, and `recordWarning()` helpers.
+
+| `ViolationCollector`
+| Collects violations per line, keeping highest priority (lowest number wins).
+
+| `AdviceCollector`
+| Stores advice candidates and file-level advice per file and line.
+
+| `AdviceReportBuilder`
+| Aggregates candidates into per-file advice groups and selects the rarest advice per line.
+
+| `AdviceReportManager`
+| Coordinates console/JSONL output and rank generation across a run.
+|===
+
+=== Advice-First Reporting
+
+Advice-first reporting produces aggregated guidance that is separate from standard Checkstyle violations.
+It uses stable AdviceIds (user-facing) and internal RuleIds (detector-facing).
+
+* AdviceId drives suppression in the aggregated report.
+* RuleId remains for diagnostics and legacy suppression.
+* AdviceSource identifies the call-site category (including annotation subtypes).
+
+Advice text is loaded from:
+
+* `quality/src/main/resources/net/openhft/quality/mm-advice.properties`
+
+Advice ranks are loaded from:
+
+* `quality/src/main/resources/net/openhft/quality/mm-advice-ranks.properties`
+
+Lower rank values are rarer and are preferred when multiple AdviceIds fire on the same line.
+Unknown AdviceIds resolve to rank -1 (treated as rarest).
+See link:meaningful-message-jsonl.adoc[Meaningful Message JSONL Schema] for the JSONL output contract.
+
+Rank generation in dry-run counts each AdviceId once per line (deduped by line), then orders by frequency.
+
+=== Glossary
+
+AdviceId::
+Stable, user-facing identifier for aggregated advice and suppression.
+
+RuleId::
+Internal detector identifier used for rule logic and verbose diagnostics.
+
+AdviceSource::
+Call-site category used to select the correct AdviceId (includes annotation subtypes).
+
+=== Suppression Behaviour
+
+Suppression tokens still accept `@SuppressWarnings("MM-all")`, `MeaningfulMessage`, and legacy RuleId codes.
+Comment toggles `// <token>:OFF` and `// <token>:ON` (or `#` for hash-commented files) are supported.
+The check also supports an `excludePaths` property for path fragments, globs, or `regex:` patterns to skip files entirely.
+AdviceId suppressions affect only the aggregated report.
+Standard Checkstyle violations continue to follow Checkstyle's usual suppression rules.
+
+=== Message Flow
+
+1. **Token dispatch**: `MeaningfulMessageProcessor` receives AST tokens and dispatches to appropriate extractor
+2. **Extraction**: Extractor builds `MessageCandidate` with message text, source type, and metadata
+3. **Candidate emission**: Extractor calls `sink().emitCandidate(candidate)` or `sink().emitMissingMessage()`
+4. **Metrics calculation**: Processor computes `MessageMetrics` (word counts, meaningful words, long words)
+5. **Rule evaluation**: `RuleEngine` iterates rules by priority, each rule checks applicability and fires violations
+6. **Violation collection**: `ViolationCollector` de-duplicates, keeping highest priority per line
+7. **Advice aggregation**: `AdviceCandidateEmitter` records AdviceIds for the aggregated report
+8. **Reporting**: Violations logged via Checkstyle API, aggregated advice printed per file
+
+== How to Add a New Rule
+
+=== Step 1: Create the Rule Class
+
+Create a new class in `net.openhft.quality.mm` extending `AbstractMessageRule`:
+
+[source,java,opts=novalidate]
+----
+package net.openhft.quality.mm;
+
+/**
+ * Flags messages that contain [describe the problem].
+ */
+public final class MMYourRuleName extends AbstractMessageRule {
+
+    /**
+     * Create the rule instance.
+     */
+    public MMYourRuleName() {
+        super(RuleId.YOUR_RULE);
+    }
+
+    @Override
+    protected void doEvaluate(MessageContext context, ViolationCollector collector,
+                              RuleEvaluationState state) {
+        // For rules that need metrics:
+        MessageMetrics metrics = requireMetrics(context, state);
+        if (metrics == null) {
+            return;
+        }
+
+        // Your rule logic here
+        MessageCandidate candidate = context.candidate();
+        String message = candidate.message();
+
+        if (/* violation condition */) {
+            record(context, collector, /* message args for messages.properties */);
+        }
+    }
+}
+----
+
+=== Step 2: Add Entry to RuleId Enum
+
+Edit `RuleId.java` to add your rule:
+
+[source,java,opts=novalidate]
+----
+public enum RuleId {
+    // ... existing rules ...
+
+    /** Your rule description. */
+    YOUR_RULE("assert.message.your.key", "MMYourRule", 15, MessageSource.ASSERTION, MessageSource.THROW),
+
+    // ...
+}
+----
+
+Parameters:
+- `messageKey`: Verbose key in `messages.properties` (add a matching `.intent` entry for intent-first output)
+- `code`: Short code for `@SuppressWarnings` (e.g., `MMYourRule`)
+- `priority`: Lower = higher priority (evaluated earlier, wins conflicts).
+Use 10-20 for most rules.
+- `sources`: Which `MessageSource` types this rule applies to
+
+=== Step 3: Add AdviceId Mapping
+
+Add a new AdviceId entry in `AdviceId` with the rule and advice source mapping.
+AdviceId names are stable (do not rename once shipped).
+
+=== Step 4: Add Message to messages.properties
+
+Edit `src/main/resources/net/openhft/quality/messages.properties`:
+
+[source,properties]
+----
+assert.message.your.key.intent = [MMYourRule] Intent-first message text.
+assert.message.your.key = [MMYourRule] Problem description. Why: {0}. Fix: Suggested action. Ref: your-rule-anchor
+----
+
+Placeholders `\{0}`, `\{1}`, etc. correspond to arguments passed to `record()`.
+
+=== Step 5: Add Advice Text
+
+Add the required keys for the AdviceId to `mm-advice.properties`:
+
+* `title`
+* `intent_intro`
+* `intent_outro`
+* `hint_a`
+* `hint_b`
+* `checklist`
+* `anti_patterns`
+* `verbose`
+
+Intent and hint pairs must differ unless you add an explicit allow flag for the advice id.
+
+=== Step 6: Update Ranks
+
+Add the AdviceId to `mm-advice-ranks.properties` or regenerate ranks via `--dry-run`.
+Lower rank values are rarer and are selected first when multiple AdviceIds fire.
+
+=== Step 7: Add Test Input and Test Method
+
+Create test input file `src/test/resources/net/openhft/quality/InputYourRule.java`:
+
+[source,java]
+----
+package net.openhft.quality;
+
+public class InputYourRule {
+    void triggerViolation() {
+        // Code that triggers your rule violation
+        assert condition : "message that violates rule"; // violation
+    }
+
+    void noViolation() {
+        // Code that should NOT trigger your rule
+        assert condition : "message that passes rule";
+    }
+}
+----
+
+Add test method in `MeaningfulMessageCheckTest.java`:
+
+[source,java]
+----
+@Test
+public void testYourRule() throws Exception {
+    final DefaultConfiguration checkConfig =
+            createModuleConfig(MeaningfulMessageCheck.class);
+
+    final String[] expected = {
+        "7: " + getCheckMessage(RuleId.YOUR_RULE.messageKey(false), "arg0"),
+    };
+
+    verify(checkConfig, getPath("InputYourRule.java"), expected);
+}
+----
+
+=== Step 8: Document in message-quality-guide.adoc
+
+Add documentation for your rule in `src/main/docs/message-quality-guide.adoc`.
+
+=== CLI Usage
+
+The standalone CLI supports:
+
+* `--verbose` for diagnostics
+* `--dry-run` to generate rank files
+* `--jsonl <path>` to emit JSONL output
+* `--rank-out <path>` to control rank output location
+
+=== Checkstyle Properties
+
+`MeaningfulMessageCheck` supports:
+
+* `verbose` (boolean)
+* `dryRun` (boolean)
+* `jsonl` (path)
+* `rankOut` (path)
+* `warnLegacySuppressions` (boolean)
+
+=== Operational Notes
+
+Error handling::
+Missing advice keys or malformed rank files are treated as configuration errors and fail fast.
+Rank files are required outside dry-run.
+
+Performance::
+Advice aggregation buffers per file and writes console/JSONL output on file completion.
+Keep advice text concise to avoid large console output on wide scans.
+
+JSONL versioning::
+`schema_version` increases only for breaking changes. Additive fields may appear without a bump.
+
+Rollback::
+To disable aggregated advice output, remove `MeaningfulMessageCheck` from the Checkstyle configuration
+or run without the CLI. This leaves standard Checkstyle violations unchanged.
+
+== How to Add a New Extractor
+
+=== Step 1: Create the Extractor Class
+
+Create a new class extending `AbstractMessageExtractor`:
+
+[source,java]
+----
+package net.openhft.quality.mm;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+
+/**
+ * Extracts message candidates from [describe source].
+ */
+public final class YourMessageExtractor extends AbstractMessageExtractor {
+
+    /**
+     * Create an extractor for [source] messages.
+     *
+     * @param context extraction context with imports and type information.
+     * @param sink sink to receive message candidates.
+     */
+    public YourMessageExtractor(MessageExtractionContext context, MessageCandidateSink sink) {
+        super(context, sink);
+    }
+
+    /**
+     * Handle a [describe token type].
+     *
+     * @param ast AST node for the element.
+     */
+    public void handleYourToken(DetailAST ast) {
+        // Use context() for extraction context
+        // Use astSupport() for AST utilities
+        // Use sink().emitCandidate() or sink().emitMissingMessage()
+
+        String message = extractMessage(ast);
+        if (message == null) {
+            sink().emitMissingMessage(ast.getLineNo(), MessageSource.YOUR_SOURCE);
+            return;
+        }
+
+        MessageCandidate candidate = new MessageCandidate.Builder()
+                .source(MessageSource.YOUR_SOURCE)
+                .lineNo(ast.getLineNo())
+                .message(message)
+                .normalisedMessage(MessageNormaliser.normalise(message))
+                .placeholderCount(0)
+                .keyValueLabelCount(0)
+                .build();
+        sink().emitCandidate(candidate);
+    }
+}
+----
+
+=== Step 2: Add MessageSource Entry (if needed)
+
+If you're extracting from a new source type, add it to `MessageSource.java`:
+
+[source,java,opts=novalidate]
+----
+public enum MessageSource {
+    // ... existing sources ...
+
+    /** Your source description. */
+    YOUR_SOURCE(4, 2),  // minWordCount, minMeaningfulWordCount
+
+    // ...
+}
+----
+
+=== Step 3: Register in MeaningfulMessageProcessor
+
+Edit `MeaningfulMessageProcessor.java` to:
+
+1. Add field for your extractor
+2. Instantiate in constructor
+3. Add token types to `getDefaultTokens()` and `getAcceptableTokens()`
+4. Add dispatch logic in `visitToken()`
+
+== Design Decisions
+
+Key architectural decisions are documented in `decision-log.adoc`.
+Notable choices:
+
+- **Priority-based conflict resolution**: When multiple rules match, lowest priority number wins
+- **Per-line deduplication**: Only one violation per line to avoid noise
+- **Flexible suppression**: `@SuppressWarnings`, comment toggles (`// AdviceId:OFF` / `// AdviceId:ON`), and Checkstyle `CHECKSTYLE:OFF` all supported
+- **Source-specific thresholds**: Different word count minimums per source type (assertions need more than throws)
+
+== Useful Helper Methods
+
+=== In AbstractMessageRule
+
+[source,java,opts=novalidate]
+----
+// Get metrics only if no prior warning fired (returns null otherwise)
+MessageMetrics metrics = requireMetrics(context, state);
+
+// Record a violation
+record(context, collector, arg1, arg2);
+
+// Record and mark warning fired
+recordWarning(context, collector, state, arg1, arg2);
+----
+
+=== In AbstractMessageExtractor
+
+[source,java,opts=novalidate]
+----
+// Access extraction context
+context().templateExtractor();
+context().getVariableType(name);
+context().resolveTypeName(typeName);
+
+// Access AST utilities
+astSupport().extractMethodName(methodCall);
+astSupport().collectArguments(elist);
+astSupport().unwrapExpr(expr);
+
+// Emit candidates
+sink().emitCandidate(candidate);
+sink().emitMissingMessage(lineNo, source);
+----
+
+=== In MessageAstSupport
+
+Commonly used methods:
+- `extractMethodName(DetailAST methodCall)` - Get method name from call - `collectArguments(DetailAST elist)` - Get list of argument expressions - `unwrapExpr(DetailAST expr)` - Remove EXPR wrapper - `isNullLiteral(DetailAST expr)` - Check for null - `findLambda(DetailAST expr)` - Find lambda in expression - `extractTypeName(DetailAST type)` - Get type name from TYPE node
