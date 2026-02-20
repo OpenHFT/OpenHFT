@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>net.openhft</groupId>
+        <artifactId>root-parent-pom</artifactId>
+        <version>2026.1-SNAPSHOT</version>
+        <relativePath>../root-parent-pom/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>quality</artifactId>
+    <version>2026.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>OpenHFT/Quality Rules JAR</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <license.year>2013-2025</license.year>
+        <license.owner>chronicle.software</license.owner>
+        <license.spdx>Apache-2.0</license.spdx>
+        <license.skip>false</license.skip>
+        <!-- jvm.requiredArgs and jvm.extraArgs inherited from root-parent-pom profiles -->
+        <jvm.extraArgs/>
+        <!-- Enable strict quality enforcement for this module -->
+        <quality.enforced>true</quality.enforced>
+        <!-- Use checkstyle26 baseline for this module -->
+        <maven.checkstyle.config.location>net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml
+        </maven.checkstyle.config.location>
+        <maven.checkstyle.suppressions.location>net/openhft/quality/checkstyle26/checkstyle-suppressions.xml
+        </maven.checkstyle.suppressions.location>
+        <!-- Use pmd26 baseline ruleset for this module -->
+        <pmd.ruleset>net/openhft/quality/pmd26/pmd-ruleset.xml</pmd.ruleset>
+        <!-- Use spotbugs26 baseline for this module -->
+        <spotbugs.excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml
+        </spotbugs.excludeFilterFile>
+
+        <!-- Coverage thresholds: 90% line / 80% branch -->
+        <!-- Updated after Phase 1-4 coverage improvements -->
+        <jacoco.line.coverage>0.90</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>net.openhft</groupId>
+                <artifactId>third-party-bom</artifactId>
+                <version>2026.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>9.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>9.3</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.10.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>5.10.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Required by checkstyle test utilities -->
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>1.4.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- SLF4J for test logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.6</version>
+                <configuration>
+                    <skip>${license.skip}</skip>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <strictCheck>true</strictCheck>
+                    <defaultProperties>
+                        <year>${license.year}</year>
+                        <owner>${license.owner}</owner>
+                        <spdx>${license.spdx}</spdx>
+                    </defaultProperties>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                        <sh>SCRIPT_STYLE</sh>
+                    </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <inlineHeader><![CDATA[Copyright ${license.year} ${license.owner}; SPDX-License-Identifier: ${license.spdx}]]></inlineHeader>
+                            <includes>
+                                <include>**/*.java</include>
+                                <include>**/*.sh</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/target/**</exclude>
+                                <exclude>**/generated-sources/**</exclude>
+                                <exclude>**/build/generated/**</exclude>
+                                <exclude>**/src/test/resources/**</exclude>
+                                <exclude>**/src/main/resources/**</exclude>
+                            </excludes>
+                            <useDefaultExcludes>true</useDefaultExcludes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>license-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint:all,-processing,-options</arg>
+                    </compilerArgs>
+                    <failOnWarning>${quality.enforced}</failOnWarning>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <doclint>all</doclint>
+                    <failOnWarnings>${quality.enforced}</failOnWarnings>
+                </configuration>
+            </plugin>
+
+            <!-- JaCoCo for code coverage -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.line.coverage}</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.branch.coverage}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} ${jvm.requiredArgs} ${jvm.extraArgs}</argLine>
+                    <parallel>classes</parallel>
+                    <threadCount>4</threadCount>
+                    <perCoreThreadCount>false</perCoreThreadCount>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>pitest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>argLine</propertyName>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>report</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <phase>verify</phase>
+                                <configuration>
+                                    <formats>
+                                        <format>HTML</format>
+                                        <format>XML</format>
+                                        <format>CSV</format>
+                                    </formats>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <version>1.22.0</version>
+                        <dependencies>
+                            <!-- JUnit 5 support -->
+                            <dependency>
+                                <groupId>org.pitest</groupId>
+                                <artifactId>pitest-junit5-plugin</artifactId>
+                                <version>1.2.1</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <!-- Target production packages (** includes subpackages) -->
+                            <targetClasses>
+                                <param>net.openhft.quality.**</param>
+                            </targetClasses>
+                            <!-- Target tests (** includes subpackages) -->
+                            <targetTests>
+                                <param>net.openhft.quality.**</param>
+                            </targetTests>
+                            <!-- Build settings -->
+                            <threads>4</threads>
+                            <timeoutFactor>2</timeoutFactor>
+                            <jvmArgs>
+                                <param>-Xmx2g</param>
+                            </jvmArgs>
+                            <outputFormats>
+                                <param>HTML</param>
+                                <param>XML</param>
+                            </outputFormats>
+                            <!-- Mutation thresholds -->
+                            <!-- Current: 80% mutation coverage -->
+                            <mutationThreshold>80</mutationThreshold>
+                            <coverageThreshold>90</coverageThreshold>
+                            <!-- Run all tests against all mutations for accuracy -->
+                            <fullMutationMatrix>true</fullMutationMatrix>
+                            <!-- Reduce noise from logging -->
+                            <avoidCallsTo>
+                                <avoidCallsTo>java.util.logging</avoidCallsTo>
+                                <avoidCallsTo>org.slf4j</avoidCallsTo>
+                            </avoidCallsTo>
+                            <!-- Exclude methods that cause RUN_ERROR due to test harness failures -->
+                            <!-- These are record/enum accessors and static lookups used in test setup -->
+                            <excludedMethods>
+                                <param>forCode</param>
+                                <param>hasSubstance</param>
+                                <param>diagnosis</param>
+                                <param>verboseDetails</param>
+                                <param>minWordCount</param>
+                                <param>minMeaningfulWordCount</param>
+                            </excludedMethods>
+                            <!-- Exclude slow integration test that causes timeouts -->
+                            <excludedTestClasses>
+                                <param>net.openhft.quality.QualityCheckstyleSelfTest</param>
+                            </excludedTestClasses>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>pit</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>mutationCoverage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

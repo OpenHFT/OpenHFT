@@ -32,8 +32,8 @@
     <modules>
         <module>root-parent-pom</module>
         <module>third-party-bom</module>
+        <module>quality</module>
         <module>java-parent-pom</module>
-
         <module>chronicle-bom</module>
     </modules>
 
