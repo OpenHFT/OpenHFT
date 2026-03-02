@@ -107,6 +107,48 @@ class CommentMessageExtractorTest {
     }
 
     @Test
+    @DisplayName("Return null inside if with comment before guard emits candidate")
+    void returnNullInsideIfWithCommentBeforeGuardEmitsCandidate() throws Exception {
+        List<String> lines = Arrays.asList(
+                "// guard skips blank input since it cannot hold a candidate token",
+                "if (text.isEmpty()) {",
+                "    return null;",
+                "}");
+        FileContents contents = createFileContents("InputReturnGuard.java", lines);
+        contents.reportSingleLineComment(1, lines.get(0).indexOf("//"));
+        prepareContext(contents);
+
+        extractor.handleReturnStatement(createReturnNullInsideIf(2, 3));
+
+        assertEquals(1, sink.candidates.size(),
+                "Comment before the if guard should satisfy the return null requirement");
+        assertEquals("guard skips blank input since it cannot hold a candidate token",
+                sink.candidates.get(0).message(),
+                "Should use the comment text from before the enclosing guard");
+        assertTrue(sink.missingMessages.isEmpty(),
+                "Should not emit missing message when guard comment exists");
+    }
+
+    @Test
+    @DisplayName("Return null inside if without any comment emits missing message")
+    void returnNullInsideIfWithoutCommentEmitsMissingMessage() throws Exception {
+        List<String> lines = Arrays.asList(
+                "int x = 1;",
+                "if (text.isEmpty()) {",
+                "    return null;",
+                "}");
+        FileContents contents = createFileContents("InputReturnGuardMissing.java", lines);
+        prepareContext(contents);
+
+        extractor.handleReturnStatement(createReturnNullInsideIf(2, 3));
+
+        assertEquals(1, sink.missingMessages.size(),
+                "Should emit missing message when neither return nor guard has a comment");
+        assertEquals(3, sink.missingMessages.get(0).lineNo,
+                "Should report the violation on the return line");
+    }
+
+    @Test
     @DisplayName("Return null with prior and inline comments emits nothing")
     void returnNullWithMultipleCommentsEmitsNothing() throws Exception {
         List<String> lines = Arrays.asList("// first comment", "return null; // second comment");
@@ -528,6 +570,20 @@ class CommentMessageExtractorTest {
         Files.write(file, lines, StandardCharsets.UTF_8);
         FileText text = new FileText(file.toFile(), lines);
         return new FileContents(text);
+    }
+
+    private DetailAstImpl createReturnNullInsideIf(int ifLineNo, int returnLineNo) {
+        DetailAstImpl ifAst = new DetailAstImpl();
+        ifAst.setType(TokenTypes.LITERAL_IF);
+        ifAst.setLineNo(ifLineNo);
+
+        DetailAstImpl slist = new DetailAstImpl();
+        slist.setType(TokenTypes.SLIST);
+        ifAst.addChild(slist);
+
+        DetailAstImpl returnAst = createReturnNull(returnLineNo);
+        slist.addChild(returnAst);
+        return returnAst;
     }
 
     private DetailAstImpl createReturnNull(int lineNo) {

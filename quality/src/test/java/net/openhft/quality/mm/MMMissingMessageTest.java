@@ -181,7 +181,7 @@ class MMMissingMessageTest {
 
         Violation violation = collector.pendingForTesting().get(40);
         assertNotNull(violation, "Violation should be recorded for missing comment");
-        assertEquals("add a single-line comment on the line before explaining why returning null is required",
+        assertEquals("add a single-line comment before the return or before its enclosing guard explaining why returning null is required",
                 violation.args()[0], "Return-null fix guidance should match");
     }
 

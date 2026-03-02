@@ -31,8 +31,8 @@ public final class MMMissingMessage extends AbstractMessageRule {
             if (kind != null) {
                 switch (kind) {
                     case RETURN_NULL:
-                        return "add a single-line comment on the line before explaining why "
-                                + "returning null is required";
+                        return "add a single-line comment before the return or before its "
+                                + "enclosing guard explaining why returning null is required";
                     case SYSTEM_CALL:
                         return "add a single-line comment on the line before explaining why "
                                 + "java.lang.System is required here";

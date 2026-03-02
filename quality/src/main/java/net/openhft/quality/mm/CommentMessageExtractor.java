@@ -47,6 +47,10 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
     /**
      * Process {@code return} statements that return {@code null}.
      *
+     * <p>Comments are accepted either immediately before the {@code return null}
+     * or before the enclosing {@code if} guard, since the guard and return
+     * together form a single logical unit.</p>
+     *
      * @param returnAst AST node for the return statement.
      */
     public void handleReturnStatement(DetailAST returnAst) {
@@ -54,7 +58,29 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         if (expr == null || !astSupport().isNullLiteral(expr)) {
             return;
         }
-        requireReasonComment(returnAst.getLineNo(), MissingMessageKind.RETURN_NULL);
+        int returnLine = returnAst.getLineNo();
+        int guardLine = enclosingGuardLine(returnAst);
+        requireReasonCommentWithFallback(returnLine, guardLine, MissingMessageKind.RETURN_NULL);
+    }
+
+    /**
+     * Return the line number of an enclosing {@code if} guard, or {@code -1}.
+     */
+    private int enclosingGuardLine(DetailAST ast) {
+        DetailAST parent = ast.getParent();
+        if (parent == null) {
+            return -1;
+        }
+        if (parent.getType() == TokenTypes.LITERAL_IF) {
+            return parent.getLineNo();
+        }
+        if (parent.getType() == TokenTypes.SLIST) {
+            DetailAST grandparent = parent.getParent();
+            if (grandparent != null && grandparent.getType() == TokenTypes.LITERAL_IF) {
+                return grandparent.getLineNo();
+            }
+        }
+        return -1;
     }
 
     /**
@@ -198,10 +224,18 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
     }
 
     private void requireReasonComment(int lineNo, MissingMessageKind missingMessageKind) {
+        requireReasonCommentWithFallback(lineNo, -1, missingMessageKind);
+    }
+
+    private void requireReasonCommentWithFallback(int lineNo, int fallbackLine,
+                                                  MissingMessageKind missingMessageKind) {
         if (lineNo <= 0 || !processedLines.add(lineNo)) {
             return;
         }
         ReasonComment comment = findReasonComment(lineNo);
+        if (comment.isMissing() && fallbackLine > 0) {
+            comment = findReasonComment(fallbackLine);
+        }
         if (comment.isMissing()) {
             sink().emitMissingMessage(lineNo, MessageSource.COMMENT, missingMessageKind);
             return;
