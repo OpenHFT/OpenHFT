@@ -406,7 +406,17 @@
                                     <goal>cpd-check</goal>
                                 </goals>
                                 <configuration>
+                                    <!-- CPD gate: fail on duplications above minimumTokens=80.
+                                         Compare with identifiers/symbols, literals, and annotations included
+                                         so only genuinely distinct logic escapes detection. Attempt refactoring
+                                         first (extract shared helpers, parameterise tests, etc.) before using
+                                         CPD-OFF/CPD-ON. Any CPD suppression must carry an inline justification
+                                         describing why duplication is irreducible. -->
                                     <failOnViolation>${quality.enforced}</failOnViolation>
+                                    <minimumTokens>80</minimumTokens>
+                                    <ignoreIdentifiers>false</ignoreIdentifiers>
+                                    <ignoreLiterals>false</ignoreLiterals>
+                                    <ignoreAnnotations>false</ignoreAnnotations>
                                 </configuration>
                             </execution>
                         </executions>
