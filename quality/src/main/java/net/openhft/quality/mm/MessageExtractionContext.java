@@ -20,6 +20,7 @@ public final class MessageExtractionContext {
     private final Map<String, String> importedClasses = new HashMap<>();
     private final Map<String, String> fieldTypes = new HashMap<>();
     private final Map<String, String> methodVariableTypes = new HashMap<>();
+    private final Set<String> methodParameterNames = new HashSet<>();
     private final Map<String, MessageTemplate> fieldStringTemplates = new HashMap<>();
     private final Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
     private final Set<String> junit4StaticMethods = new HashSet<>();
@@ -109,6 +110,7 @@ public final class MessageExtractionContext {
         importedClasses.clear();
         fieldTypes.clear();
         methodVariableTypes.clear();
+        methodParameterNames.clear();
         fieldStringTemplates.clear();
         methodStringTemplates.clear();
         junit4StaticMethods.clear();
@@ -620,6 +622,9 @@ public final class MessageExtractionContext {
         boolean inMethodOrCtor = isInMethodOrCtor(varDef);
         if (inMethodOrCtor) {
             methodVariableTypes.put(name, typeName);
+            if (varDef.getType() == TokenTypes.PARAMETER_DEF) {
+                methodParameterNames.add(name);
+            }
         } else {
             fieldTypes.put(name, typeName);
         }
@@ -761,6 +766,16 @@ public final class MessageExtractionContext {
             return type;
         }
         return fieldTypes.get(name);
+    }
+
+    /**
+     * Check whether a name corresponds to a method or constructor parameter.
+     *
+     * @param name variable name to check.
+     * @return {@code true} if the name is a parameter of the current method or constructor.
+     */
+    public boolean isMethodParameter(String name) {
+        return methodParameterNames.contains(name);
     }
 
     /**

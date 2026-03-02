@@ -699,6 +699,22 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    @DisplayName("Test parameter delegation helpers do not produce unhandled warnings")
+    public void testParameterDelegationSkipsUnhandled() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(MeaningfulMessageCheck.class);
+
+        // The only expected violation is the missing @DisplayName on the class itself.
+        // No MMUnhandled should be emitted for helpers that pass a String parameter to assertions.
+        final String[] expected = {
+                "17: " + getCheckMessage(RuleId.MISSING_DISPLAY_NAME.messageKey(false),
+                        "InputParameterDelegation")
+        };
+
+        verify(checkConfig, getPath("InputParameterDelegation.java"), expected);
+    }
+
+    @Test
     @DisplayName("Test extraction file failure is reported scenario")
     public void testExtractionFileFailureIsReported() throws Exception {
         final DefaultConfiguration checkConfig =

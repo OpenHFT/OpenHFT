@@ -365,7 +365,9 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
                 if (!context().hasInlineReasonComment(methodCall)) {
                     DetailAST content = astSupport().unwrapExpr(messageExpr);
                     if (content != null && isNonLiteralMessageExpression(content)) {
-                        emitUnhandled(methodCall, "Non-literal message argument not handled for " + methodName);
+                        if (!isMethodParameterIdent(content)) {
+                            emitUnhandled(methodCall, "Non-literal message argument not handled for " + methodName);
+                        }
                     } else {
                         sink().emitMissingMessage(lineNo, source);
                     }
@@ -617,6 +619,12 @@ public final class AssertionMessageExtractor extends AbstractMessageExtractor {
             return false;
         }
         return context().isDeclaredMethodName(methodName);
+    }
+
+    private boolean isMethodParameterIdent(DetailAST expr) {
+        return expr != null
+                && expr.getType() == TokenTypes.IDENT
+                && context().isMethodParameter(expr.getText());
     }
 
     private boolean isNonLiteralMessageExpression(DetailAST expr) {
