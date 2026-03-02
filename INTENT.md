@@ -39,6 +39,11 @@ Use these IDs in plans, docs, and commit notes when useful.
 
 ## Required evidence for change classes
 
+General build evidence rule:
+
+1. Run Maven commands with `-l <logfile>` and review the log after the build.
+   - Example: `mvn verify -l logs/mvn-verify.log`
+
 1. Build/pom/dependency change:
    - run at least affected-module `mvn verify`,
    - include warning/error scan evidence.
@@ -53,4 +58,3 @@ Use these IDs in plans, docs, and commit notes when useful.
 
 1. current policy causes repeated prioritization mistakes, or
 2. repository scope materially changes.
-
