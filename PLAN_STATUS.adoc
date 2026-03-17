@@ -1,0 +1,35 @@
+= Task status improvement plan
+
+== Task statuses
+
+The most tool-friendly pattern is to give every task a stable id, then add one of these under it:
+
+The valid task statuses are only as follows
+
+- [ ] `<task-ID>` `Pn` Not done, requires; none
+- [x] `<task-ID>` `Pn` Done, requires: LLL22-123, evidence: <evidence the task was done>
+
+Where the `<task-ID>` is formatted as `<3-axis code><Iteration number>-<distinguishing id>`
+
+NOTE: the plan-lint tool should enforce that each task and sub-tasks must be either `- [ ]` or `- [x]` and not have `[DONE]` `[NOT DONE]` or `[BLOCKED]` as this leads to inconsistencies like `- [ ] [DONE]` and `- [x] [NOT DONE]`, each task must have a valid 3-axis evaluation either as a prefix or part of the task-ID e.g.
+
+- `LLL` `T22-123`
+- `LLL22-123`
+
+THe back ticks are optional.
+
+After the task-ID should appear the Priority between `P0 and P12` though any task of P6+ should be listed as dropped.
+
+Following that is the description.
+
+At the end MUST appear the `requires: ` field with a list of tasks or `none` if the task doesn't depend on anything.
+
+Tasks marked as `- [x] ` must add a field `evidence: ` last with meaningful, non duplicate/templated evidence it was done. i.e. what was changed. Enforce that each evidence string is at least 4 words and not duplicated. If evidence can't be provided suggest either providing some or marking the task as not done and trying again.
+
+An optional fields are
+
+* `qna: ` needs feedback from a planner on the provided open questions to complete.
+* `review:` needs approval/review from this task
+* `blocked-by:` needs tasks to be added for functionality blocking this task, lists a description of the tasks rather than task-ID as they haven't been identified yet.
+
+Tasks that are blocked-by something lacking a task, should be left as `- [ ]` not done. tasks which are `- [x]` must add a valid `evidence: ` field:
