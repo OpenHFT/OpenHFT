@@ -70,7 +70,7 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
 <plugin>
     <groupId>com.github.spotbugs</groupId>
     <artifactId>spotbugs-maven-plugin</artifactId>
-     <version>4.8.6.6</version>
+     <version>${spotbugs.maven.plugin.version}</version>
     <configuration>
         <effort>Max</effort>
         <threshold>Low</threshold>
@@ -101,6 +101,8 @@ To apply the Chronicle Checkstyle rules in a standalone Maven project, add the p
 ----
 
 NOTE: In Chronicle parent POMs the quality checks are bound to the `quality` profile and only run when `-Pquality` is enabled. The profile sets `quality.enforced` to true by default, but it can be overridden in a consuming project's properties if warning-only output is preferred.
+
+For builds that need both the legacy Java 8 toolchain and newer Java 21+ runtimes, Chronicle parent POMs select `${spotbugs.maven.plugin.version}` by JDK: `4.8.6.6` for Java `<= 20` and `4.9.8.1` for Java `21+`.
 
 Parent POMs such as `root-parent-pom` and `chronicle-enterprise-root-pom` already wire this plugin; most Chronicle modules should prefer that route rather than duplicating configuration.
 

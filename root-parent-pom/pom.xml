@@ -63,6 +63,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spotbugs.maven.plugin.version>4.8.6.6</spotbugs.maven.plugin.version>
+        <spotbugs.maven.plugin.version.java21plus>4.9.8.1</spotbugs.maven.plugin.version.java21plus>
         <!--
             By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
             contain the arguments necessary to run the Chronicle libraries
@@ -141,7 +143,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.6.6</version>
+                    <version>${spotbugs.maven.plugin.version}</version>
                 </plugin>
 
                 <plugin>
@@ -523,6 +525,15 @@
                     --enable-native-access=ALL-UNNAMED
                     -XX:+EnableDynamicAgentLoading
                 </jvm.requiredArgs>
+            </properties>
+        </profile>
+        <profile>
+            <id>spotbugs-java21-plus</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <properties>
+                <spotbugs.maven.plugin.version>${spotbugs.maven.plugin.version.java21plus}</spotbugs.maven.plugin.version>
             </properties>
         </profile>
         <!--

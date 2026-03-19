@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -23,6 +23,8 @@
         <third-party-bom.version>2026.0-SNAPSHOT</third-party-bom.version>
         <quality.enforced>true</quality.enforced>
         <bytebuddy.attachArgs/>
+        <spotbugs.maven.plugin.version>4.8.6.6</spotbugs.maven.plugin.version>
+        <spotbugs.maven.plugin.version.java21plus>4.9.8.1</spotbugs.maven.plugin.version.java21plus>
     </properties>
 
     <dependencyManagement>
@@ -559,6 +561,15 @@
             </properties>
         </profile>
         <profile>
+            <id>spotbugs-java21-plus</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <properties>
+                <spotbugs.maven.plugin.version>${spotbugs.maven.plugin.version.java21plus}</spotbugs.maven.plugin.version>
+            </properties>
+        </profile>
+        <profile>
             <id>quality</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -604,7 +615,7 @@
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>4.8.6.6</version>
+                        <version>${spotbugs.maven.plugin.version}</version>
                         <configuration>
                             <effort>Max</effort>
                             <threshold>Low</threshold>

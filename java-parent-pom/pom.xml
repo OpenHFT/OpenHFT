@@ -11,7 +11,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>2026.0</version>
+        <version>2026.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -31,6 +31,8 @@
         <sonar.organization>openhft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spotbugs.maven.plugin.version>4.8.6.6</spotbugs.maven.plugin.version>
+        <spotbugs.maven.plugin.version.java21plus>4.9.8.1</spotbugs.maven.plugin.version.java21plus>
         <license.year>2013-2025</license.year>
         <license.owner>chronicle.software</license.owner>
         <license.spdx>Apache-2.0</license.spdx>
@@ -38,6 +40,7 @@
         <quality.enforced>false</quality.enforced>
         <quality.version>2026.0-SNAPSHOT</quality.version>
         <slf4j.version>2.0.17</slf4j.version>
+        <jvm.extraArgs></jvm.extraArgs>
 
         <pmd.targetJdk>1.8</pmd.targetJdk>
         <pmd.includeTests>true</pmd.includeTests>
@@ -196,6 +199,15 @@
 
     <profiles>
         <profile>
+            <id>spotbugs-java21-plus</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <properties>
+                <spotbugs.maven.plugin.version>${spotbugs.maven.plugin.version.java21plus}</spotbugs.maven.plugin.version>
+            </properties>
+        </profile>
+        <profile>
             <id>quality</id>
             <properties>
                 <quality.enforced>true</quality.enforced>
@@ -237,7 +249,8 @@
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
-                        <!-- SpotBugs 4.8 line for Java 8 compatibility -->
+                        <!-- java-parent-pom selects the SpotBugs line by build JDK:
+                             4.8.6.6 for Java <= 20 and 4.9.8.1 for Java 21+. -->
                         <configuration>
                             <effort>Max</effort>
                             <threshold>Low</threshold>

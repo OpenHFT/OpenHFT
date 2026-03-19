@@ -22,7 +22,7 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
-        <version>2026.0-SNAPSHOT</version>
+        <version>2026.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -40,6 +40,8 @@
         <!-- JVM args for Surefire - empty on Java 8, set by profiles on Java 9+ -->
         <jvm.requiredArgs></jvm.requiredArgs>
         <jvm.extraArgs></jvm.extraArgs>
+        <spotbugs.maven.plugin.version>4.8.6.6</spotbugs.maven.plugin.version>
+        <spotbugs.maven.plugin.version.java21plus>4.9.8.1</spotbugs.maven.plugin.version.java21plus>
         <!-- Maven Plugin versions -->
         <maven.version>3.9.11</maven.version>
         <maven-plugin-annotations.version>3.15.0</maven-plugin-annotations.version>
@@ -219,6 +221,15 @@
 
     <profiles>
         <profile>
+            <id>spotbugs-java21-plus</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <properties>
+                <spotbugs.maven.plugin.version>${spotbugs.maven.plugin.version.java21plus}</spotbugs.maven.plugin.version>
+            </properties>
+        </profile>
+        <profile>
             <id>pitest</id>
             <build>
                 <plugins>
@@ -317,7 +328,7 @@
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>4.8.6.6</version>
+                        <version>${spotbugs.maven.plugin.version}</version>
                         <configuration>
                             <effort>Max</effort>
                             <threshold>Low</threshold>
