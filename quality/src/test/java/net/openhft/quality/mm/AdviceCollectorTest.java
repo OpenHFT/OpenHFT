@@ -12,6 +12,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Advice collector tests for recording and querying candidates")
@@ -139,5 +140,43 @@ class AdviceCollectorTest {
         Map<String, Map<Integer, List<CandidateAdvice>>> all = collector.allCandidates();
         assertNotNull(all, "allCandidates should not return null");
         assertFalse(all.isEmpty(), "allCandidates should contain the recorded file");
+    }
+
+    @Test
+    @DisplayName("candidatesForFile returns immutable nested lists")
+    void candidatesForFile_returnsImmutableNestedLists() {
+        AdviceCollector collector = new AdviceCollector();
+        collector.record(new CandidateAdvice.Builder()
+                .adviceId(AdviceId.MMAssertionMessageMissing)
+                .source(AdviceSource.ASSERTION)
+                .lineNo(3)
+                .fileName("Test.java")
+                .build());
+
+        Map<Integer, List<CandidateAdvice>> candidates = collector.candidatesForFile("Test.java");
+        assertThrows(UnsupportedOperationException.class,
+                () -> candidates.get(3).add(new CandidateAdvice.Builder()
+                        .adviceId(AdviceId.MMAssertionMessageMissing)
+                        .source(AdviceSource.ASSERTION)
+                        .lineNo(3)
+                        .fileName("Test.java")
+                        .build()),
+                "nested candidate lists should be immutable");
+    }
+
+    @Test
+    @DisplayName("fileAdviceForFile returns immutable snapshot")
+    void fileAdviceForFile_returnsImmutableSnapshot() {
+        AdviceCollector collector = new AdviceCollector();
+        collector.recordFileAdvice("Test.java", new FileAdviceDetails(
+                AdviceId.MMCommentMapStringObject, 7,
+                java.util.Collections.singletonList("payload"), null, null, null, null, null, null));
+
+        List<FileAdviceDetails> details = collector.fileAdviceForFile("Test.java");
+        assertThrows(UnsupportedOperationException.class,
+                () -> details.add(new FileAdviceDetails(
+                        AdviceId.MMCommentMapStringObject, 8,
+                        java.util.Collections.singletonList("payload"), null, null, null, null, null, null)),
+                "file advice view should be immutable");
     }
 }

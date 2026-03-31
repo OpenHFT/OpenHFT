@@ -30,11 +30,15 @@ public final class AdviceCollector {
 
     public Map<Integer, List<CandidateAdvice>> candidatesForFile(String file) {
         Map<Integer, List<CandidateAdvice>> result = byFile.get(file);
-        return result == null ? java.util.Collections.emptyMap() : java.util.Collections.unmodifiableMap(result);
+        return result == null ? java.util.Collections.emptyMap() : immutableCandidates(result);
     }
 
     public Map<String, Map<Integer, List<CandidateAdvice>>> allCandidates() {
-        return java.util.Collections.unmodifiableMap(byFile);
+        Map<String, Map<Integer, List<CandidateAdvice>>> snapshot = new HashMap<>();
+        for (Map.Entry<String, Map<Integer, List<CandidateAdvice>>> entry : byFile.entrySet()) {
+            snapshot.put(entry.getKey(), immutableCandidates(entry.getValue()));
+        }
+        return java.util.Collections.unmodifiableMap(snapshot);
     }
 
     public void recordFileAdvice(String file, FileAdviceDetails details) {
@@ -48,7 +52,9 @@ public final class AdviceCollector {
 
     public List<FileAdviceDetails> fileAdviceForFile(String file) {
         List<FileAdviceDetails> details = fileAdvice.get(file);
-        return details == null ? java.util.Collections.emptyList() : details;
+        return details == null
+                ? java.util.Collections.emptyList()
+                : java.util.Collections.unmodifiableList(new ArrayList<>(details));
     }
 
     public void clearFile(String file) {
@@ -59,5 +65,16 @@ public final class AdviceCollector {
     public void clearAll() {
         byFile.clear();
         fileAdvice.clear();
+    }
+
+    private Map<Integer, List<CandidateAdvice>> immutableCandidates(Map<Integer, List<CandidateAdvice>> source) {
+        Map<Integer, List<CandidateAdvice>> copy = new HashMap<>();
+        for (Map.Entry<Integer, List<CandidateAdvice>> entry : source.entrySet()) {
+            List<CandidateAdvice> candidates = entry.getValue() == null
+                    ? java.util.Collections.emptyList()
+                    : java.util.Collections.unmodifiableList(new ArrayList<>(entry.getValue()));
+            copy.put(entry.getKey(), candidates);
+        }
+        return java.util.Collections.unmodifiableMap(copy);
     }
 }
