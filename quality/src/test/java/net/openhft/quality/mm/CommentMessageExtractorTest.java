@@ -688,6 +688,99 @@ class CommentMessageExtractorTest {
     }
 
     @Test
+    @DisplayName("requiresObjectMonitorComment skips helper overload with wait arguments")
+    void requiresObjectMonitorComment_skipsHelperOverloadWithWaitArguments() throws Exception {
+        prepareContext(Arrays.asList("class HelperWait {", "  void wait(int millis) {}", "}"));
+        context.setDeclaredMethodArities(Collections.singletonMap("wait", Collections.singleton(1)));
+
+        DetailAstImpl methodCall = createMethodCallWithNameAndArgs("wait", 1);
+        assertFalse(extractor.requiresObjectMonitorComment(methodCall),
+                "helper wait(int) overload should not require object monitor comment");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment skips notifyAll helper overload with arguments")
+    void requiresObjectMonitorComment_skipsNotifyAllHelperOverloadWithArguments() throws Exception {
+        prepareContext(Arrays.asList("class HelperWait {", "  void notifyAll(int signal) {}", "}"));
+
+        DetailAstImpl methodCall = createMethodCallWithNameAndArgs("notifyAll", 1);
+        assertFalse(extractor.requiresObjectMonitorComment(methodCall),
+                "helper notifyAll(int) overload should not require object monitor comment");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment keeps wait overload warnings when no helper signature matches")
+    void requiresObjectMonitorComment_keepsWaitWarningsWhenNoHelperSignatureMatches() throws Exception {
+        prepareContext(Arrays.asList("", "wait(100L);"));
+
+        DetailAstImpl methodCall = createMethodCallWithNameAndArgs("wait", 1);
+        assertTrue(extractor.requiresObjectMonitorComment(methodCall),
+                "wait(arg) should still require an object monitor comment when no helper overload exists");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment ignores impossible wait overloads with more than two arguments")
+    void requiresObjectMonitorComment_ignoresWaitOverloadsWithMoreThanTwoArguments() throws Exception {
+        prepareContext(Arrays.asList("", "wait(1, 2, 3);"));
+
+        DetailAstImpl methodCall = createMethodCallWithNameAndArgs("wait", 3);
+        assertFalse(extractor.requiresObjectMonitorComment(methodCall),
+                "wait(arg1, arg2, arg3) should not be treated as an object monitor call");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment skips this qualified helper overload because it resolves to the current class")
+    void requiresObjectMonitorComment_skipsThisQualifiedHelperOverload() throws Exception {
+        prepareContext(Arrays.asList("class HelperWait {", "  void wait(int millis) {}", "}"));
+        context.setDeclaredMethodArities(Collections.singletonMap("wait", Collections.singleton(1)));
+
+        DetailAstImpl literalThis = new DetailAstImpl();
+        literalThis.setType(TokenTypes.LITERAL_THIS);
+
+        DetailAstImpl methodCall = createQualifiedMethodCallWithArgs(literalThis, "wait", 1, 2);
+        assertFalse(extractor.requiresObjectMonitorComment(methodCall),
+                "this.wait(arg) should be treated as the helper overload on the current class");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment skips field qualified helper overload from the current class")
+    void requiresObjectMonitorComment_skipsFieldQualifiedHelperOverloadFromCurrentClass() throws Exception {
+        prepareContext(Arrays.asList("class HelperWait {", "  void wait(int millis) {}", "}"));
+        context.enterType(createTypeDef("HelperWait", 1));
+        context.setDeclaredMethodArities(Collections.singletonMap("wait", Collections.singleton(1)));
+        context.recordVariableType(createVariableDef("helper", "HelperWait"));
+
+        DetailAstImpl methodCall = createQualifiedMethodCallWithArgs(createIdent("helper"), "wait", 1, 2);
+        assertFalse(extractor.requiresObjectMonitorComment(methodCall),
+                "helper.wait(arg) should be treated as the current-class helper overload");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment keeps field qualified helper warning when current class context is missing")
+    void requiresObjectMonitorComment_keepsFieldQualifiedWarningWhenCurrentClassContextIsMissing() throws Exception {
+        prepareContext(Arrays.asList("class HelperWait {", "  void wait(int millis) {}", "}"));
+        context.setDeclaredMethodArities(Collections.singletonMap("wait", Collections.singleton(1)));
+        context.recordVariableType(createVariableDef("helper", "HelperWait"));
+
+        DetailAstImpl methodCall = createQualifiedMethodCallWithArgs(createIdent("helper"), "wait", 1, 2);
+        assertTrue(extractor.requiresObjectMonitorComment(methodCall),
+                "helper.wait(arg) should still require a comment when the current class is unknown");
+    }
+
+    @Test
+    @DisplayName("requiresObjectMonitorComment keeps field qualified helper warning for a different owner type")
+    void requiresObjectMonitorComment_keepsFieldQualifiedWarningForDifferentOwnerType() throws Exception {
+        prepareContext(Arrays.asList("class HelperWait {", "  void wait(int millis) {}", "}"));
+        context.enterType(createTypeDef("HelperWait", 1));
+        context.setDeclaredMethodArities(Collections.singletonMap("wait", Collections.singleton(1)));
+        context.recordVariableType(createVariableDef("helper", "OtherHelper"));
+
+        DetailAstImpl methodCall = createQualifiedMethodCallWithArgs(createIdent("helper"), "wait", 1, 2);
+        assertTrue(extractor.requiresObjectMonitorComment(methodCall),
+                "helper.wait(arg) should still require a comment when the field is not the current class type");
+    }
+
+    @Test
     @DisplayName("requiresClassForNameComment returns true for Class.forName call")
     void requiresClassForNameComment_returnsTrueForForName() throws Exception {
         prepareContext(Arrays.asList("", "Class.forName(\"test\");"));
@@ -806,6 +899,39 @@ class CommentMessageExtractorTest {
         return methodCall;
     }
 
+    private DetailAstImpl createMethodCallWithNameAndArgs(String name, int argumentCount) {
+        DetailAstImpl methodCall = createMethodCallWithName(name);
+        DetailAstImpl elist = new DetailAstImpl();
+        elist.setType(TokenTypes.ELIST);
+        for (int i = 0; i < argumentCount; i++) {
+            DetailAstImpl expr = new DetailAstImpl();
+            expr.setType(TokenTypes.EXPR);
+            DetailAstImpl ident = new DetailAstImpl();
+            ident.setType(TokenTypes.IDENT);
+            ident.setText("arg" + i);
+            expr.addChild(ident);
+            elist.addChild(expr);
+        }
+        methodCall.addChild(elist);
+        return methodCall;
+    }
+
+    private DetailAstImpl createQualifiedMethodCallWithArgs(DetailAstImpl qualifier, String name,
+                                                            int argumentCount, int lineNo) {
+        DetailAstImpl methodCall = createMethodCallWithQualifier(qualifier, name, lineNo);
+        DetailAstImpl elist = (DetailAstImpl) methodCall.findFirstToken(TokenTypes.ELIST);
+        for (int i = 0; i < argumentCount; i++) {
+            DetailAstImpl expr = new DetailAstImpl();
+            expr.setType(TokenTypes.EXPR);
+            DetailAstImpl ident = new DetailAstImpl();
+            ident.setType(TokenTypes.IDENT);
+            ident.setText("arg" + i);
+            expr.addChild(ident);
+            elist.addChild(expr);
+        }
+        return methodCall;
+    }
+
     private DetailAstImpl createDotMethodCall(String qualifier, String name) {
         DetailAstImpl methodCall = new DetailAstImpl();
         methodCall.setType(TokenTypes.METHOD_CALL);
@@ -821,6 +947,14 @@ class CommentMessageExtractorTest {
         dot.addChild(nameIdent);
         methodCall.addChild(dot);
         return methodCall;
+    }
+
+    private DetailAstImpl createTypeDef(String name, int lineNo) {
+        DetailAstImpl typeDef = new DetailAstImpl();
+        typeDef.setType(TokenTypes.CLASS_DEF);
+        typeDef.setLineNo(lineNo);
+        typeDef.addChild(createIdent(name));
+        return typeDef;
     }
 
     private static final class TestMessageSink implements MessageCandidateSink {

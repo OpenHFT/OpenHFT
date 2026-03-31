@@ -342,6 +342,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         context.reset(fileContents);
         currentFileName = fileContents == null ? "unknown" : fileContents.getFileName();
         context.setDeclaredMethodNames(collectDeclaredMethods(rootAst));
+        context.setDeclaredMethodArities(collectDeclaredMethodArities(rootAst));
         skipFile = shouldSkipFile(fileContents);
         if (!skipFile && suppressionTracker != null) {
             suppressionTracker.recordCommentSuppressions(fileContents);
@@ -619,6 +620,47 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             }
         }
         return names;
+    }
+
+    Map<String, Set<Integer>> collectDeclaredMethodArities(DetailAST rootAst) {
+        if (rootAst == null) {
+            return java.util.Collections.emptyMap();
+        }
+        Map<String, Set<Integer>> arities = new HashMap<>();
+        ArrayDeque<DetailAST> stack = new ArrayDeque<>();
+        stack.push(rootAst);
+        while (!stack.isEmpty()) {
+            DetailAST current = stack.pop();
+            if (current.getType() == TokenTypes.METHOD_DEF) {
+                DetailAST ident = current.findFirstToken(TokenTypes.IDENT);
+                if (ident != null) {
+                    arities.computeIfAbsent(ident.getText(), key -> new HashSet<>())
+                            .add(parameterCount(current));
+                }
+            }
+            DetailAST child = current.getFirstChild();
+            while (child != null) {
+                stack.push(child);
+                child = child.getNextSibling();
+            }
+        }
+        return arities;
+    }
+
+    private int parameterCount(DetailAST methodDef) {
+        DetailAST parameters = methodDef.findFirstToken(TokenTypes.PARAMETERS);
+        if (parameters == null) {
+            return 0;
+        }
+        int count = 0;
+        DetailAST child = parameters.getFirstChild();
+        while (child != null) {
+            if (child.getType() == TokenTypes.PARAMETER_DEF) {
+                count++;
+            }
+            child = child.getNextSibling();
+        }
+        return count;
     }
 
     private String trimJavadocLine(String raw) {

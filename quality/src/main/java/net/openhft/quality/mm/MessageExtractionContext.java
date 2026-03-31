@@ -23,6 +23,7 @@ public final class MessageExtractionContext {
     private final Map<String, String> methodVariableTypes = new HashMap<>();
     private final Map<String, MessageTemplate> fieldStringTemplates = new HashMap<>();
     private final Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
+    private final Map<String, Set<Integer>> declaredMethodArities = new HashMap<>();
     private final Set<String> junit4StaticMethods = new HashSet<>();
     private final Set<String> junit5StaticMethods = new HashSet<>();
     private final Set<String> declaredMethodNames = new HashSet<>();
@@ -119,6 +120,7 @@ public final class MessageExtractionContext {
         junit4ImportWildcard = false;
         junit5ImportWildcard = false;
         junit5ParamsImportWildcard = false;
+        declaredMethodArities.clear();
         declaredMethodNames.clear();
         classScopes.clear();
         currentClassName = null;
@@ -153,6 +155,26 @@ public final class MessageExtractionContext {
     }
 
     /**
+     * Record method arities declared in the current file.
+     *
+     * @param methodArities declared method names mapped to supported parameter counts.
+     */
+    public void setDeclaredMethodArities(Map<String, Set<Integer>> methodArities) {
+        declaredMethodArities.clear();
+        if (methodArities == null || methodArities.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Set<Integer>> entry : methodArities.entrySet()) {
+            String methodName = entry.getKey();
+            Set<Integer> arities = entry.getValue();
+            if (methodName == null || arities == null || arities.isEmpty()) {
+                continue;
+            }
+            declaredMethodArities.put(methodName, new HashSet<>(arities));
+        }
+    }
+
+    /**
      * Check whether a method name is declared in this file.
      *
      * @param methodName method name to check.
@@ -160,6 +182,21 @@ public final class MessageExtractionContext {
      */
     public boolean isDeclaredMethodName(String methodName) {
         return methodName != null && declaredMethodNames.contains(methodName);
+    }
+
+    /**
+     * Check whether the current file declares a method with the given name and parameter count.
+     *
+     * @param methodName method name to check.
+     * @param parameterCount number of parameters in the candidate signature.
+     * @return {@code true} if a matching declaration exists in the current file.
+     */
+    public boolean isDeclaredMethodSignature(String methodName, int parameterCount) {
+        if (methodName == null) {
+            return false;
+        }
+        Set<Integer> arities = declaredMethodArities.get(methodName);
+        return arities != null && arities.contains(parameterCount);
     }
 
     /**

@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -277,6 +278,54 @@ class MessageExtractionContextTest {
         assertTrue(context.isDeclaredMethodName("verifyOrder"));
         assertFalse(context.isDeclaredMethodName("missingMethod"));
         assertFalse(context.isDeclaredMethodName(null));
+    }
+
+    @Test
+    @DisplayName("Declared method signatures default to empty")
+    void declaredMethodSignaturesDefaultToEmpty() {
+        assertFalse(context.isDeclaredMethodSignature("wait", 1));
+    }
+
+    @Test
+    @DisplayName("Declared method signatures reflect supplied arities")
+    void declaredMethodSignaturesReflectSuppliedArities() {
+        context.setDeclaredMethodArities(Map.of(
+                "wait", Set.of(1, 2),
+                "notifyAll", Set.of(1)));
+
+        assertTrue(context.isDeclaredMethodSignature("wait", 1));
+        assertTrue(context.isDeclaredMethodSignature("wait", 2));
+        assertTrue(context.isDeclaredMethodSignature("notifyAll", 1));
+        assertFalse(context.isDeclaredMethodSignature("wait", 0));
+        assertFalse(context.isDeclaredMethodSignature("missingMethod", 1));
+        assertFalse(context.isDeclaredMethodSignature(null, 1));
+    }
+
+    @Test
+    @DisplayName("Declared method signatures clear when null input arrives so stale helper overloads do not leak")
+    void declaredMethodSignaturesClearWhenNullInputArrives() {
+        context.setDeclaredMethodArities(Map.of("wait", Set.of(1)));
+        assertTrue(context.isDeclaredMethodSignature("wait", 1));
+
+        context.setDeclaredMethodArities(null);
+
+        assertFalse(context.isDeclaredMethodSignature("wait", 1));
+    }
+
+    @Test
+    @DisplayName("Declared method signatures ignore blank entries so only concrete helper overloads match")
+    void declaredMethodSignaturesIgnoreBlankEntries() {
+        java.util.Map<String, Set<Integer>> methodArities = new java.util.HashMap<>();
+        methodArities.put(null, Set.of(1));
+        methodArities.put("notifyAll", null);
+        methodArities.put("wait", Collections.emptySet());
+        methodArities.put("sleep", Set.of(2));
+
+        context.setDeclaredMethodArities(methodArities);
+
+        assertFalse(context.isDeclaredMethodSignature("wait", 1));
+        assertFalse(context.isDeclaredMethodSignature("notifyAll", 0));
+        assertTrue(context.isDeclaredMethodSignature("sleep", 2));
     }
 
     // --- getVariableType ---
