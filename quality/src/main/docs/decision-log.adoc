@@ -43,5 +43,5 @@ Alternatives Considered::
 Rationale for Decision:: A no-custom baseline keeps local builds clean without extra artefacts.
 Impact & Consequences:: The module uses the full baseline once published, but a reduced baseline
 for its own build.
-Notes/Links:: `quality/src/main/resources/net/openhft/quality/chronicle-baseline-checkstyle-no-custom.xml`,
+Notes/Links:: `quality/src/main/resources/net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml`,
 `quality/pom.xml`.
