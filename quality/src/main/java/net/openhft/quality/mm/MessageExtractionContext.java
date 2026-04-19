@@ -20,14 +20,17 @@ public final class MessageExtractionContext {
     private final MessageAstSupport astSupport;
     private final Map<String, String> importedClasses = new HashMap<>();
     private final Map<String, String> fieldTypes = new HashMap<>();
-    private final Map<String, String> methodVariableTypes = new HashMap<>();
+    // Not final: enterMethod/leaveMethod swap references with the top of methodScopes
+    // to avoid copying the maps across nested method boundaries.
+    private Map<String, String> methodVariableTypes = new HashMap<>();
     private final Map<String, MessageTemplate> fieldStringTemplates = new HashMap<>();
-    private final Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
+    private Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
     private final Map<String, Set<Integer>> declaredMethodArities = new HashMap<>();
     private final Set<String> junit4StaticMethods = new HashSet<>();
     private final Set<String> junit5StaticMethods = new HashSet<>();
     private final Set<String> declaredMethodNames = new HashSet<>();
     private final Deque<ClassScope> classScopes = new ArrayDeque<>();
+    private final Deque<MethodScope> methodScopes = new ArrayDeque<>();
     private MessageTemplateExtractor templateExtractor;
     private FileContents fileContents;
     private boolean junit4StaticWildcard;
@@ -123,6 +126,7 @@ public final class MessageExtractionContext {
         declaredMethodArities.clear();
         declaredMethodNames.clear();
         classScopes.clear();
+        methodScopes.clear();
         currentClassName = null;
         currentClassLineNo = 0;
         currentClassHasDisplayName = false;
@@ -263,6 +267,7 @@ public final class MessageExtractionContext {
      * @param methodAst method definition AST node.
      */
     public void enterMethod(DetailAST methodAst) {
+        methodScopes.push(snapshotMethodScope());
         currentMethodName = astSupport.extractName(methodAst);
         currentMethodLineNo = methodAst.getLineNo();
         currentMethodIsTest = false;
@@ -271,14 +276,50 @@ public final class MessageExtractionContext {
         currentMethodFirstAnnotationLine = 0;
         currentMethodHasTestAnnotation = false;
         currentMethodTestAnnotationLine = 0;
-        methodVariableTypes.clear();
-        methodStringTemplates.clear();
+        methodVariableTypes = new HashMap<>();
+        methodStringTemplates = new HashMap<>();
     }
 
     /**
-     * Leave the current method and clear method-local state.
+     * Leave the current method and restore the enclosing method's state, if any.
      */
     public void leaveMethod() {
+        if (methodScopes.isEmpty()) {
+            clearCurrentMethodState();
+        } else {
+            restoreMethodScope(methodScopes.pop());
+        }
+    }
+
+    private MethodScope snapshotMethodScope() {
+        MethodScope scope = new MethodScope();
+        scope.name = currentMethodName;
+        scope.lineNo = currentMethodLineNo;
+        scope.isTest = currentMethodIsTest;
+        scope.hasDisplayName = currentMethodHasDisplayName;
+        scope.firstAnnotationName = currentMethodFirstAnnotationName;
+        scope.firstAnnotationLine = currentMethodFirstAnnotationLine;
+        scope.hasTestAnnotation = currentMethodHasTestAnnotation;
+        scope.testAnnotationLine = currentMethodTestAnnotationLine;
+        scope.variableTypes = methodVariableTypes;
+        scope.stringTemplates = methodStringTemplates;
+        return scope;
+    }
+
+    private void restoreMethodScope(MethodScope scope) {
+        currentMethodName = scope.name;
+        currentMethodLineNo = scope.lineNo;
+        currentMethodIsTest = scope.isTest;
+        currentMethodHasDisplayName = scope.hasDisplayName;
+        currentMethodFirstAnnotationName = scope.firstAnnotationName;
+        currentMethodFirstAnnotationLine = scope.firstAnnotationLine;
+        currentMethodHasTestAnnotation = scope.hasTestAnnotation;
+        currentMethodTestAnnotationLine = scope.testAnnotationLine;
+        methodVariableTypes = scope.variableTypes;
+        methodStringTemplates = scope.stringTemplates;
+    }
+
+    private void clearCurrentMethodState() {
         currentMethodName = null;
         currentMethodIsTest = false;
         currentMethodHasDisplayName = false;
@@ -1032,6 +1073,7 @@ public final class MessageExtractionContext {
         }
         int startIndex = Math.max(0, scanCol);
         boolean inBlockComment = false;
+        boolean inTextBlock = false;
         boolean inString = false;
         boolean inChar = false;
         boolean foundOpen = false;
@@ -1055,6 +1097,22 @@ public final class MessageExtractionContext {
                 if (inBlockComment) {
                     if (current == '*' && next == '/') {
                         inBlockComment = false;
+                        index += 2;
+                        continue;
+                    }
+                    index++;
+                    continue;
+                }
+                if (inTextBlock) {
+                    if (current == '"'
+                            && index + 2 < text.length()
+                            && text.charAt(index + 1) == '"'
+                            && text.charAt(index + 2) == '"') {
+                        inTextBlock = false;
+                        index += 3;
+                        continue;
+                    }
+                    if (current == '\\' && index + 1 < text.length()) {
                         index += 2;
                         continue;
                     }
@@ -1096,17 +1154,9 @@ public final class MessageExtractionContext {
                     if (index + 2 < text.length()
                             && text.charAt(index + 1) == '"'
                             && text.charAt(index + 2) == '"') {
-                        // text block: skip to closing """
+                        // Text block: state persists across lines until closing """.
+                        inTextBlock = true;
                         index += 3;
-                        while (index + 2 < text.length()) {
-                            if (text.charAt(index) == '"'
-                                    && text.charAt(index + 1) == '"'
-                                    && text.charAt(index + 2) == '"') {
-                                index += 3;
-                                break;
-                            }
-                            index++;
-                        }
                         continue;
                     }
                     inString = true;
@@ -1193,5 +1243,18 @@ public final class MessageExtractionContext {
             this.name = name;
             this.lineNo = lineNo;
         }
+    }
+
+    private static final class MethodScope {
+        String name;
+        int lineNo;
+        boolean isTest;
+        boolean hasDisplayName;
+        String firstAnnotationName;
+        int firstAnnotationLine;
+        boolean hasTestAnnotation;
+        int testAnnotationLine;
+        Map<String, String> variableTypes;
+        Map<String, MessageTemplate> stringTemplates;
     }
 }

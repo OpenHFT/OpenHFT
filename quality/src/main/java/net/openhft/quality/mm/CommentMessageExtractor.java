@@ -45,13 +45,6 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
     }
 
     /**
-     * Clear per-file state so the extractor can be reused across files.
-     */
-    public void reset() {
-        processedLines.clear();
-    }
-
-    /**
      * Process {@code return} statements that return {@code null}.
      *
      * @param returnAst AST node for the return statement.

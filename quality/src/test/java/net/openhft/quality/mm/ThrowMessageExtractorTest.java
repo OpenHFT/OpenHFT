@@ -826,9 +826,13 @@ class ThrowMessageExtractorTest {
     void throwableRethrowRecognisesTypeCastsAndMethodCalls() throws Exception {
         context.recordVariableType(createVariableDef("e", "RuntimeException"));
 
-        DetailAstImpl cast = createTypeCast("String", createIdent("e"));
-        assertTrue(invokeIsThrowableRethrow(cast),
-                "Type cast of throwable variable should be treated as rethrow");
+        DetailAstImpl throwableCast = createTypeCast("RuntimeException", createIdent("e"));
+        assertTrue(invokeIsThrowableRethrow(throwableCast),
+                "Cast to throwable type should be treated as rethrow");
+
+        DetailAstImpl nonThrowableCast = createTypeCast("String", createIdent("e"));
+        assertFalse(invokeIsThrowableRethrow(nonThrowableCast),
+                "Cast to non-throwable type must not be treated as rethrow even when the castee is throwable");
 
         DetailAstImpl methodCall = createMethodCall("someFactory");
         assertFalse(invokeIsThrowableRethrow(methodCall),

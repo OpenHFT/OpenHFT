@@ -177,8 +177,11 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             DetailAST type = content.findFirstToken(TokenTypes.TYPE);
             if (type != null) {
                 String typeName = astSupport().extractTypeName(type);
-                if (isThrowableTypeName(typeName)) {
-                    return true;
+                if (typeName != null && !typeName.isEmpty()) {
+                    // Respect the declared cast type: a cast to a non-Throwable
+                    // type means the expression is not a rethrow, even if the
+                    // castee variable was a Throwable.
+                    return isThrowableTypeName(typeName);
                 }
             }
             DetailAST castExpr = content.getLastChild();
@@ -186,17 +189,31 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         }
         if (content.getType() == TokenTypes.METHOD_CALL) {
             String methodName = astSupport().extractMethodName(content);
-            if (methodName != null) {
-                String lower = methodName.toLowerCase(java.util.Locale.ROOT);
-                if (lower.startsWith("rethrow") || lower.startsWith("propagate")
-                        || lower.startsWith("sneaky") || lower.equals("wrap")) {
-                    return true;
-                }
+            if (methodName == null) {
+                return false;
             }
-            return false;
+            String lower = methodName.toLowerCase(java.util.Locale.ROOT);
+            boolean nameMatches = lower.startsWith("rethrow") || lower.startsWith("propagate")
+                    || lower.startsWith("sneaky") || lower.equals("wrap");
+            if (!nameMatches) {
+                return false;
+            }
+            // Require a Throwable argument so names like propagateEvent or wrap(config)
+            // do not silently mask missing-message advice.
+            DetailAST elist = content.findFirstToken(TokenTypes.ELIST);
+            return elist != null && containsThrowable(astSupport().collectArguments(elist));
         }
         if (content.getType() == TokenTypes.IDENT || content.getType() == TokenTypes.DOT) {
             return isThrowableExpression(content);
+        }
+        return false;
+    }
+
+    boolean containsThrowable(List<DetailAST> args) {
+        for (DetailAST arg : args) {
+            if (isThrowableExpression(arg)) {
+                return true;
+            }
         }
         return false;
     }
@@ -212,7 +229,7 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             return false;
         }
         String methodName = astSupport().extractMethodName(content);
-        if (!"getMessage".equals(methodName)) {
+        if (!"getMessage".equals(methodName) && !"getLocalizedMessage".equals(methodName)) {
             return false;
         }
         DetailAST dot = content.findFirstToken(TokenTypes.DOT);
