@@ -523,6 +523,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (isExcludedPath(fileContents.getFileName())) {
             return true;
         }
+        // Intentionally scans the file-top Javadoc, not the class-level one:
+        // generated-file headers in this project sit above the package declaration.
         String[] lines = fileContents.getLines();
         if (lines == null) {
             return false;

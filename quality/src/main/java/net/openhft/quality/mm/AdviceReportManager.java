@@ -14,7 +14,8 @@ import java.util.Map;
 public final class AdviceReportManager {
     static final String ADVICE_TEXT_RESOURCE = "net/openhft/quality/mm-advice.properties";
     static final String RANK_RESOURCE = "net/openhft/quality/mm-advice-ranks.properties";
-    // Relative to user.dir (CWD); resolved at runtime when rankOut is not explicitly configured
+    // Resolved against the JVM working directory at runtime when no explicit rankOut is configured.
+    // Callers that need deterministic placement (IDE, CI) should pass --rank-out with an absolute path.
     static final String DEFAULT_RANK_OUT = "logs/mm-advice-ranks.properties";
 
     private final boolean verbose;
@@ -82,15 +83,18 @@ public final class AdviceReportManager {
 
     public void finishRun() {
         if (!started) return;
-        if (dryRun && rankOutPath != null) {
-            Map<AdviceId, Integer> ranks = AdviceRankings.buildRanks(counts);
-            AdviceRankings.write(rankOutPath, ranks);
-        }
-        if (consoleWriter != null) {
-            consoleWriter.writeRunSummary(fileCount, issueCount);
-        }
-        if (jsonlWriter != null) {
-            jsonlWriter.close();
+        try {
+            if (dryRun && rankOutPath != null) {
+                Map<AdviceId, Integer> ranks = AdviceRankings.buildRanks(counts);
+                AdviceRankings.write(rankOutPath, ranks);
+            }
+            if (consoleWriter != null) {
+                consoleWriter.writeRunSummary(fileCount, issueCount);
+            }
+        } finally {
+            if (jsonlWriter != null) {
+                jsonlWriter.close();
+            }
         }
     }
 
@@ -141,11 +145,15 @@ public final class AdviceReportManager {
             java.nio.file.Path root = Paths.get(".").toAbsolutePath().normalize();
             java.nio.file.Path path = Paths.get(fileName).toAbsolutePath().normalize();
             if (path.startsWith(root)) {
-                return root.relativize(path).toString();
+                return toPosix(root.relativize(path).toString());
             }
         } catch (RuntimeException e) {
-            return fileName;
+            return toPosix(fileName);
         }
-        return fileName;
+        return toPosix(fileName);
+    }
+
+    private static String toPosix(String path) {
+        return path.replace('\\', '/');
     }
 }

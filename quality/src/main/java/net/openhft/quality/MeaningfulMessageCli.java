@@ -21,12 +21,12 @@ import java.util.Set;
  * CLI entry point for running MeaningfulMessage checks against source files.
  * Provides command-line options for verbose output, dry-run mode, and various output formats.
  */
-@SuppressWarnings({"MMTooShort", "MMMissingMessage"})
 public final class MeaningfulMessageCli {
     private MeaningfulMessageCli() {
     }
 
     public static void main(String[] args) throws Exception {
+        // Propagate Checkstyle error count as the CLI process exit code.
         System.exit(run(args, System.out, System.err));
     }
 

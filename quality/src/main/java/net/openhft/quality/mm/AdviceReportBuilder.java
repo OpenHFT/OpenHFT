@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -39,7 +40,7 @@ public final class AdviceReportBuilder {
                             MessageExtractionContext context,
                             SuppressionTracker suppressionTracker) {
         Map<Integer, List<CandidateAdvice>> rawCandidates = collector.candidatesForFile(fileName);
-        Map<Integer, List<CandidateAdvice>> deduped = new java.util.HashMap<>();
+        Map<Integer, List<CandidateAdvice>> deduped = new LinkedHashMap<>();
         List<Integer> lines = new ArrayList<>(rawCandidates.keySet());
         Collections.sort(lines);
         Map<AdviceId, List<AdviceOccurrence>> grouped = new EnumMap<>(AdviceId.class);
