@@ -107,7 +107,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2026.5</version>
+                <version>2026.6-SNAPSHOT</version>
             </dependency>
 
             <dependency>
