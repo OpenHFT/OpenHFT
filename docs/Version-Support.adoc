@@ -25,7 +25,7 @@ Each annual release series receives:
 
 |====
 | Year | Version Format | Supported Java Versions | Support End
-| 2026 | 2026.X | 8, 11, 17, 21 | January 2028
+| 2026 | 2026.X | 8, 11, 17, 21, 25 (a) | January 2028
 | 2027 | 2027.X | 11, 17, 21, 25 | January 2029
 | 2028 | 2028.X | 11, 17, 21, 25 | January 2030
 | 2029 | 2029.X | 11, 17, 21, 25 | January 2031
@@ -36,6 +36,7 @@ Each annual release series receives:
 | 2034 | 2034.X | 11, 17, 21, 25 | January 2036
 | 2035 | 2035.X | 11, 17, 21, 25 | January 2037
 |====
+(a) Java 25 is supported in the 2026 release series as of BOM 2026.20.
 
 === Release and Development Model
 
@@ -105,7 +106,7 @@ Java 17 LTS is supported from the x.22 release.
 
 Java 21 LTS is supported from the x.25 release.
 
-Java 25 LTS will be supported from the x.29 release.
+Java 25 LTS is supported in the 2026 release series as of BOM 2026.20 (see the new annual release methodology above).
 
 NOTE: There was no x.18 release.
 
