@@ -39,7 +39,7 @@
         <chronicle.queue.enterprise.version>2026.4</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2026.2</chronicle.ring.version>
         <chronicle.fix.version>2026.11</chronicle.fix.version>
-        <chronicle.services.version>2026.6</chronicle.services.version>
+        <chronicle.services.version>2026.7-SNAPSHOT</chronicle.services.version>
         <chronicle.logger.version>2026.0</chronicle.logger.version>
         <chronicle.efx.version>2026.3</chronicle.efx.version>
         <chronicle.matching.engine.version>2026.0</chronicle.matching.engine.version>
