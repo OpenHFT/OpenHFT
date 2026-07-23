@@ -34,14 +34,14 @@
     <properties>
         <chronicle.network.version>2.26.7</chronicle.network.version>
         <chronicle.queue.version>5.26.16</chronicle.queue.version>
-        <chronicle.zero.version>2.26.4</chronicle.zero.version>
+        <chronicle.zero.version>2.26.5-SNAPSHOT</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2.26.5</chronicle.wire.enterprise.version>
         <chronicle.queue.enterprise.version>2.26.17</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2.26.6</chronicle.ring.version>
         <chronicle.fix.version>4.26.43</chronicle.fix.version>
         <chronicle.services.version>3.26.15</chronicle.services.version>
         <chronicle.logger.version>4.26.3</chronicle.logger.version>
-        <chronicle.efx.version>2.26.12</chronicle.efx.version>
+        <chronicle.efx.version>2.26.13-SNAPSHOT</chronicle.efx.version>
         <chronicle.matching.engine.version>2.26.3</chronicle.matching.engine.version>
         <chronicle.platform.version>2.26.5</chronicle.platform.version>
         <chronicle.market.data.distributor.version>3.26.4</chronicle.market.data.distributor.version>
