@@ -37,6 +37,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <commons-compress.version>1.28.0</commons-compress.version>
         <jetty.version>9.4.46.v20220331</jetty.version>
         <log4j2.version>2.17.2</log4j2.version>
         <slf4j.version>2.0.17</slf4j.version>
@@ -440,6 +441,12 @@
                 <artifactId>guava-testlib</artifactId>
                 <scope>test</scope>
                 <version>33.1.0-jre</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
             </dependency>
 
             <dependency>
