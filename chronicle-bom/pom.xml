@@ -33,9 +33,13 @@
     </description>
     <properties>
         <chronicle.network.version>2026.3</chronicle.network.version>
+        <!-- //! Queue #1739-#1746 form one coordinated landing chain and use this distinct
+             snapshot so downstream CQE builds cannot silently resolve the previous Queue API. -->
         <chronicle.queue.version>2026.10-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2026.1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2026.1</chronicle.wire.enterprise.version>
+        <!-- //! CQE #956-#960 compile and test against the coordinated Queue chain above;
+             sharing its visible snapshot generation prevents mixed pre-QUEUE-146 artifacts. -->
         <chronicle.queue.enterprise.version>2026.10-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2026.2</chronicle.ring.version>
         <chronicle.fix.version>2026.14</chronicle.fix.version>
@@ -107,6 +111,8 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
+                <!-- //! Wire #1280 supplies the context-count and EOF contracts consumed by
+                     Queue #1746 and CSE #842, so staged consumers must not fall back to 2026.8. -->
                 <version>2026.10-SNAPSHOT</version>
             </dependency>
 
