@@ -32,11 +32,19 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
+        <!-- //! This staged BOM retains the shared 2026.0-SNAPSHOT coordinate. Prevent ordinary
+             remote deployment; qualify it with install in an isolated Maven repository until
+             the coordinated CI publication repository is explicitly configured. -->
+        <maven.deploy.skip>true</maven.deploy.skip>
         <chronicle.network.version>2026.3</chronicle.network.version>
-        <chronicle.queue.version>2026.6</chronicle.queue.version>
+        <!-- //! Queue #1739-#1746 form one coordinated landing chain and use this distinct
+             snapshot so downstream CQE builds cannot silently resolve the previous Queue API. -->
+        <chronicle.queue.version>2026.10-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2026.1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2026.1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2026.5</chronicle.queue.enterprise.version>
+        <!-- //! CQE #956-#960 compile and test against the coordinated Queue chain above;
+             sharing its visible snapshot generation prevents mixed pre-QUEUE-146 artifacts. -->
+        <chronicle.queue.enterprise.version>2026.10-SNAPSHOT</chronicle.queue.enterprise.version>
         <chronicle.ring.version>2026.2</chronicle.ring.version>
         <chronicle.fix.version>2026.14</chronicle.fix.version>
         <chronicle.services.version>2026.7</chronicle.services.version>
