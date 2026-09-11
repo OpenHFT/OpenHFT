@@ -8,35 +8,35 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.DisplayName;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 
-import static net.openhft.thirdparty.smoke.SmokeTestFixtures.skipIfNoSockets;
+import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/**
- * Smoke test verifying OkHttp client can call MockWebServer and read response bodies.
- */
-@DisplayName("Smoke test verifies OkHttp response handling")
 class OkHttpSmokeTest {
-
     @Test
-    @DisplayName("OkHttp client should call MockWebServer and read response body correctly")
-    void okHttpCanCallMockWebServer() throws Exception {
+    void callsAnOwnedLoopbackServer() throws Exception {
+        OkHttpClient client = new OkHttpClient.Builder().callTimeout(5, TimeUnit.SECONDS).build();
         try (MockWebServer server = new MockWebServer()) {
-            server.enqueue(new MockResponse().setBody("hello"));
-            skipIfNoSockets();
-            server.start();
-
-            String baseUrl = server.url("/hello").toString();
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder()
-                    .url(baseUrl)
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-                assertEquals("hello", response.body().string(), "OkHttp should receive mocked response body");
+            server.start(InetAddress.getLoopbackAddress(), 0);
+            server.enqueue(new MockResponse().setResponseCode(201).setBody("hello"));
+            try (Response response = client.newCall(new Request.Builder()
+                    .url(server.url("/hello")).build()).execute()) {
+                assertEquals(201, response.code());
+                assertNotNull(response.body());
+                assertEquals("hello", response.body().string());
             }
+            RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
+            assertNotNull(request, "the owned server must receive the request");
+            assertEquals("GET", request.getMethod());
+            assertEquals("/hello", request.getPath());
+        } finally {
+            client.connectionPool().evictAll();
+            client.dispatcher().executorService().shutdownNow();
         }
     }
 }

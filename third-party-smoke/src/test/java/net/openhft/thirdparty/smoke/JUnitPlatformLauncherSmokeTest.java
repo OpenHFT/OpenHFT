@@ -3,49 +3,72 @@
  */
 package net.openhft.thirdparty.smoke;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.launcher.Launcher;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
-/**
- * Verifies the JUnit Platform launcher executes a Jupiter test class using discovery selectors.
- */
-@DisplayName("Smoke test verifies JUnit platform launcher runs")
 class JUnitPlatformLauncherSmokeTest {
-
     @Test
-    @DisplayName("JUnit Platform Launcher should execute sample class")
-    void canCreateLauncherAndExecuteSampleClass() {
-        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder
-                .request()
-                .selectors(selectClass(LauncherSample.class))
-                .build();
-
-        Launcher launcher = LauncherFactory.create();
-        launcher.execute(request);
-
-        assertNotNull(launcher, "platform launcher should initialise for execution");
+    void executesExactlyOneSuccessfulTest() {
+        requireOneSuccess(execute(PassingSample.class));
     }
 
-    /**
-     * Jupiter sample executed by the platform launcher.
-     */
-    @Nested
-    @DisplayName("Launcher sample used for platform execution")
-    class LauncherSample {
+    @Test
+    void rejectsAnExecutedFailure() {
+        TestExecutionSummary summary = execute(FailingSample.class);
+        assertEquals(1, summary.getTestsFailedCount());
+        assertThrows(AssertionError.class, () -> requireOneSuccess(summary));
+    }
 
+    @Test
+    void rejectsAnAbortedTest() {
+        TestExecutionSummary summary = execute(AbortedSample.class);
+        assertEquals(1, summary.getTestsAbortedCount());
+        assertThrows(AssertionError.class, () -> requireOneSuccess(summary));
+    }
+
+    private static TestExecutionSummary execute(Class<?> sample) {
+        SummaryGeneratingListener listener = new SummaryGeneratingListener();
+        LauncherFactory.create().execute(LauncherDiscoveryRequestBuilder.request()
+                .selectors(selectClass(sample)).build(), listener);
+        return listener.getSummary();
+    }
+
+    private static void requireOneSuccess(TestExecutionSummary summary) {
+        assertEquals(1, summary.getTestsFoundCount(), "one intended test must be discovered");
+        assertEquals(1, summary.getTestsStartedCount(), "the discovered test must start");
+        assertEquals(0, summary.getTotalFailureCount(), "test and container failures must fail the probe");
+        assertEquals(0, summary.getTestsAbortedCount(), "an aborted test is not a successful probe");
+        assertEquals(0, summary.getTestsSkippedCount(), "a skipped test is not a successful probe");
+        assertEquals(1, summary.getTestsSucceededCount(), "the intended test must pass");
+    }
+
+    static class PassingSample {
         @Test
-        @DisplayName("Launcher sample should run without failures")
         void sample() {
-            assertTrue(true, "Platform launcher test should pass");
+            assertEquals(4, 2 + 2);
+        }
+    }
+
+    static class FailingSample {
+        @Test
+        void sample() {
+            fail("intentional launcher negative control");
+        }
+    }
+
+    static class AbortedSample {
+        @Test
+        void sample() {
+            assumeTrue(false, "intentional launcher abort control");
         }
     }
 }
