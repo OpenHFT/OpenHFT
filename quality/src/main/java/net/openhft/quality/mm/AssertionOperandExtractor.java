@@ -50,8 +50,9 @@ public final class AssertionOperandExtractor {
             child = child.getNextSibling();
         }
 
-        requireNonNull(firstExpr);
-        requireNonNull(secondExpr);
+        if (firstExpr == null || secondExpr == null) {
+            return null;
+        }
         if (style == AssertionStyle.JUNIT4) {
             return new BooleanAssertionOperands(secondExpr, firstExpr);
         }

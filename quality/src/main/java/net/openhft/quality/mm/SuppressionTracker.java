@@ -141,6 +141,9 @@ public class SuppressionTracker {
             }
         }
         int lastLine = lines.length;
+        // Close any still-open suppression ranges at EOF: the loops below intentionally
+        // close every open range so that a suppression started without a matching ON
+        // directive still covers the rest of the file.
         if (openAll != NO_LINE) {
             commentSuppressAll.add(new LineRange(openAll, lastLine));
         }
@@ -156,9 +159,10 @@ public class SuppressionTracker {
      * Leave the current suppression scope.
      */
     public void leaveScope() {
-        if (!scopes.isEmpty()) {
-            scopes.pop();
+        if (scopes.isEmpty()) {
+            throw new IllegalStateException("leaveScope without matching enterScope");
         }
+        scopes.pop();
     }
 
     /**
@@ -472,7 +476,6 @@ public class SuppressionTracker {
         return current != null && current.getType() == TokenTypes.IDENT ? current : null;
     }
 
-
     String stripQuotes(String text) {
         requireNonNull(text);
         if (text.length() >= 2 && text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"') {
@@ -544,7 +547,8 @@ public class SuppressionTracker {
         }
     }
 
-    void pushScopeForTesting(SuppressionScope scope) {
+    // visible for testing
+    void pushScopeForTest(SuppressionScope scope) {
         scopes.push(scope);
     }
 
@@ -553,7 +557,8 @@ public class SuppressionTracker {
      *
      * @param tokens suppression tokens to add.
      */
-    void addFileSuppressionsForTesting(String... tokens) {
+    // visible for testing
+    void addFileSuppressionsForTest(String... tokens) {
         for (String token : tokens) {
             fileScope.addToken(token);
         }

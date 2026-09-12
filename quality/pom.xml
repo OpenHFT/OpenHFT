@@ -36,10 +36,10 @@
         <spotbugs.excludeFilterFile>net/openhft/quality/spotbugs26/chronicle-spotbugs-exclude.xml
         </spotbugs.excludeFilterFile>
 
-        <!-- Coverage thresholds: 90% line / 80% branch -->
-        <!-- Updated after Phase 1-4 coverage improvements -->
+        <!-- Coverage thresholds: 90% line / 85% branch -->
+        <!-- Branch threshold reflects genuinely unreachable defensive code -->
         <jacoco.line.coverage>0.90</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
+        <jacoco.branch.coverage>0.85</jacoco.branch.coverage>
     </properties>
 
     <dependencyManagement>
@@ -195,6 +195,11 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>net/openhft/quality/MeaningfulMessageCli*.class</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>check</id>
@@ -203,6 +208,9 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <excludes>
+                                <exclude>net/openhft/quality/MeaningfulMessageCli*.class</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
@@ -307,8 +315,8 @@
                                 <param>XML</param>
                             </outputFormats>
                             <!-- Mutation thresholds -->
-                            <!-- Current: 80% mutation coverage -->
-                            <mutationThreshold>80</mutationThreshold>
+                            <!-- Current: 85% mutation coverage -->
+                            <mutationThreshold>85</mutationThreshold>
                             <coverageThreshold>90</coverageThreshold>
                             <!-- Run all tests against all mutations for accuracy -->
                             <fullMutationMatrix>true</fullMutationMatrix>

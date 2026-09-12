@@ -68,7 +68,6 @@
             contain the arguments necessary to run the Chronicle libraries
         -->
         <jvm.requiredArgs />
-        <jvm.extraArgs/>
         <!-- Define the target coverage thresholds as properties -->
         <jacoco.line.coverage>0.8</jacoco.line.coverage>
         <jacoco.branch.coverage>0.7</jacoco.branch.coverage>
@@ -523,7 +522,6 @@
                     --add-opens=java.base/java.util=ALL-UNNAMED
                     --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
                     --enable-native-access=ALL-UNNAMED
-                    -XX:+EnableDynamicAgentLoading
                 </jvm.requiredArgs>
             </properties>
         </profile>

@@ -135,42 +135,6 @@
         <Class name="net.openhft.chronicle.map.channel.AbstractMapService"/>
     </Match>
 
-    <!-- EI_EXPOSE_REP2: ArrayFieldModel keeps a reference to the shared ScalarFieldModel so element metadata stays consistent -->
-    <Match>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-        <Class name="net.openhft.chronicle.values.ArrayFieldModel"/>
-        <Method name="&lt;init&gt;"/>
-    </Match>
-
-    <!-- EI_EXPOSE_REP: FieldModel intentionally exposes Method handles so generators/serialisers can invoke the declared accessors -->
-    <Match>
-        <Bug pattern="EI_EXPOSE_REP"/>
-        <Class name="net.openhft.chronicle.values.FieldModel"/>
-        <Method name="get"/>
-    </Match>
-    <Match>
-        <Bug pattern="EI_EXPOSE_REP"/>
-        <Class name="net.openhft.chronicle.values.FieldModel"/>
-        <Method name="set"/>
-    </Match>
-    <Match>
-        <Bug pattern="EI_EXPOSE_REP"/>
-        <Class name="net.openhft.chronicle.values.FieldModel"/>
-        <Method name="setOrSetOrderedOrSetVolatile"/>
-    </Match>
-    <Match>
-        <Bug pattern="EI_EXPOSE_REP"/>
-        <Class name="net.openhft.chronicle.values.FieldModel"/>
-        <Method name="getOrGetVolatile"/>
-    </Match>
-
-    <!-- CT_CONSTRUCTOR_THROW: ValueModel constructor validates layouts and must fail-fast if the interface definition is invalid -->
-    <Match>
-        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
-        <Class name="net.openhft.chronicle.values.ValueModel"/>
-        <Method name="&lt;init&gt;"/>
-    </Match>
-
     <!-- UC_USELESS_OBJECT: OSTest.testMap keeps anchors list only to pin mapped buffers in memory -->
     <Match>
         <Bug pattern="UC_USELESS_OBJECT"/>
@@ -216,36 +180,6 @@
     <Match>
         <Bug pattern="URF_UNREAD_FIELD"/>
         <Class name="net.openhft.chronicle.core.UnsafeMemoryTest$TestClass"/>
-    </Match>
-
-    <!-- DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED in cleaner tests: classloader is test-only and runs under unit-test security context -->
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
-        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceFallbackTest"/>
-    </Match>
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
-        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceIncludeNewerOlderTest"/>
-    </Match>
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
-        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceLoaderErrorTest"/>
-    </Match>
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
-        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceLocatorTest"/>
-    </Match>
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
-        <Class name="net.openhft.chronicle.core.cleaner.CleanerServiceMixedTest"/>
-    </Match>
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
-        <Class name="net.openhft.chronicle.core.cleaner.CleanerServicePriorityTest"/>
-    </Match>
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
-        <Class name="net.openhft.chronicle.core.internal.pom.InternalPomPropertiesPresenceTest"/>
     </Match>
 
     <!-- UPM/URF in reflection-focused ClassUtil tests: private members are probed reflectively -->
@@ -405,16 +339,6 @@
         <Class name="net.openhft.chronicle.wire.HashWire$HashValueOut"/>
     </Match>
 
-    <!-- Dead store patterns in internal perf / comparison tests -->
-    <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-        <Class name="net.openhft.chronicle.bytes.internal.BytesInternalGuardedTest"/>
-    </Match>
-    <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-        <Class name="net.openhft.chronicle.bytes.internal.BytesInternalTest"/>
-    </Match>
-
     <!-- URF_* in PrimitiveTest DTOs used for README-style marshalling examples -->
     <Match>
         <Bug pattern="URF_UNREAD_FIELD"/>
@@ -519,10 +443,6 @@
         <Field name="copy"/>
     </Match>
     <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-        <Class name="net.openhft.chronicle.queue.channel.Main"/>
-    </Match>
-    <Match>
         <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
         <Class name="net.openhft.chronicle.queue.channel.PerfLatencyMain"/>
     </Match>
@@ -597,10 +517,6 @@
         <Class name="net.openhft.chronicle.testframework.internal.network.proxy.TcpProxyTest"/>
     </Match>
     <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-        <Class name="net.openhft.chronicle.testframework.mappedfiles.MappedFileUtilTest"/>
-    </Match>
-    <Match>
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
         <Class name="net.openhft.chronicle.values.ValuesTestCommon"/>
     </Match>
@@ -615,10 +531,6 @@
         <Class name="net.openhft.posix.internal.PosixAPIHolder"/>
     </Match>
     <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-        <Class name="net.openhft.posix.internal.jnr.BenchmarkMain"/>
-    </Match>
-    <Match>
         <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
         <Class name="net.openhft.posix.internal.jnr.BenchmarkMain"/>
     </Match>
@@ -627,20 +539,12 @@
         <Class name="net.openhft.posix.internal.jnr.BenchmarkMain"/>
     </Match>
     <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-        <Class name="net.openhft.posix.internal.jnr.JNRPosixAPITest"/>
-    </Match>
-    <Match>
         <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
         <Class name="net.openhft.posix.internal.jnr.JNRPosixAPITest"/>
     </Match>
     <Match>
         <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
         <Class name="net.openhft.posix.internal.jnr.MSyncFileBenchmarkMain"/>
-    </Match>
-    <Match>
-        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-        <Class name="net.openhft.posix.PosixAPI"/>
     </Match>
     <!-- Runtime-generated MethodReader/MethodWriter classes from Chronicle-Wire's compiler.
          These are emitted into target/test-classes during test execution and produce

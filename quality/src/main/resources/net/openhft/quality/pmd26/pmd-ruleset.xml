@@ -138,18 +138,27 @@
         <exclude name="UncommentedEmptyConstructor"/>
     </rule>
 
-    <!-- Disable multithreading rules as well -->
-    <rule ref="category/java/multithreading.xml">
-        <exclude name="AvoidSynchronizedAtMethodLevel"/>
-        <exclude name="AvoidThreadGroup"/>
-        <exclude name="AvoidUsingVolatile"/>
-        <exclude name="DoNotUseThreads"/>
-        <exclude name="DontCallThreadRun"/>
-        <exclude name="DoubleCheckedLocking"/>
-        <exclude name="NonThreadSafeSingleton"/>
-        <exclude name="UnsynchronizedStaticFormatter"/>
-        <exclude name="UseConcurrentHashMap"/>
-        <exclude name="UseNotifyAllInsteadOfNotify"/>
-        <exclude name="AvoidSynchronizedStatement"/>
+    <rule ref="category/java/design.xml">
+        <exclude name="LawOfDemeter"/>
+        <exclude name="LoosePackageCoupling"/>
+        <exclude name="NcssCount"/>
+        <exclude name="NPathComplexity"/>
+        <exclude name="TooManyMethods"/>
+        <exclude name="TooManyFields"/>
+        <exclude name="ExcessiveImports"/>
+        <exclude name="ExcessiveClassLength"/>
+        <exclude name="ExcessiveMethodLength"/>
+        <exclude name="ExcessiveParameterList"/>
+        <exclude name="ExcessivePublicCount"/>
+        <exclude name="GodClass"/>
+        <exclude name="DataClass"/>
+        <exclude name="CouplingBetweenObjects"/>
+        <exclude name="AbstractClassWithoutAnyMethod"/>
+        <exclude name="UseObjectForClearerAPI"/>
+        <exclude name="SignatureDeclareThrowsException"/>
+        <exclude name="AvoidCatchingGenericException"/>
+        <exclude name="AvoidThrowingRawExceptionTypes"/>
+        <exclude name="AvoidRethrowingException"/>
+        <exclude name="AvoidThrowingNullPointerException"/>
     </rule>
 </ruleset>

@@ -25,6 +25,12 @@ class MessageCandidateSinkTest {
             @Override
             public void emitMissingMessage(int lineNo, MessageSource source) {
             }
+
+            @Override
+            public void emitMissingMessage(int lineNo, MessageSource source,
+                                           AdviceSource adviceSource,
+                                           MissingMessageKind missingMessageKind) {
+            }
         };
 
         assertDoesNotThrow(() -> sink.emitUnhandled(null, "no-op"),

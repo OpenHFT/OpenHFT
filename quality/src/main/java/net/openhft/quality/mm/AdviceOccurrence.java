@@ -48,4 +48,12 @@ public final class AdviceOccurrence {
     public String snippet() {
         return snippet;
     }
+
+    @Override
+    public String toString() {
+        return "AdviceOccurrence{lineNo=" + lineNo
+                + ", source=" + source
+                + ", messageLiteral='" + messageLiteral + '\''
+                + '}';
+    }
 }

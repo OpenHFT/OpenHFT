@@ -36,10 +36,6 @@ public class ViolationCollector {
         this.verbose = verbose;
     }
 
-    void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
     /**
      * Record a violation for a line, keeping the highest priority for that line.
      *
@@ -101,14 +97,22 @@ public class ViolationCollector {
         return !pending.isEmpty();
     }
 
-    void putPendingForTesting(int lineNo, Violation violation) {
+    // visible for testing
+    void putPendingForTest(int lineNo, Violation violation) {
         pending.put(lineNo, violation);
     }
 
-    Map<Integer, Violation> pendingForTesting() {
+    // visible for testing
+    Map<Integer, Violation> pendingForTest() {
         return new HashMap<>(pending);
     }
 
+    /**
+     * Compares two rules using a three-level tiebreaker:
+     * (1) lower numeric priority wins, (2) shorter code string wins,
+     * (3) lower enum ordinal wins. This ensures deterministic ordering
+     * even when rules share the same priority bucket.
+     */
     private boolean isHigherPriority(RuleId candidate, RuleId existing) {
         requireNonNull(existing);
         requireNonNull(candidate);

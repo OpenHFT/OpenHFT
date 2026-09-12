@@ -25,6 +25,12 @@ CM is designed to store the data off-heap, which means it minimizes the heap usa
 CM is structured key-value store able to support exceptionally high updates and high throughput data e.g. OPRA Market Data with minimum configuration.
 Replication is provided by Chronicle Map Enterprise
 
+== Reporting security issues
+
+If you discover a security vulnerability in any Chronicle / OpenHFT library, please report it responsibly by emailing security@chronicle.software.
+Please do not open a public GitHub issue or pull request for security vulnerabilities.
+See <<SECURITY.md#,our Security Policy>> for details on what to include and what to expect.
+
 == Contributor agreement
 
 For us to accept contributions to open source libraries we require contributors to sign the below

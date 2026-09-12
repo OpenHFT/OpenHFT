@@ -21,8 +21,8 @@ class ViolationCollectorTest {
     @DisplayName("Flush skips null entries without logging")
     void flushSkipsNullEntriesWithoutLogging() throws Exception {
         ViolationCollector collector = new ViolationCollector(null);
-        collector.putPendingForTesting(5, null);
-        collector.putPendingForTesting(6, new Violation(6, RuleId.MISSING_MESSAGE, new Object[]{}));
+        collector.putPendingForTest(5, null);
+        collector.putPendingForTest(6, new Violation(6, RuleId.MISSING_MESSAGE, new Object[]{}));
 
         TestCheck check = new TestCheck();
         check.configure(new com.puppycrawl.tools.checkstyle.DefaultConfiguration("TestCheck"));
@@ -36,9 +36,9 @@ class ViolationCollectorTest {
     @DisplayName("Flush emits all violations from unsorted input")
     void flushEmitsAllViolationsFromUnsortedInput() throws Exception {
         ViolationCollector collector = new ViolationCollector(null);
-        collector.putPendingForTesting(30, new Violation(30, RuleId.MISSING_MESSAGE, new Object[]{}));
-        collector.putPendingForTesting(10, new Violation(10, RuleId.TOO_SHORT, new Object[]{}));
-        collector.putPendingForTesting(20, new Violation(20, RuleId.GENERIC, new Object[]{}));
+        collector.putPendingForTest(30, new Violation(30, RuleId.MISSING_MESSAGE, new Object[]{}));
+        collector.putPendingForTest(10, new Violation(10, RuleId.TOO_SHORT, new Object[]{}));
+        collector.putPendingForTest(20, new Violation(20, RuleId.GENERIC, new Object[]{}));
 
         TestCheck check = new TestCheck();
         check.configure(new com.puppycrawl.tools.checkstyle.DefaultConfiguration("TestCheck"));
@@ -109,9 +109,9 @@ class ViolationCollectorTest {
         collector.record(10, RuleId.TOO_LONG);
         collector.record(10, RuleId.MISSING_MESSAGE);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "only one violation should remain for the line");
-        assertEquals(RuleId.MISSING_MESSAGE, collector.pendingForTesting().get(10).ruleId(),
+        assertEquals(RuleId.MISSING_MESSAGE, collector.pendingForTest().get(10).ruleId(),
                 "higher priority violation should replace existing");
     }
 
@@ -122,9 +122,9 @@ class ViolationCollectorTest {
         collector.record(10, RuleId.MISSING_MESSAGE);
         collector.record(10, RuleId.TOO_LONG);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "only one violation should remain for the line");
-        assertEquals(RuleId.MISSING_MESSAGE, collector.pendingForTesting().get(10).ruleId(),
+        assertEquals(RuleId.MISSING_MESSAGE, collector.pendingForTest().get(10).ruleId(),
                 "existing higher priority violation should be kept");
     }
 
@@ -231,29 +231,12 @@ class ViolationCollectorTest {
     }
 
     @Test
-    @DisplayName("Set verbose updates verbose flag")
-    void setVerboseUpdatesVerboseFlag() throws Exception {
-        ViolationCollector collector = new ViolationCollector(null, false);
-        collector.setVerbose(true);
-        
-        // Record a violation with the updated verbose setting
-        collector.record(10, RuleId.MISSING_MESSAGE);
-        
-        TestCheck check = new TestCheck();
-        check.configure(new com.puppycrawl.tools.checkstyle.DefaultConfiguration("TestCheck"));
-        collector.flush(check);
-        
-        // Verify that a violation was recorded (showing setVerbose was called)
-        assertEquals(1, check.getViolations().size(), "violation should be recorded");
-    }
-
-    @Test
     @DisplayName("Record returns false when violation is suppressed by tracker")
     void recordReturnsFalseWhenSuppressedByTracker() {
         SuppressionTracker tracker = new SuppressionTracker();
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMTooShort");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         ViolationCollector collector = new ViolationCollector(tracker);
         boolean result = collector.record(10, RuleId.TOO_SHORT);
@@ -269,7 +252,7 @@ class ViolationCollectorTest {
         SuppressionTracker tracker = new SuppressionTracker();
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMTooShort");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         ViolationCollector collector = new ViolationCollector(tracker);
         boolean result = collector.record(10, RuleId.MISSING_MESSAGE);
@@ -286,7 +269,7 @@ class ViolationCollectorTest {
         collector.record(10, RuleId.TOO_SHORT);
         collector.record(10, RuleId.TOO_SHORT);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "should keep only one violation per line");
     }
 
@@ -297,7 +280,7 @@ class ViolationCollectorTest {
         collector.record(10, RuleId.MISSING_MESSAGE, "first");
         collector.record(10, RuleId.THROW_NULL, "second");
 
-        java.util.Map<Integer, Violation> pending = collector.pendingForTesting();
+        java.util.Map<Integer, Violation> pending = collector.pendingForTest();
         assertEquals(1, pending.size(), "should have one violation for line 10");
     }
 
@@ -308,7 +291,7 @@ class ViolationCollectorTest {
         collector.record(10, RuleId.THROW_NULL, "higher priority first");
         collector.record(10, RuleId.TOO_SHORT, "lower priority second");
 
-        java.util.Map<Integer, Violation> pending = collector.pendingForTesting();
+        java.util.Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertEquals(RuleId.THROW_NULL, violation.ruleId(),
                 "higher priority THROW_NULL should be kept over TOO_SHORT");

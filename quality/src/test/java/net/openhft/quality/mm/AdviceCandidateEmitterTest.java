@@ -87,7 +87,7 @@ class AdviceCandidateEmitterTest {
         SuppressionTracker tracker = new SuppressionTracker();
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMMissingMessage");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         AdviceCandidateEmitter emitter = new AdviceCandidateEmitter(collector, tracker, null);
         MessageCandidate candidate = new MessageCandidate.Builder()
@@ -111,7 +111,7 @@ class AdviceCandidateEmitterTest {
         SuppressionTracker tracker = new SuppressionTracker();
         SuppressionTracker.SuppressionScope scope = tracker.new SuppressionScope();
         scope.addToken("MMAssertionMessageMissing");
-        tracker.pushScopeForTesting(scope);
+        tracker.pushScopeForTest(scope);
 
         AdviceCandidateEmitter emitter = new AdviceCandidateEmitter(collector, tracker, null);
         MessageCandidate candidate = new MessageCandidate.Builder()

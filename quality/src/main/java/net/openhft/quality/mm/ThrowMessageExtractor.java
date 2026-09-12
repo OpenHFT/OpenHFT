@@ -53,6 +53,14 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
                 sink().emitMissingMessage(throwAst.getLineNo(), MessageSource.THROW);
                 return;
             }
+            if (isMethodCallExpression(expr)) {
+                // Factory method like throw createException("msg") — emit missing message
+                if (!context().hasInlineReasonComment(expr)
+                        && !context().hasAdjacentReasonComment(throwAst.getLineNo())) {
+                    sink().emitMissingMessage(throwAst.getLineNo(), MessageSource.THROW);
+                }
+                return;
+            }
             emitUnhandled(throwAst, "Throw statement does not construct new exception");
             return;
         }
@@ -138,7 +146,7 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
-    private DetailAST findMessageExpression(List<DetailAST> args) {
+    DetailAST findMessageExpression(List<DetailAST> args) {
         for (DetailAST arg : args) {
             if (astSupport().isNullLiteral(arg)) {
                 continue;
@@ -169,20 +177,50 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             DetailAST type = content.findFirstToken(TokenTypes.TYPE);
             if (type != null) {
                 String typeName = astSupport().extractTypeName(type);
-                if (isThrowableTypeName(typeName)) {
-                    return true;
+                if (typeName != null && !typeName.isEmpty()) {
+                    // Respect the declared cast type: a cast to a non-Throwable
+                    // type means the expression is not a rethrow, even if the
+                    // castee variable was a Throwable.
+                    return isThrowableTypeName(typeName);
                 }
             }
             DetailAST castExpr = content.getLastChild();
             return castExpr != null && isThrowableExpression(castExpr);
         }
         if (content.getType() == TokenTypes.METHOD_CALL) {
-            return true;
+            String methodName = astSupport().extractMethodName(content);
+            if (methodName == null) {
+                return false;
+            }
+            String lower = methodName.toLowerCase(java.util.Locale.ROOT);
+            boolean nameMatches = lower.startsWith("rethrow") || lower.startsWith("propagate")
+                    || lower.startsWith("sneaky") || lower.equals("wrap");
+            if (!nameMatches) {
+                return false;
+            }
+            // Require a Throwable argument so names like propagateEvent or wrap(config)
+            // do not silently mask missing-message advice.
+            DetailAST elist = content.findFirstToken(TokenTypes.ELIST);
+            return elist != null && containsThrowable(astSupport().collectArguments(elist));
         }
         if (content.getType() == TokenTypes.IDENT || content.getType() == TokenTypes.DOT) {
             return isThrowableExpression(content);
         }
         return false;
+    }
+
+    boolean containsThrowable(List<DetailAST> args) {
+        for (DetailAST arg : args) {
+            if (isThrowableExpression(arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean isMethodCallExpression(DetailAST expr) {
+        DetailAST content = astSupport().unwrapExpr(expr);
+        return content != null && content.getType() == TokenTypes.METHOD_CALL;
     }
 
     boolean isThrowableMessageCall(DetailAST expr) {
@@ -191,7 +229,7 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
             return false;
         }
         String methodName = astSupport().extractMethodName(content);
-        if (!"getMessage".equals(methodName)) {
+        if (!"getMessage".equals(methodName) && !"getLocalizedMessage".equals(methodName)) {
             return false;
         }
         DetailAST dot = content.findFirstToken(TokenTypes.DOT);
@@ -207,22 +245,10 @@ public final class ThrowMessageExtractor extends AbstractMessageExtractor {
     }
 
     boolean isThrowableTypeName(String typeName) {
-        if (typeName == null) {
-            return false;
-        }
-        String resolved = context().resolveTypeName(typeName);
-        String simple = resolved;
-        int lastDot = resolved.lastIndexOf('.');
-        if (lastDot >= 0) {
-            simple = resolved.substring(lastDot + 1);
-        }
-        return simple.equals("Throwable")
-                || simple.endsWith("Exception")
-                || simple.endsWith("Error")
-                || simple.equals("StackTrace");
+        return MessageAstSupport.isThrowableTypeName(typeName, context()::resolveTypeName);
     }
 
-    private boolean isUnsupportedOperationException(String typeName) {
+    boolean isUnsupportedOperationException(String typeName) {
         if (typeName == null) {
             return false;
         }

@@ -139,6 +139,86 @@ class AnnotationMessageExtractorTest {
         return extractor.extractAnnotationName(annotation);
     }
 
+    @Test
+    @DisplayName("Handle Disabled annotation emits missing message with ANNOTATION_DISABLED source")
+    void handleDisabledAnnotation_usesDisabledSource() {
+        DetailAstImpl annotation = createAnnotation("Disabled", createStringExpr("Bug #123"));
+
+        extractor.handleAnnotation(annotation);
+
+        assertEquals(1, sink.candidates.size(), "Should emit one candidate for @Disabled");
+        assertEquals("Bug #123", sink.candidates.get(0).message());
+    }
+
+    @Test
+    @DisplayName("Handle Ignore annotation emits candidate")
+    void handleIgnoreAnnotation_emitsCandidate() {
+        DetailAstImpl annotation = createAnnotation("Ignore", createStringExpr("Legacy test"));
+
+        extractor.handleAnnotation(annotation);
+
+        assertEquals(1, sink.candidates.size(), "Should emit one candidate for @Ignore");
+        assertEquals("Legacy test", sink.candidates.get(0).message());
+    }
+
+    @Test
+    @DisplayName("Handle ParameterizedTest with name attribute emits candidate")
+    void handleParameterizedTestNameAttribute_emitsCandidate() {
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        annotation.addChild(createIdent("ParameterizedTest"));
+
+        DetailAstImpl pair = new DetailAstImpl();
+        pair.setType(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+        annotation.addChild(pair);
+        pair.addChild(createIdent("name"));
+        pair.addChild(createStringExpr("{index}: input={0}"));
+
+        extractor.handleAnnotation(annotation);
+
+        assertEquals(1, sink.candidates.size(), "Should emit candidate for @ParameterizedTest(name=...)");
+        assertEquals("{index}: input={0}", sink.candidates.get(0).message());
+    }
+
+    @Test
+    @DisplayName("Handle RepeatedTest with name attribute emits candidate")
+    void handleRepeatedTestNameAttribute_emitsCandidate() {
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        annotation.addChild(createIdent("RepeatedTest"));
+
+        DetailAstImpl pair = new DetailAstImpl();
+        pair.setType(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+        annotation.addChild(pair);
+        pair.addChild(createIdent("name"));
+        pair.addChild(createStringExpr("repetition {currentRepetition}"));
+
+        extractor.handleAnnotation(annotation);
+
+        assertEquals(1, sink.candidates.size(), "Should emit candidate for @RepeatedTest(name=...)");
+        assertEquals("repetition {currentRepetition}", sink.candidates.get(0).message());
+    }
+
+    @Test
+    @DisplayName("Handle annotation with disabledReason attribute emits candidate")
+    void handleAnnotationWithDisabledReasonAttribute_emitsCandidate() {
+        DetailAstImpl annotation = new DetailAstImpl();
+        annotation.setType(TokenTypes.ANNOTATION);
+        annotation.addChild(createIdent("EnabledIf"));
+
+        DetailAstImpl pair = new DetailAstImpl();
+        pair.setType(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+        annotation.addChild(pair);
+        pair.addChild(createIdent("disabledReason"));
+        pair.addChild(createStringExpr("Only runs on Linux"));
+
+        extractor.handleAnnotation(annotation);
+
+        assertEquals(1, sink.candidates.size(),
+                "Should emit candidate for @EnabledIf(disabledReason=...)");
+        assertEquals("Only runs on Linux", sink.candidates.get(0).message());
+    }
+
     private static final class TestSink implements MessageCandidateSink {
         final List<MessageCandidate> candidates = new ArrayList<>();
         final List<MessageSource> missingMessages = new ArrayList<>();
@@ -152,6 +232,13 @@ class AnnotationMessageExtractorTest {
         @Override
         public void emitMissingMessage(int lineNo, MessageSource source) {
             missingMessages.add(source);
+        }
+
+        @Override
+        public void emitMissingMessage(int lineNo, MessageSource source,
+                                       AdviceSource adviceSource,
+                                       MissingMessageKind missingMessageKind) {
+            emitMissingMessage(lineNo, source);
         }
 
         @Override

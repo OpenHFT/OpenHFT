@@ -35,7 +35,7 @@ class MMMissingLoopIndexTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -48,7 +48,7 @@ class MMMissingLoopIndexTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -60,7 +60,7 @@ class MMMissingLoopIndexTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(12);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_LOOP_INDEX, violation.ruleId());

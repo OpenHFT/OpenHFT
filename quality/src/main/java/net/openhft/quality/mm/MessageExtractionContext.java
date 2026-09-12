@@ -16,16 +16,21 @@ import static java.util.Objects.requireNonNull;
  * Holds per-file extraction state such as imports, variable types, and comments.
  */
 public final class MessageExtractionContext {
+    private static final int MAX_PARSE_ITERATIONS = 10_000;
     private final MessageAstSupport astSupport;
     private final Map<String, String> importedClasses = new HashMap<>();
     private final Map<String, String> fieldTypes = new HashMap<>();
-    private final Map<String, String> methodVariableTypes = new HashMap<>();
+    // Not final: enterMethod/leaveMethod swap references with the top of methodScopes
+    // to avoid copying the maps across nested method boundaries.
+    private Map<String, String> methodVariableTypes = new HashMap<>();
     private final Map<String, MessageTemplate> fieldStringTemplates = new HashMap<>();
-    private final Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
+    private Map<String, MessageTemplate> methodStringTemplates = new HashMap<>();
+    private final Map<String, Set<Integer>> declaredMethodArities = new HashMap<>();
     private final Set<String> junit4StaticMethods = new HashSet<>();
     private final Set<String> junit5StaticMethods = new HashSet<>();
     private final Set<String> declaredMethodNames = new HashSet<>();
     private final Deque<ClassScope> classScopes = new ArrayDeque<>();
+    private final Deque<MethodScope> methodScopes = new ArrayDeque<>();
     private MessageTemplateExtractor templateExtractor;
     private FileContents fileContents;
     private boolean junit4StaticWildcard;
@@ -118,8 +123,10 @@ public final class MessageExtractionContext {
         junit4ImportWildcard = false;
         junit5ImportWildcard = false;
         junit5ParamsImportWildcard = false;
+        declaredMethodArities.clear();
         declaredMethodNames.clear();
         classScopes.clear();
+        methodScopes.clear();
         currentClassName = null;
         currentClassLineNo = 0;
         currentClassHasDisplayName = false;
@@ -130,6 +137,13 @@ public final class MessageExtractionContext {
         junit4AnnotationName = null;
         junit4AssertionUsage = false;
         junit4AssertionLine = 0;
+        currentMethodIsTest = false;
+        currentMethodHasDisplayName = false;
+        currentMethodLineNo = 0;
+        currentMethodFirstAnnotationName = null;
+        currentMethodFirstAnnotationLine = 0;
+        currentMethodHasTestAnnotation = false;
+        currentMethodTestAnnotationLine = 0;
     }
 
     /**
@@ -145,6 +159,26 @@ public final class MessageExtractionContext {
     }
 
     /**
+     * Record method arities declared in the current file.
+     *
+     * @param methodArities declared method names mapped to supported parameter counts.
+     */
+    public void setDeclaredMethodArities(Map<String, Set<Integer>> methodArities) {
+        declaredMethodArities.clear();
+        if (methodArities == null || methodArities.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Set<Integer>> entry : methodArities.entrySet()) {
+            String methodName = entry.getKey();
+            Set<Integer> arities = entry.getValue();
+            if (methodName == null || arities == null || arities.isEmpty()) {
+                continue;
+            }
+            declaredMethodArities.put(methodName, new HashSet<>(arities));
+        }
+    }
+
+    /**
      * Check whether a method name is declared in this file.
      *
      * @param methodName method name to check.
@@ -152,6 +186,21 @@ public final class MessageExtractionContext {
      */
     public boolean isDeclaredMethodName(String methodName) {
         return methodName != null && declaredMethodNames.contains(methodName);
+    }
+
+    /**
+     * Check whether the current file declares a method with the given name and parameter count.
+     *
+     * @param methodName method name to check.
+     * @param parameterCount number of parameters in the candidate signature.
+     * @return {@code true} if a matching declaration exists in the current file.
+     */
+    public boolean isDeclaredMethodSignature(String methodName, int parameterCount) {
+        if (methodName == null) {
+            return false;
+        }
+        Set<Integer> arities = declaredMethodArities.get(methodName);
+        return arities != null && arities.contains(parameterCount);
     }
 
     /**
@@ -218,6 +267,7 @@ public final class MessageExtractionContext {
      * @param methodAst method definition AST node.
      */
     public void enterMethod(DetailAST methodAst) {
+        methodScopes.push(snapshotMethodScope());
         currentMethodName = astSupport.extractName(methodAst);
         currentMethodLineNo = methodAst.getLineNo();
         currentMethodIsTest = false;
@@ -226,14 +276,50 @@ public final class MessageExtractionContext {
         currentMethodFirstAnnotationLine = 0;
         currentMethodHasTestAnnotation = false;
         currentMethodTestAnnotationLine = 0;
-        methodVariableTypes.clear();
-        methodStringTemplates.clear();
+        methodVariableTypes = new HashMap<>();
+        methodStringTemplates = new HashMap<>();
     }
 
     /**
-     * Leave the current method and clear method-local state.
+     * Leave the current method and restore the enclosing method's state, if any.
      */
     public void leaveMethod() {
+        if (methodScopes.isEmpty()) {
+            clearCurrentMethodState();
+        } else {
+            restoreMethodScope(methodScopes.pop());
+        }
+    }
+
+    private MethodScope snapshotMethodScope() {
+        MethodScope scope = new MethodScope();
+        scope.name = currentMethodName;
+        scope.lineNo = currentMethodLineNo;
+        scope.isTest = currentMethodIsTest;
+        scope.hasDisplayName = currentMethodHasDisplayName;
+        scope.firstAnnotationName = currentMethodFirstAnnotationName;
+        scope.firstAnnotationLine = currentMethodFirstAnnotationLine;
+        scope.hasTestAnnotation = currentMethodHasTestAnnotation;
+        scope.testAnnotationLine = currentMethodTestAnnotationLine;
+        scope.variableTypes = methodVariableTypes;
+        scope.stringTemplates = methodStringTemplates;
+        return scope;
+    }
+
+    private void restoreMethodScope(MethodScope scope) {
+        currentMethodName = scope.name;
+        currentMethodLineNo = scope.lineNo;
+        currentMethodIsTest = scope.isTest;
+        currentMethodHasDisplayName = scope.hasDisplayName;
+        currentMethodFirstAnnotationName = scope.firstAnnotationName;
+        currentMethodFirstAnnotationLine = scope.firstAnnotationLine;
+        currentMethodHasTestAnnotation = scope.hasTestAnnotation;
+        currentMethodTestAnnotationLine = scope.testAnnotationLine;
+        methodVariableTypes = scope.variableTypes;
+        methodStringTemplates = scope.stringTemplates;
+    }
+
+    private void clearCurrentMethodState() {
         currentMethodName = null;
         currentMethodIsTest = false;
         currentMethodHasDisplayName = false;
@@ -770,7 +856,10 @@ public final class MessageExtractionContext {
      * @return {@code true} if the expression represents a Locale.
      */
     public boolean isLocaleExpression(DetailAST expr) {
-        DetailAST content = requireNonNull(astSupport.unwrapExpr(expr));
+        DetailAST content = astSupport.unwrapExpr(expr);
+        if (content == null) {
+            return false;
+        }
         if (content.getType() == TokenTypes.IDENT) {
             return isLocaleTypeName(getVariableType(content.getText()));
         }
@@ -933,13 +1022,7 @@ public final class MessageExtractionContext {
     }
 
     String normalizeClassName(String className) {
-        requireNonNull(className);
-        String trimmed = className.trim();
-        if (trimmed.isEmpty()) {
-            return null;
-        }
-        int lastDot = trimmed.lastIndexOf('.');
-        return lastDot >= 0 ? trimmed.substring(lastDot + 1) : trimmed;
+        return MessageAstSupport.normalizeClassName(className);
     }
 
     int[] findArgumentListRange(DetailAST nodeWithParens, FileContents contents) {
@@ -990,6 +1073,7 @@ public final class MessageExtractionContext {
         }
         int startIndex = Math.max(0, scanCol);
         boolean inBlockComment = false;
+        boolean inTextBlock = false;
         boolean inString = false;
         boolean inChar = false;
         boolean foundOpen = false;
@@ -997,17 +1081,38 @@ public final class MessageExtractionContext {
         int openLine = 0;
         int openCol = 0;
 
+        int iterations = 0;
         for (int line = scanLine - 1; line < lines.length; line++) {
             String text = lines[line];
             requireNonNull(text);
             int index = line == scanLine - 1 ? Math.min(startIndex, text.length()) : 0;
             while (index < text.length()) {
+                if (++iterations > MAX_PARSE_ITERATIONS) {
+                    // guard against hanging on malformed or unusually long input
+                    break;
+                }
                 char current = text.charAt(index);
                 char next = index + 1 < text.length() ? text.charAt(index + 1) : '\0';
 
                 if (inBlockComment) {
                     if (current == '*' && next == '/') {
                         inBlockComment = false;
+                        index += 2;
+                        continue;
+                    }
+                    index++;
+                    continue;
+                }
+                if (inTextBlock) {
+                    if (current == '"'
+                            && index + 2 < text.length()
+                            && text.charAt(index + 1) == '"'
+                            && text.charAt(index + 2) == '"') {
+                        inTextBlock = false;
+                        index += 3;
+                        continue;
+                    }
+                    if (current == '\\' && index + 1 < text.length()) {
                         index += 2;
                         continue;
                     }
@@ -1046,6 +1151,14 @@ public final class MessageExtractionContext {
                     continue;
                 }
                 if (current == '"') {
+                    if (index + 2 < text.length()
+                            && text.charAt(index + 1) == '"'
+                            && text.charAt(index + 2) == '"') {
+                        // Text block: state persists across lines until closing """.
+                        inTextBlock = true;
+                        index += 3;
+                        continue;
+                    }
                     inString = true;
                     index++;
                     continue;
@@ -1130,5 +1243,18 @@ public final class MessageExtractionContext {
             this.name = name;
             this.lineNo = lineNo;
         }
+    }
+
+    private static final class MethodScope {
+        String name;
+        int lineNo;
+        boolean isTest;
+        boolean hasDisplayName;
+        String firstAnnotationName;
+        int firstAnnotationLine;
+        boolean hasTestAnnotation;
+        int testAnnotationLine;
+        Map<String, String> variableTypes;
+        Map<String, MessageTemplate> stringTemplates;
     }
 }

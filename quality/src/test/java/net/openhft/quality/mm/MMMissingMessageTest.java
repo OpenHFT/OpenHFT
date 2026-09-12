@@ -179,7 +179,7 @@ class MMMissingMessageTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(40);
+        Violation violation = collector.pendingForTest().get(40);
         assertNotNull(violation, "Violation should be recorded for missing comment");
         assertEquals("add a single-line comment on the line before explaining why returning null is required",
                 violation.args()[0], "Return-null fix guidance should match");
@@ -198,7 +198,7 @@ class MMMissingMessageTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(41);
+        Violation violation = collector.pendingForTest().get(41);
         assertNotNull(violation, "Violation should be recorded for missing comment");
         assertEquals("add a single-line comment on the line before explaining why java.lang.System is required here",
                 violation.args()[0], "System call fix guidance should match");
@@ -217,7 +217,7 @@ class MMMissingMessageTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(42);
+        Violation violation = collector.pendingForTest().get(42);
         assertNotNull(violation, "Violation should be recorded for missing comment");
         assertEquals("add a single-line comment on the line before explaining why java.lang.Runtime is required here",
                 violation.args()[0], "Runtime call fix guidance should match");
@@ -235,7 +235,7 @@ class MMMissingMessageTest {
 
         rule.evaluate(context, collector, state);
 
-        Violation violation = collector.pendingForTesting().get(43);
+        Violation violation = collector.pendingForTest().get(43);
         assertNotNull(violation, "Violation should be recorded for missing message");
         assertEquals("add a meaningful message, supply a Throwable, or add a single-line comment on the line before when a message must be omitted",
                 violation.args()[0], "Default fix guidance should match");

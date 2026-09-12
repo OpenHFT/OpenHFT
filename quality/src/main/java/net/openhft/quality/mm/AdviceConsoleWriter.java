@@ -3,24 +3,31 @@
  */
 package net.openhft.quality.mm;
 
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Writes aggregated advice to the console.
+ * Writes aggregated advice to a configurable output.
  */
 public final class AdviceConsoleWriter {
     private final boolean verbose;
+    private final PrintWriter out;
 
     public AdviceConsoleWriter(boolean verbose) {
+        this(verbose, new PrintWriter(System.out, true));
+    }
+
+    public AdviceConsoleWriter(boolean verbose, PrintWriter out) {
         this.verbose = verbose;
+        this.out = out;
     }
 
     public void write(FileReport report) {
         if (report == null || !report.hasIssues()) {
             return;
         }
-        System.out.println("FILE: " + report.fileName());
+        out.println("FILE: " + report.fileName());
         printRuleSummary(report);
         for (FileAdviceGroup group : report.fileAdvice()) {
             printFileAdvice(group);
@@ -36,7 +43,7 @@ public final class AdviceConsoleWriter {
 
     public void writeRunSummary(int fileCount, int issueCount) {
         if (issueCount == 0) {
-            System.out.println(fileCount + " files read; no issues found.");
+            out.println(fileCount + " files read; no issues found.");
         }
     }
 
@@ -60,10 +67,10 @@ public final class AdviceConsoleWriter {
         if (fileRules.isEmpty() && lineRules.isEmpty()) {
             return;
         }
-        System.out.println("  RULES:");
+        out.println("  RULES:");
         if (!fileRules.isEmpty()) {
             java.util.Collections.sort(fileRules);
-            System.out.println("    FILE: " + String.join(", ", fileRules));
+            out.println("    FILE: " + String.join(", ", fileRules));
         }
         for (java.util.Map.Entry<Integer, java.util.List<String>> entry : lineRules.entrySet()) {
             java.util.List<String> rules = entry.getValue();
@@ -72,28 +79,28 @@ public final class AdviceConsoleWriter {
             }
             java.util.Collections.sort(rules);
             String joined = String.join(", ", new java.util.LinkedHashSet<>(rules));
-            System.out.println("    L" + entry.getKey() + ": " + joined);
+            out.println("    L" + entry.getKey() + ": " + joined);
         }
     }
 
     private void printFileAdvice(FileAdviceGroup group) {
         AdviceText text = group.adviceText();
         String lineRef = group.details().lineNo() > 0 ? " L" + group.details().lineNo() : "";
-        System.out.println("  FILE-LEVEL " + group.adviceId().name() + " - " + text.title() + lineRef);
-        System.out.println("    " + text.intentIntro());
-        System.out.println("    " + text.intentOutro());
+        out.println("  FILE-LEVEL " + group.adviceId().name() + " - " + text.title() + lineRef);
+        out.println("    " + text.intentIntro());
+        out.println("    " + text.intentOutro());
         if (!group.details().items().isEmpty()) {
-            System.out.println("    Result: " + String.join(", ", group.details().items()));
+            out.println("    Result: " + String.join(", ", group.details().items()));
         }
     }
 
     private void printLineAdvice(AdviceGroup group) {
         AdviceText text = group.adviceText();
-        System.out.println("  " + group.adviceId().name() + " - " + text.title());
-        System.out.println("    " + text.intentIntro());
-        System.out.println("    " + text.intentOutro());
-        System.out.println("    Checklist: " + text.checklist());
-        System.out.println("    Anti-patterns: " + text.antiPatterns());
+        out.println("  " + group.adviceId().name() + " - " + text.title());
+        out.println("    " + text.intentIntro());
+        out.println("    " + text.intentOutro());
+        out.println("    Checklist: " + text.checklist());
+        out.println("    Anti-patterns: " + text.antiPatterns());
         for (AdviceOccurrence occurrence : group.occurrences()) {
             String messageText = occurrence.messageLiteral() != null
                     ? occurrence.messageLiteral()
@@ -111,7 +118,7 @@ public final class AdviceConsoleWriter {
             } else {
                 line.append(" hint=").append(text.hintA()).append(" / ").append(text.hintB());
             }
-            System.out.println(line);
+            out.println(line);
         }
     }
 
@@ -119,7 +126,7 @@ public final class AdviceConsoleWriter {
         if (candidatesByLine == null || candidatesByLine.isEmpty()) {
             return;
         }
-        System.out.println("  Verbose candidates:");
+        out.println("  Verbose candidates:");
         for (Map.Entry<Integer, List<CandidateAdvice>> entry : candidatesByLine.entrySet()) {
             int lineNo = entry.getKey();
             for (CandidateAdvice candidate : entry.getValue()) {
@@ -158,7 +165,7 @@ public final class AdviceConsoleWriter {
                         line.append(" search=").append(metrics.stringSearchMethod());
                     }
                 }
-                System.out.println(line);
+                out.println(line);
             }
         }
     }
@@ -174,6 +181,6 @@ public final class AdviceConsoleWriter {
             }
             builder.append(ruleId.code());
         }
-        System.out.println("  Legacy suppressions: " + builder);
+        out.println("  Legacy suppressions: " + builder);
     }
 }

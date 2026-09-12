@@ -274,11 +274,10 @@ class ExpressionTypeAnalyzerTest {
     }
 
     @Test
-    @DisplayName("Is supplier typed expression null throws NPE")
-    void isSupplierTypedExpression_null_throwsNPE() {
-        assertThrows(NullPointerException.class,
-                () -> analyzer.isSupplierTypedExpression(null),
-                "null should throw NPE");
+    @DisplayName("Is supplier typed expression null returns false")
+    void isSupplierTypedExpression_null_returnsFalse() {
+        assertFalse(analyzer.isSupplierTypedExpression(null),
+                "null should return false");
     }
 
     private DetailAstImpl createVariableDef(String name, String typeName) {

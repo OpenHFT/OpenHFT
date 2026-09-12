@@ -21,6 +21,15 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Coordinates extraction and evaluation of message candidates for a single file.
+ *
+ * <p><strong>Threading contract:</strong> instances are <em>not</em> thread-safe.
+ * Checkstyle guarantees that {@code beginTree}, {@code visitToken},
+ * {@code leaveToken}, and {@code finishTree} are called sequentially on the
+ * same thread for each file. Do not share an instance across threads.
+ *
+ * <p>The {@code *ForTesting()} accessors expose internal state for unit testing.
+ * They exist because the processor is a monolith that will be decomposed into
+ * collaborators in a future refactoring. See god-class decomposition plan.
  */
 public class MeaningfulMessageProcessor implements MessageCandidateSink {
     private static final int OVERUSED_WORD_MIN_MESSAGES = 12;
@@ -93,9 +102,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
      */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
-        if (violationCollector != null) {
-            violationCollector.setVerbose(verbose);
-        }
+        // violationCollector is recreated at beginTree with the latest verbose value
     }
 
     /**
@@ -115,7 +122,6 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     SuppressionTracker suppressionTrackerForTesting() {
         return suppressionTracker;
     }
-
 
     /**
      * Configure JSONL output path for aggregated advice.
@@ -336,6 +342,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         context.reset(fileContents);
         currentFileName = fileContents == null ? "unknown" : fileContents.getFileName();
         context.setDeclaredMethodNames(collectDeclaredMethods(rootAst));
+        context.setDeclaredMethodArities(collectDeclaredMethodArities(rootAst));
         skipFile = shouldSkipFile(fileContents);
         if (!skipFile && suppressionTracker != null) {
             suppressionTracker.recordCommentSuppressions(fileContents);
@@ -516,6 +523,8 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         if (isExcludedPath(fileContents.getFileName())) {
             return true;
         }
+        // Intentionally scans the file-top Javadoc, not the class-level one:
+        // generated-file headers in this project sit above the package declaration.
         String[] lines = fileContents.getLines();
         if (lines == null) {
             return false;
@@ -613,6 +622,47 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
             }
         }
         return names;
+    }
+
+    Map<String, Set<Integer>> collectDeclaredMethodArities(DetailAST rootAst) {
+        if (rootAst == null) {
+            return java.util.Collections.emptyMap();
+        }
+        Map<String, Set<Integer>> arities = new HashMap<>();
+        ArrayDeque<DetailAST> stack = new ArrayDeque<>();
+        stack.push(rootAst);
+        while (!stack.isEmpty()) {
+            DetailAST current = stack.pop();
+            if (current.getType() == TokenTypes.METHOD_DEF) {
+                DetailAST ident = current.findFirstToken(TokenTypes.IDENT);
+                if (ident != null) {
+                    arities.computeIfAbsent(ident.getText(), key -> new HashSet<>())
+                            .add(parameterCount(current));
+                }
+            }
+            DetailAST child = current.getFirstChild();
+            while (child != null) {
+                stack.push(child);
+                child = child.getNextSibling();
+            }
+        }
+        return arities;
+    }
+
+    private int parameterCount(DetailAST methodDef) {
+        DetailAST parameters = methodDef.findFirstToken(TokenTypes.PARAMETERS);
+        if (parameters == null) {
+            return 0;
+        }
+        int count = 0;
+        DetailAST child = parameters.getFirstChild();
+        while (child != null) {
+            if (child.getType() == TokenTypes.PARAMETER_DEF) {
+                count++;
+            }
+            child = child.getNextSibling();
+        }
+        return count;
     }
 
     private String trimJavadocLine(String raw) {
@@ -917,12 +967,11 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         }
         Path outputPath = Paths.get(trimmed);
         messageExtractionTarget = outputPath.toString();
-        boolean writeHeader;
         try {
-            writeHeader = !Files.exists(outputPath) || Files.size(outputPath) == 0L;
+            // Always open in APPEND mode — appending to a new file is safe
             messageExtractionWriter = Files.newBufferedWriter(outputPath, StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            if (writeHeader) {
+            if (Files.size(outputPath) == 0L) {
                 messageExtractionWriter.write("file\tline\tsource\trole\tchars\twords\tmeaningful\tplaceholders\tkeyValueLabels\ttotalWords\teffectiveMeaningful\tmessage");
                 messageExtractionWriter.newLine();
                 messageExtractionWriter.flush();
@@ -978,6 +1027,7 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
         } catch (IOException e) {
             recordMessageExtractionFailure(lineNo,
                     "Unable to write message extraction record: " + extractionTarget());
+            closeMessageExtractionWriter();
         }
     }
 
@@ -1315,6 +1365,16 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
                 expectedMin, fileMessageCount, null, null));
     }
 
+    /**
+     * Emits a low-entropy warning only when no other violations exist for the file.
+     * <p>
+     * Low entropy (Shannon word entropy below {@link #MIN_WORD_SHANNON_ENTROPY}) is a
+     * soft signal that messages across the file lack vocabulary diversity. It is deliberately
+     * suppressed when harder violations are already present, because those violations
+     * produce more actionable advice and low entropy is usually a symptom rather than a
+     * root cause. This coupling is intentional: fixing the real violations typically
+     * raises entropy as a side effect.
+     */
     private void emitLowEntropyWarning() {
         if (violationCollector == null) {
             return;
@@ -1514,12 +1574,6 @@ public class MeaningfulMessageProcessor implements MessageCandidateSink {
     }
 
     String normalizeClassName(String className) {
-        requireNonNull(className);
-        String trimmed = className.trim();
-        if (trimmed.isEmpty()) {
-            return null;
-        }
-        int lastDot = trimmed.lastIndexOf('.');
-        return lastDot >= 0 ? trimmed.substring(lastDot + 1) : trimmed;
+        return MessageAstSupport.normalizeClassName(className);
     }
 }

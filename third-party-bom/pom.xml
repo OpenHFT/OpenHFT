@@ -63,12 +63,6 @@
     <dependencyManagement>
         <dependencies>
 
-            <dependency>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>biz.aQute.bnd.annotation</artifactId>
-                <version>${bnd.annotation.version}</version>
-            </dependency>
-
             <!-- OpenTelemetry API -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>

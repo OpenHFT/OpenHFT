@@ -34,7 +34,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -46,7 +46,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -58,7 +58,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -70,7 +70,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -83,7 +83,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -99,7 +99,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -115,7 +115,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -131,7 +131,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -144,7 +144,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -160,7 +160,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -176,7 +176,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -192,7 +192,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -208,7 +208,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -221,7 +221,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -237,7 +237,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -250,7 +250,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -263,7 +263,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.MISSING_STRING_VALUE, violation.ruleId());
@@ -279,7 +279,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -292,7 +292,7 @@ class MMMissingStringSearchValueTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     private MessageCandidate.Builder baseCandidate() {

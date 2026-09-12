@@ -500,6 +500,7 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                         {25, RuleId.CONTEXTLESS, "operation result should equal expected value"}
                 }),
                 arguments("PrefilteredMessages", "InputPrefilteredMessages.java", new Object[][]{
+                        {20, RuleId.TOO_SHORT, "AlphaBetaGammaDeltaEpsilon", 1, 4, 25, FIX_TOO_SHORT_ASSERTION},
                         {21, RuleId.TOO_SHORT, "alpha beta gamma", 3, 4, 42, FIX_TOO_SHORT_ASSERTION}
                 }),
                 arguments("CoveragePaths", "InputCoveragePaths.java", new Object[][]{
@@ -542,7 +543,43 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
                 arguments("AssertionRarePaths", "InputAssertionRarePaths.java", new Object[][]{}),
                 // All tests have @DisplayName, so no MISSING_DISPLAY_NAME violations
                 arguments("MessageQualityGuideAfterExamples",
-                        "InputMessageQualityGuideAfterExamples.java", new Object[][]{})
+                        "InputMessageQualityGuideAfterExamples.java", new Object[][]{}),
+                // --- Coverage fixtures ---
+                arguments("JUnit4WildcardImport", "InputJUnit4WildcardImport.java", new Object[][]{
+                        {14, RuleId.JUNIT4_ANNOTATION, "Before"},
+                        {16, RuleId.JUNIT4_ASSERTION}
+                }),
+                arguments("JUnit5WildcardImport", "InputJUnit5WildcardImport.java", new Object[][]{}),
+                arguments("QualifiedAssertions", "InputQualifiedAssertions.java", new Object[][]{
+                        {12, RuleId.JUNIT4_ASSERTION},
+                        {30, RuleId.MISSING_MESSAGE}
+                }),
+                arguments("ThrowRethrowPatterns", "InputThrowRethrowPatterns.java", new Object[][]{
+                        {16, RuleId.MISSING_MESSAGE},
+                        {20, RuleId.MISSING_MESSAGE},
+                        {24, RuleId.MISSING_MESSAGE},
+                        {33, RuleId.MISSING_MESSAGE}
+                }),
+                arguments("SuppressWarningsArray", "InputSuppressWarningsArray.java", new Object[][]{
+                        {15, RuleId.GENERIC, "ok"},
+                        {16, RuleId.GENERIC, "check"},
+                        {30, RuleId.GENERIC, "expected"}
+                }),
+                arguments("CommentSuppression", "InputCommentSuppression.java", new Object[][]{
+                        {21, RuleId.GENERIC, "expected"}
+                }),
+                arguments("TextBlockMessages", "InputTextBlockMessages.java", new Object[][]{
+                        {20, RuleId.MISSING_MESSAGE}
+                }),
+                arguments("LogSupplierVariants", "InputLogSupplierVariants.java", new Object[][]{}),
+                arguments("MapStringObject", "InputMapStringObject.java", new Object[][]{
+                        {14, RuleId.MAP_STRING_OBJECT, "config", "Map<String, Object>"},
+                        {24, RuleId.MAP_STRING_OBJECT, "headers", "Map<String, String>"},
+                        {29, RuleId.MAP_STRING_OBJECT, "data", "Map<String, ?>"}
+                }),
+                arguments("StandardLogCalls", "InputStandardLogCalls.java", new Object[][]{
+                        {15, RuleId.MISSING_MESSAGE}
+                })
         );
     }
 
@@ -580,6 +617,55 @@ public class MeaningfulMessageCheckTest extends AbstractModuleTestSupport {
         assertEquals(42, violation.getLineNo(), "line should be taken from AST when positive");
         assertEquals(RuleId.messageKey("assert.message.unexpected.exception", false),
                 violation.getKey(), "message key should match when detail is present");
+    }
+
+    @Test
+    @DisplayName("init propagates verbose and dryRun to processor")
+    void initPropagatesVerboseAndDryRun() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(MeaningfulMessageCheck.class);
+        checkConfig.addProperty("verbose", "true");
+        checkConfig.addProperty("dryRun", "true");
+        checkConfig.addProperty("emitUnhandled", "false");
+        checkConfig.addProperty("warnLegacySuppressions", "false");
+
+        // Run against a simple fixture — verbose+dryRun mode should produce advice output
+        // without crashing. The key is exercising init() with non-default values.
+        verify(checkConfig, getPath("InputGoodAssertMessages.java"), new String[]{});
+    }
+
+    @Test
+    @DisplayName("init propagates excludedPaths glob so matching file is skipped")
+    void initPropagatesExcludedPaths() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(MeaningfulMessageCheck.class);
+        checkConfig.addProperty("excludedPaths", "InputGoodAssertMessages.java");
+        checkConfig.addProperty("emitUnhandled", "false");
+
+        // File should be excluded — no violations
+        verify(checkConfig, getPath("InputGoodAssertMessages.java"), new String[]{});
+    }
+
+    @Test
+    @DisplayName("init propagates jsonl output path to processor")
+    void initPropagatesJsonlOutput() throws Exception {
+        Path jsonlFile = java.nio.file.Files.createTempFile("mm-test", ".jsonl");
+        try {
+            final DefaultConfiguration checkConfig =
+                    createModuleConfig(MeaningfulMessageCheck.class);
+            checkConfig.addProperty("jsonl", jsonlFile.toString());
+            checkConfig.addProperty("emitUnhandled", "false");
+
+            verify(checkConfig, getPath("InputGoodAssertMessages.java"), new String[]{});
+
+            assertTrue(java.nio.file.Files.exists(jsonlFile),
+                    "JSONL output file should exist after run");
+            String content = java.nio.file.Files.readString(jsonlFile);
+            assertTrue(content.contains("\"type\":\"run\""),
+                    "JSONL output should contain '\"type\":\"run\"' record");
+        } finally {
+            java.nio.file.Files.deleteIfExists(jsonlFile);
+        }
     }
 
     private static MeaningfulMessageCheck configuredCheck() throws Exception {

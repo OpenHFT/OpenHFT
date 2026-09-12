@@ -9,6 +9,10 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Flags duplicate messages within the same file.
+ *
+ * <p><strong>Threading note:</strong> {@code messageOccurrences} is created fresh per file in
+ * {@code MeaningfulMessageProcessor.beginTree()} and is only ever accessed from a single thread
+ * per file evaluation. There is no concurrent mutation.
  */
 public final class MMDuplicate extends AbstractMessageRule {
     private final Map<String, Integer> messageOccurrences;

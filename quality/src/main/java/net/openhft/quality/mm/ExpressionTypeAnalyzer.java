@@ -69,9 +69,21 @@ public final class ExpressionTypeAnalyzer {
      * @return {@code true} if the expression has Supplier type.
      */
     public boolean isSupplierTypedExpression(DetailAST expr) {
-        requireNonNull(expr);
+        if (expr == null) {
+            return false;
+        }
         if (expr.getType() == TokenTypes.IDENT) {
             return isSupplierTypeName(context.getVariableType(expr.getText()));
+        }
+        if (expr.getType() == TokenTypes.DOT) {
+            DetailAST rightmost = astSupport.findRightmostIdent(expr);
+            if (rightmost != null) {
+                return isSupplierTypeName(context.getVariableType(rightmost.getText()));
+            }
+        }
+        if (expr.getType() == TokenTypes.TYPECAST) {
+            DetailAST type = expr.findFirstToken(TokenTypes.TYPE);
+            return type != null && isSupplierTypeName(astSupport.extractTypeName(type));
         }
         return false;
     }

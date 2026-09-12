@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -57,6 +58,13 @@ public final class MessageRuleSupport {
                     + ")$"
     );
 
+    private static final int SUBSTANCE_CACHE_MAX = 256;
+    private final Map<String, Pattern> substancePatternCache = new java.util.LinkedHashMap<String, Pattern>(SUBSTANCE_CACHE_MAX, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Pattern> eldest) {
+            return size() > SUBSTANCE_CACHE_MAX;
+        }
+    };
     private final MessageMetricsCalculator metricsCalculator;
 
     /**
@@ -127,12 +135,12 @@ public final class MessageRuleSupport {
         if (containsNameExact(text, swappedCase)) {
             return swappedCase;
         }
-        String lowerCase = name.toLowerCase();
+        String lowerCase = name.toLowerCase(Locale.ROOT);
         if (!lowerCase.equals(name) && !lowerCase.equals(swappedCase)
                 && containsNameExact(text, lowerCase)) {
             return lowerCase;
         }
-        String upperCase = name.toUpperCase();
+        String upperCase = name.toUpperCase(Locale.ROOT);
         if (!upperCase.equals(name) && containsNameExact(text, upperCase)) {
             return upperCase;
         }
@@ -147,7 +155,9 @@ public final class MessageRuleSupport {
      * @return substance analysis for the message.
      */
     public SubstanceAnalysis analyseSubstance(String message, String name) {
-        String withoutName = message.replaceAll("(?i)" + Pattern.quote(name), " ");
+        Pattern namePattern = substancePatternCache.computeIfAbsent(
+                name, k -> Pattern.compile("(?i)" + Pattern.quote(k)));
+        String withoutName = namePattern.matcher(message).replaceAll(" ");
         String[] words = metricsCalculator.splitWords(withoutName);
         List<String> filler = new ArrayList<>();
         List<String> meaningful = new ArrayList<>();

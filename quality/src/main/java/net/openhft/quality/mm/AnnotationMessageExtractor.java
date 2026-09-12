@@ -115,6 +115,8 @@ public final class AnnotationMessageExtractor extends AbstractMessageExtractor {
                 || "RepeatedTest".equals(annotationName))) {
             return AdviceSource.ANNOTATION_DISPLAY_NAME;
         }
+        // Fallthrough: treat unrecognised annotation/attribute combinations as display names.
+        // New annotation kinds with distinct semantics should add explicit cases above.
         return AdviceSource.ANNOTATION_DISPLAY_NAME;
     }
 

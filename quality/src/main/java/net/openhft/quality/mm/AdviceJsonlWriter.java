@@ -368,8 +368,18 @@ public final class AdviceJsonlWriter implements AutoCloseable {
                 case '\t':
                     sb.append("\\t");
                     break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
                 default:
-                    sb.append(ch);
+                    if (ch < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) ch));
+                    } else {
+                        sb.append(ch);
+                    }
                     break;
             }
         }
@@ -382,8 +392,7 @@ public final class AdviceJsonlWriter implements AutoCloseable {
     private void writeLine(StringBuilder sb) {
         try {
             writer.write(sb.toString());
-            writer.write(System.lineSeparator());
-            writer.flush();
+            writer.write("\n");
         } catch (IOException e) {
             throw new IllegalStateException("Unable to write JSONL output", e);
         }

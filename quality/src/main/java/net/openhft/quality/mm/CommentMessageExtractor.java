@@ -119,7 +119,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         }
     }
 
-    private boolean requiresSystemComment(DetailAST methodCall) {
+    boolean requiresSystemComment(DetailAST methodCall) {
         String member = findMemberAfterClass(methodCall, SYSTEM);
         if (member == null || member.isEmpty()) {
             return false;
@@ -127,14 +127,14 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return !isAllowedSystemMember(member);
     }
 
-    private boolean requiresRuntimeComment(DetailAST methodCall) {
+    boolean requiresRuntimeComment(DetailAST methodCall) {
         if (findMemberAfterClass(methodCall, RUNTIME) != null) {
             return true;
         }
         return isRuntimeInstanceCall(methodCall);
     }
 
-    private boolean requiresThreadComment(DetailAST methodCall) {
+    boolean requiresThreadComment(DetailAST methodCall) {
         String member = findMemberAfterClass(methodCall, THREAD);
         if (member != null && isThreadMethod(member)) {
             return true;
@@ -146,7 +146,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return isInstanceMethodCall(methodCall, methodName, THREAD);
     }
 
-    private boolean requiresThreadLocalComment(DetailAST methodCall) {
+    boolean requiresThreadLocalComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
         if (!"set".equals(methodName)) {
             return false;
@@ -154,19 +154,30 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return isInstanceMethodCall(methodCall, methodName, THREAD_LOCAL, INHERITABLE_THREAD_LOCAL);
     }
 
-    private boolean requiresObjectMonitorComment(DetailAST methodCall) {
+    boolean requiresObjectMonitorComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
-        return "wait".equals(methodName)
-                || "notify".equals(methodName)
-                || "notifyAll".equals(methodName);
+        int argumentCount = argumentCount(methodCall);
+        if ("notify".equals(methodName) || "notifyAll".equals(methodName)) {
+            return argumentCount == 0;
+        }
+        if (!"wait".equals(methodName)) {
+            return false;
+        }
+        if (argumentCount == 0) {
+            return true;
+        }
+        if (argumentCount > 2) {
+            return false;
+        }
+        return !isCurrentClassHelperOverload(methodCall, methodName, argumentCount);
     }
 
-    private boolean requiresClassForNameComment(DetailAST methodCall) {
+    boolean requiresClassForNameComment(DetailAST methodCall) {
         String member = findMemberAfterClass(methodCall, CLASS);
         return "forName".equals(member);
     }
 
-    private boolean requiresProcessBuilderComment(DetailAST methodCall) {
+    boolean requiresProcessBuilderComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
         if (!"start".equals(methodName)) {
             return false;
@@ -174,7 +185,7 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return isInstanceMethodCall(methodCall, methodName, PROCESS_BUILDER);
     }
 
-    private boolean requiresStringInternComment(DetailAST methodCall) {
+    boolean requiresStringInternComment(DetailAST methodCall) {
         String methodName = astSupport().extractMethodName(methodCall);
         if (!"intern".equals(methodName)) {
             return false;
@@ -417,6 +428,9 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
             return null;
         }
         DetailAST content = astSupport().unwrapExpr(ast);
+        if (content == null) {
+            return null;
+        }
         if (content.getType() == TokenTypes.METHOD_CALL) {
             DetailAST dot = content.findFirstToken(TokenTypes.DOT);
             return dot == null ? null : findMemberAfterClass(dot, className);
@@ -510,6 +524,11 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
         return false;
     }
 
+    private int argumentCount(DetailAST methodCall) {
+        DetailAST elist = methodCall.findFirstToken(TokenTypes.ELIST);
+        return elist == null ? 0 : astSupport().collectArguments(elist).size();
+    }
+
     boolean isThreadMethod(String methodName) {
         return "stop".equals(methodName)
                 || "suspend".equals(methodName)
@@ -517,6 +536,37 @@ public final class CommentMessageExtractor extends AbstractMessageExtractor {
                 || "yield".equals(methodName)
                 || "setPriority".equals(methodName)
                 || "sleep".equals(methodName);
+    }
+
+    private boolean isCurrentClassHelperOverload(DetailAST methodCall, String methodName, int argumentCount) {
+        if (!context().isDeclaredMethodSignature(methodName, argumentCount)) {
+            return false;
+        }
+        DetailAST dot = methodCall.findFirstToken(TokenTypes.DOT);
+        if (dot == null) {
+            return true;
+        }
+        DetailAST qualifier = dot.getFirstChild();
+        if (qualifier == null) {
+            return false;
+        }
+        if (qualifier.getType() == TokenTypes.LITERAL_THIS) {
+            return true;
+        }
+        String qualifierName = resolveQualifierName(qualifier);
+        if (qualifierName == null || qualifierName.isEmpty()) {
+            return false;
+        }
+        String typeName = context().getVariableType(qualifierName);
+        if (typeName == null) {
+            return false;
+        }
+        String currentClassName = context().currentClassName();
+        if (currentClassName == null || currentClassName.isEmpty()) {
+            return false;
+        }
+        String resolved = context().resolveTypeName(typeName);
+        return currentClassName.equals(typeName) || currentClassName.equals(resolved);
     }
 
     private String resolveQualifierName(DetailAST qualifier) {

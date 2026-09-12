@@ -32,14 +32,13 @@ public interface MessageCandidateSink {
      * @param adviceSource  advice source override.
      * @param missingMessageKind missing message kind for fix guidance.
      */
-    default void emitMissingMessage(int lineNo, MessageSource source,
-                                    AdviceSource adviceSource,
-                                    MissingMessageKind missingMessageKind) {
-        emitMissingMessage(lineNo, source, missingMessageKind);
-    }
+    void emitMissingMessage(int lineNo, MessageSource source,
+                            AdviceSource adviceSource,
+                            MissingMessageKind missingMessageKind);
 
     /**
      * Emit a missing-message candidate with additional context.
+     * Delegates to the 4-arg overload with a {@code null} advice source.
      *
      * @param lineNo             line number where the message is missing.
      * @param source             source category of the missing message.
@@ -47,7 +46,7 @@ public interface MessageCandidateSink {
      */
     default void emitMissingMessage(int lineNo, MessageSource source,
                                     MissingMessageKind missingMessageKind) {
-        emitMissingMessage(lineNo, source);
+        emitMissingMessage(lineNo, source, null, missingMessageKind);
     }
 
     /**

@@ -24,14 +24,12 @@ public final class FileReport {
                       Map<Integer, List<CandidateAdvice>> candidatesByLine,
                       List<RuleId> legacySuppressionRuleIds) {
         this.fileName = requireNonNull(fileName, "fileName");
-        this.fileAdvice = Collections.unmodifiableList(fileAdvice);
-        this.lineAdvice = Collections.unmodifiableList(lineAdvice);
-        this.candidatesByLine = candidatesByLine == null
-                ? Collections.emptyMap()
-                : Collections.unmodifiableMap(candidatesByLine);
+        this.fileAdvice = Collections.unmodifiableList(new java.util.ArrayList<>(fileAdvice));
+        this.lineAdvice = Collections.unmodifiableList(new java.util.ArrayList<>(lineAdvice));
+        this.candidatesByLine = immutableCandidates(candidatesByLine);
         this.legacySuppressionRuleIds = legacySuppressionRuleIds == null
                 ? Collections.emptyList()
-                : Collections.unmodifiableList(legacySuppressionRuleIds);
+                : Collections.unmodifiableList(new java.util.ArrayList<>(legacySuppressionRuleIds));
     }
 
     public String fileName() {
@@ -56,5 +54,28 @@ public final class FileReport {
 
     public boolean hasIssues() {
         return !(fileAdvice.isEmpty() && lineAdvice.isEmpty());
+    }
+
+    private static Map<Integer, List<CandidateAdvice>> immutableCandidates(
+            Map<Integer, List<CandidateAdvice>> candidatesByLine) {
+        if (candidatesByLine == null || candidatesByLine.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<Integer, List<CandidateAdvice>> copy = new java.util.HashMap<>();
+        for (Map.Entry<Integer, List<CandidateAdvice>> entry : candidatesByLine.entrySet()) {
+            List<CandidateAdvice> candidates = entry.getValue() == null
+                    ? Collections.emptyList()
+                    : Collections.unmodifiableList(new java.util.ArrayList<>(entry.getValue()));
+            copy.put(entry.getKey(), candidates);
+        }
+        return Collections.unmodifiableMap(copy);
+    }
+
+    @Override
+    public String toString() {
+        return "FileReport{fileName='" + fileName + '\''
+                + ", fileAdvice=" + fileAdvice.size()
+                + ", lineAdvice=" + lineAdvice.size()
+                + '}';
     }
 }

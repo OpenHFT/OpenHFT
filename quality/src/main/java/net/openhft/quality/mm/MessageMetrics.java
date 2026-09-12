@@ -40,9 +40,9 @@ public final class MessageMetrics {
         this.totalWordCount = totalWordCount;
         this.effectiveMeaningfulWordCount = effectiveMeaningfulWordCount;
         requireNonNull(meaningfulWords);
-        this.meaningfulWords = Collections.unmodifiableList(meaningfulWords);
+        this.meaningfulWords = Collections.unmodifiableList(new java.util.ArrayList<>(meaningfulWords));
         requireNonNull(longWords);
-        this.longWords = Collections.unmodifiableList(longWords);
+        this.longWords = Collections.unmodifiableList(new java.util.ArrayList<>(longWords));
     }
 
     /**
@@ -123,5 +123,15 @@ public final class MessageMetrics {
      */
     public java.util.List<String> longWords() {
         return longWords;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageMetrics{charCount=" + charCount
+                + ", wordCount=" + wordCount
+                + ", meaningfulWordCount=" + meaningfulWordCount
+                + ", totalWordCount=" + totalWordCount
+                + ", effectiveMeaningfulWordCount=" + effectiveMeaningfulWordCount
+                + '}';
     }
 }

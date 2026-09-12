@@ -17,6 +17,7 @@ public final class MMContextless extends AbstractMessageRule {
     @Override
     protected void doEvaluate(MessageContext context, ViolationCollector collector,
                               RuleEvaluationState state) {
+        if (context.ruleSupport() == null) return;
         String message = context.candidate().message();
         if (context.ruleSupport().isContextless(message)) {
             recordWarning(context, collector, state, message);

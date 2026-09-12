@@ -40,7 +40,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -53,7 +53,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -66,7 +66,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.DUPLICATES_INPUT, violation.ruleId());
@@ -82,7 +82,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -107,7 +107,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty());
+        assertTrue(collector.pendingForTest().isEmpty());
     }
 
     @Test
@@ -120,7 +120,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.DUPLICATES_INPUT, violation.ruleId());
@@ -136,7 +136,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.DUPLICATES_INPUT, violation.ruleId());
@@ -152,7 +152,7 @@ class MMDuplicatesInputTest {
 
         rule.evaluate(context(candidate), collector, state);
 
-        Map<Integer, Violation> pending = collector.pendingForTesting();
+        Map<Integer, Violation> pending = collector.pendingForTest();
         Violation violation = pending.get(10);
         assertNotNull(violation);
         assertEquals(RuleId.DUPLICATES_INPUT, violation.ruleId());

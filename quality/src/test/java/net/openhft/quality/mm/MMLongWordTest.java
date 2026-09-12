@@ -51,7 +51,7 @@ class MMLongWordTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "long word matching class name should not trigger violation");
     }
 
@@ -75,7 +75,7 @@ class MMLongWordTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "long word matching class name case-insensitive should not trigger violation");
     }
 
@@ -99,7 +99,7 @@ class MMLongWordTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "long word matching method name should not trigger violation");
     }
 
@@ -123,9 +123,9 @@ class MMLongWordTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "long word not matching class or method should trigger violation");
-        assertEquals(RuleId.LONG_WORD, collector.pendingForTesting().get(20).ruleId(),
+        assertEquals(RuleId.LONG_WORD, collector.pendingForTest().get(20).ruleId(),
                 "violation should be for long word rule");
     }
 
@@ -143,7 +143,7 @@ class MMLongWordTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "null metrics should skip evaluation");
     }
 
@@ -165,7 +165,7 @@ class MMLongWordTest {
 
         rule.evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "empty long words list should skip evaluation");
     }
 
@@ -189,7 +189,7 @@ class MMLongWordTest {
 
         rule.evaluate(context, collector, state);
 
-        assertEquals(1, collector.pendingForTesting().size(),
+        assertEquals(1, collector.pendingForTest().size(),
                 "only one violation should be recorded for multiple long words");
     }
 }

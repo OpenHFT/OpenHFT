@@ -67,6 +67,16 @@ public final class CandidateAdvice {
         return metrics;
     }
 
+    @Override
+    public String toString() {
+        return "CandidateAdvice{adviceId=" + adviceId
+                + ", ruleId=" + ruleId
+                + ", lineNo=" + lineNo
+                + ", source=" + source
+                + ", messageLiteral='" + messageLiteral + '\''
+                + '}';
+    }
+
     /**
      * Builder for {@link CandidateAdvice}.
      */

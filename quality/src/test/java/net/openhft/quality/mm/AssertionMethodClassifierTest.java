@@ -34,6 +34,13 @@ public class AssertionMethodClassifierTest {
         assertEquals(expected, AssertionMethodClassifier.isAssertionMethod(methodName));
     }
 
+    @DisplayName("Is assertion method null returns false scenario case")
+    @ParameterizedTest
+    @NullSource
+    void isAssertionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isAssertionMethod(methodName));
+    }
+
     @DisplayName("Is precondition method scenario case detail")
     @ParameterizedTest
     @CsvSource({
@@ -207,5 +214,173 @@ public class AssertionMethodClassifierTest {
     })
     void isAssumptionMethod(String methodName, boolean expected) {
         assertEquals(expected, AssertionMethodClassifier.isAssumptionMethod(methodName));
+    }
+
+    // -- Null guard tests for all public methods --
+
+    @DisplayName("isPreconditionMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isPreconditionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isPreconditionMethod(methodName));
+    }
+
+    @DisplayName("isRequireNotNullMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isRequireNotNullMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isRequireNotNullMethod(methodName));
+    }
+
+    @DisplayName("isFailMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isFailMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isFailMethod(methodName));
+    }
+
+    @DisplayName("isAssertThatMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isAssertThatMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isAssertThatMethod(methodName));
+    }
+
+    @DisplayName("isBooleanAssertionMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isBooleanAssertionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isBooleanAssertionMethod(methodName));
+    }
+
+    @DisplayName("isAssumptionMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isAssumptionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isAssumptionMethod(methodName));
+    }
+
+    @DisplayName("isNullnessAssertionMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isNullnessAssertionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isNullnessAssertionMethod(methodName));
+    }
+
+    @DisplayName("isEqualityAssertionMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isEqualityAssertionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isEqualityAssertionMethod(methodName));
+    }
+
+    @DisplayName("isAssertJMessageMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isAssertJMessageMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isAssertJMessageMethod(methodName));
+    }
+
+    @DisplayName("isAssertThrowsMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isAssertThrowsMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isAssertThrowsMethod(methodName));
+    }
+
+    @DisplayName("isTimeoutAssertionMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isTimeoutAssertionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isTimeoutAssertionMethod(methodName));
+    }
+
+    @DisplayName("isDoesNotThrowMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isDoesNotThrowMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isDoesNotThrowMethod(methodName));
+    }
+
+    @DisplayName("isAssertJOverrideMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isAssertJOverrideMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isAssertJOverrideMethod(methodName));
+    }
+
+    @DisplayName("isRecognisedAssertionMethod null returns false")
+    @ParameterizedTest
+    @NullSource
+    void isRecognisedAssertionMethod_null_returnsFalse(String methodName) {
+        assertFalse(AssertionMethodClassifier.isRecognisedAssertionMethod(methodName));
+    }
+
+    // -- Additional branch coverage for equality methods --
+
+    @DisplayName("isEqualityAssertionMethod covers assertNotSame and tail branches")
+    @ParameterizedTest
+    @CsvSource({
+            "assertNotSame, true",
+            "assertIterableEquals, true",
+            "assertLinesMatch, true"
+    })
+    void isEqualityAssertionMethod_additionalBranches(String methodName, boolean expected) {
+        assertEquals(expected, AssertionMethodClassifier.isEqualityAssertionMethod(methodName));
+    }
+
+    @DisplayName("isRecognisedAssertionMethod covers fail and assertThrows branches")
+    @ParameterizedTest
+    @CsvSource({
+            "fail, true",
+            "assertThrows, true",
+            "assertTimeout, true",
+            "assertNull, true",
+            "assertEquals, true",
+            "assertAll, true",
+            "assertFalse, true",
+            "assertDoesNotThrow, true"
+    })
+    void isRecognisedAssertionMethod_additionalBranches(String methodName, boolean expected) {
+        assertEquals(expected, AssertionMethodClassifier.isRecognisedAssertionMethod(methodName));
+    }
+
+    @DisplayName("isAssertionMethod covers withFailMessage and overridingErrorMessage")
+    @ParameterizedTest
+    @CsvSource({
+            "withFailMessage, true",
+            "overridingErrorMessage, true",
+            "assumeTrue, true"
+    })
+    void isAssertionMethod_additionalBranches(String methodName, boolean expected) {
+        assertEquals(expected, AssertionMethodClassifier.isAssertionMethod(methodName));
+    }
+
+    @DisplayName("isBooleanAssertionMethod covers assumeTrue and assumeFalse")
+    @ParameterizedTest
+    @CsvSource({
+            "assumeTrue, true",
+            "assumeFalse, true"
+    })
+    void isBooleanAssertionMethod_additionalBranches(String methodName, boolean expected) {
+        assertEquals(expected, AssertionMethodClassifier.isBooleanAssertionMethod(methodName));
+    }
+
+    @DisplayName("isAssertJMessageMethod covers overridingErrorMessage")
+    @ParameterizedTest
+    @CsvSource({
+            "overridingErrorMessage, true"
+    })
+    void isAssertJMessageMethod_additionalBranches(String methodName, boolean expected) {
+        assertEquals(expected, AssertionMethodClassifier.isAssertJMessageMethod(methodName));
+    }
+
+    @DisplayName("isLoopIndexAssertionMethod covers assume prefix")
+    @ParameterizedTest
+    @CsvSource({
+            "assumeTrue, true"
+    })
+    void isLoopIndexAssertionMethod_additionalBranches(String methodName, boolean expected) {
+        assertEquals(expected, AssertionMethodClassifier.isLoopIndexAssertionMethod(methodName));
     }
 }

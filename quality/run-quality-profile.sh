@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+# Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+#
 
 set -u
 set -o pipefail
@@ -12,13 +15,13 @@ ENFORCED="true"
 JACOCO85="off"
 PITEST80="off"
 CPD_MIN_TOKENS="100"
-MVN_CMD="${MVN:-mvn}"
+declare -a MVN_CMD=()
 
 PMD_PLUGIN_VERSION="3.26.0"
 SPOTBUGS_PLUGIN_VERSION="4.8.6.6"
 DEPENDENCY_PLUGIN_VERSION="3.6.1"
-JACOCO_VERSION="0.8.12"
-PITEST_PLUGIN_VERSION="1.17.2"
+JACOCO_VERSION="0.8.14"
+PITEST_PLUGIN_VERSION="1.22.0"
 
 CHECKSTYLE_BASELINE_CFG="src/main/resources/net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml"
 PMD_RULESET="src/main/resources/net/openhft/quality/pmd26/pmd-ruleset.xml"
@@ -39,46 +42,73 @@ Options:
   --quality-dir <path>        Path to this quality repo (default: script directory)
   --logs-dir <path>           Output directory for logs (default: <module>/logs/quality-profile)
   --enforced <true|false>     Fail on tool violations (default: true)
-  --jacoco85 <on|off>         Enable optional 85%% line/branch gate (default: off)
+  --jacoco85 <on|off>         Enable optional 90%% line / 85%% branch gate (default: off)
   --pitest80 <on|off>         Enable optional PIT mutation gate at 80%% (default: off)
   --cpd-min-tokens <int>      PMD CPD minimum tokens (default: 100)
-  --mvn-cmd <command>         Maven command to use (default: mvn or MVN env)
+  --mvn-cmd <command>         Maven command to use, including flags (default: mvn or MVN env)
   --help                      Show this help
 USAGE
 }
 
+set_mvn_cmd() {
+  local command_text="$1"
+  read -r -a MVN_CMD <<< "$command_text"
+  if [[ ${#MVN_CMD[@]} -eq 0 ]]; then
+    MVN_CMD=(mvn)
+  fi
+}
+
+require_option_value() {
+  local option="$1"
+  if [[ $# -lt 2 ]]; then
+    echo "$option requires a value" >&2
+    usage
+    exit 2
+  fi
+}
+
+set_mvn_cmd "${MVN:-mvn}"
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --module-dir)
+      require_option_value "$@"
       MODULE_DIR="$2"
       shift 2
       ;;
     --quality-dir)
+      require_option_value "$@"
       QUALITY_DIR="$2"
       shift 2
       ;;
     --logs-dir)
+      require_option_value "$@"
       LOGS_DIR="$2"
       shift 2
       ;;
     --enforced)
+      require_option_value "$@"
       ENFORCED="$2"
       shift 2
       ;;
     --jacoco85)
+      require_option_value "$@"
       JACOCO85="$2"
       shift 2
       ;;
     --pitest80)
+      require_option_value "$@"
       PITEST80="$2"
       shift 2
       ;;
     --cpd-min-tokens)
+      require_option_value "$@"
       CPD_MIN_TOKENS="$2"
       shift 2
       ;;
     --mvn-cmd)
-      MVN_CMD="$2"
+      require_option_value "$@"
+      set_mvn_cmd "$2"
       shift 2
       ;;
     --help|-h)
@@ -137,7 +167,7 @@ if [[ -z "$LOGS_DIR" ]]; then
 fi
 mkdir -p "$LOGS_DIR"
 
-for required_cmd in "$MVN_CMD" java awk; do
+for required_cmd in "${MVN_CMD[0]}" java awk; do
   if ! command -v "$required_cmd" >/dev/null 2>&1; then
     echo "Required command not found: $required_cmd" >&2
     exit 2
@@ -196,13 +226,13 @@ run_gate() {
 }
 
 run_required bootstrap_quality_classes \
-  "$MVN_CMD" -q -f "$QUALITY_DIR/pom.xml" \
+  "${MVN_CMD[@]}" -q -f "$QUALITY_DIR/pom.xml" \
   -DskipTests -Dcheckstyle.skip=true -Dspotbugs.skip=true -Dpmd.skip=true -Dmaven.javadoc.skip=true \
   compile
 
 CHECKSTYLE_CP_FILE="$LOGS_DIR/checkstyle.classpath"
 run_required resolve_checkstyle_classpath \
-  "$MVN_CMD" -q -f "$QUALITY_DIR/pom.xml" \
+  "${MVN_CMD[@]}" -q -f "$QUALITY_DIR/pom.xml" \
   -DincludeScope=provided \
   -Dmdep.outputFile="$CHECKSTYLE_CP_FILE" \
   "org.apache.maven.plugins:maven-dependency-plugin:${DEPENDENCY_PLUGIN_VERSION}:build-classpath"
@@ -232,7 +262,7 @@ run_gate checkstyle_baseline \
   "${CHECKSTYLE_INPUTS[@]}"
 
 run_gate pmd_check \
-  "$MVN_CMD" -f "$MODULE_DIR/pom.xml" \
+  "${MVN_CMD[@]}" -f "$MODULE_DIR/pom.xml" \
   -DskipTests \
   -Dpmd.includeTests=true \
   -Dpmd.failOnViolation="$ENFORCED" \
@@ -240,7 +270,7 @@ run_gate pmd_check \
   "org.apache.maven.plugins:maven-pmd-plugin:${PMD_PLUGIN_VERSION}:check"
 
 run_gate pmd_cpd_check \
-  "$MVN_CMD" -f "$MODULE_DIR/pom.xml" \
+  "${MVN_CMD[@]}" -f "$MODULE_DIR/pom.xml" \
   -DskipTests \
   -Dpmd.failOnViolation="$ENFORCED" \
   -DfailOnViolation="$ENFORCED" \
@@ -248,10 +278,10 @@ run_gate pmd_cpd_check \
   "org.apache.maven.plugins:maven-pmd-plugin:${PMD_PLUGIN_VERSION}:cpd-check"
 
 run_required module_test_compile \
-  "$MVN_CMD" -f "$MODULE_DIR/pom.xml" -DskipTests test-compile
+  "${MVN_CMD[@]}" -f "$MODULE_DIR/pom.xml" -DskipTests test-compile
 
 run_gate spotbugs_check \
-  "$MVN_CMD" -f "$MODULE_DIR/pom.xml" \
+  "${MVN_CMD[@]}" -f "$MODULE_DIR/pom.xml" \
   -Dspotbugs.includeTests=true \
   -Dspotbugs.effort=Max \
   -Dspotbugs.threshold=Low \
@@ -263,7 +293,7 @@ run_gate spotbugs_check \
 if [[ "$JACOCO85" == "on" ]]; then
   JACOCO_AGENT_JAR="$HOME/.m2/repository/org/jacoco/org.jacoco.agent/${JACOCO_VERSION}/org.jacoco.agent-${JACOCO_VERSION}-runtime.jar"
   run_required jacoco_fetch_agent \
-    "$MVN_CMD" -q -f "$QUALITY_DIR/pom.xml" \
+    "${MVN_CMD[@]}" -q -f "$QUALITY_DIR/pom.xml" \
     "org.apache.maven.plugins:maven-dependency-plugin:${DEPENDENCY_PLUGIN_VERSION}:get" \
     -Dartifact="org.jacoco:org.jacoco.agent:${JACOCO_VERSION}:jar:runtime"
 
@@ -272,12 +302,12 @@ if [[ "$JACOCO85" == "on" ]]; then
   JACOCO_EXEC="$MODULE_DIR/target/jacoco-quality-profile.exec"
 
   run_required jacoco_test_with_agent \
-    "$MVN_CMD" -f "$MODULE_DIR/pom.xml" \
+    "${MVN_CMD[@]}" -f "$MODULE_DIR/pom.xml" \
     -DargLine="-javaagent:${JACOCO_AGENT_JAR}=destfile=${JACOCO_EXEC}" \
     test
 
   run_required jacoco_report \
-    "$MVN_CMD" -f "$MODULE_DIR/pom.xml" \
+    "${MVN_CMD[@]}" -f "$MODULE_DIR/pom.xml" \
     -Djacoco.dataFile="$JACOCO_EXEC" \
     "org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report"
 
@@ -295,13 +325,13 @@ if [[ "$JACOCO85" == "on" ]]; then
     line_ratio=$(echo "$ratios" | awk '{print $1}')
     branch_ratio=$(echo "$ratios" | awk '{print $2}')
 
-    line_ok=$(awk -v r="$line_ratio" 'BEGIN{print (r>=0.85)?1:0}')
+    line_ok=$(awk -v r="$line_ratio" 'BEGIN{print (r>=0.90)?1:0}')
     branch_ok=$(awk -v r="$branch_ratio" 'BEGIN{print (r>=0.85)?1:0}')
 
     {
       echo "line_ratio=$line_ratio"
       echo "branch_ratio=$branch_ratio"
-      echo "line_threshold=0.85"
+      echo "line_threshold=0.90"
       echo "branch_threshold=0.85"
     } >"$LOGS_DIR/jacoco_85_gate.log"
 
@@ -314,7 +344,7 @@ if [[ "$JACOCO85" == "on" ]]; then
       else
         STATUS[jacoco_85_gate]="WARN"
       fi
-      echo "JaCoCo 85%% gate not met (line=$line_ratio branch=$branch_ratio)." >&2
+      echo "JaCoCo 90/85 gate not met (line=$line_ratio branch=$branch_ratio)." >&2
     fi
   fi
 else
@@ -323,7 +353,7 @@ fi
 
 if [[ "$PITEST80" == "on" ]]; then
   run_gate pitest_80_gate \
-    "$MVN_CMD" -f "$MODULE_DIR/pom.xml" \
+    "${MVN_CMD[@]}" -f "$MODULE_DIR/pom.xml" \
     -DskipTests=false \
     -DmutationThreshold=80 \
     -DoutputFormats=XML,HTML \

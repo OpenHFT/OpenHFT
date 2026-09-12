@@ -28,7 +28,7 @@ public final class FileAdviceDetails {
                              Double entropy, Double minEntropy) {
         this.adviceId = requireNonNull(adviceId, "adviceId");
         this.lineNo = lineNo;
-        this.items = items == null ? Collections.emptyList() : Collections.unmodifiableList(items);
+        this.items = items == null ? Collections.emptyList() : Collections.unmodifiableList(new java.util.ArrayList<>(items));
         this.messageCount = messageCount;
         this.purposeCueCount = purposeCueCount;
         this.expectedPurposeCueCount = expectedPurposeCueCount;

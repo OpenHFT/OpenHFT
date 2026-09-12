@@ -25,7 +25,7 @@ class MMAssertJGenericOverrideTest {
 
         new MMAssertJGenericOverride().evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "Should not record when assertJOverride is false");
     }
 
@@ -42,7 +42,7 @@ class MMAssertJGenericOverrideTest {
         rule.evaluate(buildContext(nullMessage, null), collector, state);
         rule.evaluate(buildContext(emptyMessage, null), collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "Should not record for null or empty messages");
     }
 
@@ -107,7 +107,7 @@ class MMAssertJGenericOverrideTest {
 
         new MMAssertJGenericOverride().evaluate(context, collector, state);
 
-        assertTrue(collector.pendingForTesting().isEmpty(),
+        assertTrue(collector.pendingForTest().isEmpty(),
                 "Should not record when metrics are unavailable");
     }
 
@@ -115,7 +115,7 @@ class MMAssertJGenericOverrideTest {
         ViolationCollector collector = new ViolationCollector(null);
         RuleEvaluationState state = new RuleEvaluationState();
         new MMAssertJGenericOverride().evaluate(context, collector, state);
-        return collector.pendingForTesting();
+        return collector.pendingForTest();
     }
 
     private MessageCandidate buildCandidate(String message, boolean assertJOverride) {
