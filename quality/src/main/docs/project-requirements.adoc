@@ -1,0 +1,54 @@
+= Project Requirements
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Scope
+
+These requirements cover the `quality` module, which packages shared static analysis configuration and documentation for Chronicle projects.
+
+== Functional Requirements
+
+*QUALITY-REQ-001* Centralised quality resources :: Publish Checkstyle, SpotBugs, and PMD configuration resources on the classpath for reuse by Chronicle builds.
+Implementation: `quality/src/main/resources/net/openhft/quality`,
+`quality/src/main/resources/net/openhft/quality/spotbugs26`,
+`quality/src/main/resources/net/openhft/quality/pmd26`.
+
+*QUALITY-REQ-002* Baseline Checkstyle profile :: Provide a baseline Chronicle Checkstyle configuration and suppression files for parent POMs and standalone builds.
+Implementation: `quality/src/main/resources/net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml`,
+`quality/src/main/resources/net/openhft/quality/checkstyle26/checkstyle-suppressions.xml`,
+`quality/src/main/resources/net/openhft/quality/checkstyle26/checkstyle-suppressions-tests.xml`.
+
+*QUALITY-REQ-003* Local build compatibility :: The bootstrap problem (Checkstyle custom check not on the classpath when compiling the module that defines it) is solved by Maven compilation order: the quality module compiles before consuming modules, so the custom check class is always available. A separate no-custom-check configuration is no longer required.
+Implementation: `quality/pom.xml` (standard compilation).
+
+*QUALITY-REQ-004* Meaningful Message check :: Provide the `MeaningfulMessageCheck` extension and message bundle for message-quality enforcement in Chronicle builds, including advice text and rank resources for aggregated reporting.
+Implementation: `quality/src/main/java/net/openhft/quality/MeaningfulMessageCheck.java`,
+`quality/src/main/resources/net/openhft/quality/messages.properties`,
+`quality/src/main/resources/net/openhft/quality/mm-advice.properties`,
+`quality/src/main/resources/net/openhft/quality/mm-advice-ranks.properties`.
+
+*QUALITY-REQ-005* Documentation set :: Provide developer guidance under `src/main/docs`, including Meaningful Message check documentation and PMD suppression guidance.
+Documentation in `src/main/docs` is not packaged in the release JAR.
+
+*QUALITY-REQ-006* Self-check baseline warnings :: Keep Meaningful Message self-check coverage stable by sourcing expected violations exclusively from `SelfCheckFixture`, so the self test can distinguish a broken check (no warnings found) from a clean codebase (no warnings expected) by always providing intentional violations.
+Implementation: `quality/src/test/java/net/openhft/quality/QualityCheckstyleSelfTest.java`,
+`quality/src/test/java/net/openhft/quality/selfcheck/SelfCheckFixture.java`.
+
+== Non-Functional Requirements
+
+=== Operational Requirements
+
+*QUALITY-NF-O-001* Centralised reuse :: Parent POMs and downstream builds should consume configuration resources from this module to avoid duplicated rule sets and drift.
+
+*QUALITY-NF-O-002* Configurable enforcement :: Quality plugins must support the
+`quality.enforced` property to switch between warning-only and build-breaking enforcement, and parent POMs must bind the checks under a `quality` profile so they only run when explicitly enabled.
+
+*QUALITY-NF-O-003* Documentation currency :: When rule sets or guidance change, update documentation in `src/main/docs` in the same change set.
+
+== Toolchain Expectations
+
+* Maven builds using Checkstyle, SpotBugs, and PMD
+* Chronicle parent POMs wire configuration paths and gate checks under the `quality` profile using `quality.enforced`

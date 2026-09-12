@@ -1,0 +1,47 @@
+= Decision Log
+Chronicle Software
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Recorded Decisions
+
+=== QUALITY-DEC-001 Centralised quality configuration module
+
+Date:: 2025-12-24
+Context:: Chronicle modules need consistent static analysis configuration across repositories.
+Duplicated rule sets drift over time and increase maintenance effort.
+Decision Statement:: Maintain a dedicated `quality` module that packages shared Checkstyle,
+SpotBugs, and PMD configuration resources and documentation.
+Alternatives Considered::
+* Per-project configuration:
+** *Pros:* Local control per repository.
+** *Cons:* Drift, duplicated effort, inconsistent standards.
+* External shared repository:
+** *Pros:* Single source of truth outside the build.
+** *Cons:* Extra release and versioning overhead for every consumer.
+Rationale for Decision:: Centralised resources reduce boilerplate and keep standards aligned.
+Impact & Consequences:: Updates to quality rules must be coordinated with consumer upgrades.
+Documentation in `src/main/docs` must stay in sync with rule changes.
+Notes/Links:: See requirement `QUALITY-REQ-001` in project-requirements.adoc.
+
+=== QUALITY-DEC-002 Checkstyle no-custom baseline for local builds
+
+Date:: 2025-12-24
+Context:: The quality module builds custom Checkstyle extensions, which are not yet available
+on the classpath when Checkstyle runs during the same build.
+Decision Statement:: Provide a baseline Checkstyle configuration that excludes custom checks
+and override the module build to use it.
+Alternatives Considered::
+* Skip Checkstyle for this module:
+** *Pros:* Simpler build.
+** *Cons:* Loses quality enforcement for the module itself.
+* Publish a prebuilt custom check artefact:
+** *Pros:* Enables full baseline use during the build.
+** *Cons:* Adds bootstrapping complexity and release steps.
+Rationale for Decision:: A no-custom baseline keeps local builds clean without extra artefacts.
+Impact & Consequences:: The module uses the full baseline once published, but a reduced baseline
+for its own build.
+Notes/Links:: `quality/src/main/resources/net/openhft/quality/checkstyle26/chronicle-baseline-checkstyle.xml`,
+`quality/pom.xml`.

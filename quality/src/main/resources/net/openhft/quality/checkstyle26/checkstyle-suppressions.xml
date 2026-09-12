@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Quality module: suppress its own MeaningfulMessage check because the quality module's own
+         source contains many example/internal strings that would produce circular violations.
+         VariableDeclarationUsageDistance is also suppressed because the processor has inherent
+         long-distance variables for legitimate reasons. Checkstyle matches on file paths so the
+         file-path regex below is sufficient; a dot-notation backup is not needed. -->
+    <suppress checks="MeaningfulMessage|VariableDeclarationUsageDistance"
+              files=".*[\\/]net[\\/]openhft[\\/]quality[\\/](mm[\\/].*|MeaningfulMessageCheck\\.java|MeaningfulMessageCheckTest\\.java|QualityCheckstyleSelfTest\\.java|package-info\\.java)"/>
+
+    <!-- Chronicle-Core backward-compatibility shims -->
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]core[\\/]pool[\\/]ClassAliasPool\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]core[\\/]pool[\\/]ClassAliasPoolTest\\.java"/>
+
+    <!-- Chronicle-Bytes low-level helpers (naming / VDU distance intentionally non-standard) -->
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]Bytes\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]internal[\\/]BytesInternal\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]BinaryWireCode\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]ref[\\/]BinaryIntArrayReference\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]ref[\\/]BinaryLongArrayReference\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]bytes[\\/]BytesMarshallable\\.java"/>
+
+    <!-- Zero-Allocation-Hashing API-compatibility (method names) -->
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]hashing[\\/]LongHashFunction\\.java"/>
+
+    <!-- Java-Thread-Affinity JNA / OS bindings (names match native APIs) -->
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]affinity[\\/]impl[\\/]LinuxHelper\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]affinity[\\/]impl[\\/]SolarisJNAAffinity\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]affinity[\\/]impl[\\/]WindowsJNAAffinity\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]affinity[\\/]impl[\\/]PosixJNAAffinity\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]affinity[\\/]impl[\\/]OSXJNAAffinity\\.java"/>
+
+    <!-- Posix JNR/JNA interfaces (method/type names mirror native layer) -->
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]posix[\\/]PosixAPI\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]posix[\\/]internal[\\/]jnr[\\/]WinJNRPosixInterface\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]posix[\\/]internal[\\/]jnr[\\/]Kernel32JNRInterface\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]posix[\\/]internal[\\/]jnr[\\/]JNRPosixInterface\\.java"/>
+
+    <!-- Chronicle-Wire core APIs & tests with intentional naming / examples -->
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]Marshallable\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]ValueOut\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]SelfDescribingTriviallyCopyable\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]marshallable[\\/]This0AsTransientTest\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]ReadmeChapter1Test\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]wire[\\/]TextWireTest\\.java"/>
+
+    <!-- Chronicle-Map generated compiled contexts -->
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledReplicatedMapIterationContext\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledReplicatedMapQueryContext\\.java"/>
+    <suppress checks=".*" files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledMapQueryContext\\.java"/>
+    <suppress checks=".*"
+              files=".*/net[\\/]openhft[\\/]chronicle[\\/]map[\\/]impl[\\/]CompiledMapIterationContext\\.java"/>
+
+    <suppress checks="CommentsIndentation" files=".*/src/test/.*"/>
+    <suppress checks="VariableDeclarationUsageDistance" files=".*/src/test/.*"/>
+</suppressions>

@@ -1,0 +1,65 @@
+/*
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ */
+package net.openhft.quality.mm;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+
+/**
+ * Base class for message extractors providing common context and sink access.
+ */
+public abstract class AbstractMessageExtractor {
+    private final MessageExtractionContext context;
+    private final MessageCandidateSink sink;
+    private final MessageAstSupport astSupport;
+
+    /**
+     * Create an extractor with the given context and sink.
+     *
+     * @param context extraction context with imports and type information.
+     * @param sink    sink to receive message candidates.
+     */
+    protected AbstractMessageExtractor(MessageExtractionContext context,
+                                       MessageCandidateSink sink) {
+        this.context = context;
+        this.sink = sink;
+        this.astSupport = context.astSupport();
+    }
+
+    /**
+     * Return the extraction context.
+     *
+     * @return the extraction context.
+     */
+    protected final MessageExtractionContext context() {
+        return context;
+    }
+
+    /**
+     * Return the candidate sink.
+     *
+     * @return the candidate sink.
+     */
+    protected final MessageCandidateSink sink() {
+        return sink;
+    }
+
+    /**
+     * Emit a debug signal for an unhandled extraction case.
+     *
+     * @param ast    AST node related to the unhandled case.
+     * @param reason description of the unhandled case.
+     */
+    protected final void emitUnhandled(DetailAST ast, String reason) {
+        sink.emitUnhandled(ast, reason);
+    }
+
+    /**
+     * Return AST support utilities.
+     *
+     * @return AST support utilities.
+     */
+    protected final MessageAstSupport astSupport() {
+        return astSupport;
+    }
+}
