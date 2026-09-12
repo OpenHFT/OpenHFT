@@ -33,20 +33,20 @@
     </description>
     <properties>
         <chronicle.network.version>2026.3</chronicle.network.version>
-        <chronicle.queue.version>2026.1</chronicle.queue.version>
-        <chronicle.zero.version>2026.0</chronicle.zero.version>
+        <chronicle.queue.version>2026.6</chronicle.queue.version>
+        <chronicle.zero.version>2026.1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2026.1</chronicle.wire.enterprise.version>
-        <chronicle.queue.enterprise.version>2026.3-SNAPSHOT</chronicle.queue.enterprise.version>
-        <chronicle.ring.version>2026.1</chronicle.ring.version>
-        <chronicle.fix.version>2026.3</chronicle.fix.version>
-        <chronicle.services.version>2026.3</chronicle.services.version>
+        <chronicle.queue.enterprise.version>2026.5</chronicle.queue.enterprise.version>
+        <chronicle.ring.version>2026.2</chronicle.ring.version>
+        <chronicle.fix.version>2026.14</chronicle.fix.version>
+        <chronicle.services.version>2026.7</chronicle.services.version>
         <chronicle.logger.version>2026.0</chronicle.logger.version>
-        <chronicle.efx.version>2026.2</chronicle.efx.version>
+        <chronicle.efx.version>2026.4</chronicle.efx.version>
         <chronicle.matching.engine.version>2026.0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2026.1</chronicle.platform.version>
-        <chronicle.market.data.distributor.version>2026.0</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2026.4-SNAPSHOT</chronicle.core.version>
-        <chronicle.itch.adapters.version>2026.0</chronicle.itch.adapters.version>
+        <chronicle.platform.version>2026.5</chronicle.platform.version>
+        <chronicle.market.data.distributor.version>2026.1</chronicle.market.data.distributor.version>
+        <chronicle.core.version>2026.6</chronicle.core.version>
+        <chronicle.itch.adapters.version>2026.2</chronicle.itch.adapters.version>
         <chronicle.extensions.version>2026.0</chronicle.extensions.version>
     </properties>
 
@@ -95,7 +95,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2026.3</version>
+                <version>2026.4</version>
             </dependency>
 
             <dependency>
@@ -107,7 +107,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2026.4</version>
+                <version>2026.10-SNAPSHOT</version>
             </dependency>
 
             <dependency>
