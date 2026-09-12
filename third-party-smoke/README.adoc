@@ -1,0 +1,32 @@
+= Third-party compatibility smoke tests
+
+This test-only module probes selected dependencies managed by the sibling BOM.
+Run it from the OpenHFT reactor so Maven uses that source BOM, rather than an
+unrelated locally installed snapshot:
+
+[source,bash]
+----
+mvn -B -nsu -pl third-party-bom,third-party-smoke -am verify -l smoke-verify.log
+----
+
+Execute the command on Java 8 and a supported newer JDK. Compiling to Java 8
+bytecode on a newer JDK alone does not qualify execution on Java 8.
+
+The suite checks HSQLDB JDBC operations using its managed `jdk8` classifier;
+Gson, YAML and BSON round trips; Mockito stubbing and verification; an owned
+loopback HTTP exchange; Netty decoding, buffer release and event-loop execution;
+and JUnit discovery and successful execution. Launcher negative controls require
+intentional failures and aborts to be rejected. No external database is contacted.
+
+The bytecode rule runs during `validate`, scans direct and transitive dependencies
+including test scope, and has no whole-artifact exclusions. Versioned classes in
+multi-release JARs are handled by the rule's Java-version selection. Operational
+qualification also needs direct and transitive incompatible-dependency controls.
+
+No class-presence, inline-agent, native-capability or competing logging-provider
+probes are included. No environmental failure is converted to a capability skip.
+This bounded suite does not qualify every BOM entry or a packaged Chronicle
+consumer. Commons Compress has a separate real consumer test in the BOM.
+
+The module is not deployed. It adds no production implementation classes and
+inherits the existing parent build policy without changing it.
