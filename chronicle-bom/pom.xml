@@ -676,7 +676,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>2026.2</version>
+                <version>2026.3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
