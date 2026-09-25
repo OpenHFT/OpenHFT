@@ -63,6 +63,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Consumed by qualified child test executions; these properties do not enable parallel tests. -->
+        <chronicle.test.forkCount>8</chronicle.test.forkCount>
+        <chronicle.test.reuseForks>true</chronicle.test.reuseForks>
         <!--
             By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
             contain the arguments necessary to run the Chronicle libraries
