@@ -513,10 +513,10 @@
         <profile>
             <id>java17</id>
             <activation>
-                <jdk>[17,)</jdk>
+                <jdk>[17,25)</jdk>
             </activation>
             <properties>
-                <!-- Required JVM args for Java 17+ -->
+                <!-- Required JVM args for Java 17-24 -->
                 <jvm.requiredArgs>
                     --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED
                     --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
@@ -530,6 +530,62 @@
                     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
                     --add-opens=java.base/java.util=ALL-UNNAMED
                     --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+                    --add-opens=java.base/java.nio.channels.spi=ALL-UNNAMED
+                    --enable-native-access=ALL-UNNAMED
+                </jvm.requiredArgs>
+            </properties>
+        </profile>
+        <profile>
+            <id>java25</id>
+            <activation>
+                <jdk>[25,26)</jdk>
+            </activation>
+            <properties>
+                <!-- The Unsafe option cannot be used across the Java 17-24 band. -->
+                <!-- Required JVM args for Java 25 -->
+                <jvm.requiredArgs>
+                    --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-exports=java.base/jdk.internal.util=ALL-UNNAMED
+                    --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+                    --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                    --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                    --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
+                    --add-opens=java.base/java.io=ALL-UNNAMED
+                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+                    --add-opens=java.base/java.util=ALL-UNNAMED
+                    --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+                    --add-opens=java.base/java.nio.channels.spi=ALL-UNNAMED
+                    --enable-native-access=ALL-UNNAMED
+                    --sun-misc-unsafe-memory-access=allow
+                </jvm.requiredArgs>
+            </properties>
+        </profile>
+        <profile>
+            <id>java26</id>
+            <activation>
+                <jdk>[26,)</jdk>
+            </activation>
+            <properties>
+                <!-- Required JVM args for Java 26+ -->
+                <jvm.requiredArgs>
+                    --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED
+                    --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
+                    --add-exports=java.base/jdk.internal.util=ALL-UNNAMED
+                    --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+                    --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                    --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+                    --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
+                    --add-opens=java.base/java.io=ALL-UNNAMED
+                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+                    --add-opens=java.base/java.util=ALL-UNNAMED
+                    --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+                    --add-opens=java.base/java.nio.channels.spi=ALL-UNNAMED
+                    --enable-native-access=ALL-UNNAMED
+                    --sun-misc-unsafe-memory-access=allow
+                    --enable-final-field-mutation=ALL-UNNAMED
                 </jvm.requiredArgs>
             </properties>
         </profile>
