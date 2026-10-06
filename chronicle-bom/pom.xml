@@ -89,7 +89,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2026.3</version>
+                <version>2026.4-SNAPSHOT</version>
             </dependency>
 
             <dependency>
