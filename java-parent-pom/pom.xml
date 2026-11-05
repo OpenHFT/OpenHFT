@@ -11,12 +11,12 @@
     <parent>
         <groupId>net.openhft</groupId>
         <artifactId>root-parent-pom</artifactId>
-        <version>2026.0</version>
+        <version>2026.0.1-sonar-SNAPSHOT</version>
         <relativePath />
     </parent>
 
     <artifactId>java-parent-pom</artifactId>
-    <version>2026.0</version>
+    <version>2026.0.1-sonar-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Java Parent POM</name>
