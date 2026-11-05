@@ -20,7 +20,7 @@
 
     <groupId>net.openhft</groupId>
     <artifactId>root-parent-pom</artifactId>
-    <version>2026.0.1-sonar-SNAPSHOT</version>
+    <version>2026.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenHFT/Root Parent POM</name>
