@@ -63,6 +63,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Consumed by qualified child test executions; these properties do not enable parallel tests. -->
+        <chronicle.test.forkCount>8</chronicle.test.forkCount>
+        <chronicle.test.reuseForks>true</chronicle.test.reuseForks>
         <!-- Empty until JaCoCo prepares the agent; Surefire resolves it at fork time. -->
         <surefireArgLine />
         <!--

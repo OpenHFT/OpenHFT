@@ -1,0 +1,48 @@
+= Shared build-performance settings
+
+The root parent defines `chronicle.test.forkCount=8` and `chronicle.test.reuseForks=true` for qualified child test executions.
+Defining these properties does not change Surefire's global configuration or enable parallel tests in existing consumers.
+A child opts in by referencing them in its ordinary-test execution:
+
+[source,xml]
+----
+<configuration>
+    <forkCount>${chronicle.test.forkCount}</forkCount>
+    <reuseForks>${chronicle.test.reuseForks}</reuseForks>
+</configuration>
+----
+
+Keep the ordinary and serial test selections in the child project.
+Exception executions use a literal `forkCount=1` and `reuseForks=false` and run after the ordinary execution.
+Each participating project retains a full `test-serial` fallback and its existing explicit-test/debug behaviour.
+Project-specific variants, discovery patterns, packaged-JAR checks and platform exceptions also remain local.
+The parent's `sonar` coverage configuration is unchanged; qualify that route separately when adopting a test split.
+
+Use `-T1` for test stages: Maven reactor parallelism can multiply Surefire worker pools.
+CI must invoke every named execution belonging to the project's split.
+A bare `surefire:test` invocation does not select execution-level configuration automatically.
+For a matched ordinary-pool comparison, pass `-Dchronicle.test.forkCount=4` or `8` with `-Dchronicle.test.reuseForks=true` to the same complete goal sequence.
+Preserve test identities, skips, variants and artifact inputs when measuring elapsed time.
+
+== Adopting the parent
+
+OpenHFT Java projects inherit through `java-parent-pom`.
+Enterprise Java projects inherit through `software.chronicle:chronicle-enterprise-root-pom`, maintained in ChronicleSoftware/RootPom.
+Both intermediate parents currently pin `root-parent-pom:2026.0`; these shared properties are introduced in the next root-parent development version.
+Publish and adopt the intended root version in both intermediate parents, then update the consumers' explicit parent versions before removing their repeated worker-property defaults.
+Editing a BOM or building all parent modules does not replace those parent references.
+This change does not alter parent coordinates or release any artifacts.
+
+== Avoiding repeated source generation
+
+`java-parent-pom` already attaches the main source archive using `source:jar-no-fork` during package.
+Its released `2026.0` parent still uses `source:jar`, so consumers may need a local override until they adopt the updated parent.
+The enterprise parent attaches both main and test sources and needs `jar-no-fork` and `test-jar-no-fork` respectively.
+Preserve both existing source classifiers when removing local overrides after a parent update.
+
+Compare effective POMs and produced class, resource and source contents when adopting parent versions.
+Preserve validation, assertions, failure handling and release/obfuscation routes.
+Javadoc deduplication belongs in CI where a redundant invocation exists; keep the lifecycle attachment or sole documentation check.
+
+See the https://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html[Surefire fork documentation]
+and https://maven.apache.org/plugins/maven-source-plugin/jar-no-fork-mojo.html[non-forking source goal].
