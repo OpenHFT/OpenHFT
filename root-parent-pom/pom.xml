@@ -66,6 +66,8 @@
         <!-- Consumed by qualified child test executions; these properties do not enable parallel tests. -->
         <chronicle.test.forkCount>8</chronicle.test.forkCount>
         <chronicle.test.reuseForks>true</chronicle.test.reuseForks>
+        <!-- Empty until JaCoCo prepares the agent; Surefire resolves it at fork time. -->
+        <surefireArgLine />
         <!--
             By default (on Java 8) ${jvm.requiredArgs} is an empty string, on other javas it will
             contain the arguments necessary to run the Chronicle libraries
@@ -366,7 +368,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>${surefireArgLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
+                            <argLine>@{surefireArgLine} ${jvm.requiredArgs} -Djvm.coverage=true</argLine>
                             <forkCount>1</forkCount>
                             <reuseForks>false</reuseForks>
                         </configuration>
