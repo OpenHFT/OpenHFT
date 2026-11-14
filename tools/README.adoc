@@ -1,0 +1,29 @@
+= Optional module verification
+
+Use Python 3.9+ and the selected JDK/Maven on Windows or Linux.
+Check out repositories as siblings, build/install the source dependencies first,
+and review `optional-modules.json` against the selected revisions. A missing
+repository or POM fails visibly; private modules require authorized source access.
+The manifest is a starting inventory, not proof that every repository is present.
+Add all separately distributed demo POMs (including `pom-siab.xml`) for the branch.
+
+[source,shell]
+----
+python OpenHFT/tools/verify-optional-modules.py OpenHFT/tools/optional-modules.json --workspace . --output verification/windows-jdk21 --local-repository verification/cache
+----
+
+Run the same manifest in separate Windows and Linux jobs, with a distinct cache
+per source stack. Installs are serial; do not replace a cached JAR while another
+JVM consumes it on Windows. Retain results.json and every numbered log on failure.
+An aggregate nonzero exit is mandatory: failures do not become allowlisted skips.
+Run once against the declared release/BOM baseline and once against the reviewed
+current source stack. Record revision SHAs and dependency trees with each result.
+
+Package/test verification, bounded JMH smoke and performance measurement are
+separate jobs. A successful build does not establish performance or native C++
+support. Keep platform limitations and missing native artifacts in the inventory.
+Do not run live trading demos from this build runner.
+
+The runner requests zero Surefire retries and rejects fresh Surefire/Failsafe XML
+containing flakyFailure or flakyError, even if a POM hardcodes retries and Maven
+returns success. Inspect effective plugin configuration when adding modules.

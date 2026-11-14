@@ -1,0 +1,211 @@
+[
+  {
+    "name": "Chronicle-Algorithms/measures",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Algorithms/measures/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Bytes/microbenchmarks",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Bytes/microbenchmarks/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Core/benchmarks",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Core/benchmarks/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Wire/demo",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Wire/demo/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Network/jmh",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Network/jmh/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Ring/benchmark",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Ring/benchmark/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Queue-Enterprise/Chronicle-Queue-Enterprise/jmh",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Queue-Enterprise/Chronicle-Queue-Enterprise/jmh/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-FIX/bytes-marshallable-test",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-FIX/bytes-marshallable-test/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Services-Enterprise/copyto-benchmark",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Services-Enterprise/copyto-benchmark/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Services-Demo/",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Services-Demo/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Queue-Demo/",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Queue-Demo/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Ring-Demo/",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Ring-Demo/pom.xml",
+    "arguments": [
+      "-Pbom-version",
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Queue-Zero-Demo/",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Queue-Zero-Demo/pom.xml",
+    "arguments": [
+      "-Pbom-version",
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Wire/marshallingperf",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Wire/marshallingperf/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Wire/microbenchmarks",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Wire/microbenchmarks/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Map/benchmark",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Map/benchmark/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Queue-Enterprise/Chronicle-Queue-Enterprise/load-harness",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Queue-Enterprise/Chronicle-Queue-Enterprise/load-harness/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Queue-Enterprise/QE-Demos",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Queue-Enterprise/QE-Demos/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Queue-Zero",
+    "owner": "OpenHFT",
+    "pom": "Chronicle-Queue-Zero/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-FIX/Chronicle-Fix-Queue-Zero",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-FIX/Chronicle-Fix-Queue-Zero/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-FIX/Chronicle-Fix-Demos",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-FIX/Chronicle-Fix-Demos/pom.xml",
+    "arguments": [
+      "verify",
+      "-Dsort.skip=true"
+    ]
+  },
+  {
+    "name": "Chronicle-Market-Data-Distributor-Demo",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Market-Data-Distributor-Demo/pom.xml",
+    "arguments": [
+      "-Dchronicle.market.data.distributor.version=2026.3-SNAPSHOT",
+      "verify"
+    ]
+  },
+  {
+    "name": "Chronicle-Crypto-Adapters-Demo",
+    "owner": "ChronicleEnterprise",
+    "pom": "Chronicle-Crypto-Adapters-Demo/pom.xml",
+    "arguments": [
+      "-Psource",
+      "verify"
+    ]
+  }
+]
