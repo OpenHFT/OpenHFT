@@ -37,7 +37,7 @@
   },
   {
     "name": "Chronicle-Network/jmh",
-    "owner": "OpenHFT",
+    "owner": "ChronicleEnterprise",
     "pom": "Chronicle-Network/jmh/pom.xml",
     "arguments": [
       "verify",

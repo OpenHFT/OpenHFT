@@ -27,3 +27,12 @@ Do not run live trading demos from this build runner.
 The runner requests zero Surefire retries and rejects fresh Surefire/Failsafe XML
 containing flakyFailure or flakyError, even if a POM hardcodes retries and Maven
 returns success. Inspect effective plugin configuration when adding modules.
+
+Each entry has a 600-second default deadline, overridden by `--timeout-seconds`
+or its `timeout_seconds` field. A timeout stops only the invocation's process tree
+and records exit 124 before continuing. Results include the source SHA and JDK.
+Fresh terminal test failures/errors are rejected even when Maven ignores test
+failures; flaky reports remain failures too. Reports are deduplicated by real path.
+
+Run `python3 -m unittest discover -s tools -p test_verify_optional_modules.py`
+for the POSIX timeout, failed-report and continuation controls.
