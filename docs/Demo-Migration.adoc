@@ -15,8 +15,8 @@ build its matching dependencies before running a current demo.
 |===
 
 Current CSE source also contains embedded tests; these are distinct from the
-standalone Services cookbook. The cookbook's 2026 migration line and historical
-master line have different parents and distributions. Consult their BUILDING
-instructions, rather than assuming the standalone repository is simply an older
-copy of the embedded tests. Archived examples remain historical documentation;
+standalone Services cookbook. Select the intended cookbook branch and consult
+its README and build instructions for the matching parent and distribution.
+The standalone repository is not simply an older copy of the embedded tests.
+Archived examples remain historical documentation;
 this catalogue does not unarchive them or claim live integration compatibility.
