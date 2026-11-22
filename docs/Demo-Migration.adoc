@@ -1,0 +1,22 @@
+= Historical and current demo locations
+
+Archived repositories preserve historical examples; do not use a successful old
+build as evidence of current API support. Select a documented source version and
+build its matching dependencies before running a current demo.
+
+[cols="1,2,2",options="header"]
+|===
+|Historical repository |Current place to inspect |Coverage boundary
+|ChronicleEnterprise/Chronicle-FIX-Demo |ChronicleEnterprise/Chronicle-FIX, Chronicle-Fix-Demos |Current FIX demos are organised differently; inspect their individual configurations. No one-to-one scenario mapping is implied.
+|ChronicleEnterprise/Chronicle-Queue-Enterprise-Demo |ChronicleEnterprise/Chronicle-Queue-Enterprise, QE-Demos |Current replication examples live with the library. Historical launcher paths are not interchangeable.
+|ChronicleEnterprise/Chronicle-Map-Enterprise-Demo |Historical archived repository |No verified feature-equivalent successor established. Preserve the historical version requirements.
+|ChronicleEnterprise/Chronicle-Platform-Demo |ChronicleEnterprise/Chronicle-Services-Demo cookbook for current services examples |Services examples are related material, not a verified replacement for every Platform scenario.
+|ChronicleEnterprise/Chronicle-Datagrid-Demo |Historical archived repository |No verified feature-equivalent successor established.
+|===
+
+Current CSE source also contains embedded tests; these are distinct from the
+standalone Services cookbook. Select the intended cookbook branch and consult
+its README and build instructions for the matching parent and distribution.
+The standalone repository is not simply an older copy of the embedded tests.
+Archived examples remain historical documentation;
+this catalogue does not unarchive them or claim live integration compatibility.
