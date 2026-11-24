@@ -368,7 +368,7 @@
             <dependency>
                 <groupId>org.ops4j.pax.exam</groupId>
                 <artifactId>pax-exam-junit4</artifactId>
-                <version>4.13.5</version>
+                <version>4.14.0</version>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.exam</groupId>
