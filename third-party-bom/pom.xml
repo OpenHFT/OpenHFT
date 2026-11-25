@@ -47,7 +47,7 @@
         <!-- mockito 5.x requires Java 11+ -->
         <mockito.version>4.11.0</mockito.version>
         <prometheus.version>0.16.0</prometheus.version>
-        <opentelemetry.version>1.12.0</opentelemetry.version>
+        <opentelemetry.version>1.67.0</opentelemetry.version>
     </properties>
 
     <dependencyManagement>
