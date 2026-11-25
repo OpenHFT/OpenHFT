@@ -1,6 +1,5 @@
 = Chronicle Overview
 
-See link:docs/Demo-Migration.adoc[Current and historical demo locations].
 See link:docs/Windows-Builds.adoc[Windows source-build prerequisites and troubleshooting].
 
 Chronicle Software provides libraries to help with fast data.
