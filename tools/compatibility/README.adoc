@@ -1,0 +1,24 @@
+= Compatibility checker launcher
+
+JAPICC 2.4 closes the read end of its nested `javap` stderr pipe before reading
+class data. On Unix, a JVM startup banner such as `Picked up _JAVA_OPTIONS` can
+then terminate `javap` with `SIGPIPE`, producing `internal error in parser`.
+
+This launcher ignores `SIGPIPE` only in the checker process tree. It preserves
+all JVM environment options, including heap limits, and forwards arguments and
+the installed checker's exit status. It neither skips nor weakens compatibility
+checking. The installed checker must remain available later in `PATH`.
+
+For a single CI run using an existing checkout, prepend
+`<checkout>/OpenHFT/tools/compatibility` to that run's `PATH` and retain the rest
+of the agent's path. No saved TeamCity configuration or installed tool is changed.
+This also supports consumers of released compatibility plugins until a plugin
+release includes the process-launch fix.
+
+Run `python3 tools/compatibility/verify.py /path/to/jdk` on Unix with the real
+checker installed. Run once with Java 8 and once with Java 25. The test sets
+`_JAVA_OPTIONS=-Xms64m -Xmx512m` and checks duplicate launcher paths and a missing
+checker as well as real compatibility outcomes:
+an unchanged API must produce a report and exit zero; removing a public method
+must report incompatibility and exit one. Without this launcher, the same
+unchanged-API control reproduces the parser error with JAPICC 2.4.
