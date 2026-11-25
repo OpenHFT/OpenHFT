@@ -40,7 +40,7 @@
         <chronicle.ring.version>2026.3</chronicle.ring.version>
         <chronicle.fix.version>2026.16</chronicle.fix.version>
         <chronicle.services.version>2026.9</chronicle.services.version>
-        <chronicle.logger.version>2026.0</chronicle.logger.version>
+        <chronicle.logger.version>2026.1-SNAPSHOT</chronicle.logger.version>
         <chronicle.efx.version>2026.6</chronicle.efx.version>
         <chronicle.matching.engine.version>2026.0</chronicle.matching.engine.version>
         <chronicle.platform.version>2026.6</chronicle.platform.version>
