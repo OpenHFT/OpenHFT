@@ -32,28 +32,22 @@
         chronicle dependencyManagement section.
     </description>
     <properties>
-        <!-- //! This staged BOM retains the shared 2026.0-SNAPSHOT coordinate. Prevent ordinary
-             remote deployment; qualify it with install in an isolated Maven repository until
-             the coordinated CI publication repository is explicitly configured. -->
+        <!-- Install this qualification BOM locally until the isolated snapshot repository is configured. -->
         <maven.deploy.skip>true</maven.deploy.skip>
-        <chronicle.network.version>2026.3</chronicle.network.version>
-        <!-- //! Queue #1739-#1746 form one coordinated landing chain and use this distinct
-             snapshot so downstream CQE builds cannot silently resolve the previous Queue API. -->
+        <chronicle.network.version>2026.5</chronicle.network.version>
         <chronicle.queue.version>2026.10-SNAPSHOT</chronicle.queue.version>
         <chronicle.zero.version>2026.1</chronicle.zero.version>
         <chronicle.wire.enterprise.version>2026.1</chronicle.wire.enterprise.version>
-        <!-- //! CQE #956-#960 compile and test against the coordinated Queue chain above;
-             sharing its visible snapshot generation prevents mixed pre-QUEUE-146 artifacts. -->
         <chronicle.queue.enterprise.version>2026.10-SNAPSHOT</chronicle.queue.enterprise.version>
-        <chronicle.ring.version>2026.2</chronicle.ring.version>
-        <chronicle.fix.version>2026.14</chronicle.fix.version>
-        <chronicle.services.version>2026.7</chronicle.services.version>
-        <chronicle.logger.version>2026.0</chronicle.logger.version>
-        <chronicle.efx.version>2026.4</chronicle.efx.version>
+        <chronicle.ring.version>2026.3</chronicle.ring.version>
+        <chronicle.fix.version>2026.16</chronicle.fix.version>
+        <chronicle.services.version>2026.9</chronicle.services.version>
+        <chronicle.logger.version>2026.1</chronicle.logger.version>
+        <chronicle.efx.version>2026.6</chronicle.efx.version>
         <chronicle.matching.engine.version>2026.0</chronicle.matching.engine.version>
-        <chronicle.platform.version>2026.5</chronicle.platform.version>
-        <chronicle.market.data.distributor.version>2026.1</chronicle.market.data.distributor.version>
-        <chronicle.core.version>2026.6</chronicle.core.version>
+        <chronicle.platform.version>2026.6</chronicle.platform.version>
+        <chronicle.market.data.distributor.version>2026.2</chronicle.market.data.distributor.version>
+        <chronicle.core.version>2026.7</chronicle.core.version>
         <chronicle.itch.adapters.version>2026.2</chronicle.itch.adapters.version>
         <chronicle.extensions.version>2026.0</chronicle.extensions.version>
     </properties>
@@ -97,7 +91,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2026.3</version>
+                <version>2026.5</version>
             </dependency>
 
             <dependency>
@@ -115,7 +109,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2026.10-SNAPSHOT</version>
+                <version>2026.11</version>
             </dependency>
 
             <dependency>
@@ -140,7 +134,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>2026.1</version>
+                <version>2026.2</version>
             </dependency>
 
             <dependency>

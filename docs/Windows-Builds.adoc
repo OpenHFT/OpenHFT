@@ -1,0 +1,86 @@
+= Building Chronicle Projects on Windows
+:toc:
+:sectnums:
+:source-highlighter: rouge
+
+== Java and Maven
+
+The FIX and Queue Enterprise demo wrappers require Maven 3.9.6 or later. The source build has been verified with Maven 3.9.16 on JDK 21.
+Use a full JDK, including `javac` and `javadoc`, and set `JAVA_HOME` to its installation directory.
+Check `java -version`, `javac -version`, and `mvn -version` before starting a build.
+Changes to user environment variables apply to newly started terminals and applications.
+
+A Cygwin-hosted Maven installation can be on PATH while its Windows ACL grants read access but not execute access.
+This produces `Access is denied` for `mvn.cmd`; invoking it through `cmd.exe` can conceal the launcher problem while Jansi still fails to load.
+Inspect the launcher and the Jansi native DLL with `icacls`.
+If this is the cause, grant the current account Read and Execute on those specific files, preserving the other permissions.
+Verify that `mvn -version` works directly and produces no Jansi load error.
+Do not reset permissions recursively or grant broader access than required.
+
+Quote Maven property arguments in PowerShell, especially names containing dots; otherwise PowerShell can split the argument before Maven receives it.
+
+[source,powershell]
+----
+mvn '-Dsort.skip=true' clean install
+----
+
+== Git checkouts
+
+Generated FIX sources can exceed the traditional Windows path limit.
+Enable Git long paths before cloning:
+
+[source,powershell]
+----
+git config --global core.longpaths true
+----
+
+Compatibility fixtures can require exact LF bytes even on Windows.
+Repositories should declare these requirements with `.gitattributes`, for example:
+
+[source,text]
+----
+src/test/resources/compat/*.yaml text eol=lf
+----
+
+For isolated source-build checkouts without complete attributes, disable automatic conversion for that clone:
+
+[source,powershell]
+----
+git -c core.longpaths=true -c core.autocrlf=false clone REPOSITORY_URL DESTINATION
+git -C DESTINATION config core.longpaths true
+git -C DESTINATION config core.autocrlf false
+----
+
+Do not change line endings in an existing working tree without first preserving local edits.
+
+== Snapshot dependency builds
+
+A successful build against released dependencies does not verify a stack of snapshots built from source.
+Record each repository revision, align dependency versions with the checked-out snapshots, and use Maven reactor ordering or install dependencies before dependants.
+Keep any POM changes used to assemble the reactor separate from production fixes.
+The `0.EMPTY` Analytics dependency in Enterprise builds is intentional and must remain empty.
+
+Current Chronicle Network sources are in https://github.com/ChronicleEnterprise/Chronicle-Network[ChronicleEnterprise/Chronicle-Network].
+The old OpenHFT repository does not contain the current development line.
+Use an authenticated connection that can access the Enterprise repositories; do not substitute the old public sources.
+
+== Platform-sensitive checks
+
+Core CPU-model detection uses Windows PowerShell and `Get-CimInstance Win32_Processor` instead of requiring the optional legacy WMIC tool.
+Socket tests must handle partial writes and backpressure and must not assume the operating system can queue every connection before the acceptor runs.
+Hardware-dependent throughput benchmarks belong in an explicit benchmark run, with their assertions retained, rather than gating every developer build.
+Chronicle Network's SSL benchmark can be run with `-DrunSslPerformanceTest=true -Dtest=TransparentSslPerformanceTest`.
+
+Run `mvn clean verify` for a repository check, or `mvn clean install` when its snapshot artifacts are needed by the next source build.
+Keep test failures distinct from compilation or packaging results; a successful packaging run with tests skipped is not a successful test run.
+== Concurrent Maven builds and optional compatibility tooling
+
+On Windows, a running test JVM can hold dependency JARs open in the local Maven repository.
+Do not install a snapshot over the same coordinate while another build is using it: the final atomic rename can fail even after all tests and packaging pass.
+Build dependencies before dependants, or give independent builds separate local repositories with a quoted `-Dmaven.repo.local=...` argument.
+Once the consuming JVM exits, retry installation; do not weaken file permissions to address an open-file lock.
+
+Queue Enterprise's binary-compatibility plugin invokes the external Java API Compliance Checker.
+The checker was not available in this machine's build environment; the plugin reported this as a warning and continued.
+A successful Maven build therefore does not establish binary compatibility with the configured reference release.
+Keep that check in an environment with the checker and reference artifacts configured, and retain its result separately from compilation and unit tests.
