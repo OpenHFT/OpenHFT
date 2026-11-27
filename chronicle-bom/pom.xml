@@ -109,7 +109,7 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2026.11</version>
+                <version>2026.12-SNAPSHOT</version>
             </dependency>
 
             <dependency>
