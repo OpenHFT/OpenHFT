@@ -48,6 +48,22 @@
         <chronicle.core.version>2026.7</chronicle.core.version>
         <chronicle.itch.adapters.version>2026.2</chronicle.itch.adapters.version>
         <chronicle.extensions.version>2026.0</chronicle.extensions.version>
+        <chronicle.test.framework.version>2026.2</chronicle.test.framework.version>
+        <posix.version>2026.2</posix.version>
+        <chronicle.analytics.version>2026.2</chronicle.analytics.version>
+        <chronicle.threads.version>2026.5</chronicle.threads.version>
+        <chronicle.bytes.version>2026.4</chronicle.bytes.version>
+        <chronicle.values.version>2026.2</chronicle.values.version>
+        <chronicle.wire.version>2026.11</chronicle.wire.version>
+        <chronicle.algorithms.version>2026.2</chronicle.algorithms.version>
+        <chronicle.map.version>2026.2</chronicle.map.version>
+        <chronicle.fix.tr.sbe.version>2.27ea1</chronicle.fix.tr.sbe.version>
+        <jlbh.version>2026.2</jlbh.version>
+        <affinity.version>2026.2</affinity.version>
+        <compiler.version>2026.2</compiler.version>
+        <assertions.enabled.version>1.0.0</assertions.enabled.version>
+        <assertions.disabled.version>1.0.0</assertions.disabled.version>
+        <zero.allocation.hashing.version>2026.0</zero.allocation.hashing.version>
     </properties>
 
     <dependencyManagement>
@@ -58,19 +74,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-test-framework</artifactId>
-                <version>2026.2</version>
+                <version>${chronicle.test.framework.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>posix</artifactId>
-                <version>2026.2</version>
+                <version>${posix.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-analytics</artifactId>
-                <version>2026.2</version>
+                <version>${chronicle.analytics.version}</version>
             </dependency>
 
             <dependency>
@@ -89,25 +105,25 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-threads</artifactId>
-                <version>2026.5</version>
+                <version>${chronicle.threads.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bytes</artifactId>
-                <version>2026.4</version>
+                <version>${chronicle.bytes.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-values</artifactId>
-                <version>2026.2</version>
+                <version>${chronicle.values.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-wire</artifactId>
-                <version>2026.11</version>
+                <version>${chronicle.wire.version}</version>
             </dependency>
 
             <dependency>
@@ -126,13 +142,13 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-algorithms</artifactId>
-                <version>2026.2</version>
+                <version>${chronicle.algorithms.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-map</artifactId>
-                <version>2026.2</version>
+                <version>${chronicle.map.version}</version>
             </dependency>
 
             <dependency>
@@ -602,7 +618,7 @@
             <dependency>
                 <groupId>software.chronicle</groupId>
                 <artifactId>chronicle-fix-tr-sbe</artifactId>
-                <version>2.27ea1</version>
+                <version>${chronicle.fix.tr.sbe.version}</version>
             </dependency>
 
             <dependency>
@@ -670,19 +686,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>jlbh</artifactId>
-                <version>2026.2</version>
+                <version>${jlbh.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>affinity</artifactId>
-                <version>2026.2</version>
+                <version>${affinity.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>compiler</artifactId>
-                <version>2026.2</version>
+                <version>${compiler.version}</version>
             </dependency>
 
             <dependency>
@@ -896,19 +912,19 @@
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>assertions-enabled</artifactId>
-                <version>1.0.0</version>
+                <version>${assertions.enabled.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>assertions-disabled</artifactId>
-                <version>1.0.0</version>
+                <version>${assertions.disabled.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>zero-allocation-hashing</artifactId>
-                <version>2026.0</version>
+                <version>${zero.allocation.hashing.version}</version>
             </dependency>
 
         </dependencies>
@@ -935,4 +951,45 @@
         <developerConnection>scm:git:git@github.com:OpenHFT/OpenHFT.git</developerConnection>
         <tag>ea</tag>
     </scm>
+    <profiles>
+        <profile>
+            <id>build-all-snapshots</id>
+            <activation>
+                <property>
+                    <name>build-all</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <!-- Match the source reactor versions used by Build All Branch. -->
+            <properties>
+                <chronicle.test.framework.version>2026.3-SNAPSHOT</chronicle.test.framework.version>
+                <posix.version>2026.3-SNAPSHOT</posix.version>
+                <chronicle.analytics.version>2026.3-SNAPSHOT</chronicle.analytics.version>
+                <chronicle.core.version>2026.8-SNAPSHOT</chronicle.core.version>
+                <chronicle.threads.version>2026.6-SNAPSHOT</chronicle.threads.version>
+                <chronicle.bytes.version>2026.5-SNAPSHOT</chronicle.bytes.version>
+                <chronicle.values.version>2026.3-SNAPSHOT</chronicle.values.version>
+                <chronicle.wire.version>2026.12-SNAPSHOT</chronicle.wire.version>
+                <chronicle.network.version>2026.6-SNAPSHOT</chronicle.network.version>
+                <chronicle.algorithms.version>2026.3-SNAPSHOT</chronicle.algorithms.version>
+                <chronicle.map.version>2026.3-SNAPSHOT</chronicle.map.version>
+                <chronicle.queue.version>2026.10-SNAPSHOT</chronicle.queue.version>
+                <chronicle.zero.version>2026.2-SNAPSHOT</chronicle.zero.version>
+                <chronicle.queue.enterprise.version>2026.7-SNAPSHOT</chronicle.queue.enterprise.version>
+                <chronicle.matching.engine.version>2026.1-SNAPSHOT</chronicle.matching.engine.version>
+                <chronicle.ring.version>2026.4-SNAPSHOT</chronicle.ring.version>
+                <chronicle.fix.version>2026.17-SNAPSHOT</chronicle.fix.version>
+                <chronicle.services.version>2026.10-SNAPSHOT</chronicle.services.version>
+                <chronicle.fix.tr.sbe.version>2026.0-SNAPSHOT</chronicle.fix.tr.sbe.version>
+                <jlbh.version>2026.3-SNAPSHOT</jlbh.version>
+                <affinity.version>2026.3-SNAPSHOT</affinity.version>
+                <compiler.version>2026.3-SNAPSHOT</compiler.version>
+                <chronicle.logger.version>2026.2-SNAPSHOT</chronicle.logger.version>
+                <chronicle.efx.version>2026.7-SNAPSHOT</chronicle.efx.version>
+                <assertions.enabled.version>1.0.0-SNAPSHOT</assertions.enabled.version>
+                <assertions.disabled.version>1.0.0-SNAPSHOT</assertions.disabled.version>
+                <zero.allocation.hashing.version>2026.1-SNAPSHOT</zero.allocation.hashing.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>
