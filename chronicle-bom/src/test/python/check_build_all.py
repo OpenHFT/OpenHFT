@@ -64,6 +64,9 @@ def main():
             dependencies = ET.parse(effective).findall('m:dependencyManagement/m:dependencies/m:dependency', NS)
             managed = {(d.findtext('m:artifactId', namespaces=NS), d.findtext('m:type', 'jar', NS)):
                        d.findtext('m:version', namespaces=NS) for d in dependencies}
+            # Build All does not build Core's standalone assertion modules.
+            for artifact in ('assertions-enabled', 'assertions-disabled'):
+                assert managed[(artifact, 'jar')] == '1.0.0', (label, artifact, managed[(artifact, 'jar')])
             queue = managed[('chronicle-queue', 'jar')]
             assert queue == managed[('chronicle-queue', 'test-jar')], (label, 'Queue main/test mismatch')
             if label == 'override':

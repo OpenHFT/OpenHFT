@@ -34,6 +34,10 @@ Normal consumers use the released dependency versions in this BOM.
 development snapshots for the coordinated source build. The existing TeamCity
 Build All Branch job already supplies this flag.
 
+The standalone `assertions-enabled` and `assertions-disabled` modules retain
+release 1.0.0: Build All does not build those modules, so selecting their
+unpublished snapshots would block dependency resolution before compilation.
+
 Build and install the producer repositories before their consumers, using the
 same branch where available. Keep Queue's main and test jars from the same build.
 Snapshot names alone do not prove which source revision supplied an artifact;

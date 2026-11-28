@@ -986,8 +986,6 @@
                 <compiler.version>2026.3-SNAPSHOT</compiler.version>
                 <chronicle.logger.version>2026.2-SNAPSHOT</chronicle.logger.version>
                 <chronicle.efx.version>2026.7-SNAPSHOT</chronicle.efx.version>
-                <assertions.enabled.version>1.0.0-SNAPSHOT</assertions.enabled.version>
-                <assertions.disabled.version>1.0.0-SNAPSHOT</assertions.disabled.version>
                 <zero.allocation.hashing.version>2026.1-SNAPSHOT</zero.allocation.hashing.version>
             </properties>
         </profile>
