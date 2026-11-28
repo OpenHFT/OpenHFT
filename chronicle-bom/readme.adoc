@@ -26,3 +26,34 @@ https://github.com/issues?page=1&q=is%3Aopen+is%3Aissue+archived%3Afalse+user%3A
 == All PRs
 
 https://github.com/pulls?q=is%3Aopen+is%3Apr+user%3AOpenHFT+user%3AChronicleEnterprise+user%3AChronicleSoftware
+
+== Coordinated source builds
+
+Normal consumers use the released dependency versions in this BOM.
+`-Dbuild-all=true` activates `build-all-snapshots`, which selects the current
+development snapshots for the coordinated source build. The existing TeamCity
+Build All Branch job already supplies this flag.
+
+The standalone `assertions-enabled` and `assertions-disabled` modules retain
+release 1.0.0: Build All does not build those modules, so selecting their
+unpublished snapshots would block dependency resolution before compilation.
+
+Build and install the producer repositories before their consumers, using the
+same branch where available. Keep Queue's main and test jars from the same build.
+Snapshot names alone do not prove which source revision supplied an artifact;
+record producer revisions and artifact hashes when qualifying a composition.
+
+Update the snapshot properties when producer development versions advance.
+`-Dbuild-all=false` leaves the release selection unchanged. An explicit Maven
+property, such as `-Dchronicle.queue.version=...`, still takes precedence.
+
+The imported-BOM controls exercise Maven's actual profile activation, Queue
+main/test alignment and explicit property precedence. Run them with each JDK:
+
+[source,shell]
+----
+python chronicle-bom/src/test/python/check_build_all.py --repository /path/to/isolated/maven-cache
+----
+
+On Windows, add `--maven C:/path/to/mvn.cmd` if Maven is not on `PATH`.
+The check stages a unique local BOM coordinate and does not publish artifacts.
