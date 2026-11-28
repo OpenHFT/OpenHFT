@@ -39,6 +39,11 @@ For us to accept contributions to open source libraries we require contributors 
 
 https://chronicle.software/contributor-agreement/
 
+== Coordinated source builds
+
+See link:chronicle-bom/readme.adoc[the BOM source-build selection] for the
+`build-all` snapshot profile and its consumer checks.
+
 == Documentation in this repo
 
 This repo contains the following docs
